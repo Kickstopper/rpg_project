@@ -1,0 +1,34 @@
+using UnityEngine;
+using System.Collections.Generic;
+namespace Data
+{
+    [System.Serializable]
+    public struct WallAnimConfig
+    {
+        public string name;         
+        public int baseTexId;       // 기본 텍스처 ID
+        public int altTexId;        // 바뀔 텍스처 ID
+        public float minInterval;   
+        public float maxInterval;   
+    }
+
+    [CreateAssetMenu(fileName = "NewTheme", menuName = "Dungeon/DungeonTheme")]
+    public class DungeonTheme : ScriptableObject
+    {
+        [Header("텍스처 설정")]
+        public string themeName; // 예: "지하 1층 - 하수구"
+        
+        public Texture2D background; // 던전 아래에 깔릴 스카이박스
+        public Texture2D[] texture;
+        public int floorTexIdx = 1;   // 바닥 텍스처 인덱스
+        public int ceilingTexIdx = 2; // 천장 텍스처 인덱스
+        
+        [Header("Animations")]
+        public List<WallAnimConfig> wallAnimations; // 테마별 애니메이션 설정
+
+        [Header("환경 설정")]
+        public Color fogColor = Color.black; // 심도 표현을 위한 안개의 색
+        public BgmID bgmID;                  // 이 레벨에서 재생될 BGM
+        public List<string> monsterList;     // 출현하는 몬스터의 ID 목록
+    }
+}

@@ -1,0 +1,4 @@
+MapID,X,Y,EventID,Repeatable,Description
+Dungeon_F1,3,5,EVT_GUARD_MEET,FALSE,경비병 조우 (최초 1회만)
+Dungeon_F1,10,10,EVT_FOUNTAIN,TRUE,회복의 샘 (반복 가능)
+Dungeon_F2,5,2,EVT_BOSS_WARNING,FALSE,보스방 앞 경고

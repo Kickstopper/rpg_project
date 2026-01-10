@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
+  m_Name: basement
+  m_EditorClassIdentifier: 
+  themeName: basement
+  background: {fileID: 0}
+  texture:
+  - {fileID: 2800000, guid: 4603e34b45171b24ea3050ff20670123, type: 3}
+  - {fileID: 2800000, guid: a49e2fa3360deaf47b9b988ff67876f4, type: 3}
+  - {fileID: 2800000, guid: d74dd02b1ada04e45af62e2906bec55b, type: 3}
+  - {fileID: 2800000, guid: 0beed1f1e8c213042b6a8dc53eb96503, type: 3}
+  - {fileID: 2800000, guid: 47feb6709f874be47902943f547d2a94, type: 3}
+  - {fileID: 2800000, guid: 6e633d473ea81d04a9b6aa09c6579b8e, type: 3}
+  floorTexIdx: 5
+  ceilingTexIdx: 4
+  wallAnimations: []
+  fogColor: {r: 0, g: 0, b: 0, a: 1}
+  bgmID: 9
+  monsterList:
+  - 006
+  - 007
+  - 008
+  - 009
+  - 010

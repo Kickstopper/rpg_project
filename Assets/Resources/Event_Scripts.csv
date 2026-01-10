@@ -1,0 +1,4 @@
+EventID,Seq,Type,Speaker,Portrait,Text,Condition,Action / Param,NextID
+EVT_GUARD_MEET,1,TALK,Army,npc,Tomare! Tomarinasai!,None,None,2
+EVT_GUARD_MEET,1,TALK,Army,npc,Humu... Omaedattanoka.,None,None,
+EVT_GUARD_MEET,5,TALK,Army,npc,"Yoshi Tottemoyoi!",None,SET_FLAG:passed_guard,END

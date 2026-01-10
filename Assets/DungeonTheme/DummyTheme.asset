@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
+  m_Name: DummyTheme
+  m_EditorClassIdentifier: 
+  themeName: DummyTheme
+  background: {fileID: 0}
+  texture:
+  - {fileID: 2800000, guid: 87cbe03c2d569d3449817b8787af0635, type: 3}
+  - {fileID: 2800000, guid: 66a92645f20c0fe46bb1641e7c050252, type: 3}
+  - {fileID: 2800000, guid: d07420b81bf4bd54ba4f1efeccb6ab2c, type: 3}
+  - {fileID: 2800000, guid: 188bf5825b90a5d409aee05f7a739e08, type: 3}
+  floorTexIdx: 3
+  ceilingTexIdx: 2
+  wallAnimations:
+  - name: anim
+    baseTexId: 0
+    altTexId: 1
+    minInterval: 0.5
+    maxInterval: 1
+  fogColor: {r: 1, g: 1, b: 1, a: 1}
+  bgmID: 8
+  monsterList:
+  - 004
+  - 005
+  - 006
+  - 007
