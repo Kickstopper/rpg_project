@@ -15,6 +15,9 @@ namespace UI.DungeonMapScene
         public SkillData skillData; 
         // public ItemData itemData; // (아이템 구현 시 사용)
 
+        // 아이템 데이터
+        public ConsumableItemData itemData;
+
         public int speed; // 행동 속도 (AGI + 스킬 보정치 + 랜덤 변수)
 
         // 생성자 (편의용)

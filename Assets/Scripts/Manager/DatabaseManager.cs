@@ -13,6 +13,8 @@ namespace Manager
         public ArmorDatabase armorDB;
         public SkillDatabase skillDB;
 
+        public ConsumableDatabase cosumableDB;
+
         void Awake()
         {
             if (Instance == null)
@@ -37,5 +39,6 @@ namespace Manager
         public AmmoData GetAmmo(string id) => ammoDB.GetItem(id);
         public ArmorData GetArmor(string id) => armorDB.GetItem(id);
         public SkillData GetSkill(string id) => skillDB.GetItem(id);
+        public ConsumableItemData GetConsumable(string id) => cosumableDB.GetItem(id);
     }
 }

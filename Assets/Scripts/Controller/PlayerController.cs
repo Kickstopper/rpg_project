@@ -8,7 +8,7 @@ using Data;
 
 namespace Controller
 {
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : BattleEntity
     {
         [Header("UI Objects")]
         public Image bgImage;         // 배경의 사각형 이미지
@@ -20,15 +20,6 @@ namespace Controller
         [Header("Runtime Data")]
         public CharacterDatabase.CharacterEntry sourceData; 
 
-        [Header("Hit Feedback")]
-        // 일반 피격 시 흔들림 강도/시간
-        private float normalShakeMagnitude = 5f; 
-        private float normalShakeDuration = 0.2f;
-
-        // 크리티컬 피격 시 흔들림 강도/시간 (더 세고 길게)
-        private float critShakeMagnitude = 15f;
-        private float critShakeDuration = 0.5f;
-        
         // 현재 배운 스킬 목록 (ID)
         public List<string> learnedSkillIds = new List<string>();
 
@@ -48,37 +39,42 @@ namespace Controller
         // 상태 이상 (Status Effect)
         public List<string> currentStatusEffects = new List<string>();
         public int level = 1;
-        public int currentHp;
-        public int currentMp;
-
-        // 현재 방어 태세인지 확인하는 플래그
-        public bool isGuarding = false;
 
         // 현재 위치 (전열/후열) - 전투 매니저가 세팅해줌
         public RowType currentRow; 
 
-        private Color originalColor; // 원래 색상
-        private Coroutine highlightCoroutine; // 깜빡임 효과 제어용
+        // [BattleEntity 구현] 스탯 반환 (레벨 및 장비 보정 포함)
+        public override int GetTotalStr()
+        {
+            // 예시: 기본STR + 레벨
+            // (장비 추가 시 + GetWeaponBonus() 등으로 확장)
+            return sourceData.baseStats.str + level; 
+        }
+        
+        public override int GetTotalAgi() => sourceData.baseStats.agi + level;
+        public override int GetTotalMag() => sourceData.baseStats.mag + level;
+        public override int GetTotalLuc() => sourceData.baseStats.luc + level;
 
         // 초기화 함수 (CombatManager가 호출)
         public void Initialize(CharacterDatabase.CharacterEntry data, RowType row)
         {
             sourceData = data;
             currentRow = row;
+            entityName = data.name;
             
-            // 이름 설정 (디버그용)
-            gameObject.name = $"{data.name}_{data.id}";
-            
+            // HP/MP 설정
+            maxHp = data.maxHp;
+            maxMp = data.maxMp;
+            currentHp = maxHp;
+            currentMp = maxMp;
+
+            // UI 설정
             faceImage.sprite = data.portraitImage;
             faceImage.SetNativeSize();
-            
-            // 레벨 1 기준 스탯으로 초기화 (저장된 데이터가 있다면 거기서 로드)
             nameText.text = data.name;
-            level = data.baseStats.level; 
-            currentHp = data.maxHp; 
-            currentMp = data.maxMp; // CharacterEntry의 프로퍼티 활용
-
-            originalColor = bgImage.color;
+            level = data.baseStats.level;
+            
+            if (bgImage != null) originalColor = bgImage.color;
 
             UpdateUI();
 
@@ -98,49 +94,34 @@ namespace Controller
             RefreshArmorStats();
         }
 
-        // 외부(CombatManager)에서 호출할 함수
-        public void TriggerHitShake(bool isCritical)
+        // 회복 함수
+        public void Recover(int hpAmount, int mpAmount)
         {
-            // 혹시 이미 흔들리고 있다면 멈추고 새로 시작
-            StopCoroutine("ProcessHitShake");
-
-            float magnitude = isCritical ? critShakeMagnitude : normalShakeMagnitude;
-            float duration = isCritical ? critShakeDuration : normalShakeDuration;
-
-            StartCoroutine(ProcessHitShake(magnitude, duration));
-        }
-
-        // 실제 흔들림을 수행하는 코루틴
-        private IEnumerator ProcessHitShake(float magnitude, float duration)
-        {
-            // 원래 위치 저장 (흔들린 후 돌아오기 위함)
-            Vector3 originalPos = transform.localPosition;
-            float elapsed = 0f;
-
-            while (elapsed < duration)
+            if (hpAmount > 0)
             {
-                // 랜덤한 방향으로 오프셋 생성
-                // 2D 게임이므로 x, y축으로만 흔들림 적용
-                float xOffset = Random.Range(-1f, 1f) * magnitude;
-                float yOffset = Random.Range(-1f, 1f) * magnitude;
-
-                // 위치 적용 (원래 위치 기준)
-                transform.localPosition = originalPos + new Vector3(xOffset, yOffset, 0);
-
-                elapsed += Time.deltaTime;
-                // 다음 프레임까지 대기 (프레임마다 위치 변경 = 떨림 효과)
-                yield return null; 
+                currentHp = Mathf.Min(currentHp + hpAmount, sourceData.maxHp);
+                // 회복 연출 (텍스트 등)
+                Debug.Log($"{sourceData.name} HP {hpAmount} 회복");
             }
-
-            // 원래 위치로 복구
-            transform.localPosition = originalPos;
+            if (mpAmount > 0)
+            {
+                currentMp = Mathf.Min(currentMp + mpAmount, sourceData.maxMp);
+            }
+            UpdateUI();
         }
 
-        // 턴 시작 시 방어 상태 초기화용 함수
-        public void ResetStatus()
+        // 부활 함수
+        public void Revive(int percent)
         {
-            isGuarding = false;
-            // 추후 다른 일시적 상태이상 해제도 여기서 처리 가능
+            if (currentHp > 0) return; // 이미 살아있음
+
+            int healAmount = Mathf.FloorToInt(sourceData.maxHp * (percent / 100f));
+            currentHp = healAmount;
+            
+            // 죽은 상태(Dead) 플래그 해제 및 UI 복구 로직 필요
+            gameObject.SetActive(true); 
+            UpdateUI();
+            Debug.Log($"{sourceData.name} 부활!");
         }
 
         public void SetHighlightColor(Color color)
@@ -159,45 +140,29 @@ namespace Controller
             }
         }
 
-        // 선택 상태 켜기/끄기
-        public void SetSelectionState(bool isSelected)
+        // [BattleEntity 구현] 선택 강조
+        public override void SetSelectionState(bool isSelected)
         {
-            // 이미지가 없으면 무시
             if (bgImage == null) return;
+            if (highlightCoroutine != null) StopCoroutine(highlightCoroutine);
 
-            // 1. 선택 해제된 경우: 원래 색으로 복구하고 코루틴 정지
-            if (!isSelected)
-            {
-                if (highlightCoroutine != null) StopCoroutine(highlightCoroutine);
-                bgImage.color = originalColor;
-                // 크기도 원래대로 (선택 시 커졌다면 복구)
-                transform.localScale = Vector3.one; 
-                return;
-            }
-
-            // 2. 선택된 경우: 깜빡임 코루틴 시작
             if (isSelected)
             {
-                if (highlightCoroutine != null) StopCoroutine(highlightCoroutine);
                 highlightCoroutine = StartCoroutine(AnimateHighlight());
+            }
+            else
+            {
+                bgImage.color = originalColor;
+                transform.localScale = Vector3.one; 
             }
         }
 
-        // 노란색 <-> 원래색 반복해서 부드럽게 깜빡이는 연출
         IEnumerator AnimateHighlight()
         {
             while (true)
             {
-                // PingPong을 이용해 0~1 사이 값을 오가게 함
                 float time = Mathf.PingPong(Time.time * 5f, 1f); 
-                
-                // 원래색과 선택색(Yellow) 사이를 부드럽게 섞음
                 bgImage.color = Color.Lerp(originalColor, Color.yellow, time);
-                
-                // (선택 사항) 약간 커졌다 작아졌다 하는 연출 추가
-                // float scale = Mathf.Lerp(1.0f, 1.1f, time);
-                // transform.localScale = Vector3.one * scale;
-
                 yield return null;
             }
         }
@@ -227,7 +192,6 @@ namespace Controller
         // =========================================================
         // [장비 관리 메서드]
         // =========================================================
-
         public void EquipWeapon(string weaponId)
         {
             equippedWeaponId = weaponId;
@@ -272,8 +236,7 @@ namespace Controller
         // =========================================================
         // 장비 스탯 반영
         // =========================================================
-
-        public int GetAttack()
+        public override int GetAttack()
         {
             int statAtk = sourceData.baseStats.str;
             int levelBonus = level;
@@ -284,7 +247,7 @@ namespace Controller
             return statAtk + levelBonus + weaponBonus;
         }
 
-        public int GetDefense()
+        public override int GetDefense()
         {
             int statDef = sourceData.baseStats.vit;
             int levelBonus = Mathf.FloorToInt(level * 0.5f);
@@ -299,49 +262,20 @@ namespace Controller
             return statDef + levelBonus + armorBonus;
         }
         
-        public ResistanceData GetResistances()
+        public override ResistanceData GetResistances()
         {
             return sourceData.resistances; 
         }
 
-        // 최종 민첩성(AGI) 반환 (기본 + 레벨 + 장비??)
-        public int GetTotalAgi()
+        // [BattleEntity 구현] 데미지 처리
+        public override IEnumerator OnDamageTaken(int damage)
         {
-            // 현재는 장비에 AGI가 없다고 가정하고 기본+레벨만 계산합니다.
-            // 만약 장비에도 AGI가 붙는다면 GetAttack()처럼 장비 보정치를 더해주세요.
-            return sourceData.baseStats.agi + level;
-        }
+            currentHp = Mathf.Max(0, currentHp - damage);
+            UpdateUI(); 
 
-        // 최종 행운(LUC) 반환
-        public int GetTotalLuc()
-        {
-            return sourceData.baseStats.luc + level;
-        }
+            Debug.Log($"<color=red>{entityName}에게 {damage} 데미지!</color>");
 
-        // 최종 힘(STR) 반환
-        public int GetTotalStr()
-        {
-            // 장비 보정치가 있다면 여기서 더해줍니다.
-            return sourceData.baseStats.str + level; 
-        }
-
-        // 최종 마력(MAG) 반환
-        public int GetTotalMag()
-        {
-            return sourceData.baseStats.mag + level;
-        }
-
-        // 데미지 처리
-        public IEnumerator OnDamageTaken(int damage)
-        {
-            currentHp -= damage;
-            if (currentHp < 0) currentHp = 0;
-            
-            UpdateUI(); // HP바 갱신
-
-            Debug.Log($"<color=red>{sourceData.name}에게 {damage} 데미지!</color> (남은 HP: {currentHp})");
-
-            // 피격 연출 (얼굴이 흔들리거나 붉어짐)
+            // 플레이어 전용 피격 연출 (얼굴 붉어짐)
             if (faceImage)
             {
                 faceImage.color = Color.red;
@@ -351,24 +285,15 @@ namespace Controller
 
             if (currentHp <= 0)
             {
-                Debug.Log($"{sourceData.name} 사망...");
-                // 사망 상태 아이콘 표시 등
+                Debug.Log($"{entityName} 쓰러짐...");
+                // Player는 비활성화 대신 사망 상태(Dead State) 처리 필요
             }
         }
-
+        
         void UpdateUI()
         {
-            if (hpSlider)
-            {
-                hpSlider.maxValue = sourceData.maxHp;
-                hpSlider.value = currentHp;
-            }
-
-            if (mpSlider)
-            {
-                mpSlider.maxValue = sourceData.maxMp;
-                mpSlider.value = currentMp;
-            }
+            if (hpSlider) { hpSlider.maxValue = maxHp; hpSlider.value = currentHp; }
+            if (mpSlider) { mpSlider.maxValue = maxMp; mpSlider.value = currentMp; }
         }
     }
 }

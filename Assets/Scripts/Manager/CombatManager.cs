@@ -15,9 +15,19 @@ namespace Manager
     {
         public static CombatManager Instance;
 
-        [Header("UI Structure")]
+        [Header("UI References")]
         public GameObject baseCmdContainer;   // 1단계 메뉴 (Fight, Talk...)
         public GameObject fightCmdContainer;  // 2단계 메뉴 (Attack, Move...)
+        public BattleItemUIController battleItemUI; // 인스펙터에서 할당
+        public GameObject commandPanel;     // 커맨드 버튼들
+        public GameObject logPanel;         // 시스템 로그 패널
+        public TextMeshProUGUI logText;     // 시스템 안내 메시지 텍스트
+        public GameObject messagePanel;     // 전투 중 캐릭터의 메시지 패널
+        public TextMeshProUGUI messageText; // 전투 중 캐릭터의 메시지 텍스트
+
+        [Header("Prefabs")]
+        public GameObject defaultMonsterPrefab;
+        public GameObject playerPrefab;
 
         [Header("First Focus Buttons")]
         public GameObject baseFirstButton;    // Base 메뉴의 첫 버튼 (Fight 버튼)
@@ -51,26 +61,15 @@ namespace Manager
         private int currentMoveSlotIndex = 0; // 0~2: 전열, 3~5: 후열
 
         [Header("Highlight Colors")]
-        public Color moveSourceColor = Color.green;   // 이동하려는 내 캐릭터 색상 (예: 초록)
-        public Color moveTargetColor = Color.yellow;  // 커서가 가리키는 대상 색상 (예: 노랑)
+        public Color moveSourceColor = Color.gray;   // 이동하려는 내 캐릭터 색상
+        public Color moveTargetColor = Color.cyan;  // 커서가 가리키는 대상 색상
 
         [Header("Slot Management")]
         // 몬스터들의 슬롯을 관리할 리스트 (0,1,2: 전열 / 0,1,2: 후열)
         private List<Transform> frontSlots = new List<Transform>();
         private List<Transform> backSlots = new List<Transform>();
         
-        [Header("Prefabs")]
-        public GameObject defaultMonsterPrefab;
-        public GameObject playerPrefab;
-
-        [Header("UI References")]
-        public GameObject commandPanel;     // 커맨드 버튼들
-        public GameObject logPanel;         // 시스템 로그 패널
-        public TextMeshProUGUI logText;     // 시스템 안내 메시지 텍스트
-        public GameObject messagePanel;     // 전투 중 캐릭터의 메시지 패널
-        public TextMeshProUGUI messageText; // 전투 중 캐릭터의 메시지 텍스트
-
-        [Header("Auto Battle")]
+        private ConsumableItemData currentSelectedItem; // 현재 사용하려는 아이템
         private bool isAutoMode = false; // 오토 모드 활성화 여부
         
         // 각 캐릭터(인덱스)가 마지막으로 수행한 행동 타입 저장
@@ -166,8 +165,6 @@ namespace Manager
             for (int i = 0; i < spawnCount; i++)
             {
                 // 몬스터 ID 풀에서 랜덤 선택 (중복 허용)
-                // 리스트가 적을 때 중복을 피하고 싶다면 별도의 Shuffle 로직이 필요하지만,
-                // 보통 RPG에서는 ["Slime", "Orc"] 풀에서 슬라임 2마리가 나올 수도 있으므로 이 방식이 자연스럽습니다.
                 int randomIndex = Random.Range(0, monsterIds.Count);
                 string selectedId = monsterIds[randomIndex];
 
@@ -360,6 +357,13 @@ namespace Manager
                 if (isAutoMode) return;
                 Time.timeScale = 1.0f;
 
+                // 아이템 UI가 켜져 있다면 CombatManager의 모든 입력을 중단하고 리턴
+                // 이렇게 해야 방향키 입력이 CombatManager로 새지 않고 아이템 UI 안에서만 돕니다.
+                if (battleItemUI != null && battleItemUI.gameObject.activeSelf)
+                {
+                    return; 
+                }
+
                 if (isSelectingTarget)
                 {
                     if (inputCooldown <= 0) HandleTargetSelectionInput();
@@ -373,9 +377,10 @@ namespace Manager
                 {
                     if (inputCooldown <= 0) HandleCommandInput();
                 }
-                
+
+                bool isItemUIPopupActive = (battleItemUI != null && battleItemUI.gameObject.activeSelf);
                 // 포커스 유지 로직 (이동 선택 중이 아닐 때만)
-                if (!isSelectingTarget && !isSelectingMoveTarget && commandPanel.activeSelf)
+                if (!isSelectingTarget && !isSelectingMoveTarget && !isItemUIPopupActive && commandPanel.activeSelf)
                 {
                     MaintainSelection();
                 }
@@ -518,7 +523,133 @@ namespace Manager
         }
 
         public void OnFightCommand_Skill() { Debug.Log("스킬 (미구현)"); }
-        public void OnFightCommand_Item() { Debug.Log("아이템 (미구현)"); }
+        public void OnFightCommand_Item()
+        {
+            if (battleItemUI != null) 
+            {
+                // 1. 뒷배경(커맨드 버튼들) 상호작용 차단
+                // CanvasGroup의 interactable을 끄면 네비게이션이 이쪽으로 절대 넘어오지 않는다.
+                SetContainerInteractable(fightCmdContainer, false);
+
+                // 2. 아이템 UI 열기
+                battleItemUI.Show();
+            }
+        }
+
+        // 아이템 선택이 취소되거나 완료되어 창이 닫힐 때 호출할 함수
+        public void OnItemMenuClosed()
+        {
+            // 1. 뒷배경 상호작용 다시 허용
+            SetContainerInteractable(fightCmdContainer, true);
+
+            // 2. 포커스 복구 (Item 버튼이나 Attack 버튼으로)
+            StartCoroutine(SelectButton(attackButton)); 
+        }
+
+        // 헬퍼 함수: 컨테이너의 상호작용 켜기/끄기
+        void SetContainerInteractable(GameObject container, bool isInteractable)
+        {
+            if (container == null) return;
+            
+            CanvasGroup group = container.GetComponent<CanvasGroup>();
+            if (group != null)
+            {
+                group.interactable = isInteractable;
+                group.blocksRaycasts = isInteractable; // 마우스 클릭도 차단
+            }
+        }
+
+        // 2. 아이템이 선택되었을 때
+        public void OnItemSelected(ConsumableItemData item)
+        {
+            currentSelectedItem = item;
+            
+            // 타겟 선택 로직 재활용을 위해 변수 설정
+            // (PrepareWeaponAction과 유사한 로직)
+            
+            TargetScope scope = item.targetScope;
+            
+            // 범위에 따라 타겟 선택 모드 진입 or 즉시 실행
+            if (scope == TargetScope.OneEnemy || scope == TargetScope.OneAlly || scope == TargetScope.DeadAlly)
+            {
+                // 타겟 선택 모드 시작 (validTargets 세팅 필요)
+                StartItemTargetSelection(scope);
+            }
+            else
+            {
+                // 전체/랜덤/자신 -> 즉시 큐에 등록
+                QueueItemAction(null); // 타겟 null (전체/자신)
+            }
+        }
+
+        // 3. 아이템 타겟팅 준비 (Weapon 타겟팅 로직과 유사하게 구현)
+        // 타겟팅 시작 시 리스트가 비어있으면 에러 방지
+        void StartItemTargetSelection(TargetScope scope)
+        {
+            validTargets.Clear();
+
+            // 1. 타겟 리스트 구성
+            if (scope == TargetScope.OneEnemy)
+            {
+                // 살아있는 몬스터만 추가
+                foreach(var m in activeMonsters) 
+                {
+                    if(m != null && m.currentHp > 0) validTargets.Add(m);
+                }
+            }
+            else if (scope == TargetScope.OneAlly) // 아군 선택 (포션 등)
+            {
+                // 아군 타겟팅 로직 미구현
+            }
+            
+            // 2. 타겟이 한 명도 없으면 모드 진입 차단!
+            if (validTargets.Count == 0)
+            {
+                Debug.LogWarning("사용할 수 있는 대상이 없습니다.");
+                
+                // 안내 메시지 표시
+                if (logPanel)
+                {
+                    logPanel.SetActive(true);
+                    logText.text = "No Target!";
+                    StartCoroutine(HideLogAfterDelay(1.0f));
+                }
+                
+                // 아이템 UI를 다시 켜거나, 취소 처리
+                // 여기서는 아이템 선택 취소로 간주하고 UI 유지
+                return; 
+            }
+            
+            // 3. 타겟이 있을 때만 진입
+            isSelectingTarget = true;
+            currentSelectedAction = CombatAction.ActionType.Item;
+            currentTargetIndex = 0; // 인덱스 초기화
+            UpdateTargetHighlight();
+            
+            // 키 입력 중복 방지 쿨타임
+            inputCooldown = 0.2f;
+        }
+
+        // 로그 자동 숨김 코루틴
+        IEnumerator HideLogAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if(logPanel) logPanel.SetActive(false);
+        }
+
+        // 4. 행동 큐 등록
+        void QueueItemAction(GameObject target)
+        {
+            PlayerController actor = activePlayers[currentPlayerIndex];
+            
+            CombatAction action = new CombatAction(actor.gameObject, target, CombatAction.ActionType.Item, actor.sourceData.baseStats.agi);
+            action.skillData = null; // 스킬 아님
+            // CombatAction 클래스에 public ConsumableItemData itemData; 필드 추가 필요
+            action.itemData = currentSelectedItem; 
+
+            actionQueue.Add(action);
+            NextPlayerInput();
+        }
 
         public void OnFightCommand_Guard()
         {
@@ -1029,7 +1160,7 @@ namespace Manager
                 
                 yield return new WaitForSeconds(1.0f);
 
-                // 전투 종료 및 탐험 상태 복귀 (승리가 아니므로 false 전달하지 않고 바로 종료 처리)
+                // 전투 종료 및 던전 탐색 상태 복귀 (승리가 아니므로 false 전달하지 않고 바로 종료 처리)
                 // EndBattleRoutine을 재활용하거나 직접 종료 로직 수행
                 DungeonStateManager.Instance.ChangeState(GameState.Exploration);
             }
@@ -1347,230 +1478,309 @@ namespace Manager
 
         IEnumerator PerformAction(CombatAction action)
         {
-            // Guard 타입 처리
-            if (action.type == CombatAction.ActionType.Guard)
+            // 액션 타입에 따라 적절한 핸들러 코루틴 실행
+            switch (action.type)
             {
-                var playerActor = action.actor.GetComponent<PlayerController>();
-                if (playerActor != null)
-                {
-                    playerActor.isGuarding = true; // 방어 켜기
-                    
-                    // 연출
-                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click); // 방어 효과음(철그럭?) 추천
-                    logPanel.SetActive(true);
-                    logText.SetText("방어 태세!");
-                    yield return new WaitForSeconds(0.5f);
-                    if (logPanel) logPanel.SetActive(false);
-                }
-                
-                // 2. 몬스터인 경우
-                var monsterActor = action.actor.GetComponent<MonsterController>();
-                if (monsterActor != null)
-                {
-                    monsterActor.isGuarding = true;
-                    
-                    // 몬스터 방어 연출 (로그 or 사운드)
-                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click); // 적절한 방어 사운드
-                    logPanel.SetActive(true);
-                    logText.SetText($"[Monster] {monsterActor.sourceData.name}이(가) 몸을 웅크렸다!");
-                    yield return new WaitForSeconds(0.5f);
-                    if (logPanel) logPanel.SetActive(false);
-                }
+                case CombatAction.ActionType.Item:
+                    yield return HandleItemAction(action);
+                    break;
 
-                yield return new WaitForSeconds(0.5f);
-                yield break;
-            }
-            
-            // Move 타입 처리
-            if (action.type == CombatAction.ActionType.Move)
-            {
-                yield return StartCoroutine(PerformMove(action));
-                yield break; // 이동 후 함수 종료
+                case CombatAction.ActionType.Guard:
+                    yield return HandleGuardAction(action);
+                    break;
+
+                case CombatAction.ActionType.Move:
+                    yield return StartCoroutine(PerformMove(action));
+                    break;
+
+                case CombatAction.ActionType.Attack:
+                case CombatAction.ActionType.Gun:
+                    yield return HandleAttackAction(action);
+                    break;
             }
 
-            // =========================================================
-            // Attack 타입 처리
-            // =========================================================
-            if (action.type == CombatAction.ActionType.Attack || action.type == CombatAction.ActionType.Gun)
-            {
-                PlayerController pActor = action.actor.GetComponent<PlayerController>();
-                // MonsterController mActor = ... (필요 시)
-                
-                // 1. 사용할 무기 정보 가져오기
-                WeaponData weaponUsed = null;
-                if (action.type == CombatAction.ActionType.Gun && pActor != null) weaponUsed = pActor.currentGun;
-                else if (pActor != null) weaponUsed = pActor.currentWeapon;
-
-                // =========================================================
-                // 무기가 없을 때(맨손)의 기본값 설정
-                // =========================================================
-                int minHits = 1;
-                int maxHits = 1;
-                TargetScope scope = TargetScope.FrontSingle;
-
-                if (weaponUsed != null)
-                {
-                    minHits = weaponUsed.minHits;
-                    maxHits = weaponUsed.maxHits;
-                    scope = weaponUsed.attackRange;
-                }
-                else
-                {
-                    // 무기가 없는데 Gun 타입이면 중단 (안전 장치)
-                    if (action.type == CombatAction.ActionType.Gun) yield break;
-                    
-                    // Attack 타입이면 맨손 공격 (위의 기본값 1타/FrontSingle 사용)
-                }
-                // =========================================================
-                
-                // 2. 공격 횟수 결정 (랜덤)
-                // 무기가 없으면 기본 1회
-                int hitCount = Random.Range(minHits, maxHits + 1);
-                
-                // 로그 출력
-                if (logPanel) 
-                {
-                    logPanel.SetActive(true);
-                    string atkName = (action.type == CombatAction.ActionType.Gun) ? "Gun Fire!" : "Attack!";
-                    logText.SetText($"{action.actor.name}: {atkName} x{hitCount}");
-                }
-
-                // 3. 연타 루프
-                for (int i = 0; i < hitCount; i++)
-                {
-                    // === 타겟 결정 로직 (매 타격마다 재평가) ===
-                    List<GameObject> currentTargets = new List<GameObject>();
-
-                    // 살아있는 적/아군 목록 갱신
-                    var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
-                    var livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
-                    
-                    if (livingMonsters.Count == 0 && livingPlayers.Count == 0) break; // 전투 종료
-
-                    // (1) 단일 지정 (이미 action.target에 들어있음)
-                    if (scope == TargetScope.FrontSingle || scope == TargetScope.AnySingle)
-                    {
-                        if (action.target != null && IsAlive(action.target))
-                        {
-                            currentTargets.Add(action.target);
-                        }
-                        else
-                        {
-                            // 죽었으면 재타겟팅 (가장 가까운 적)
-                            GameObject newTarget = FindNearestLivingTarget(action.actor);
-                            if (newTarget != null) 
-                            {
-                                action.target = newTarget; // 메인 타겟 갱신
-                                currentTargets.Add(newTarget);
-                            }
-                        }
-                    }
-                    // (2) 랜덤/전체 타겟 로직
-                    else if (scope == TargetScope.FrontRandom || scope == TargetScope.AnyRandom)
-                    {
-                        List<GameObject> candidates = new List<GameObject>();
-                        foreach(var m in livingMonsters) 
-                        {
-                            bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
-                            if (scope == TargetScope.FrontRandom && !isFront) continue;
-                            candidates.Add(m.gameObject);
-                        }
-                        if (scope == TargetScope.FrontRandom && candidates.Count == 0) candidates.AddRange(livingMonsters.Select(m => m.gameObject)); // 보정
-
-                        if (candidates.Count > 0) currentTargets.Add(candidates[Random.Range(0, candidates.Count)]);
-                    }
-                    else if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll)
-                    {
-                        foreach(var m in livingMonsters) 
-                        {
-                            bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
-                            if (scope == TargetScope.FrontAll && !isFront) continue;
-                            currentTargets.Add(m.gameObject);
-                        }
-                        if (scope == TargetScope.FrontAll && currentTargets.Count == 0) currentTargets.AddRange(livingMonsters.Select(m => m.gameObject)); // 보정
-                    }
-
-                    // === 각 타겟에 대해 실행 ===
-                    foreach (var target in currentTargets)
-                    {
-                        // 공격 사운드
-                        if (action.type == CombatAction.ActionType.Gun) SoundManager.Instance.PlaySFX(SfxID.Attack_Gun); 
-                        else SoundManager.Instance.PlaySFX(SfxID.Attack_Sword);
-
-                        // 공격자 애니메이션 (첫 타격 시에만 전진)
-                        if (i == 0) 
-                        {
-                            action.actor.transform.localPosition += Vector3.forward * 0.3f;
-                            yield return new WaitForSeconds(0.1f);
-                        }
-
-                        // =========================================================
-                        // [핵심 추가] 위치에 따른 보정치 계산
-                        // =========================================================
-                        float posDmgMult;
-                        float posEvaBonus;
-                        GetPositionalModifiers(action.actor, target, action, out posDmgMult, out posEvaBonus);
-
-                        // -----------------------------------------------------
-                        // 회피(Evade) 체크
-                        // -----------------------------------------------------
-                        bool isEvaded = CheckEvasion(action.actor, target, posEvaBonus);
-
-                        if (isEvaded)
-                        {
-                            // 회피 성공 시: 데미지 스킵 + 회피 연출
-                            Debug.Log($"{target.name} 회피!");
-                            
-                            // 회피 애니메이션 (오른쪽/왼쪽 쓱)
-                            yield return StartCoroutine(ProcessDodgeAnimation(target.transform)); //
-                        }
-                        else
-                        {
-                            // 데미지 계산 (무기가 없으면 CalculateDamage 내부에서 weaponBonus가 0이 되어 주먹 데미지(STR)만 들어감)
-                            // 회피 실패 시: 명중 -> 크리티컬/데미지 계산
-                            bool isCritical = CheckCritical(action.actor, target, action); //
-                            
-                            int damage = 0;
-                            if (action.type == CombatAction.ActionType.Gun && pActor != null)
-                            {
-                                damage = CalculateGunDamage(pActor, target, isCritical);
-                            }
-                            else
-                            {
-                                damage = CalculateDamage(action.actor, target, action, isCritical, posDmgMult);
-                            }
-                            
-                            // 피격 처리 (흔들림 + 데미지)
-                            if (target.TryGetComponent(out MonsterController mc))
-                            {
-                                mc.TriggerHitShake(isCritical); //
-                                StartCoroutine(mc.OnDamageTaken(damage)); //
-                            }
-                            else if (target.TryGetComponent(out PlayerController pc))
-                            {
-                                pc.TriggerHitShake(isCritical); //
-                                StartCoroutine(pc.OnDamageTaken(damage)); //
-                            }
-                        }
-
-                        // 타격 간 딜레이 (연타 느낌)
-                        yield return new WaitForSeconds(0.15f);
-                    }
-
-                    // 전체 공격(All)은 한 번만 실행하고 루프 종료 (반복 횟수가 의미가 없으므로)
-                    if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll) break; 
-                }
-
-                // 복귀 애니메이션
-                action.actor.transform.localPosition -= Vector3.forward * 0.3f;
-                yield return new WaitForSeconds(0.3f);
-            }
-
-            // 5. 후딜레이 (메시지가 읽힐 시간)
+            // 공통 후처리
             yield return new WaitForSeconds(0.5f);
             if (logPanel) logPanel.SetActive(false);
             logText.SetText(string.Empty);
+        }
+
+        // ========================================================================
+        // 1. 아이템 처리 핸들러
+        // ========================================================================
+        IEnumerator HandleItemAction(CombatAction action)
+        {
+            ConsumableItemData item = action.itemData;
+            GameObject target = action.target;
+
+            Debug.Log($"{action.actor.name}의 아이템 사용: {item.dataName}");
+            // Manager.InventoryManager.Instance.UseItem(item.id); // 아이템 차감
+
+            // 효과 적용
+            ApplyItemEffect(target, item);
+
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        void ApplyItemEffect(GameObject target, ConsumableItemData item)
+        {
+            // 공통 컴포넌트 접근 헬퍼 사용 (하단 구현 참조)
+            var pTarget = target.GetComponent<PlayerController>();
+            var mTarget = target.GetComponent<MonsterController>();
+
+            switch (item.effectType)
+            {
+                case ItemEffectType.RecoverHP:
+                    if (pTarget) pTarget.Recover(item.effectValue, 0);
+                    // 몬스터 회복 로직 추가 가능
+                    break;
+                case ItemEffectType.RecoverMP:
+                    if (pTarget) pTarget.Recover(0, item.effectValue);
+                    break;
+                case ItemEffectType.Revive:
+                    if (pTarget && pTarget.currentHp <= 0) pTarget.Revive(item.effectValue);
+                    break;
+                case ItemEffectType.Attack_Physical:
+                case ItemEffectType.Attack_Magic:
+                    int dmg = item.effectValue;
+                    ApplyDamage(target, dmg, false); // 공통 데미지 함수 호출
+                    break;
+                case ItemEffectType.Buff_ReflectPhys:
+                    if (pTarget) pTarget.isPhysicalReflect = true;
+                    Debug.Log($"{target.name}: 물리 반사 배리어!");
+                    break;
+                case ItemEffectType.Buff_ReflectMagic:
+                    if (pTarget) pTarget.isMagicReflect = true;
+                    Debug.Log($"{target.name}: 마법 반사 배리어!");
+                    break;
+            }
+        }
+
+        // ========================================================================
+        // 2. 방어 처리 핸들러
+        // ========================================================================
+        IEnumerator HandleGuardAction(CombatAction action)
+        {
+            // 플레이어/몬스터 여부 상관없이 처리
+            SetGuardState(action.actor, true);
+
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+            ShowLog($"{action.actor.name}의 방어 태세!");
+
+            yield return new WaitForSeconds(0.5f);
+            if (logPanel) logPanel.SetActive(false);
+        }
+
+        void SetGuardState(GameObject actor, bool state)
+        {
+            if (actor.TryGetComponent(out PlayerController pc)) pc.isGuarding = state;
+            else if (actor.TryGetComponent(out MonsterController mc)) mc.isGuarding = state;
+        }
+
+        // ========================================================================
+        // 3. 공격 처리 핸들러 (가장 복잡한 부분 최적화)
+        // ========================================================================
+        IEnumerator HandleAttackAction(CombatAction action)
+        {
+            // 1. 무기 및 공격 정보 설정
+            GetWeaponInfo(action, out int minHits, out int maxHits, out TargetScope scope);
             
+            int hitCount = Random.Range(minHits, maxHits + 1);
+            
+            string actStr = string.Empty;
+            if (action.type == CombatAction.ActionType.Gun)
+            {
+                actStr = "의 총이 불을 뿜었다!";
+            }
+            else actStr = "은(는) 검을 휘둘렀다!";
+            ShowLog($"{action.actor.name}{actStr} 횟수: {hitCount}");
+            
+            // 2. 연타 루프
+            for (int i = 0; i < hitCount; i++)
+            {
+                // 타겟 갱신 (죽은 적 제외 등)
+                List<GameObject> currentTargets = GetTargetsByScope(scope, action);
+                if (currentTargets.Count == 0) break; // 대상 없음
+
+                // 공격 애니메이션 (첫 타격만)
+                if (i == 0)
+                {
+                    action.actor.transform.localPosition += Vector3.forward * 0.3f;
+                    yield return new WaitForSeconds(0.1f);
+                }
+
+                // 실제 타격 처리
+                foreach (var target in currentTargets)
+                {
+                    yield return StartCoroutine(ProcessSingleHit(action, target));
+                }
+
+                yield return new WaitForSeconds(0.15f); // 타격 간 딜레이
+
+                // 전체 공격은 1회만 수행
+                if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll) break;
+            }
+
+            // 복귀
+            action.actor.transform.localPosition -= Vector3.forward * 0.3f;
+            yield return new WaitForSeconds(0.3f);
+        }
+
+        // 단일 타격 처리 (반사, 회피, 데미지 통합)
+        IEnumerator ProcessSingleHit(CombatAction action, GameObject target)
+        {
+            // 사운드
+            var sfxId = (action.type == CombatAction.ActionType.Gun) ? SfxID.Attack_Gun : SfxID.Attack_Sword;
+            SoundManager.Instance.PlaySFX(sfxId);
+
+            // 위치 보정값 계산
+            GetPositionalModifiers(action.actor, target, action, out float posDmgMult, out float posEvaBonus);
+
+            // 1. 회피 체크
+            if (CheckEvasion(action.actor, target, posEvaBonus))
+            {
+                Debug.Log($"{target.name} 회피!");
+                yield return StartCoroutine(ProcessDodgeAnimation(target.transform));
+                yield break; // 종료
+            }
+
+            // 2. 반사 체크
+            if (CheckReflection(target, action.type))
+            {
+                Debug.Log("공격 반사!");
+                ShowLog("Reflect!");
+                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+
+                // 공격자에게 데미지 반사 (계산 로직 재사용)
+                int reflectDmg = CalculateDamage(action.actor, action.actor, action, false, 1.0f);
+                ApplyDamage(action.actor, reflectDmg, false); // 본인에게 데미지
+                yield break;
+            }
+
+            // 3. 정상 피격 (데미지 계산)
+            bool isCritical = CheckCritical(action.actor, target, action);
+            int damage = 0;
+
+            if (action.type == CombatAction.ActionType.Gun && action.actor.GetComponent<PlayerController>())
+                damage = CalculateGunDamage(action.actor.GetComponent<PlayerController>(), target, isCritical);
+            else
+                damage = CalculateDamage(action.actor, target, action, isCritical, posDmgMult);
+
+            ApplyDamage(target, damage, isCritical);
+        }
+
+
+        // ========================================================================
+        // 4. 공통 헬퍼 함수 (핵심: 중복 코드 제거)
+        // ========================================================================
+
+        // Player와 Monster의 데미지 처리를 하나로 통합
+        void ApplyDamage(GameObject target, int damage, bool isCritical)
+        {
+            // 부모 클래스로 가져옵니다. (Player든 Monster든 상관없음)
+            var entity = target.GetComponent<BattleEntity>();
+
+            if (entity != null)
+            {
+                entity.TriggerHitShake(isCritical); // 부모 클래스에 정의된 공통 메서드
+                StartCoroutine(entity.OnDamageTaken(damage)); // 자식에서 구현한 오버라이드 메서드 실행
+            }
+        }
+
+        // 반사 여부 체크 로직
+        bool CheckReflection(GameObject target, CombatAction.ActionType type)
+        {
+            var entity = target.GetComponent<BattleEntity>();
+            if (entity == null) return false;
+
+            bool isPhysical = (type == CombatAction.ActionType.Attack || type == CombatAction.ActionType.Gun);
+            // 스킬 데이터가 물리 속성이면 물리 반사, 그 외면 마법 반사 등의 디테일 추가 가능
+            bool isMagic = (type == CombatAction.ActionType.Skill); // 임시
+
+            if (isPhysical && entity.isPhysicalReflect) return true;
+            if (isMagic && entity.isMagicReflect) return true;
+
+            return false;
+        }
+
+        // 타겟팅 로직
+        List<GameObject> GetTargetsByScope(TargetScope scope, CombatAction action)
+        {
+            List<GameObject> targets = new List<GameObject>();
+            
+            // 살아있는 목록 갱신 (프로퍼티나 메서드로 관리 추천)
+            var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
+            
+            // 1. 단일 타겟
+            if (scope == TargetScope.FrontSingle || scope == TargetScope.AnySingle)
+            {
+                if (action.target != null && IsAlive(action.target))
+                    targets.Add(action.target);
+                else
+                {
+                    // 타겟 사망 시 자동 변경
+                    var newTarget = FindNearestLivingTarget(action.actor);
+                    if (newTarget) 
+                    {
+                        action.target = newTarget;
+                        targets.Add(newTarget);
+                    }
+                }
+            }
+            // (2) 랜덤/전체 타겟 로직
+            else if (scope == TargetScope.FrontRandom || scope == TargetScope.AnyRandom)
+            {
+                List<GameObject> candidates = new List<GameObject>();
+                foreach(var m in livingMonsters) 
+                {
+                    bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
+                    if (scope == TargetScope.FrontRandom && !isFront) continue;
+                    candidates.Add(m.gameObject);
+                }
+                if (scope == TargetScope.FrontRandom && candidates.Count == 0) candidates.AddRange(livingMonsters.Select(m => m.gameObject)); // 보정
+
+                if (candidates.Count > 0) targets.Add(candidates[Random.Range(0, candidates.Count)]);
+            }
+            else if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll)
+            {
+                foreach(var m in livingMonsters) 
+                {
+                    bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
+                    if (scope == TargetScope.FrontAll && !isFront) continue;
+                    targets.Add(m.gameObject);
+                }
+                if (scope == TargetScope.FrontAll && targets.Count == 0) targets.AddRange(livingMonsters.Select(m => m.gameObject)); // 보정
+            }
+            
+            return targets;
+        }
+
+        void ShowLog(string msg)
+        {
+            if (logPanel)
+            {
+                logPanel.SetActive(true);
+                logText.SetText(msg);
+            }
+        }
+
+        // 무기 정보 가져오기
+        void GetWeaponInfo(CombatAction action, out int min, out int max, out TargetScope scope)
+        {
+            min = 1; max = 1; scope = TargetScope.FrontSingle; // 기본값
+
+            var pActor = action.actor.GetComponent<PlayerController>();
+            WeaponData weapon = null;
+
+            if (pActor != null)
+                weapon = (action.type == CombatAction.ActionType.Gun) ? pActor.currentGun : pActor.currentWeapon;
+
+            if (weapon != null)
+            {
+                min = weapon.minHits;
+                max = weapon.maxHits;
+                scope = weapon.attackRange;
+            }
         }
 
         // 총기 데미지 계산 함수 (기존 CalculateDamage 변형)
@@ -1594,10 +1804,7 @@ namespace Manager
         // 헬퍼: 살아있는지 확인
         bool IsAlive(GameObject obj)
         {
-            if (obj == null || !obj.activeSelf) return false;
-            if (obj.TryGetComponent(out MonsterController mc)) return mc.currentHp > 0;
-            if (obj.TryGetComponent(out PlayerController pc)) return pc.currentHp > 0;
-            return false;
+            return obj != null && obj.activeSelf && (obj.GetComponent<BattleEntity>()?.IsAlive ?? false);
         }
 
         // 턴 실행 중에 호출될 이동 로직
@@ -1819,7 +2026,7 @@ namespace Manager
                 Debug.Log($"[전진] {monster.sourceData.name} -> 전열 {monster.columnIndex}번 슬롯으로 이동");
 
                 // 1. 부모 변경 (슬롯 안으로 입양)
-                // 부모가 바뀌는 순간, 유니티가 현재 보이는 크기를 유지하려고 scale 값을 이상하게 바꿀 수 있습니다.
+                // 부모가 바뀌는 순간, 유니티가 현재 보이는 크기를 유지하려고 scale 값을 이상하게 바꿀 수 있다.
                 monster.transform.SetParent(myFrontSlot);
 
                 // 2. 애니메이션 시작/목표값 설정
@@ -1891,7 +2098,7 @@ namespace Manager
             }
         }
 
-        // [새로운 함수] 공격자가 때릴 수 있는 '가장 가까운 살아있는 적' 찾기
+        // 공격자가 때릴 수 있는 '가장 가까운 살아있는 적' 찾기
         GameObject FindNearestLivingTarget(GameObject attacker)
         {
             GameObject bestTarget = null;
@@ -2033,33 +2240,18 @@ namespace Manager
         // 회피 성공 여부 판단
         private bool CheckEvasion(GameObject attackerObj, GameObject defenderObj, float evasionBonus)
         {
-            int attackerAgi = 0, attackerLuc = 0;
-            int defenderAgi = 0, defenderLuc = 0;
+            // 1. BattleEntity로 통일해서 가져오기
+            var attacker = attackerObj.GetComponent<BattleEntity>();
+            var defender = defenderObj.GetComponent<BattleEntity>();
 
-            // 1. 공격자 스탯 가져오기
-            if (attackerObj.TryGetComponent(out PlayerController pAttacker))
-            {
-                attackerAgi = pAttacker.GetTotalAgi();
-                attackerLuc = pAttacker.GetTotalLuc();
-            }
-            else if (attackerObj.TryGetComponent(out MonsterController mAttacker))
-            {
-                attackerAgi = mAttacker.GetTotalAgi();
-                attackerLuc = mAttacker.GetTotalLuc();
-            }
+            if (attacker == null || defender == null) return false;
 
-            // 2. 방어자 스탯 가져오기
-            if (defenderObj.TryGetComponent(out PlayerController pDefender))
-            {
-                // 방어자가 기절/수면 상태라면 회피 불가 처리도 가능
-                defenderAgi = pDefender.GetTotalAgi();
-                defenderLuc = pDefender.GetTotalLuc();
-            }
-            else if (defenderObj.TryGetComponent(out MonsterController mDefender))
-            {
-                defenderAgi = mDefender.GetTotalAgi();
-                defenderLuc = mDefender.GetTotalLuc();
-            }
+            // 2. 추상 메서드를 통해 스탯 바로 가져오기
+            int attackerAgi = attacker.GetTotalAgi();
+            int attackerLuc = attacker.GetTotalLuc();
+
+            int defenderAgi = defender.GetTotalAgi();
+            int defenderLuc = defender.GetTotalLuc();
 
             // ---------------------------------------------------------
             // 임시 회피 공식
@@ -2075,7 +2267,7 @@ namespace Manager
             float lucBonus = (defenderLuc - attackerLuc) * 0.005f;
             lucBonus = Mathf.Clamp(lucBonus, -0.1f, 0.1f); // 최대 +/- 10%로 제한
 
-            // [핵심 추가] 위치 보정치 합산
+            // 위치 보정치 합산
             float totalChance = Mathf.Clamp(baseEvasionChance + agiBonus + lucBonus + evasionBonus, 0f, 0.9f);
 
             // 확률 디버깅용 로그 (완성 후 주석 처리)
@@ -2085,38 +2277,24 @@ namespace Manager
             return Random.value < totalChance;
         }
         
-        // [새로운 함수] 크리티컬 발생 여부 판단
+        // 크리티컬 발생 여부 판단
         private bool CheckCritical(GameObject attackerObj, GameObject defenderObj, CombatAction action)
         {
-            int atkLuc = 0, atkMainStat = 0; // 주 공격 스탯 (STR or MAG)
-            int defLuc = 0, defAgi = 0;
+            // 1. BattleEntity로 통일
+            var attacker = attackerObj.GetComponent<BattleEntity>();
+            var defender = defenderObj.GetComponent<BattleEntity>();
 
-            // 1. 공격 타입에 따른 주 스탯 결정 (물리:STR, 마법:MAG)
+            if (attacker == null || defender == null) return false;
+
+            // 2. 공격 타입에 따른 주 스탯 결정 (물리:STR, 마법:MAG)
             bool isMagic = (action.skillData != null && action.skillData.element != ElementType.Physical);
 
-            // 2. 공격자 스탯 가져오기
-            if (attackerObj.TryGetComponent(out PlayerController pAtk))
-            {
-                atkLuc = pAtk.GetTotalLuc();
-                atkMainStat = isMagic ? pAtk.GetTotalMag() : pAtk.GetTotalStr();
-            }
-            else if (attackerObj.TryGetComponent(out MonsterController mAtk))
-            {
-                atkLuc = mAtk.GetTotalLuc();
-                atkMainStat = isMagic ? mAtk.GetTotalMag() : mAtk.GetTotalStr();
-            }
+            // 3. 다형성(GetTotal...)을 이용해 스탯 가져오기 (if-else 불필요)
+            int atkLuc = attacker.GetTotalLuc();
+            int atkMainStat = isMagic ? attacker.GetTotalMag() : attacker.GetTotalStr();
 
-            // 3. 방어자 스탯 가져오기
-            if (defenderObj.TryGetComponent(out PlayerController pDef))
-            {
-                defLuc = pDef.GetTotalLuc();
-                defAgi = pDef.GetTotalAgi();
-            }
-            else if (defenderObj.TryGetComponent(out MonsterController mDef))
-            {
-                defLuc = mDef.GetTotalLuc();
-                defAgi = mDef.GetTotalAgi();
-            }
+            int defLuc = defender.GetTotalLuc();
+            int defAgi = defender.GetTotalAgi();
 
             // ---------------------------------------------------------
             // [크리티컬 공식]
@@ -2138,68 +2316,26 @@ namespace Manager
             return Random.value < totalChance;
         }
 
-        public int CalculateDamage(GameObject attacker, GameObject defender, CombatAction action, bool isCritical, float damageMultiplier)
+        public int CalculateDamage(GameObject attackerObj, GameObject defenderObj, CombatAction action, bool isCritical, float damageMultiplier)
         {
-            // ------------------------------------
-            // 1. 공격력 (Attack Power) 계산
-            // ------------------------------------
-            int baseAtk = 0;
+            var attacker = attackerObj.GetComponent<BattleEntity>();
+            var defender = defenderObj.GetComponent<BattleEntity>();
 
-            // 공격자 확인
-            var pAttacker = attacker.GetComponent<PlayerController>();
-            if (pAttacker != null) baseAtk = pAttacker.GetAttack();
-            else
-            {
-                var mAttacker = attacker.GetComponent<MonsterController>();
-                if (mAttacker != null) baseAtk = mAttacker.sourceData.stats.str;
-            }
+            if (attacker == null || defender == null) return 0;
 
-            // 스킬 위력 합산
-            int skillPower = (action.type == CombatAction.ActionType.Attack) ? 0 : action.skillData.basePower;
+            // 1. 공격력 계산
+            int baseAtk = attacker.GetTotalStr(); 
+
+            int skillPower = (action.type == CombatAction.ActionType.Attack || action.type == CombatAction.ActionType.Gun) ? 0 : (action.skillData != null ? action.skillData.basePower : 0);
             int totalAtk = baseAtk + skillPower;
-
 
             // ------------------------------------
             // 2. 방어력 (Defense) 및 내성 (Resistance) 가져오기
             // ------------------------------------
-            int totalDef = 0;
-            float resistanceValue = 0f; // 기본 내성 0 (0% 감소 = 100% 피해)
-
-            bool isGuarding = false;
-
-            // A. 방어자가 플레이어
-            var pDefender = defender.GetComponent<PlayerController>();
-            if (pDefender != null)
-            {
-                isGuarding = pDefender.isGuarding;
-                totalDef = pDefender.GetDefense();
-                
-                // 내성값 가져오기
-                if (action.skillData != null) 
-                { 
-                    // (추후 구현: 스킬 속성에 따른 내성)
-                    // resistanceValue = pDefender.sourceData.resistances.fire; 
-                }
-                else resistanceValue = pDefender.sourceData.resistances.physical;
-            }
-            // B. 방어자가 몬스터
-            else
-            {
-                var mDefender = defender.GetComponent<MonsterController>();
-                isGuarding = mDefender.isGuarding;
-                if (mDefender != null)
-                {
-                    totalDef = mDefender.sourceData.stats.vit;
-                    
-                    // 몬스터도 내성 적용
-                    if (action.skillData != null) 
-                    {
-                        // (추후 구현)
-                    }
-                    else resistanceValue = mDefender.sourceData.resistances.physical;
-                }
-            }
-
+            bool isGuarding = defender.isGuarding;
+            float resistanceValue = GetResistanceValue(action.skillData, defender.GetResistances()); // 기본 내성 0 (0% 감소 = 100% 피해)
+            int totalDef = defender.GetDefense();
+            
             // ------------------------------------
             // 3. 최종 데미지 산출
             // ------------------------------------
@@ -2233,6 +2369,28 @@ namespace Manager
             if (finalDamage < 1) finalDamage = 1;
 
             return finalDamage;
+        }
+
+        private float GetResistanceValue(SkillData skill, ResistanceData resist)
+        {
+            if (skill == null) return resist.physical; 
+            
+            ElementType type = skill.element;
+            switch(type)
+            {
+                case ElementType.Fire:
+                return resist.fire;
+                case ElementType.Ice:
+                    return resist.ice;
+                case ElementType.Elec:
+                    return resist.elec;
+                case ElementType.Force:
+                    return resist.force;
+                case ElementType.Havoc:
+                    return resist.havoc;
+                default:
+                    return resist.physical;
+            }
         }
 
         // 도망 확률 계산 공식
@@ -2296,7 +2454,7 @@ namespace Manager
             }
 
             // 4. 플레이어가 결과를 읽을 때까지 대기 (키 입력)
-            //    실수로 연타해서 넘어가는 것을 방지하기 위해 0.5초 딜레이 후 입력을 받습니다.
+            //    실수로 연타해서 넘어가는 것을 방지하기 위해 0.5초 딜레이 후 입력을 받는다.
             yield return new WaitForSeconds(0.5f);
             
             // 플레이어가 Space나 Enter를 누를 때까지 무한 대기
@@ -2305,14 +2463,10 @@ namespace Manager
                 yield return null;
             }
 
-            // 5. 뒷정리 (UI 끄기, 몬스터 정리 등)
+            // 5. UI 끄기
             logPanel.SetActive(false);
             
-            // (옵션) 전투 종료 후 몬스터 오브젝트를 바로 지울지, 
-            // 다음 전투 시작(StartEncounter) 때 지울지는 선택입니다. 
-            // 여기서는 깔끔하게 남겨두고 상태만 바꿉니다.
-
-            // 6. [핵심] 탐험 상태로 복귀
+            // 6. 던전 탐색 상태로 복귀
             DungeonStateManager.Instance.ChangeState(GameState.Exploration);
         }
 

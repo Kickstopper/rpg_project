@@ -15,7 +15,8 @@ public enum TargetScope
     Self,               // 자신 (버프 등)
     OneAlly,            // 아군 1명
     AllAllies,          // 아군 전체
-    DeadAlly            // 죽은 아군
+    DeadAlly,           // 죽은 아군
+    OneEnemy,           // 적 1명
 }
 
 namespace Data
