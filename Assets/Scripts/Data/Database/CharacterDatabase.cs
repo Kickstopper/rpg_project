@@ -15,7 +15,7 @@ public class CharacterDatabase : ScriptableObject
         public Sprite standingImage;
 
         [Header("Combat Stats")]
-        public StatData baseStats;
+        public StatData stats;
         public ResistanceData resistances;
         
         // ----------------------------------------------------------
@@ -32,8 +32,8 @@ public class CharacterDatabase : ScriptableObject
         public List<string> initialArmorIds = new List<string>(); // 투구, 갑옷 등 여러 개일 수 있으므로 리스트
 
         // 플레이어만의 추가 정보 (프로퍼티)
-        public int maxHp => baseStats.vit * 10; 
-        public int maxMp => baseStats.mag * 5;
+        public int maxHp => stats.vit * 10; 
+        public int maxMp => stats.mag * 5;
     }
 
     [Header("캐릭터 이미지 등록")]

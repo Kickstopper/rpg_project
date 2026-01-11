@@ -89,8 +89,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41fe55d466b9471479075c5853ccbdba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entityName: 
   currentHp: 0
   currentMp: 0
+  maxHp: 0
+  maxMp: 0
+  columnIndex: 0
+  preferredImage: {fileID: 7721651834789844838}
+  isGuarding: 0
+  isPhysicalReflect: 0
+  isMagicReflect: 0
+  isPhysicalAbsorb: 0
+  isMagicAbsorb: 0
   sourceData:
     id: 
     name: 
@@ -103,6 +113,7 @@ MonoBehaviour:
       level: 0
       str: 0
       mag: 0
+      intel: 0
       vit: 0
       agi: 0
       luc: 0
@@ -115,7 +126,6 @@ MonoBehaviour:
       havoc: 0
     expReward: 0
     goldReward: 0
-  monsterImage: {fileID: 7721651834789844838}
 --- !u!114 &7568836264752897540
 MonoBehaviour:
   m_ObjectHideFlags: 0

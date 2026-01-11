@@ -38,22 +38,16 @@ namespace Controller
         
         // 상태 이상 (Status Effect)
         public List<string> currentStatusEffects = new List<string>();
-        public int level = 1;
 
         // 현재 위치 (전열/후열) - 전투 매니저가 세팅해줌
         public RowType currentRow; 
 
         // [BattleEntity 구현] 스탯 반환 (레벨 및 장비 보정 포함)
-        public override int GetTotalStr()
-        {
-            // 예시: 기본STR + 레벨
-            // (장비 추가 시 + GetWeaponBonus() 등으로 확장)
-            return sourceData.baseStats.str + level; 
-        }
-        
-        public override int GetTotalAgi() => sourceData.baseStats.agi + level;
-        public override int GetTotalMag() => sourceData.baseStats.mag + level;
-        public override int GetTotalLuc() => sourceData.baseStats.luc + level;
+        public override int GetTotalStr() => sourceData.stats.str + level; 
+        public override int GetTotalAgi() => sourceData.stats.agi + level;
+        public override int GetTotalMag() => sourceData.stats.mag + level;
+        public override int GetTotalLuc() => sourceData.stats.luc + level;
+        public override int GetTotalVit() => sourceData.stats.vit + level;
 
         // 초기화 함수 (CombatManager가 호출)
         public void Initialize(CharacterDatabase.CharacterEntry data, RowType row)
@@ -72,7 +66,7 @@ namespace Controller
             faceImage.sprite = data.portraitImage;
             faceImage.SetNativeSize();
             nameText.text = data.name;
-            level = data.baseStats.level;
+            level = data.stats.level;
             
             if (bgImage != null) originalColor = bgImage.color;
 
@@ -238,7 +232,7 @@ namespace Controller
         // =========================================================
         public override int GetAttack()
         {
-            int statAtk = sourceData.baseStats.str;
+            int statAtk = sourceData.stats.str;
             int levelBonus = level;
 
             // 무기 공격력 합산
@@ -247,9 +241,15 @@ namespace Controller
             return statAtk + levelBonus + weaponBonus;
         }
 
+        public override int GetMagicAttack()
+        {
+            //차후 구체화
+            return GetTotalMag();
+        }
+
         public override int GetDefense()
         {
-            int statDef = sourceData.baseStats.vit;
+            int statDef = sourceData.stats.vit;
             int levelBonus = Mathf.FloorToInt(level * 0.5f);
 
             // 모든 방어구의 방어력 합산

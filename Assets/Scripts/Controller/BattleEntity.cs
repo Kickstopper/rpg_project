@@ -9,10 +9,15 @@ namespace Controller
     {
         [Header("Entity Status")]
         public string entityName; // 이름 공통화
+        public int level = 1;
         public int currentHp;
         public int currentMp;
         public int maxHp; // 최대 체력 공통 필드 필요
         public int maxMp;
+        public int columnIndex;
+        
+        [Header("UI Reference")]
+        public Image preferredImage; 
 
         [Header("State Flags")]
         public bool isGuarding = false;
@@ -26,6 +31,7 @@ namespace Controller
         protected float normalShakeDuration = 0.2f;
         protected float critShakeMagnitude = 15f;
         protected float critShakeDuration = 0.5f;
+        
 
         // 공통 코루틴 참조
         protected Coroutine highlightCoroutine;
@@ -34,7 +40,6 @@ namespace Controller
         // =========================================================
         // 1. 공통 로직 (그대로 상속받아 사용)
         // =========================================================
-
         public void ResetStatus()
         {
             isGuarding = false;
@@ -81,8 +86,10 @@ namespace Controller
         public abstract int GetTotalAgi();
         public abstract int GetTotalMag();
         public abstract int GetTotalLuc();
+        public abstract int GetTotalVit();
 
         public abstract int GetAttack();
+        public abstract int GetMagicAttack();
         public abstract int GetDefense();
         public abstract ResistanceData GetResistances();
         public abstract void SetSelectionState(bool isSelected);

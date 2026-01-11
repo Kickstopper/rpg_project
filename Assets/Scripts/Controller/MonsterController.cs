@@ -11,27 +11,28 @@ namespace Controller
     {
         public MonsterDatabase.MonsterEntry sourceData;
 
-        [Header("UI Reference")]
-        public Image monsterImage; 
-
         // Monster 전용 필드
-        public int columnIndex;
         private Color backRowColor = new Color(0.6f, 0.6f, 0.6f, 1f); 
         private Color frontRowColor = Color.white;
         private Button button;
 
         // [BattleEntity 구현] 스탯 반환
-        public override int GetTotalAgi() => sourceData.stats.agi;
-        public override int GetTotalLuc() => sourceData.stats.luc;
-        public override int GetTotalStr() => sourceData.stats.str;
-        public override int GetTotalMag() => sourceData.stats.mag;
+        public override int GetTotalStr() => sourceData.stats.str + level; 
+        public override int GetTotalAgi() => sourceData.stats.agi + level;
+        public override int GetTotalMag() => sourceData.stats.mag + level;
+        public override int GetTotalLuc() => sourceData.stats.luc + level;
+        public override int GetTotalVit() => sourceData.stats.vit + level;
 
         public override int GetAttack()
         {
-            int statAtk = sourceData.stats.str;
-            int levelBonus = sourceData.stats.level;
+            // 차후 구체화
+            return GetTotalStr();
+        }
 
-            return statAtk + levelBonus;
+        public override int GetMagicAttack()
+        {
+            // 차후 구체화
+            return GetTotalMag();
         }
 
         public override int GetDefense()
@@ -51,6 +52,8 @@ namespace Controller
         {
             sourceData = data;
             entityName = $"{data.name}_{data.id}"; // 부모 필드 사용
+
+            level = data.stats.level;
             
             // HP/MP 설정
             maxHp = data.stats.vit * 5; 
@@ -59,11 +62,11 @@ namespace Controller
             currentMp = maxMp;
 
             // 이미지 설정
-            if (monsterImage != null && data.image != null)
+            if (preferredImage != null && data.image != null)
             {
-                monsterImage.sprite = data.image[0];
-                monsterImage.SetNativeSize();
-                originalColor = monsterImage.color; // 부모 필드 사용
+                preferredImage.sprite = data.image[0];
+                preferredImage.SetNativeSize();
+                originalColor = preferredImage.color; // 부모 필드 사용
             }
             
             gameObject.name = entityName;
@@ -82,9 +85,9 @@ namespace Controller
             // 목표 색상 결정
             Color targetColor = isFront ? frontRowColor : backRowColor;
 
-            if (monsterImage != null)
+            if (preferredImage != null)
             {
-                monsterImage.color = targetColor;
+                preferredImage.color = targetColor;
             }
 
             // "이제부터 이 색이 나의 기본 색이다"라고 저장
@@ -94,9 +97,9 @@ namespace Controller
         // 이동 애니메이션용 색상 설정 (CombatManager에서 Lerp할 때 사용)
         public void SetColor(Color color)
         {
-            if (monsterImage != null)
+            if (preferredImage != null)
             {
-                monsterImage.color = color;
+                preferredImage.color = color;
             }
             
             // 색이 변했으면 기본 색 정보도 갱신
@@ -112,7 +115,7 @@ namespace Controller
         // [BattleEntity 구현] 선택 강조
         public override void SetSelectionState(bool isSelected)
         {
-            if (monsterImage == null) return;
+            if (preferredImage == null) return;
 
             if (highlightCoroutine != null) StopCoroutine(highlightCoroutine);
 
@@ -123,7 +126,7 @@ namespace Controller
             }
             else
             {
-                monsterImage.color = originalColor;
+                preferredImage.color = originalColor;
             }
         }
 
@@ -133,7 +136,7 @@ namespace Controller
             while (true)
             {
                 float time = Mathf.PingPong(Time.time * 5f, 1f); 
-                monsterImage.color = Color.Lerp(originalColor, Color.cyan, time);
+                preferredImage.color = Color.Lerp(originalColor, Color.cyan, time);
                 yield return null;
             }
         }
@@ -141,11 +144,11 @@ namespace Controller
         // 몬스터가 클릭되었을 때 실행됨
         void OnClicked()
         {
-            CombatManager.Instance.OnMonsterSelected(this);
+            CombatManager.Instance.OnTargetSelected(this);
         }
 
         // AI 행동 결정 함수
-        public CombatAction ChooseAction(List<PlayerController> players)
+        public CombatAction ChooseAction(List<BattleEntity> players)
         {
             // 예시 AI: HP가 30% 미만이면 50% 확률로 방어
             float hpRatio = (float)currentHp / sourceData.stats.vit; // 혹은 maxHp
@@ -160,7 +163,7 @@ namespace Controller
             }
 
             // 기본 공격 로직 (기존 코드)
-            PlayerController target = players[Random.Range(0, players.Count)];
+            BattleEntity target = players[Random.Range(0, players.Count)];
             int speed = sourceData.stats.agi + Random.Range(0, 5);
             return new CombatAction(this.gameObject, target.gameObject, CombatAction.ActionType.Attack, speed);
         }
@@ -172,17 +175,17 @@ namespace Controller
             Debug.Log($"<color=red>{sourceData.name}에게 {damage} 데미지!</color> (남은 HP: {currentHp})");
 
             // 몬스터 전용 피격 연출 (빨간색 깜빡임 + 진동)
-            if (monsterImage != null)
+            if (preferredImage != null)
             {
-                Color cachedColor = monsterImage.color;
-                monsterImage.color = Color.red; 
+                Color cachedColor = preferredImage.color;
+                preferredImage.color = Color.red; 
                 
                 Vector3 originalPos = transform.localPosition;
                 // ... (기존의 좌우 진동 로직 유지) ...
                 yield return new WaitForSeconds(0.1f); 
                 
                 transform.localPosition = originalPos;
-                monsterImage.color = cachedColor;
+                preferredImage.color = cachedColor;
             }
 
             if (currentHp <= 0) Die();

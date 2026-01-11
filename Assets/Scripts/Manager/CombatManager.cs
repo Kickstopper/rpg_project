@@ -37,7 +37,7 @@ namespace Manager
         public Vector3 cursorOffset = new Vector3(0, 50, 0); // 몬스터 머리 위 오프셋
 
         // 타겟팅 로직 변수
-        private List<MonsterController> validTargets = new List<MonsterController>();
+        private List<BattleEntity> validTargets = new List<BattleEntity>();
         private int currentTargetIndex = 0;
 
         [Header("Managers & Data")]
@@ -79,8 +79,8 @@ namespace Manager
         // [핵심 변수] 전투 상태 및 리스트
         // -------------------------------------------------------
         public BattleState state;
-        public List<MonsterController> activeMonsters = new List<MonsterController>();
-        public List<PlayerController> activePlayers = new List<PlayerController>(); // 아군 리스트
+        public List<BattleEntity> activeMonsters = new List<BattleEntity>();
+        public List<BattleEntity> activePlayers = new List<BattleEntity>(); // 아군 리스트
 
         public List<CombatAction> actionQueue = new List<CombatAction>(); // 이번 턴의 모든 행동
 
@@ -104,6 +104,10 @@ namespace Manager
 
         // "싸우다"를 선택했는지 여부
         private bool isFightMode = false;
+
+        // 자주 쓰는 딜레이 캐싱
+        private WaitForSeconds wait01 = new WaitForSeconds(0.1f);
+        private WaitForSeconds wait05 = new WaitForSeconds(0.5f);
         
         void Awake() { if (Instance == null) Instance = this; }
 
@@ -147,7 +151,7 @@ namespace Manager
                 return;
             }
 
-            SoundManager.Instance.PlayBGM(Data.BgmID.Encounter);
+            SoundManager.Instance.PlayBGM(BgmID.Encounter);
 
             // 1. 최대 스폰 가능 수 결정
             // 리스트가 6개 미만(예: 2개)이면 최대 2마리까지만, 
@@ -174,6 +178,13 @@ namespace Manager
             // =========================================================
 
             SpawnParty();
+
+            if (activePlayers.Count == 0)
+            {
+                Debug.LogError("오류: 아군 파티원이 한 명도 없습니다! PartyManager 데이터를 확인하세요.");
+                // 전투 진행을 막거나 강제 종료
+                return; 
+            }
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(enemyFrontRowContainer as RectTransform);
             LayoutRebuilder.ForceRebuildLayoutImmediate(playerFrontRowContainer as RectTransform);
@@ -224,7 +235,7 @@ namespace Manager
         // [공통 함수] 무기(또는 맨손)에 따른 타겟팅 준비
         private void PrepareWeaponAction(WeaponData weapon, CombatAction.ActionType actionType)
         {
-            PlayerController currentActor = activePlayers[currentPlayerIndex];
+            BattleEntity currentActor = activePlayers[currentPlayerIndex];
 
             // =========================================================
             // [핵심 수정] 무기가 없으면(null) -> 맨손 공격 설정 (전열 1명)
@@ -288,7 +299,7 @@ namespace Manager
                 currentSelectedAction = actionType;
                 
                 // 속도 계산
-                int speed = currentActor.sourceData.baseStats.agi + Random.Range(0, 5);
+                int speed = currentActor.GetTotalAgi() + Random.Range(0, 5);
                 
                 CombatAction action = new CombatAction(currentActor.gameObject, null, actionType, speed);
                 actionQueue.Add(action);
@@ -421,7 +432,7 @@ namespace Manager
             // Esc 또는 LeftShift 키 감지
             if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift))
             {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
 
                 // 행동 큐가 비어있다는 것은, 내가 이번 턴의 '첫 번째 행동 결정자'라는 뜻.
                 if (actionQueue.Count == 0)
@@ -471,7 +482,7 @@ namespace Manager
 
         public void OnBaseCommand_Auto()
         {
-            SoundManager.Instance.PlayBGM(Data.BgmID.Normal_Battle);
+            SoundManager.Instance.PlayBGM(BgmID.Normal_Battle);
             Debug.Log("오토 모드 시작! (x2 속도)");
             isAutoMode = true;
             
@@ -494,20 +505,20 @@ namespace Manager
         // 공격 버튼 클릭
         public void OnFightCommand_Attack()
         {
-            PlayerController actor = activePlayers[currentPlayerIndex];
+            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
             
             // 무기가 null이어도 PrepareWeaponAction 호출 (맨손 공격)
             PrepareWeaponAction(actor.currentWeapon, CombatAction.ActionType.Attack);
         }
         public void OnFightCommand_Gun()
         {
-            PlayerController actor = activePlayers[currentPlayerIndex];
+            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
 
             // 1. 총과 총알이 모두 있는지 확인
             if (!actor.CanShootGun())
             {
                 Debug.Log("총 또는 탄약이 장비되어 있지 않습니다!");
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel); // 실패음
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); // 실패음
                 
                 if (logPanel)
                 {
@@ -588,18 +599,29 @@ namespace Manager
         {
             validTargets.Clear();
 
-            // 1. 타겟 리스트 구성
+            // 1. 적군 선택
             if (scope == TargetScope.OneEnemy)
             {
-                // 살아있는 몬스터만 추가
                 foreach(var m in activeMonsters) 
                 {
                     if(m != null && m.currentHp > 0) validTargets.Add(m);
                 }
             }
-            else if (scope == TargetScope.OneAlly) // 아군 선택 (포션 등)
+            // 2. 아군 선택 (OneAlly)
+            else if (scope == TargetScope.OneAlly) 
             {
-                // 아군 타겟팅 로직 미구현
+                foreach(var p in activePlayers)
+                {
+                    if(p != null && p.currentHp > 0) validTargets.Add(p);
+                }
+            }
+            // 3. 죽은 아군 선택 (부활 아이템)
+            else if (scope == TargetScope.DeadAlly)
+            {
+                foreach(var p in activePlayers)
+                {
+                    if(p != null && p.currentHp <= 0) validTargets.Add(p);
+                }
             }
             
             // 2. 타겟이 한 명도 없으면 모드 진입 차단!
@@ -628,6 +650,19 @@ namespace Manager
             
             // 키 입력 중복 방지 쿨타임
             inputCooldown = 0.2f;
+
+            // =========================================================
+            // 뒷배경(커맨드 버튼) 상호작용 차단 & 포커스 제거
+            // =========================================================
+            if (fightCmdContainer != null && fightCmdContainer.activeSelf)
+            {
+                // 배경 버튼들이 눌리지 않도록 CanvasGroup 비활성화
+                SetContainerInteractable(fightCmdContainer, false);
+                
+                // 현재 잡혀있는 버튼 포커스(예: 아이템 버튼) 강제 해제
+                EventSystem.current.SetSelectedGameObject(null);
+            }
+            // =========================================================
         }
 
         // 로그 자동 숨김 코루틴
@@ -640,11 +675,10 @@ namespace Manager
         // 4. 행동 큐 등록
         void QueueItemAction(GameObject target)
         {
-            PlayerController actor = activePlayers[currentPlayerIndex];
+            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
             
-            CombatAction action = new CombatAction(actor.gameObject, target, CombatAction.ActionType.Item, actor.sourceData.baseStats.agi);
+            CombatAction action = new CombatAction(actor.gameObject, target, CombatAction.ActionType.Item, actor.GetTotalAgi());
             action.skillData = null; // 스킬 아님
-            // CombatAction 클래스에 public ConsumableItemData itemData; 필드 추가 필요
             action.itemData = currentSelectedItem; 
 
             actionQueue.Add(action);
@@ -654,11 +688,11 @@ namespace Manager
         public void OnFightCommand_Guard()
         {
             // 1. 현재 캐릭터 가져오기
-            PlayerController currentActor = activePlayers[currentPlayerIndex];
+            PlayerController currentActor = activePlayers[currentPlayerIndex] as PlayerController;
 
             // 2. 행동 생성
             // 방어는 적의 공격보다 빨라야 하므로 속도에 큰 보정(+2000)을 준다.
-            int guardSpeed = currentActor.sourceData.baseStats.agi + 2000;
+            int guardSpeed = currentActor.GetTotalAgi() + 2000;
 
             // 타겟은 '자기 자신'으로 설정
             CombatAction action = new CombatAction(
@@ -726,7 +760,7 @@ namespace Manager
             // 종료 및 스킵 로직
             if (currentPlayerIndex >= activePlayers.Count) { ProcessTurn(); return; }
 
-            PlayerController currentPlayer = activePlayers[currentPlayerIndex];
+            PlayerController currentPlayer = activePlayers[currentPlayerIndex] as PlayerController;
             if (currentPlayer.currentHp <= 0) { NextPlayerInput(); return; }
 
             // =========================================================
@@ -793,11 +827,11 @@ namespace Manager
                 ProcessTurn(); 
                 return;
             }
-            MonsterController target = livingMonsters[Random.Range(0, livingMonsters.Count)];
+            BattleEntity target = livingMonsters[Random.Range(0, livingMonsters.Count)];
 
             // 3. 행동 생성 (현재는 Attack만 구현, 나중에 Guard/Skill 분기 추가 가능)
             // (Guard나 Skill은 타겟이 아군이거나 없을 수 있으므로 추후 보완 필요)
-            int speed = actor.sourceData.baseStats.agi + Random.Range(0, 5);
+            int speed = actor.GetTotalAgi() + Random.Range(0, 5);
             CombatAction action = new CombatAction(actor.gameObject, target.gameObject, actionType, speed);
 
             // 4. 큐에 추가
@@ -826,7 +860,7 @@ namespace Manager
         public void OnCommandButton_Move()
         {
             // 현재 캐릭터
-            PlayerController currentActor = activePlayers[currentPlayerIndex];
+            BattleEntity currentActor = activePlayers[currentPlayerIndex];
 
             // 상태 변경: 이동 타겟 선택 모드
             isSelectingMoveTarget = true;
@@ -877,7 +911,7 @@ namespace Manager
 
             if (moved)
             {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
                 Debug.Log($"이동함! 현재 인덱스: {currentMoveSlotIndex}"); // 로그 확인용
                 UpdateMoveCursor();
                 RefreshMoveHighlights(currentMoveSlotIndex); // 호출
@@ -886,9 +920,9 @@ namespace Manager
             // 3. 확정 (Space, Enter)
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
 
-                PlayerController currentActor = activePlayers[currentPlayerIndex];
+                BattleEntity currentActor = activePlayers[currentPlayerIndex];
                 int myCurrentIndex = GetPlayerSlotIndex(currentActor.transform.parent);
 
                 // A. 제자리 선택 = 취소
@@ -907,7 +941,7 @@ namespace Manager
 
                 // 2. 행동 생성
                 // 이동은 전략적으로 중요하므로 속도에 보너스(+2000)를 주어 턴의 가장 처음에 발동하게 함.
-                int moveSpeed = currentActor.sourceData.baseStats.agi + 2000; 
+                int moveSpeed = currentActor.GetTotalAgi() + 2000; 
 
                 CombatAction action = new CombatAction(
                     currentActor.gameObject, 
@@ -922,7 +956,7 @@ namespace Manager
                 // 4. 하이라이트/커서 끄기
                 isSelectingMoveTarget = false;
                 if (targetCursor) targetCursor.gameObject.SetActive(false);
-                foreach (var player in activePlayers) player.ResetHighlightColor();
+                foreach (var player in activePlayers) (player as PlayerController).ResetHighlightColor();
 
                 Debug.Log($"{currentActor.name}: 위치 이동 예약 완료");
 
@@ -938,7 +972,7 @@ namespace Manager
             if (targetCursor) targetCursor.gameObject.SetActive(false);
 
             // 이동 시작 전 색상 초기화
-            foreach (var player in activePlayers) player.ResetHighlightColor();
+            foreach (var player in activePlayers) (player as PlayerController).ResetHighlightColor();
 
             // 1. 대상 슬롯에 누가 있는지 확인
             PlayerController targetChar = targetSlot.GetComponentInChildren<PlayerController>();
@@ -1008,7 +1042,7 @@ namespace Manager
         {
             isSelectingMoveTarget = false;
             if (targetCursor) targetCursor.gameObject.SetActive(false);
-            foreach (var player in activePlayers) player.ResetHighlightColor();
+            foreach (var player in activePlayers) (player as PlayerController).ResetHighlightColor();
 
             // 커맨드 패널 표시 (여기서는 전체 패널을 켜고)
             commandPanel.SetActive(true);
@@ -1018,7 +1052,7 @@ namespace Manager
             fightCmdContainer.SetActive(true);
 
             if (logPanel) logPanel.SetActive(true); 
-            logText.SetText($"Command Wait: {activePlayers[currentPlayerIndex].sourceData.name}");
+            logText.SetText($"Command Wait: {activePlayers[currentPlayerIndex].entityName}");
             
             inputCooldown = 0.2f;
             
@@ -1040,6 +1074,12 @@ namespace Manager
 
             if (logPanel) logPanel.SetActive(false);
 
+            // =========================================================
+            // 뒷배경 상호작용 다시 허용
+            // =========================================================
+            SetContainerInteractable(fightCmdContainer, true);
+            // =========================================================
+
             inputCooldown = 0.2f; 
             StartCoroutine(SelectButton(attackButton));
         }
@@ -1060,7 +1100,7 @@ namespace Manager
         void RefreshMoveHighlights(int cursorSlotIndex)
         {
             // 1. 모든 아군 캐릭터의 색상을 흰색(기본)으로 초기화
-            foreach (var player in activePlayers)
+            foreach (PlayerController player in activePlayers)
             {
                 player.ResetHighlightColor();
             }
@@ -1068,7 +1108,7 @@ namespace Manager
             // 2. '이동하려는 주인공(Source)'을 초록색으로 칠하기
             if (currentPlayerIndex < activePlayers.Count)
             {
-                PlayerController sourcePlayer = activePlayers[currentPlayerIndex];
+                PlayerController sourcePlayer = activePlayers[currentPlayerIndex] as PlayerController;
                 sourcePlayer.SetHighlightColor(moveSourceColor);
             }
 
@@ -1192,112 +1232,103 @@ namespace Manager
                     validTargets[currentTargetIndex].SetSelectionState(false);
                     
                     // 선택 완료 함수 호출
-                    OnMonsterSelected(validTargets[currentTargetIndex]);
+                    OnTargetSelected(validTargets[currentTargetIndex]);
                 }
                 return;
             }
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
+
+            BattleEntity currentEntity = validTargets[currentTargetIndex];
+
+            // 현재 타겟 리스트가 '아군'인지 '적군'인지 판단하여 기준 컨테이너 결정
+            Transform targetFrontContainer = enemyFrontRowContainer;
+            
+            // validTargets의 첫 번째 요소가 PlayerController라면 아군 타겟팅 중인 것임
+            if (validTargets.Count > 0 && validTargets[0] is PlayerController)
             {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Hover);
-                // 하이라이트 끄기
-                if (validTargets.Count > currentTargetIndex)
-                {
-                    validTargets[currentTargetIndex].SetSelectionState(false);
-                }
-                
-                // 취소 처리
-                CancelTargetSelection();
-                return;
+                targetFrontContainer = playerFrontRowContainer;
             }
             
-            MonsterController currentMonster = validTargets[currentTargetIndex];
+            // 현재 타겟이 전열인가? (기준 컨테이너와 비교)
+            bool isCurrentFront = (currentEntity.transform.parent.parent == targetFrontContainer);
             
-            // 내 할아버지(Container)가 전열 컨테이너인가?
-            bool isCurrentFront = (currentMonster.transform.parent.parent == enemyFrontRowContainer);
-            
-            int currentCol = currentMonster.columnIndex;
-            MonsterController nextMonster = null;
+            int currentCol = currentEntity.columnIndex;
+            BattleEntity nextEntity = null;
             bool moved = false;
 
-            // 1. 좌우 이동
+            // 1. 좌우 이동 (매개변수에 컨테이너 전달)
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
-                nextMonster = FindMonsterInRow(isCurrentFront, currentCol, -1);
+                nextEntity = FindEntityInRow(targetFrontContainer, isCurrentFront, currentCol, -1);
                 moved = true;
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
-                nextMonster = FindMonsterInRow(isCurrentFront, currentCol, 1);
+                nextEntity = FindEntityInRow(targetFrontContainer, isCurrentFront, currentCol, 1);
                 moved = true;
             }
             // 2. 상하 이동
             else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
-                // 전열 -> 후열 이동
-                if (isCurrentFront) 
-                {
-                    moved = true;
-                    nextMonster = FindClosestMonsterInRow(false, currentCol);
-                }
-            }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-            {
                 // 후열 -> 전열 이동
                 if (!isCurrentFront) 
                 {
                     moved = true;
-                    nextMonster = FindClosestMonsterInRow(true, currentCol);
+                    nextEntity = FindClosestEntityInRow(targetFrontContainer, true, currentCol);
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                // 전열 -> 후열 이동
+                if (isCurrentFront) 
+                {
+                    moved = true;
+                    nextEntity = FindClosestEntityInRow(targetFrontContainer, false, currentCol);
                 }
             }
 
-            if (moved)
-            {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
-            }
+            if (moved) SoundManager.Instance.PlaySFX(SfxID.UI_Click);
 
-            if (nextMonster != null)
+            if (nextEntity != null)
             {
-                currentTargetIndex = validTargets.IndexOf(nextMonster);
+                currentTargetIndex = validTargets.IndexOf(nextEntity);
                 UpdateTargetHighlight();
             }
         }
 
         // direction: -1(왼쪽), 1(오른쪽)
-        MonsterController FindMonsterInRow(bool isFrontRow, int startCol, int direction)
+        BattleEntity FindEntityInRow(Transform frontContainer, bool isTargetFront, int startCol, int direction)
         {
-            // 부모의 부모가 FrontContainer인지 확인
-            var rowMonsters = validTargets
-                .Where(m => (m.transform.parent.parent == enemyFrontRowContainer) == isFrontRow)
+            // 컨테이너 비교 로직 수정
+            var rowEntities = validTargets
+                .Where(m => (m.transform.parent.parent == frontContainer) == isTargetFront)
                 .OrderBy(m => m.columnIndex)
                 .ToList();
 
-            if (rowMonsters.Count == 0) return null;
+            if (rowEntities.Count == 0) return null;
 
-            MonsterController current = validTargets[currentTargetIndex];
-            int currentIndexInRow = rowMonsters.IndexOf(current);
+            BattleEntity current = validTargets[currentTargetIndex];
+            int currentIndexInRow = rowEntities.IndexOf(current);
             
-            // 혹시라도 IndexOf가 실패하면(-1), 안전하게 처리
             if (currentIndexInRow == -1) return null;
 
             int nextIndex = currentIndexInRow + direction;
 
-            if (nextIndex >= 0 && nextIndex < rowMonsters.Count)
+            if (nextIndex >= 0 && nextIndex < rowEntities.Count)
             {
-                return rowMonsters[nextIndex];
+                return rowEntities[nextIndex];
             }
             return null; 
         }
 
-        MonsterController FindClosestMonsterInRow(bool isTargetFront, int targetCol)
+        BattleEntity FindClosestEntityInRow(Transform frontContainer, bool isTargetFront, int targetCol)
         {
-            // 조건식 변경
-            var targetRowMonsters = validTargets
-                .Where(m => (m.transform.parent.parent == enemyFrontRowContainer) == isTargetFront)
+            var targetRowEntities = validTargets
+                .Where(m => (m.transform.parent.parent == frontContainer) == isTargetFront)
                 .ToList();
 
-            if (targetRowMonsters.Count == 0) return null;
+            if (targetRowEntities.Count == 0) return null;
 
-            MonsterController closest = targetRowMonsters
+            BattleEntity closest = targetRowEntities
                 .OrderBy(m => Mathf.Abs(m.columnIndex - targetCol))
                 .First();
 
@@ -1316,7 +1347,7 @@ namespace Manager
             // 2. 현재 선택된 타겟만 하이라이트 켜기
             if (validTargets.Count > 0)
             {
-                MonsterController currentTarget = validTargets[currentTargetIndex];
+                BattleEntity currentTarget = validTargets[currentTargetIndex];
                 currentTarget.SetSelectionState(true);
             }
         }
@@ -1325,37 +1356,63 @@ namespace Manager
         {
             if (validTargets.Count == 0) return;
 
-            MonsterController target = validTargets[currentTargetIndex];
+            BattleEntity target = validTargets[currentTargetIndex];
 
             // 몬스터의 스크린 좌표(UI 좌표)를 가져와서 커서를 이동
             // 몬스터가 UI 요소(Image)라면 transform.position을 그대로 쓰면 됨
-            if (targetCursor) targetCursor.position = target.monsterImage.transform.position + cursorOffset;
+            if (targetCursor) targetCursor.position = target.preferredImage.transform.position + cursorOffset;
         }
 
-        // [이벤트] 몬스터 클릭 시 (타겟 지정 완료)
-        public void OnMonsterSelected(MonsterController targetMonster)
+        // [이벤트] 타겟 클릭 시 (타겟 지정 완료)
+        public void OnTargetSelected(BattleEntity targetEntity)
         {
             if (!isSelectingTarget) return;
 
             // 현재 순서의 플레이어 가져오기
-            PlayerController actor = activePlayers[currentPlayerIndex];
+            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
 
-            // 이번 행동(Attack)을 기록해둠
+            // (옵션) 이번 행동을 '마지막 행동'으로 기록 (오토 모드용)
             if (lastPlayerActions.ContainsKey(currentPlayerIndex))
                 lastPlayerActions[currentPlayerIndex] = currentSelectedAction;
             else
                 lastPlayerActions.Add(currentPlayerIndex, currentSelectedAction);
             
-            // 1. 행동 생성 (속도는 아군 AGI + 난수)
-            int speed = actor.sourceData.baseStats.agi + Random.Range(0, 5);
-            CombatAction action = new CombatAction(actor.gameObject, targetMonster.gameObject, currentSelectedAction, speed);
+            // 1. 행동 속도 결정 (기본 AGI + 난수)
+            int speed = actor.GetTotalAgi() + Random.Range(0, 5);
+
+            // 2. CombatAction 생성
+            CombatAction action = new CombatAction(actor.gameObject, targetEntity.gameObject, currentSelectedAction, speed); //
             
-            // 2. 큐에 저장
+            // =========================================================
+            // OnTargetSelected 아이템 사용이라면, 아이템 데이터를 액션에 연결해야 함!
+            // =========================================================
+            if (currentSelectedAction == CombatAction.ActionType.Item)
+            {
+                action.itemData = currentSelectedItem; 
+
+                // (옵션) 아이템 사용은 공격보다 우선순위를 높이고 싶다면 속도 보정
+                action.speed += 500;
+            }
+            // =========================================================
+
+            Debug.Log($"{actor.entityName}의 {currentSelectedAction} 예약 완료! (Target: {targetEntity.entityName})");
+
+            // 3. 큐에 저장 
             actionQueue.Add(action);
+            // 4. UI 정리 및 다음 입력으로 이동
+            isSelectingTarget = false;
+            if (targetCursor) targetCursor.gameObject.SetActive(false); // 커서 끄기
+            
+            // 타겟 하이라이트 끄기
+            targetEntity.SetSelectionState(false);
 
-            Debug.Log($"{actor.sourceData.name}의 행동 예약 완료!");
+            // =========================================================
+            // 다음 턴을 위해 상호작용 복구
+            // =========================================================
+            SetContainerInteractable(fightCmdContainer, true);
+            // =========================================================
 
-            // 3. 다음 아군 입력으로 이동
+            // 다음 캐릭터로 턴 넘기기
             NextPlayerInput();
         }
 
@@ -1364,7 +1421,7 @@ namespace Manager
         // =================================================================
         void ProcessTurn()
         {
-            SoundManager.Instance.PlayBGM(Data.BgmID.Normal_Battle);
+            SoundManager.Instance.PlayBGM(BgmID.Normal_Battle);
             
             state = BattleState.Processing;
             commandPanel.SetActive(false);
@@ -1372,7 +1429,7 @@ namespace Manager
 
             // 1. 적들의 행동 결정 (AI)
             // 살아있는 아군 리스트 추출
-            List<PlayerController> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
+            List<BattleEntity> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
 
             if (livingPlayers.Count == 0)
             {
@@ -1381,7 +1438,7 @@ namespace Manager
                 return;
             }
 
-            foreach (var monster in activeMonsters)
+            foreach (MonsterController monster in activeMonsters)
             {
                 if (monster.currentHp <= 0) continue;
 
@@ -1418,12 +1475,14 @@ namespace Manager
                 bool isActorDead = false;
 
                 // 1. 오브젝트가 아예 없거나 꺼져있는지 체크
-                if (action.actor == null || !action.actor.activeSelf) isActorDead = true;
+                if (action.actor == null || !action.actor.activeSelf) 
+                {
+                    isActorDead = true;
+                }
                 else
                 {
                     // 2. HP 체크 (몬스터 & 플레이어)
-                    if (action.actor.TryGetComponent(out MonsterController mc) && mc.currentHp <= 0) isActorDead = true;
-                    else if (action.actor.TryGetComponent(out PlayerController pc) && pc.currentHp <= 0) isActorDead = true;
+                    if (action.actor.TryGetComponent(out BattleEntity be) && !be.IsAlive) isActorDead = true;
                 }
 
                 // 3. 죽었다면 이번 행동 스킵
@@ -1500,7 +1559,7 @@ namespace Manager
             }
 
             // 공통 후처리
-            yield return new WaitForSeconds(0.5f);
+            yield return wait05;
             if (logPanel) logPanel.SetActive(false);
             logText.SetText(string.Empty);
         }
@@ -1519,7 +1578,7 @@ namespace Manager
             // 효과 적용
             ApplyItemEffect(target, item);
 
-            yield return new WaitForSeconds(0.5f);
+            yield return wait05;
         }
 
         void ApplyItemEffect(GameObject target, ConsumableItemData item)
@@ -1564,10 +1623,10 @@ namespace Manager
             // 플레이어/몬스터 여부 상관없이 처리
             SetGuardState(action.actor, true);
 
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             ShowLog($"{action.actor.name}의 방어 태세!");
 
-            yield return new WaitForSeconds(0.5f);
+            yield return wait05;
             if (logPanel) logPanel.SetActive(false);
         }
 
@@ -1606,7 +1665,7 @@ namespace Manager
                 if (i == 0)
                 {
                     action.actor.transform.localPosition += Vector3.forward * 0.3f;
-                    yield return new WaitForSeconds(0.1f);
+                    yield return wait01;
                 }
 
                 // 실제 타격 처리
@@ -1649,7 +1708,7 @@ namespace Manager
             {
                 Debug.Log("공격 반사!");
                 ShowLog("Reflect!");
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
 
                 // 공격자에게 데미지 반사 (계산 로직 재사용)
                 int reflectDmg = CalculateDamage(action.actor, action.actor, action, false, 1.0f);
@@ -1791,7 +1850,7 @@ namespace Manager
             
             // 2. 방어력
             int def = 0;
-            if (defender.TryGetComponent(out MonsterController mc)) def = mc.sourceData.stats.vit;
+            if (defender.TryGetComponent(out MonsterController mc)) def = mc.GetTotalVit();
             // (플레이어 방어 로직 생략)
 
             // 3. 계산
@@ -1847,8 +1906,8 @@ namespace Manager
             actor.transform.localPosition = Vector3.zero;
 
             // 4. 간단한 연출 대기
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click); // 발소리 등으로 교체 추천
-            yield return new WaitForSeconds(0.5f);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click); // 발소리 등으로 교체 추천
+            yield return wait05;
 
             if (messagePanel) messagePanel.SetActive(false);
         }
@@ -1909,7 +1968,7 @@ namespace Manager
 
         void SpawnMonster(string id)
         {
-            SoundManager.Instance.PlaySFX(Data.SfxID.Encounter);
+            SoundManager.Instance.PlaySFX(SfxID.Encounter);
             var entry = monsterDB.GetEntry(id);
             if (entry == null) return;
 
@@ -2090,7 +2149,7 @@ namespace Manager
 
 
             // 2. 각 몬스터에 대해 이동 가능 여부 체크
-            foreach (var monster in backRowMonsters)
+            foreach (MonsterController monster in backRowMonsters)
             {
                 // CheckAndMoveForward는 이동이 발생하면 0.5초 대기(yield)를 포함하고 있음
                 // 이동이 발생했을 때만 시간을 소모.
@@ -2289,9 +2348,9 @@ namespace Manager
             // 2. 공격 타입에 따른 주 스탯 결정 (물리:STR, 마법:MAG)
             bool isMagic = (action.skillData != null && action.skillData.element != ElementType.Physical);
 
-            // 3. 다형성(GetTotal...)을 이용해 스탯 가져오기 (if-else 불필요)
+            // 3. 다스탯 가져오기
             int atkLuc = attacker.GetTotalLuc();
-            int atkMainStat = isMagic ? attacker.GetTotalMag() : attacker.GetTotalStr();
+            int atkMainStat = isMagic ? attacker.GetMagicAttack() : attacker.GetAttack();
 
             int defLuc = defender.GetTotalLuc();
             int defAgi = defender.GetTotalAgi();
@@ -2397,18 +2456,18 @@ namespace Manager
         bool CalculateEscapeSuccess()
         {
             // 1. 아군 평균 AGI, LUC 계산 (살아있는 인원만)
-            List<PlayerController> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
+            List<BattleEntity> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
             if (livingPlayers.Count == 0) return false;
 
-            float playerAvgAgi = (float)livingPlayers.Average(p => p.sourceData.baseStats.agi);
-            float playerAvgLuc = (float)livingPlayers.Average(p => p.sourceData.baseStats.luc);
+            float playerAvgAgi = (float)livingPlayers.Average(p => p.GetTotalAgi());
+            float playerAvgLuc = (float)livingPlayers.Average(p => p.GetTotalLuc());
 
             // 2. 적군 평균 AGI, LUC 계산
-            List<MonsterController> livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
+            List<BattleEntity> livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
             if (livingMonsters.Count == 0) return true; // 적이 없으면 당연히 성공
 
-            float enemyAvgAgi = (float)livingMonsters.Average(m => m.sourceData.stats.agi);
-            float enemyAvgLuc = (float)livingMonsters.Average(m => m.sourceData.stats.luc);
+            float enemyAvgAgi = (float)livingMonsters.Average(m => m.GetTotalAgi());
+            float enemyAvgLuc = (float)livingMonsters.Average(m => m.GetTotalLuc());
 
             // 3. 비교 공식 (기획에 따라 조절 가능)
             // 기본 확률 50%
@@ -2446,7 +2505,7 @@ namespace Manager
             {
                 logText.text = "VICTORY!\n(Press Space Key)";
                 Debug.Log("승리! 경험치 획득..."); 
-                SoundManager.Instance.PlayBGM(Data.BgmID.Victory);
+                SoundManager.Instance.PlayBGM(BgmID.Victory);
             }
             else
             {
@@ -2455,7 +2514,7 @@ namespace Manager
 
             // 4. 플레이어가 결과를 읽을 때까지 대기 (키 입력)
             //    실수로 연타해서 넘어가는 것을 방지하기 위해 0.5초 딜레이 후 입력을 받는다.
-            yield return new WaitForSeconds(0.5f);
+            yield return wait05;
             
             // 플레이어가 Space나 Enter를 누를 때까지 무한 대기
             while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return))

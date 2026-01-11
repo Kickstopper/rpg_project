@@ -838,6 +838,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a452566938dbc8545b75a105464a2bec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entityName: 
+  currentHp: 0
+  currentMp: 0
+  maxHp: 0
+  maxMp: 0
+  columnIndex: 0
+  preferredImage: {fileID: 3565750124405715318}
+  isGuarding: 0
+  isPhysicalReflect: 0
+  isMagicReflect: 0
+  isPhysicalAbsorb: 0
+  isMagicAbsorb: 0
   bgImage: {fileID: 3565750124405715318}
   faceImage: {fileID: 4412860075172480683}
   hpSlider: {fileID: 3251042766647597053}
@@ -852,6 +864,7 @@ MonoBehaviour:
       level: 0
       str: 0
       mag: 0
+      intel: 0
       vit: 0
       agi: 0
       luc: 0
@@ -864,14 +877,19 @@ MonoBehaviour:
       havoc: 0
     initialSkillIds: []
     initialWeaponId: 
+    initialGunId: 
+    initialAmmoId: 
     initialArmorIds: []
   learnedSkillIds: []
   equippedWeaponId: 
+  equippedGunId: 
+  equippedAmmoId: 
   equippedArmorIds: []
+  currentWeapon: {fileID: 0}
+  currentGun: {fileID: 0}
+  currentAmmo: {fileID: 0}
   currentStatusEffects: []
   level: 1
-  currentHp: 0
-  currentMp: 0
   currentRow: 0
 --- !u!1 &6923753880825221758
 GameObject:
