@@ -23,6 +23,11 @@ namespace UI.DungeonMapScene
         [Header("Display Settings")]
         public Material screenMaterial; // 인스펙터에서 DungeonScreenMat 연결
 
+        [Header("Visual Effects")]
+        public bool useWallDistortion = false; // 효과 켜기/끄기
+        public float distortionFreq = 0.5f;   // 굴곡의 빈도 (얼마나 자글자글한지)
+        public float distortionAmp = 2.0f;    // 굴곡의 강도 (얼마나 심하게 휘는지)
+
         [Header("Transition Settings")]
         public CanvasGroup fadeOverlay; // 인스펙터에서 할당 (검은색 패널)
         public float fadeDuration = 0.5f; // 페이드 효과 지속 시간
@@ -791,12 +796,27 @@ namespace UI.DungeonMapScene
                     }
                     else
                     {
-                        // 일반 텍스처 로직
-                        color = GetPixelFast(hitTexId, texX, texY);
+                        // 울퉁불퉁 효과 (Distortion)
+                        int sampleTexX = texX;
 
-                        // [추가된 부분] 측면(Side 1: 남/북쪽 벽) 그림자 적용
-                        // side == 1인 벽(세로 벽)을 볼 때 색상을 75% 정도로 어둡게 만듭니다.
-                        // 이렇게 하면 모서리 부분에서 명암 차이가 생겨 입체적으로 보입니다.
+                        if (useWallDistortion)
+                        {
+                            // y(화면 높이)와 x(화면 가로)를 섞어서 불규칙한 파동 생성
+                            // x를 더해주는 이유: 옆줄과 파동이 어긋나게 해서 자연스러운 굴곡을 만듦
+                            float wave = Mathf.Sin((y + x) * distortionFreq) * distortionAmp;
+                            
+                            // 원본 texX에 오프셋을 더함
+                            sampleTexX = (int)(texX + wave);
+                            
+                            // 텍스처 범위를 벗어나지 않게 마스킹 (Wrap Around)
+                            // texWidth가 64(2의 n승)라고 가정할 때 안전장치
+                            sampleTexX = sampleTexX & (texWidth - 1); 
+                        }
+
+                        // 기존 texX 대신 sampleTexX 사용
+                        color = GetPixelFast(hitTexId, sampleTexX, texY);
+
+                        // 측면(Side 1: 남/북쪽 벽) 그림자 적용
                         if (side == 1) 
                         { 
                             color.r *= 0.9f; 
@@ -804,7 +824,7 @@ namespace UI.DungeonMapScene
                             color.b *= 0.9f; 
                         } 
 
-                        // 깊이에 따른 밝기 (기존 코드)
+                        // 깊이에 따른 밝기
                         color.r *= gamma;
                         color.g *= gamma;
                         color.b *= gamma;
