@@ -32,7 +32,31 @@ MonoBehaviour:
       elec: 0
       force: 0
       havoc: 0
-    initialSkillIds: []
+    initialSkillIds:
+    - skl_000
+    - skl_001
+    - skl_002
+    - skl_003
+    - skl_004
+    - skl_005
+    - skl_006
+    - skl_007
+    - skl_008
+    - skl_010
+    - skl_011
+    - skl_012
+    - skl_013
+    - skl_014
+    - skl_015
+    - skl_016
+    - skl_017
+    - skl_018
+    - skl_019
+    - skl_020
+    - skl_021
+    - skl_022
+    - skl_023
+    - skl_024
     initialWeaponId: 
     initialGunId: gun_000
     initialAmmoId: ammo_000

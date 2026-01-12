@@ -7,16 +7,17 @@ using Manager;
 using Data;
 namespace Controller
 {
-    public class BattleItemUIController : MonoBehaviour
+    public class BattleSkillUIController : MonoBehaviour
     {
         [Header("UI References")]
         public Transform contentTransform; 
-        public GameObject itemSlotPrefab;  
+        public GameObject skillSlotPrefab;  
         
         [Header("Tabs")]
+        public Button btnTabMagic;
         public Button btnTabRecover;
-        public Button btnTabBuff;
-        public Button btnTabAttack;
+        public Button btnTabAssist;
+        public Button btnTabSpecial;
 
         // 현재 선택된 탭 (0:Recover, 1:Buff, 2:Attack)
         private int currentTab = 0;
@@ -28,12 +29,15 @@ namespace Controller
         private Color activeTabColor = Color.white;
         private Color inactiveTabColor = new Color(0.7f, 0.7f, 0.7f, 1f); // 약간 어둡게
 
+        private List<string> currentSkillIds;
+
         void Start()
         {
             // 버튼 이벤트 연결
-            btnTabRecover.onClick.AddListener(() => SwitchTab(0));
-            btnTabBuff.onClick.AddListener(() => SwitchTab(1));
-            btnTabAttack.onClick.AddListener(() => SwitchTab(2));
+            btnTabMagic.onClick.AddListener(() => SwitchTab(0));
+            btnTabRecover.onClick.AddListener(() => SwitchTab(1));
+            btnTabAssist.onClick.AddListener(() => SwitchTab(2));
+            btnTabSpecial.onClick.AddListener(() => SwitchTab(3));
             
             // 초기 탭 색상 업데이트
             UpdateTabVisuals();
@@ -67,29 +71,34 @@ namespace Controller
         // 탭 변경 로직 (인덱스 순환)
         void ChangeTab(int direction)
         {
-            // 0 -> 1 -> 2 -> 0 순환
+            // 0 -> 1 -> 2 -> 3 -> 0 순환
             currentTab += direction;
 
-            if (currentTab > 2) currentTab = 0;
-            else if (currentTab < 0) currentTab = 2;
+            if (currentTab > 3) currentTab = 0;
+            else if (currentTab < 0) currentTab = 3;
 
             SwitchTab(currentTab);
         }
 
-        public void Show()
+        public void Show(List<string> skillIds)
         {
+            if (skillIds == null || skillIds.Count == 0) return;
+            currentSkillIds = skillIds;
             gameObject.SetActive(true);
             SwitchTab(0); // 열릴 때는 항상 첫 번째 탭부터
         }
 
         public void Close()
         {
+            currentSkillIds = null;
             gameObject.SetActive(false);
             CombatManager.Instance.OnPopupMenuClosed();
         }
 
         void SwitchTab(int categoryIndex)
         {
+            if (currentSkillIds == null) return;
+            
             currentTab = categoryIndex;
             
             // 탭 버튼 색상 갱신
@@ -102,9 +111,10 @@ namespace Controller
         // 현재 선택된 탭을 시각적으로 강조
         void UpdateTabVisuals()
         {
-            SetTabColor(btnTabRecover, currentTab == 0);
-            SetTabColor(btnTabBuff, currentTab == 1);
-            SetTabColor(btnTabAttack, currentTab == 2);
+            SetTabColor(btnTabMagic, currentTab == 0);
+            SetTabColor(btnTabRecover, currentTab == 1);
+            SetTabColor(btnTabAssist, currentTab == 2);
+            SetTabColor(btnTabSpecial, currentTab == 3);
         }
 
         void SetTabColor(Button btn, bool isActive)
@@ -124,15 +134,14 @@ namespace Controller
             currentSlots.Clear();
 
             // 2. 아이템 생성
-            List<string> allItemIds = InventoryManager.Instance.GetAllItemIds();
-            foreach (string id in allItemIds)
+            foreach (string id in currentSkillIds)
             {
-                ConsumableItemData data = DatabaseManager.Instance.GetConsumable(id); // [구현 필요]
+                SkillData data = DatabaseManager.Instance.GetSkill(id);
                 if (data == null) continue;
 
                 if (data.GetCategoryIndex() == currentTab)
                 {
-                    CreateItemSlot(data);
+                    CreateSkillSlot(data);
                 }
             }
             
@@ -140,15 +149,18 @@ namespace Controller
             StartCoroutine(SelectFirstItem());
         }
 
-        void CreateItemSlot(ConsumableItemData data)
+        void CreateSkillSlot(SkillData data)
         {
-            GameObject slotObj = Instantiate(itemSlotPrefab, contentTransform);
+            GameObject slotObj = Instantiate(skillSlotPrefab, contentTransform);
             
-            // 이름/개수 표시 (예시)
+            // 이름 표시
             var texts = slotObj.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
             if(texts.Length > 0) texts[0].text = data.dataName;
-            int count = InventoryManager.Instance.GetItemCount(data.id);
-            if(texts.Length > 1) texts[1].text = $"x{count}";
+            
+            // 소모량 표시
+            string consumeText = data.useHpCost ? "HP" : "MP";
+            string cost = data.costValue.ToString();
+            if(texts.Length > 1) texts[1].text = $"{consumeText} {cost}";
 
             // 버튼 이벤트
             slotObj.GetComponent<Button>().onClick.AddListener(() => OnItemClicked(data));
@@ -156,7 +168,7 @@ namespace Controller
             currentSlots.Add(slotObj);
         }
 
-        void OnItemClicked(ConsumableItemData itemData)
+        void OnItemClicked(BaseRootData itemData)
         {
             // 선택 후 닫기
             gameObject.SetActive(false);
@@ -176,9 +188,10 @@ namespace Controller
             {
                 // 아이템이 없으면 탭 버튼으로 포커스
                 EventSystem.current.SetSelectedGameObject(null);
-                if (currentTab == 0) EventSystem.current.SetSelectedGameObject(btnTabRecover.gameObject);
-                else if (currentTab == 1) EventSystem.current.SetSelectedGameObject(btnTabBuff.gameObject);
-                else EventSystem.current.SetSelectedGameObject(btnTabAttack.gameObject);
+                if (currentTab == 0) EventSystem.current.SetSelectedGameObject(btnTabMagic.gameObject);
+                else if (currentTab == 1) EventSystem.current.SetSelectedGameObject(btnTabRecover.gameObject);
+                else if (currentTab == 2) EventSystem.current.SetSelectedGameObject(btnTabAssist.gameObject);
+                else  EventSystem.current.SetSelectedGameObject(btnTabSpecial.gameObject);
             }
         }
     }

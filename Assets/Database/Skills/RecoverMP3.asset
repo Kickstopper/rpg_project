@@ -9,17 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbd550e54fb7702488429f5a8bae4b22, type: 3}
-  m_Name: ReflectPhys
+  m_Script: {fileID: 11500000, guid: 2509d072dc88eee4e99bc80b884fd02e, type: 3}
+  m_Name: RecoverMP3
   m_EditorClassIdentifier: 
-  id: item_002
-  dataName: "\uBB3C\uBC29\uAC1C"
-  description: "\uBB3C\uACF5\uC744 \uBC18\uC0AC\uD558\uACE0 \uC2F6\uB2E4\uC694"
+  id: skl_016
+  dataName: "\uB9AC\uCEE4\uBC84 MP 3"
+  description: "MP\uB97C \uB300 \uD68C\uBCF5"
   icon: {fileID: 0}
-  effectType: 9
-  effectValue: 22
+  effectType: 0
+  effectValue: 10
   element: 6
   targetScope: 7
-  price: 0
-  isSellable: 1
-  effectPrefab: {fileID: 0}
+  useHpCost: 0
+  costValue: 10
+  hitRate: 0

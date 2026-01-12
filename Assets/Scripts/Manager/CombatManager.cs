@@ -18,6 +18,7 @@ namespace Manager
         [Header("UI References")]
         public GameObject baseCmdContainer;   // 1단계 메뉴 (Fight, Talk...)
         public GameObject fightCmdContainer;  // 2단계 메뉴 (Attack, Move...)
+        public BattleSkillUIController battleSkillUI; // 인스펙터에서 할당
         public BattleItemUIController battleItemUI; // 인스펙터에서 할당
         public GameObject commandPanel;     // 커맨드 버튼들
         public GameObject logPanel;         // 시스템 로그 패널
@@ -37,7 +38,7 @@ namespace Manager
         public Vector3 cursorOffset = new Vector3(0, 50, 0); // 몬스터 머리 위 오프셋
 
         // 타겟팅 로직 변수
-        private List<BattleEntity> validTargets = new List<BattleEntity>();
+        private List<BattleEntity> validTargets = new();
         private int currentTargetIndex = 0;
 
         [Header("Managers & Data")]
@@ -52,8 +53,8 @@ namespace Manager
 
         [Header("Player Slots")]
         //아군 슬롯 리스트
-        private List<Transform> playerFrontSlots = new List<Transform>();
-        private List<Transform> playerBackSlots = new List<Transform>();
+        private List<Transform> playerFrontSlots = new();
+        private List<Transform> playerBackSlots = new();
 
         //이동 모드 관련 변수
         private PlayerController lastHighlightedPlayer; // 마지막으로 하이라이트된 플레이어를 기억할 변수
@@ -66,23 +67,22 @@ namespace Manager
 
         [Header("Slot Management")]
         // 몬스터들의 슬롯을 관리할 리스트 (0,1,2: 전열 / 0,1,2: 후열)
-        private List<Transform> frontSlots = new List<Transform>();
-        private List<Transform> backSlots = new List<Transform>();
+        private List<Transform> frontSlots = new();
+        private List<Transform> backSlots = new();
         
-        private ConsumableItemData currentSelectedItem; // 현재 사용하려는 아이템
+        private BaseRootData currentSelectedItem; // 현재 사용하려는 아이템
         private bool isAutoMode = false; // 오토 모드 활성화 여부
         
         // 각 캐릭터(인덱스)가 마지막으로 수행한 행동 타입 저장
-        private Dictionary<int, CombatAction.ActionType> lastPlayerActions = new Dictionary<int, CombatAction.ActionType>();
-
+        private Dictionary<int, (CombatAction.ActionType type, BaseRootData data)> lastPlayerActions = new();
         // -------------------------------------------------------
         // [핵심 변수] 전투 상태 및 리스트
         // -------------------------------------------------------
         public BattleState state;
-        public List<BattleEntity> activeMonsters = new List<BattleEntity>();
-        public List<BattleEntity> activePlayers = new List<BattleEntity>(); // 아군 리스트
+        public List<BattleEntity> activeMonsters = new();
+        public List<BattleEntity> activePlayers = new(); // 아군 리스트
 
-        public List<CombatAction> actionQueue = new List<CombatAction>(); // 이번 턴의 모든 행동
+        public List<CombatAction> actionQueue = new(); // 이번 턴의 모든 행동
 
         // 입력 제어용 변수
         private int currentPlayerIndex = 0; // 지금 누구 차례?
@@ -368,12 +368,12 @@ namespace Manager
                 if (isAutoMode) return;
                 Time.timeScale = 1.0f;
 
-                // 아이템 UI가 켜져 있다면 CombatManager의 모든 입력을 중단하고 리턴
-                // 이렇게 해야 방향키 입력이 CombatManager로 새지 않고 아이템 UI 안에서만 돕니다.
+                // 스킬/아이템 UI가 켜져 있다면 CombatManager의 모든 입력을 중단하고 리턴
+                // 이렇게 해야 방향키 입력이 CombatManager로 새지 않고 스킬/아이템 UI 안에서만 돕니다.
                 if (battleItemUI != null && battleItemUI.gameObject.activeSelf)
-                {
                     return; 
-                }
+                if (battleSkillUI != null && battleSkillUI.gameObject.activeSelf) 
+                    return;
 
                 if (isSelectingTarget)
                 {
@@ -390,8 +390,9 @@ namespace Manager
                 }
 
                 bool isItemUIPopupActive = (battleItemUI != null && battleItemUI.gameObject.activeSelf);
+                bool isSkillUIPopupActive = (battleSkillUI != null && battleSkillUI.gameObject.activeSelf);
                 // 포커스 유지 로직 (이동 선택 중이 아닐 때만)
-                if (!isSelectingTarget && !isSelectingMoveTarget && !isItemUIPopupActive && commandPanel.activeSelf)
+                if (!isSelectingTarget && !isSelectingMoveTarget && !isItemUIPopupActive && !isSkillUIPopupActive && commandPanel.activeSelf)
                 {
                     MaintainSelection();
                 }
@@ -533,26 +534,65 @@ namespace Manager
             PrepareWeaponAction(actor.currentGun, CombatAction.ActionType.Gun);
         }
 
-        public void OnFightCommand_Skill() { Debug.Log("스킬 (미구현)"); }
+        public void OnFightCommand_Skill()
+        {
+            if (battleSkillUI == null) return; 
+            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+
+            List<string> skills = actor.learnedSkillIds;
+            if (skills == null || skills.Count == 0)
+            {
+                if (logPanel)
+                {
+                    logPanel.SetActive(true);
+                    logText.text = "사용할 수 있는 스킬이 없습니다";
+                }
+            }
+            else
+            {
+                if (logPanel)
+                {
+                    logPanel.SetActive(true);
+                    logText.text = "사용할 스킬을 선택하세요";
+                }
+                // 1. 뒷배경(커맨드 버튼들) 상호작용 차단
+                SetContainerInteractable(fightCmdContainer, false);
+                // 2. 스킬 UI 열기
+                battleSkillUI.Show(skills);
+            } 
+        }
         public void OnFightCommand_Item()
         {
-            if (battleItemUI != null) 
+            if (battleItemUI == null) return;
+            List<string> allItemIds = InventoryManager.Instance.GetAllItemIds();
+            if (allItemIds == null || allItemIds.Count == 0)
             {
+                if (logPanel)
+                {
+                    logPanel.SetActive(true);
+                    logText.text = "사용할 수 있는 아이템이 없습니다";
+                }
+            }
+            else
+            {
+                if (logPanel)
+                {
+                    logPanel.SetActive(true);
+                    logText.text = "사용할 아이템을 선택하세요";
+                }
                 // 1. 뒷배경(커맨드 버튼들) 상호작용 차단
-                // CanvasGroup의 interactable을 끄면 네비게이션이 이쪽으로 절대 넘어오지 않는다.
                 SetContainerInteractable(fightCmdContainer, false);
-
                 // 2. 아이템 UI 열기
                 battleItemUI.Show();
             }
+            
         }
 
         // 아이템 선택이 취소되거나 완료되어 창이 닫힐 때 호출할 함수
-        public void OnItemMenuClosed()
+        public void OnPopupMenuClosed()
         {
             // 1. 뒷배경 상호작용 다시 허용
             SetContainerInteractable(fightCmdContainer, true);
-
             // 2. 포커스 복구 (Item 버튼이나 Attack 버튼으로)
             StartCoroutine(SelectButton(attackButton)); 
         }
@@ -570,26 +610,32 @@ namespace Manager
             }
         }
 
-        // 2. 아이템이 선택되었을 때
-        public void OnItemSelected(ConsumableItemData item)
+        // 2. 리스트 팝업의 스킬 또는 아이템이 선택되었을 때
+        public void OnPopupItemSelected(BaseRootData item)
         {
             currentSelectedItem = item;
-            
-            // 타겟 선택 로직 재활용을 위해 변수 설정
-            // (PrepareWeaponAction과 유사한 로직)
-            
+
+            // 들어온 데이터가 스킬인지 아이템인지에 따라 ActionType 결정
+            if (item is SkillData)
+            {
+                currentSelectedAction = CombatAction.ActionType.Skill;
+            }
+            else if (item is ConsumableItemData)
+            {
+                currentSelectedAction = CombatAction.ActionType.Item;
+            }
+
+            // 타겟팅 로직은 동일 (BaseRootData의 targetScope 사용)
             TargetScope scope = item.targetScope;
-            
-            // 범위에 따라 타겟 선택 모드 진입 or 즉시 실행
+
             if (scope == TargetScope.OneEnemy || scope == TargetScope.OneAlly || scope == TargetScope.DeadAlly)
             {
-                // 타겟 선택 모드 시작 (validTargets 세팅 필요)
                 StartItemTargetSelection(scope);
             }
             else
             {
-                // 전체/랜덤/자신 -> 즉시 큐에 등록
-                QueueItemAction(null); // 타겟 null (전체/자신)
+                // 타겟 선택 불필요 (전체/자신/랜덤) -> 즉시 큐 등록
+                QueuePolymorphicAction(null); 
             }
         }
 
@@ -673,13 +719,19 @@ namespace Manager
         }
 
         // 4. 행동 큐 등록
-        void QueueItemAction(GameObject target)
+        void QueuePolymorphicAction(GameObject target)
         {
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+
+            // 위에서 결정한 currentSelectedAction (Skill or Item)을 사용
+            CombatAction action = new CombatAction(actor.gameObject, target, currentSelectedAction, actor.GetTotalAgi());
             
-            CombatAction action = new CombatAction(actor.gameObject, target, CombatAction.ActionType.Item, actor.GetTotalAgi());
-            action.skillData = null; // 스킬 아님
+            // [중요] 다형성 필드(itemData)에 데이터 연결
             action.itemData = currentSelectedItem; 
+            
+            // skillData 필드는 이제 itemData로 통합되었으므로 굳이 안 써도 되지만,
+            // 기존 코드 호환성을 위해 캐스팅해서 넣어줄 수도 있음 (선택 사항)
+            if (currentSelectedItem is SkillData skill) action.skillData = skill;
 
             actionQueue.Add(action);
             NextPlayerInput();
@@ -813,9 +865,14 @@ namespace Manager
         {
             // 1. 이전 행동 가져오기 (없으면 기본 Attack)
             CombatAction.ActionType actionType = CombatAction.ActionType.Attack;
+            BaseRootData autoData = null; // 데이터를 받아줄 변수
+
             if (lastPlayerActions.ContainsKey(currentPlayerIndex))
             {
-                actionType = lastPlayerActions[currentPlayerIndex];
+                // 튜플에서 타입과 데이터를 분리해서 가져옴
+                var info = lastPlayerActions[currentPlayerIndex];
+                actionType = info.type;
+                autoData = info.data; 
             }
 
             // 2. 타겟 결정 (랜덤 적)
@@ -832,7 +889,14 @@ namespace Manager
             // 3. 행동 생성 (현재는 Attack만 구현, 나중에 Guard/Skill 분기 추가 가능)
             // (Guard나 Skill은 타겟이 아군이거나 없을 수 있으므로 추후 보완 필요)
             int speed = actor.GetTotalAgi() + Random.Range(0, 5);
+            // 3. 행동 생성
             CombatAction action = new CombatAction(actor.gameObject, target.gameObject, actionType, speed);
+
+            // 여기서 데이터를 넣어야 에러가 안 난다!
+            action.itemData = autoData; 
+
+            // 스킬 데이터 캐스팅 (호환성 유지용)
+            if (autoData is SkillData skill) action.skillData = skill;
 
             // 4. 큐에 추가
             actionQueue.Add(action);
@@ -1371,11 +1435,15 @@ namespace Manager
             // 현재 순서의 플레이어 가져오기
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
 
-            // (옵션) 이번 행동을 '마지막 행동'으로 기록 (오토 모드용)
+            // 이번 행동을 '마지막 행동'으로 기록 (오토 모드용)
             if (lastPlayerActions.ContainsKey(currentPlayerIndex))
-                lastPlayerActions[currentPlayerIndex] = currentSelectedAction;
+            {
+                lastPlayerActions[currentPlayerIndex] = (currentSelectedAction, currentSelectedItem);
+            }
             else
-                lastPlayerActions.Add(currentPlayerIndex, currentSelectedAction);
+            {
+                lastPlayerActions.Add(currentPlayerIndex, (currentSelectedAction, currentSelectedItem));
+            }
             
             // 1. 행동 속도 결정 (기본 AGI + 난수)
             int speed = actor.GetTotalAgi() + Random.Range(0, 5);
@@ -1544,6 +1612,10 @@ namespace Manager
                     yield return HandleItemAction(action);
                     break;
 
+                case CombatAction.ActionType.Skill:
+                    yield return HandleSkillAction(action);
+                    break;
+
                 case CombatAction.ActionType.Guard:
                     yield return HandleGuardAction(action);
                     break;
@@ -1565,11 +1637,44 @@ namespace Manager
         }
 
         // ========================================================================
+        // 1. 스킬 처리 핸들러
+        // ========================================================================
+        IEnumerator HandleSkillAction(CombatAction action)
+        {
+            SkillData skill = action.itemData as SkillData; // BaseRootData를 SkillData로 캐스팅
+            GameObject target = action.target;
+            PlayerController actor = action.actor.GetComponent<PlayerController>();
+
+            // 1. 코스트 지불 (MP/HP)
+            if (actor != null && skill != null)
+            {
+                if (skill.useHpCost)
+                {
+                    // HP 코스트 로직
+                    // actor.currentHp -= skill.costValue;
+                }
+                else
+                {
+                    actor.currentMp -= skill.costValue;
+                    // UI 갱신 필요
+                }
+            }
+
+            Debug.Log($"{action.actor.name}의 스킬 발동: {skill.dataName}");
+            
+            // 2. 효과 적용 (ApplyItemEffect 재사용!)
+            // 스킬과 아이템의 효과 처리는 같으므로 공유 가능
+            ApplyItemEffect(target, skill); 
+
+            yield return wait05;
+        }
+
+        // ========================================================================
         // 1. 아이템 처리 핸들러
         // ========================================================================
         IEnumerator HandleItemAction(CombatAction action)
         {
-            ConsumableItemData item = action.itemData;
+            BaseRootData item = action.itemData;
             GameObject target = action.target;
 
             Debug.Log($"{action.actor.name}의 아이템 사용: {item.dataName}");
@@ -1581,7 +1686,7 @@ namespace Manager
             yield return wait05;
         }
 
-        void ApplyItemEffect(GameObject target, ConsumableItemData item)
+        void ApplyItemEffect(GameObject target, BaseRootData item)
         {
             // 공통 컴포넌트 접근 헬퍼 사용 (하단 구현 참조)
             var pTarget = target.GetComponent<PlayerController>();
@@ -1589,26 +1694,29 @@ namespace Manager
 
             switch (item.effectType)
             {
-                case ItemEffectType.RecoverHP:
+                case EffectType.Recover_HP:
                     if (pTarget) pTarget.Recover(item.effectValue, 0);
                     // 몬스터 회복 로직 추가 가능
                     break;
-                case ItemEffectType.RecoverMP:
+                case EffectType.Recover_MP:
                     if (pTarget) pTarget.Recover(0, item.effectValue);
                     break;
-                case ItemEffectType.Revive:
+                case EffectType.Revive_Empty:
+                case EffectType.Revive_Fully:
                     if (pTarget && pTarget.currentHp <= 0) pTarget.Revive(item.effectValue);
                     break;
-                case ItemEffectType.Attack_Physical:
-                case ItemEffectType.Attack_Magic:
+                    
+                case EffectType.Special_Atk:
+                case EffectType.Magic_Atk:
                     int dmg = item.effectValue;
                     ApplyDamage(target, dmg, false); // 공통 데미지 함수 호출
                     break;
-                case ItemEffectType.Buff_ReflectPhys:
+
+                case EffectType.Reflect_Phys:
                     if (pTarget) pTarget.isPhysicalReflect = true;
                     Debug.Log($"{target.name}: 물리 반사 배리어!");
                     break;
-                case ItemEffectType.Buff_ReflectMagic:
+                case EffectType.Reflect_Magic:
                     if (pTarget) pTarget.isMagicReflect = true;
                     Debug.Log($"{target.name}: 마법 반사 배리어!");
                     break;
@@ -2385,7 +2493,17 @@ namespace Manager
             // 1. 공격력 계산
             int baseAtk = attacker.GetTotalStr(); 
 
-            int skillPower = (action.type == CombatAction.ActionType.Attack || action.type == CombatAction.ActionType.Gun) ? 0 : (action.skillData != null ? action.skillData.basePower : 0);
+            int skillPower = 0;
+            // 타입이 스킬이거나, 아이템(공격아이템)인 경우 effectValue를 위력으로 사용
+            if (action.type == CombatAction.ActionType.Skill || action.type == CombatAction.ActionType.Item)
+            {
+                if (action.itemData != null)
+                {
+                    // BaseRootData의 effectValue를 위력으로 사용 (SkillData.basePower 대신)
+                    skillPower = action.itemData.effectValue; 
+                }
+            }
+
             int totalAtk = baseAtk + skillPower;
 
             // ------------------------------------
@@ -2430,11 +2548,11 @@ namespace Manager
             return finalDamage;
         }
 
-        private float GetResistanceValue(SkillData skill, ResistanceData resist)
+        private float GetResistanceValue(BaseRootData data,ResistanceData resist)
         {
-            if (skill == null) return resist.physical; 
-            
-            ElementType type = skill.element;
+            if (data == null) return resist.physical; 
+    
+            ElementType type = data.element;
             switch(type)
             {
                 case ElementType.Fire:

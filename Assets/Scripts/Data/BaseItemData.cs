@@ -19,6 +19,26 @@ public enum TargetScope
     OneEnemy,           // 적 1명
 }
 
+public enum EffectType 
+{ 
+    // [Atk Magic]
+    Magic_Atk,
+
+    // [Assistance Magic]
+    Buff_Phys_Atk, Buff_Magic_Atk, Buff_Phys_Def, Buff_Mag_Def,             // 공격력 및 방어력 상승
+    Debuff_Phys_Atk, Debuff_Magic_Atk, Debuff_Phys_Def, Debuff_Magic_Def,   // 공격력 및 방어력 하락
+    Reflect_Phys, Reflect_Magic,                                            // 물리 및 마법 공격 반사
+    Absorb_Phys, Absorb_Magic,                                              // 물리 및 마법 공격 흡수 
+    
+    
+    // [Recover Magic]
+    Recover_HP, Recover_MP,                 // HP 및 MP 상승 
+    Revive_Empty, Revive_Fully,   // 부활만 시킴, HP와 MP가 최대 상태로 부활
+
+    // [Special]
+    Special_Atk,
+}
+
 namespace Data
 {
     // ---------------------------------------------------------
@@ -31,6 +51,12 @@ namespace Data
         public string dataName;        // 게임 내 표시 이름
         [TextArea] public string description; // 설명
         public Sprite icon;            // 아이콘
+        public EffectType effectType;
+        public int effectValue; // 회복량 또는 데미지
+        public ElementType element;
+        public TargetScope targetScope;
+        [Header("Visual")]
+        public GameObject effectPrefab; // 사용 시 이펙트 (옵션)
     }
 
     // ---------------------------------------------------------

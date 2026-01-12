@@ -16,10 +16,10 @@ MonoBehaviour:
   dataName: "\uBD80\uD65C\uB85C"
   description: "\uBD80\uD65C\uD558\uACE0 \uC2F6\uC73C\uBA74 \uAFC0\uAEBD\uD574"
   icon: {fileID: 0}
+  effectType: 15
+  effectValue: 100
+  element: 6
+  targetScope: 7
   price: 0
   isSellable: 1
-  effectType: 2
-  effectValue: 100
-  targetScope: 9
-  element: 6
   effectPrefab: {fileID: 0}
