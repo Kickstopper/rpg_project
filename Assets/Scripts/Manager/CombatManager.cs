@@ -29,6 +29,8 @@ namespace Manager
         [Header("Prefabs")]
         public GameObject defaultMonsterPrefab;
         public GameObject playerPrefab;
+        public GameObject vfxSlashPrefab;  // 물리 공격용
+        public GameObject vfxMagicPrefab;  // 마법 공격용
 
         [Header("First Focus Buttons")]
         public GameObject baseFirstButton;    // Base 메뉴의 첫 버튼 (Fight 버튼)
@@ -1799,6 +1801,42 @@ namespace Manager
             // 사운드
             var sfxId = (action.type == CombatAction.ActionType.Gun) ? SfxID.Attack_Gun : SfxID.Attack_Sword;
             SoundManager.Instance.PlaySFX(sfxId);
+
+            // =========================================================
+            // 타격 이펙트 생성
+            // =========================================================
+            GameObject vfxToSpawn = null;
+            // 공격 타입에 따라 이펙트 결정
+            if (action.type == CombatAction.ActionType.Attack || action.type == CombatAction.ActionType.Gun)
+            {
+                vfxToSpawn = vfxSlashPrefab;
+            }
+            else if (action.type == CombatAction.ActionType.Skill) // 혹은 마법 스킬
+            {
+                // 스킬 속성에 따라 다르게 할 수도 있음 (여기선 magicPrefab 통일)
+                vfxToSpawn = vfxMagicPrefab;
+            }
+            else if (action.type == CombatAction.ActionType.Item)
+            {
+                // 아이템(공격용)인 경우
+                if (action.itemData.effectType == EffectType.Special_Atk || 
+                    action.itemData.effectType == EffectType.Magic_Atk)
+                {
+                    vfxToSpawn = vfxMagicPrefab;
+                }
+            }
+
+            if (vfxToSpawn != null)
+            {
+                // 타겟의 위치(가운데 혹은 약간 위)에 생성
+                Vector3 spawnPos = target.transform.position;
+                
+                // 2D 스프라이트라면 Z값이 중요할 수 있으므로 보정 (카메라 쪽으로 살짝 당김)
+                spawnPos.z = -5; 
+
+                Instantiate(vfxToSpawn, spawnPos, Quaternion.identity);
+            }
+            // =========================================================
 
             // 위치 보정값 계산
             GetPositionalModifiers(action.actor, target, action, out float posDmgMult, out float posEvaBonus);

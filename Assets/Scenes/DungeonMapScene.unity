@@ -1067,7 +1067,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 32
+    m_Bits: 33
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -5422,6 +5422,8 @@ MonoBehaviour:
   messageText: {fileID: 1855285923}
   defaultMonsterPrefab: {fileID: 5675693360896444327, guid: 5886499ad23134b40a1350463fb19b81, type: 3}
   playerPrefab: {fileID: 6815253905712193029, guid: d7f43cf7a138ea1439eaeabd115425df, type: 3}
+  vfxSlashPrefab: {fileID: 7405688537336936215, guid: 7c7486c5695c3ba489d13e3922f0c1f8, type: 3}
+  vfxMagicPrefab: {fileID: 7405688537336936215, guid: 0ee5f5d0414c76e47b2d7409a5ad57e7, type: 3}
   baseFirstButton: {fileID: 251505308}
   attackButton: {fileID: 591616784}
   targetCursor: {fileID: 0}
