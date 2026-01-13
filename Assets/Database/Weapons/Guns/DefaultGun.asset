@@ -16,13 +16,18 @@ MonoBehaviour:
   dataName: 
   description: "\uAC00\uC7A5 \uBCF4\uD1B5\uC758 \uCD1D"
   icon: {fileID: 0}
+  effectType: 19
+  effectValue: 0
+  element: 0
+  targetScope: 1
+  effectPrefab: {fileID: 0}
   price: 0
   isSellable: 1
   type: 1
-  attackPower: 10
-  hitRateBonus: 10
+  attackPower: 1
+  hitRateBonus: 1
   scalingStatName: 
   damageElement: 0
-  attackRange: 5
+  attackRange: 1
   minHits: 1
-  maxHits: 2
+  maxHits: 6

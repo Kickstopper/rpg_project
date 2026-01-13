@@ -20,6 +20,7 @@ namespace Data
         Monster_Dead_M, // 몬스터 죽음 (남)
         Monster_Dead_F, // 몬스터 죽음 (여)
         Attack_Gun,     // 총 공격
+        Attack_Magic,   // 마법 공격
 
     }
 

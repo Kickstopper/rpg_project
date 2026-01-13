@@ -37,6 +37,9 @@ public enum EffectType
 
     // [Special]
     Special_Atk,
+
+    // [Atk Phys]
+    Phys_Atk, Gun_Atk
 }
 
 namespace Data

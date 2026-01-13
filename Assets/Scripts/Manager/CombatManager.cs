@@ -25,11 +25,13 @@ namespace Manager
         public TextMeshProUGUI logText;     // 시스템 안내 메시지 텍스트
         public GameObject messagePanel;     // 전투 중 캐릭터의 메시지 패널
         public TextMeshProUGUI messageText; // 전투 중 캐릭터의 메시지 텍스트
+        public Slider qteTimingSlider; // 타이머 슬라이더. 인스펙터에서 할당
 
         [Header("Prefabs")]
         public GameObject defaultMonsterPrefab;
         public GameObject playerPrefab;
         public GameObject vfxSlashPrefab;  // 물리 공격용
+        public GameObject vfxGunPrefab;  // 총 공격용
         public GameObject vfxMagicPrefab;  // 마법 공격용
 
         [Header("First Focus Buttons")]
@@ -244,7 +246,7 @@ namespace Manager
             BattleEntity currentActor = activePlayers[currentPlayerIndex];
 
             // =========================================================
-            // [핵심 수정] 무기가 없으면(null) -> 맨손 공격 설정 (전열 1명)
+            // 무기가 없으면(null) -> 맨손 공격 설정 (전열 1명)
             // =========================================================
             TargetScope scope = TargetScope.FrontSingle; 
             
@@ -1441,52 +1443,47 @@ namespace Manager
             // 현재 순서의 플레이어 가져오기
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
 
-            // 이번 행동을 '마지막 행동'으로 기록 (오토 모드용)
+            // (옵션) 이번 행동을 '마지막 행동'으로 기록 (오토 모드용)
             if (lastPlayerActions.ContainsKey(currentPlayerIndex))
-            {
                 lastPlayerActions[currentPlayerIndex] = (currentSelectedAction, currentSelectedItem);
-            }
             else
-            {
                 lastPlayerActions.Add(currentPlayerIndex, (currentSelectedAction, currentSelectedItem));
-            }
             
-            // 1. 행동 속도 결정 (기본 AGI + 난수)
-            int speed = actor.GetTotalAgi() + Random.Range(0, 5);
+            // =========================================================
+            // 행동 속도 결정 (페널티 적용)
+            // =========================================================
+            // 기존 AGI + 난수 - 누적된 페널티
+            int finalSpeed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty + Random.Range(0, 5);
+            
+            // 페널티 적용했으니 초기화 (다음 턴을 위해)
+            actor.nextTurnSpeedPenalty = 0; 
+            // =========================================================
 
-            // 2. CombatAction 생성
-            CombatAction action = new CombatAction(actor.gameObject, targetEntity.gameObject, currentSelectedAction, speed); //
+            // =========================================================
+            // 계산된 finalSpeed를 액션에 전달
+            // =========================================================
+            CombatAction action = new CombatAction(actor.gameObject, targetEntity.gameObject, currentSelectedAction, finalSpeed); 
             
-            // =========================================================
-            // OnTargetSelected 아이템 사용이라면, 아이템 데이터를 액션에 연결해야 함!
-            // =========================================================
+            // 아이템 데이터 연결
             if (currentSelectedAction == CombatAction.ActionType.Item)
             {
                 action.itemData = currentSelectedItem; 
-
-                // (옵션) 아이템 사용은 공격보다 우선순위를 높이고 싶다면 속도 보정
-                action.speed += 500;
+                action.speed += 500; // 아이템 우선권 보정
             }
-            // =========================================================
 
-            Debug.Log($"{actor.entityName}의 {currentSelectedAction} 예약 완료! (Target: {targetEntity.entityName})");
+            Debug.Log($"{actor.entityName}의 {currentSelectedAction} 예약 완료! (Speed: {finalSpeed}, Target: {targetEntity.entityName})");
 
             // 3. 큐에 저장 
             actionQueue.Add(action);
+
             // 4. UI 정리 및 다음 입력으로 이동
             isSelectingTarget = false;
-            if (targetCursor) targetCursor.gameObject.SetActive(false); // 커서 끄기
+            if (targetCursor) targetCursor.gameObject.SetActive(false);
             
-            // 타겟 하이라이트 끄기
             targetEntity.SetSelectionState(false);
 
-            // =========================================================
-            // 다음 턴을 위해 상호작용 복구
-            // =========================================================
             SetContainerInteractable(fightCmdContainer, true);
-            // =========================================================
 
-            // 다음 캐릭터로 턴 넘기기
             NextPlayerInput();
         }
 
@@ -1758,43 +1755,120 @@ namespace Manager
             // 1. 무기 및 공격 정보 설정
             GetWeaponInfo(action, out int minHits, out int maxHits, out TargetScope scope);
             
-            int hitCount = Random.Range(minHits, maxHits + 1);
+            // 플레이어인지 확인
+            bool isPlayer = (action.actor.GetComponent<PlayerController>() != null);
             
-            string actStr = string.Empty;
-            if (action.type == CombatAction.ActionType.Gun)
+            // 오토 모드이거나 몬스터라면: 랜덤 횟수
+            int autoHitCount = 0;
+            if (!isPlayer || isAutoMode)
             {
-                actStr = "의 총이 불을 뿜었다!";
+                autoHitCount = Random.Range(minHits, maxHits + 1);
             }
-            else actStr = "은(는) 검을 휘둘렀다!";
-            ShowLog($"{action.actor.name}{actStr} 횟수: {hitCount}");
-            
-            // 2. 연타 루프
-            for (int i = 0; i < hitCount; i++)
+            else
             {
-                // 타겟 갱신 (죽은 적 제외 등)
-                List<GameObject> currentTargets = GetTargetsByScope(scope, action);
-                if (currentTargets.Count == 0) break; // 대상 없음
+                // 수동 플레이어: 최소 횟수만큼만 자동 실행
+                autoHitCount = minHits;
+            }
 
-                // 공격 애니메이션 (첫 타격만)
+            // 로그 출력
+            string actStr = (action.type == CombatAction.ActionType.Gun) ? "의 사격!" : "의 참격!";
+            ShowLog($"{action.actor.name}{actStr}");
+
+            // =========================================================
+            // Phase 1: 자동 공격 (기존과 동일, 순차 실행 유지)
+            // =========================================================
+            for (int i = 0; i < autoHitCount; i++)
+            {
+                List<GameObject> currentTargets = GetTargetsByScope(scope, action);
+                if (currentTargets.Count == 0) break; 
+
                 if (i == 0)
                 {
                     action.actor.transform.localPosition += Vector3.forward * 0.3f;
                     yield return wait01;
                 }
 
-                // 실제 타격 처리
                 foreach (var target in currentTargets)
                 {
+                    // [중요] 자동 공격은 리듬감을 위해 여전히 기다려줌(yield return)
                     yield return StartCoroutine(ProcessSingleHit(action, target));
                 }
-
-                yield return new WaitForSeconds(0.15f); // 타격 간 딜레이
-
-                // 전체 공격은 1회만 수행
+                
+                yield return new WaitForSeconds(0.1f);
                 if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll) break;
             }
 
-            // 복귀
+            // =========================================================
+            // Phase 2: QTE 추가 타격
+            // =========================================================
+            int maxExtraHits = maxHits - minHits;
+
+            if (isPlayer && !isAutoMode && maxExtraHits > 0)
+            {
+                if (qteTimingSlider)
+                {
+                    qteTimingSlider.gameObject.SetActive(true);
+                    qteTimingSlider.maxValue = 1.0f;
+                    qteTimingSlider.value = 1.0f;
+                }
+
+                float qteDuration = 2.0f; // 제한 시간
+                float timer = 0f;
+                int currentExtraHits = 0;
+
+                if (logPanel) logText.text = "Button Mash!! (Space/Enter)";
+
+                // [핵심] 타이머 루프
+                while (timer < qteDuration && currentExtraHits < maxExtraHits)
+                {
+                    timer += Time.deltaTime;
+                    
+                    // 슬라이더 갱신
+                    if (qteTimingSlider)
+                        qteTimingSlider.value = 1.0f - (timer / qteDuration);
+
+                    // 입력 감지
+                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                    {
+                        List<GameObject> currentTargets = GetTargetsByScope(scope, action);
+                        if (currentTargets.Count == 0) break;
+
+                        foreach (var target in currentTargets)
+                        {
+                            // "Fire and Forget" 방식: 시작만 시키고 바로 다음 코드로 넘어감
+                            StartCoroutine(ProcessSingleHit(action, target));
+                        }
+
+                        currentExtraHits++;
+                        
+                        // 페널티 적용
+                        BattleEntity actorEntity = action.actor.GetComponent<BattleEntity>();
+                        if (actorEntity)
+                        {
+                            actorEntity.nextTurnSpeedPenalty += 500;
+                            Debug.Log($"추가 타격! (누적 페널티: -{actorEntity.nextTurnSpeedPenalty})");
+                        }
+
+                        if (logPanel) logText.text = $"Combo! ({currentExtraHits}/{maxExtraHits})";
+                        
+                        // 사운드만 재생하고, 딜레이(Wait) 없이 즉시 루프 계속 진행
+                        SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
+                    }
+
+                    yield return null; // 다음 프레임까지 대기 (타이머 진행)
+                }
+
+                // QTE 종료
+                if (qteTimingSlider) qteTimingSlider.gameObject.SetActive(false);
+                
+                // 비동기로 실행된 마지막 공격 이펙트들이 끝날 때까지 살짝 대기 (선택 사항)
+                // 이걸 안 넣으면 이펙트가 터지는 도중에 캐릭터가 자리로 돌아갈 수 있음
+                if (currentExtraHits > 0) yield return new WaitForSeconds(0.5f);
+            }
+            
+            // =========================================================
+            // 복귀 애니메이션
+            // =========================================================
             action.actor.transform.localPosition -= Vector3.forward * 0.3f;
             yield return new WaitForSeconds(0.3f);
         }
@@ -1802,21 +1876,25 @@ namespace Manager
         // 단일 타격 처리 (반사, 회피, 데미지 통합)
         IEnumerator ProcessSingleHit(CombatAction action, GameObject target)
         {
-            // 사운드
-            var sfxId = (action.type == CombatAction.ActionType.Gun) ? SfxID.Attack_Gun : SfxID.Attack_Sword;
-            SoundManager.Instance.PlaySFX(sfxId);
-
             // =========================================================
             // 타격 이펙트 생성
             // =========================================================
+            var sfxId = SfxID.None;
             GameObject vfxToSpawn = null;
             // 공격 타입에 따라 이펙트 결정
-            if (action.type == CombatAction.ActionType.Attack || action.type == CombatAction.ActionType.Gun)
+            if (action.type == CombatAction.ActionType.Attack)
             {
+                sfxId = SfxID.Attack_Sword;
                 vfxToSpawn = vfxSlashPrefab;
+            }
+            else if (action.type == CombatAction.ActionType.Gun)
+            {
+                sfxId = SfxID.Attack_Gun;
+                vfxToSpawn = vfxGunPrefab;
             }
             else if (action.type == CombatAction.ActionType.Skill) // 혹은 마법 스킬
             {
+                sfxId = SfxID.Attack_Magic;
                 // 스킬 속성에 따라 다르게 할 수도 있음 (여기선 magicPrefab 통일)
                 vfxToSpawn = vfxMagicPrefab;
             }
@@ -1826,9 +1904,12 @@ namespace Manager
                 if (action.itemData.effectType == EffectType.Special_Atk || 
                     action.itemData.effectType == EffectType.Magic_Atk)
                 {
+                    sfxId = SfxID.Attack_Magic;
                     vfxToSpawn = vfxMagicPrefab;
                 }
             }
+            // 사운드
+            if (sfxId != SfxID.None) SoundManager.Instance.PlaySFX(sfxId);
 
             if (vfxToSpawn != null)
             {

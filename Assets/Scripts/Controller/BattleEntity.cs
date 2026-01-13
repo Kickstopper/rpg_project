@@ -8,13 +8,14 @@ namespace Controller
     public abstract class BattleEntity : MonoBehaviour
     {
         [Header("Entity Status")]
-        public string entityName; // 이름 공통화
+        public string entityName;
         public int level = 1;
         public int currentHp;
         public int currentMp;
-        public int maxHp; // 최대 체력 공통 필드 필요
+        public int maxHp;
         public int maxMp;
         public int columnIndex;
+        public int nextTurnSpeedPenalty = 0; // 이번 턴에 무리해서 다음 턴 속도가 느려질 값
         
         [Header("UI Reference")]
         public Image preferredImage; 

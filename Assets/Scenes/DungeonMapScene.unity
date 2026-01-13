@@ -2071,6 +2071,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aa764687e19ba54a8d51ff4ff33872c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1105207573 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2851317578289610829, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+  m_PrefabInstance: {fileID: 1925991827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1118026758
 GameObject:
   m_ObjectHideFlags: 0
@@ -2418,6 +2429,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   screenMaterial: {fileID: 0}
+  useWallDistortion: 0
+  distortionFreq: 0.5
+  distortionAmp: 2
   fadeOverlay: {fileID: 1028032715}
   fadeDuration: 0.5
   bumpDuration: 0.2
@@ -5420,9 +5434,11 @@ MonoBehaviour:
   logText: {fileID: 131535963}
   messagePanel: {fileID: 1855285924}
   messageText: {fileID: 1855285923}
+  qteTimingSlider: {fileID: 1105207573}
   defaultMonsterPrefab: {fileID: 5675693360896444327, guid: 5886499ad23134b40a1350463fb19b81, type: 3}
   playerPrefab: {fileID: 6815253905712193029, guid: d7f43cf7a138ea1439eaeabd115425df, type: 3}
   vfxSlashPrefab: {fileID: 7405688537336936215, guid: 7c7486c5695c3ba489d13e3922f0c1f8, type: 3}
+  vfxGunPrefab: {fileID: 7405688537336936215, guid: c653612a10f1bfd4987b27887f13aef8, type: 3}
   vfxMagicPrefab: {fileID: 7405688537336936215, guid: 0ee5f5d0414c76e47b2d7409a5ad57e7, type: 3}
   baseFirstButton: {fileID: 251505308}
   attackButton: {fileID: 591616784}
