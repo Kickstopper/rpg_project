@@ -868,11 +868,8 @@ namespace Manager
             isSelectingTarget = false;
             commandPanel.SetActive(true);
             
-            if (logPanel)
-            {
-                logPanel.SetActive(true);
-                logText.text = $"Command Wait: {currentPlayer.sourceData.name}";
-            } 
+            if (logPanel) logPanel.SetActive(true);
+            logText.text = $"명령 대기: {currentPlayer.sourceData.name}";
             if (targetCursor) targetCursor.gameObject.SetActive(false);
 
             if (isFightMode)
@@ -1141,7 +1138,6 @@ namespace Manager
         void CancelMoveSelection()
         {
             isSelectingMoveTarget = false;
-            if (targetCursor) targetCursor.gameObject.SetActive(false);
             foreach (var player in activePlayers) (player as PlayerController).ResetHighlightColor();
 
             // 커맨드 패널 표시 (여기서는 전체 패널을 켜고)
@@ -1152,7 +1148,8 @@ namespace Manager
             fightCmdContainer.SetActive(true);
 
             if (logPanel) logPanel.SetActive(true); 
-            logText.SetText($"Command Wait: {activePlayers[currentPlayerIndex].entityName}");
+            logText.SetText($"명령 대기: {activePlayers[currentPlayerIndex].entityName}");
+            if (targetCursor) targetCursor.gameObject.SetActive(false);
             
             inputCooldown = 0.2f;
             
@@ -1164,15 +1161,15 @@ namespace Manager
         void CancelTargetSelection()
         {
             isSelectingTarget = false;
-            if (targetCursor) targetCursor.gameObject.SetActive(false); 
-            
             commandPanel.SetActive(true);
             
             // 공격(Attack) 취소 시에도 Fight 메뉴 유지
             baseCmdContainer.SetActive(false);
             fightCmdContainer.SetActive(true);
-
-            if (logPanel) logPanel.SetActive(false);
+            
+            if (targetCursor) targetCursor.gameObject.SetActive(false);
+            if (logPanel) logPanel.SetActive(true); 
+            logText.SetText($"명령 대기: {activePlayers[currentPlayerIndex].entityName}");
 
             // =========================================================
             // 뒷배경 상호작용 다시 허용
@@ -1323,16 +1320,24 @@ namespace Manager
 
         void HandleTargetSelectionInput()
         {
-            // 취소/확인
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            bool isCancel = (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape));
+            if (isCancel || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 // 선택된 몬스터의 하이라이트 끄기
                 if (validTargets.Count > currentTargetIndex)
                 {
                     validTargets[currentTargetIndex].SetSelectionState(false);
                     
-                    // 선택 완료 함수 호출
-                    OnTargetSelected(validTargets[currentTargetIndex]);
+                    if (isCancel)
+                    {
+                        // 취소 함수
+                        CancelTargetSelection();   
+                    }
+                    else
+                    {
+                        // 선택 완료 함수 호출
+                        OnTargetSelected(validTargets[currentTargetIndex]);
+                    }
                 }
                 return;
             }
@@ -1369,20 +1374,20 @@ namespace Manager
             // 2. 상하 이동
             else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
-                // 후열 -> 전열 이동
-                if (!isCurrentFront) 
-                {
-                    moved = true;
-                    nextEntity = FindClosestEntityInRow(targetFrontContainer, true, currentCol);
-                }
-            }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-            {
                 // 전열 -> 후열 이동
                 if (isCurrentFront) 
                 {
                     moved = true;
                     nextEntity = FindClosestEntityInRow(targetFrontContainer, false, currentCol);
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                // 후열 -> 전열 이동
+                if (!isCurrentFront) 
+                {
+                    moved = true;
+                    nextEntity = FindClosestEntityInRow(targetFrontContainer, true, currentCol);
                 }
             }
 
