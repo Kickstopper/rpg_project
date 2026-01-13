@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,9 +17,10 @@ namespace Controller
         public int maxMp;
         public int columnIndex;
         public int nextTurnSpeedPenalty = 0; // 이번 턴에 무리해서 다음 턴 속도가 느려질 값
-        
+
         [Header("UI Reference")]
-        public Image preferredImage; 
+        public Image preferredImage;
+        public TextMeshProUGUI turnOrderText; 
 
         [Header("State Flags")]
         public bool isGuarding = false;

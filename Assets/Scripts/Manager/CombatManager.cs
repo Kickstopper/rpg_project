@@ -112,6 +112,7 @@ namespace Manager
         // 자주 쓰는 딜레이 캐싱
         private WaitForSeconds wait01 = new WaitForSeconds(0.1f);
         private WaitForSeconds wait05 = new WaitForSeconds(0.5f);
+        private WaitForSeconds wait10 = new WaitForSeconds(1f);
         
         void Awake() { if (Instance == null) Instance = this; }
 
@@ -221,6 +222,8 @@ namespace Manager
 
                 // 컬럼 인덱스 초기화
                 pc.columnIndex = slotIndex;
+                // 행동 순서 페널티 초기화
+                pc.nextTurnSpeedPenalty = 0;
 
                 activePlayers.Add(pc);
             }
@@ -231,7 +234,7 @@ namespace Manager
         // -----------------------------------------------------------
         IEnumerator SetupBattle()
         {
-            yield return new WaitForSeconds(1f);
+            yield return wait10;
             
             // 첫 번째 턴 시작!
             PreparePlayerTurn();
@@ -304,15 +307,15 @@ namespace Manager
             // 2. 광역/랜덤 타겟 (Random / All) -> 즉시 행동 예약
             else
             {
+                // 광역 공격: 랜덤성 제거, 속도 계산 로직 통일
                 currentSelectedAction = actionType;
                 
-                // 속도 계산
-                int speed = currentActor.GetTotalAgi() + Random.Range(0, 5);
-                
+                // 속도 계산 (페널티만 적용)
+                int speed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty;
+                currentActor.nextTurnSpeedPenalty = 0; // 이번 턴 속도에 사용했으므로 초기화
+
                 CombatAction action = new CombatAction(currentActor.gameObject, null, actionType, speed);
                 actionQueue.Add(action);
-
-                Debug.Log($"{currentActor.name}: 공격 예약 (범위: {scope})");
 
                 NextPlayerInput();
             }
@@ -352,8 +355,51 @@ namespace Manager
 
             Debug.Log("== 플레이어 페이즈 시작 ==");
 
-            // 3. 첫 번째 플레이어 UI 표시
-            NextPlayerInput(); 
+            //  ★ 핵심 로직 추가: 턴 시작 전 이번 턴의 예상 행동 순서 계산 및 표시
+            CalculateAndShowTurnOrder();
+
+            NextPlayerInput();
+        }
+
+        // =========================================================
+        // 턴 순서 계산 및 시각화
+        // =========================================================
+        void CalculateAndShowTurnOrder()
+        {
+            // 1. 살아있는 모든 엔티티(아군 + 적군) 수집
+            List<BattleEntity> allEntities = new List<BattleEntity>();
+            allEntities.AddRange(activePlayers.Where(p => p.currentHp > 0));
+            allEntities.AddRange(activeMonsters.Where(m => m.currentHp > 0));
+
+            // 2. 속도 기준 정렬 (예상 속도 = AGI - 누적된 페널티)
+            // 숫자가 클수록 먼저 행동합니다.
+            allEntities.Sort((a, b) => 
+            {
+                int speedA = a.GetTotalAgi() - a.nextTurnSpeedPenalty;
+                int speedB = b.GetTotalAgi() - b.nextTurnSpeedPenalty;
+                
+                // 속도가 같으면 아군 우선, 그 다음엔 운(LUC) 비교
+                if (speedA == speedB)
+                {
+                    bool isAPlayer = a is PlayerController;
+                    bool isBPlayer = b is PlayerController;
+                    if (isAPlayer && !isBPlayer) return -1; // A(Player) First (Desc sort니까 -1은 A가 앞?) -> Sort는 오름차순이 기본이므로, 내림차순하려면 b.CompareTo(a)
+                    if (!isAPlayer && isBPlayer) return 1;
+                    return b.GetTotalLuc().CompareTo(a.GetTotalLuc());
+                }
+                return speedB.CompareTo(speedA); // 내림차순 정렬
+            });
+
+            // 3. UI 업데이트
+            for (int i = 0; i < allEntities.Count; i++)
+            {
+                BattleEntity entity = allEntities[i];
+                if (entity.turnOrderText != null)
+                {
+                    entity.turnOrderText.gameObject.SetActive(true);
+                    entity.turnOrderText.text = (i + 1).ToString(); // 1등부터 번호 표시
+                }
+            }
         }
         
         void Update()
@@ -745,31 +791,23 @@ namespace Manager
             NextPlayerInput();
         }
 
+        // 방어: 우선권(Speed) 보정, 페널티는 적게
         public void OnFightCommand_Guard()
         {
-            // 1. 현재 캐릭터 가져오기
             PlayerController currentActor = activePlayers[currentPlayerIndex] as PlayerController;
 
-            // 2. 행동 생성
-            // 방어는 적의 공격보다 빨라야 하므로 속도에 큰 보정(+2000)을 준다.
-            int guardSpeed = currentActor.GetTotalAgi() + 2000;
+            // 방어는 즉시 발동하게 보정함
+            int guardSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
+            currentActor.nextTurnSpeedPenalty = 0; // 이번 턴 페널티 소모
 
-            // 타겟은 '자기 자신'으로 설정
             CombatAction action = new CombatAction(
                 currentActor.gameObject, 
-                currentActor.gameObject, // Self targeting
+                currentActor.gameObject, 
                 CombatAction.ActionType.Guard, 
                 guardSpeed
             );
 
-            // 3. 큐에 추가
             actionQueue.Add(action);
-
-            // 로그 출력 (선택 사항)
-            Debug.Log($"{currentActor.name}: 방어 태세 예약");
-            
-            // 4. 다음 캐릭터로 넘기기
-            // 방어는 타겟 선택 과정이 필요 없으므로 바로 넘긴다.
             NextPlayerInput();
         }
 
@@ -816,25 +854,17 @@ namespace Manager
         void NextPlayerInput()
         {
             currentPlayerIndex++;
-
-            // 종료 및 스킵 로직
             if (currentPlayerIndex >= activePlayers.Count) { ProcessTurn(); return; }
 
             PlayerController currentPlayer = activePlayers[currentPlayerIndex] as PlayerController;
             if (currentPlayer.currentHp <= 0) { NextPlayerInput(); return; }
 
-            // =========================================================
-            // 오토 모드 처리 로직
-            // =========================================================
             if (isAutoMode)
             {
-                // UI를 켜지 않고 내부적으로 행동 결정 후 재귀 호출
                 ProcessAutoAction(currentPlayer);
                 return; 
             }
-            // =========================================================
 
-            // UI 활성화
             isSelectingTarget = false;
             commandPanel.SetActive(true);
             
@@ -845,25 +875,18 @@ namespace Manager
             } 
             if (targetCursor) targetCursor.gameObject.SetActive(false);
 
-
-            // =========================================================
-            // isFightMode 변수에 따라 어떤 메뉴를 띄울지 결정
-            // =========================================================
-
             if (isFightMode)
             {
-                // 이미 "싸우다"를 골랐으므로, 곧바로 상세 행동(Attack/Skill...) 메뉴 표시
                 if (baseCmdContainer) baseCmdContainer.SetActive(false);
                 if (fightCmdContainer) fightCmdContainer.SetActive(true);
-                
                 StartCoroutine(SelectButton(attackButton));
             }
             else
             {
-                // 아직 방침을 안 정했으므로(첫 캐릭터), Base 메뉴(Fight/Run...) 표시
+                //  메뉴가 뜨는 시점에 (이미 턴 시작 시 계산했지만) 혹시 모르니 여기서 다시 갱신 가능
+                // 하지만 PreparePlayerTurn에서 한 번만 하는 것이 성능상/논리상 깔끔함.
                 if (baseCmdContainer) baseCmdContainer.SetActive(true);
                 if (fightCmdContainer) fightCmdContainer.SetActive(false);
-                
                 StartCoroutine(SelectButton(baseFirstButton));
             }
         }
@@ -896,7 +919,9 @@ namespace Manager
 
             // 3. 행동 생성 (현재는 Attack만 구현, 나중에 Guard/Skill 분기 추가 가능)
             // (Guard나 Skill은 타겟이 아군이거나 없을 수 있으므로 추후 보완 필요)
-            int speed = actor.GetTotalAgi() + Random.Range(0, 5);
+            int speed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
+            actor.nextTurnSpeedPenalty = 0; // 페널티 소모
+
             // 3. 행동 생성
             CombatAction action = new CombatAction(actor.gameObject, target.gameObject, actionType, speed);
 
@@ -1013,7 +1038,10 @@ namespace Manager
 
                 // 2. 행동 생성
                 // 이동은 전략적으로 중요하므로 속도에 보너스(+2000)를 주어 턴의 가장 처음에 발동하게 함.
-                int moveSpeed = currentActor.GetTotalAgi() + 2000; 
+
+                // 속도 계산 (이동은 최우선)
+                int moveSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
+                currentActor.nextTurnSpeedPenalty = 0; // 페널티 소모
 
                 CombatAction action = new CombatAction(
                     currentActor.gameObject, 
@@ -1068,7 +1096,7 @@ namespace Manager
             actor.transform.localPosition = Vector3.zero;
 
             // 3. 연출 대기
-            yield return new WaitForSeconds(0.8f);
+            yield return wait10;
 
             // 4. 턴 소비 처리
             // 이동했으므로 이번 캐릭터의 행동은 끝난 것으로 간주하고 다음으로 넘김
@@ -1259,7 +1287,7 @@ namespace Manager
             }
 
             // 2. 연출 대기 (긴장감)
-            yield return new WaitForSeconds(1.0f);
+            yield return wait10;
 
             // 3. 도망 성공 여부 계산
             bool isSuccess = CalculateEscapeSuccess();
@@ -1270,7 +1298,7 @@ namespace Manager
                 logText.text = "무사히 도망쳤다!";
                 Debug.Log("도망 성공!");
                 
-                yield return new WaitForSeconds(1.0f);
+                yield return wait10;
 
                 // 전투 종료 및 던전 탐색 상태 복귀 (승리가 아니므로 false 전달하지 않고 바로 종료 처리)
                 // EndBattleRoutine을 재활용하거나 직접 종료 로직 수행
@@ -1282,7 +1310,7 @@ namespace Manager
                 logText.text = "도망치지 못했다!\n적에게 틈을 보이고 말았다.";
                 Debug.Log("도망 실패!");
 
-                yield return new WaitForSeconds(1.0f);
+                yield return wait10;
 
                 // 5. 실패 페널티: 아군 턴을 강제로 종료하고 적의 턴으로 넘김
                 // 큐에 예약된 행동들을 다 지우고 바로 ProcessTurn 호출
@@ -1452,11 +1480,11 @@ namespace Manager
             // =========================================================
             // 행동 속도 결정 (페널티 적용)
             // =========================================================
-            // 기존 AGI + 난수 - 누적된 페널티
-            int finalSpeed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty + Random.Range(0, 5);
+            // 기존 AGI - 누적된 페널티
+            int finalSpeed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
             
-            // 페널티 적용했으니 초기화 (다음 턴을 위해)
-            actor.nextTurnSpeedPenalty = 0; 
+            // 이번 턴 계산에 사용했으므로 페널티 초기화
+            actor.nextTurnSpeedPenalty = 0;
             // =========================================================
 
             // =========================================================
@@ -1498,6 +1526,9 @@ namespace Manager
             commandPanel.SetActive(false);
             if (logPanel) logPanel.SetActive(false);
 
+            // 전투 시작 시 켜둔 순서 표시 UI 끄기 (연출을 위해)
+            HideTurnOrderUI();
+
             // 1. 적들의 행동 결정 (AI)
             // 살아있는 아군 리스트 추출
             List<BattleEntity> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
@@ -1513,10 +1544,17 @@ namespace Manager
             {
                 if (monster.currentHp <= 0) continue;
 
-                // livingPlayers 리스트를 넘겨줌
+                // 몬스터도 AGI - Penalty로 속도 결정 필요
+                // 몬스터 AI 내부에서 CombatAction 생성 시 speed를 (AGI - nextTurnSpeedPenalty)로 설정하도록 
+                // MonsterController.ChooseAction 로직을 수정하거나, 여기서 강제 보정해야 함.
+                // 여기서는 생성된 action의 speed를 덮어쓰는 방식으로 처리:
                 CombatAction enemyAction = monster.ChooseAction(livingPlayers);
                 if (enemyAction != null)
                 {
+                    // 몬스터의 속도 덮어쓰기
+                    enemyAction.speed = monster.GetTotalAgi() - monster.nextTurnSpeedPenalty;
+                    monster.nextTurnSpeedPenalty = 0; // 다음 턴의 페널티 제거
+
                     actionQueue.Add(enemyAction);
                 }
             }
@@ -1526,6 +1564,12 @@ namespace Manager
 
             // 3. 실행 시작
             StartCoroutine(ExecuteActions());
+        }
+
+        void HideTurnOrderUI()
+        {
+            foreach(var p in activePlayers) if(p.turnOrderText) p.turnOrderText.gameObject.SetActive(false);
+            foreach(var m in activeMonsters) if(m.turnOrderText) m.turnOrderText.gameObject.SetActive(false);
         }
 
         IEnumerator ExecuteActions()
@@ -1544,25 +1588,20 @@ namespace Manager
                 // 행동 주체(Actor)의 생존 여부 확인
                 // =========================================================
                 bool isActorDead = false;
+                if (action.actor == null || !action.actor.activeSelf) isActorDead = true;
+                else if (action.actor.TryGetComponent(out BattleEntity be) && !be.IsAlive) isActorDead = true;
+                
+                if (isActorDead) continue; 
 
-                // 1. 오브젝트가 아예 없거나 꺼져있는지 체크
-                if (action.actor == null || !action.actor.activeSelf) 
+                // 핵심 로직: 행동 수행 후, 해당 행동의 비용(Delay)을 '다음 턴 페널티'로 저장
+                int delay = CalculateActionDelay(action);
+                BattleEntity actorEntity = action.actor.GetComponent<BattleEntity>();
+                if (actorEntity != null)
                 {
-                    isActorDead = true;
+                    // 페널티 누적 (혹은 덮어쓰기. 보통은 행동 하나만 하므로 덮어쓰기)
+                    // 이번 행동이 강력할수록 nextTurnSpeedPenalty가 커짐 -> 다음 턴 speed(AGI - Penalty)가 작아짐 -> 순서 밀림
+                    actorEntity.nextTurnSpeedPenalty += delay; 
                 }
-                else
-                {
-                    // 2. HP 체크 (몬스터 & 플레이어)
-                    if (action.actor.TryGetComponent(out BattleEntity be) && !be.IsAlive) isActorDead = true;
-                }
-
-                // 3. 죽었다면 이번 행동 스킵
-                if (isActorDead)
-                {
-                    // Debug.Log($"[Skip] {action.actor?.name}은(는) 사망하여 행동 취소");
-                    continue; 
-                }
-                // =========================================================
 
                 yield return StartCoroutine(PerformAction(action));
             }
@@ -1578,6 +1617,40 @@ namespace Manager
                 // -> 적 이동 체크 -> UI 표시 순서로 진행됨
                 PreparePlayerTurn(); 
             }
+        }
+
+        // [New Feature] 행동별 다음 턴 지연 시간 계산 함수
+        int CalculateActionDelay(CombatAction action)
+        {
+            int baseDelay = 0;
+
+            // 1. 행동 타입별 기본 딜레이
+            switch (action.type)
+            {
+                case CombatAction.ActionType.Attack:
+                    baseDelay = 10; // 기본 공격은 딜레이가 적음
+                    // 무기 무게 등을 추가할 수 있음
+                    break;
+                case CombatAction.ActionType.Gun:
+                    baseDelay = 15; // 총은 조금 더 김
+                    break;
+                case CombatAction.ActionType.Guard:
+                    baseDelay = 0; // 방어는 다음 턴에 빠르게 행동 가능 (페널티 없음)
+                    break;
+                case CombatAction.ActionType.Move:
+                    baseDelay = 5; // 이동도 비교적 가벼움
+                    break;
+                case CombatAction.ActionType.Item:
+                    baseDelay = 20; // 아이템 사용은 표준
+                    if (action.itemData != null) baseDelay = action.itemData.actionDelay; // 데이터에 정의된 값 우선
+                    break;
+                case CombatAction.ActionType.Skill:
+                    baseDelay = 30; // 스킬은 대체로 무거움
+                    if (action.itemData != null) baseDelay = action.itemData.actionDelay; // 데이터 값 우선
+                    break;
+            }
+
+            return baseDelay;
         }
 
         // 반환값: 전투가 끝났으면 true
@@ -1634,7 +1707,7 @@ namespace Manager
             }
 
             // 공통 후처리
-            yield return wait05;
+            yield return wait01;
             if (logPanel) logPanel.SetActive(false);
             logText.SetText(string.Empty);
         }
@@ -1794,7 +1867,7 @@ namespace Manager
                     yield return StartCoroutine(ProcessSingleHit(action, target));
                 }
                 
-                yield return new WaitForSeconds(0.1f);
+                yield return wait01;
                 if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll) break;
             }
 
@@ -1863,14 +1936,14 @@ namespace Manager
                 
                 // 비동기로 실행된 마지막 공격 이펙트들이 끝날 때까지 살짝 대기 (선택 사항)
                 // 이걸 안 넣으면 이펙트가 터지는 도중에 캐릭터가 자리로 돌아갈 수 있음
-                if (currentExtraHits > 0) yield return new WaitForSeconds(0.5f);
+                if (currentExtraHits > 0) yield return wait01;
             }
             
             // =========================================================
             // 복귀 애니메이션
             // =========================================================
             action.actor.transform.localPosition -= Vector3.forward * 0.3f;
-            yield return new WaitForSeconds(0.3f);
+            yield return wait01;
         }
 
         // 단일 타격 처리 (반사, 회피, 데미지 통합)

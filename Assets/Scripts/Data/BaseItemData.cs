@@ -58,6 +58,9 @@ namespace Data
         public int effectValue; // 회복량 또는 데미지
         public ElementType element;
         public TargetScope targetScope;
+
+        public int actionDelay = 0; // 사용했을 때의 딜레이 (행동 속도 지연)
+
         [Header("Visual")]
         public GameObject effectPrefab; // 사용 시 이펙트 (옵션)
     }

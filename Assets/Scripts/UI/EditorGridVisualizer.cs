@@ -1,6 +1,6 @@
 using UnityEngine;
 using Data;
-namespace UI.MapEditorScene
+namespace UI
 {
     public class EditorGridVisualizer : MonoBehaviour
     {

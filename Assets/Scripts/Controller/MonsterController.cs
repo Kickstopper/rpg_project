@@ -162,7 +162,7 @@ namespace Controller
                 return new CombatAction(this.gameObject, this.gameObject, CombatAction.ActionType.Guard, guardSpeed);
             }
 
-            // 기본 공격 로직 (기존 코드)
+            // 기본 공격 로직
             BattleEntity target = players[Random.Range(0, players.Count)];
             int speed = sourceData.stats.agi + Random.Range(0, 5);
             return new CombatAction(this.gameObject, target.gameObject, CombatAction.ActionType.Attack, speed);
@@ -177,15 +177,12 @@ namespace Controller
             // 몬스터 전용 피격 연출 (빨간색 깜빡임 + 진동)
             if (preferredImage != null)
             {
-                Color cachedColor = preferredImage.color;
                 preferredImage.color = Color.red; 
-                
                 Vector3 originalPos = transform.localPosition;
-                // ... (기존의 좌우 진동 로직 유지) ...
                 yield return new WaitForSeconds(0.1f); 
                 
                 transform.localPosition = originalPos;
-                preferredImage.color = cachedColor;
+                preferredImage.color = originalColor;
             }
 
             if (currentHp <= 0) Die();

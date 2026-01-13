@@ -11,7 +11,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/DungeonMapScene.unity
     guid: 53a27defb29d64150a45b32280f29b1e
-  - enabled: 1
-    path: Assets/Scenes/MapGeneraterScene.unity
-    guid: f8b810795e9dc4f7cb97d8be3a61b027
   m_configObjects: {}
