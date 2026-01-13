@@ -216,6 +216,10 @@ namespace Manager
                 
                 PlayerController pc = go.GetComponent<PlayerController>();
                 pc.Initialize(data, isFront ? RowType.Front : RowType.Back);
+
+                // 컬럼 인덱스 초기화
+                pc.columnIndex = slotIndex;
+
                 activePlayers.Add(pc);
             }
         }
@@ -2017,7 +2021,6 @@ namespace Manager
         {
             PlayerController actor = action.actor.GetComponent<PlayerController>();
             
-            // action.target은 우리가 위에서 넣은 '슬롯(Slot)' 오브젝트입니다.
             Transform targetSlot = action.target.transform; 
             Transform originSlot = actor.transform.parent; // 현재 나의 부모(원래 위치)
 
@@ -2025,7 +2028,7 @@ namespace Manager
             if (messagePanel) 
             {
                 messagePanel.SetActive(true);
-                messageText.SetText("자리 좀 바꿀게!");
+                messageText.SetText("자리 이동!");
             }
             Debug.Log($"[Action] {actor.name}의 이동 실행 -> {targetSlot.name}");
 
@@ -2051,8 +2054,11 @@ namespace Manager
             actor.transform.SetParent(targetSlot);
             actor.transform.localPosition = Vector3.zero;
 
-            // 4. 간단한 연출 대기
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click); // 발소리 등으로 교체 추천
+            // 4. 이동한 나의 인덱스 갱신
+            actor.columnIndex = targetSlot.GetSiblingIndex();
+
+            // 5. 간단한 연출 대기
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click); // TODO: 발소리로 바꾸자
             yield return wait05;
 
             if (messagePanel) messagePanel.SetActive(false);
