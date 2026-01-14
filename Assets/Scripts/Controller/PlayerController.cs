@@ -12,7 +12,8 @@ namespace Controller
     {
         [Header("UI Objects")]
         public Image bgImage;         // 배경의 사각형 이미지
-        public Image faceImage;       // 캐릭터 얼굴
+        public Image highlightImage;         // 하이라이트 사각형 이미지
+        public Image portraitImage;       // 캐릭터 얼굴
         public Slider hpSlider;       // HP 게이지
         public Slider mpSlider;       // SP 게이지
         public TextMeshProUGUI nameText;         // 이름 텍스트
@@ -49,9 +50,38 @@ namespace Controller
         public override int GetTotalLuc() => sourceData.stats.luc + level;
         public override int GetTotalVit() => sourceData.stats.vit + level;
 
+        public bool IsEmpty { get; private set; } = false;
+
+        // 빈 슬롯용 초기화 함수
+        public void InitializeEmpty(int colIndex)
+        {
+            IsEmpty = true;
+            this.columnIndex = colIndex;
+
+            currentHp = 0;
+            currentMp = 0;
+            currentWeapon = null;
+            currentAmmo = null;
+            currentGun = null;
+            learnedSkillIds.Clear();
+            equippedArmorIds.Clear();
+            RefreshArmorStats();
+
+            sourceData = null;
+            currentStatusEffects.Clear();
+            
+            // 1. 그래픽 숨기기 (스프라이트, UI 등)
+            UpdateUI();
+
+            // 2. 이름표 변경 (디버깅용)
+            this.name = $"Empty_Slot_{colIndex}";
+        }
+
         // 초기화 함수 (CombatManager가 호출)
         public void Initialize(CharacterDatabase.CharacterEntry data, RowType row)
         {
+            IsEmpty = false; // 데이터가 있으면 False
+
             sourceData = data;
             currentRow = row;
             entityName = data.name;
@@ -63,13 +93,18 @@ namespace Controller
             currentMp = maxMp;
 
             // UI 설정
-            faceImage.sprite = data.portraitImage;
-            faceImage.SetNativeSize();
-            nameText.text = data.name;
-            level = data.stats.level;
+            portraitImage.gameObject.SetActive(true);
+            portraitImage.sprite = data.portraitImage;
+            portraitImage.SetNativeSize();
             
-            if (bgImage != null) originalColor = bgImage.color;
+            nameText.text = data.name;
+            nameText.alignment = TextAlignmentOptions.TopLeft;
+            
+            level = data.stats.level;
 
+            highlightImage.gameObject.SetActive(true);
+            highlightImage.color = Color.clear;
+            
             UpdateUI();
 
             // -----------------------------------------------------
@@ -120,24 +155,17 @@ namespace Controller
 
         public void SetHighlightColor(Color color)
         {
-            if (bgImage != null)
-            {
-                bgImage.color = color;
-            }
+            highlightImage.color = color;
         }
 
         public void ResetHighlightColor()
         {
-            if (bgImage != null)
-            {
-                bgImage.color = originalColor;
-            }
+            highlightImage.color = Color.clear;
         }
 
         // [BattleEntity 구현] 선택 강조
         public override void SetSelectionState(bool isSelected)
         {
-            if (bgImage == null) return;
             if (highlightCoroutine != null) StopCoroutine(highlightCoroutine);
 
             if (isSelected)
@@ -146,7 +174,7 @@ namespace Controller
             }
             else
             {
-                bgImage.color = originalColor;
+                highlightImage.color = Color.clear;
                 transform.localScale = Vector3.one; 
             }
         }
@@ -156,7 +184,7 @@ namespace Controller
             while (true)
             {
                 float time = Mathf.PingPong(Time.time * 5f, 1f); 
-                bgImage.color = Color.Lerp(originalColor, Color.yellow, time);
+                highlightImage.color = Color.Lerp(Color.clear, Color.yellow, time);
                 yield return null;
             }
         }
@@ -276,24 +304,40 @@ namespace Controller
             Debug.Log($"<color=red>{entityName}에게 {damage} 데미지!</color>");
 
             // 플레이어 전용 피격 연출 (얼굴 붉어짐)
-            if (faceImage)
+            if (portraitImage)
             {
-                faceImage.color = Color.red;
+                portraitImage.color = Color.red;
                 yield return new WaitForSeconds(0.1f);
-                faceImage.color = Color.white;
+                portraitImage.color = Color.white;
             }
 
             if (currentHp <= 0)
             {
                 Debug.Log($"{entityName} 쓰러짐...");
                 // Player는 비활성화 대신 사망 상태(Dead State) 처리 필요
+                InitializeEmpty(this.columnIndex);
             }
         }
         
         void UpdateUI()
         {
-            if (hpSlider) { hpSlider.maxValue = maxHp; hpSlider.value = currentHp; }
-            if (mpSlider) { mpSlider.maxValue = maxMp; mpSlider.value = currentMp; }
+            if (IsEmpty)
+            {
+                hpSlider.gameObject.SetActive(false);
+                mpSlider.gameObject.SetActive(false);
+                nameText.text = "EMPTY";
+                nameText.alignment = TextAlignmentOptions.Center;
+                portraitImage.gameObject.SetActive(false);
+            }
+            else
+            {
+                hpSlider.gameObject.SetActive(true);
+                mpSlider.gameObject.SetActive(true);
+                hpSlider.maxValue = maxHp;
+                hpSlider.value = currentHp;
+                mpSlider.maxValue = maxMp;
+                mpSlider.value = currentMp;
+            }
         }
     }
 }

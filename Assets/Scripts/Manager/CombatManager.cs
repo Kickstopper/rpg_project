@@ -84,7 +84,11 @@ namespace Manager
         // -------------------------------------------------------
         public BattleState state;
         public List<BattleEntity> activeMonsters = new();
-        public List<BattleEntity> activePlayers = new(); // 아군 리스트
+        // 전투 로직용 리스트 (데이터가 있는 캐릭터만)
+        public List<BattleEntity> activePlayers = new(); 
+
+        // 렌더링 및 그리드 관리용 리스트 (Empty 포함, 총 6개 고정)
+        public List<PlayerController> allSlotControllers = new();
 
         public List<CombatAction> actionQueue = new(); // 이번 턴의 모든 행동
 
@@ -199,33 +203,44 @@ namespace Manager
 
         void SpawnParty()
         {
-            // 0~2번: 전열, 3~5번: 후열
+            activePlayers.Clear();
+            allSlotControllers.Clear();
+
+            // 0~5번 슬롯(전열 0,1,2 / 후열 3,4,5)을 모두 순회
             for (int i = 0; i < 6; i++)
             {
-                var data = PartyManager.Instance.GetMemberData(i);
-                if (data == null) continue; // 데이터 없으면 스킵
-
-                // 바로 컨테이너에 넣지 않고, 해당 인덱스의 '슬롯'을 찾아서 넣음
+                // 1. 슬롯 위치 결정
                 bool isFront = (i < 3);
                 List<Transform> targetSlots = isFront ? playerFrontSlots : playerBackSlots;
                 int slotIndex = isFront ? i : (i - 3);
-                
-                // 해당 슬롯 가져오기
                 Transform targetSlot = targetSlots[slotIndex];
 
-                // 생성 (부모를 슬롯으로 지정)
+                // 2. 프리팹 생성 (무조건 생성)
                 GameObject go = Instantiate(playerPrefab, targetSlot);
-                go.transform.localPosition = Vector3.zero; // 슬롯 중앙 정렬
-                
+                go.transform.localPosition = Vector3.zero;
+
                 PlayerController pc = go.GetComponent<PlayerController>();
-                pc.Initialize(data, isFront ? RowType.Front : RowType.Back);
 
-                // 컬럼 인덱스 초기화
-                pc.columnIndex = slotIndex;
-                // 행동 순서 페널티 초기화
-                pc.nextTurnSpeedPenalty = 0;
+                // 생성된 모든 컨트롤러(Empty 포함)를 관리 리스트에 등록
+                allSlotControllers.Add(pc);
 
-                activePlayers.Add(pc);
+                // 3. 데이터 확인
+                var data = PartyManager.Instance.GetMemberData(i);
+
+                if (data != null)
+                {
+                    // A. 실제 캐릭터가 있는 경우
+                    pc.Initialize(data, isFront ? RowType.Front : RowType.Back);
+                    pc.columnIndex = i; // 0~5 전체 인덱스로 관리하거나, 0~2 로컬 인덱스로 관리 (기존 로직 따름)
+                    
+                    // ★ 중요: 턴을 잡을 수 있는 'activePlayers'에는 실제 캐릭터만 추가
+                    activePlayers.Add(pc);
+                }
+                else
+                {
+                    // B. 빈 자리인 경우 (Empty Placeholder)
+                    pc.InitializeEmpty(i);
+                }
             }
         }
 
@@ -331,19 +346,15 @@ namespace Manager
         IEnumerator PreparePlayerTurnRoutine()
         {
             // 턴 시작 시 모든 아군의 방어 상태 및 일시적 상태 초기화
-            foreach (var player in activePlayers)
-            {
-                player.ResetStatus(); // isGuarding = false
-            }
-
+            foreach (var player in activePlayers) player.ResetStatus(); // isGuarding = false
             // 적군(몬스터) 상태 초기화
-            foreach (var monster in activeMonsters)
-            {
-                monster.ResetStatus(); // isGuarding = false
-            }
+            foreach (var monster in activeMonsters) monster.ResetStatus(); // isGuarding = false
 
-            // 1. 적들의 전열 이동 처리
+            // 1. 적군 전열 빈자리 채우기
             yield return StartCoroutine(ProcessEnemyRowShift());
+
+            // 2. 아군 전열 빈자리 채우기
+            yield return StartCoroutine(ProcessPlayerRowShift());
 
             // 2. 플레이어 입력 상태 초기화
             state = BattleState.PlayerInput;
@@ -359,6 +370,90 @@ namespace Manager
             CalculateAndShowTurnOrder();
 
             NextPlayerInput();
+        }
+
+        // 아군 전열 채우기 로직
+        IEnumerator ProcessPlayerRowShift()
+        {
+            // 전열은 0, 1, 2번 인덱스, 후열은 3, 4, 5번 인덱스 (같은 열끼리 매칭: 0-3, 1-4, 2-5)
+            for (int col = 0; col < 3; col++)
+            {
+                int frontIdx = col;
+                int backIdx = col + 3;
+
+                PlayerController frontPC = allSlotControllers[frontIdx];
+                PlayerController backPC = allSlotControllers[backIdx];
+
+                // 1. 후열 캐릭터가 '이동 가능'한지 확인 (Empty가 아니고 살아있어야 함)
+                bool backCanMove = !backPC.IsEmpty && backPC.currentHp > 0;
+                if (!backCanMove) continue;
+
+                // 2. 전열 자리가 '비어 있거나 무력화'되었는지 확인 (Empty거나 죽었거나)
+                bool frontIsOpen = frontPC.IsEmpty || frontPC.currentHp <= 0;
+
+                // 3. 조건이 맞으면 교대 (Swap)
+                if (frontIsOpen)
+                {
+                    yield return StartCoroutine(SwapPlayerSlots(frontIdx, backIdx));
+                }
+            }
+        }
+
+        //  슬롯 교체 및 연출 코루틴
+        IEnumerator SwapPlayerSlots(int frontIdx, int backIdx)
+        {
+            PlayerController frontPC = allSlotControllers[frontIdx];
+            PlayerController backPC = allSlotControllers[backIdx];
+
+            Transform frontSlot = playerFrontSlots[frontIdx]; // 혹은 GetPlayerSlotByIndex(frontIdx)
+            Transform backSlot = playerBackSlots[backIdx - 3];
+
+            // 로그 출력
+            Debug.Log($"[전진] {backPC.name}가 전열로 이동 (교체대상: {frontPC.name})");
+
+            // =========================================================
+            // 1. 데이터(리스트) 스왑
+            // =========================================================
+            allSlotControllers[frontIdx] = backPC;
+            allSlotControllers[backIdx] = frontPC;
+
+            // 인덱스 정보 갱신
+            backPC.columnIndex = frontIdx;
+            frontPC.columnIndex = backIdx;
+
+            // =========================================================
+            // 2. 물리적 위치(부모) 스왑
+            // =========================================================
+            // worldPositionStays=true로 설정하여 튀는 현상 방지 후 Lerp
+            backPC.transform.SetParent(frontSlot, true);
+            frontPC.transform.SetParent(backSlot, true);
+
+            // =========================================================
+            // 3. 이동 애니메이션 (부드럽게 자기 슬롯 0,0,0으로 이동)
+            // =========================================================
+            float duration = 0.4f;
+            float elapsed = 0f;
+
+            Vector3 backStartPos = backPC.transform.localPosition;
+            Vector3 frontStartPos = frontPC.transform.localPosition;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                
+                // SmoothStep으로 부드럽게
+                t = t * t * (3f - 2f * t);
+
+                backPC.transform.localPosition = Vector3.Lerp(backStartPos, Vector3.zero, t);
+                frontPC.transform.localPosition = Vector3.Lerp(frontStartPos, Vector3.zero, t);
+                
+                yield return null;
+            }
+
+            // 위치 확정
+            backPC.transform.localPosition = Vector3.zero;
+            frontPC.transform.localPosition = Vector3.zero;
         }
 
         // =========================================================
@@ -708,9 +803,9 @@ namespace Manager
                 }
             }
             // 2. 아군 선택 (OneAlly)
-            else if (scope == TargetScope.OneAlly) 
+            if (scope == TargetScope.OneAlly) 
             {
-                foreach(var p in activePlayers)
+                foreach(var p in activePlayers) // activePlayers에는 이미 IsEmpty=false인 애들만 들어있음
                 {
                     if(p != null && p.currentHp > 0) validTargets.Add(p);
                 }
@@ -1011,6 +1106,12 @@ namespace Manager
                 RefreshMoveHighlights(currentMoveSlotIndex); // 호출
             }
 
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
+            {
+                CancelMoveSelection();
+                return;
+            }
+
             // 3. 확정 (Space, Enter)
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
@@ -1053,7 +1154,7 @@ namespace Manager
                 // 4. 하이라이트/커서 끄기
                 isSelectingMoveTarget = false;
                 if (targetCursor) targetCursor.gameObject.SetActive(false);
-                foreach (var player in activePlayers) (player as PlayerController).ResetHighlightColor();
+                ResetPlayerSlotHighlights();
 
                 Debug.Log($"{currentActor.name}: 위치 이동 예약 완료");
 
@@ -1069,7 +1170,7 @@ namespace Manager
             if (targetCursor) targetCursor.gameObject.SetActive(false);
 
             // 이동 시작 전 색상 초기화
-            foreach (var player in activePlayers) (player as PlayerController).ResetHighlightColor();
+            ResetPlayerSlotHighlights();
 
             // 1. 대상 슬롯에 누가 있는지 확인
             PlayerController targetChar = targetSlot.GetComponentInChildren<PlayerController>();
@@ -1138,7 +1239,7 @@ namespace Manager
         void CancelMoveSelection()
         {
             isSelectingMoveTarget = false;
-            foreach (var player in activePlayers) (player as PlayerController).ResetHighlightColor();
+            ResetPlayerSlotHighlights();
 
             // 커맨드 패널 표시 (여기서는 전체 패널을 켜고)
             commandPanel.SetActive(true);
@@ -1193,14 +1294,19 @@ namespace Manager
             }
         }
 
+        void ResetPlayerSlotHighlights()
+        {
+            foreach (PlayerController player in allSlotControllers)
+            {
+                player.ResetHighlightColor();
+            }
+        }
+
         // 해당 슬롯의 캐릭터 하이라이트 업데이트
         void RefreshMoveHighlights(int cursorSlotIndex)
         {
             // 1. 모든 아군 캐릭터의 색상을 흰색(기본)으로 초기화
-            foreach (PlayerController player in activePlayers)
-            {
-                player.ResetHighlightColor();
-            }
+            ResetPlayerSlotHighlights();
 
             // 2. '이동하려는 주인공(Source)'을 초록색으로 칠하기
             if (currentPlayerIndex < activePlayers.Count)
@@ -2180,44 +2286,74 @@ namespace Manager
         {
             PlayerController actor = action.actor.GetComponent<PlayerController>();
             
-            Transform targetSlot = action.target.transform; 
-            Transform originSlot = actor.transform.parent; // 현재 나의 부모(원래 위치)
+            // 0. [안전 장치] 행동 직전에 죽었거나 Empty 상태라면 이동 취소
+            if (actor == null || actor.currentHp <= 0 || actor.IsEmpty)
+            {
+                Debug.Log($"[Action Cancelled] {actor.name}은(는) 행동 불능 상태라 이동할 수 없습니다.");
+                yield break;
+            }
+
+            // 이동하려는 목표 슬롯
+            Transform targetSlotTransform = action.target.transform; 
+            // 현재 내가 있는 슬롯
+            Transform originSlotTransform = actor.transform.parent;
+
+            // 제자리 이동이면 무시
+            if (targetSlotTransform == originSlotTransform) yield break;
+
+            // 1. 목표 슬롯에 있는 캐릭터 가져오기
+            PlayerController targetChar = targetSlotTransform.GetComponentInChildren<PlayerController>();
 
             // 로그 출력
             if (messagePanel) 
             {
                 messagePanel.SetActive(true);
-                messageText.SetText("자리 이동!");
+                string msg = targetChar.IsEmpty ? "자리 이동!" : "위치 교대!";
+                messageText.SetText(msg);
             }
-            Debug.Log($"[Action] {actor.name}의 이동 실행 -> {targetSlot.name}");
+            
+            Debug.Log($"[Action] {actor.name} 이동: {originSlotTransform.name} -> {targetSlotTransform.name}");
 
-            // 이미 그 자리에 있다면 스킵
-            if (targetSlot == originSlot) 
+            // =========================================================
+            // 관리 리스트(allSlotControllers) 순서 동기화
+            // =========================================================
+            // 리스트에서의 현재 인덱스를 찾는다.
+            int actorListIndex = allSlotControllers.IndexOf(actor);
+            int targetListIndex = allSlotControllers.IndexOf(targetChar);
+
+            // 리스트 내의 위치를 스왑.
+            // 이렇게 해야 ProcessPlayerRowShift가 올바른 전열/후열 캐릭터를 참조.
+            if (actorListIndex != -1 && targetListIndex != -1)
             {
-                if (messagePanel) messagePanel.SetActive(false);
-                yield break;
+                allSlotControllers[actorListIndex] = targetChar;
+                allSlotControllers[targetListIndex] = actor;
             }
+            // =========================================================
 
-            // 1. 대상 슬롯에 누가 있는지 확인 (스왑 대상)
-            PlayerController targetChar = targetSlot.GetComponentInChildren<PlayerController>();
-
-            // 2. 스왑 로직
+            // =========================================================
+            // 물리적 위치(Parent) 및 Index 정보 스왑
+            // =========================================================
+            
+            // A. 타겟 캐릭터(Empty든 아니든)를 내 원래 자리로 보냄
             if (targetChar != null)
             {
-                // 상대방을 내 자리(원래 부모)로 보냄
-                targetChar.transform.SetParent(originSlot);
+                targetChar.transform.SetParent(originSlotTransform);
                 targetChar.transform.localPosition = Vector3.zero;
+                
+                // 인덱스 정보 갱신 (슬롯 기준)
+                targetChar.columnIndex = GetPlayerSlotIndex(originSlotTransform); 
             }
 
-            // 3. 나는 목표 자리로 이동
-            actor.transform.SetParent(targetSlot);
+            // B. 나를 목표 자리로 보냄
+            actor.transform.SetParent(targetSlotTransform);
             actor.transform.localPosition = Vector3.zero;
+            
+            // 내 인덱스 정보 갱신
+            actor.columnIndex = GetPlayerSlotIndex(targetSlotTransform);
 
-            // 4. 이동한 나의 인덱스 갱신
-            actor.columnIndex = targetSlot.GetSiblingIndex();
+            // =========================================================
 
-            // 5. 간단한 연출 대기
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click); // TODO: 발소리로 바꾸자
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
             yield return wait05;
 
             if (messagePanel) messagePanel.SetActive(false);
