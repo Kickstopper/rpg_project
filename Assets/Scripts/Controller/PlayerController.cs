@@ -93,9 +93,13 @@ namespace Controller
             currentMp = maxMp;
 
             // UI 설정
-            portraitImage.gameObject.SetActive(true);
-            portraitImage.sprite = data.portraitImage;
-            portraitImage.SetNativeSize();
+            if (portraitImage && data.portraitImage)
+            {
+                portraitImage.gameObject.SetActive(true);
+                portraitImage.sprite = data.portraitImage;
+                portraitImage.color = Color.white;
+                portraitImage.SetNativeSize();
+            }
             
             nameText.text = data.name;
             nameText.alignment = TextAlignmentOptions.TopLeft;
@@ -304,7 +308,7 @@ namespace Controller
             Debug.Log($"<color=red>{entityName}에게 {damage} 데미지!</color>");
 
             // 플레이어 전용 피격 연출 (얼굴 붉어짐)
-            if (portraitImage)
+            if (portraitImage && portraitImage.sprite)
             {
                 portraitImage.color = Color.red;
                 yield return new WaitForSeconds(0.1f);

@@ -15,7 +15,7 @@ MonoBehaviour:
   entries:
   - id: chr000
     name: "\uC870\uAE4C"
-    portraitImage: {fileID: 21300000, guid: 11408ed42c2430a4da7da88799010da1, type: 3}
+    portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
       level: 1
@@ -63,7 +63,7 @@ MonoBehaviour:
     initialArmorIds: []
   - id: chr001
     name: "\uBE64\uC2A4"
-    portraitImage: {fileID: 21300000, guid: 899b5c2af7041ec48bc7c33fdc8cf91a, type: 3}
+    portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
       level: 1
@@ -87,7 +87,7 @@ MonoBehaviour:
     initialArmorIds: []
   - id: chr002
     name: "\uD14D\uCF04"
-    portraitImage: {fileID: 21300000, guid: 55e468aa56ad22c448b3d03fa923ab9b, type: 3}
+    portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
       level: 1
@@ -111,7 +111,7 @@ MonoBehaviour:
     initialArmorIds: []
   - id: chr003
     name: "\uD1A0\uB07C"
-    portraitImage: {fileID: 21300000, guid: c1befcf80fcec114c8ff97c212d6c288, type: 3}
+    portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
       level: 1
@@ -135,7 +135,7 @@ MonoBehaviour:
     initialArmorIds: []
   - id: chr004
     name: "\uC774\uBE68"
-    portraitImage: {fileID: 21300000, guid: 4bbda335dac90d84588673a6344dfdac, type: 3}
+    portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
       level: 1
@@ -159,7 +159,7 @@ MonoBehaviour:
     initialArmorIds: []
   - id: chr005
     name: "\uBA58\uD5E4\uB77C"
-    portraitImage: {fileID: 21300000, guid: 6d55c94e763dac24487ca34b7317058e, type: 3}
+    portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
       level: 1
