@@ -66,6 +66,7 @@ namespace Manager
         private int currentMoveSlotIndex = 0; // 0~2: 전열, 3~5: 후열
 
         [Header("Highlight Colors")]
+        public Color currentCmdTargetColor = Color.gray;
         public Color moveSourceColor = Color.gray;   // 이동하려는 내 캐릭터 색상
         public Color moveTargetColor = Color.cyan;  // 커서가 가리키는 대상 색상
 
@@ -948,11 +949,15 @@ namespace Manager
         
         void NextPlayerInput()
         {
+            ResetPlayerSlotHighlights();
+
             currentPlayerIndex++;
             if (currentPlayerIndex >= activePlayers.Count) { ProcessTurn(); return; }
 
             PlayerController currentPlayer = activePlayers[currentPlayerIndex] as PlayerController;
             if (currentPlayer.currentHp <= 0) { NextPlayerInput(); return; }
+            
+            currentPlayer.SetHighlightColor(currentCmdTargetColor);
 
             if (isAutoMode)
             {
