@@ -34,6 +34,9 @@ namespace Manager
         public GameObject vfxSlashPrefab;  // 물리 공격용
         public GameObject vfxGunPrefab;  // 총 공격용
         public GameObject vfxMagicPrefab;  // 마법 공격용
+        public GameObject vfxGuardHitPrefab;   // 방어 상태에서 맞았을 때 (방패 모양 등)
+        public GameObject vfxReflectPrefab;    // 반사 발동 시 (배리어 등)
+        public GameObject vfxAbsorbPrefab;     // 흡수 발동 시 (녹색 회복 이펙트 등)
 
         [Header("First Focus Buttons")]
         public GameObject baseFirstButton;    // Base 메뉴의 첫 버튼 (Fight 버튼)
@@ -241,6 +244,7 @@ namespace Manager
                     pc.columnIndex = i; // 0~5 전체 인덱스로 관리하거나, 0~2 로컬 인덱스로 관리 (기존 로직 따름)
                     
                     // ★ 중요: 턴을 잡을 수 있는 'activePlayers'에는 실제 캐릭터만 추가
+                    pc.gameObject.name = pc.sourceData.name;
                     activePlayers.Add(pc);
                 }
                 else
@@ -2099,53 +2103,6 @@ namespace Manager
         // 단일 타격 처리 (반사, 회피, 데미지 통합)
         IEnumerator ProcessSingleHit(CombatAction action, GameObject target)
         {
-            // =========================================================
-            // 타격 이펙트 생성
-            // =========================================================
-            var sfxId = SfxID.None;
-            GameObject vfxToSpawn = null;
-            // 공격 타입에 따라 이펙트 결정
-            if (action.type == CombatAction.ActionType.Attack)
-            {
-                sfxId = SfxID.Attack_Sword;
-                vfxToSpawn = vfxSlashPrefab;
-            }
-            else if (action.type == CombatAction.ActionType.Gun)
-            {
-                sfxId = SfxID.Attack_Gun;
-                vfxToSpawn = vfxGunPrefab;
-            }
-            else if (action.type == CombatAction.ActionType.Skill) // 혹은 마법 스킬
-            {
-                sfxId = SfxID.Attack_Magic;
-                // 스킬 속성에 따라 다르게 할 수도 있음 (여기선 magicPrefab 통일)
-                vfxToSpawn = vfxMagicPrefab;
-            }
-            else if (action.type == CombatAction.ActionType.Item)
-            {
-                // 아이템(공격용)인 경우
-                if (action.itemData.effectType == EffectType.Special_Atk || 
-                    action.itemData.effectType == EffectType.Magic_Atk)
-                {
-                    sfxId = SfxID.Attack_Magic;
-                    vfxToSpawn = vfxMagicPrefab;
-                }
-            }
-            // 사운드
-            if (sfxId != SfxID.None) SoundManager.Instance.PlaySFX(sfxId);
-
-            if (vfxToSpawn != null)
-            {
-                // 타겟의 위치(가운데 혹은 약간 위)에 생성
-                Vector3 spawnPos = target.transform.position;
-                
-                // 2D 스프라이트라면 Z값이 중요할 수 있으므로 보정 (카메라 쪽으로 살짝 당김)
-                spawnPos.z = -5; 
-
-                Instantiate(vfxToSpawn, spawnPos, Quaternion.identity);
-            }
-            // =========================================================
-
             // 위치 보정값 계산
             GetPositionalModifiers(action.actor, target, action, out float posDmgMult, out float posEvaBonus);
 
@@ -2163,6 +2120,8 @@ namespace Manager
                 Debug.Log("공격 반사!");
                 ShowLog("Reflect!");
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                // 반사 이펙트 표시
+                SpawnVFX(vfxReflectPrefab, target.transform.position);
 
                 // 공격자에게 데미지 반사 (계산 로직 재사용)
                 int reflectDmg = CalculateDamage(action.actor, action.actor, action, false, 1.0f);
@@ -2170,7 +2129,32 @@ namespace Manager
                 yield break;
             }
 
-            // 3. 정상 피격 (데미지 계산)
+            // =========================================================
+            // 3. 흡수 (Absorption) 체크 및 이펙트
+            // =========================================================
+            // BattleEntity에 isPhysicalAbsorb 등의 플래그가 있으므로 여기서 처리
+            if (CheckAbsorption(target, action.type))
+            {
+                Debug.Log("공격 흡수!");
+                ShowLog("Absorb!");
+                
+                // [추가] 흡수 이펙트 표시
+                SpawnVFX(vfxAbsorbPrefab, target.transform.position);
+
+                // 데미지 계산 (회복량으로 전환)
+                int absorbAmount = CalculateDamage(action.actor, target, action, false, 1.0f);
+                
+                // 타겟 회복 처리
+                var targetEntity = target.GetComponent<BattleEntity>();
+                if (targetEntity is PlayerController pc) pc.Recover(absorbAmount, 0);
+                else if (targetEntity is MonsterController mc) mc.currentHp = Mathf.Min(mc.currentHp + absorbAmount, mc.maxHp); // 몬스터 회복 로직
+
+                yield break; // 데미지 단계로 가지 않고 종료
+            }
+
+            // =========================================================
+            // 4. 일반 피격 (데미지 계산)
+            // =========================================================
             bool isCritical = CheckCritical(action.actor, target, action);
             int damage = 0;
 
@@ -2179,6 +2163,63 @@ namespace Manager
             else
                 damage = CalculateDamage(action.actor, target, action, isCritical, posDmgMult);
 
+            // =========================================================
+            // 5. 방어 (Guard) 상태 이펙트 처리
+            // =========================================================
+            BattleEntity defenderEntity = target.GetComponent<BattleEntity>();
+            if (defenderEntity != null && defenderEntity.isGuarding)
+            {
+                // 방어 성공 이펙트 (깡! 소리나 방패 이펙트)
+                // 데미지는 CalculateDamage 내부에서 이미 반감되어 있음
+                SpawnVFX(vfxGuardHitPrefab, target.transform.position);
+                yield return wait01;
+            }
+            // 공격이 클린 히트 했을 경우
+            else
+            {
+                
+                // =========================================================
+                // 타격 이펙트 생성
+                // =========================================================
+                var sfxId = SfxID.None;
+                GameObject vfxToSpawn = null;
+                // 공격 타입에 따라 이펙트 결정
+                if (action.type == CombatAction.ActionType.Attack)
+                {
+                    sfxId = SfxID.Attack_Sword;
+                    vfxToSpawn = vfxSlashPrefab;
+                }
+                else if (action.type == CombatAction.ActionType.Gun)
+                {
+                    sfxId = SfxID.Attack_Gun;
+                    vfxToSpawn = vfxGunPrefab;
+                }
+                else if (action.type == CombatAction.ActionType.Skill) // 혹은 마법 스킬
+                {
+                    sfxId = SfxID.Attack_Magic;
+                    // 스킬 속성에 따라 다르게 할 수도 있음 (여기선 magicPrefab 통일)
+                    vfxToSpawn = vfxMagicPrefab;
+                }
+                else if (action.type == CombatAction.ActionType.Item)
+                {
+                    // 아이템(공격용)인 경우
+                    if (action.itemData.effectType == EffectType.Special_Atk || 
+                        action.itemData.effectType == EffectType.Magic_Atk)
+                    {
+                        sfxId = SfxID.Attack_Magic;
+                        vfxToSpawn = vfxMagicPrefab;
+                    }
+                }
+                // =========================================================
+
+                if (sfxId != SfxID.None) SoundManager.Instance.PlaySFX(sfxId);
+
+                // 타겟의 위치(가운데 혹은 약간 위)에 생성
+                Vector3 spawnPos = target.transform.position;
+                SpawnVFX(vfxToSpawn, spawnPos);
+                yield return wait01;
+            }
+
             ApplyDamage(target, damage, isCritical);
         }
 
@@ -2186,6 +2227,17 @@ namespace Manager
         // ========================================================================
         // 4. 공통 헬퍼 함수 (핵심: 중복 코드 제거)
         // ========================================================================
+
+        // VFX 생성
+        void SpawnVFX(GameObject vfxPrefab, Vector3 position)
+        {
+            if (vfxPrefab != null)
+            {
+                // 2D 게임이므로 Z축 정렬을 위해 약간 앞으로 당김 (-5 등)
+                Vector3 spawnPos = new Vector3(position.x, position.y, -5f);
+                Instantiate(vfxPrefab, spawnPos, Quaternion.identity);
+            }
+        }
 
         // Player와 Monster의 데미지 처리를 하나로 통합
         void ApplyDamage(GameObject target, int damage, bool isCritical)
@@ -2198,6 +2250,22 @@ namespace Manager
                 entity.TriggerHitShake(isCritical); // 부모 클래스에 정의된 공통 메서드
                 StartCoroutine(entity.OnDamageTaken(damage)); // 자식에서 구현한 오버라이드 메서드 실행
             }
+        }
+
+        // 흡수 여부 체크 로직
+        bool CheckAbsorption(GameObject target, CombatAction.ActionType type)
+        {
+            var entity = target.GetComponent<BattleEntity>();
+            if (entity == null) return false;
+
+            bool isPhysical = (type == CombatAction.ActionType.Attack || type == CombatAction.ActionType.Gun);
+            // 스킬은 속성에 따라 다르겠지만 일단 Skill이면 Magic으로 간주 (구체화 필요 시 skillData 확인)
+            bool isMagic = (type == CombatAction.ActionType.Skill); 
+
+            if (isPhysical && entity.isPhysicalAbsorb) return true;
+            if (isMagic && entity.isMagicAbsorb) return true;
+
+            return false;
         }
 
         // 반사 여부 체크 로직
@@ -2503,6 +2571,7 @@ namespace Manager
 
             // 3. 데이터 초기화 실행
             controller.Initialize(entry);
+            newMonsterObj.name = $"{controller.sourceData.race} {controller.sourceData.name}";
 
             // 4. [요청하신 기능] 데이터 무결성 체크 (HP가 0이면 불량품 취급)
             if (controller.currentHp <= 0)

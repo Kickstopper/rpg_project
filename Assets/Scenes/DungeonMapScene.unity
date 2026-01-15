@@ -3864,6 +3864,21 @@ MonoBehaviour:
   colorLeft: {r: 0, g: 0, b: 0.5, a: 0.5019608}
   colorRight: {r: 0, g: 0.6, b: 1, a: 0.5019608}
   angle: -60
+--- !u!114 &1855285926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1855285924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0.08321268, b: 0.3207547, a: 0.5}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 0
 --- !u!1 &1863840028
 GameObject:
   m_ObjectHideFlags: 0
@@ -4192,6 +4207,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 109808361112585852, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_EffectColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 109808361112585852, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_UseGraphicAlpha
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 186240474166309185, guid: beee0a64d8af03d40855188208769f2c, type: 3}
@@ -5154,6 +5173,18 @@ PrefabInstance:
       propertyPath: m_fontSizeBase
       value: 32
       objectReference: {fileID: 0}
+    - target: {fileID: 3602715421750307906, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_EffectColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3602715421750307906, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_EffectColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3602715421750307906, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_EffectColor.r
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3633926997145437493, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: angle
       value: 162
@@ -5784,11 +5815,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6913327368282093093, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -609
+      value: -605
       objectReference: {fileID: 0}
     - target: {fileID: 6913327368282093093, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 217
+      value: 213
       objectReference: {fileID: 0}
     - target: {fileID: 7012162560556748275, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_Sprite
@@ -6062,6 +6093,10 @@ PrefabInstance:
       propertyPath: m_EffectColor.r
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7918809753856678814, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_UseGraphicAlpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8070915848827554740, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -6278,9 +6313,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 907590103207973808, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1925991833}
+    - targetCorrespondingSourceObject: {fileID: 907590103207973808, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1925991834}
     - targetCorrespondingSourceObject: {fileID: 6710136265086569079, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1855285925}
+    - targetCorrespondingSourceObject: {fileID: 6710136265086569079, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1855285926}
   m_SourcePrefab: {fileID: 100100000, guid: beee0a64d8af03d40855188208769f2c, type: 3}
 --- !u!1 &1925991828 stripped
 GameObject:
@@ -6322,6 +6363,21 @@ MonoBehaviour:
   colorLeft: {r: 0.5, g: 0, b: 0, a: 0.5019608}
   colorRight: {r: 0.5019608, g: 0, b: 0.5, a: 0.5019608}
   angle: -60
+--- !u!114 &1925991834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925991832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0.3433962, g: 0, b: 0.14298737, a: 0.5}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 0
 --- !u!1 &1955599055
 GameObject:
   m_ObjectHideFlags: 0
@@ -6769,6 +6825,9 @@ MonoBehaviour:
   vfxSlashPrefab: {fileID: 7405688537336936215, guid: 7c7486c5695c3ba489d13e3922f0c1f8, type: 3}
   vfxGunPrefab: {fileID: 7405688537336936215, guid: c653612a10f1bfd4987b27887f13aef8, type: 3}
   vfxMagicPrefab: {fileID: 7405688537336936215, guid: 0ee5f5d0414c76e47b2d7409a5ad57e7, type: 3}
+  vfxGuardHitPrefab: {fileID: 7405688537336936215, guid: 6dc6624beff7575439c1fbeef41310ed, type: 3}
+  vfxReflectPrefab: {fileID: 7405688537336936215, guid: f2183626627725b4b81fd7a8016f4235, type: 3}
+  vfxAbsorbPrefab: {fileID: 7405688537336936215, guid: 2ca0461892faed842b464c926396fcd7, type: 3}
   baseFirstButton: {fileID: 251505308}
   attackButton: {fileID: 591616784}
   targetCursor: {fileID: 0}
@@ -7090,6 +7149,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1163613326082503710, guid: 1297d0e698c13104eb88be69bad52d43, type: 3}
       insertIndex: -1
       addedObject: {fileID: 61542035373122068}
+    - targetCorrespondingSourceObject: {fileID: 1163613326082503710, guid: 1297d0e698c13104eb88be69bad52d43, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 61542035373122069}
   m_SourcePrefab: {fileID: 100100000, guid: 1297d0e698c13104eb88be69bad52d43, type: 3}
 --- !u!1 &61542035373122067 stripped
 GameObject:
@@ -7111,6 +7173,21 @@ MonoBehaviour:
   colorLeft: {r: 0, g: 0, b: 0, a: 0.9019608}
   colorRight: {r: 0.021238793, g: 0.021238793, b: 0.5924529, a: 0.52156866}
   angle: 118
+--- !u!114 &61542035373122069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 61542035373122067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0.2, g: 0.20784314, b: 0.24705882, a: 0.5}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

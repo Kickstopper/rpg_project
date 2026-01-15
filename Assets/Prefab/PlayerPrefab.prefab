@@ -909,7 +909,7 @@ GameObject:
   - component: {fileID: 7386235388751826534}
   - component: {fileID: 3239132202619996078}
   m_Layer: 0
-  m_Name: PartyPrefab
+  m_Name: PlayerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
