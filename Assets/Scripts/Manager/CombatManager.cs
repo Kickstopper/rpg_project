@@ -26,6 +26,7 @@ namespace Manager
         public GameObject messagePanel;     // 전투 중 캐릭터의 메시지 패널
         public TextMeshProUGUI messageText; // 전투 중 캐릭터의 메시지 텍스트
         public Slider qteTimingSlider; // 타이머 슬라이더. 인스펙터에서 할당
+        public Button autoModeButton; // 오토 모드의 트리거
 
         [Header("Prefabs")]
         public GameObject defaultMonsterPrefab;
@@ -77,6 +78,8 @@ namespace Manager
         
         private BaseRootData currentSelectedItem; // 현재 사용하려는 아이템
         private bool isAutoMode = false; // 오토 모드 활성화 여부
+        // 오토 모드 종료 예약 플래그
+        private bool reserveAutoOff = false;
         
         // 각 캐릭터(인덱스)가 마지막으로 수행한 행동 타입 저장
         private Dictionary<int, (CombatAction.ActionType type, BaseRootData data)> lastPlayerActions = new();
@@ -128,6 +131,9 @@ namespace Manager
             // 전투 시작 시 모든 상태 플래그와 속도 리셋
             // =========================================================
             isAutoMode = false;         // 오토 모드 해제
+            reserveAutoOff = false;     // 오토 모드 해제 예약 취소
+            autoModeButton.gameObject.SetActive(false);
+
             isFightMode = false;        // 메뉴 상태 초기화 (Base 메뉴부터 시작)
             Time.timeScale = 1.0f;      // 게임 속도 정상화 (혹시 2배속이었다면 복구)
             
@@ -339,7 +345,18 @@ namespace Manager
 
         void PreparePlayerTurn()
         {
-            // 턴 시작 시퀀스(이동 -> 입력) 실행
+            // 예약된 오토 해제가 있다면 여기서 적용
+            if (reserveAutoOff)
+            {
+                isAutoMode = false;
+                reserveAutoOff = false;
+                autoModeButton.gameObject.SetActive(false);
+                Time.timeScale = 1.0f; // 속도 정상화
+                Debug.Log("오토 모드가 종료되었습니다. 수동 입력을 시작합니다.");
+                
+                if (logPanel) logPanel.SetActive(false); // "Stopping Auto..." 메시지 끄기
+            }
+
             StartCoroutine(PreparePlayerTurnRoutine());
         }
 
@@ -458,42 +475,32 @@ namespace Manager
         }
 
         // =========================================================
-        // 턴 순서 계산 및 시각화
+        // 턴 순서 시각화 (아군 턴에는 아군 순서만 표시)
         // =========================================================
         void CalculateAndShowTurnOrder()
         {
-            // 1. 살아있는 모든 엔티티(아군 + 적군) 수집
-            List<BattleEntity> allEntities = new List<BattleEntity>();
-            allEntities.AddRange(activePlayers.Where(p => p.currentHp > 0));
-            allEntities.AddRange(activeMonsters.Where(m => m.currentHp > 0));
+            // 1. 살아있는 아군만 수집
+            List<BattleEntity> validEntities = new List<BattleEntity>();
+            validEntities.AddRange(activePlayers.Where(p => p.currentHp > 0));
 
-            // 2. 속도 기준 정렬 (예상 속도 = AGI - 누적된 페널티)
-            // 숫자가 클수록 먼저 행동합니다.
-            allEntities.Sort((a, b) => 
+            // 2. 속도 기준 정렬
+            validEntities.Sort((a, b) => 
             {
                 int speedA = a.GetTotalAgi() - a.nextTurnSpeedPenalty;
                 int speedB = b.GetTotalAgi() - b.nextTurnSpeedPenalty;
                 
-                // 속도가 같으면 아군 우선, 그 다음엔 운(LUC) 비교
-                if (speedA == speedB)
-                {
-                    bool isAPlayer = a is PlayerController;
-                    bool isBPlayer = b is PlayerController;
-                    if (isAPlayer && !isBPlayer) return -1; // A(Player) First (Desc sort니까 -1은 A가 앞?) -> Sort는 오름차순이 기본이므로, 내림차순하려면 b.CompareTo(a)
-                    if (!isAPlayer && isBPlayer) return 1;
-                    return b.GetTotalLuc().CompareTo(a.GetTotalLuc());
-                }
-                return speedB.CompareTo(speedA); // 내림차순 정렬
+                if (speedA == speedB) return b.GetTotalLuc().CompareTo(a.GetTotalLuc());
+                return speedB.CompareTo(speedA); // 내림차순
             });
 
             // 3. UI 업데이트
-            for (int i = 0; i < allEntities.Count; i++)
+            for (int i = 0; i < validEntities.Count; i++)
             {
-                BattleEntity entity = allEntities[i];
+                BattleEntity entity = validEntities[i];
                 if (entity.turnOrderText != null)
                 {
                     entity.turnOrderText.gameObject.SetActive(true);
-                    entity.turnOrderText.text = (i + 1).ToString(); // 1등부터 번호 표시
+                    entity.turnOrderText.text = (i + 1).ToString();
                 }
             }
         }
@@ -505,8 +512,15 @@ namespace Manager
             {
                 if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift))
                 {
-                    isAutoMode = false;
-                    Debug.Log("오토 모드 해제 예약: 다음 턴부터 수동 조작");
+                    // 즉시 끄지 않고, 예약만 걸어둠
+                    if (!reserveAutoOff)
+                    {
+                        autoModeButton.Select();
+                        autoModeButton.GetComponent<Image>().color = Color.white;
+                        reserveAutoOff = true;
+                        
+                        Debug.Log("오토 모드 해제 예약: 이번 턴(아군+적군)이 모두 끝나면 수동으로 전환됩니다.");
+                    }
                 }
             }
 
@@ -636,6 +650,9 @@ namespace Manager
             SoundManager.Instance.PlayBGM(BgmID.Normal_Battle);
             Debug.Log("오토 모드 시작! (x2 속도)");
             isAutoMode = true;
+            reserveAutoOff = false; // 시작할 때 예약 확실히 초기화
+            autoModeButton.gameObject.SetActive(true);
+            autoModeButton.GetComponent<Image>().color = Color.red;
             
             // 게임 속도 2배
             Time.timeScale = 2.0f;
@@ -1634,51 +1651,60 @@ namespace Manager
         // =================================================================
         // 3. 턴 처리 및 실행 (Process & Execution)
         // =================================================================
+        //  아군 행동 실행 (플레이어 턴) 플레이어의 입력이 모두 끝난 후 호출됨
         void ProcessTurn()
         {
             SoundManager.Instance.PlayBGM(BgmID.Normal_Battle);
             
-            state = BattleState.Processing;
+            // ★ 상태 설정: 아군 행동 실행 중 = Processing
+            state = BattleState.Processing; 
+            
             commandPanel.SetActive(false);
             if (logPanel) logPanel.SetActive(false);
-
-            // 전투 시작 시 켜둔 순서 표시 UI 끄기 (연출을 위해)
             HideTurnOrderUI();
 
-            // 1. 적들의 행동 결정 (AI)
-            // 살아있는 아군 리스트 추출
-            List<BattleEntity> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
+            // 1. 아군 행동만 속도 순 정렬 (적군 AI 로직 제거됨)
+            actionQueue = actionQueue.OrderByDescending(x => x.speed).ToList();
 
-            if (livingPlayers.Count == 0)
+            // 2. 실행 시작
+            StartCoroutine(ExecuteActions());
+        }
+
+        // 적군 행동 실행 (적군 턴)
+        void ProcessEnemyTurn()
+        {
+            // 1. 전투 종료 체크
+            if (CheckBattleEnd(out bool isWin))
             {
-                state = BattleState.Lost;
-                Debug.Log("전멸했습니다...");
+                StartCoroutine(EndBattleRoutine(isWin));
                 return;
             }
 
+            state = BattleState.EnemyInput; 
+
+            Debug.Log("== 적군 페이즈 시작 ==");
+            actionQueue.Clear(); // 큐 초기화
+
+            // 2. 살아있는 아군 리스트 (타겟용)
+            List<BattleEntity> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
+
+            // 3. 몬스터 AI 결정
             foreach (MonsterController monster in activeMonsters)
             {
                 if (monster.currentHp <= 0) continue;
-
-                // 몬스터도 AGI - Penalty로 속도 결정 필요
-                // 몬스터 AI 내부에서 CombatAction 생성 시 speed를 (AGI - nextTurnSpeedPenalty)로 설정하도록 
-                // MonsterController.ChooseAction 로직을 수정하거나, 여기서 강제 보정해야 함.
-                // 여기서는 생성된 action의 speed를 덮어쓰는 방식으로 처리:
+                
                 CombatAction enemyAction = monster.ChooseAction(livingPlayers);
                 if (enemyAction != null)
                 {
-                    // 몬스터의 속도 덮어쓰기
+                    // 속도 계산 (AGI - 페널티)
                     enemyAction.speed = monster.GetTotalAgi() - monster.nextTurnSpeedPenalty;
-                    monster.nextTurnSpeedPenalty = 0; // 다음 턴의 페널티 제거
-
+                    monster.nextTurnSpeedPenalty = 0; 
                     actionQueue.Add(enemyAction);
                 }
             }
 
-            // 2. 속도 순 정렬
+            // 4. 정렬 및 실행
             actionQueue = actionQueue.OrderByDescending(x => x.speed).ToList();
-
-            // 3. 실행 시작
             StartCoroutine(ExecuteActions());
         }
 
@@ -1688,54 +1714,60 @@ namespace Manager
             foreach(var m in activeMonsters) if(m.turnOrderText) m.turnOrderText.gameObject.SetActive(false);
         }
 
+        // 행동 실행 및 턴 교체 처리
         IEnumerator ExecuteActions()
         {
             foreach (var action in actionQueue)
             {
-                // 매 행동마다 전투 종료 체크
+                // 전투 종료 체크
                 if (CheckBattleEnd(out bool isWin)) 
                 {
-                    // 종료 조건 만족 시, 바로 종료 시퀀스 실행 후 루프 탈출
                     StartCoroutine(EndBattleRoutine(isWin));
                     yield break; 
                 }
 
-                // =========================================================
-                // 행동 주체(Actor)의 생존 여부 확인
-                // =========================================================
+                // 행동 주체 생존 확인
                 bool isActorDead = false;
                 if (action.actor == null || !action.actor.activeSelf) isActorDead = true;
                 else if (action.actor.TryGetComponent(out BattleEntity be) && !be.IsAlive) isActorDead = true;
                 
                 if (isActorDead) continue; 
 
-                // 핵심 로직: 행동 수행 후, 해당 행동의 비용(Delay)을 '다음 턴 페널티'로 저장
+                // 페널티 적용
                 int delay = CalculateActionDelay(action);
                 BattleEntity actorEntity = action.actor.GetComponent<BattleEntity>();
-                if (actorEntity != null)
-                {
-                    // 페널티 누적 (혹은 덮어쓰기. 보통은 행동 하나만 하므로 덮어쓰기)
-                    // 이번 행동이 강력할수록 nextTurnSpeedPenalty가 커짐 -> 다음 턴 speed(AGI - Penalty)가 작아짐 -> 순서 밀림
-                    actorEntity.nextTurnSpeedPenalty += delay; 
-                }
+                if (actorEntity != null) actorEntity.nextTurnSpeedPenalty += delay; 
 
+                // 실제 행동 수행
                 yield return StartCoroutine(PerformAction(action));
             }
 
-            // 턴의 모든 행동이 끝난 후 다시 체크
-            if (CheckBattleEnd(out bool win))
+            // =========================================================
+            // [핵심] 턴 교체 로직 (isPlayerTurn 변수 대신 state 직접 비교)
+            // =========================================================
+            
+            // 1. 방금 끝난 것이 '아군 행동(Processing)'이었다면? -> 적군 턴 호출
+            if (state == BattleState.Processing)
             {
-                StartCoroutine(EndBattleRoutine(win));
+                yield return wait05; // 잠시 대기
+                ProcessEnemyTurn();
             }
-            else
+            // 2. 방금 끝난 것이 '적군 행동(EnemyInput)'이었다면? -> 다시 아군 입력(PreparePlayerTurn) 호출
+            else if (state == BattleState.EnemyInput)
             {
-                // PreparePlayerTurn()을 호출하면 -> PreparePlayerTurnRoutine()이 시작됨
-                // -> 적 이동 체크 -> UI 표시 순서로 진행됨
-                PreparePlayerTurn(); 
+                // 턴이 끝났으니 다시 한 번 종료 체크
+                if (CheckBattleEnd(out bool win))
+                {
+                    StartCoroutine(EndBattleRoutine(win));
+                }
+                else
+                {
+                    PreparePlayerTurn(); // 다음 라운드(플레이어 입력) 시작
+                }
             }
         }
 
-        // [New Feature] 행동별 다음 턴 지연 시간 계산 함수
+        // 행동별 다음 턴 지연 시간 계산 함수
         int CalculateActionDelay(CombatAction action)
         {
             int baseDelay = 0;
@@ -1957,18 +1989,19 @@ namespace Manager
             // =========================================================
             // Phase 1: 수동 QTE 타격
             // =========================================================
-            if (isPlayer && !isAutoMode && maxHits > 0)
+            if (isPlayer && !isAutoMode && maxHits > 0 && minHits < maxHits)
             {
                 if (qteTimingSlider)
                 {
                     qteTimingSlider.gameObject.SetActive(true);
+                    qteTimingSlider.minValue = 0f;
                     qteTimingSlider.maxValue = 1.0f;
                     qteTimingSlider.value = 1.0f;
+                    qteTimingSlider.interactable = false;// 유저 조작 방지
                 }
 
                 float qteDuration = 2.0f; // 제한 시간
                 float timer = 0f;
-                
 
                 if (logPanel) logText.text = "SHOOT IT IN THE HEAD!! (Space/Enter)";
 
