@@ -1946,53 +1946,18 @@ namespace Manager
             
             // 플레이어인지 확인
             bool isPlayer = (action.actor.GetComponent<PlayerController>() != null);
-            
-            // 오토 모드이거나 몬스터라면: 랜덤 횟수
-            int autoHitCount = 0;
-            if (!isPlayer || isAutoMode)
-            {
-                autoHitCount = Random.Range(minHits, maxHits + 1);
-            }
-            else
-            {
-                // 수동 플레이어: 최소 횟수만큼만 자동 실행
-                autoHitCount = minHits;
-            }
 
             // 로그 출력
             string actStr = (action.type == CombatAction.ActionType.Gun) ? "의 사격!" : "의 참격!";
             ShowLog($"{action.actor.name}{actStr}");
 
-            // =========================================================
-            // Phase 1: 자동 공격 (기존과 동일, 순차 실행 유지)
-            // =========================================================
-            for (int i = 0; i < autoHitCount; i++)
-            {
-                List<GameObject> currentTargets = GetTargetsByScope(scope, action);
-                if (currentTargets.Count == 0) break; 
+            yield return wait05;
 
-                if (i == 0)
-                {
-                    action.actor.transform.localPosition += Vector3.forward * 0.3f;
-                    yield return wait01;
-                }
-
-                foreach (var target in currentTargets)
-                {
-                    // [중요] 자동 공격은 리듬감을 위해 여전히 기다려줌(yield return)
-                    yield return StartCoroutine(ProcessSingleHit(action, target));
-                }
-                
-                yield return wait01;
-                if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll) break;
-            }
-
+            int currentHits = 0;
             // =========================================================
-            // Phase 2: QTE 추가 타격
+            // Phase 1: 수동 QTE 타격
             // =========================================================
-            int maxExtraHits = maxHits - minHits;
-
-            if (isPlayer && !isAutoMode && maxExtraHits > 0)
+            if (isPlayer && !isAutoMode && maxHits > 0)
             {
                 if (qteTimingSlider)
                 {
@@ -2003,12 +1968,12 @@ namespace Manager
 
                 float qteDuration = 2.0f; // 제한 시간
                 float timer = 0f;
-                int currentExtraHits = 0;
+                
 
-                if (logPanel) logText.text = "Button Mash!! (Space/Enter)";
+                if (logPanel) logText.text = "SHOOT IT IN THE HEAD!! (Space/Enter)";
 
                 // [핵심] 타이머 루프
-                while (timer < qteDuration && currentExtraHits < maxExtraHits)
+                while (timer < qteDuration && currentHits < maxHits)
                 {
                     timer += Time.deltaTime;
                     
@@ -2028,7 +1993,7 @@ namespace Manager
                             StartCoroutine(ProcessSingleHit(action, target));
                         }
 
-                        currentExtraHits++;
+                        currentHits++;
                         
                         // 페널티 적용
                         BattleEntity actorEntity = action.actor.GetComponent<BattleEntity>();
@@ -2038,7 +2003,7 @@ namespace Manager
                             Debug.Log($"추가 타격! (누적 페널티: -{actorEntity.nextTurnSpeedPenalty})");
                         }
 
-                        if (logPanel) logText.text = $"Combo! ({currentExtraHits}/{maxExtraHits})";
+                        if (logPanel) logText.text = $"Combo! ({currentHits}/{maxHits})";
                         
                         // 사운드만 재생하고, 딜레이(Wait) 없이 즉시 루프 계속 진행
                         SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
@@ -2052,7 +2017,43 @@ namespace Manager
                 
                 // 비동기로 실행된 마지막 공격 이펙트들이 끝날 때까지 살짝 대기 (선택 사항)
                 // 이걸 안 넣으면 이펙트가 터지는 도중에 캐릭터가 자리로 돌아갈 수 있음
-                if (currentExtraHits > 0) yield return wait01;
+                if (currentHits > 0) yield return wait01;
+            }
+            
+            // =========================================================
+            // Phase 2: 자동 공격 (기존과 동일, 순차 실행 유지)
+            // =========================================================
+            // 오토 모드이거나 몬스터라면: 랜덤 횟수
+            int autoHitCount = 0;
+            if (!isPlayer || isAutoMode)
+            {
+                autoHitCount = Random.Range(minHits, maxHits + 1);
+            }
+            else if (minHits - currentHits > 0)
+            {
+                // 수동 플레이어: 최소 횟수보다 공격 횟수가 적으면 차이만큼 자동 연사
+                autoHitCount = minHits - currentHits;
+            }
+            
+            for (int i = 0; i < autoHitCount; i++)
+            {
+                List<GameObject> currentTargets = GetTargetsByScope(scope, action);
+                if (currentTargets.Count == 0) break; 
+
+                if (i == 0)
+                {
+                    action.actor.transform.localPosition += Vector3.forward * 0.3f;
+                    yield return wait01;
+                }
+
+                foreach (var target in currentTargets)
+                {
+                    // 자동 공격은 리듬감을 위해 여전히 기다려줌(yield return)
+                    yield return StartCoroutine(ProcessSingleHit(action, target));
+                }
+                
+                yield return wait01;
+                if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll) break;
             }
             
             // =========================================================
