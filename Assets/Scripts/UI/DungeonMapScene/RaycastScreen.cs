@@ -562,168 +562,133 @@ namespace UI.DungeonMapScene
         // =========================================================
         // Render Logic (Raycasting)
         // =========================================================
+        // step이 1이면 정밀 렌더링, 2면 고속(반해상도) 렌더링
+        private void PerformRenderPass(int step)
+        {
+            // 각 함수에도 step을 전달
+            CastFloorAndCeiling(step);
+            CastWalls(step);
+            
+            // 스프라이트는 굳이 step을 적용 안 해도(또는 복잡해서) 
+            // 성능 영향이 적다면 그대로 둬도 되지만, 최적화를 위해 적용 추천
+            if (_sprtData != null && _sprtData.Length > 0) CastSprites(step);
+        }
+
         private void Render()
         {
-            // 애너글리프 모드인지 확인
             if (useAnaglyph)
             {
-                // 원래 위치 저장
                 float originalX = _posX;
                 float originalY = _posY;
+                
+                // [최적화] 3D 모드에서는 가로 해상도를 절반으로 낮춰서 연산량 보존
+                int step = 2; 
 
-                // -----------------------------------------------------
-                // 1. 왼쪽 눈 렌더링 (Red Channel)
-                // -----------------------------------------------------
-                // 카메라 평면 벡터(_plane) 방향의 반대로 이동
+                // 1. Left Eye
                 _posX = originalX - _planeX * stereoSeparation;
                 _posY = originalY - _planeY * stereoSeparation;
-
-                PerformRenderPass(); // 렌더링 수행 (결과는 _buffer에 담김)
-
-                // 결과를 임시 버퍼에 복사
+                PerformRenderPass(step); // step 전달
                 Array.Copy(_buffer, _leftEyeBuffer, _buffer.Length);
 
-                // -----------------------------------------------------
-                // 2. 오른쪽 눈 렌더링 (Cyan Channel: Green + Blue)
-                // -----------------------------------------------------
-                // 카메라 평면 벡터(_plane) 방향으로 이동
+                // 2. Right Eye
                 _posX = originalX + _planeX * stereoSeparation;
                 _posY = originalY + _planeY * stereoSeparation;
+                PerformRenderPass(step); // step 전달
 
-                PerformRenderPass(); // _buffer가 오른쪽 눈 이미지로 덮어씌워짐
-
-                // -----------------------------------------------------
-                // 3. 합성 (Merge)
-                // -----------------------------------------------------
-                // 왼쪽 눈의 R과 오른쪽 눈의 G, B를 합침
+                // 3. Merge (기존과 동일)
                 for (int i = 0; i < _buffer.Length; i++)
                 {
                     Color left = _leftEyeBuffer[i];
                     Color right = _buffer[i];
-                    
-                    // Simple Anaglyph: Left(R) + Right(G,B)
-                    // 알파값은 1로 고정
                     _buffer[i] = new Color(left.r, right.g, right.b, 1.0f);
                 }
 
-                // 위치 원상 복구 (중요: 다음 프레임 이동 로직을 위해)
                 _posX = originalX;
                 _posY = originalY;
             }
             else
             {
-                // 일반 렌더링 (단일 패스)
-                PerformRenderPass();
+                // 일반 모드는 모든 픽셀 정밀 계산 (step = 1)
+                PerformRenderPass(1); 
             }
-
-            // GPU로 텍스처 업로드
+            
             _screenTexture.SetPixels(_buffer);
             _screenTexture.Apply();
 
             UpdateBackgroundUV();
         }
 
-        // 실제 레이캐스팅 과정을 수행하는 내부 함수 (기존 Render 로직을 분리)
-        private void PerformRenderPass()
+        private void CastWalls(int step)
         {
-            // 1. 바닥 & 천장 그리기 (화면 전체를 덮어씀 -> 버퍼 Clear 불필요)
-            CastFloorAndCeiling();
-
-            // 2. 벽 그리기 (DDA 알고리즘)
-            CastWalls();
-
-            // 3. 스프라이트(적, 아이템) 그리기
-            if (_sprtData != null && _sprtData.Length > 0) CastSprites();
-        }
-
-        private void CastWalls()
-        {
-            for (int x = 0; x < screenWidth; x++)
+            // x를 1씩 증가시키는 대신 step만큼 건너뛰며 반복
+            for (int x = 0; x < screenWidth; x += step)
             {
-                float cameraX = 2 * x / (float)screenWidth - 1;
+                // ---------------------------------------------------------
+                // 1. 레이(Ray) 초기화
+                // ---------------------------------------------------------
+                float cameraX = 2 * x / (float)screenWidth - 1; // -1 ~ 1
                 float rayDirX = _dirX + _planeX * cameraX;
                 float rayDirY = _dirY + _planeY * cameraX;
 
                 int mapX = Mathf.FloorToInt(_posX);
                 int mapY = Mathf.FloorToInt(_posY);
 
+                // DDA 변수
                 float sideDistX, sideDistY;
+                // 0으로 나누는 경우 방지 (무한대 대신 아주 큰 값 사용)
                 float deltaDistX = (rayDirX == 0) ? 1e30f : Mathf.Abs(1 / rayDirX);
                 float deltaDistY = (rayDirY == 0) ? 1e30f : Mathf.Abs(1 / rayDirY);
                 float perpWallDist;
 
                 int stepX, stepY;
                 int hit = 0; 
-                int side = 0; 
+                int side = 0; // 0: 세로선(NS), 1: 가로선(EW)
                 bool hitBackFace = false;
-                
-                // 텍스처 ID를 저장할 변수
                 int hitTexId = -1; 
 
-                // 초기 스텝 계산
+                // ---------------------------------------------------------
+                // 2. 초기 스텝 및 sideDist 계산
+                // ---------------------------------------------------------
                 if (rayDirX < 0) { stepX = -1; sideDistX = (_posX - mapX) * deltaDistX; }
                 else             { stepX = 1;  sideDistX = (mapX + 1.0f - _posX) * deltaDistX; }
                 
                 if (rayDirY < 0) { stepY = -1; sideDistY = (_posY - mapY) * deltaDistY; }
                 else             { stepY = 1;  sideDistY = (mapY + 1.0f - _posY) * deltaDistY; }
 
-                // 2. DDA 알고리즘
+                // ---------------------------------------------------------
+                // 3. DDA 알고리즘 (벽 찾기)
+                // ---------------------------------------------------------
                 while (hit == 0)
                 {
                     int prevMapX = mapX;
                     int prevMapY = mapY;
 
-                    // --- [Step 1] 다음 칸으로 이동 ---
-                    if (sideDistX < sideDistY)
-                    {
-                        sideDistX += deltaDistX;
-                        mapX += stepX;
-                        side = 0;
-                    }
-                    else
-                    {
-                        sideDistY += deltaDistY;
-                        mapY += stepY;
-                        side = 1;
-                    }
+                    // 다음 칸으로 이동
+                    if (sideDistX < sideDistY) { sideDistX += deltaDistX; mapX += stepX; side = 0; }
+                    else                       { sideDistY += deltaDistY; mapY += stepY; side = 1; }
 
-                    // --- [Step 2] 맵 범위 체크 (반드시 Step 1의 if/else 바깥에 있어야 함) ---
+                    // 맵 범위 체크
                     if (mapX < 0 || mapX >= _worldMap.width || mapY < 0 || mapY >= _worldMap.height)
                     {
-                        hit = 1; // [중요] 루프 종료 플래그
-
-                        // 경계선에 맞닿아 있는 '직전 타일(prevMapX, prevMapY)'의 텍스처 정보를 가져옴
+                        hit = 1; 
+                        // 맵 끝에 도달했을 때 마지막 칸의 벽 정보 가져오기
                         CellData lastCell = _worldMap.GetCell(prevMapX, prevMapY);
-                        
                         if (lastCell != null)
                         {
-                            // '나가는 방향'의 벽 텍스처를 가져오기 위해 isBackFace=true 옵션 사용
                             int boundaryTexId = GetTextureIdOnSide(lastCell, side, stepX, stepY, true);
-                            
-                            // 설정된 텍스처가 있다면 그 ID를, 없다면(-1) 기본값 0을 사용
                             hitTexId = (boundaryTexId != -1) ? boundaryTexId : 0;
                         }
-                        else
-                        {
-                            hitTexId = 0; // 예외적인 상황 (직전 타일도 맵 밖인 경우 등)
-                        }
-
-                        // 맵의 가장 끝 벽은 '방의 안쪽 면'을 보는 것이므로 hitBackFace를 true로 설정
+                        else hitTexId = 0;
                         hitBackFace = true;
                     }
                     else 
                     {
-                        // --- [Step 3] 맵 내부 벽 검사 ---
-                        
-                        // A. 진입하려는 "다음 칸"의 앞면 검사 (Front Face Check)
+                        // 벽 충돌 검사
+                        // A. 진입면 (Front Face)
                         CellData cell = _worldMap.GetCell(mapX, mapY);
-                        
-                        // HasWall이 true여야만 검사 (빈 공간은 통과)
                         if (cell != null && cell.HasWall())
                         {
                             int frontTexId = GetTextureIdOnSide(cell, side, stepX, stepY, false);
-                            
-                            // 텍스처 ID가 유효하면(-1이 아니면) 벽으로 판정
                             if (frontTexId != -1)
                             {
                                 hit = 1;
@@ -732,15 +697,13 @@ namespace UI.DungeonMapScene
                             }
                         }
 
-                        // B. 방금 떠나온 "이전 칸"의 뒷면 검사 (Back Face Check)
-                        // 앞면에 안 부딪혔을 때만 검사
+                        // B. 이탈면 (Back Face) - 지나온 칸의 뒷면 확인
                         if (hit == 0)
                         {
                             cell = _worldMap.GetCell(prevMapX, prevMapY);
                             if (cell != null && cell.HasWall())
                             {
                                 int backTexId = GetTextureIdOnSide(cell, side, stepX, stepY, true);
-                                
                                 if (backTexId != -1)
                                 {
                                     hit = 1;
@@ -752,44 +715,43 @@ namespace UI.DungeonMapScene
                     }
                 }
 
-                // 뒷면에 부딪혔다면, 좌표를 '지나온 벽'의 위치로 되돌림
+                // 벽을 되돌려 좌표 보정 (BackFace인 경우)
                 if (hitBackFace)
                 {
                     if (side == 0) mapX -= stepX;
                     else           mapY -= stepY;
                 }
 
-                // 맵 범위 내에 있고, 히트된 텍스처가 유효할 때
+                // ---------------------------------------------------------
+                // 4. 텍스처 애니메이션 교체 로직
+                // ---------------------------------------------------------
                 if (hitTexId != -1 && 
                     mapX >= 0 && mapX < _tileAnimStates.GetLength(0) &&
                     mapY >= 0 && mapY < _tileAnimStates.GetLength(1))
                 {
                     TileAnimState state = _tileAnimStates[mapX, mapY];
-                    
-                    // 1. 이 타일이 애니메이션 중인지 확인
-                    // 2. 현재 상태가 Alt(B)를 보여줄 차례인지 확인
-                    // 3. 그리고 히트된 텍스처가 설정된 Base(A) 텍스처와 일치하는지 확인 (다른 면일 수도 있으므로)
                     if (state != null && state.isAnimating && state.showAlt)
                     {
-                        if (hitTexId == state.config.baseTexId)
-                        {
-                            hitTexId = state.config.altTexId; // 텍스처 ID 교체!
-                        }
+                        if (hitTexId == state.config.baseTexId) hitTexId = state.config.altTexId;
                     }
                 }
 
-                // 3. 거리 계산
+                // ---------------------------------------------------------
+                // 5. 거리 및 높이 계산
+                // ---------------------------------------------------------
                 if (side == 0) perpWallDist = (sideDistX - deltaDistX);
                 else           perpWallDist = (sideDistY - deltaDistY);
 
+                // 스캔 효과용 플래그
                 bool renderWireframe = _isScanning && (perpWallDist < _currentScanRadius);
 
-                // 4. 화면 높이 계산
-                // fovScale이 커질수록(광각), 벽 높이는 작아져야 비율이 맞음
+                // 화면 높이 계산 (FOV Scale, Pitch, Jump 반영)
                 float heightScale = 0.66f / fovScale;
                 int horizon = (int)(screenHeight / 2 - _currentJumpOffset + _currentPitch);
-    
-                // perpWallDist로 나눈 값에 heightScale을 곱함
+                
+                // 0으로 나누기 방지
+                if (perpWallDist <= 0.001f) perpWallDist = 0.001f;
+
                 int lineHeight = (int)((screenHeight / perpWallDist) * heightScale); 
 
                 int drawStart = -lineHeight / 2 + horizon;
@@ -797,55 +759,51 @@ namespace UI.DungeonMapScene
                 int drawEnd = lineHeight / 2 + horizon;
                 if (drawEnd >= screenHeight) drawEnd = screenHeight - 1;
 
-                // 5. 텍스처 X 좌표 계산
+                // ---------------------------------------------------------
+                // 6. 텍스처 좌표 (X) 계산
+                // ---------------------------------------------------------
                 float wallX; 
                 if (side == 0) wallX = _posY + perpWallDist * rayDirY;
                 else           wallX = _posX + perpWallDist * rayDirX;
                 wallX -= Mathf.Floor(wallX);
 
                 int texX = (int)(wallX * (float)texWidth);
+                // 텍스처 반전 처리 (벽의 방향에 따라 좌우가 뒤집히는 것 방지)
                 if ((side == 0 && rayDirX > 0) ^ hitBackFace) texX = texWidth - texX - 1;
                 if ((side == 1 && rayDirY < 0) ^ hitBackFace) texX = texWidth - texX - 1;
 
-                // 6. 픽셀 그리기 (기존 로직에서 hitTexId 사용)
-                // 거리(perpWallDist)에 반비례하여 어두워짐
-                // lightingIntensity를 곱해서 너무 빨리 어두워지는 것을 방지
+                // ---------------------------------------------------------
+                // 7. 조명(Gamma) 계산
+                // ---------------------------------------------------------
                 float gamma = 0f;
-
                 if (useGridLighting)
                 {
-                    // Side와 상관없이, 플레이어 위치(_logic)와 벽 위치(map) 사이의 
-                    // "가장 큰 좌표 차이(Chebyshev Distance)"를 구합니다.
-                    // 이렇게 해야 대각선 방향이나 옆 라인의 멀리 있는 벽도 정상적으로 어두워집니다.
-                    
                     float distX = Mathf.Abs(mapX - _logicX);
                     float distY = Mathf.Abs(mapY - _logicY);
-                    
-                    // 두 축 중 더 멀리 떨어진 거리를 기준으로 삼습니다 (사각형 형태로 빛이 퍼짐)
-                    float dist = Mathf.Max(distX, distY);
-
+                    float dist = Mathf.Max(distX, distY); // Chebyshev Distance
                     gamma = Mathf.Clamp(lightingIntensity / (dist + 1.0f), 0f, 1f);
                 }
                 else
                 {
-                    // 부드러운 조명
                     gamma = Mathf.Clamp(lightingIntensity / perpWallDist, 0f, 1f); 
                 }
 
+                // ---------------------------------------------------------
+                // 8. 수직선 그리기 (Texture Mapping Loop)
+                // ---------------------------------------------------------
                 int trueDrawStart = -lineHeight / 2 + horizon;
-                float step = 1.0f * texHeight / lineHeight;
-                float texPos = (drawStart - trueDrawStart) * step;
+                float stepVal = 1.0f * texHeight / lineHeight; // 텍스처 Y 증가량
+                float texPos = (drawStart - trueDrawStart) * stepVal;
 
                 for (int y = drawStart; y < drawEnd; y++)
                 {
                     int texY = (int)texPos & (texHeight - 1);
-                    texPos += step;
+                    texPos += stepVal;
                     Color color;
 
-                    // 1. 기본 색상 결정 (와이어프레임 vs 텍스처)
                     if (renderWireframe)
                     {
-                        // 스캔 와이어프레임 로직
+                        // --- 와이어프레임/스캔 모드 ---
                         float distanceToScanBoundary = Mathf.Abs(perpWallDist - _currentScanRadius);
                         bool isPulseEdge = distanceToScanBoundary < pulseWidth;
                         bool isVerticalEdge = (texX == 0 || texX == texWidth - 1); 
@@ -854,54 +812,58 @@ namespace UI.DungeonMapScene
                         if (isPulseEdge) color = pulseColor; 
                         else if (isVerticalEdge || isHorizontalEdge) color = wireframeColor;
                         else color = Color.black;
-                        
-                        // if (color != Color.black)
-                        // {
-                        //     color.r *= gamma;
-                        //     color.g *= gamma;
-                        //     color.b *= gamma;
-                        // }
                     }
                     else
                     {
-                        // 울퉁불퉁 효과 (Distortion)
+                        // --- 일반 텍스처 모드 ---
                         int sampleTexX = texX;
 
+                        // 벽 울렁거림 효과 (Distortion)
                         if (useWallDistortion)
                         {
-                            // y(화면 높이)와 x(화면 가로)를 섞어서 불규칙한 파동 생성
-                            // x를 더해주는 이유: 옆줄과 파동이 어긋나게 해서 자연스러운 굴곡을 만듦
                             float wave = Mathf.Sin((y + x) * distortionFreq) * distortionAmp;
-                            
-                            // 원본 texX에 오프셋을 더함
-                            sampleTexX = (int)(texX + wave);
-                            
-                            // 텍스처 범위를 벗어나지 않게 마스킹 (Wrap Around)
-                            // texWidth가 64(2의 n승)라고 가정할 때 안전장치
-                            sampleTexX = sampleTexX & (texWidth - 1); 
+                            sampleTexX = (int)(texX + wave) & (texWidth - 1); 
                         }
 
-                        // 기존 texX 대신 sampleTexX 사용
+                        // 텍스처 픽셀 가져오기 (Fast Access)
                         color = GetPixelFast(hitTexId, sampleTexX, texY);
 
-                        // 측면(Side 1: 남/북쪽 벽) 그림자 적용
+                        // 측면 그림자 (Side 1)
                         if (side == 1) 
                         { 
-                            color.r *= 0.9f; 
-                            color.g *= 0.9f; 
-                            color.b *= 0.9f; 
+                            color.r *= 0.9f; color.g *= 0.9f; color.b *= 0.9f; 
                         } 
 
-                        // 깊이에 따른 밝기
-                        color.r *= gamma;
-                        color.g *= gamma;
-                        color.b *= gamma;
+                        // 거리별 조명 적용
+                        color.r *= gamma; color.g *= gamma; color.b *= gamma;
                     }
 
-                    _buffer[y * screenWidth + x] = color;
+                    // -----------------------------------------------------
+                    // [최적화 핵심] 계산된 1개의 픽셀을 step만큼 가로로 채우기
+                    // -----------------------------------------------------
+                    int bufferIndexBase = y * screenWidth + x;
+                    
+                    for (int s = 0; s < step; s++)
+                    {
+                        // 화면 범위를 벗어나지 않는지 확인
+                        if (x + s < screenWidth)
+                        {
+                            _buffer[bufferIndexBase + s] = color;
+                        }
+                    }
                 }
-                
-                _zBuffer[x] = perpWallDist; 
+
+                // ---------------------------------------------------------
+                // 9. Z-Buffer 채우기 (스프라이트 깊이 판정용)
+                // ---------------------------------------------------------
+                // 벽의 거리 정보도 step만큼 동일하게 채워줍니다.
+                for (int s = 0; s < step; s++)
+                {
+                    if (x + s < screenWidth)
+                    {
+                        _zBuffer[x + s] = perpWallDist;
+                    }
+                }
             }
         }
 
@@ -930,13 +892,13 @@ namespace UI.DungeonMapScene
             }
         }
 
-        private void CastFloorAndCeiling() 
+        private void CastFloorAndCeiling(int step)
         {
             // Horizon 계산 (점프, 피치 반영)
             float horizon = screenHeight / 2 - _currentJumpOffset + _currentPitch;
             
-            // Unity 텍스처 좌표계는 Y=0이 맨 아래, Y=Height가 맨 위입니다.
-            // 따라서 0 ~ horizon은 바닥, horizon ~ screenHeight는 천장입니다.
+            // Unity 텍스처 좌표계는 Y=0이 맨 아래, Y=Height가 맨 위.
+            // 따라서 0 ~ horizon은 바닥, horizon ~ screenHeight는 천장.
 
             // --------------------------------------------------------
             // 1. 바닥 그리기 (y: 0 ~ horizon)
@@ -958,18 +920,28 @@ namespace UI.DungeonMapScene
                 float rayDirX1 = _dirX + _planeX;
                 float rayDirY1 = _dirY + _planeY;
 
+                // x 루프에서 step 사용
+                // 바닥 텍스처 매핑은 x가 건너뛰어지면 텍스처 좌표(floorX)도 그만큼 더 많이 이동해야 함을 주의!
+                // 하지만 여기서는 픽셀 단위 렌더링이므로, 단순히 계산 횟수만 줄이고 옆칸을 복사하는 방식이 안전함.
                 float floorStepX = rowDistance * (rayDirX1 - rayDirX0) / screenWidth;
                 float floorStepY = rowDistance * (rayDirY1 - rayDirY0) / screenWidth;
 
-                float floorX = _posX + rowDistance * rayDirX0;
-                float floorY = _posY + rowDistance * rayDirY0;
+                // step만큼 미리 점프하기 위해 보정
+                floorStepX *= step;
+                floorStepY *= step;
 
-                for (int x = 0; x < screenWidth; ++x) 
+                float floorX = _posX + rowDistance * rayDirX0 + (floorStepX * 0 / step); // 초기값 보정 미세조정 필요없음
+                float floorY = _posY + rowDistance * rayDirY0 + (floorStepY * 0 / step);
+
+                for (int x = 0; x < screenWidth; x += step) 
                 {
-                    // 텍스처 좌표 및 색상 계산 (기존 로직 함수화 혹은 그대로 사용)
-                    Color color = GetFloorColor(floorX, floorY, rowDistance); // 아래 헬퍼 함수 참고
+                    Color color = GetFloorColor(floorX, floorY, rowDistance);
                     
-                    _buffer[y * screenWidth + x] = color;
+                    // 가로로 채우기
+                    for (int s = 0; s < step; s++)
+                    {
+                        if (x + s < screenWidth) _buffer[y * screenWidth + (x + s)] = color;
+                    }
 
                     floorX += floorStepX;
                     floorY += floorStepY;
@@ -1001,14 +973,25 @@ namespace UI.DungeonMapScene
 
                     float floorStepX = rowDistance * (rayDirX1 - rayDirX0) / screenWidth;
                     float floorStepY = rowDistance * (rayDirY1 - rayDirY0) / screenWidth;
+                    
+                    // 스텝만큼 이동하도록 보정
+                    floorStepX *= step;
+                    floorStepY *= step;
 
-                    float floorX = _posX + rowDistance * rayDirX0;
-                    float floorY = _posY + rowDistance * rayDirY0;
+                    float floorX = _posX + rowDistance * rayDirX0 + (floorStepX * 0 / step); // 초기값 보정
+                    float floorY = _posY + rowDistance * rayDirY0 + (floorStepY * 0 / step);
 
-                    for (int x = 0; x < screenWidth; ++x) 
+                    // 루프에서 step 사용
+                    for (int x = 0; x < screenWidth; x += step) 
                     {
                         Color color = GetCeilingColor(floorX, floorY, rowDistance);
-                        _buffer[y * screenWidth + x] = color;
+                        
+                        // 가로로 채우기 (Filling Loop)
+                        for (int s = 0; s < step; s++)
+                        {
+                            if (x + s < screenWidth) 
+                                _buffer[y * screenWidth + (x + s)] = color;
+                        }
 
                         floorX += floorStepX;
                         floorY += floorStepY;
@@ -1113,7 +1096,7 @@ namespace UI.DungeonMapScene
             return color;
         }
 
-        private void CastSprites()
+        private void CastSprites(int step)
         {
             // 스프라이트를 먼 것부터 가까운 것까지 정렬 
             for (int i = 0; i < _spriteNum; i++) {
@@ -1179,7 +1162,7 @@ namespace UI.DungeonMapScene
                 int drawEndX = Mathf.Min(spriteWidth / 2 + spriteScreenX, screenWidth);
 
                 // 화면의 스프라이트에 대해 수직 스트라이프 반복
-                for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
+                for (int stripe = drawStartX; stripe < drawEndX; stripe += step) {
                     int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * _textures[_sprtData[spriteIdx].texIdx].width / spriteWidth) / 256;
                     if (texX < 0) texX = 0;
 
@@ -1201,6 +1184,14 @@ namespace UI.DungeonMapScene
 
                                 Color mixedColor = oldColor * (1 - color.a) + color * color.a; 
                                 _buffer[y * screenWidth + stripe] = mixedColor;
+                                
+                                for (int s = 0; s < step; s++)
+                                {
+                                    if (stripe + s < drawEndX && stripe + s < screenWidth)
+                                    {
+                                         _buffer[y * screenWidth + (stripe + s)] = mixedColor;
+                                    }
+                                }
                             }
                         }
                     }
