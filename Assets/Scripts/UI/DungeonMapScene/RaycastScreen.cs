@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Manager;
 using Data;
-using Unity.VisualScripting;
 
 namespace UI.DungeonMapScene
 {
@@ -24,9 +23,14 @@ namespace UI.DungeonMapScene
         public Material screenMaterial; // 인스펙터에서 DungeonScreenMat 연결
 
         [Header("Visual Effects")]
-        public bool useWallDistortion = false; // 효과 켜기/끄기
-        public float distortionFreq = 0.5f;   // 굴곡의 빈도 (얼마나 자글자글한지)
-        public float distortionAmp = 2.0f;    // 굴곡의 강도 (얼마나 심하게 휘는지)
+        public bool useWallDistortion = false;
+        public float distortionFreq = 0.5f;
+        public float distortionAmp = 2.0f;
+        public bool useAnaglyph = false; // 애너글리프 3D 효과 켜기/끄기
+        [Range(0.03f, 0.07f)]
+        public float stereoSeparation = 0.05f; // 두 눈 사이의 거리 (값이 클수록 입체감이 강해짐)
+        
+        private Color[] _leftEyeBuffer; // 애너글리프 사용 시 왼쪽 눈 렌더링 결과를 저장할 임시 버퍼
 
         [Header("Transition Settings")]
         public CanvasGroup fadeOverlay; // 인스펙터에서 할당 (검은색 패널)
@@ -183,6 +187,7 @@ namespace UI.DungeonMapScene
         {
             // 버퍼 메모리 할당
             _buffer = new Color[screenWidth * screenHeight];
+            _leftEyeBuffer = new Color[screenWidth * screenHeight]; // 애너글리프용
             _zBuffer = new float[screenWidth];
 
             if (controllerPanel != null)
@@ -504,6 +509,13 @@ namespace UI.DungeonMapScene
 
             if (Input.GetKeyDown(KeyCode.Tab)) ToggleMovementMode();
             if (Input.GetKeyDown(KeyCode.M)) autoMap.SetActive(!autoMap.activeSelf);
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                // 애너글리프 토글
+                useAnaglyph = !useAnaglyph;
+                Render(); // 즉시 반영
+                Debug.Log($"Anaglyph Mode: {useAnaglyph}");
+            }
 
             if (isGridMove)
             {
@@ -552,7 +564,69 @@ namespace UI.DungeonMapScene
         // =========================================================
         private void Render()
         {
-            // 1. 바닥 & 천장 그리기
+            // 애너글리프 모드인지 확인
+            if (useAnaglyph)
+            {
+                // 원래 위치 저장
+                float originalX = _posX;
+                float originalY = _posY;
+
+                // -----------------------------------------------------
+                // 1. 왼쪽 눈 렌더링 (Red Channel)
+                // -----------------------------------------------------
+                // 카메라 평면 벡터(_plane) 방향의 반대로 이동
+                _posX = originalX - _planeX * stereoSeparation;
+                _posY = originalY - _planeY * stereoSeparation;
+
+                PerformRenderPass(); // 렌더링 수행 (결과는 _buffer에 담김)
+
+                // 결과를 임시 버퍼에 복사
+                Array.Copy(_buffer, _leftEyeBuffer, _buffer.Length);
+
+                // -----------------------------------------------------
+                // 2. 오른쪽 눈 렌더링 (Cyan Channel: Green + Blue)
+                // -----------------------------------------------------
+                // 카메라 평면 벡터(_plane) 방향으로 이동
+                _posX = originalX + _planeX * stereoSeparation;
+                _posY = originalY + _planeY * stereoSeparation;
+
+                PerformRenderPass(); // _buffer가 오른쪽 눈 이미지로 덮어씌워짐
+
+                // -----------------------------------------------------
+                // 3. 합성 (Merge)
+                // -----------------------------------------------------
+                // 왼쪽 눈의 R과 오른쪽 눈의 G, B를 합침
+                for (int i = 0; i < _buffer.Length; i++)
+                {
+                    Color left = _leftEyeBuffer[i];
+                    Color right = _buffer[i];
+                    
+                    // Simple Anaglyph: Left(R) + Right(G,B)
+                    // 알파값은 1로 고정
+                    _buffer[i] = new Color(left.r, right.g, right.b, 1.0f);
+                }
+
+                // 위치 원상 복구 (중요: 다음 프레임 이동 로직을 위해)
+                _posX = originalX;
+                _posY = originalY;
+            }
+            else
+            {
+                // 일반 렌더링 (단일 패스)
+                PerformRenderPass();
+            }
+
+            // GPU로 텍스처 업로드
+            _screenTexture.SetPixels(_buffer);
+            _screenTexture.Apply();
+
+            UpdateBackgroundUV();
+        }
+
+        // 실제 레이캐스팅 과정을 수행하는 내부 함수 (기존 Render 로직을 분리)
+        private void PerformRenderPass()
+        {
+            // 1. 바닥 & 천장 그리기 (화면 전체를 덮어씀 -> 버퍼 Clear 불필요)
             CastFloorAndCeiling();
 
             // 2. 벽 그리기 (DDA 알고리즘)
@@ -560,12 +634,6 @@ namespace UI.DungeonMapScene
 
             // 3. 스프라이트(적, 아이템) 그리기
             if (_sprtData != null && _sprtData.Length > 0) CastSprites();
-
-            // GPU로 텍스처 업로드
-            _screenTexture.SetPixels(_buffer);
-            _screenTexture.Apply();
-
-            UpdateBackgroundUV();
         }
 
         private void CastWalls()
