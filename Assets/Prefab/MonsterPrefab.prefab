@@ -130,6 +130,7 @@ MonoBehaviour:
       havoc: 0
     expReward: 0
     goldReward: 0
+  baseAnaglyphMaterial: {fileID: 2100000, guid: e1386aaf0e2e7e94ebe62e2e5427a515, type: 2}
 --- !u!114 &7568836264752897540
 MonoBehaviour:
   m_ObjectHideFlags: 0

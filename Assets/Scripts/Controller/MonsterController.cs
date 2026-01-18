@@ -10,11 +10,85 @@ namespace Controller
     public class MonsterController : BattleEntity
     {
         public MonsterDatabase.MonsterEntry sourceData;
+        [Header("VFX")]
+        public Material baseAnaglyphMaterial; // 여기에 'Mat_Anaglyph'를 연결.
 
         // Monster 전용 필드
         private Color backRowColor = new Color(0.6f, 0.6f, 0.6f, 1f); 
         private Color frontRowColor = Color.white;
         private Button button;
+
+        private Material instanceMaterial;
+        private const float FRONT_OFFSET = 0.02f;
+        private const float BACK_OFFSET = 0.01f;
+
+        // 상태 기억용 변수
+        private bool cachedIsFront = false;      // 내가 전열인지 후열인지 기억
+        private bool lastGlobalState = false;    // 최적화: 이전 프레임의 옵션 상태 기억
+
+        // 외부(CombatManager)에서 호출하는 함수
+        public void SetAnaglyphDepth(bool isFront)
+        {
+            // 1. 내 위치 상태 저장
+            cachedIsFront = isFront;
+
+            // 2. 즉시 화면 갱신
+            UpdateAnaglyphVisuals(true); 
+        }
+
+        // 매 프레임 옵션 변경 감지
+        private void Update()
+        {
+            // RaycastScreen의 static 변수라고 가정 (접근 방식에 따라 수정 필요)
+            bool currentGlobalState = RaycastScreen.useAnaglyph;
+
+            // 옵션값이 이전 프레임과 달라졌을 때만 머티리얼 갱신 (성능 최적화)
+            if (currentGlobalState != lastGlobalState)
+            {
+                UpdateAnaglyphVisuals(false);
+            }
+        }
+
+        // 실제 머티리얼 값을 변경하는 함수
+        private void UpdateAnaglyphVisuals(bool forceUpdate)
+        {
+            if (preferredImage == null) return;
+
+            // 머티리얼 인스턴싱 (없으면 생성)
+            if (instanceMaterial == null)
+            {
+                if (baseAnaglyphMaterial != null)
+                {
+                    instanceMaterial = new Material(baseAnaglyphMaterial);
+                    preferredImage.material = instanceMaterial;
+                }
+                else return;
+            }
+
+            // 1. 현재 글로벌 설정 가져오기
+            bool useEffect = RaycastScreen.useAnaglyph;
+            
+            // 상태 동기화
+            lastGlobalState = useEffect;
+
+            // 2. 오프셋 결정 로직
+            // 옵션이 꺼져있으면(false) -> 오프셋 0 (평면)
+            // 옵션이 켜져있으면(true)  -> 내 위치(cachedIsFront)에 따른 오프셋 적용
+            float finalOffset = 0f;
+
+            if (useEffect)
+            {
+                finalOffset = cachedIsFront ? FRONT_OFFSET : BACK_OFFSET;
+            }
+
+            // 3. 셰이더 적용
+            instanceMaterial.SetFloat("_Offset", finalOffset);
+        }
+
+        private void OnDestroy()
+        {
+            if (instanceMaterial != null) Destroy(instanceMaterial);
+        }
 
         // [BattleEntity 구현] 스탯 반환
         public override int GetTotalStr() => sourceData.stats.str + level; 

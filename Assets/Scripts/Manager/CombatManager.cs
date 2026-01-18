@@ -8,9 +8,11 @@ using TMPro;
 using Controller;
 using UnityEngine.EventSystems;
 using Data;
+using UI;
 namespace Manager
 {
     public enum BattleState { Start, PlayerInput, EnemyInput, Processing, Won, Lost }
+    
     public class CombatManager : MonoBehaviour
     {
         public static CombatManager Instance;
@@ -18,6 +20,10 @@ namespace Manager
         [Header("UI References")]
         public GameObject baseCmdContainer;   // 1단계 메뉴 (Fight, Talk...)
         public GameObject fightCmdContainer;  // 2단계 메뉴 (Attack, Move...)
+        public RectTransform btnContainer; //fightCmdContainer의 버튼이 붙는 트랜스폼
+        public List<Button> baseButtons; 
+        public List<CommandButton> allFightButtons;
+
         public BattleSkillUIController battleSkillUI; // 인스펙터에서 할당
         public BattleItemUIController battleItemUI; // 인스펙터에서 할당
         public GameObject commandPanel;     // 커맨드 버튼들
@@ -27,6 +33,12 @@ namespace Manager
         public TextMeshProUGUI messageText; // 전투 중 캐릭터의 메시지 텍스트
         public Slider qteTimingSlider; // 타이머 슬라이더. 인스펙터에서 할당
         public Button autoModeButton; // 오토 모드의 트리거
+        // 에디터에서 모든 버튼(Attack, Gun, Skill, Item, Move, Guard)을 순서대로 넣으세요.
+        
+        
+        private List<Button> activeFightButtons = new List<Button>();
+        private int currentFightBtnIndex = 0; // fight 메뉴용 인덱스
+        private int currentBaseBtnIndex = 0;  // Base 메뉴용 인덱스
 
         [Header("Prefabs")]
         public GameObject defaultMonsterPrefab;
@@ -595,48 +607,215 @@ namespace Manager
             }
         }
 
+        void RefreshCommandButtons(PlayerController actor)
+        {
+            activeFightButtons.Clear();
+
+            // =========================================================
+            // [조건 계산]
+            // 1. 현재 턴의 첫 번째 행동자인가? (0번 인덱스 캐릭터)
+            //    (전열 3명이 모두 살아있다면 0번은 무조건 살아있으므로 이 조건으로 충분함)
+            bool isFirstActor = (currentPlayerIndex == 0);
+
+            // 2. 전열(0,1,2번 슬롯)에 3명이 꽉 차있고 후열에 1명 이상이 존재하는가?
+            bool isFrontRowFull = activePlayers.Count > 3;
+
+            // 최종 조건: 첫 번째 행동자이고 + 전열이 꽉 차 있어야 함
+            bool canUseSpecialCmd = isFirstActor && isFrontRowFull;
+            // =========================================================
+
+            foreach (CommandButton cmd in allFightButtons)
+            {
+                bool isActive = false;
+
+                switch (cmd.type)
+                {
+                    // --- 기본 커맨드 ---
+                    case CommandType.Attack: 
+                        isActive = true; 
+                        break;
+                    case CommandType.Gun:    
+                        isActive = actor.CanShootGun(); 
+                        break;
+                    case CommandType.Skill:  
+                        isActive = (actor.learnedSkillIds.Count > 0); 
+                        break;
+                    case CommandType.Item:   
+                        isActive = (InventoryManager.Instance.GetAllItemIds().Count > 0); 
+                        break;
+                    case CommandType.Move:   
+                        isActive = true; 
+                        break;
+                    case CommandType.Guard:  
+                        isActive = true; 
+                        break;
+                    
+                    // --- 특수 커맨드 (조건부 활성) ---
+                    case CommandType.Union_Attack:
+                    case CommandType.Last_Stand:
+                        isActive = canUseSpecialCmd;
+                        break;
+                        
+                    // (기타 정의된 타입이 있다면 유지)
+                    default:
+                        isActive = true;
+                        break;
+                }
+
+                // 오브젝트 활성/비활성 설정
+                cmd.gameObject.SetActive(isActive);
+
+                // 활성화된 경우 입력 리스트에 추가
+                if (isActive)
+                {
+                    Button btn = cmd.button;
+                    
+                    // 네비게이션 끄기 (직접 제어)
+                    Navigation nav = btn.navigation;
+                    nav.mode = Navigation.Mode.None;
+                    btn.navigation = nav;
+
+                    activeFightButtons.Add(btn);
+                }
+            }
+
+            // =========================================================
+            // 버튼 수에 따른 컨테이너(Image) 높이 조절
+            // =========================================================
+            if (btnContainer != null)
+            {
+                int count = activeFightButtons.Count;
+                float newHeight = 60f + (count * 30f);
+
+                Vector2 size = btnContainer.sizeDelta;
+                size.y = newHeight;
+                btnContainer.sizeDelta = size;
+                
+                // (선택 사항) 레이아웃 갱신 강제 (버튼 위치가 즉시 안 잡힐 경우 대비)
+                // LayoutRebuilder.ForceRebuildLayoutImmediate(btnContainer);
+            }
+            // =========================================================
+
+            // 인덱스 초기화
+            currentFightBtnIndex = 0;
+        }
+
         // 커맨드 메뉴에서의 키 입력 처리
         void HandleCommandInput()
         {
-            // Esc 또는 LeftShift 키 감지
+            // =========================================================
+            // 1. 취소 키 처리 (공통)
+            // =========================================================
             if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
 
-                // 행동 큐가 비어있다는 것은, 내가 이번 턴의 '첫 번째 행동 결정자'라는 뜻.
-                if (actionQueue.Count == 0)
+                if (isFightMode)
                 {
-                    // Fight 메뉴가 켜져 있다면 -> Base 메뉴로 돌아감 (싸우기 취소)
-                    if (fightCmdContainer != null && fightCmdContainer.activeSelf)
+                    // [수정] 첫 번째 캐릭터인지 확인
+                    if (currentPlayerIndex == 0)
                     {
-                        ShowBaseMenu(); 
+                        // 첫 번째 캐릭터라면: Fight 메뉴 -> Base 메뉴(싸우다/도망)로 뒤로가기
+                        ShowBaseMenu();
+                    }
+                    else
+                    {
+                        // 두 번째 이후 캐릭터라면: Base 메뉴를 건너뛰고 바로 이전 캐릭터로 복귀
+                        GoToPreviousPlayer();
                     }
                 }
-                // 큐에 뭔가 들어있다면 (내 앞사람이 행동을 결정했다면)
                 else
                 {
-                    // 앞사람의 행동을 취소하러 돌아감
-                    GoToPreviousPlayer();
+                    // Base 메뉴 상태에서의 취소 (기존 로직 유지)
+                    // 이전 캐릭터 선택으로 돌아가기
+                    if (actionQueue.Count > 0 || currentPlayerIndex > 0)
+                    {
+                        GoToPreviousPlayer();
+                    }
                 }
+                return;
             }
+
+            // =========================================================
+            // 2. 방향키 및 결정 키 처리 (상태별 분기)
+            // =========================================================
+            if (isFightMode)
+            {
+                // --- Fight 메뉴 조작 (공격, 스킬, 아이템...) ---
+                HandleMenuNavigation(activeFightButtons, ref currentFightBtnIndex);
+            }
+            else
+            {
+                // --- Base 메뉴 조작 (싸우다, 오토, 도망...) ---
+                HandleMenuNavigation(baseButtons, ref currentBaseBtnIndex);
+            }
+        }
+
+        // 메뉴 리스트를 조작하는 공통 헬퍼 함수
+        void HandleMenuNavigation(List<Button> currentList, ref int currentIndex)
+        {
+            if (currentList == null || currentList.Count == 0) return;
+
+            bool changed = false;
+
+            // 위/아래 입력
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            {
+                currentIndex--;
+                if (currentIndex < 0) currentIndex = currentList.Count - 1; // 루프
+                changed = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                currentIndex++;
+                if (currentIndex >= currentList.Count) currentIndex = 0; // 루프
+                changed = true;
+            }
+
+            // 변경사항이 있으면 하이라이트 갱신
+            if (changed)
+            {
+                UpdateSelection(currentList, currentIndex);
+            }
+
+            // 확정 키 입력
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            {
+                currentList[currentIndex].onClick.Invoke();
+            }
+        }
+
+        // 실제로 버튼을 선택(하이라이트)하고 소리를 재생하는 함수
+        void UpdateSelection(List<Button> list, int index)
+        {
+            if (list == null || list.Count == 0) return;
+            if (index < 0 || index >= list.Count) return;
+
+            // Unity EventSystem 선택 알림
+            list[index].Select();
+
+            // 효과음 재생
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
         }
 
         // =========================================================
         // [UI 연결] BaseCmdContainer 버튼 함수들
         // =========================================================
 
-        // 1. Fight 버튼 클릭 시 -> FightCmdContainer 활성화
+        // 1. Fight 메뉴 보이기 (OnBaseCommand_Fight 에서 호출)
         public void OnBaseCommand_Fight()
         {
-            // [핵심] 이제부터는 전투 모드임
             isFightMode = true;
 
-            // Base 끄기, Fight 켜기
             baseCmdContainer.SetActive(false);
             fightCmdContainer.SetActive(true);
 
-            // Fight 메뉴의 첫 버튼(Attack)에 포커스
-            StartCoroutine(SelectButton(attackButton));
+            // 메뉴가 바뀌는 순간 쿨타임을 주어 'Space' 키가 연속으로 인식되는 것을 방지
+            inputCooldown = 0.2f;
+
+            // Fight 메뉴의 0번(Attack)으로 포커스 이동
+            currentFightBtnIndex = 0;
+            StartCoroutine(SelectButtonDelayed(activeFightButtons, currentFightBtnIndex));
         }
 
         // 2. Escape(Run) 버튼 클릭 시 (기존 Run 로직 연결)
@@ -677,6 +856,7 @@ namespace Manager
         // 공격 버튼 클릭
         public void OnFightCommand_Attack()
         {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
             
             // 무기가 null이어도 PrepareWeaponAction 호출 (맨손 공격)
@@ -684,6 +864,7 @@ namespace Manager
         }
         public void OnFightCommand_Gun()
         {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
 
             // 1. 총과 총알이 모두 있는지 확인
@@ -707,6 +888,7 @@ namespace Manager
 
         public void OnFightCommand_Skill()
         {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             if (battleSkillUI == null) return; 
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
 
@@ -734,6 +916,7 @@ namespace Manager
         }
         public void OnFightCommand_Item()
         {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             if (battleItemUI == null) return;
             List<string> allItemIds = InventoryManager.Instance.GetAllItemIds();
             if (allItemIds == null || allItemIds.Count == 0)
@@ -762,6 +945,7 @@ namespace Manager
         // 아이템 선택이 취소되거나 완료되어 창이 닫힐 때 호출할 함수
         public void OnPopupMenuClosed()
         {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             // 1. 뒷배경 상호작용 다시 허용
             SetContainerInteractable(fightCmdContainer, true);
             // 2. 포커스 복구 (Item 버튼이나 Attack 버튼으로)
@@ -929,15 +1113,17 @@ namespace Manager
         }
 
         
-        // [내부 함수] 다시 Base 메뉴로 돌아오는 함수
+        // Base 메뉴 보이기
         void ShowBaseMenu()
         {
-            isFightMode = false; // [핵심] 전투 모드 해제
+            isFightMode = false; // 모드 변경
 
             fightCmdContainer.SetActive(false);
             baseCmdContainer.SetActive(true);
-            
-            StartCoroutine(SelectButton(baseFirstButton));
+
+            // Base 메뉴의 0번(Fight) 또는 기억해둔 인덱스로 포커스 이동
+            currentBaseBtnIndex = 0; 
+            UpdateSelection(baseButtons, currentBaseBtnIndex);
         }
 
         // [핵심] 이전 캐릭터로 되돌아가는 함수
@@ -977,6 +1163,9 @@ namespace Manager
 
             PlayerController currentPlayer = activePlayers[currentPlayerIndex] as PlayerController;
             if (currentPlayer.currentHp <= 0) { NextPlayerInput(); return; }
+
+            // 1. 버튼 목록 갱신 (Gun, Skill 등이 없으면 꺼지고 리스트에서 빠짐)
+            RefreshCommandButtons(currentPlayer);
             
             currentPlayer.SetHighlightColor(currentCmdTargetColor);
 
@@ -993,19 +1182,38 @@ namespace Manager
             logText.text = $"명령 대기: {currentPlayer.sourceData.name}";
             if (targetCursor) targetCursor.gameObject.SetActive(false);
 
+            // =========================================================
+            // 메뉴 초기화 로직
+            // =========================================================
             if (isFightMode)
             {
+                // Fight 모드인 경우 (Run 실패 후 복귀 등 특수 상황)
                 if (baseCmdContainer) baseCmdContainer.SetActive(false);
                 if (fightCmdContainer) fightCmdContainer.SetActive(true);
-                StartCoroutine(SelectButton(attackButton));
+                
+                currentFightBtnIndex = 0;
+                StartCoroutine(SelectButtonDelayed(activeFightButtons, currentFightBtnIndex));
             }
             else
             {
-                //  메뉴가 뜨는 시점에 (이미 턴 시작 시 계산했지만) 혹시 모르니 여기서 다시 갱신 가능
-                // 하지만 PreparePlayerTurn에서 한 번만 하는 것이 성능상/논리상 깔끔함.
+                // 기본: Base 모드 시작
                 if (baseCmdContainer) baseCmdContainer.SetActive(true);
                 if (fightCmdContainer) fightCmdContainer.SetActive(false);
-                StartCoroutine(SelectButton(baseFirstButton));
+                
+                // Base 메뉴 인덱스 초기화 (0번: Fight)
+                currentBaseBtnIndex = 0;
+                StartCoroutine(SelectButtonDelayed(baseButtons, currentBaseBtnIndex));
+            }
+        }
+
+        // 리스트 기반 지연 선택 코루틴
+        IEnumerator SelectButtonDelayed(List<Button> list, int index)
+        {
+            yield return null; // 1프레임 대기
+            if (list != null && list.Count > index)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+                UpdateSelection(list, index);
             }
         }
 
@@ -1126,7 +1334,7 @@ namespace Manager
 
             if (moved)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                 Debug.Log($"이동함! 현재 인덱스: {currentMoveSlotIndex}"); // 로그 확인용
                 UpdateMoveCursor();
                 RefreshMoveHighlights(currentMoveSlotIndex); // 호출
@@ -1134,6 +1342,7 @@ namespace Manager
 
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
             {
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 CancelMoveSelection();
                 return;
             }
@@ -1523,7 +1732,7 @@ namespace Manager
                 }
             }
 
-            if (moved) SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            if (moved) SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
 
             if (nextEntity != null)
             {
@@ -1959,7 +2168,7 @@ namespace Manager
             // 플레이어/몬스터 여부 상관없이 처리
             SetGuardState(action.actor, true);
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            //SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             ShowLog($"{action.actor.name}의 방어 태세!");
 
             yield return wait05;
@@ -2043,7 +2252,7 @@ namespace Manager
                         if (logPanel) logText.text = $"Combo! ({currentHits}/{maxHits})";
                         
                         // 사운드만 재생하고, 딜레이(Wait) 없이 즉시 루프 계속 진행
-                        SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
+                        SoundManager.Instance.PlaySFX(SfxID.Attack_Gun); 
                     }
 
                     yield return null; // 다음 프레임까지 대기 (타이머 진행)
@@ -2119,7 +2328,7 @@ namespace Manager
             {
                 Debug.Log("공격 반사!");
                 ShowLog("Reflect!");
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                //SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 // 반사 이펙트 표시
                 SpawnVFX(vfxReflectPrefab, target.transform.position);
 
@@ -2591,6 +2800,7 @@ namespace Manager
             // 배치된 슬롯이 전열인지 후열인지 확인하여 색상 적용
             bool isFront = (targetSlots == frontSlots);
             controller.SetRowAppearance(isFront); // 전열이면 원래 색, 후열이면 어둡게
+            controller.SetAnaglyphDepth(isFront); // 전열/후열에 따른 입체감 설정
 
             activeMonsters.Add(controller);
 
@@ -2642,6 +2852,9 @@ namespace Manager
                 // 1. 부모 변경 (슬롯 안으로 입양)
                 // 부모가 바뀌는 순간, 유니티가 현재 보이는 크기를 유지하려고 scale 값을 이상하게 바꿀 수 있다.
                 monster.transform.SetParent(myFrontSlot);
+
+                // 앞으로 나오면서 입체감을 전열 기준으로 변경
+                monster.SetAnaglyphDepth(true);
 
                 // 2. 애니메이션 시작/목표값 설정
                 Vector3 startPos = monster.transform.localPosition; // 현재 위치(부모 변경 직후)에서 시작

@@ -26,9 +26,15 @@ namespace UI.DungeonMapScene
         public bool useWallDistortion = false;
         public float distortionFreq = 0.5f;
         public float distortionAmp = 2.0f;
-        public bool useAnaglyph = false; // 애너글리프 3D 효과 켜기/끄기
+         // 실린더 효과 켜기
+        public bool useCylinderEffect = false;
+        [Range(-10f, 10f)]
+        public float cylinderStrength = 3.0f; // 곡률 강도 (양수: 볼록, 음수: 오목)
+         // 애너글리프 3D 효과 켜기/끄기
+        public static bool useAnaglyph = false;
         [Range(0.03f, 0.07f)]
         public float stereoSeparation = 0.05f; // 두 눈 사이의 거리 (값이 클수록 입체감이 강해짐)
+
         
         private Color[] _leftEyeBuffer; // 애너글리프 사용 시 왼쪽 눈 렌더링 결과를 저장할 임시 버퍼
 
@@ -742,17 +748,31 @@ namespace UI.DungeonMapScene
                 if (side == 0) perpWallDist = (sideDistX - deltaDistX);
                 else           perpWallDist = (sideDistY - deltaDistY);
 
+                // =========================================================
+                // [수정: 위치 이동] 실린더 효과를 여기서 적용해야 벽의 높이가 변합니다.
+                // =========================================================
+                if (useCylinderEffect)
+                {
+                    // cameraX: 화면 왼쪽(-1) ~ 중앙(0) ~ 오른쪽(1)
+                    float distFactor = cameraX * cameraX; 
+                    
+                    // 가장자리로 갈수록 거리를 조작하여 벽 높이를 바꿈
+                    float distortion = 1.0f + (distFactor * cylinderStrength);
+                    
+                    perpWallDist *= distortion;
+                }
+                // =========================================================
+
                 // 스캔 효과용 플래그
                 bool renderWireframe = _isScanning && (perpWallDist < _currentScanRadius);
+
+                // 0으로 나누기 방지
+                if (perpWallDist <= 0.001f) perpWallDist = 0.001f;
 
                 // 화면 높이 계산 (FOV Scale, Pitch, Jump 반영)
                 float heightScale = 0.66f / fovScale;
                 int horizon = (int)(screenHeight / 2 - _currentJumpOffset + _currentPitch);
-                
-                // 0으로 나누기 방지
-                if (perpWallDist <= 0.001f) perpWallDist = 0.001f;
-
-                int lineHeight = (int)((screenHeight / perpWallDist) * heightScale); 
+                int lineHeight = (int)((screenHeight / perpWallDist) * heightScale);
 
                 int drawStart = -lineHeight / 2 + horizon;
                 if (drawStart < 0) drawStart = 0;
@@ -824,6 +844,10 @@ namespace UI.DungeonMapScene
                             float wave = Mathf.Sin((y + x) * distortionFreq) * distortionAmp;
                             sampleTexX = (int)(texX + wave) & (texWidth - 1); 
                         }
+
+                        // 텍스처 반복(Wrap) 처리 (음수나 범위를 벗어날 경우 대비)
+                        // 비트 연산(&)을 쓰려면 texWidth가 2의 n승이어야 함. (예: 64)
+                        sampleTexX = sampleTexX & (texWidth - 1);
 
                         // 텍스처 픽셀 가져오기 (Fast Access)
                         color = GetPixelFast(hitTexId, sampleTexX, texY);

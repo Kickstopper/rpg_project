@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entries:
   - id: chr000
-    name: "\uC870\uAE4C"
+    name: "\uB098\uBB38\uD76C"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
@@ -62,7 +62,7 @@ MonoBehaviour:
     initialAmmoId: ammo_000
     initialArmorIds: []
   - id: chr001
-    name: "\uBE64\uC2A4"
+    name: "\uACE0\uB450\uC2EC"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
@@ -86,7 +86,7 @@ MonoBehaviour:
     initialAmmoId: ammo_000
     initialArmorIds: []
   - id: chr002
-    name: "\uD14D\uCF04"
+    name: "\uAE40\uD61C\uC790"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
@@ -110,7 +110,7 @@ MonoBehaviour:
     initialAmmoId: ammo_000
     initialArmorIds: []
   - id: chr003
-    name: "\uD1A0\uB07C"
+    name: "\uC724\uC5EC\uC625"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
@@ -134,7 +134,7 @@ MonoBehaviour:
     initialAmmoId: ammo_000
     initialArmorIds: []
   - id: chr004
-    name: "\uC774\uBE68"
+    name: "\uAE40\uC601\uC625"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
@@ -158,7 +158,7 @@ MonoBehaviour:
     initialAmmoId: ammo_000
     initialArmorIds: []
   - id: chr005
-    name: "\uBA58\uD5E4\uB77C"
+    name: "\uAE40\uC218\uBBF8"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     stats:
