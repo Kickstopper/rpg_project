@@ -712,7 +712,7 @@ namespace Manager
 
                 if (isFightMode)
                 {
-                    // [수정] 첫 번째 캐릭터인지 확인
+                    // 첫 번째 캐릭터인지 확인
                     if (currentPlayerIndex == 0)
                     {
                         // 첫 번째 캐릭터라면: Fight 메뉴 -> Base 메뉴(싸우다/도망)로 뒤로가기
@@ -1095,6 +1095,8 @@ namespace Manager
         // 방어: 우선권(Speed) 보정, 페널티는 적게
         public void OnFightCommand_Guard()
         {
+            // 방어 버튼을 누르는 순간 쿨타임을 주어, 이 입력이 다음 턴의 버튼(Attack)까지 이어지지 않게 함
+            inputCooldown = 0.2f;
             PlayerController currentActor = activePlayers[currentPlayerIndex] as PlayerController;
 
             // 방어는 즉시 발동하게 보정함
@@ -1220,47 +1222,80 @@ namespace Manager
         // 오토 행동 결정 및 처리
         void ProcessAutoAction(PlayerController actor)
         {
-            // 1. 이전 행동 가져오기 (없으면 기본 Attack)
+            // 1. 이전 행동 정보 가져오기 (없으면 기본 Attack)
             CombatAction.ActionType actionType = CombatAction.ActionType.Attack;
-            BaseRootData autoData = null; // 데이터를 받아줄 변수
+            BaseRootData autoData = null;
 
             if (lastPlayerActions.ContainsKey(currentPlayerIndex))
             {
-                // 튜플에서 타입과 데이터를 분리해서 가져옴
                 var info = lastPlayerActions[currentPlayerIndex];
                 actionType = info.type;
                 autoData = info.data; 
             }
 
-            // 2. 타겟 결정 (랜덤 적)
-            // 살아있는 몬스터 중 랜덤 선택
-            var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
-            if (livingMonsters.Count == 0) 
+            // 2. 행동에 따른 TargetScope 조회
+            TargetScope scope = TargetScope.FrontSingle; // 기본값
+
+            switch (actionType)
             {
-                // 적이 없으면 턴 종료 처리
-                ProcessTurn(); 
-                return;
+                case CombatAction.ActionType.Attack:
+                    if (actor.currentWeapon != null) scope = actor.currentWeapon.attackRange;
+                    else scope = TargetScope.FrontSingle; // 맨손
+                    break;
+
+                case CombatAction.ActionType.Gun:
+                    if (actor.currentGun != null) scope = actor.currentGun.attackRange;
+                    break;
+
+                case CombatAction.ActionType.Skill:
+                case CombatAction.ActionType.Item:
+                    if (autoData != null) scope = autoData.targetScope;
+                    break;
             }
-            BattleEntity target = livingMonsters[Random.Range(0, livingMonsters.Count)];
 
-            // 3. 행동 생성 (현재는 Attack만 구현, 나중에 Guard/Skill 분기 추가 가능)
-            // (Guard나 Skill은 타겟이 아군이거나 없을 수 있으므로 추후 보완 필요)
+            // 3. Scope에 맞는 타겟 후보 필터링
+            List<BattleEntity> candidates = new List<BattleEntity>();
+            var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
+
+            // 범위 조건 체크
+            bool targetFrontOnly = (scope == TargetScope.FrontSingle || scope == TargetScope.FrontRandom || scope == TargetScope.FrontAll);
+
+            foreach (var m in livingMonsters)
+            {
+                bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
+                
+                // 전열 전용 공격인데 적이 후열에 있다면 제외
+                if (targetFrontOnly && !isFront) continue;
+
+                candidates.Add(m);
+            }
+
+            // 4. 타겟 결정 (후보가 없으면 null -> 헛손질)
+            BattleEntity target = null;
+            if (candidates.Count > 0)
+            {
+                target = candidates[Random.Range(0, candidates.Count)];
+            }
+            else
+            {
+                // 범위 내에 적이 없음 (예: 전열 공격인데 전열 전멸)
+                // target을 null로 두어 '헛손질' 유도
+                Debug.Log($"[Auto] {actor.name}: {scope} 범위 내에 적이 없어 헛손질 예정");
+            }
+
+            // 5. 행동 생성
             int speed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
-            actor.nextTurnSpeedPenalty = 0; // 페널티 소모
+            actor.nextTurnSpeedPenalty = 0;
 
-            // 3. 행동 생성
-            CombatAction action = new CombatAction(actor.gameObject, target.gameObject, actionType, speed);
+            // target이 null이어도 Action은 생성됨 (GameObject로 전달되므로 null 처리 가능)
+            GameObject targetObj = (target != null) ? target.gameObject : null;
+            
+            CombatAction action = new CombatAction(actor.gameObject, targetObj, actionType, speed);
 
-            // 여기서 데이터를 넣어야 에러가 안 난다!
             action.itemData = autoData; 
-
-            // 스킬 데이터 캐스팅 (호환성 유지용)
             if (autoData is SkillData skill) action.skillData = skill;
 
-            // 4. 큐에 추가
             actionQueue.Add(action);
-
-            // 5. 다음 캐릭터로 즉시 이동
             NextPlayerInput();
         }
 
@@ -2182,15 +2217,16 @@ namespace Manager
         }
 
         // ========================================================================
-        // 3. 공격 처리 핸들러 (가장 복잡한 부분 최적화)
+        // 3. 공격 처리 핸들러 (부드러운 연출 적용)
         // ========================================================================
         IEnumerator HandleAttackAction(CombatAction action)
         {
             // 1. 무기 및 공격 정보 설정
             GetWeaponInfo(action, out int minHits, out int maxHits, out TargetScope scope);
             
-            // 플레이어인지 확인
+            // 플레이어/몬스터 여부 확인
             bool isPlayer = (action.actor.GetComponent<PlayerController>() != null);
+            bool isMonster = (action.actor.GetComponent<MonsterController>() != null);
 
             // 로그 출력
             string actStr = (action.type == CombatAction.ActionType.Gun) ? "의 사격!" : "의 참격!";
@@ -2198,10 +2234,43 @@ namespace Manager
 
             yield return wait05;
 
-            int currentHits = 0;
+            // =========================================================
+            // 등장 연출 (Move & Scale)
+            // =========================================================
+            Vector3 originalPos = action.actor.transform.localPosition;
+            Vector3 originalScale = action.actor.transform.localScale;
+
+            Vector3 targetPos = originalPos;
+            Vector3 targetScale = originalScale;
+
+            // 사라짐 방지를 위해 Z축 이동 제거 (또는 -1f 정도로 아주 살짝만)
+            // UI 캔버스 렌더링 방식에 따라 Z축이 너무 크면 카메라 뒤로 넘어가서 안 보입니다.
+            float zOrderOffset = 0f; 
+
+            if (isMonster)
+            {
+                // 몬스터: 크기 1.2배 확대 (위압감)
+                targetScale = originalScale * 1.2f; 
+                // 위치는 제자리 유지 (필요하다면 zOrderOffset만 살짝 적용)
+                targetPos = originalPos + new Vector3(0, 0, zOrderOffset);
+            }
+            else
+            {
+                // 플레이어: 크기는 그대로, 위치만 위로 점프 (Y + 20)
+                targetPos = originalPos + new Vector3(0, 20f, zOrderOffset);
+                // targetScale은 originalScale 유지 (아군은 커지지 않음)
+            }
+
+            // 1. 앞으로 나오기 (0.15초 동안 부드럽게)
+            yield return StartCoroutine(AnimateUnitVisual(action.actor.transform, targetPos, targetScale));
+            
+            // =========================================================
+
+            
             // =========================================================
             // Phase 1: 수동 QTE 타격
             // =========================================================
+            int currentHits = 0;
             if (isPlayer && !isAutoMode && maxHits > 0 && minHits < maxHits)
             {
                 if (qteTimingSlider)
@@ -2210,24 +2279,19 @@ namespace Manager
                     qteTimingSlider.minValue = 0f;
                     qteTimingSlider.maxValue = 1.0f;
                     qteTimingSlider.value = 1.0f;
-                    qteTimingSlider.interactable = false;// 유저 조작 방지
+                    qteTimingSlider.interactable = false;
                 }
 
-                float qteDuration = 2.0f; // 제한 시간
+                float qteDuration = 2.0f; 
                 float timer = 0f;
 
                 if (logPanel) logText.text = "SHOOT IT IN THE HEAD!! (Space/Enter)";
 
-                // [핵심] 타이머 루프
                 while (timer < qteDuration && currentHits < maxHits)
                 {
                     timer += Time.deltaTime;
-                    
-                    // 슬라이더 갱신
-                    if (qteTimingSlider)
-                        qteTimingSlider.value = 1.0f - (timer / qteDuration);
+                    if (qteTimingSlider) qteTimingSlider.value = 1.0f - (timer / qteDuration);
 
-                    // 입력 감지
                     if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
                     {
                         List<GameObject> currentTargets = GetTargetsByScope(scope, action);
@@ -2235,41 +2299,25 @@ namespace Manager
 
                         foreach (var target in currentTargets)
                         {
-                            // "Fire and Forget" 방식: 시작만 시키고 바로 다음 코드로 넘어감
                             StartCoroutine(ProcessSingleHit(action, target));
                         }
-
                         currentHits++;
                         
-                        // 페널티 적용
                         BattleEntity actorEntity = action.actor.GetComponent<BattleEntity>();
-                        if (actorEntity)
-                        {
-                            actorEntity.nextTurnSpeedPenalty += 500;
-                            Debug.Log($"추가 타격! (누적 페널티: -{actorEntity.nextTurnSpeedPenalty})");
-                        }
+                        if (actorEntity) actorEntity.nextTurnSpeedPenalty += 500;
 
                         if (logPanel) logText.text = $"Combo! ({currentHits}/{maxHits})";
-                        
-                        // 사운드만 재생하고, 딜레이(Wait) 없이 즉시 루프 계속 진행
                         SoundManager.Instance.PlaySFX(SfxID.Attack_Gun); 
                     }
-
-                    yield return null; // 다음 프레임까지 대기 (타이머 진행)
+                    yield return null; 
                 }
-
-                // QTE 종료
                 if (qteTimingSlider) qteTimingSlider.gameObject.SetActive(false);
-                
-                // 비동기로 실행된 마지막 공격 이펙트들이 끝날 때까지 살짝 대기 (선택 사항)
-                // 이걸 안 넣으면 이펙트가 터지는 도중에 캐릭터가 자리로 돌아갈 수 있음
                 if (currentHits > 0) yield return wait01;
             }
             
             // =========================================================
-            // Phase 2: 자동 공격 (기존과 동일, 순차 실행 유지)
+            // Phase 2: 자동 공격
             // =========================================================
-            // 오토 모드이거나 몬스터라면: 랜덤 횟수
             int autoHitCount = 0;
             if (!isPlayer || isAutoMode)
             {
@@ -2277,7 +2325,6 @@ namespace Manager
             }
             else if (minHits - currentHits > 0)
             {
-                // 수동 플레이어: 최소 횟수보다 공격 횟수가 적으면 차이만큼 자동 연사
                 autoHitCount = minHits - currentHits;
             }
             
@@ -2286,15 +2333,8 @@ namespace Manager
                 List<GameObject> currentTargets = GetTargetsByScope(scope, action);
                 if (currentTargets.Count == 0) break; 
 
-                if (i == 0)
-                {
-                    action.actor.transform.localPosition += Vector3.forward * 0.3f;
-                    yield return wait01;
-                }
-
                 foreach (var target in currentTargets)
                 {
-                    // 자동 공격은 리듬감을 위해 여전히 기다려줌(yield return)
                     yield return StartCoroutine(ProcessSingleHit(action, target));
                 }
                 
@@ -2303,10 +2343,37 @@ namespace Manager
             }
             
             // =========================================================
-            // 복귀 애니메이션
+            // 복귀 연출 (Move & Scale)
             // =========================================================
-            action.actor.transform.localPosition -= Vector3.forward * 0.3f;
+            // 2. 원래 자리와 크기로 복귀 (0.15초)
+            yield return StartCoroutine(AnimateUnitVisual(action.actor.transform, originalPos, originalScale));
+            
             yield return wait01;
+        }
+
+        // 유닛의 위치와 크기를 부드럽게 변경하는 헬퍼 코루틴
+        IEnumerator AnimateUnitVisual(Transform target, Vector3 toPos, Vector3 toScale, float duration = 0.15f)
+        {
+            Vector3 fromPos = target.localPosition;
+            Vector3 fromScale = target.localScale;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                
+                // SmoothStep: 시작과 끝을 부드럽게 (가속-감속)
+                t = t * t * (3f - 2f * t);
+
+                target.localPosition = Vector3.Lerp(fromPos, toPos, t);
+                target.localScale = Vector3.Lerp(fromScale, toScale, t);
+                yield return null;
+            }
+            
+            // 최종값 확정 (오차 제거)
+            target.localPosition = toPos;
+            target.localScale = toScale;
         }
 
         // 단일 타격 처리 (반사, 회피, 데미지 통합)
@@ -2497,23 +2564,41 @@ namespace Manager
         List<GameObject> GetTargetsByScope(TargetScope scope, CombatAction action)
         {
             List<GameObject> targets = new List<GameObject>();
-            
-            // 살아있는 목록 갱신 (프로퍼티나 메서드로 관리 추천)
             var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
+            
+            // 범위 체크용 플래그
+            bool targetFrontOnly = (scope == TargetScope.FrontSingle || scope == TargetScope.FrontRandom || scope == TargetScope.FrontAll);
             
             // 1. 단일 타겟
             if (scope == TargetScope.FrontSingle || scope == TargetScope.AnySingle)
             {
+                // 타겟이 존재하고 살아있으면 추가
                 if (action.target != null && IsAlive(action.target))
+                {
                     targets.Add(action.target);
+                }
                 else
                 {
-                    // 타겟 사망 시 자동 변경
-                    var newTarget = FindNearestLivingTarget(action.actor);
-                    if (newTarget) 
+                    // 타겟이 없거나 죽었을 때, Scope 규칙을 어기지 않는 선에서만 자동 변경
+                    var newTargetObj = FindNearestLivingTarget(action.actor);
+                    
+                    if (newTargetObj != null)
                     {
-                        action.target = newTarget;
-                        targets.Add(newTarget);
+                        // 새로 찾은 타겟이 Scope에 맞는지 검사
+                        bool isValid = true;
+                        if (targetFrontOnly)
+                        {
+                            // 전열 공격인데 새 타겟이 전열인지 확인
+                            bool isFront = (newTargetObj.transform.parent.parent == enemyFrontRowContainer);
+                            if (!isFront) isValid = false; // 후열이면 무효
+                        }
+
+                        if (isValid)
+                        {
+                            action.target = newTargetObj;
+                            targets.Add(newTargetObj);
+                        }
+                        // isValid가 false면 targets에 아무것도 추가되지 않음 -> 루프 안 돎 -> 헛손질
                     }
                 }
             }
@@ -2527,8 +2612,9 @@ namespace Manager
                     if (scope == TargetScope.FrontRandom && !isFront) continue;
                     candidates.Add(m.gameObject);
                 }
-                if (scope == TargetScope.FrontRandom && candidates.Count == 0) candidates.AddRange(livingMonsters.Select(m => m.gameObject)); // 보정
-
+                // [중요] 보정 로직 제거 또는 수정: "전열 랜덤인데 전열 없으면 헛손질"을 원한다면 보정 삭제
+                // if (scope == TargetScope.FrontRandom && candidates.Count == 0) candidates.AddRange(livingMonsters.Select(m => m.gameObject)); // 이 부분 삭제하면 헛손질 됨
+                
                 if (candidates.Count > 0) targets.Add(candidates[Random.Range(0, candidates.Count)]);
             }
             else if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll)
@@ -2860,7 +2946,7 @@ namespace Manager
                 Vector3 startPos = monster.transform.localPosition; // 현재 위치(부모 변경 직후)에서 시작
                 Vector3 endPos = Vector3.zero;                      // 목표는 슬롯 정중앙
                 
-                Vector3 startScale = Vector3.one * 0.74f; //monster.transform.localScale;  // 현재 크기(약 0.74)에서 시작
+                Vector3 startScale = Vector3.one * 0.9f; //monster.transform.localScale;  // 현재 크기(0.9)에서 시작
                 Vector3 endScale = Vector3.one;                     // 목표는 원래 크기(1.0)
 
                 // 색상 시작/목표값 설정
@@ -2878,7 +2964,7 @@ namespace Manager
                     float t = elapsed / duration; // 진행률 (0.0 ~ 1.0)
 
                     // [옵션] SmoothStep을 쓰면 움직임이 더 부드러워짐 (시작과 끝이 감속됨)
-                    // t = Mathf.SmoothStep(0f, 1f, t);
+                    t = Mathf.SmoothStep(0f, 1f, t);
 
                     // 위치와 크기를 서서히 변화시킴
                     monster.transform.localPosition = Vector3.Lerp(startPos, endPos, t);

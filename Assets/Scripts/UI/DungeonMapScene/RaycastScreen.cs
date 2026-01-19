@@ -924,6 +924,9 @@ namespace UI.DungeonMapScene
             // Unity 텍스처 좌표계는 Y=0이 맨 아래, Y=Height가 맨 위.
             // 따라서 0 ~ horizon은 바닥, horizon ~ screenHeight는 천장.
 
+            // 벽 렌더링(CastWalls)에서 사용한 것과 동일한 비율 계수(heightScale).
+            float heightScale = 0.66f / fovScale;
+
             // --------------------------------------------------------
             // 1. 바닥 그리기 (y: 0 ~ horizon)
             // --------------------------------------------------------
@@ -935,7 +938,8 @@ namespace UI.DungeonMapScene
                 float p = horizon - y; 
                 if (p <= 0.1f) p = 0.1f; // 0 나누기 방지
 
-                float posZ = 0.5f * screenHeight;
+                // 천장 posZ에도 heightScale 적용
+                float posZ = 0.5f * screenHeight * heightScale;
                 float rowDistance = posZ / p;
 
                 // 레이 방향 계산
@@ -986,7 +990,8 @@ namespace UI.DungeonMapScene
                     float p = y - horizon;
                     if (p <= 0.1f) p = 0.1f;
 
-                    float posZ = 0.5f * screenHeight;
+                    // posZ 계산에 heightScale 곱하기
+                    float posZ = 0.5f * screenHeight * heightScale;
                     float rowDistance = posZ / p;
                     
                     // 천장은 바닥과 레이 계산 로직이 동일
@@ -1914,8 +1919,7 @@ namespace UI.DungeonMapScene
                 {
                     Debug.Log($"[Wall Warp] {validWarp.targetMapName}으로 이동합니다.");
                     
-                    // [수정] 이동하려던 방향(moveDir)을 함께 전달하여
-                    // 페이드 아웃되는 동안 그 방향으로 걸어가는 연출을 실행
+                    // 이동하려던 방향(moveDir)을 함께 전달하여 페이드 아웃되는 동안 그 방향으로 걸어가는 연출을 실행
                     StartCoroutine(TransitionToLevel(validWarp, moveDir));
                 }
                 else

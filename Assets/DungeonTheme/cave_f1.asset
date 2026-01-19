@@ -15,23 +15,24 @@ MonoBehaviour:
   themeName: cave_f1
   background: {fileID: 0}
   texture:
-  - {fileID: 2800000, guid: df76849d6cf73b84e9d07e73678f8859, type: 3}
-  - {fileID: 2800000, guid: bd2ef8447f38f5941a77f4266a945b52, type: 3}
-  - {fileID: 2800000, guid: edb096cfa3f50284bb1151a03c5b7257, type: 3}
-  - {fileID: 2800000, guid: be85e0823ea6bbb42b916ab1fed06876, type: 3}
-  - {fileID: 2800000, guid: ae771b8c151f14e41a13523c436b4376, type: 3}
+  - {fileID: 2800000, guid: 74592ab127ca47f4082dedaf86678fbc, type: 3}
+  - {fileID: 2800000, guid: 873de684e4559f44faa3158d40bc05a8, type: 3}
+  - {fileID: 2800000, guid: de7dfa07d4e5e8c4db1d5b84fc76fa6c, type: 3}
+  - {fileID: 2800000, guid: f5d3f4621986e8e4c94f6d83e44d7c22, type: 3}
+  - {fileID: 2800000, guid: 84c6ffc9484095f498ccca135f5093d5, type: 3}
   floorTexIdx: 0
   ceilingTexIdx: 0
-  wallAnimations:
-  - name: 
-    baseTexId: 0
-    altTexId: 0
-    minInterval: 0
-    maxInterval: 0
-  fogColor: {r: 0.23018861, g: 0, b: 0, a: 1}
-  bgmID: 7
+  wallAnimations: []
+  fogColor: {r: 0.5396226, g: 0.5396226, b: 0.5396226, a: 1}
+  bgmID: 12
   monsterList:
-  - 000
+  - 006
+  - 009
+  - 007
+  - 008
+  - 005
   - 001
   - 002
+  - 004
+  - 000
   - 003
