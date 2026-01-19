@@ -54,7 +54,7 @@ namespace Manager
         public GameObject baseFirstButton;    // Base 메뉴의 첫 버튼 (Fight 버튼)
         public GameObject attackButton;    // Fight 메뉴의 첫 버튼 (Attack 버튼)
 
-        public RectTransform targetCursor; // 아까 만든 손가락 커서 이미지
+        public RectTransform targetCursor; // 손가락 커서 이미지
         public Vector3 cursorOffset = new Vector3(0, 50, 0); // 몬스터 머리 위 오프셋
 
         // 타겟팅 로직 변수
@@ -133,6 +133,7 @@ namespace Manager
         private bool isFightMode = false;
         // 배수진(Last Stand) 활성화 플래그
         private bool isLastStandActive = false;
+        private bool isLastStandInputMode = false; // isLastStandActive는 '실행/데미지'용이고, 이건 '입력 스킵'용
 
         // 자주 쓰는 딜레이 캐싱
         private WaitForSeconds wait01 = new WaitForSeconds(0.1f);
@@ -153,6 +154,16 @@ namespace Manager
 
             isFightMode = false;        // 메뉴 상태 초기화 (Base 메뉴부터 시작)
             Time.timeScale = 1.0f;      // 게임 속도 정상화 (혹시 2배속이었다면 복구)
+
+            // 메뉴 인덱스 및 포커스 초기화
+            currentBaseBtnIndex = 0;
+            currentFightBtnIndex = 0;
+            // EventSystem이 기억하고 있는 '이전 전투의 마지막 버튼' 포커스를 해제
+            if (EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+            }
+            // =========================================================
             
             // 상태 초기화
             state = BattleState.Start;
@@ -363,6 +374,8 @@ namespace Manager
 
         void PreparePlayerTurn()
         {
+            isLastStandInputMode = false; //초기화
+
             // Last Stand 상태 해제
             if (isLastStandActive)
             {
@@ -630,16 +643,36 @@ namespace Manager
             activeFightButtons.Clear();
 
             // =========================================================
-            // [조건 계산]
-            // 1. 현재 턴의 첫 번째 행동자인가? (0번 인덱스 캐릭터)
-            //    (전열 3명이 모두 살아있다면 0번은 무조건 살아있으므로 이 조건으로 충분함)
-            bool isFirstActor = (currentPlayerIndex == 0);
-
-            // 2. 전열(0,1,2번 슬롯)에 3명이 꽉 차있고 후열에 1명 이상이 존재하는가?
+            // Union_Attack / Last_Stand 사용 조건
+            // 1. 전열이 가득 차있을 때
+            // 2. 전열의 캐릭터에게 처음으로 명령 선택의 기회가 주어졌을 때
+            // =========================================================
+            
+            // 1. 현재 캐릭터가 전열(0,1,2)에 있는지 확인
+            bool isFrontRow = (actor.columnIndex < 3);
+            
+            // 2. 내가 이번 턴의 '첫 번째 전열 행동자'인지 확인
+            // (내 순서 이전에 행동했던 아군 중, 살아있는 전열 캐릭터가 없어야 함)
+            bool isFirstFrontRowInput = true;
+            for (int i = 0; i < currentPlayerIndex; i++)
+            {
+                // activePlayers 리스트 앞부분 검사
+                if (activePlayers[i] is PlayerController prevPlayer)
+                {
+                    // 살아있고, 전열에 있는 아군이 내 앞에 있었다면 -> 나는 첫 번째가 아님
+                    if (prevPlayer.currentHp > 0 && prevPlayer.columnIndex < 3)
+                    {
+                        isFirstFrontRowInput = false;
+                        break;
+                    }
+                }
+            }
+            
+            // 3. 전열이 3인 이상인지 확인
             bool isFrontRowFull = activePlayers.Count > 3;
 
-            // 최종 조건: 첫 번째 행동자이고 + 전열이 꽉 차 있어야 함
-            bool canUseSpecialCmd = isFirstActor && isFrontRowFull;
+            // 최종 조건: 내가 전열에 있고 && 전열 캐릭터 중 가장 먼저 턴을 잡았을 때
+            bool canUseSpecialCmd = isFrontRow && isFirstFrontRowInput && isFrontRowFull;
             // =========================================================
 
             foreach (CommandButton cmd in allFightButtons)
@@ -668,13 +701,12 @@ namespace Manager
                         isActive = true; 
                         break;
                     
-                    // --- 특수 커맨드 (조건부 활성) ---
+                    // --- [변경] 특수 커맨드 조건 적용 ---
                     case CommandType.Union_Attack:
                     case CommandType.Last_Stand:
                         isActive = canUseSpecialCmd;
                         break;
                         
-                    // (기타 정의된 타입이 있다면 유지)
                     default:
                         isActive = true;
                         break;
@@ -708,11 +740,7 @@ namespace Manager
                 Vector2 size = btnContainer.sizeDelta;
                 size.y = newHeight;
                 btnContainer.sizeDelta = size;
-                
-                // (선택 사항) 레이아웃 갱신 강제 (버튼 위치가 즉시 안 잡힐 경우 대비)
-                // LayoutRebuilder.ForceRebuildLayoutImmediate(btnContainer);
             }
-            // =========================================================
 
             // 인덱스 초기화
             currentFightBtnIndex = 0;
@@ -874,7 +902,6 @@ namespace Manager
         // 공격 버튼 클릭
         public void OnFightCommand_Attack()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
             
             // 무기가 null이어도 PrepareWeaponAction 호출 (맨손 공격)
@@ -882,7 +909,6 @@ namespace Manager
         }
         public void OnFightCommand_Gun()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
 
             // 1. 총과 총알이 모두 있는지 확인
@@ -906,7 +932,6 @@ namespace Manager
 
         public void OnFightCommand_Skill()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             if (battleSkillUI == null) return; 
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
 
@@ -934,7 +959,6 @@ namespace Manager
         }
         public void OnFightCommand_Item()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             if (battleItemUI == null) return;
             List<string> allItemIds = InventoryManager.Instance.GetAllItemIds();
             if (allItemIds == null || allItemIds.Count == 0)
@@ -964,6 +988,9 @@ namespace Manager
         public void OnPopupMenuClosed()
         {
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+
+            currentFightBtnIndex = 0;
+
             // 1. 뒷배경 상호작용 다시 허용
             SetContainerInteractable(fightCmdContainer, true);
             // 2. 포커스 복구 (Item 버튼이나 Attack 버튼으로)
@@ -1135,13 +1162,12 @@ namespace Manager
         // Last Stand(배수진) 버튼 클릭 시 호출
         public void OnFightCommand_LastStand()
         {
-            // 입력 쿨타임 (중복 방지)
             inputCooldown = 0.2f;
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
 
             PlayerController leader = activePlayers[currentPlayerIndex] as PlayerController;
 
-            // 1. 리더(발동자)의 행동 생성 (최우선 발동: 속도 +9999)
+            // 리더(발동자)의 행동 생성 (최우선 발동)
             int prioritySpeed = 9999;
             CombatAction leaderAction = new CombatAction(
                 leader.gameObject, 
@@ -1149,55 +1175,13 @@ namespace Manager
                 CombatAction.ActionType.Last_Stand,
                 prioritySpeed
             );
-            
             actionQueue.Add(leaderAction);
 
             Debug.Log($"{leader.name}: Last Stand 발동 예약!");
 
-            // 2. 나머지 '전열' 아군들의 행동을 강제로 예약 (Input Skip)
-            // currentPlayerIndex는 현재 0번(리더)임. 다음 사람부터 체크.
-            
-            // 임시 인덱스
-            int nextIdx = currentPlayerIndex + 1;
+            isLastStandInputMode = true;
 
-            while (nextIdx < activePlayers.Count)
-            {
-                PlayerController nextPlayer = activePlayers[nextIdx] as PlayerController;
-                
-                // 죽었거나 없는 캐릭터는 패스
-                if (nextPlayer == null || nextPlayer.currentHp <= 0) 
-                {
-                    nextIdx++;
-                    continue;
-                }
-
-                // 후열(ColumnIndex >= 3)을 만나면 루프 종료 (후열은 입력 받아야 함)
-                if (nextPlayer.columnIndex >= 3) 
-                {
-                    break; 
-                }
-
-                // 전열(0,1,2)인 경우 -> 강제로 대기(Guard) 상태로 만들고 큐에 추가
-                // 속도는 Last Stand 보조를 위해 빠르게 설정하거나 기본값
-                CombatAction supportAction = new CombatAction(
-                    nextPlayer.gameObject,
-                    nextPlayer.gameObject,
-                    CombatAction.ActionType.Guard, // 방어 태세로 대기
-                    nextPlayer.GetTotalAgi() + 2000 // 이동과 비슷한 우선순위
-                );
-                
-                actionQueue.Add(supportAction);
-                Debug.Log($"{nextPlayer.name}: 배수진 참가를 위해 자동 대기");
-
-                // 인덱스 증가 (이 캐릭터의 입력은 건너뜀)
-                nextIdx++;
-            }
-
-            // 3. 입력 포커스를 후열 캐릭터(혹은 다음 순서)로 이동
-            // currentPlayerIndex를 방금 처리한 마지막 전열 캐릭터까지 당겨옴
-            currentPlayerIndex = nextIdx - 1; 
-
-            // 4. 다음 입력 호출 (후열 캐릭터 차례가 됨)
+            // 다음 캐릭터 입력으로 진행
             NextPlayerInput();
         }
 
@@ -1252,6 +1236,29 @@ namespace Manager
 
             PlayerController currentPlayer = activePlayers[currentPlayerIndex] as PlayerController;
             if (currentPlayer.currentHp <= 0) { NextPlayerInput(); return; }
+
+            // =========================================================
+            // Last Stand 입력 모드일 때 전열 캐릭터 자동 패스 로직
+            // =========================================================
+            // 조건: 배수진 입력 모드 ON + 현재 캐릭터가 전열(0,1,2)에 있음
+            if (isLastStandInputMode && currentPlayer.columnIndex < 3)
+            {
+                // 강제로 방어(Guard) 행동 생성
+                CombatAction supportAction = new CombatAction(
+                    currentPlayer.gameObject,
+                    currentPlayer.gameObject,
+                    CombatAction.ActionType.Guard,
+                    currentPlayer.GetTotalAgi() + 2000 // 빠른 행동
+                );
+                
+                actionQueue.Add(supportAction);
+                Debug.Log($"[Last Stand] {currentPlayer.name}: 전열 동료 자동 방어 예약");
+
+                // 입력 UI를 띄우지 않고 바로 다음 사람으로 재귀 호출
+                NextPlayerInput(); 
+                return; // [중요] 아래 UI 로직 실행 막기
+            }
+            // =========================================================
 
             // 1. 버튼 목록 갱신 (Gun, Skill 등이 없으면 꺼지고 리스트에서 빠짐)
             RefreshCommandButtons(currentPlayer);
@@ -1596,6 +1603,7 @@ namespace Manager
         void CancelMoveSelection()
         {
             isSelectingMoveTarget = false;
+            currentFightBtnIndex = 0;
             ResetPlayerSlotHighlights();
 
             // 커맨드 패널 표시 (여기서는 전체 패널을 켜고)
@@ -1619,6 +1627,7 @@ namespace Manager
         void CancelTargetSelection()
         {
             isSelectingTarget = false;
+            currentFightBtnIndex = 0;
             commandPanel.SetActive(true);
             
             // 공격(Attack) 취소 시에도 Fight 메뉴 유지
@@ -1853,11 +1862,10 @@ namespace Manager
                     nextEntity = FindClosestEntityInRow(targetFrontContainer, true, currentCol);
                 }
             }
-
-            if (moved) SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
-
+            
             if (nextEntity != null)
             {
+                if (moved) SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                 currentTargetIndex = validTargets.IndexOf(nextEntity);
                 UpdateTargetHighlight();
             }
@@ -2493,6 +2501,7 @@ namespace Manager
 
                 foreach (var target in currentTargets)
                 {
+                    SoundManager.Instance.PlaySFX(SfxID.Attack_Gun); 
                     yield return StartCoroutine(ProcessSingleHit(action, target));
                 }
                 
@@ -2888,8 +2897,8 @@ namespace Manager
         {
             PlayerController actor = action.actor.GetComponent<PlayerController>();
             
-            // 0. [안전 장치] 행동 직전에 죽었거나 Empty 상태라면 이동 취소
-            if (actor == null || actor.currentHp <= 0 || actor.IsEmpty)
+            // 0. [안전 장치] 행동 직전에 죽었거나 비정상 상태라면 취소
+            if (actor == null || actor.currentHp <= 0)
             {
                 Debug.Log($"[Action Cancelled] {actor.name}은(는) 행동 불능 상태라 이동할 수 없습니다.");
                 yield break;
@@ -2899,6 +2908,37 @@ namespace Manager
             Transform targetSlotTransform = action.target.transform; 
             // 현재 내가 있는 슬롯
             Transform originSlotTransform = actor.transform.parent;
+
+            // =========================================================
+            // Last Stand 활성 시 전열 관련 이동 차단 로직
+            // =========================================================
+            if (isLastStandActive)
+            {
+                // 1. 목표 위치가 전열인지, 혹은 현재 위치가 전열인지 확인
+                // (배수진은 전열이 꽉 짜여진 상태이므로, 전열로 들어오거나 전열에서 나가는 것을 막음)
+                int targetIndex = GetPlayerSlotIndex(targetSlotTransform);
+                int originIndex = GetPlayerSlotIndex(originSlotTransform);
+
+                bool involvesFrontRow = (targetIndex < 3 || originIndex < 3);
+
+                if (involvesFrontRow)
+                {
+                    Debug.Log($"[Move Cancelled] Last Stand 발동 중이라 {actor.name}의 이동이 차단되었습니다.");
+                    
+                    if (logPanel)
+                    {
+                        logPanel.SetActive(true);
+                        logText.SetText("LAST STAND 발동중.\n이동 불가!");
+                    }
+                    
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    yield return wait10; // 메시지 보여줄 시간 대기
+                    
+                    if (logPanel) logPanel.SetActive(false);
+                    yield break; // [중요] 이동 로직을 수행하지 않고 여기서 종료
+                }
+            }
+            // =========================================================
 
             // 제자리 이동이면 무시
             if (targetSlotTransform == originSlotTransform) yield break;
@@ -2910,57 +2950,85 @@ namespace Manager
             if (messagePanel) 
             {
                 messagePanel.SetActive(true);
-                string msg = targetChar.IsEmpty ? "자리 이동!" : "위치 교대!";
+                // 대상이 비어있는 자리면 "이동", 사람이 있으면 "교대"
+                string msg = (targetChar != null && !targetChar.IsEmpty) ? "위치 교대!" : "자리 이동!";
                 messageText.SetText(msg);
             }
             
             Debug.Log($"[Action] {actor.name} 이동: {originSlotTransform.name} -> {targetSlotTransform.name}");
 
             // =========================================================
-            // 관리 리스트(allSlotControllers) 순서 동기화
+            // A. 관리 리스트(allSlotControllers) 순서 동기화
             // =========================================================
-            // 리스트에서의 현재 인덱스를 찾는다.
             int actorListIndex = allSlotControllers.IndexOf(actor);
-            int targetListIndex = allSlotControllers.IndexOf(targetChar);
+            int targetListIndex = (targetChar != null) ? allSlotControllers.IndexOf(targetChar) : -1;
 
-            // 리스트 내의 위치를 스왑.
-            // 이렇게 해야 ProcessPlayerRowShift가 올바른 전열/후열 캐릭터를 참조.
             if (actorListIndex != -1 && targetListIndex != -1)
             {
                 allSlotControllers[actorListIndex] = targetChar;
                 allSlotControllers[targetListIndex] = actor;
             }
-            // =========================================================
 
             // =========================================================
-            // 물리적 위치(Parent) 및 Index 정보 스왑
+            // B. 부모 변경 (SetParent with worldPositionStays = true)
             // =========================================================
+            // 중요: true를 넣으면 화면상 위치는 그대로 유지된 채 부모만 바뀜.
+            // 즉, actor.localPosition이 (0,0,0)이 아니라 '새로운 슬롯 기준에서의 먼 거리'로 자동 설정됨.
             
-            // A. 타겟 캐릭터(Empty든 아니든)를 내 원래 자리로 보냄
             if (targetChar != null)
             {
-                targetChar.transform.SetParent(originSlotTransform);
-                targetChar.transform.localPosition = Vector3.zero;
-                
-                // 인덱스 정보 갱신 (슬롯 기준)
+                targetChar.transform.SetParent(originSlotTransform, true);
                 targetChar.columnIndex = GetPlayerSlotIndex(originSlotTransform); 
             }
 
-            // B. 나를 목표 자리로 보냄
-            actor.transform.SetParent(targetSlotTransform);
-            actor.transform.localPosition = Vector3.zero;
-            
-            // 내 인덱스 정보 갱신
+            actor.transform.SetParent(targetSlotTransform, true);
             actor.columnIndex = GetPlayerSlotIndex(targetSlotTransform);
 
             // =========================================================
+            // C. 이동 애니메이션 (Lerp)
+            // =========================================================
+            // 현재 위치(시작점) 저장
+            Vector3 actorStartPos = actor.transform.localPosition;
+            Vector3 targetStartPos = (targetChar != null) ? targetChar.transform.localPosition : Vector3.zero;
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
-            yield return wait05;
+            // 목표 위치는 슬롯의 정중앙 (0,0,0)
+            Vector3 endPos = Vector3.zero;
+
+            float duration = 0.5f; // 이동 시간 (0.5초)
+            float elapsed = 0f;
+
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click); // 이동 시작음 (혹은 발소리)
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                
+                // SmoothStep (부드러운 감속)
+                t = t * t * (3f - 2f * t);
+
+                // Actor 이동
+                actor.transform.localPosition = Vector3.Lerp(actorStartPos, endPos, t);
+
+                // Target 이동 (상대방이 있으면 반대편으로 이동)
+                if (targetChar != null)
+                {
+                    targetChar.transform.localPosition = Vector3.Lerp(targetStartPos, endPos, t);
+                }
+
+                yield return null;
+            }
+
+            // =========================================================
+            // D. 최종 위치 확정
+            // =========================================================
+            actor.transform.localPosition = endPos;
+            if (targetChar != null) targetChar.transform.localPosition = endPos;
+
+            yield return wait05; // 도착 후 잠시 대기
 
             if (messagePanel) messagePanel.SetActive(false);
         }
-
 
         void InitializeSlots()
         {
