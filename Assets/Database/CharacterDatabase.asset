@@ -105,7 +105,7 @@ MonoBehaviour:
       force: 0
       havoc: 0
     initialSkillIds: []
-    initialWeaponId: 
+    initialWeaponId: sword_000
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []
@@ -201,7 +201,7 @@ MonoBehaviour:
       force: 0
       havoc: 0
     initialSkillIds: []
-    initialWeaponId: sword_000
+    initialWeaponId: 
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []

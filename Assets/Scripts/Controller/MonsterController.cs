@@ -19,8 +19,8 @@ namespace Controller
         private Button button;
 
         private Material instanceMaterial;
-        private const float FRONT_OFFSET = 0.02f;
-        private const float BACK_OFFSET = 0.01f;
+        private const float FRONT_OFFSET = 0.01f;
+        private const float BACK_OFFSET = 0.005f;
 
         // 상태 기억용 변수
         private bool cachedIsFront = false;      // 내가 전열인지 후열인지 기억

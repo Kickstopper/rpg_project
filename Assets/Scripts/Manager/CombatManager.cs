@@ -131,6 +131,8 @@ namespace Manager
 
         // "싸우다"를 선택했는지 여부
         private bool isFightMode = false;
+        // 배수진(Last Stand) 활성화 플래그
+        private bool isLastStandActive = false;
 
         // 자주 쓰는 딜레이 캐싱
         private WaitForSeconds wait01 = new WaitForSeconds(0.1f);
@@ -361,6 +363,22 @@ namespace Manager
 
         void PreparePlayerTurn()
         {
+            // Last Stand 상태 해제
+            if (isLastStandActive)
+            {
+                isLastStandActive = false;
+                
+                // 위치 복구 (전열 캐릭터들 원위치)
+                foreach (var p in activePlayers)
+                {
+                    if (p.columnIndex < 3)
+                    {
+                        // 원래 슬롯 위치(0,0,0)으로 복귀
+                        StartCoroutine(AnimateUnitVisual(p.transform, Vector3.zero, Vector3.one, 0.3f));
+                    }
+                }
+            }
+
             // 예약된 오토 해제가 있다면 여기서 적용
             if (reserveAutoOff)
             {
@@ -1111,6 +1129,75 @@ namespace Manager
             );
 
             actionQueue.Add(action);
+            NextPlayerInput();
+        }
+
+        // Last Stand(배수진) 버튼 클릭 시 호출
+        public void OnFightCommand_LastStand()
+        {
+            // 입력 쿨타임 (중복 방지)
+            inputCooldown = 0.2f;
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+
+            PlayerController leader = activePlayers[currentPlayerIndex] as PlayerController;
+
+            // 1. 리더(발동자)의 행동 생성 (최우선 발동: 속도 +9999)
+            int prioritySpeed = 9999;
+            CombatAction leaderAction = new CombatAction(
+                leader.gameObject, 
+                leader.gameObject, 
+                CombatAction.ActionType.Last_Stand,
+                prioritySpeed
+            );
+            
+            actionQueue.Add(leaderAction);
+
+            Debug.Log($"{leader.name}: Last Stand 발동 예약!");
+
+            // 2. 나머지 '전열' 아군들의 행동을 강제로 예약 (Input Skip)
+            // currentPlayerIndex는 현재 0번(리더)임. 다음 사람부터 체크.
+            
+            // 임시 인덱스
+            int nextIdx = currentPlayerIndex + 1;
+
+            while (nextIdx < activePlayers.Count)
+            {
+                PlayerController nextPlayer = activePlayers[nextIdx] as PlayerController;
+                
+                // 죽었거나 없는 캐릭터는 패스
+                if (nextPlayer == null || nextPlayer.currentHp <= 0) 
+                {
+                    nextIdx++;
+                    continue;
+                }
+
+                // 후열(ColumnIndex >= 3)을 만나면 루프 종료 (후열은 입력 받아야 함)
+                if (nextPlayer.columnIndex >= 3) 
+                {
+                    break; 
+                }
+
+                // 전열(0,1,2)인 경우 -> 강제로 대기(Guard) 상태로 만들고 큐에 추가
+                // 속도는 Last Stand 보조를 위해 빠르게 설정하거나 기본값
+                CombatAction supportAction = new CombatAction(
+                    nextPlayer.gameObject,
+                    nextPlayer.gameObject,
+                    CombatAction.ActionType.Guard, // 방어 태세로 대기
+                    nextPlayer.GetTotalAgi() + 2000 // 이동과 비슷한 우선순위
+                );
+                
+                actionQueue.Add(supportAction);
+                Debug.Log($"{nextPlayer.name}: 배수진 참가를 위해 자동 대기");
+
+                // 인덱스 증가 (이 캐릭터의 입력은 건너뜀)
+                nextIdx++;
+            }
+
+            // 3. 입력 포커스를 후열 캐릭터(혹은 다음 순서)로 이동
+            // currentPlayerIndex를 방금 처리한 마지막 전열 캐릭터까지 당겨옴
+            currentPlayerIndex = nextIdx - 1; 
+
+            // 4. 다음 입력 호출 (후열 캐릭터 차례가 됨)
             NextPlayerInput();
         }
 
@@ -2100,6 +2187,10 @@ namespace Manager
                 case CombatAction.ActionType.Gun:
                     yield return HandleAttackAction(action);
                     break;
+
+                case CombatAction.ActionType.Last_Stand:
+                    yield return HandleLastStandAction(action);
+                break;
             }
 
             // 공통 후처리
@@ -2205,6 +2296,73 @@ namespace Manager
 
             //SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             ShowLog($"{action.actor.name}의 방어 태세!");
+
+            yield return wait05;
+            if (logPanel) logPanel.SetActive(false);
+        }
+
+        // 배수진 발동 및 연출
+        IEnumerator HandleLastStandAction(CombatAction action)
+        {
+            isLastStandActive = true; // 플래그 활성화
+            
+            ShowLog("LAST STAND!!");
+            //SoundManager.Instance.PlaySFX(SfxID.Buff); // 적절한 효과음
+
+            // 1. 전열 캐릭터들 찾기
+            List<PlayerController> frontRowMembers = activePlayers
+                .Where(p => p.currentHp > 0 && p.columnIndex < 3)
+                .Select(p => p as PlayerController)
+                .ToList();
+
+            // 2. 모이는 애니메이션 (가운데로 집결)
+            // 기준점: 전열 가운데 슬롯(인덱스 1)의 위치는 (0,0,0)이라고 가정 시
+            // 왼쪽(0)은 +X 방향으로, 오른쪽(2)은 -X 방향으로 이동
+            
+            float moveDuration = 0.3f;
+            float elapsed = 0f;
+            
+            // 원래 위치 저장 (나중에 복구를 위해 Dictionary 사용하자)
+            // ※ 복구는 턴 종료 시(PreparePlayerTurn)에 일괄 초기화하자.
+
+            Vector3[] startPositions = frontRowMembers.Select(p => p.transform.localPosition).ToArray();
+            Vector3[] endPositions = new Vector3[frontRowMembers.Count];
+
+            for(int i=0; i<frontRowMembers.Count; i++)
+            {
+                PlayerController pc = frontRowMembers[i];
+                Vector3 targetPos = pc.transform.localPosition;
+
+                // 왼쪽(0번 컬럼)에 있는 애 -> 오른쪽으로 조금 이동
+                if (pc.columnIndex % 3 == 0) targetPos += new Vector3(50f, 0, 0); 
+                // 오른쪽(2번 컬럼)에 있는 애 -> 왼쪽으로 조금 이동
+                else if (pc.columnIndex % 3 == 2) targetPos += new Vector3(-50f, 0, 0);
+                // 가운데(1번)는 유지 or 약간 앞으로?
+
+                endPositions[i] = targetPos;
+            }
+
+            // Lerp 이동
+            while (elapsed < moveDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / moveDuration;
+                t = t * t * (3f - 2f * t); // SmoothStep
+
+                for (int i = 0; i < frontRowMembers.Count; i++)
+                {
+                    frontRowMembers[i].transform.localPosition = 
+                        Vector3.Lerp(startPositions[i], endPositions[i], t);
+                }
+                yield return null;
+            }
+            
+            // 전열 캐릭터들에게 방어 이펙트나 오라 표시
+            foreach(var member in frontRowMembers)
+            {
+                SpawnVFX(vfxGuardHitPrefab, member.transform.position); // 임시 이펙트
+                member.isGuarding = true; // 시스템적으로도 방어 상태 부여
+            }
 
             yield return wait05;
             if (logPanel) logPanel.SetActive(false);
@@ -2429,6 +2587,44 @@ namespace Manager
             }
 
             // =========================================================
+            // Last Stand (배수진) 데미지 분산 처리
+            // =========================================================
+            // 조건: 배수진 활성 + 타겟이 아군임 + 공격자가 적군임
+            if (isLastStandActive && target.GetComponent<PlayerController>() != null)
+            {
+                // 살아있는 전열 캐릭터 수집
+                List<PlayerController> defenders = activePlayers
+                    .Where(p => p.currentHp > 0 && p.columnIndex < 3)
+                    .Select(p => p as PlayerController)
+                    .ToList();
+
+                if (defenders.Count > 0)
+                {
+                    bool isCrit = CheckCritical(action.actor, target, action);
+                    
+                    // 위에서 계산해둔 posDmgMult를 그대로 사용
+                    int originalDamage = CalculateDamage(action.actor, target, action, isCrit, posDmgMult);
+                    
+                    // 데미지 분산 (최소 1)
+                    int splitDamage = Mathf.Max(1, originalDamage / defenders.Count);
+                    
+                    Debug.Log($"[Last Stand] 총 {originalDamage} 데미지를 {defenders.Count}명이 {splitDamage}씩 나누어 받습니다!");
+                    ShowLog("Covered!");
+
+                    // 전열 모두에게 데미지 적용
+                    foreach (var defender in defenders)
+                    {
+                        ApplyDamage(defender.gameObject, splitDamage, false);
+                        SpawnVFX(vfxGuardHitPrefab, defender.transform.position);
+                    }
+                    
+                    yield return wait01;
+                    yield break; // 분산 처리 후 종료
+                }
+            }
+            // =========================================================
+
+            // =========================================================
             // 4. 일반 피격 (데미지 계산)
             // =========================================================
             bool isCritical = CheckCritical(action.actor, target, action);
@@ -2485,6 +2681,10 @@ namespace Manager
                         sfxId = SfxID.Attack_Magic;
                         vfxToSpawn = vfxMagicPrefab;
                     }
+                }
+                else if (action.type == CombatAction.ActionType.Last_Stand)
+                {
+                    // 필요 시 추가
                 }
                 // =========================================================
 
