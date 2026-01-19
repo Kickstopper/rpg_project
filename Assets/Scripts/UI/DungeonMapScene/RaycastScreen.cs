@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Manager;
 using Data;
+using DG.Tweening;
 
 namespace UI.DungeonMapScene
 {
@@ -35,7 +36,6 @@ namespace UI.DungeonMapScene
         [Range(0.03f, 0.07f)]
         public float stereoSeparation = 0.05f; // 두 눈 사이의 거리 (값이 클수록 입체감이 강해짐)
 
-        
         private Color[] _leftEyeBuffer; // 애너글리프 사용 시 왼쪽 눈 렌더링 결과를 저장할 임시 버퍼
 
         [Header("Transition Settings")]
@@ -113,6 +113,7 @@ namespace UI.DungeonMapScene
 
 
         [Header("References")]
+        public GameObject screenContainer;
         public GridMap miniMap; 
         public GameObject autoMap;
         public GameObject controllerPanel;
@@ -145,8 +146,9 @@ namespace UI.DungeonMapScene
         // 내부 렌더링 해상도 (실제 화면보다 작게 그려서 확대함)
         private int screenWidth = 512;
         private int screenHeight = 256;
-        private float screenScale = 2f; // 저해상도를 확대해서 보여줄 비율 (레트로 느낌 + 최적화)
-        
+        private Vector2 screenScale = new Vector2(2.5f, 2.8125f); // 저해상도를 확대해서 보여줄 비율 (1280 / screenWidth, 720 / screenHeight)
+        private Vector2 battleScreenScale = new Vector2(0.8f, 0.7111f); // 전투 UI가 표시될 때의 화면 비율
+
         private int texWidth = 64;  // 텍스처 가로 크기 (2의 n승 권장)
         private int texHeight = 64; // 텍스처 세로 크기
 
@@ -489,15 +491,23 @@ namespace UI.DungeonMapScene
         {
             if (newState == GameState.Exploration)
             {
-                // 탐험 모드: 렌더링 재개
-                canRender = true;
-                Debug.Log("탐험 모드 복귀: 렌더링 시작");
-                SoundManager.Instance.PlayBGM(currentTheme.bgmID);
+                screenContainer.transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutQuart).OnComplete(() =>
+                {
+                    screenContainer.transform.localScale = Vector3.one;
+                    // 탐험 모드: 렌더링 재개
+                    canRender = true;
+                    Debug.Log("탐험 모드 복귀: 렌더링 시작");
+                    SoundManager.Instance.PlayBGM(currentTheme.bgmID);
+                });
             }
             else
             {
                 // 전투/메뉴 등: 렌더링 중지 (성능 확보)
                 canRender = false;
+                screenContainer.transform.DOScale(battleScreenScale, 0.3f).SetEase(Ease.OutElastic).OnComplete(() =>
+                {
+                    screenContainer.transform.localScale = battleScreenScale;
+                });
             }
         }
 
@@ -1230,10 +1240,8 @@ namespace UI.DungeonMapScene
 
         private void CreateScreen()
         {
-            Vector2 pos = new Vector2(-128, 104);
-            Vector2 scale = Vector2.one * screenScale;
+            Vector2 pos = Vector2.zero;
             backgroundImage.transform.localPosition = pos;
-            backgroundImage.transform.localScale = scale;
             
             _screenTexture = new Texture2D(screenWidth, screenHeight);
             _screenTexture.filterMode = FilterMode.Point; // 도트 느낌 살리기
@@ -1255,7 +1263,7 @@ namespace UI.DungeonMapScene
             _rawImg = screen.AddComponent<RawImage>();
             _rawImg.rectTransform.sizeDelta = new Vector2(screenWidth, screenHeight);
             _rawImg.transform.localPosition = pos;
-            _rawImg.transform.localScale = scale;
+            _rawImg.transform.localScale = screenScale;
             _rawImg.material = mat;
         }
 
@@ -2324,7 +2332,7 @@ namespace UI.DungeonMapScene
             // DungeonStateManager에게 전투 개시 명령
             DungeonStateManager.Instance.StartEncounter(currentTheme.monsterList);
 
-            // 3. 카운터 리셋 (전투 끝나고 돌아왔을 때를 위해)
+            // 카운터 리셋 (전투 끝나고 돌아왔을 때를 위해)
             ResetEncounterSteps();
         }
     }
