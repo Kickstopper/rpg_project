@@ -11,6 +11,7 @@ namespace Controller
         [Header("Entity Status")]
         public string entityName;
         public int level = 1;
+        public Align align;
         public int currentHp;
         public int currentMp;
         public int maxHp;

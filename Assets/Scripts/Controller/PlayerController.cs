@@ -5,6 +5,7 @@ using TMPro;
 using System.Collections.Generic;
 using Manager;
 using Data;
+using Data.Database;
 
 namespace Controller
 {
@@ -58,6 +59,8 @@ namespace Controller
             IsEmpty = true;
             this.columnIndex = colIndex;
 
+            align = Align.None;
+
             currentHp = 0;
             currentMp = 0;
             currentWeapon = null;
@@ -85,6 +88,8 @@ namespace Controller
             sourceData = data;
             currentRow = row;
             entityName = data.name;
+            
+            align = data.align;
             
             // HP/MP 설정
             maxHp = data.maxHp;

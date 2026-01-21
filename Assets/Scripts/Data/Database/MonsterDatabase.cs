@@ -9,6 +9,12 @@ public enum RowType
     Front,
     Back,
 }
+public enum Align { 
+    None,
+    Lawful_Good, Neutral_Good, Chaotic_Good,
+    Lawful_Neutral, True_Neutral, Chaotic_Neutral,
+    Lawful_Evil, Neutral_Evil, Chaotic_Evil 
+}
 [CreateAssetMenu(fileName = "MonsterDatabase", menuName = "Game Data/Monster Database")]
 public class MonsterDatabase : ScriptableObject
 {
@@ -29,6 +35,7 @@ public class MonsterDatabase : ScriptableObject
         public RowType preferredRow; // Front 또는 Back
 
         [Header("Combat Stats")]
+        public Align align;
         public StatData stats;             // 레벨, 힘, 마력, 체력 등
         public ResistanceData resistances; // 물리, 화염, 빙결 내성 등
 

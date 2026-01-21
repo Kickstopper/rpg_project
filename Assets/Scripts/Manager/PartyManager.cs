@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using Data.Database;
 using UnityEngine;
 
 namespace Manager
@@ -16,7 +15,11 @@ namespace Manager
 
         void Awake()
         {
-            if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
+            if (Instance == null) { 
+                Instance = this; 
+                transform.SetParent(null);
+                DontDestroyOnLoad(gameObject); 
+            }
             else Destroy(gameObject);
 
             // 테스트용: 임시 파티 결성

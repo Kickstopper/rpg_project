@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using Manager;
+using Data.Database;
 
 namespace UI
 {
