@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: skl_018
   dataName: "\uBC18\uC0AC \uBB3C\uB9AC"
-  description: 
+  description: "\uBB3C\uB9AC \uACF5\uACA9\uC744 \uBC18\uC0AC"
   icon: {fileID: 0}
   effectType: 9
   effectValue: 0

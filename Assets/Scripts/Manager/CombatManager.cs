@@ -100,7 +100,7 @@ namespace Manager
         private bool reserveAutoOff = false;
         
         // 각 캐릭터(인덱스)가 마지막으로 수행한 행동 타입 저장
-        private Dictionary<int, (CombatAction.ActionType type, BaseRootData data)> lastPlayerActions = new();
+        private Dictionary<int, (CombatAction.ActionType type, BaseRootData data, GameObject target)> lastPlayerActions = new();
         // -------------------------------------------------------
         // [핵심 변수] 전투 상태 및 리스트
         // -------------------------------------------------------
@@ -816,6 +816,12 @@ namespace Manager
             action.itemData = currentSelectedItem; 
             if (currentSelectedItem is SkillData skill) action.skillData = skill;
 
+            // [추가] 즉시 실행되는 행동(AllAllies, Self 등)도 Auto 모드를 위해 저장
+            if (lastPlayerActions.ContainsKey(currentPlayerIndex))
+                lastPlayerActions[currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, target);
+            else
+                lastPlayerActions.Add(currentPlayerIndex, (currentSelectedAction, currentSelectedItem, target));
+
             actionQueue.Add(action);
             NextPlayerInput();
         }
@@ -1068,14 +1074,18 @@ namespace Manager
         {
             CombatAction.ActionType actionType = CombatAction.ActionType.Attack;
             BaseRootData autoData = null;
+            GameObject autoTarget = null; // 저장된 타겟
 
+            // 저장된 행동 불러오기
             if (lastPlayerActions.ContainsKey(currentPlayerIndex))
             {
                 var info = lastPlayerActions[currentPlayerIndex];
                 actionType = info.type;
                 autoData = info.data; 
+                autoTarget = info.target; // 타겟 복원
             }
 
+            // 스코프 확인
             TargetScope scope = TargetScope.FrontSingle; 
             switch (actionType)
             {
@@ -1085,22 +1095,44 @@ namespace Manager
                 case CombatAction.ActionType.Item: if (autoData != null) scope = autoData.targetScope; break;
             }
 
-            List<BattleEntity> candidates = new List<BattleEntity>();
-            var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
-            bool targetFrontOnly = (scope == TargetScope.FrontSingle || scope == TargetScope.FrontRandom || scope == TargetScope.FrontAll);
+            // 타겟 결정
+            GameObject finalTarget = null;
 
-            foreach (var m in livingMonsters)
+            // 아군 대상(회복/버프) 스코프인지 확인
+            bool isAllyScope = (scope == TargetScope.OneAlly || scope == TargetScope.AllAllies || 
+                                scope == TargetScope.Self || scope == TargetScope.DeadAlly);
+
+            if (isAllyScope)
             {
-                bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
-                if (targetFrontOnly && !isFront) continue;
-                candidates.Add(m);
+                // 아군 대상인 경우: 무조건 저장된 타겟(autoTarget) 사용
+                // (OneAlly인 경우 지정했던 아군, AllAllies/Self인 경우 null 혹은 본인이 들어있음)
+                finalTarget = autoTarget;
+            }
+            else
+            {
+                // 적 대상인 경우: 기존 로직대로 살아있는 몬스터 중 랜덤 선택
+                // (공격 대상은 매번 바뀌거나 죽을 수 있으므로 랜덤이 일반적)
+                List<BattleEntity> candidates = new List<BattleEntity>();
+                var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
+                bool targetFrontOnly = (scope == TargetScope.FrontSingle || scope == TargetScope.FrontRandom || scope == TargetScope.FrontAll);
+
+                foreach (var m in livingMonsters)
+                {
+                    bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
+                    if (targetFrontOnly && !isFront) continue;
+                    candidates.Add(m);
+                }
+
+                if (candidates.Count > 0)
+                {
+                    finalTarget = candidates[Random.Range(0, candidates.Count)].gameObject;
+                }
             }
 
-            BattleEntity target = (candidates.Count > 0) ? candidates[Random.Range(0, candidates.Count)] : null;
             int speed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
             actor.nextTurnSpeedPenalty = 0;
 
-            CombatAction action = new CombatAction(actor.gameObject, (target != null) ? target.gameObject : null, actionType, speed);
+            CombatAction action = new CombatAction(actor.gameObject, finalTarget, actionType, speed);
             action.itemData = autoData; 
             if (autoData is SkillData skill) action.skillData = skill;
 
@@ -1413,28 +1445,28 @@ namespace Manager
         {
             if (!isSelectingTarget) return;
 
-            // Union Attack 선택 완료 시 시각 효과 정지
             if (currentSelectedAction == CombatAction.ActionType.Union_Attack)
             {
                 StopBlinkEffects();
             }
 
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+
+            // 타겟 정보(targetEntity.gameObject)까지 함께 저장
             if (lastPlayerActions.ContainsKey(currentPlayerIndex))
-                lastPlayerActions[currentPlayerIndex] = (currentSelectedAction, currentSelectedItem);
+                lastPlayerActions[currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, targetEntity.gameObject);
             else
-                lastPlayerActions.Add(currentPlayerIndex, (currentSelectedAction, currentSelectedItem));
+                lastPlayerActions.Add(currentPlayerIndex, (currentSelectedAction, currentSelectedItem, targetEntity.gameObject));
             
             int finalSpeed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
             actor.nextTurnSpeedPenalty = 0;
 
             CombatAction action = new CombatAction(actor.gameObject, targetEntity.gameObject, currentSelectedAction, finalSpeed); 
             
-            // Union Attack 사용 확정 처리
             if (currentSelectedAction == CombatAction.ActionType.Union_Attack)
             {
                  action.speed = 9999; 
-                 isUnionAttackUsedThisTurn = true; // [핵심] 사용됨 표시
+                 isUnionAttackUsedThisTurn = true;
             }
             if (currentSelectedAction == CombatAction.ActionType.Item)
             {

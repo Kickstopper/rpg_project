@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Manager;
 using Data;
 using DG.Tweening;
+using TMPro;
 
 namespace UI.DungeonMapScene
 {
@@ -91,6 +92,17 @@ namespace UI.DungeonMapScene
         public int maxSteps = 30; // 최대 30걸음 안에는 무조건 전투
         
         private int stepsUntilNextBattle; // 다음 전투까지 남은 걸음
+        private int _initialSteps; // 초기 걸음 수 (비율 계산용)
+
+        [Header("Encounter UI")]
+        public Slider dangerSlider;
+        public TextMeshProUGUI dangerText;
+        public Image fillImage; // 슬라이더의 Fill 영역 이미지 (색상 변경용)
+        
+        public Color safeColor = Color.green;
+        public Color warningColor = Color.yellow;
+        public Color dangerColor = Color.red;
+        private Tween _pulseTween;
         
         [Header("Movement Settings")]
         public float gridBaseTurnDuration = .1f; 
@@ -479,11 +491,10 @@ namespace UI.DungeonMapScene
         
         void OnDestroy()
         {
-            // 오브젝트 파괴 시 구독 해제 (메모리 누수 방지)
+            _pulseTween?.Kill();
+            
             if (DungeonStateManager.Instance != null)
-            {
                 DungeonStateManager.Instance.OnStateChanged -= OnGameStateChanged;
-            }
         }
 
         // [핵심] 상태가 바뀔 때마다 자동으로 호출되는 함수
@@ -1932,7 +1943,7 @@ namespace UI.DungeonMapScene
                 }
                 else
                 {
-                    // 워프가 없으면 일반 벽 충돌 (기존 동일)
+                    // 워프가 없으면 일반 벽 충돌
                     SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                     if (!_isMoving) 
                     {
@@ -2020,7 +2031,7 @@ namespace UI.DungeonMapScene
                     // 1. 화면 점점 어둡게
                     fadeOverlay.alpha = t;
 
-                    // 2. [추가] 플레이어를 벽(워프) 쪽으로 이동시킴
+                    // 2. 플레이어를 벽(워프) 쪽으로 이동시킴
                     _posX = Mathf.Lerp(startX, targetPos.x, t);
                     _posY = Mathf.Lerp(startY, targetPos.y, t);
 
@@ -2035,7 +2046,7 @@ namespace UI.DungeonMapScene
             yield return new WaitForSeconds(0.2f);
 
             // -----------------------------------------------------
-            // Phase 2: Data Load (기존 동일)
+            // Phase 2: Data Load
             // -----------------------------------------------------
             DungeonEventManager.Instance.SetCurrentMapID(warp.targetMapName);
             LevelManager.Instance.LoadLevelFromJson(warp.targetMapName);
@@ -2045,7 +2056,7 @@ namespace UI.DungeonMapScene
             yield return null; 
 
             // -----------------------------------------------------
-            // Phase 3: Fade In (기존 동일)
+            // Phase 3: Fade In
             // -----------------------------------------------------
             if (fadeOverlay != null)
             {
@@ -2065,8 +2076,7 @@ namespace UI.DungeonMapScene
         // 좌표 보정 함수
         private (float x, float y) GetModifiedPosition(float x, float y, int dir)
         {
-             // ... 기존 로직 유지 (그리드 중앙 정렬용) ...
-             return (x + 0.5f, y + 0.5f);
+            return (x + 0.5f, y + 0.5f);
         }
 
         // 이동 벡터(Vector2Int)를 Direction Enum으로 변환하는 헬퍼 함수
@@ -2104,7 +2114,6 @@ namespace UI.DungeonMapScene
         // =========================================================
         // Direction & Rotation Logic
         // =========================================================
-
         /*
         * 현재 _direction(0~3) 값에 맞춰 벡터를 강제로 재설정 (오차 보정용)
         * Start()나 회전이 완전히 끝난 직후에 호출.
@@ -2281,19 +2290,19 @@ namespace UI.DungeonMapScene
 
         private void SearchEvent(int x, int y)
         {
-            // 1. 이벤트 체크 (DungeonEventManager가 유효한 ID만 리턴한다고 가정)
+            // 이벤트 체크 (DungeonEventManager가 유효한 ID만 리턴한다고 가정)
             string eventID = DungeonEventManager.Instance.CheckEvent(x, y);
 
             if (!string.IsNullOrEmpty(eventID))
             {
-                // 2. 플레이어 조작 잠금
+                // 플레이어 조작 잠금
                 isInputLocked = true;
 
-                // 3. 기존에 연결된 것이 있을 수 있으므로 안전하게 제거 후 다시 연결 (안전제일)
+                // 기존에 연결된 것이 있을 수 있으므로 안전하게 제거 후 다시 연결
                 dialogueUI.OnDialogueFinished -= OnEventFinished; 
                 dialogueUI.OnDialogueFinished += OnEventFinished;
 
-                // 4. 대화 시작
+                // 대화 시작
                 dialogueUI.StartDialogue(eventID);
             }
         }
@@ -2309,15 +2318,22 @@ namespace UI.DungeonMapScene
         // 전투가 끝나거나 처음 시작할 때 호출
         void ResetEncounterSteps()
         {
-            // 15 ~ 30 사이의 랜덤한 걸음 수를 지정
             stepsUntilNextBattle = UnityEngine.Random.Range(minSteps, maxSteps);
+            _initialSteps = stepsUntilNextBattle;
+            
             Debug.Log($"다음 전투까지 {stepsUntilNextBattle} 걸음 남음");
+            
+            // UI 및 애니메이션 초기화
+            UpdateEncounterUI();
         }
 
         // 플레이어가 한 칸 이동할 때마다 호출 (Move 함수 내부)
         private void OnStepTaken()
         {
             stepsUntilNextBattle--;
+            
+            // 걸을 때마다 게이지와 깜빡임 속도 갱신
+            UpdateEncounterUI();
 
             if (stepsUntilNextBattle <= 0)
             {
@@ -2325,14 +2341,49 @@ namespace UI.DungeonMapScene
             }
         }
 
+        void UpdateEncounterUI()
+        {
+            if (dangerSlider == null || fillImage == null) return;
+
+            // 현재 위험도 비율 계산 (0.0 ~ 1.0)
+            float ratio = 1.0f - ((float)stepsUntilNextBattle / _initialSteps);
+            ratio = Mathf.Clamp01(ratio);
+
+            // 텍스트 갱신
+            if (dangerText != null) dangerText.text = $"DANGER: {ratio * 100f:F0}%";
+
+            // 슬라이더 색상 결정 (초록 -> 노랑 -> 빨강)
+            Color baseColor = (ratio < 0.5f) 
+                ? Color.Lerp(safeColor, warningColor, ratio * 2f) 
+                : Color.Lerp(warningColor, dangerColor, (ratio - 0.5f) * 2f);
+            
+            fillImage.color = baseColor;
+
+            _pulseTween?.Kill();
+
+            dangerSlider.value = 0f;
+
+            // 안전함(0%) -> 1초 (천천히 차오름)
+            // 위험함(100%) -> 0.1초 (빠르게 펌프질)
+            float duration = Mathf.Lerp(1f, 0.1f, ratio);
+
+            if (ratio > 0.01f)
+            {
+                _pulseTween = dangerSlider.DOValue(ratio, duration)
+                    .SetLoops(-1, LoopType.Yoyo)
+                    .SetEase(Ease.InOutSine);
+            }
+            else
+            {
+                dangerSlider.value = 0f;
+            }
+        }
+
         void TriggerEncounter()
         {
-            Debug.Log("적 출현!");
+            _pulseTween?.Kill();
             
-            // DungeonStateManager에게 전투 개시 명령
             DungeonStateManager.Instance.StartEncounter(currentTheme.monsterList);
-
-            // 카운터 리셋 (전투 끝나고 돌아왔을 때를 위해)
             ResetEncounterSteps();
         }
     }

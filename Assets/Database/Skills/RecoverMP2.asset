@@ -16,10 +16,12 @@ MonoBehaviour:
   dataName: "\uB9AC\uCEE4\uBC84 MP 2"
   description: "MP\uB97C \uC911 \uD68C\uBCF5"
   icon: {fileID: 0}
-  effectType: 0
+  effectType: 14
   effectValue: 10
   element: 6
   targetScope: 7
+  actionDelay: 0
+  effectPrefab: {fileID: 0}
   useHpCost: 0
   costValue: 10
   hitRate: 0
