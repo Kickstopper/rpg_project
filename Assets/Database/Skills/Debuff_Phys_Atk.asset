@@ -19,7 +19,9 @@ MonoBehaviour:
   effectType: 5
   effectValue: 0
   element: 6
-  targetScope: 10
+  targetScope: 1
+  actionDelay: 0
+  effectPrefab: {fileID: 0}
   useHpCost: 0
   costValue: 10
   hitRate: 0

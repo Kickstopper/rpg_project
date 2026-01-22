@@ -6,17 +6,21 @@ public enum ElementType { Physical, Fire, Ice, Elec, Force, Havoc, None }
 // 행동 범위
 public enum TargetScope 
 { 
-    FrontSingle,        // 전열 1명 지정
-    AnySingle,          // 전열/후열 1명 지정
-    FrontRandom,        // 전열 랜덤 (1~N회)
-    AnyRandom,          // 전체 랜덤 (1~N회)
-    FrontAll,           // 전열 전체
-    AnyAll,             // 적 전체
-    Self,               // 자신 (버프 등)
-    OneAlly,            // 아군 1명
-    AllAllies,          // 아군 전체
-    DeadAlly,           // 죽은 아군
-    OneEnemy,           // 적 1명
+    // --- [적 대상] ---
+    FrontSingle,        // 전열 적 1명 지정
+    AnySingle,          // 전체 적 중 1명 지정 (OneEnemy 통합)
+    
+    FrontRandom,        // 전열 적 랜덤 (다단 히트 등)
+    AnyRandom,          // 전체 적 랜덤 (다단 히트 등)
+    
+    FrontAll,           // 전열 적 전체 (광역기)
+    AnyAll,             // 전체 적 전체 (광역기)
+
+    // --- [아군 대상] ---
+    Self,               // 사용자 자신
+    OneAlly,            // 아군 1명 (회복, 버프)
+    AllAllies,          // 아군 전체 (광역 힐/버프)
+    DeadAlly,           // 죽은 아군 (부활)
 }
 
 public enum EffectType 

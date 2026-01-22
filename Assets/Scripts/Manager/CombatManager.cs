@@ -757,16 +757,27 @@ namespace Manager
 
             TargetScope scope = item.targetScope;
 
-            if (scope == TargetScope.OneEnemy || scope == TargetScope.OneAlly || scope == TargetScope.DeadAlly)
-                StartItemTargetSelection(scope);
+            // 대상을 직접 찍어야 하는 경우만 StartItemTargetSelection 호출
+            if (scope == TargetScope.AnySingle || scope == TargetScope.OneAlly || scope == TargetScope.DeadAlly || scope == TargetScope.FrontSingle)
+            {
+                StartItemTargetSelection(scope); 
+            }
             else
+            {
+                // AllAllies, Self, FrontAll, AnyAll 등은 대상 선택 없이 즉시 사용 예약
+                
+                // 아이템 선택 키 입력이 다음 턴의 명령 선택(Attack 등)으로 이어지지 않도록 쿨타임 부여
+                inputCooldown = 0.2f; 
+
+                // 이때 target은 null로 전달되지만, 수정한 HandleItemAction이 scope를 보고 대상을 찾음
                 QueuePolymorphicAction(null); 
+            }
         }
 
         void StartItemTargetSelection(TargetScope scope)
         {
             validTargets.Clear();
-            if (scope == TargetScope.OneEnemy)
+            if (scope == TargetScope.AnySingle)
                 validTargets.AddRange(activeMonsters.Where(m => m != null && m.currentHp > 0));
             else if (scope == TargetScope.OneAlly) 
                 validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp > 0));
@@ -1287,6 +1298,7 @@ namespace Manager
 
         void HandleTargetSelectionInput()
         {
+            // 1. 취소 및 확정 입력 처리
             bool isCancel = (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape));
             if (isCancel || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
@@ -1296,13 +1308,9 @@ namespace Manager
                     if (isCancel) 
                     {
                         if (currentSelectedAction == CombatAction.ActionType.Union_Attack)
-                        {
                             CancelUnionSelection();
-                        }
                         else
-                        {
                             CancelTargetSelection();   
-                        }
                     }
                     else 
                     {
@@ -1312,22 +1320,63 @@ namespace Manager
                 return;
             }
 
+            // 2. 방향키 이동 로직
             BattleEntity currentEntity = validTargets[currentTargetIndex];
-            Transform targetFrontContainer = (validTargets.Count > 0 && validTargets[0] is PlayerController) ? playerFrontRowContainer : enemyFrontRowContainer;
-            bool isCurrentFront = (currentEntity.transform.parent.parent == targetFrontContainer);
             
-            int currentCol = currentEntity.columnIndex;
+            // 타겟 그룹 판별 (플레이어 대상인지 몬스터 대상인지)
+            Transform targetFrontContainer = (validTargets.Count > 0 && validTargets[0] is PlayerController) ? playerFrontRowContainer : enemyFrontRowContainer;
+            
+            // 현재 타겟이 전열에 있는지 확인
+            bool isCurrentInFront = (currentEntity.transform.parent.parent == targetFrontContainer);
+
+            // 현재 행(Row)과 다른 행(Row)의 타겟 리스트 분리
+            var currentRowTargets = validTargets.Where(m => (m.transform.parent.parent == targetFrontContainer) == isCurrentInFront)
+                                                .OrderBy(m => m.columnIndex).ToList();
+            
+            var otherRowTargets = validTargets.Where(m => (m.transform.parent.parent == targetFrontContainer) != isCurrentInFront)
+                                              .OrderBy(m => m.columnIndex).ToList();
+
             BattleEntity nextEntity = null;
             bool moved = false;
 
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { nextEntity = FindEntityInRow(targetFrontContainer, isCurrentFront, currentCol, -1); moved = true; }
-            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { nextEntity = FindEntityInRow(targetFrontContainer, isCurrentFront, currentCol, 1); moved = true; }
-            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) { if (isCurrentFront) { moved = true; nextEntity = FindClosestEntityInRow(targetFrontContainer, false, currentCol); } }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) { if (!isCurrentFront) { moved = true; nextEntity = FindClosestEntityInRow(targetFrontContainer, true, currentCol); } }
-            
-            if (nextEntity != null)
+            // 좌우 키: 같은 행 내에서 순환
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
-                if (moved) SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                int idx = currentRowTargets.IndexOf(currentEntity);
+                idx--;
+                if (idx < 0) idx = currentRowTargets.Count - 1; 
+                nextEntity = currentRowTargets[idx];
+                moved = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            {
+                int idx = currentRowTargets.IndexOf(currentEntity);
+                idx++;
+                if (idx >= currentRowTargets.Count) idx = 0;
+                nextEntity = currentRowTargets[idx];
+                moved = true;
+            }
+            // 상하 키: 행 교체 (같은 열 위치 유지)
+            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || 
+                     Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                if (otherRowTargets.Count > 0)
+                {
+                    // 인덱스를 3으로 나눈 나머지(% 3)를 비교하여 같은 열(왼쪽끼리, 중앙끼리, 오른쪽끼리)을 우선적으로 찾음
+                    int currentNormalizedCol = currentEntity.columnIndex % 3;
+
+                    nextEntity = otherRowTargets
+                        .OrderBy(t => Mathf.Abs((t.columnIndex % 3) - currentNormalizedCol))
+                        .First();
+                        
+                    moved = true;
+                }
+            }
+            
+            // 3. 포커스 변경 적용
+            if (moved && nextEntity != null)
+            {
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                 currentTargetIndex = validTargets.IndexOf(nextEntity);
                 UpdateTargetHighlight();
             }
@@ -1524,24 +1573,81 @@ namespace Manager
             logText.SetText(string.Empty);
         }
 
-        IEnumerator HandleSkillAction(CombatAction action)
-        {
-            SkillData skill = action.itemData as SkillData; 
-            GameObject target = action.target;
-            PlayerController actor = action.actor.GetComponent<PlayerController>();
-
-            if (actor != null && skill != null && !skill.useHpCost) actor.currentMp -= skill.costValue;
-            Debug.Log($"{action.actor.name}의 스킬 발동: {skill.dataName}");
-            ApplyItemEffect(target, skill); 
-            yield return wait05;
-        }
-
         IEnumerator HandleItemAction(CombatAction action)
         {
             BaseRootData item = action.itemData;
-            GameObject target = action.target;
-            Debug.Log($"{action.actor.name}의 아이템 사용: {item.dataName}");
-            ApplyItemEffect(target, item);
+            
+            // TargetScope에 따라 다중 타겟 가져오기
+            // (QueuePolymorphicAction에서 target을 null로 보냈어도 여기서 찾음)
+            TargetScope scope = (item != null) ? item.targetScope : TargetScope.OneAlly;
+            List<GameObject> targets = GetTargetsByScope(scope, action);
+
+            ShowLog($"{action.actor.name}의 아이템 사용: {item.dataName} (대상: {targets.Count}명)");
+
+            // 모든 대상에게 효과 적용
+            foreach (var target in targets)
+            {
+                ApplyItemEffect(target, item);
+                // 공격 스킬인 경우 피격 모션/이펙트 처리
+                if (item.effectType == EffectType.Special_Atk || item.effectType == EffectType.Magic_Atk)
+                {
+                    // 데미지/이펙트 처리는 ApplyItemEffect 내부 혹은 별도 로직이 필요할 수 있음
+                    // 여기서는 ApplyItemEffect가 데미지를 주는 경우(Special_Atk 등)를 포함한다고 가정
+                    SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
+                    SpawnVFX(vfxMagicPrefab, target.transform.position);
+                }
+                else if (item.effectType == EffectType.Recover_HP || item.effectType == EffectType.Recover_MP ||
+                         item.effectType == EffectType.Revive_Empty ||item.effectType == EffectType.Revive_Fully)
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
+                    SpawnVFX(vfxMagicPrefab, target.transform.position);
+                }
+            }
+            
+            yield return wait05;
+        }
+
+        IEnumerator HandleSkillAction(CombatAction action)
+        {
+            // [스킬 타겟 자동 변경 로직]
+            if (action.target == null || !IsAlive(action.target))
+            {
+                action.target = FindNearestLivingTarget(action.actor);
+                if (action.target == null) yield break; // 대상 없으면 취소
+            }
+
+            SkillData skill = action.itemData as SkillData; 
+            PlayerController actor = action.actor.GetComponent<PlayerController>();
+
+            // 비용 지불 (MP)
+            if (actor != null && skill != null && !skill.useHpCost) actor.currentMp -= skill.costValue;
+            
+            // 다중 타겟 처리
+            TargetScope scope = (skill != null) ? skill.targetScope : TargetScope.FrontSingle;
+            List<GameObject> targets = GetTargetsByScope(scope, action);
+
+            ShowLog($"{action.actor.name}의 스킬 발동: {skill.dataName} (대상: {targets.Count}명)");
+
+            foreach (var target in targets)
+            {
+                ApplyItemEffect(target, skill);
+                
+                // 공격 스킬인 경우 피격 모션/이펙트 처리
+                if (skill.effectType == EffectType.Special_Atk || skill.effectType == EffectType.Magic_Atk)
+                {
+                    // 데미지/이펙트 처리는 ApplyItemEffect 내부 혹은 별도 로직이 필요할 수 있음
+                    // 여기서는 ApplyItemEffect가 데미지를 주는 경우(Special_Atk 등)를 포함한다고 가정
+                    SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
+                    SpawnVFX(vfxMagicPrefab, target.transform.position);
+                }
+                else if (skill.effectType == EffectType.Recover_HP || skill.effectType == EffectType.Recover_MP ||
+                         skill.effectType == EffectType.Revive_Empty ||skill.effectType == EffectType.Revive_Fully)
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
+                    SpawnVFX(vfxMagicPrefab, target.transform.position);
+                }
+            }
+
             yield return wait05;
         }
 
@@ -1578,7 +1684,7 @@ namespace Manager
                 if (action.target == null)
                 {
                     Debug.Log("Union Attack 취소: 유효한 타겟 없음");
-                    ShowLog("Target Lost...");
+                    ShowLog("유효한 타겟 없음");
                     currentUnionParticipants.Clear(); 
                     yield return wait05;
                     yield break;
@@ -1611,7 +1717,7 @@ namespace Manager
             // 파트너 부족 시 취소 (본인 포함 2명 이상이어야 함)
             if (partners.Count < 2) 
             {
-                ShowLog("Union Attack Failed...");
+                ShowLog("협동 공격 실패!");
                 currentUnionParticipants.Clear(); 
                 yield break;
             }
@@ -1639,7 +1745,7 @@ namespace Manager
             // 2. 애니메이션: 타겟 앞으로 모이기
             GameObject target = action.target;
             Vector3 targetBasePos = target.transform.position;
-            Vector3 rallyPoint = targetBasePos + new Vector3(0, -1.0f, 0); 
+            Vector3 rallyPoint = targetBasePos + new Vector3(0, -2.0f, 0); 
 
             Dictionary<PlayerController, Vector3> originPositions = new Dictionary<PlayerController, Vector3>();
             Sequence moveSeq = DOTween.Sequence();
@@ -1647,7 +1753,7 @@ namespace Manager
             foreach (var p in partners)
             {
                 originPositions[p] = p.transform.position; 
-                Vector3 randomOffset = new Vector3(Random.Range(-1f, 1f), Random.Range(-0.5f, 0.5f), 0);
+                Vector3 randomOffset = new Vector3(Random.Range(-0.5f, 0.5f), 0, 0);
                 moveSeq.Join(p.transform.DOMove(rallyPoint + randomOffset, 0.3f).SetEase(Ease.OutBack));
             }
             yield return moveSeq.WaitForCompletion();
@@ -1858,6 +1964,30 @@ namespace Manager
 
         IEnumerator HandleAttackAction(CombatAction action)
         {
+            // =========================================================
+            // 타겟 자동 변경(Retargeting) 로직
+            // =========================================================
+            // 타겟이 없거나 이미 죽은 상태라면?
+            if (action.target == null || !IsAlive(action.target))
+            {
+                // 가장 가까운 살아있는 적을 찾는다
+                GameObject newTarget = FindNearestLivingTarget(action.actor);
+
+                if (newTarget != null)
+                {
+                    // 타겟 변경
+                    action.target = newTarget;
+                    // (선택사항) 로그에 타겟 변경 알림
+                    // ShowLog("Target Changed!"); 
+                }
+                else
+                {
+                    // 더 이상 공격할 적이 없다면 공격 중단
+                    yield break;
+                }
+            }
+            // =========================================================
+
             GetWeaponInfo(action, out int minHits, out int maxHits, out TargetScope scope);
             bool isPlayer = (action.actor.GetComponent<PlayerController>() != null);
             bool isMonster = (action.actor.GetComponent<MonsterController>() != null);
@@ -2041,6 +2171,9 @@ namespace Manager
 
         void ApplyDamage(GameObject target, int damage, bool isCritical)
         {
+            // 1. 타겟이 없거나, 비활성화 상태라면 아무것도 하지 않고 리턴
+            if (target == null || !target.activeInHierarchy) return;
+
             var entity = target.GetComponent<BattleEntity>();
             if (entity != null)
             {
@@ -2075,26 +2208,15 @@ namespace Manager
         {
             List<GameObject> targets = new List<GameObject>();
             var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
-            bool targetFrontOnly = (scope == TargetScope.FrontSingle || scope == TargetScope.FrontRandom || scope == TargetScope.FrontAll);
-            
-            if (scope == TargetScope.FrontSingle || scope == TargetScope.AnySingle)
+            var livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList(); // 아군 생존자
+
+            // 1. 단일 지정 (이미 타겟이 정해진 경우)
+            if (scope == TargetScope.FrontSingle || scope == TargetScope.AnySingle || 
+                scope == TargetScope.OneAlly || scope == TargetScope.DeadAlly)
             {
-                if (action.target != null && IsAlive(action.target)) targets.Add(action.target);
-                else
-                {
-                    var newTargetObj = FindNearestLivingTarget(action.actor);
-                    if (newTargetObj != null)
-                    {
-                        bool isValid = true;
-                        if (targetFrontOnly)
-                        {
-                            bool isFront = (newTargetObj.transform.parent.parent == enemyFrontRowContainer);
-                            if (!isFront) isValid = false; 
-                        }
-                        if (isValid) { action.target = newTargetObj; targets.Add(newTargetObj); }
-                    }
-                }
+                if (action.target != null) targets.Add(action.target);
             }
+            // 2. 적 랜덤 / 전체
             else if (scope == TargetScope.FrontRandom || scope == TargetScope.AnyRandom)
             {
                 List<GameObject> candidates = new List<GameObject>();
@@ -2114,8 +2236,20 @@ namespace Manager
                     if (scope == TargetScope.FrontAll && !isFront) continue;
                     targets.Add(m.gameObject);
                 }
-                if (scope == TargetScope.FrontAll && targets.Count == 0) targets.AddRange(livingMonsters.Select(m => m.gameObject)); 
+                if (scope == TargetScope.FrontAll && targets.Count == 0) targets.AddRange(livingMonsters.Select(m => m.gameObject));
             }
+            // 3. 아군 관련 타겟 (AllAllies, Self 등)
+            else if (scope == TargetScope.AllAllies)
+            {
+                // 아군 전체 추가
+                foreach (var p in livingPlayers) targets.Add(p.gameObject);
+            }
+            else if (scope == TargetScope.Self)
+            {
+                // 사용자 자신
+                if (action.actor != null) targets.Add(action.actor);
+            }
+            
             return targets;
         }
 

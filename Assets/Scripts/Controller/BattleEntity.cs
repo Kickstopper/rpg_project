@@ -56,6 +56,9 @@ namespace Controller
         // 피격 시 흔들림 연출 (두 클래스에서 완전히 동일한 코드)
         public void TriggerHitShake(bool isCritical)
         {
+            // 오브젝트가 꺼져있으면 코루틴을 시작하지 않음
+            if (!gameObject.activeInHierarchy) return;
+
             StopCoroutine("ProcessHitShake");
             float magnitude = isCritical ? critShakeMagnitude : normalShakeMagnitude;
             float duration = isCritical ? critShakeDuration : normalShakeDuration;
