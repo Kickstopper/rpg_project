@@ -1251,6 +1251,10 @@ namespace UI.DungeonMapScene
 
         private void CreateScreen()
         {
+            //최초 1회 페이드인
+            fadeOverlay.alpha = 1;
+            fadeOverlay.DOFade(0f, 3f);
+
             Vector2 pos = Vector2.zero;
             backgroundImage.transform.localPosition = pos;
             

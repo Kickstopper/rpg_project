@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using Manager;
 using System.Collections;
 using System.Collections.Generic;
 namespace Controller 
@@ -9,6 +8,7 @@ namespace Controller
     public static class GameScene
     {
         public const string TITLE_SCENE = "TitleScene";
+        public const string WORLD_MAP_SCENE = "WorldMapScene";
         public const string DUNGEON_MAP_SCENE = "DungeonMapScene";
     }
 
@@ -89,9 +89,8 @@ namespace Controller
 
         public void OnClickNewGame()
         {
-            LevelManager.Instance.LoadLevelFromJson("cave_f1");
             // TODO: 캐릭터 생성 씬 또는 오프닝 씬으로 이동
-            SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
+            SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
         }
 
         public void OnClickLoadGame()

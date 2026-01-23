@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/TitleScene.unity
     guid: 15ad07a1224f5394ebfe370ee862ce3b
   - enabled: 1
+    path: Assets/Scenes/WorldMapScene.unity
+    guid: 230e2e0e0648c2d4086d57fa6c0efc86
+  - enabled: 1
     path: Assets/Scenes/DungeonMapScene.unity
     guid: 53a27defb29d64150a45b32280f29b1e
   m_configObjects: {}
