@@ -44,6 +44,15 @@ namespace Data
         Dungeon_8,
         Dungeon_9,
         Dungeon_10,
+        Dungeon_11,
+        Dungeon_12,
+        Dungeon_13,
+        Dungeon_14,
+        Dungeon_15,
+        Dungeon_16,
+        Dungeon_17,
+        Dungeon_18,
+        WorldMap,
     }
 
     [CreateAssetMenu(fileName = "AudioLibrary", menuName = "Audio/AudioLibrary")]
