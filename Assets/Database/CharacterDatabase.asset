@@ -17,6 +17,7 @@ MonoBehaviour:
     name: "\uB098\uBB38\uD76C"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
+    align: 2
     stats:
       level: 1
       str: 1
@@ -65,13 +66,14 @@ MonoBehaviour:
     name: "\uACE0\uB450\uC2EC"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
+    align: 2
     stats:
-      level: 1
+      level: 2
       str: 1
       mag: 1
       intel: 1
       vit: 1
-      agi: 1
+      agi: 5
       luc: 1
     resistances:
       physical: 0
@@ -89,13 +91,14 @@ MonoBehaviour:
     name: "\uAE40\uD61C\uC790"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
+    align: 5
     stats:
       level: 1
       str: 1
       mag: 1
       intel: 1
       vit: 1
-      agi: 1
+      agi: 5
       luc: 1
     resistances:
       physical: 0
@@ -113,6 +116,7 @@ MonoBehaviour:
     name: "\uC724\uC5EC\uC625"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
+    align: 6
     stats:
       level: 1
       str: 1
@@ -137,6 +141,7 @@ MonoBehaviour:
     name: "\uAE40\uC601\uC625"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
+    align: 8
     stats:
       level: 1
       str: 1
@@ -161,6 +166,7 @@ MonoBehaviour:
     name: "\uAE40\uC218\uBBF8"
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
+    align: 9
     stats:
       level: 1
       str: 1
@@ -185,6 +191,7 @@ MonoBehaviour:
     name: P6
     portraitImage: {fileID: 21300000, guid: de3b970acb33b374d9ab84c2ccfd9d39, type: 3}
     standingImage: {fileID: 21300000, guid: b3ec6733117635647bf811957034913c, type: 3}
+    align: 7
     stats:
       level: 1
       str: 1

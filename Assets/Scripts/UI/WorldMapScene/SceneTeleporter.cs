@@ -51,7 +51,7 @@ namespace UI.WorldMapScene
                     // (선택) 텍스트 내용 변경: "지하 1층 던전(으)로 이동 (Space)"
                     if (messageText != null)
                     {
-                        messageText.text = $"{locationName}(으)로 이동\nOK?";
+                        messageText.text = $"-{locationName} 입구-\n이동 OK?";
                     }
                 }
             }

@@ -18,6 +18,7 @@ namespace Controller
         public Slider hpSlider;       // HP 게이지
         public Slider mpSlider;       // SP 게이지
         public TextMeshProUGUI nameText;         // 이름 텍스트
+        public TextMeshProUGUI alignText;        // 성향
 
         [Header("Runtime Data")]
         public CharacterDatabase.CharacterEntry sourceData; 
@@ -108,6 +109,8 @@ namespace Controller
             
             nameText.text = data.name;
             nameText.alignment = TextAlignmentOptions.TopLeft;
+
+            alignText.text = GetAlignString(align);
             
             level = data.stats.level;
 
@@ -130,6 +133,36 @@ namespace Controller
             // 3. 방어구 장착
             equippedArmorIds = new List<string>(data.initialArmorIds);
             RefreshArmorStats();
+        }
+
+        private string GetAlignString(Align align)
+        {
+            switch(align)
+            {
+                case Align.Chaotic_Evil:
+                    return "C/E";
+                case Align.Chaotic_Neutral:
+                    return "C/N";
+                case Align.Chaotic_Good:
+                    return "C/G";
+
+                case Align.Lawful_Evil:
+                    return "L/E";
+                case Align.Lawful_Neutral:
+                    return "L/N";
+                case Align.Lawful_Good:
+                    return "L/G";
+
+                case Align.Neutral_Evil:
+                    return "N/E";
+                case Align.True_Neutral:
+                    return "T/N";
+                case Align.Neutral_Good:
+                    return "N/G";
+                
+                default:
+                    return "None";
+            }
         }
 
         // 회복 함수
@@ -336,6 +369,7 @@ namespace Controller
                 mpSlider.gameObject.SetActive(false);
                 nameText.text = "EMPTY";
                 nameText.alignment = TextAlignmentOptions.Center;
+                alignText.text = string.Empty;
                 portraitImage.gameObject.SetActive(false);
             }
             else
