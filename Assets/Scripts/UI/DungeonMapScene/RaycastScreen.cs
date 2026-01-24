@@ -502,7 +502,7 @@ namespace UI.DungeonMapScene
         {
             if (newState == GameState.Exploration)
             {
-                screenContainer.transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutQuart).OnComplete(() =>
+                screenContainer.transform.DOScale(Vector3.one, 0.1f).SetEase(Ease.OutQuart).OnComplete(() =>
                 {
                     screenContainer.transform.localScale = Vector3.one;
                     // 탐험 모드: 렌더링 재개

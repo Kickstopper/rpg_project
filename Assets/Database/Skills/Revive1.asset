@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Revive1
   m_EditorClassIdentifier: 
   id: skl_019
-  dataName: "\uB9AC\uBC14\uC774\uBE0C"
+  dataName: "\uBD80\uD65C"
   description: "\uC544\uAD70 1\uBA85\uC744 \uBD80\uD65C\uC2DC\uD0B5\uB2C8\uB2E4"
   icon: {fileID: 0}
   effectType: 15

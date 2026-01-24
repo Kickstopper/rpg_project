@@ -156,7 +156,7 @@ namespace Controller
                 case Align.Neutral_Evil:
                     return "N/E";
                 case Align.True_Neutral:
-                    return "T/N";
+                    return "T.N.";
                 case Align.Neutral_Good:
                     return "N/G";
                 

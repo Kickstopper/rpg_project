@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: ReflectMagic
   m_EditorClassIdentifier: 
   id: item_001
-  dataName: "\uB9C8\uBC29\uACBD"
-  description: "\uB9C8\uBC95\uC744 \uBC18\uC0AC\uBC18\uC0AC"
+  dataName: "\uC9C4\uAD34\uBD80"
+  description: "\uC544\uCE5C\uCE74\uC774"
   icon: {fileID: 0}
   effectType: 10
   effectValue: 11
   element: 6
   targetScope: 7
+  actionDelay: 0
+  effectPrefab: {fileID: 0}
   price: 0
   isSellable: 1
-  effectPrefab: {fileID: 0}

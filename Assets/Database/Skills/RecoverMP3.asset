@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RecoverMP3
   m_EditorClassIdentifier: 
   id: skl_016
-  dataName: "\uB9AC\uCEE4\uBC84 MP 3"
+  dataName: "\uD68C\uBCF5 MP 3"
   description: "MP\uB97C \uB300 \uD68C\uBCF5"
   icon: {fileID: 0}
   effectType: 14

@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: RecoverHP1
   m_EditorClassIdentifier: 
   id: skl_011
-  dataName: "\uB9AC\uCEE4\uBC84 HP 1"
+  dataName: "\uD68C\uBCF5 HP 1"
   description: "HP\uB97C \uC18C \uD68C\uBCF5"
   icon: {fileID: 0}
   effectType: 13
   effectValue: 10
   element: 6
   targetScope: 7
+  actionDelay: 0
+  effectPrefab: {fileID: 0}
   useHpCost: 0
   costValue: 10
   hitRate: 0

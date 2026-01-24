@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RecoverMP2
   m_EditorClassIdentifier: 
   id: skl_015
-  dataName: "\uB9AC\uCEE4\uBC84 MP 2"
+  dataName: "\uD68C\uBCF5 MP 2"
   description: "MP\uB97C \uC911 \uD68C\uBCF5"
   icon: {fileID: 0}
   effectType: 14

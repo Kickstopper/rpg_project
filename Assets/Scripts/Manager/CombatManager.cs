@@ -2124,7 +2124,7 @@ namespace Manager
 
             if (CheckReflection(target, action.type))
             {
-                ShowLog("Reflect!");
+                ShowLog("반사!");
                 SpawnVFX(vfxReflectPrefab, target.transform.position);
                 int reflectDmg = CalculateDamage(action.actor, action.actor, action, false, 1.0f);
                 ApplyDamage(action.actor, reflectDmg, false); 
@@ -2133,7 +2133,7 @@ namespace Manager
 
             if (CheckAbsorption(target, action.type))
             {
-                ShowLog("Absorb!");
+                ShowLog("흡수!");
                 SpawnVFX(vfxAbsorbPrefab, target.transform.position);
                 int absorbAmount = CalculateDamage(action.actor, target, action, false, 1.0f);
                 var targetEntity = target.GetComponent<BattleEntity>();
@@ -2150,7 +2150,7 @@ namespace Manager
                     bool isCrit = CheckCritical(action.actor, target, action);
                     int originalDamage = CalculateDamage(action.actor, target, action, isCrit, posDmgMult);
                     int splitDamage = Mathf.Max(1, originalDamage / defenders.Count);
-                    ShowLog("Covered!");
+                    ShowLog("방어!");
                     foreach (var defender in defenders)
                     {
                         ApplyDamage(defender.gameObject, splitDamage, false);
@@ -2727,8 +2727,8 @@ namespace Manager
             if (commandPanel) commandPanel.SetActive(false);
             if (logPanel) logPanel.SetActive(true);
 
-            if (isWin) { logText.text = "VICTORY!\n(Press Space Key)"; SoundManager.Instance.PlayBGM(BgmID.Victory); }
-            else logText.text = "You Lose\n(Press Space Key)";
+            if (isWin) { logText.text = "승리는 나의 것!"; SoundManager.Instance.PlayBGM(BgmID.Victory); }
+            else logText.text = "패배는 너의 것!";
 
             yield return wait05;
             while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return)) yield return null;
