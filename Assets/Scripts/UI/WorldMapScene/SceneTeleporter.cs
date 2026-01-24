@@ -88,7 +88,7 @@ namespace UI.WorldMapScene
                 if (moveScript != null) moveScript.enabled = false;
 
                 var rb = player.GetComponent<Rigidbody>();
-                if (rb != null) rb.velocity = Vector3.zero;
+                if (rb != null) rb.linearVelocity = Vector3.zero;
             }
 
             // 페이드 아웃 코루틴 시작

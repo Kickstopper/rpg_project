@@ -166,7 +166,7 @@ namespace UI.MapEditorScene
 
         void UpdateVisualizer()
         {
-            EditorGridVisualizer visualizer = FindObjectOfType<EditorGridVisualizer>();
+            EditorGridVisualizer visualizer = FindFirstObjectByType<EditorGridVisualizer>();
             if (visualizer != null)
             {
                 visualizer.mapData = this.mapData; // 데이터 동기화
@@ -311,7 +311,7 @@ namespace UI.MapEditorScene
         // 선택된 좌표만 Visualizer에게 전달하는 함수
         void UpdateVisualizerSelection(int x, int y)
         {
-            EditorGridVisualizer visualizer = FindObjectOfType<EditorGridVisualizer>();
+            EditorGridVisualizer visualizer = FindFirstObjectByType<EditorGridVisualizer>();
             if (visualizer != null)
             {
                 // 좌표 전달
