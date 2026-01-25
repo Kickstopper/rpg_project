@@ -545,7 +545,13 @@ namespace Manager
                 switch (cmd.type)
                 {
                     case CommandType.Attack: isActive = true; break;
-                    case CommandType.Gun:    isActive = actor.CanShootGun(); break;
+                    case CommandType.Gun:
+                        isActive = actor.CanShootGun() && actor.currentGunAmmo > 0;  // Gun: 총이 있고 && 탄환이 1발 이상이어야 함
+                        break;
+                        
+                    case CommandType.Reload:
+                        isActive = (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits); // Reload: 총이 있고 && 탄환이 꽉 차지 않았을 때
+                        break;
                     case CommandType.Skill:  isActive = (actor.learnedSkillIds.Count > 0); break;
                     case CommandType.Item:   isActive = (InventoryManager.Instance.GetAllItemIds().Count > 0); break;
                     case CommandType.Move:   isActive = true; break;
@@ -672,6 +678,24 @@ namespace Manager
                 return;
             }
             PrepareWeaponAction(actor.currentGun, CombatAction.ActionType.Gun);
+        }
+
+        public void OnFightCommand_Reload()
+        {
+            inputCooldown = 0.2f;
+
+            PlayerController currentActor = activePlayers[currentPlayerIndex] as PlayerController;
+            int speed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty; // 일반 속도
+
+            CombatAction action = new CombatAction(
+                currentActor.gameObject, 
+                currentActor.gameObject, 
+                CombatAction.ActionType.Reload,
+                speed
+            );
+
+            actionQueue.Add(action);
+            NextPlayerInput();
         }
 
         public void OnFightCommand_Next()
@@ -1591,6 +1615,7 @@ namespace Manager
 
                 case CombatAction.ActionType.Attack:
                 case CombatAction.ActionType.Gun:        yield return HandleAttackAction(action); break;
+                case CombatAction.ActionType.Reload:     yield return HandleReloadAction(action); break;
 
                 case CombatAction.ActionType.Union_Attack: yield return HandleUnionAttack(action); break;
                 case CombatAction.ActionType.Last_Stand: yield return HandleLastStandAction(action); break;
@@ -1994,6 +2019,25 @@ namespace Manager
             else if (actor.TryGetComponent(out MonsterController mc)) mc.isGuarding = state;
         }
 
+        // 장전 코루틴
+        IEnumerator HandleReloadAction(CombatAction action)
+        {
+            PlayerController actor = action.actor.GetComponent<PlayerController>();
+            if (actor != null && actor.currentGun != null)
+            {
+                // 탄환 최대치로 충전
+                actor.currentGunAmmo = actor.currentGun.maxHits;
+                
+                ShowLog("RELOADED FULL AMMO!");
+                // SoundManager.Instance.PlaySFX(SfxID.Reload); // 장전 효과음
+                
+                // 간단한 연출 위로 살짝 뛰기
+                yield return actor.transform.DOLocalMoveY(10f, 0.2f).SetLoops(2, LoopType.Yoyo).WaitForCompletion();
+            }
+            yield return wait05;
+            if (logPanel) logPanel.SetActive(false);
+        }
+
         IEnumerator HandleAttackAction(CombatAction action)
         {
             // =========================================================
@@ -2040,7 +2084,21 @@ namespace Manager
 
             // 2. 타격 처리 (QTE or Auto)
             int currentHits = 0;
-            
+
+            PlayerController pc = action.actor.GetComponent<PlayerController>();
+            bool isGunAction = (action.type == CombatAction.ActionType.Gun && pc != null);
+            if (isGunAction)
+            {
+                // 현재 탄환보다 더 많이 쏠 수 없음
+                maxHits = Mathf.Min(maxHits, pc.currentGunAmmo);
+                // 최소 타격 수도 탄환 수에 맞춰 조정 (탄환이 1발이면 최소 1발)
+                minHits = Mathf.Min(minHits, maxHits);
+                
+                Debug.Log($"[Gun] 잔여 탄환: {pc.currentGunAmmo}, 발사 가능: {maxHits}");
+            }
+
+            int hitsPerformed = 0; // 실제로 수행한 타격 수 카운트
+
             if (isPlayer && !isAutoMode && maxHits > 0 && minHits < maxHits)
             {
                 if (qteTimingSlider)
@@ -2065,6 +2123,7 @@ namespace Manager
                         if (currentTargets.Count == 0) break;
                         foreach (var target in currentTargets) StartCoroutine(ProcessSingleHit(action, target));
                         currentHits++;
+                        hitsPerformed++; // 실제 발사 수 증가
                         BattleEntity actorEntity = action.actor.GetComponent<BattleEntity>();
                         if (actorEntity) actorEntity.nextTurnSpeedPenalty += 500;
                         if (logPanel) logText.text = $"Combo! ({currentHits}/{maxHits})";
@@ -2077,8 +2136,15 @@ namespace Manager
             }
             
             int autoHitCount = 0;
-            if (!isPlayer || isAutoMode) autoHitCount = Random.Range(minHits, maxHits + 1);
-            else if (minHits - currentHits > 0) autoHitCount = minHits - currentHits;
+            if (!isPlayer || isAutoMode) 
+            {
+                // 랜덤 범위도 탄환 수 안에서 결정됨 (위에서 maxHits를 clamp 했으므로)
+                autoHitCount = Random.Range(minHits, maxHits + 1);
+            }
+            else if (minHits - currentHits > 0) 
+            {
+                autoHitCount = minHits - currentHits;
+            }
             
             for (int i = 0; i < autoHitCount; i++)
             {
@@ -2089,8 +2155,17 @@ namespace Manager
                     SoundManager.Instance.PlaySFX(SfxID.Attack_Gun); 
                     yield return StartCoroutine(ProcessSingleHit(action, target));
                 }
+                hitsPerformed++; // 실제 발사 수 증가
                 yield return wait01;
                 if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll) break;
+            }
+
+            // 탄환 차감 적용
+            if (isGunAction)
+            {
+                pc.currentGunAmmo -= hitsPerformed;
+                if (pc.currentGunAmmo < 0) pc.currentGunAmmo = 0;
+                Debug.Log($"[Gun] 사격 종료. 남은 탄환: {pc.currentGunAmmo}");
             }
 
             // 3. 복귀

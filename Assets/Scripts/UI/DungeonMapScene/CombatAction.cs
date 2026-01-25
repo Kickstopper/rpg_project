@@ -8,7 +8,7 @@ namespace UI.DungeonMapScene
         public GameObject actor;    // 행동하는 사람 (아군 or 적)
         public GameObject target;   // 맞는 사람
         
-        public enum ActionType { Attack, Gun, Skill, Item, Move, Guard, Union_Attack, Last_Stand, Next }
+        public enum ActionType { Attack, Gun, Reload, Skill, Item, Move, Guard, Union_Attack, Last_Stand, Next }
         public ActionType type;
 
         // 스킬이나 아이템일 경우 상세 데이터

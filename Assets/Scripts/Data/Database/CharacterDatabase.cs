@@ -10,6 +10,8 @@ namespace Data.Database
         {
             public string id;
             public string name;
+
+            public bool isCommander;
             
             [Header("Visual")]
             public Sprite portraitImage;

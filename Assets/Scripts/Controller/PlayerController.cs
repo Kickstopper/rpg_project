@@ -19,7 +19,7 @@ namespace Controller
         public Slider mpSlider;       // SP 게이지
         public TextMeshProUGUI nameText;         // 이름 텍스트
         public TextMeshProUGUI alignText;        // 성향
-
+        
         [Header("Runtime Data")]
         public CharacterDatabase.CharacterEntry sourceData; 
 
@@ -37,6 +37,9 @@ namespace Controller
         public WeaponData currentWeapon; // 근접 무기 데이터
         public WeaponData currentGun;    // 총 데이터
         public AmmoData currentAmmo;     // 총알 데이터
+
+        public int currentGunAmmo = 0; // 현재 탄환 수
+
         private List<ArmorData> currentArmors = new List<ArmorData>();
         
         // 상태 이상 (Status Effect)
@@ -44,6 +47,8 @@ namespace Controller
 
         // 현재 위치 (전열/후열) - 전투 매니저가 세팅해줌
         public RowType currentRow; 
+
+        public bool isCommander;
 
         // [BattleEntity 구현] 스탯 반환 (레벨 및 장비 보정 포함)
         public override int GetTotalStr() => sourceData.stats.str + level; 
@@ -62,11 +67,17 @@ namespace Controller
 
             align = Align.None;
 
+            isCommander = false;
+
             currentHp = 0;
             currentMp = 0;
+
             currentWeapon = null;
-            currentAmmo = null;
+            
             currentGun = null;
+            currentAmmo = null;
+            currentGunAmmo = 0;
+            
             learnedSkillIds.Clear();
             equippedArmorIds.Clear();
             RefreshArmorStats();
@@ -91,7 +102,9 @@ namespace Controller
             entityName = data.name;
             
             align = data.align;
-            
+
+            isCommander = data.isCommander;
+
             // HP/MP 설정
             maxHp = data.maxHp;
             maxMp = data.maxMp;
@@ -282,6 +295,8 @@ namespace Controller
                 currentAmmo = DatabaseManager.Instance.GetAmmo(ammoId);
             else
                 currentAmmo = null;
+            
+            if (currentGun != null) currentGunAmmo = currentGun.maxHits;
         }
 
         public void RefreshArmorStats()
