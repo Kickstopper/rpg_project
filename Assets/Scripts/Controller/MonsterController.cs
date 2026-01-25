@@ -233,13 +233,13 @@ namespace Controller
                 
                 // 방어 행동 생성 (속도 보정 +2000)
                 int guardSpeed = sourceData.stats.agi + 2000;
-                return new CombatAction(this.gameObject, this.gameObject, CombatAction.ActionType.Guard, guardSpeed);
+                return new CombatAction(this.gameObject, this.gameObject, UI.ActionType.Guard, guardSpeed);
             }
 
             // 기본 공격 로직
             BattleEntity target = players[Random.Range(0, players.Count)];
             int speed = sourceData.stats.agi + Random.Range(0, 5);
-            return new CombatAction(this.gameObject, target.gameObject, CombatAction.ActionType.Attack, speed);
+            return new CombatAction(this.gameObject, target.gameObject, UI.ActionType.Attack, speed);
         }
 
         // [BattleEntity 구현] 데미지 처리

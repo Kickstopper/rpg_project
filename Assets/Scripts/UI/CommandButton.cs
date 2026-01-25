@@ -3,10 +3,19 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    public enum CommandType { Attack, Gun, Reload, Skill, Item, Move, Guard, Union_Attack, Last_Stand, Next }
+    public enum ActionType { 
+        Attack, 
+        Shoot, Reload, 
+        Skill, 
+        Item, Move, Guard, Next,
+        Union_Attack, Last_Stand,
+        Menu_Gun,     // Gun ▶ (Shoot, Reload)
+        Menu_Extra,   // Extra ▶ (Item, Move, Guard, Next)
+        Menu_Tactics  // Tactics ▶ (Union, Last_Stand)
+    }
     public class CommandButton : MonoBehaviour
     {
-        public CommandType type; // 인스펙터에서 설정
+        public ActionType type; // 인스펙터에서 설정
         public Button button;
 
         void Awake()

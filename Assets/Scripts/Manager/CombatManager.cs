@@ -23,10 +23,10 @@ namespace Manager
         [Header("UI References")]
         public GameObject baseCmdContainer;   // 1단계 메뉴 (Fight, Talk...)
         public GameObject fightCmdContainer;  // 2단계 메뉴 (Attack, Move...)
-        public RectTransform btnContainer; //fightCmdContainer의 버튼이 붙는 트랜스폼
+        public RectTransform btnContainer; //fightCmdContainer의 버튼이 붙는 트랜스폼 (Inspector 할당)
+        public GameObject subMenuContainer; // 서브 메뉴 패널 오브젝트 (Inspector 할당)
         public List<Button> baseButtons; 
         public List<CommandButton> allFightButtons;
-
         public BattleSkillUIController battleSkillUI; // 인스펙터에서 할당
         public BattleItemUIController battleItemUI; // 인스펙터에서 할당
         public GameObject commandPanel;     // 커맨드 버튼들
@@ -42,6 +42,12 @@ namespace Manager
         private List<Button> activeFightButtons = new List<Button>();
         private int currentFightBtnIndex = 0; // fight 메뉴용 인덱스
         private int currentBaseBtnIndex = 0;  // Base 메뉴용 인덱스
+
+        // 메뉴 계층 관리 변수
+        private bool isSubMenuActive = false; // 현재 서브 메뉴가 열려있는지
+        private List<Button> currentMenuButtons = new List<Button>(); // 현재 화면에 표시/조작 중인 버튼 리스트
+        
+        private List<Button> cachedMainMenuButtons = new List<Button>(); // 메인 메뉴 버튼들을 임시 저장할 리스트 (서브 메뉴에서 돌아올 때 복구용)
 
         [Header("Prefabs")]
         public GameObject defaultMonsterPrefab;
@@ -100,7 +106,7 @@ namespace Manager
         private bool reserveAutoOff = false;
         
         // 각 캐릭터(인덱스)가 마지막으로 수행한 행동 타입 저장
-        private Dictionary<int, (CombatAction.ActionType type, BaseRootData data, GameObject target)> lastPlayerActions = new();
+        private Dictionary<int, (ActionType type, BaseRootData data, GameObject target)> lastPlayerActions = new();
         // -------------------------------------------------------
         // [핵심 변수] 전투 상태 및 리스트
         // -------------------------------------------------------
@@ -116,7 +122,7 @@ namespace Manager
 
         // 입력 제어용 변수
         private int currentPlayerIndex = 0; // 지금 누구 차례?
-        private CombatAction.ActionType currentSelectedAction;
+        private ActionType currentSelectedAction;
         private bool isSelectingTarget = false;
 
         // 위치 정보를 반환하는 구조체
@@ -238,13 +244,13 @@ namespace Manager
             PreparePlayerTurn();
         }
 
-        private void PrepareWeaponAction(WeaponData weapon, CombatAction.ActionType actionType)
+        private void PrepareWeaponAction(WeaponData weapon, ActionType actionType)
         {
             BattleEntity currentActor = activePlayers[currentPlayerIndex];
             TargetScope scope = TargetScope.FrontSingle; 
             
             if (weapon != null) scope = weapon.attackRange;
-            else if (actionType == CombatAction.ActionType.Gun) return; 
+            else if (actionType == ActionType.Shoot) return; 
 
             if (scope == TargetScope.FrontSingle || scope == TargetScope.AnySingle)
             {
@@ -490,119 +496,305 @@ namespace Manager
             }
         }
 
-        void RefreshCommandButtons(PlayerController actor)
+        private bool CheckUnionAttackCondition(PlayerController actor)
         {
-            activeFightButtons.Clear();
-
-            // 1. Union Attack 조건 체크
             List<PlayerController> unionPartners = GetValidUnionPartners(actor);
-            bool canUnion = !isUnionAttackUsedThisTurn && (unionPartners.Count >= 2);
+            return !isUnionAttackUsedThisTurn && (unionPartners.Count >= 2);
+        }
 
-            // =========================================================
-            // Last Stand 조건 체크
-            // 1. 현재 캐릭터가 전열에 있어야 함
-            // 2. 전열의 첫 번째 행동 순서여야 함
-            // 3. 전열에 살아있는 캐릭터가 3명(만석)이어야 함
-            // =========================================================
-            
+        private bool CheckLastStandCondition(PlayerController actor)
+        {
             bool isFrontRow = (actor.columnIndex < 3);
-
-            // A. 내가 이번 턴 전열의 첫 번째 행동자인지 확인
             bool isFirstFrontRowInput = true;
-            for (int i = 0; i < currentPlayerIndex; i++)
-            {
-                if (activePlayers[i] is PlayerController prevPlayer)
-                {
-                    if (prevPlayer.currentHp > 0 && prevPlayer.columnIndex < 3)
-                    {
-                        isFirstFrontRowInput = false;
-                        break;
+            for (int i = 0; i < currentPlayerIndex; i++) {
+                 if (activePlayers[i] is PlayerController prevPlayer) {
+                    if (prevPlayer.currentHp > 0 && prevPlayer.columnIndex < 3) {
+                        isFirstFrontRowInput = false; break;
                     }
                 }
             }
+            int frontLivingCount = allSlotControllers.Take(3).Count(p => p != null && !p.IsEmpty && p.currentHp > 0);
+            
+            return isFrontRow && isFirstFrontRowInput && (frontLivingCount == 3);
+        }
 
-            // B. 전열 생존자 수 카운트
-            int frontLivingCount = 0;
-            // allSlotControllers의 0, 1, 2번 인덱스가 전열입니다.
-            for (int i = 0; i < 3; i++)
+        // 메인 메뉴 버튼 갱신 및 순서 정렬
+        void RefreshCommandButtons(PlayerController actor)
+        {
+            foreach (var btn in allFightButtons)
             {
-                PlayerController pc = allSlotControllers[i];
-                // 캐릭터가 존재하고, 빈 슬롯이 아니며, 살아있어야 함
-                if (pc != null && !pc.IsEmpty && pc.currentHp > 0)
-                {
-                    frontLivingCount++;
-                }
+                btn.transform.SetParent(btnContainer, false); 
+                btn.gameObject.SetActive(false);
             }
 
-            // 최종 조건: 전열임 && 첫 순서임 && 전열이 꽉 참(3명)
-            bool canLastStand = isFrontRow && isFirstFrontRowInput && (frontLivingCount == 3);
+            // 1. 기존 리스트 초기화
+            allFightButtons.ForEach(btn => btn.gameObject.SetActive(false));
+            activeFightButtons.Clear(); 
             
-            // =========================================================
+            // 2. 각 버튼의 활성화 조건 계산
+            
+            // Skill 조건: 배운 스킬이 있어야 함
+            bool canSkill = actor.learnedSkillIds.Count > 0;
 
-            foreach (CommandButton cmd in allFightButtons)
+            // Gun 메뉴 조건: 쏘거나 장전할 수 있어야 함
+            bool canShoot = actor.CanShootGun() && actor.currentGunAmmo > 0;
+            bool canReload = (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits);
+            bool showGunMenu = canShoot || canReload;
+
+            // Extra 메뉴 조건: 아이템이 있거나, 이동/방어/대기(항상 가능) 중 하나라도 가능하면
+            bool canItem = (InventoryManager.Instance.GetAllItemIds().Count > 0);
+            bool showExtraMenu = canItem || true; // Move, Guard, Next는 항상 가능하므로 true
+
+            // Tactics 메뉴 조건: 협동 공격이나 배수진이 가능해야 함
+            bool canUnion = CheckUnionAttackCondition(actor);
+            bool canLastStand = CheckLastStandCondition(actor);
+            bool showTacticsMenu = canUnion || canLastStand;
+
+            // ---------------------------------------------------------
+            // 3. 메인 메뉴 버튼 등록 (순서 중요: Attack > Skill > Gun > Extra > Tactics)
+            // ---------------------------------------------------------
+            
+            // 1. Attack
+            AddButtonToActiveList(ActionType.Attack, true);
+
+            // 2. Skill (Main Menu에 표시)
+            AddButtonToActiveList(ActionType.Skill, canSkill);
+
+            // 3. Gun Menu ▶ (Shoot, Reload)
+            AddButtonToActiveList(ActionType.Menu_Gun, showGunMenu);//, "Gun 〉"); 
+
+            // 4. Extra Menu ▶ (Item, Move, Guard, Next)
+            AddButtonToActiveList(ActionType.Menu_Extra, showExtraMenu);//, "Extra 〉"); 
+
+            // 5. Tactics Menu ▶ (Union, LastStand)
+            AddButtonToActiveList(ActionType.Menu_Tactics, showTacticsMenu);//, "Tactics 〉"); 
+
+            // ---------------------------------------------------------
+            // 4. UI 갱신 준비
+            // ---------------------------------------------------------
+            cachedMainMenuButtons = new List<Button>(activeFightButtons);
+            currentMenuButtons = activeFightButtons;
+            isSubMenuActive = false;
+
+            if (subMenuContainer) 
             {
-                bool isActive = false;
-                switch (cmd.type)
-                {
-                    case CommandType.Attack: isActive = true; break;
-                    case CommandType.Gun:
-                        isActive = actor.CanShootGun() && actor.currentGunAmmo > 0;  // Gun: 총이 있고 && 탄환이 1발 이상이어야 함
-                        break;
-                        
-                    case CommandType.Reload:
-                        isActive = (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits); // Reload: 총이 있고 && 탄환이 꽉 차지 않았을 때
-                        break;
-                    case CommandType.Skill:  isActive = (actor.learnedSkillIds.Count > 0); break;
-                    case CommandType.Item:   isActive = (InventoryManager.Instance.GetAllItemIds().Count > 0); break;
-                    case CommandType.Move:   isActive = true; break;
-                    case CommandType.Guard:  isActive = true; break;
-                    
-                    case CommandType.Union_Attack: isActive = canUnion; break;
-                    case CommandType.Last_Stand:   isActive = canLastStand; break; // 조건 적용
-                    case CommandType.Next:         isActive = true; break;
-                    
-                    default: isActive = true; break;
-                }
+                subMenuContainer.SetActive(false);
+                // 초기화 시점에는 부모 무시 옵션 꺼둠
+                SetContainerInteractable(subMenuContainer, false, false); 
+            }
+            
+            SetContainerInteractable(fightCmdContainer, true);
 
-                cmd.gameObject.SetActive(isActive);
+            ResizeContainer(btnContainer, currentMenuButtons.Count);
+            
+            currentFightBtnIndex = 0;
+        }
+        
+        // 버튼 추가 헬퍼 함수
+        void AddButtonToActiveList(ActionType type, bool isActive, string customLabel = null)
+        {
+            CommandButton cmdBtn = allFightButtons.Find(b => b.type == type);
+            if (cmdBtn != null)
+            {
+                cmdBtn.gameObject.SetActive(isActive);
                 if (isActive)
                 {
-                    Button btn = cmd.button;
+                    // "▶" 라벨 등 텍스트 변경이 필요하면 여기서 처리
+                    if (customLabel != null) 
+                    {
+                        TextMeshProUGUI btnText = cmdBtn.GetComponentInChildren<TextMeshProUGUI>();
+                        if (btnText) btnText.text = customLabel;
+                    }
+                    
+                    // 네비게이션 끄기
+                    Button btn = cmdBtn.button;
                     Navigation nav = btn.navigation;
                     nav.mode = Navigation.Mode.None;
                     btn.navigation = nav;
+
                     activeFightButtons.Add(btn);
                 }
             }
-
-            if (btnContainer != null)
+        }
+        
+        // 공식: (버튼 개수 * 30) + 10
+        void ResizeContainer(RectTransform container, int count)
+        {
+            if (container != null)
             {
-                float newHeight = 60f + (activeFightButtons.Count * 30f);
-                btnContainer.sizeDelta = new Vector2(btnContainer.sizeDelta.x, newHeight);
+                float newHeight = (count * 30f) + 10f;
+                container.sizeDelta = new Vector2(container.sizeDelta.x, newHeight);
             }
-            currentFightBtnIndex = 0;
         }
 
         void HandleCommandInput()
         {
+            // 1. 공통 취소/뒤로가기 입력
             if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                if (isFightMode)
+                
+                // 서브 메뉴가 열려있다면 메인 메뉴로 돌아감
+                if (isSubMenuActive)
                 {
-                    if (currentPlayerIndex == 0) ShowBaseMenu();
-                    else GoToPreviousPlayer();
+                    CloseSubMenu();
                 }
                 else
                 {
-                    if (actionQueue.Count > 0 || currentPlayerIndex > 0) GoToPreviousPlayer();
+                    // 메인 메뉴라면 이전 캐릭터로
+                    if (isFightMode)
+                    {
+                        if (currentPlayerIndex == 0) ShowBaseMenu();
+                        else GoToPreviousPlayer();
+                    }
+                    else
+                    {
+                        if (actionQueue.Count > 0 || currentPlayerIndex > 0) GoToPreviousPlayer();
+                    }
                 }
                 return;
             }
+            
+            // 왼쪽 키: 서브 메뉴 닫기 (취소와 동일 효과)
+            if (isSubMenuActive && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)))
+            {
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                CloseSubMenu();
+                return;
+            }
 
-            if (isFightMode) HandleMenuNavigation(activeFightButtons, ref currentFightBtnIndex);
-            else HandleMenuNavigation(baseButtons, ref currentBaseBtnIndex);
+            // 메뉴 네비게이션 처리
+            if (isFightMode) 
+            {
+                // currentMenuButtons 리스트를 사용하여 네비게이션
+                HandleMenuNavigation(currentMenuButtons, ref currentFightBtnIndex);
+                
+                // 오른쪽 키: 서브 메뉴 진입 (확인 키와 동일 효과 - 단, 메뉴 타입일 때만)
+                if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+                {
+                    Button currentBtn = currentMenuButtons[currentFightBtnIndex];
+                    CommandButton cmdBtn = currentBtn.GetComponent<CommandButton>();
+                    
+                    // 현재 포커스된 버튼이 '메뉴 진입용' 버튼이면 실행(진입)
+                    if (cmdBtn.type == ActionType.Menu_Gun || 
+                        cmdBtn.type == ActionType.Menu_Extra || 
+                        cmdBtn.type == ActionType.Menu_Tactics)
+                    {
+                        currentBtn.onClick.Invoke();
+                        return;
+                    }
+                }
+            }
+            else 
+            {
+                HandleMenuNavigation(baseButtons, ref currentBaseBtnIndex);
+            }
         }
+
+        // 서브 메뉴 진입
+        void OpenSubMenu(ActionType menuType)
+        {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+
+            // 1. 메인 메뉴 인터랙션 비활성화
+            SetContainerInteractable(fightCmdContainer, false);
+
+            // 2. 서브 메뉴 리스트 구성
+            List<Button> subButtons = new List<Button>();
+            
+            if (menuType == ActionType.Menu_Gun)
+            {
+                bool canShoot = actor.CanShootGun() && actor.currentGunAmmo > 0;
+                bool canReload = (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits);
+                AddSubButton(ActionType.Shoot, canShoot, subButtons); 
+                AddSubButton(ActionType.Reload, canReload, subButtons);
+            }
+            else if (menuType == ActionType.Menu_Extra)
+            {
+                bool canItem = (InventoryManager.Instance.GetAllItemIds().Count > 0);
+                AddSubButton(ActionType.Item, canItem, subButtons);
+                AddSubButton(ActionType.Move, true, subButtons);
+                AddSubButton(ActionType.Guard, true, subButtons);
+                AddSubButton(ActionType.Next, true, subButtons);
+            }
+            else if (menuType == ActionType.Menu_Tactics)
+            {
+                bool canUnion = CheckUnionAttackCondition(actor);
+                bool canLastStand = CheckLastStandCondition(actor); 
+                AddSubButton(ActionType.Union_Attack, canUnion, subButtons);
+                AddSubButton(ActionType.Last_Stand, canLastStand, subButtons);
+            }
+
+            // 3. 서브 메뉴 버튼들을 별도 패널로 이동 및 활성화
+            if (subMenuContainer != null)
+            {
+                subMenuContainer.SetActive(true);
+                
+                // 서브 메뉴 패널을 강제로 인터랙션 가능하게 설정 (부모 무시)
+                SetContainerInteractable(subMenuContainer, true, true);
+
+                foreach (var btn in subButtons)
+                {
+                    btn.transform.SetParent(subMenuContainer.transform, false);
+                    btn.gameObject.SetActive(true);
+                }
+                
+                ResizeContainer(subMenuContainer.GetComponent<RectTransform>(), subButtons.Count);
+            }
+
+            // 4. 상태 전환
+            currentMenuButtons = subButtons;
+            isSubMenuActive = true;
+            currentFightBtnIndex = 0;
+            
+            if (currentMenuButtons.Count > 0) StartCoroutine(SelectButtonDelayed(currentMenuButtons, 0));
+        }
+
+        // 서브 메뉴 버튼 추가 헬퍼
+        void AddSubButton(ActionType type, bool isActive, List<Button> list)
+        {
+            CommandButton cmdBtn = allFightButtons.Find(b => b.type == type);
+            if (cmdBtn != null)
+            {
+                cmdBtn.gameObject.SetActive(isActive);
+                if (isActive) list.Add(cmdBtn.button);
+            }
+        }
+
+        // 서브 메뉴 닫기 (메인 메뉴로 복귀)
+        void CloseSubMenu()
+        {
+            inputCooldown = 0.2f;
+
+            // 1. 서브 메뉴 버튼들 정리
+            if (subMenuContainer != null)
+            {
+                foreach (var btn in currentMenuButtons)
+                {
+                    btn.transform.SetParent(btnContainer, false);
+                    btn.gameObject.SetActive(false);
+                }
+                subMenuContainer.SetActive(false);
+            }
+
+            // 2. 메인 메뉴 활성화
+            SetContainerInteractable(fightCmdContainer, true);
+
+            // 3. 상태 복구
+            currentMenuButtons = cachedMainMenuButtons;
+            isSubMenuActive = false;
+            
+            // 메인 메뉴 컨테이너(btnContainer) 리사이징 (복구)
+            ResizeContainer(btnContainer, currentMenuButtons.Count);
+            
+            // 4. 인덱스 복구 및 포커스
+            currentFightBtnIndex = lastMainIndex; 
+            StartCoroutine(SelectButtonDelayed(currentMenuButtons, currentFightBtnIndex));
+        }
+        
+        // 메인 메뉴 인덱스 기억용 변수
+        private int lastMainIndex = 0;
 
         void HandleMenuNavigation(List<Button> currentList, ref int currentIndex)
         {
@@ -662,13 +854,34 @@ namespace Manager
             NextPlayerInput();
         }
 
+        public void OnFightCommand_Menu_Gun() 
+        { 
+            inputCooldown = 0.2f;
+            lastMainIndex = currentFightBtnIndex; // 현재 메인 메뉴 위치 기억
+            OpenSubMenu(ActionType.Menu_Gun); 
+        }
+        
+        public void OnFightCommand_Menu_Extra() 
+        { 
+            inputCooldown = 0.2f;
+            lastMainIndex = currentFightBtnIndex;
+            OpenSubMenu(ActionType.Menu_Extra); 
+        }
+        
+        public void OnFightCommand_Menu_Tactics() 
+        {
+            inputCooldown = 0.2f;
+            lastMainIndex = currentFightBtnIndex;
+            OpenSubMenu(ActionType.Menu_Tactics); 
+        }
+
         public void OnFightCommand_Attack()
         {
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
-            PrepareWeaponAction(actor.currentWeapon, CombatAction.ActionType.Attack);
+            PrepareWeaponAction(actor.currentWeapon, ActionType.Attack);
         }
 
-        public void OnFightCommand_Gun()
+        public void OnFightCommand_shoot()
         {
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
             if (!actor.CanShootGun())
@@ -677,7 +890,7 @@ namespace Manager
                 if (logPanel) { logPanel.SetActive(true); logText.text = "CANNOT USE GUN\n(Need Gun & Ammo)"; }
                 return;
             }
-            PrepareWeaponAction(actor.currentGun, CombatAction.ActionType.Gun);
+            PrepareWeaponAction(actor.currentGun, ActionType.Shoot);
         }
 
         public void OnFightCommand_Reload()
@@ -690,7 +903,7 @@ namespace Manager
             CombatAction action = new CombatAction(
                 currentActor.gameObject, 
                 currentActor.gameObject, 
-                CombatAction.ActionType.Reload,
+                ActionType.Reload,
                 speed
             );
 
@@ -713,7 +926,7 @@ namespace Manager
             CombatAction action = new CombatAction(
                 currentActor.gameObject, 
                 currentActor.gameObject, 
-                CombatAction.ActionType.Next, 
+                ActionType.Next, 
                 currentSpeed
             );
 
@@ -762,22 +975,24 @@ namespace Manager
             StartCoroutine(SelectButton(attackButton)); 
         }
 
-        void SetContainerInteractable(GameObject container, bool isInteractable)
+        void SetContainerInteractable(GameObject container, bool isInteractable, bool ignoreParent = false)
         {
             if (container == null) return;
+            
             CanvasGroup group = container.GetComponent<CanvasGroup>();
-            if (group != null)
-            {
-                group.interactable = isInteractable;
-                group.blocksRaycasts = isInteractable; 
-            }
+            // CanvasGroup이 없으면 자동으로 추가
+            if (group == null) group = container.AddComponent<CanvasGroup>();
+
+            group.interactable = isInteractable;
+            group.blocksRaycasts = isInteractable;
+            group.ignoreParentGroups = ignoreParent; // 부모의 설정 무시 여부
         }
 
         public void OnPopupItemSelected(BaseRootData item)
         {
             currentSelectedItem = item;
-            if (item is SkillData) currentSelectedAction = CombatAction.ActionType.Skill;
-            else if (item is ConsumableItemData) currentSelectedAction = CombatAction.ActionType.Item;
+            if (item is SkillData) currentSelectedAction = ActionType.Skill;
+            else if (item is ConsumableItemData) currentSelectedAction = ActionType.Item;
 
             TargetScope scope = item.targetScope;
 
@@ -815,7 +1030,7 @@ namespace Manager
             }
             
             isSelectingTarget = true;
-            currentSelectedAction = CombatAction.ActionType.Item;
+            currentSelectedAction = ActionType.Item;
             currentTargetIndex = 0; 
             UpdateTargetHighlight();
             inputCooldown = 0.2f;
@@ -857,7 +1072,7 @@ namespace Manager
             int guardSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
             currentActor.nextTurnSpeedPenalty = 0; 
 
-            CombatAction action = new CombatAction(currentActor.gameObject, currentActor.gameObject, CombatAction.ActionType.Guard, guardSpeed);
+            CombatAction action = new CombatAction(currentActor.gameObject, currentActor.gameObject, ActionType.Guard, guardSpeed);
             actionQueue.Add(action);
             NextPlayerInput();
         }
@@ -886,7 +1101,7 @@ namespace Manager
 
             // 3. 타겟 선택 시작 (전열 몬스터만 선택 가능하게 하거나, 전체 선택)
             // 조건: "전열의 몬스터 타겟을 하나 선택"
-            currentSelectedAction = CombatAction.ActionType.Union_Attack;
+            currentSelectedAction = ActionType.Union_Attack;
             StartUnionTargetSelection();
         }
 
@@ -940,7 +1155,7 @@ namespace Manager
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             PlayerController leader = activePlayers[currentPlayerIndex] as PlayerController;
 
-            CombatAction leaderAction = new CombatAction(leader.gameObject, leader.gameObject, CombatAction.ActionType.Last_Stand, 9999);
+            CombatAction leaderAction = new CombatAction(leader.gameObject, leader.gameObject, ActionType.Last_Stand, 9999);
             actionQueue.Add(leaderAction);
 
             isLastStandInputMode = true;
@@ -977,27 +1192,27 @@ namespace Manager
                 // 3. 행동 타입에 따른 분기 처리
                 
                 // --- A. Union Attack 취소 ---
-                if (lastAction.type == CombatAction.ActionType.Union_Attack)
+                if (lastAction.type == ActionType.Union_Attack)
                 {
                     Debug.Log("Union Attack 원본 취소됨: 상태 초기화");
                     isUnionAttackUsedThisTurn = false;
                     currentUnionParticipants.Clear();
                     keepRemoving = false; // 원본을 지웠으니 정지
                 }
-                else if (lastAction.type == CombatAction.ActionType.Guard && currentUnionParticipants.Contains(actor))
+                else if (lastAction.type == ActionType.Guard && currentUnionParticipants.Contains(actor))
                 {
                     // Union 참가자의 자동 방어 -> 계속 뒤로
                     keepRemoving = true; 
                 }
                 
                 // --- B. Last Stand 취소 [신규 추가] ---
-                else if (lastAction.type == CombatAction.ActionType.Last_Stand)
+                else if (lastAction.type == ActionType.Last_Stand)
                 {
                     Debug.Log("Last Stand 원본 취소됨: 상태 초기화");
                     isLastStandInputMode = false; // 입력 스킵 모드 해제
                     keepRemoving = false; // 원본을 지웠으니 정지
                 }
-                else if (lastAction.type == CombatAction.ActionType.Guard && isLastStandInputMode && actor.columnIndex < 3)
+                else if (lastAction.type == ActionType.Guard && isLastStandInputMode && actor.columnIndex < 3)
                 {
                     // Last Stand 모드 중 전열 캐릭터의 방어 -> 자동 스킵된 행동이므로 계속 뒤로
                     Debug.Log($"Last Stand로 스킵된 {actor.name}의 행동 삭제");
@@ -1037,7 +1252,7 @@ namespace Manager
                 Debug.Log($"Union Attack 참가로 {currentPlayer.name}의 턴 스킵");
                 
                 // 대기 행동 추가 (방어 아님, 그냥 대기)
-                CombatAction skipAction = new CombatAction(currentPlayer.gameObject, currentPlayer.gameObject, CombatAction.ActionType.Guard, 0);
+                CombatAction skipAction = new CombatAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Guard, 0);
                 actionQueue.Add(skipAction);
                 
                 NextPlayerInput();
@@ -1046,7 +1261,7 @@ namespace Manager
 
             if (isLastStandInputMode && currentPlayer.columnIndex < 3)
             {
-                CombatAction supportAction = new CombatAction(currentPlayer.gameObject, currentPlayer.gameObject, CombatAction.ActionType.Guard, currentPlayer.GetTotalAgi() + 2000);
+                CombatAction supportAction = new CombatAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Guard, currentPlayer.GetTotalAgi() + 2000);
                 actionQueue.Add(supportAction);
                 NextPlayerInput(); 
                 return; 
@@ -1096,7 +1311,7 @@ namespace Manager
 
         void ProcessAutoAction(PlayerController actor)
         {
-            CombatAction.ActionType actionType = CombatAction.ActionType.Attack;
+            ActionType actionType = ActionType.Attack;
             BaseRootData autoData = null;
             GameObject autoTarget = null; // 저장된 타겟
 
@@ -1113,10 +1328,10 @@ namespace Manager
             TargetScope scope = TargetScope.FrontSingle; 
             switch (actionType)
             {
-                case CombatAction.ActionType.Attack: scope = (actor.currentWeapon != null) ? actor.currentWeapon.attackRange : TargetScope.FrontSingle; break;
-                case CombatAction.ActionType.Gun: scope = (actor.currentGun != null) ? actor.currentGun.attackRange : TargetScope.FrontSingle; break;
-                case CombatAction.ActionType.Skill:
-                case CombatAction.ActionType.Item: if (autoData != null) scope = autoData.targetScope; break;
+                case ActionType.Attack: scope = (actor.currentWeapon != null) ? actor.currentWeapon.attackRange : TargetScope.FrontSingle; break;
+                case ActionType.Shoot: scope = (actor.currentGun != null) ? actor.currentGun.attackRange : TargetScope.FrontSingle; break;
+                case ActionType.Skill:
+                case ActionType.Item: if (autoData != null) scope = autoData.targetScope; break;
             }
 
             // 타겟 결정
@@ -1224,7 +1439,7 @@ namespace Manager
                 int moveSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
                 currentActor.nextTurnSpeedPenalty = 0; 
 
-                CombatAction action = new CombatAction(currentActor.gameObject, targetSlot.gameObject, CombatAction.ActionType.Move, moveSpeed);
+                CombatAction action = new CombatAction(currentActor.gameObject, targetSlot.gameObject, ActionType.Move, moveSpeed);
                 actionQueue.Add(action);
 
                 isSelectingMoveTarget = false;
@@ -1363,7 +1578,7 @@ namespace Manager
                     validTargets[currentTargetIndex].SetSelectionState(false);
                     if (isCancel) 
                     {
-                        if (currentSelectedAction == CombatAction.ActionType.Union_Attack)
+                        if (currentSelectedAction == ActionType.Union_Attack)
                             CancelUnionSelection();
                         else
                             CancelTargetSelection();   
@@ -1469,7 +1684,7 @@ namespace Manager
         {
             if (!isSelectingTarget) return;
 
-            if (currentSelectedAction == CombatAction.ActionType.Union_Attack)
+            if (currentSelectedAction == ActionType.Union_Attack)
             {
                 StopBlinkEffects();
             }
@@ -1487,12 +1702,12 @@ namespace Manager
 
             CombatAction action = new CombatAction(actor.gameObject, targetEntity.gameObject, currentSelectedAction, finalSpeed); 
             
-            if (currentSelectedAction == CombatAction.ActionType.Union_Attack)
+            if (currentSelectedAction == ActionType.Union_Attack)
             {
                  action.speed = 9999; 
                  isUnionAttackUsedThisTurn = true;
             }
-            if (currentSelectedAction == CombatAction.ActionType.Item)
+            if (currentSelectedAction == ActionType.Item)
             {
                 action.itemData = currentSelectedItem; 
                 action.speed += 500; 
@@ -1582,13 +1797,13 @@ namespace Manager
             int baseDelay = 0;
             switch (action.type)
             {
-                case CombatAction.ActionType.Attack: baseDelay = 10; break;
-                case CombatAction.ActionType.Gun:    baseDelay = 15; break;
-                case CombatAction.ActionType.Guard:  baseDelay = 0; break;
-                case CombatAction.ActionType.Move:   baseDelay = 5; break;
-                case CombatAction.ActionType.Item:   baseDelay = (action.itemData != null) ? action.itemData.actionDelay : 20; break;
-                case CombatAction.ActionType.Skill:  baseDelay = (action.itemData != null) ? action.itemData.actionDelay : 30; break;
-                case CombatAction.ActionType.Next:   baseDelay = -50; break;
+                case ActionType.Attack: baseDelay = 10; break;
+                case ActionType.Shoot:    baseDelay = 15; break;
+                case ActionType.Guard:  baseDelay = 0; break;
+                case ActionType.Move:   baseDelay = 5; break;
+                case ActionType.Item:   baseDelay = (action.itemData != null) ? action.itemData.actionDelay : 20; break;
+                case ActionType.Skill:  baseDelay = (action.itemData != null) ? action.itemData.actionDelay : 30; break;
+                case ActionType.Next:   baseDelay = -50; break;
             }
             return baseDelay;
         }
@@ -1608,18 +1823,18 @@ namespace Manager
         {
             switch (action.type)
             {
-                case CombatAction.ActionType.Item:       yield return HandleItemAction(action); break;
-                case CombatAction.ActionType.Skill:      yield return HandleSkillAction(action); break;
-                case CombatAction.ActionType.Guard:      yield return HandleGuardAction(action); break;
-                case CombatAction.ActionType.Move:       yield return StartCoroutine(PerformMove(action)); break;
+                case ActionType.Item:       yield return HandleItemAction(action); break;
+                case ActionType.Skill:      yield return HandleSkillAction(action); break;
+                case ActionType.Guard:      yield return HandleGuardAction(action); break;
+                case ActionType.Move:       yield return StartCoroutine(PerformMove(action)); break;
 
-                case CombatAction.ActionType.Attack:
-                case CombatAction.ActionType.Gun:        yield return HandleAttackAction(action); break;
-                case CombatAction.ActionType.Reload:     yield return HandleReloadAction(action); break;
+                case ActionType.Attack:
+                case ActionType.Shoot:        yield return HandleAttackAction(action); break;
+                case ActionType.Reload:     yield return HandleReloadAction(action); break;
 
-                case CombatAction.ActionType.Union_Attack: yield return HandleUnionAttack(action); break;
-                case CombatAction.ActionType.Last_Stand: yield return HandleLastStandAction(action); break;
-                case CombatAction.ActionType.Next:
+                case ActionType.Union_Attack: yield return HandleUnionAttack(action); break;
+                case ActionType.Last_Stand: yield return HandleLastStandAction(action); break;
+                case ActionType.Next:
                     ShowLog($"{action.actor.name}은(는) 기회를 엿보고 있다...");
                     // 별도의 애니메이션 없이 짧게 대기
                     yield return wait05; 
@@ -1786,7 +2001,7 @@ namespace Manager
             {
                 if (p == leader) continue; 
 
-                bool hasNextAction = actionQueue.Any(a => a.actor == p.gameObject && a.type == CombatAction.ActionType.Next);
+                bool hasNextAction = actionQueue.Any(a => a.actor == p.gameObject && a.type == ActionType.Next);
                 
                 if (hasNextAction)
                 {
@@ -2068,7 +2283,33 @@ namespace Manager
             bool isPlayer = (action.actor.GetComponent<PlayerController>() != null);
             bool isMonster = (action.actor.GetComponent<MonsterController>() != null);
 
-            string actStr = (action.type == CombatAction.ActionType.Gun) ? "의 사격!" : "의 참격!";
+            PlayerController pc = action.actor.GetComponent<PlayerController>();
+            bool isGunAction = (action.type == ActionType.Shoot && pc != null);
+            if (isGunAction)
+            {
+                // 현재 탄환보다 더 많이 쏠 수 없음
+                maxHits = Mathf.Min(maxHits, pc.currentGunAmmo);
+                // 최소 타격 수도 탄환 수에 맞춰 조정 (탄환이 1발이면 최소 1발)
+                minHits = Mathf.Min(minHits, maxHits);
+                
+                Debug.Log($"[Gun] 잔여 탄환: {pc.currentGunAmmo}, 발사 가능: {maxHits}");
+                
+                // 탄환 부족 체크 및 메시지 출력
+                if (pc.currentGunAmmo <= 0)
+                {
+                    Debug.Log($"[Auto] {action.actor.name}: 탄환 부족으로 사격 실패");
+                    ShowLog($"{action.actor.name} 탄환 부족!\nReload 필요!");
+                    
+                    // 실패 효과음
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); 
+
+                    // 메시지를 읽을 시간을 주고 턴 종료 (공격 애니메이션 실행 X)
+                    yield return wait10; 
+                    yield break; 
+                }
+            }
+
+            string actStr = (action.type == ActionType.Shoot) ? "의 사격!" : "의 참격!";
             ShowLog($"{action.actor.name}{actStr}");
             yield return wait05;
 
@@ -2084,19 +2325,6 @@ namespace Manager
 
             // 2. 타격 처리 (QTE or Auto)
             int currentHits = 0;
-
-            PlayerController pc = action.actor.GetComponent<PlayerController>();
-            bool isGunAction = (action.type == CombatAction.ActionType.Gun && pc != null);
-            if (isGunAction)
-            {
-                // 현재 탄환보다 더 많이 쏠 수 없음
-                maxHits = Mathf.Min(maxHits, pc.currentGunAmmo);
-                // 최소 타격 수도 탄환 수에 맞춰 조정 (탄환이 1발이면 최소 1발)
-                minHits = Mathf.Min(minHits, maxHits);
-                
-                Debug.Log($"[Gun] 잔여 탄환: {pc.currentGunAmmo}, 발사 가능: {maxHits}");
-            }
-
             int hitsPerformed = 0; // 실제로 수행한 타격 수 카운트
 
             if (isPlayer && !isAutoMode && maxHits > 0 && minHits < maxHits)
@@ -2239,7 +2467,7 @@ namespace Manager
             bool isCritical = CheckCritical(action.actor, target, action);
             int damage = 0;
 
-            if (action.type == CombatAction.ActionType.Gun && action.actor.GetComponent<PlayerController>())
+            if (action.type == ActionType.Shoot && action.actor.GetComponent<PlayerController>())
                 damage = CalculateGunDamage(action.actor.GetComponent<PlayerController>(), target, isCritical);
             else
                 damage = CalculateDamage(action.actor, target, action, isCritical, posDmgMult);
@@ -2254,10 +2482,10 @@ namespace Manager
             {
                 var sfxId = SfxID.None;
                 GameObject vfxToSpawn = null;
-                if (action.type == CombatAction.ActionType.Attack) { sfxId = SfxID.Attack_Sword; vfxToSpawn = vfxSlashPrefab; }
-                else if (action.type == CombatAction.ActionType.Gun) { sfxId = SfxID.Attack_Gun; vfxToSpawn = vfxGunPrefab; }
-                else if (action.type == CombatAction.ActionType.Skill) { sfxId = SfxID.Attack_Magic; vfxToSpawn = vfxMagicPrefab; }
-                else if (action.type == CombatAction.ActionType.Item)
+                if (action.type == ActionType.Attack) { sfxId = SfxID.Attack_Sword; vfxToSpawn = vfxSlashPrefab; }
+                else if (action.type == ActionType.Shoot) { sfxId = SfxID.Attack_Gun; vfxToSpawn = vfxGunPrefab; }
+                else if (action.type == ActionType.Skill) { sfxId = SfxID.Attack_Magic; vfxToSpawn = vfxMagicPrefab; }
+                else if (action.type == ActionType.Item)
                 {
                     if (action.itemData.effectType == EffectType.Special_Atk || action.itemData.effectType == EffectType.Magic_Atk)
                     { sfxId = SfxID.Attack_Magic; vfxToSpawn = vfxMagicPrefab; }
@@ -2289,23 +2517,23 @@ namespace Manager
             }
         }
 
-        bool CheckAbsorption(GameObject target, CombatAction.ActionType type)
+        bool CheckAbsorption(GameObject target, ActionType type)
         {
             var entity = target.GetComponent<BattleEntity>();
             if (entity == null) return false;
-            bool isPhysical = (type == CombatAction.ActionType.Attack || type == CombatAction.ActionType.Gun);
-            bool isMagic = (type == CombatAction.ActionType.Skill); 
+            bool isPhysical = (type == ActionType.Attack || type == ActionType.Shoot);
+            bool isMagic = (type == ActionType.Skill); 
             if (isPhysical && entity.isPhysicalAbsorb) return true;
             if (isMagic && entity.isMagicAbsorb) return true;
             return false;
         }
 
-        bool CheckReflection(GameObject target, CombatAction.ActionType type)
+        bool CheckReflection(GameObject target, ActionType type)
         {
             var entity = target.GetComponent<BattleEntity>();
             if (entity == null) return false;
-            bool isPhysical = (type == CombatAction.ActionType.Attack || type == CombatAction.ActionType.Gun);
-            bool isMagic = (type == CombatAction.ActionType.Skill); 
+            bool isPhysical = (type == ActionType.Attack || type == ActionType.Shoot);
+            bool isMagic = (type == ActionType.Skill); 
             if (isPhysical && entity.isPhysicalReflect) return true;
             if (isMagic && entity.isMagicReflect) return true;
             return false;
@@ -2396,7 +2624,7 @@ namespace Manager
                 CombatAction reservedAction = actionQueue.Find(a => a.actor == p.gameObject);
 
                 // 조건: 행동이 아직 예약되지 않았거나(미행동), 예약된 행동이 'Next'인 경우만 가능
-                if (reservedAction == null || reservedAction.type == CombatAction.ActionType.Next)
+                if (reservedAction == null || reservedAction.type == ActionType.Next)
                 {
                     partners.Add(p);
                 }
@@ -2412,7 +2640,7 @@ namespace Manager
             min = 1; max = 1; scope = TargetScope.FrontSingle; 
             var pActor = action.actor.GetComponent<PlayerController>();
             WeaponData weapon = null;
-            if (pActor != null) weapon = (action.type == CombatAction.ActionType.Gun) ? pActor.currentGun : pActor.currentWeapon;
+            if (pActor != null) weapon = (action.type == ActionType.Shoot) ? pActor.currentGun : pActor.currentWeapon;
             if (weapon != null) { min = weapon.minHits; max = weapon.maxHits; scope = weapon.attackRange; }
         }
 
@@ -2665,7 +2893,7 @@ namespace Manager
             PlayerController pActor = attacker.GetComponent<PlayerController>();
             if (pActor != null)
             {
-                if (action.type == CombatAction.ActionType.Gun) wType = WeaponType.Gun;
+                if (action.type == ActionType.Shoot) wType = WeaponType.Gun;
                 else if (pActor.currentWeapon != null && pActor.currentWeapon.type == WeaponType.Gun) wType = WeaponType.Gun;
             }
 
@@ -2727,7 +2955,7 @@ namespace Manager
 
             int baseAtk = attacker.GetTotalStr(); 
             int skillPower = 0;
-            if (action.type == CombatAction.ActionType.Skill || action.type == CombatAction.ActionType.Item)
+            if (action.type == ActionType.Skill || action.type == ActionType.Item)
                 if (action.itemData != null) skillPower = action.itemData.effectValue; 
 
             int totalAtk = baseAtk + skillPower;
