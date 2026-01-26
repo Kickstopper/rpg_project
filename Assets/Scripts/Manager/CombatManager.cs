@@ -521,47 +521,43 @@ namespace Manager
         // Rolling Vulcan 발동 조건 검사
         bool CheckRollingVulcanCondition(PlayerController leader)
         {
-            // 조건 3: 첫 번째 행동 지정 상태 (Leader가 첫 번째 턴이어야 함)
+            // 조건 3: 첫 번째 행동 지정 상태
             if (currentPlayerIndex != 0) return false;
 
-            // 생존자 리스트 (파티원)
+            // 생존자 리스트 확인
             var livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
             int count = livingPlayers.Count;
 
-            // 조건 1-1: 4명 또는 6명 파티
-            if (count != 4 && count != 6) return false;
+            // 최소 인원 4명 이상이면 5명, 6명도 허용
+            if (count < 4) return false;
 
-            // 조건 2: 포메이션이 사각형 (전열/후열이 채워진 컬럼 수 확인)
-            int fullColumnPairCount = 0;
-            
-            for (int col = 0; col < 3; col++)
-            {
-                int frontIndex = col;      // 0, 1, 2
-                int backIndex = col + 3;   // 3, 4, 5
-
-                // 전열과 후열 슬롯에 캐릭터가 있고, 살아있는지 확인
-                bool hasFront = IsSlotActive(frontIndex);
-                bool hasBack = IsSlotActive(backIndex);
-
-                if (hasFront && hasBack) fullColumnPairCount++;
-            }
-
-            // 6명이면 3열 모두, 4명이면 2열이 꽉 차 있어야 "사각형"
-            if (count == 6 && fullColumnPairCount != 3) return false;
-            if (count == 4 && fullColumnPairCount != 2) return false;
-
-            // 조건 1-2: 장비(gun_099) 및 탄환(Max) 확인
+            // 조건 1-2: 모든 생존자가 장비(gun_099) 및 탄환(Max) 확인
             foreach (var p in livingPlayers)
             {
-                PlayerController pc = p as PlayerController;
-                // 총기 ID 확인
+                var pc = p as PlayerController;
                 if (pc.equippedGunId != "gun_000") return false;
-                
-                // 총 데이터가 있고, 탄환이 최대치인지 확인
                 if (pc.currentGun == null || pc.currentGunAmmo < pc.currentGun.maxHits) return false;
             }
 
-            return true;
+            // 조건 2: "인접한 두 열"이 꽉 찼는지 확인 (사각형 형성 여부)
+            // 0열(좌측), 1열(중앙), 2열(우측) 각각 전후열이 모두 찼는지 검사
+            bool col0Full = IsSlotActive(0) && IsSlotActive(3); // 좌측 열 완성?
+            bool col1Full = IsSlotActive(1) && IsSlotActive(4); // 중앙 열 완성?
+            bool col2Full = IsSlotActive(2) && IsSlotActive(5); // 우측 열 완성?
+
+            // Case A: 좌측 + 중앙 열이 꽉 참 (0열, 1열) -> 사각형 OK
+            bool isLeftSquare = col0Full && col1Full;
+
+            // Case B: 중앙 + 우측 열이 꽉 참 (1열, 2열) -> 사각형 OK
+            bool isRightSquare = col1Full && col2Full;
+
+            // 둘 중 하나라도 만족하면 조건 통과
+            if (isLeftSquare || isRightSquare)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         // [헬퍼 함수] 해당 슬롯 인덱스의 플레이어가 전투 가능한 상태인지 확인
@@ -1230,23 +1226,75 @@ namespace Manager
         // 버튼 연결용 함수
         public void OnFightCommand_Rolling_Vulcan()
         {
+            // 입력 쿨타임 추가하여 연타/중복 입력 방지
+            inputCooldown = 0.2f;
+
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             PlayerController leader = activePlayers[currentPlayerIndex] as PlayerController;
 
-            // 1. 참가자 확정 (현재 살아있는 모든 아군) BattleEntity들 중에서 PlayerController만 골라내어 형변환
-           currentUnionParticipants = activePlayers.Where(p => p.currentHp > 0)
-                                                   .OfType<PlayerController>()
-                                                   .ToList();
+            // 1. 참가자 확정
+            currentUnionParticipants = GetRollingVulcanParticipants();
+            
+            // 안전 장치
+            if (currentUnionParticipants.Count < 4) 
+            {
+                Debug.LogWarning("Rolling Vulcan 조건 불충족: 참가자 부족");
+                return;
+            }
 
-            // 2. 행동 생성
-            // 속도는 최우선(9999)으로 설정
+            // 2. 행동 생성 (속도 9999)
             CombatAction action = new CombatAction(leader.gameObject, null, ActionType.Rolling_Vulcan, 9999);
             
-            // 3. 큐 등록
+            // 3. 큐 등록 및 다음 입력으로
             actionQueue.Add(action);
-
-            // 4. 다음 캐릭터 입력으로 넘김 (NextPlayerInput에서 참가자들은 자동 스킵됨)
             NextPlayerInput();
+        }
+
+        // Rolling Vulcan 참가자 선별 (사각형 형성 멤버만 추출)
+        List<PlayerController> GetRollingVulcanParticipants()
+        {
+            List<PlayerController> participants = new List<PlayerController>();
+
+            // 각 열의 전/후열이 모두 찼는지 확인
+            bool col0Full = IsSlotActive(0) && IsSlotActive(3); // 좌측 열
+            bool col1Full = IsSlotActive(1) && IsSlotActive(4); // 중앙 열
+            bool col2Full = IsSlotActive(2) && IsSlotActive(5); // 우측 열
+
+            // 사각형 형성 여부
+            bool isLeftSquare = col0Full && col1Full; // 0,1열 (좌측 사각형)
+            bool isRightSquare = col1Full && col2Full; // 1,2열 (우측 사각형)
+
+            List<int> validIndices = new List<int>();
+
+            // 우선순위: 6명(양쪽 모두) -> 왼쪽 -> 오른쪽
+            if (isLeftSquare && isRightSquare)
+            {
+                // 6명 전원 참가
+                validIndices.AddRange(new int[] { 0, 1, 2, 3, 4, 5 });
+            }
+            else if (isLeftSquare)
+            {
+                // 좌측 4명만 참가 (0, 1, 3, 4)
+                validIndices.AddRange(new int[] { 0, 1, 3, 4 });
+            }
+            else if (isRightSquare)
+            {
+                // 우측 4명만 참가 (1, 2, 4, 5)
+                validIndices.AddRange(new int[] { 1, 2, 4, 5 });
+            }
+
+            // 인덱스를 실제 캐릭터 객체로 변환
+            foreach (int idx in validIndices)
+            {
+                if (idx < allSlotControllers.Count)
+                {
+                    var pc = allSlotControllers[idx];
+                    if (pc != null && pc.currentHp > 0)
+                        participants.Add(pc);
+                }
+            }
+
+            return participants;
         }
 
         void ShowBaseMenu()
@@ -2150,7 +2198,7 @@ namespace Manager
             // 2. 애니메이션: 타겟 앞으로 모이기
             GameObject target = action.target;
             Vector3 targetBasePos = target.transform.position;
-            Vector3 rallyPoint = targetBasePos + new Vector3(0, -2.0f, 0); 
+            Vector3 rallyPoint = targetBasePos + new Vector3(0, -140.0f, 0); 
 
             Dictionary<PlayerController, Vector3> originPositions = new Dictionary<PlayerController, Vector3>();
             Sequence moveSeq = DOTween.Sequence();
@@ -2406,8 +2454,8 @@ namespace Manager
                 // B. 효과음 및 애니메이션은 적 생존 여부와 무관하게 무조건 실행
                 SoundManager.Instance.PlaySFX(SfxID.Attack_Gun);
                 
-                // 회전 대기 (여기서 시간 지연이 발생하므로 전체 시간 일정하게 유지됨)
-                yield return StartCoroutine(FastRotateParty(true, shotInterval));
+                // 회전 대기
+                yield return StartCoroutine(FastRotateParticipants(participants, true, shotInterval));
             }
 
             // 4. 마무리
@@ -2421,6 +2469,83 @@ namespace Manager
             
             currentUnionParticipants.Clear();
             yield return wait05;
+        }
+
+        // 롤링발칸 등에서 참여자들만 회전시키는 함수
+        IEnumerator FastRotateParticipants(List<PlayerController> participants, bool clockwise, float duration)
+        {
+            // 1. 전체 슬롯의 시계 방향 순서 정의 (0 -> 1 -> 2 -> 5 -> 4 -> 3)
+            int[] ringOrder = { 0, 1, 2, 5, 4, 3 };
+
+            // 2. 현재 참여자들이 위치한 인덱스만 추출 (순서 유지)
+            // 예: 4명(좌+중앙 열)인 경우 -> [0, 1, 4, 3] 추출됨
+            List<int> currentIndices = new List<int>();
+            foreach (int slotIdx in ringOrder)
+            {
+                // 해당 슬롯의 캐릭터가 참가자 명단에 있는지 확인
+                if (slotIdx < allSlotControllers.Count)
+                {
+                    PlayerController pc = allSlotControllers[slotIdx];
+                    if (participants.Contains(pc))
+                    {
+                        currentIndices.Add(slotIdx);
+                    }
+                }
+            }
+
+            // 만약 참여자가 1명 이하라면 회전 불필요
+            if (currentIndices.Count < 2) yield break;
+
+            // 3. 이동 목표 설정 (매핑)
+            // Key: 캐릭터, Value: 이동할 목표 슬롯 인덱스
+            Dictionary<PlayerController, int> moveMap = new Dictionary<PlayerController, int>();
+            int count = currentIndices.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                // 현재 슬롯의 주인
+                int currentSlotIdx = currentIndices[i];
+                PlayerController pc = allSlotControllers[currentSlotIdx];
+
+                // 목표 슬롯 찾기
+                // 시계 방향: 내 다음 순번의 슬롯으로 이동
+                // 반시계 방향: 내 이전 순번의 슬롯으로 이동
+                int nextIndex = clockwise ? (i + 1) : (i - 1);
+                
+                // 인덱스 보정 (Circular)
+                if (nextIndex >= count) nextIndex = 0;
+                if (nextIndex < 0) nextIndex = count - 1;
+
+                int targetSlotIdx = currentIndices[nextIndex];
+                moveMap.Add(pc, targetSlotIdx);
+            }
+
+            // 4. 데이터 갱신 및 애니메이션 실행
+            // 데이터 꼬임 방지를 위해 리스트 복제본 생성
+            List<PlayerController> nextAllSlots = new List<PlayerController>(allSlotControllers);
+            Sequence seq = DOTween.Sequence();
+
+            foreach (var kvp in moveMap)
+            {
+                PlayerController pc = kvp.Key;
+                int targetIdx = kvp.Value;
+
+                // A. 데이터 구조 상의 위치 변경 (임시 리스트에 기록)
+                nextAllSlots[targetIdx] = pc;
+
+                // B. 물리적 위치(부모) 및 인덱스 정보 변경
+                Transform targetSlot = (targetIdx < 3) ? playerFrontSlots[targetIdx] : playerBackSlots[targetIdx - 3];
+                pc.transform.SetParent(targetSlot, true);
+                pc.columnIndex = targetIdx;
+
+                // C. 애니메이션 (Duration 동안 이동)
+                seq.Join(pc.transform.DOLocalMove(Vector3.zero, duration).SetEase(Ease.Linear));
+            }
+
+            // 5. 실제 데이터 리스트 교체
+            allSlotControllers = nextAllSlots;
+
+            yield return seq.WaitForCompletion();
         }
 
         // 무지개 색상 효과 코루틴
