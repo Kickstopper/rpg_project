@@ -152,35 +152,47 @@ namespace Controller
             if(texts.Length > 1) texts[1].text = $"{consumeText} {cost}";
 
             // ---------------------------------------------------------
-            // 사용 가능 여부 판별 (Grayout Logic)
+            // 1. 사용 가능 여부 판별 (로직은 그대로 유지)
             // ---------------------------------------------------------
             bool canUse = true;
             if (currentActor != null)
             {
                 if (data.useHpCost)
                 {
-                    // HP 소모: 현재 HP가 코스트보다 커야 함 (자살 방지)
                     if (currentActor.currentHp <= data.costValue) canUse = false;
                 }
                 else
                 {
-                    // MP 소모: 현재 MP가 코스트 이상이어야 함
                     if (currentActor.currentMp < data.costValue) canUse = false;
                 }
             }
 
-            // 버튼 상태 적용
-            btn.interactable = canUse;
+            // ---------------------------------------------------------
+            // 버튼 상태 및 클릭 이벤트 처리
+            // ---------------------------------------------------------
+            
+            // 1. 버튼 자체는 항상 활성화 (그래야 포커스가 이동됨)
+            btn.interactable = true; 
 
-            // 텍스트 색상 변경 (사용 불가 시 회색)
+            // 2. 시각적 구분: 사용 불가면 글자색을 회색으로, 가능하면 흰색으로
             Color textColor = canUse ? Color.white : Color.gray;
             foreach (var txt in texts) txt.color = textColor;
 
-            // 클릭 이벤트는 사용 가능할 때만 연결
-            if (canUse)
+            // 3. 클릭 리스너 내부에서 분기 처리
+            btn.onClick.AddListener(() => 
             {
-                btn.onClick.AddListener(() => OnItemClicked(data));
-            }
+                if (canUse)
+                {
+                    // 조건 만족 시 정상 실행
+                    OnItemClicked(data);
+                }
+                else
+                {
+                    // 조건 불만족 시 거부 반응 (효과음 등)
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); // 띵~ 소리
+                    // 필요하다면 로그 출력: "MP가 부족합니다" 등
+                }
+            });
             
             currentSlots.Add(slotObj);
         }

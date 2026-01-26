@@ -541,9 +541,8 @@ namespace Manager
             bool canReload = (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits);
             bool showGunMenu = canShoot || canReload;
 
-            // Extra 메뉴 조건: 아이템이 있거나, 이동/방어/대기(항상 가능) 중 하나라도 가능하면
+            // Extra 메뉴 조건: 이동/방어/대기(항상 가능) 중 하나라도 가능하면
             bool canItem = (InventoryManager.Instance.GetAllItemIds().Count > 0);
-            bool showExtraMenu = canItem || true; // Move, Guard, Next는 항상 가능하므로 true
 
             // Tactics 메뉴 조건: 협동 공격이나 배수진이 가능해야 함
             bool canUnion = CheckUnionAttackCondition(actor);
@@ -554,20 +553,21 @@ namespace Manager
             // 3. 메인 메뉴 버튼 등록 (순서 중요: Attack > Skill > Gun > Extra > Tactics)
             // ---------------------------------------------------------
             
+            // 메인 메뉴
             // 1. Attack
             AddButtonToActiveList(ActionType.Attack, true);
-
-            // 2. Skill (Main Menu에 표시)
+            // 2. Skill
             AddButtonToActiveList(ActionType.Skill, canSkill);
+            // 3. Item
+            AddButtonToActiveList(ActionType.Item, canItem);
 
-            // 3. Gun Menu ▶ (Shoot, Reload)
-            AddButtonToActiveList(ActionType.Menu_Gun, showGunMenu);//, "Gun 〉"); 
-
-            // 4. Extra Menu ▶ (Item, Move, Guard, Next)
-            AddButtonToActiveList(ActionType.Menu_Extra, showExtraMenu);//, "Extra 〉"); 
-
-            // 5. Tactics Menu ▶ (Union, LastStand)
-            AddButtonToActiveList(ActionType.Menu_Tactics, showTacticsMenu);//, "Tactics 〉"); 
+            // 서브 메뉴
+            // 4. Gun Menu ▶ (Shoot, Reload)
+            AddButtonToActiveList(ActionType.Menu_Gun, showGunMenu);
+            // 5. Extra Menu ▶ (Move, Guard, Next)
+            AddButtonToActiveList(ActionType.Menu_Extra, true);
+            // 6. Tactics Menu ▶ (Union, LastStand)
+            AddButtonToActiveList(ActionType.Menu_Tactics, showTacticsMenu);
 
             // ---------------------------------------------------------
             // 4. UI 갱신 준비
