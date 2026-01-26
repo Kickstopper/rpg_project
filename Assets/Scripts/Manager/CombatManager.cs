@@ -940,6 +940,7 @@ namespace Manager
         {
             if (battleSkillUI == null) return; 
             PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+
             if (actor.learnedSkillIds.Count == 0)
             {
                 if (logPanel) { logPanel.SetActive(true); logText.text = "사용할 수 있는 스킬이 없습니다"; }
@@ -948,7 +949,7 @@ namespace Manager
             {
                 if (logPanel) { logPanel.SetActive(true); logText.text = "사용할 스킬을 선택하세요"; }
                 SetContainerInteractable(fightCmdContainer, false);
-                battleSkillUI.Show(actor.learnedSkillIds);
+                battleSkillUI.Show(actor.learnedSkillIds, actor);
             } 
         }
 
@@ -1030,7 +1031,13 @@ namespace Manager
             }
             
             isSelectingTarget = true;
-            currentSelectedAction = ActionType.Item;
+
+            // 현재 선택된 데이터 타입에 따라 분기
+            if (currentSelectedItem is SkillData) 
+                currentSelectedAction = ActionType.Skill;
+            else 
+                currentSelectedAction = ActionType.Item;
+            
             currentTargetIndex = 0; 
             UpdateTargetHighlight();
             inputCooldown = 0.2f;
@@ -1707,9 +1714,16 @@ namespace Manager
                  action.speed = 9999; 
                  isUnionAttackUsedThisTurn = true;
             }
-            if (currentSelectedAction == ActionType.Item)
+            if (currentSelectedAction == ActionType.Item || currentSelectedAction == ActionType.Skill)
             {
                 action.itemData = currentSelectedItem; 
+                
+                // 스킬인 경우 추가 처리
+                if (currentSelectedItem is SkillData skill)
+                {
+                    action.skillData = skill;
+                }
+                // 아이템 및 스킬 사용 딜레이 (TODO: 스킬의 위력이나 TargetScope에 따라 딜레이가 커지게 하자)
                 action.speed += 500; 
             }
 
@@ -1848,6 +1862,19 @@ namespace Manager
         IEnumerator HandleItemAction(CombatAction action)
         {
             BaseRootData item = action.itemData;
+
+            // 실제 인벤토리에서 아이템 차감 시도
+            // ConsumableItemData인지 확인 후 차감
+            if (item is ConsumableItemData consumable)
+            {
+                // UseItem이 false를 반환하면 아이템이 없다는 뜻 (예: 앞선 캐릭터가 마지막 1개를 써버림)
+                if (!InventoryManager.Instance.UseItem(consumable.id))
+                {
+                    ShowLog($"{item.dataName} 부족! 행동 취소.");
+                    yield return wait10;
+                    yield break; // 아이템 효과 발동 없이 종료
+                }
+            }
             
             // TargetScope에 따라 다중 타겟 가져오기
             // (QueuePolymorphicAction에서 target을 null로 보냈어도 여기서 찾음)
@@ -1891,8 +1918,34 @@ namespace Manager
             SkillData skill = action.itemData as SkillData; 
             PlayerController actor = action.actor.GetComponent<PlayerController>();
 
-            // 비용 지불 (MP)
-            if (actor != null && skill != null && !skill.useHpCost) actor.currentMp -= skill.costValue;
+            // 비용 지불 (HP 또는 MP)
+            if (actor != null && skill != null)
+            {
+                // HP 코스트인 경우
+                if (skill.useHpCost)
+                {
+                    // 현재 HP가 코스트보다 적으면 발동 실패 (자살 방지 or 불발 처리)
+                    if (actor.currentHp <= skill.costValue)
+                    {
+                        ShowLog("HP 부족! 스킬 실패.");
+                        yield return wait10;
+                        yield break;
+                    }
+                    actor.currentHp -= skill.costValue;
+                }
+                // MP 코스트인 경우
+                else
+                {
+                    if (actor.currentMp < skill.costValue)
+                    {
+                        ShowLog("MP 부족! 스킬 실패.");
+                        yield return wait10;
+                        yield break;
+                    }
+                    Debug.Log("MP COST : " + skill.costValue);
+                    actor.currentMp -= skill.costValue;
+                }
+            }
             
             // 다중 타겟 처리
             TargetScope scope = (skill != null) ? skill.targetScope : TargetScope.FrontSingle;

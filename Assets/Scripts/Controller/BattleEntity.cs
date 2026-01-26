@@ -12,8 +12,38 @@ namespace Controller
         public string entityName;
         public int level = 1;
         public Align align;
-        public int currentHp;
-        public int currentMp;
+
+        [SerializeField] private int _currentHp; // 인스펙터 확인용 실제 변수
+
+        public int currentHp
+        {
+            get => _currentHp;
+            set
+            {
+                // 값이 실제로 변했을 때만 로직 수행
+                if (_currentHp != value)
+                {
+                    _currentHp = Mathf.Clamp(value, 0, maxHp);
+                    
+                    UpdateUI(); 
+                }
+            }
+        }
+        [SerializeField] private int _currentMp; // 인스펙터 확인용 실제 변수
+
+        public int currentMp
+        {
+            get => _currentMp;
+            set
+            {
+                if (_currentMp != value)
+                {
+                    _currentMp = Mathf.Clamp(value, 0, maxMp);
+                    
+                    UpdateUI(); 
+                }
+            }
+        }
         public int maxHp;
         public int maxMp;
         public int columnIndex;
@@ -87,6 +117,8 @@ namespace Controller
         
         // 데미지 처리는 연출과 로직(UI갱신 vs 사망처리)이 다르므로 추상화
         public abstract IEnumerator OnDamageTaken(int damage);
+
+        protected abstract void UpdateUI();
         
         // 스탯 계산 방식이 다르므로(장비 유무) 추상화
         public abstract int GetTotalStr();

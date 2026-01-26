@@ -262,6 +262,10 @@ namespace Controller
             if (currentHp <= 0) Die();
         }
 
+        protected override void UpdateUI()
+        {
+        }
+
         void Die()
         {
             Debug.Log($"{sourceData.name} 사망");

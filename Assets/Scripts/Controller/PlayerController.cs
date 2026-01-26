@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Manager;
 using Data;
 using Data.Database;
+using DG.Tweening;
 
 namespace Controller
 {
@@ -376,25 +377,46 @@ namespace Controller
             }
         }
         
-        void UpdateUI()
+        protected override void UpdateUI()
         {
             if (IsEmpty)
             {
-                hpSlider.gameObject.SetActive(false);
-                mpSlider.gameObject.SetActive(false);
-                nameText.text = "EMPTY";
-                nameText.alignment = TextAlignmentOptions.Center;
-                alignText.text = string.Empty;
-                portraitImage.gameObject.SetActive(false);
+                // 비활성화 시 진행 중인 트윈(애니메이션)이 있다면 즉시 중단
+                if (hpSlider != null) hpSlider.DOKill();
+                if (mpSlider != null) mpSlider.DOKill();
+
+                if (hpSlider) hpSlider.gameObject.SetActive(false);
+                if (mpSlider) mpSlider.gameObject.SetActive(false);
+                
+                if (nameText)
+                {
+                    nameText.text = "EMPTY";
+                    nameText.alignment = TextAlignmentOptions.Center;
+                }
+                if (alignText) alignText.text = string.Empty;
+                if (portraitImage) portraitImage.gameObject.SetActive(false);
             }
             else
             {
-                hpSlider.gameObject.SetActive(true);
-                mpSlider.gameObject.SetActive(true);
-                hpSlider.maxValue = maxHp;
-                hpSlider.value = currentHp;
-                mpSlider.maxValue = maxMp;
-                mpSlider.value = currentMp;
+                if (hpSlider)
+                {
+                    hpSlider.gameObject.SetActive(true);
+                    hpSlider.maxValue = maxHp;
+
+                    // 즉시 변경 대신 DOValue 사용 (0.5초 동안 부드럽게 변경)
+                    hpSlider.DOKill(); // 기존 애니메이션이 있다면 취소하여 겹침 방지
+                    hpSlider.DOValue(currentHp, 0.5f).SetEase(Ease.OutCubic);
+                }
+
+                if (mpSlider)
+                {
+                    mpSlider.gameObject.SetActive(true);
+                    mpSlider.maxValue = maxMp;
+
+                    // MP도 동일하게 적용
+                    mpSlider.DOKill();
+                    mpSlider.DOValue(currentMp, 0.5f).SetEase(Ease.OutCubic);
+                }
             }
         }
     }
