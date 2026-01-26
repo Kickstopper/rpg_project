@@ -1088,6 +1088,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acdcb6d037bd65943bf47ddde9d1d82e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &167673306 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3450034170499328366, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+  m_PrefabInstance: {fileID: 1925991827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acdcb6d037bd65943bf47ddde9d1d82e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &229478682
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4416,7 +4427,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4910763360179029811, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00002014637
+      value: -0.00000846386
       objectReference: {fileID: 0}
     - target: {fileID: 5284733064188250560, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_Pivot.x
@@ -4518,13 +4529,17 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
+    - target: {fileID: 7245247903272265646, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1977504675}
     - target: {fileID: 7483852075534066200, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
     - target: {fileID: 7492207414277860654, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000037908554
+      value: 0.000010967255
       objectReference: {fileID: 0}
     - target: {fileID: 7724699326771219855, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -5014,18 +5029,19 @@ MonoBehaviour:
   - {fileID: 1637359863}
   allFightButtons:
   - {fileID: 591616785}
+  - {fileID: 448810890}
+  - {fileID: 412792405}
   - {fileID: 147047511}
   - {fileID: 147047510}
   - {fileID: 147047509}
-  - {fileID: 2063446267}
   - {fileID: 919081783}
   - {fileID: 1803306449}
-  - {fileID: 448810890}
-  - {fileID: 412792405}
   - {fileID: 531591510}
-  - {fileID: 2063446266}
   - {fileID: 1495482412}
   - {fileID: 285102257}
+  - {fileID: 2063446267}
+  - {fileID: 2063446266}
+  - {fileID: 167673306}
   battleSkillUI: {fileID: 566321830}
   battleItemUI: {fileID: 1774988335}
   commandPanel: {fileID: 1925991831}

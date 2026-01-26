@@ -518,6 +518,62 @@ namespace Manager
             return isFrontRow && isFirstFrontRowInput && (frontLivingCount == 3);
         }
 
+        // Rolling Vulcan 발동 조건 검사
+        bool CheckRollingVulcanCondition(PlayerController leader)
+        {
+            // 조건 3: 첫 번째 행동 지정 상태 (Leader가 첫 번째 턴이어야 함)
+            if (currentPlayerIndex != 0) return false;
+
+            // 생존자 리스트 (파티원)
+            var livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
+            int count = livingPlayers.Count;
+
+            // 조건 1-1: 4명 또는 6명 파티
+            if (count != 4 && count != 6) return false;
+
+            // 조건 2: 포메이션이 사각형 (전열/후열이 채워진 컬럼 수 확인)
+            int fullColumnPairCount = 0;
+            
+            for (int col = 0; col < 3; col++)
+            {
+                int frontIndex = col;      // 0, 1, 2
+                int backIndex = col + 3;   // 3, 4, 5
+
+                // 전열과 후열 슬롯에 캐릭터가 있고, 살아있는지 확인
+                bool hasFront = IsSlotActive(frontIndex);
+                bool hasBack = IsSlotActive(backIndex);
+
+                if (hasFront && hasBack) fullColumnPairCount++;
+            }
+
+            // 6명이면 3열 모두, 4명이면 2열이 꽉 차 있어야 "사각형"
+            if (count == 6 && fullColumnPairCount != 3) return false;
+            if (count == 4 && fullColumnPairCount != 2) return false;
+
+            // 조건 1-2: 장비(gun_099) 및 탄환(Max) 확인
+            foreach (var p in livingPlayers)
+            {
+                PlayerController pc = p as PlayerController;
+                // 총기 ID 확인
+                if (pc.equippedGunId != "gun_000") return false;
+                
+                // 총 데이터가 있고, 탄환이 최대치인지 확인
+                if (pc.currentGun == null || pc.currentGunAmmo < pc.currentGun.maxHits) return false;
+            }
+
+            return true;
+        }
+
+        // [헬퍼 함수] 해당 슬롯 인덱스의 플레이어가 전투 가능한 상태인지 확인
+        bool IsSlotActive(int index)
+        {
+            if (index < 0 || index >= allSlotControllers.Count) return false;
+            PlayerController pc = allSlotControllers[index];
+            
+            // pc가 존재하고, 빈 슬롯이 아니며, 체력이 0보다 커야 함
+            return pc != null && !pc.IsEmpty && pc.currentHp > 0;
+        }
+
         // 메인 메뉴 버튼 갱신 및 순서 정렬
         void RefreshCommandButtons(PlayerController actor)
         {
@@ -544,10 +600,12 @@ namespace Manager
             // Extra 메뉴 조건: 이동/방어/대기(항상 가능) 중 하나라도 가능하면
             bool canItem = (InventoryManager.Instance.GetAllItemIds().Count > 0);
 
-            // Tactics 메뉴 조건: 협동 공격이나 배수진이 가능해야 함
+            // Tactics 메뉴 조건: 협동 공격이나 배수진이나 롤링발칸이 가능해야 함
             bool canUnion = CheckUnionAttackCondition(actor);
             bool canLastStand = CheckLastStandCondition(actor);
-            bool showTacticsMenu = canUnion || canLastStand;
+            bool canRollingVulcan = CheckRollingVulcanCondition(actor);
+
+            bool showTacticsMenu = canUnion || canLastStand || canRollingVulcan;
 
             // ---------------------------------------------------------
             // 3. 메인 메뉴 버튼 등록 (순서 중요: Attack > Skill > Gun > Extra > Tactics)
@@ -566,7 +624,7 @@ namespace Manager
             AddButtonToActiveList(ActionType.Menu_Gun, showGunMenu);
             // 5. Extra Menu ▶ (Move, Guard, Next)
             AddButtonToActiveList(ActionType.Menu_Extra, true);
-            // 6. Tactics Menu ▶ (Union, LastStand)
+            // 6. Tactics Menu ▶ (Union, LastStand, RollingVulcan)
             AddButtonToActiveList(ActionType.Menu_Tactics, showTacticsMenu);
 
             // ---------------------------------------------------------
@@ -712,8 +770,6 @@ namespace Manager
             }
             else if (menuType == ActionType.Menu_Extra)
             {
-                bool canItem = (InventoryManager.Instance.GetAllItemIds().Count > 0);
-                AddSubButton(ActionType.Item, canItem, subButtons);
                 AddSubButton(ActionType.Move, true, subButtons);
                 AddSubButton(ActionType.Guard, true, subButtons);
                 AddSubButton(ActionType.Next, true, subButtons);
@@ -722,8 +778,10 @@ namespace Manager
             {
                 bool canUnion = CheckUnionAttackCondition(actor);
                 bool canLastStand = CheckLastStandCondition(actor); 
+                bool canRollingVulcan = CheckRollingVulcanCondition(actor);
                 AddSubButton(ActionType.Union_Attack, canUnion, subButtons);
                 AddSubButton(ActionType.Last_Stand, canLastStand, subButtons);
+                AddSubButton(ActionType.Rolling_Vulcan, canRollingVulcan, subButtons);
             }
 
             // 3. 서브 메뉴 버튼들을 별도 패널로 이동 및 활성화
@@ -1169,6 +1227,28 @@ namespace Manager
             NextPlayerInput();
         }
 
+        // 버튼 연결용 함수
+        public void OnFightCommand_Rolling_Vulcan()
+        {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            PlayerController leader = activePlayers[currentPlayerIndex] as PlayerController;
+
+            // 1. 참가자 확정 (현재 살아있는 모든 아군) BattleEntity들 중에서 PlayerController만 골라내어 형변환
+           currentUnionParticipants = activePlayers.Where(p => p.currentHp > 0)
+                                                   .OfType<PlayerController>()
+                                                   .ToList();
+
+            // 2. 행동 생성
+            // 속도는 최우선(9999)으로 설정
+            CombatAction action = new CombatAction(leader.gameObject, null, ActionType.Rolling_Vulcan, 9999);
+            
+            // 3. 큐 등록
+            actionQueue.Add(action);
+
+            // 4. 다음 캐릭터 입력으로 넘김 (NextPlayerInput에서 참가자들은 자동 스킵됨)
+            NextPlayerInput();
+        }
+
         void ShowBaseMenu()
         {
             isFightMode = false; 
@@ -1250,17 +1330,15 @@ namespace Manager
             PlayerController currentPlayer = activePlayers[currentPlayerIndex] as PlayerController;
             if (currentPlayer.currentHp <= 0) { NextPlayerInput(); return; }
 
-            // Union Attack 참가자는 행동 선택 불가 (리더 제외)
-            // currentUnionParticipants 리스트에 있고, 현재 리더(방금 명령 내린 사람)가 아니라면 스킵
-            // (주의: currentPlayerIndex가 리더보다 높은 경우에만 해당. 이미 지나간 사람은 고려 X)
+            // Union Attack / Rolling Vulcan 참가자 스킵 처리
             if (currentUnionParticipants.Contains(currentPlayer))
             {
-                // 리더 본인이 아니라면 스킵 (리더는 이미 명령을 내렸으므로 이 함수에 다시 들어올 일 없음)
-                Debug.Log($"Union Attack 참가로 {currentPlayer.name}의 턴 스킵");
+                Debug.Log($"Union Attack 또는 Rolling Vulcan 참가로 {currentPlayer.name}의 턴 스킵");
                 
-                // 대기 행동 추가 (방어 아님, 그냥 대기)
-                CombatAction skipAction = new CombatAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Guard, 0);
+                // 스킵 액션 주석처리                
+                /* CombatAction skipAction = new CombatAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Guard, 0);
                 actionQueue.Add(skipAction);
+                */
                 
                 NextPlayerInput();
                 return;
@@ -1848,6 +1926,8 @@ namespace Manager
 
                 case ActionType.Union_Attack: yield return HandleUnionAttack(action); break;
                 case ActionType.Last_Stand: yield return HandleLastStandAction(action); break;
+                case ActionType.Rolling_Vulcan: yield return HandleRollingVulcan(action); break;
+
                 case ActionType.Next:
                     ShowLog($"{action.actor.name}은(는) 기회를 엿보고 있다...");
                     // 별도의 애니메이션 없이 짧게 대기
@@ -2279,6 +2359,139 @@ namespace Manager
             
             yield return wait05;
             if (logPanel) logPanel.SetActive(false);
+        }
+
+        // Rolling Vulcan 실행 코루틴
+        IEnumerator HandleRollingVulcan(CombatAction action)
+        {
+            ShowLog("얘들아 롤링 발칸이다!");
+            yield return wait10;
+            
+            ShowLog("알았어! OK!!");
+            yield return wait10;
+            
+            ShowLog("롤링 발칸!!");
+            // SoundManager.Instance.PlaySFX(SfxID.Skill_Ultimate); 
+
+            // 1. 데이터 준비
+            List<PlayerController> participants = currentUnionParticipants;
+            int totalAmmo = participants.Sum(p => p.currentGunAmmo);
+            
+            // 2. 무지개 빛 효과 시작
+            Coroutine rainbowRoutine = StartCoroutine(ProcessRainbowEffect(participants));
+
+            // 3. 난사 시작
+            float shotInterval = 0.08f; 
+            
+            for (int i = 0; i < totalAmmo; i++)
+            {
+                // 매 발사마다 살아있는 적 확인
+                List<BattleEntity> enemies = activeMonsters.Where(m => m.currentHp > 0).ToList();
+                
+                // A. 적이 살아있을 때만 데미지 처리
+                if (enemies.Count > 0)
+                {
+                    foreach (var enemy in enemies)
+                    {
+                        if (enemy.currentHp <= 0) continue;
+                        
+                        PlayerController shooter = participants[i % participants.Count];
+                        int dmg = CalculateGunDamage(shooter, enemy.gameObject, false);
+                        
+                        ApplyDamage(enemy.gameObject, dmg, false);
+                        SpawnVFX(vfxGunPrefab, enemy.transform.position);
+                    }
+                }
+                
+                // B. 효과음 및 애니메이션은 적 생존 여부와 무관하게 무조건 실행
+                SoundManager.Instance.PlaySFX(SfxID.Attack_Gun);
+                
+                // 회전 대기 (여기서 시간 지연이 발생하므로 전체 시간 일정하게 유지됨)
+                yield return StartCoroutine(FastRotateParty(true, shotInterval));
+            }
+
+            // 4. 마무리
+            if (rainbowRoutine != null) StopCoroutine(rainbowRoutine);
+            
+            foreach (var p in participants)
+            {
+                p.currentGunAmmo = 0;
+                p.ResetHighlightColor(); 
+            }
+            
+            currentUnionParticipants.Clear();
+            yield return wait05;
+        }
+
+        // 무지개 색상 효과 코루틴
+        IEnumerator ProcessRainbowEffect(List<PlayerController> players)
+        {
+            float globalHue = 0f;
+            
+            // [설정] 플레이어 간의 색상 차이 간격 (0.1 ~ 0.2)
+            // 값이 클수록 알록달록해지고, 작으면 부드럽게 이어짐.
+            float hueOffsetStep = 0.1f; 
+            
+            // [설정] 색상이 변하는 속도
+            float speed = 1.0f; 
+
+            while (true)
+            {
+                // 시간 경과에 따라 기준 색상(globalHue)을 계속 변경
+                globalHue += Time.deltaTime * speed;
+                
+                // 값이 계속 커지는 것을 방지 (0~1 사이 반복)
+                if (globalHue > 1f) globalHue -= 1f;
+
+                for (int i = 0; i < players.Count; i++)
+                {
+                    // 기준 색상(globalHue)에 "인덱스 * 간격"을 더해줌.
+                    // 0번 플레이어: globalHue + 0
+                    // 1번 플레이어: globalHue + 0.15
+                    // 2번 플레이어: globalHue + 0.30 ...
+                    float localHue = (globalHue + (i * hueOffsetStep)) % 1.0f;
+                    
+                    Color rainbow = Color.HSVToRGB(localHue, 1f, 1f); // 채도(S)와 명도(V)는 최대로
+                    rainbow.a = 0.5f;
+                    players[i].SetHighlightColor(rainbow);
+                }
+                yield return null;
+            }
+        }
+
+        // 빠른 회전 (사격 간격에 맞춘 속도)
+        IEnumerator FastRotateParty(bool clockwise, float duration)
+        {
+            // RotateParty 로직을 가져오되, DOTween 시간을 duration에 맞춤
+            // 로직은 기존 RotateParty와 동일하게 배열 재배치
+             PlayerController[] newOrder = new PlayerController[6];
+
+            if (clockwise)
+            {
+                newOrder[1] = allSlotControllers[0];
+                newOrder[2] = allSlotControllers[1];
+                newOrder[5] = allSlotControllers[2];
+                newOrder[4] = allSlotControllers[5];
+                newOrder[3] = allSlotControllers[4];
+                newOrder[0] = allSlotControllers[3];
+            }
+
+            // 위치 이동 (ApplyPartyReorder 변형)
+            Sequence seq = DOTween.Sequence();
+            for (int i = 0; i < 6; i++)
+            {
+                PlayerController pc = newOrder[i];
+                Transform targetSlot = (i < 3) ? playerFrontSlots[i] : playerBackSlots[i - 3];
+                
+                pc.columnIndex = i;
+                pc.transform.SetParent(targetSlot, true);
+                
+                // duration 만큼 빠르게 이동
+                seq.Join(pc.transform.DOLocalMove(Vector3.zero, duration).SetEase(Ease.Linear));
+            }
+            allSlotControllers = newOrder.ToList();
+            
+            yield return seq.WaitForCompletion();
         }
 
         void SetGuardState(GameObject actor, bool state)
