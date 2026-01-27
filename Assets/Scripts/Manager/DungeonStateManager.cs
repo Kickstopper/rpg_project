@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using DG.Tweening;
 public enum GameState
 {
     Exploration, // 탐험 모드
@@ -48,8 +49,8 @@ namespace Manager
             switch (newState)
             {
                 case GameState.Exploration:
-                    explorationCanvas.SetActive(true);
                     combatCanvas.SetActive(false);
+                    explorationCanvas.SetActive(true);
                     // 플레이어 이동 스크립트 활성화
                     break;
 

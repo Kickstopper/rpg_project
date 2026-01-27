@@ -502,23 +502,15 @@ namespace UI.DungeonMapScene
         {
             if (newState == GameState.Exploration)
             {
-                screenContainer.transform.DOScale(Vector3.one, 0.1f).SetEase(Ease.OutQuart).OnComplete(() =>
-                {
-                    screenContainer.transform.localScale = Vector3.one;
-                    // 탐험 모드: 렌더링 재개
-                    canRender = true;
-                    Debug.Log("탐험 모드 복귀: 렌더링 시작");
-                    SoundManager.Instance.PlayBGM(currentTheme.bgmID);
-                });
+                // 탐험 모드: 렌더링 재개
+                canRender = true;
+                Debug.Log("탐험 모드 복귀: 렌더링 시작");
+                SoundManager.Instance.PlayBGM(currentTheme.bgmID);
             }
             else
             {
                 // 전투/메뉴 등: 렌더링 중지 (성능 확보)
                 canRender = false;
-                screenContainer.transform.DOScale(battleScreenScale, 0.3f).SetEase(Ease.OutElastic).OnComplete(() =>
-                {
-                    screenContainer.transform.localScale = battleScreenScale;
-                });
             }
         }
 
@@ -1253,7 +1245,7 @@ namespace UI.DungeonMapScene
         {
             //최초 1회 페이드인
             fadeOverlay.alpha = 1;
-            fadeOverlay.DOFade(0f, 3f);
+            fadeOverlay.DOFade(0f, 1f);
 
             Vector2 pos = Vector2.zero;
             backgroundImage.transform.localPosition = pos;

@@ -21,6 +21,7 @@ namespace Manager
         public static CombatManager Instance;
 
         [Header("UI References")]
+        public GameObject raycastScreen;
         public GameObject baseCmdContainer;   // 1단계 메뉴 (Fight, Talk...)
         public GameObject fightCmdContainer;  // 2단계 메뉴 (Attack, Move...)
         public RectTransform btnContainer; //fightCmdContainer의 버튼이 붙는 트랜스폼 (Inspector 할당)
@@ -36,7 +37,12 @@ namespace Manager
         public TextMeshProUGUI messageText; // 전투 중 캐릭터의 메시지 텍스트
         public Slider qteTimingSlider; // 타이머 슬라이더. 인스펙터에서 할당
         public Button autoModeButton; // 오토 모드의 트리거
-        // 에디터에서 모든 버튼(Attack, Gun, Skill, Item, Move, Guard)을 순서대로 넣으세요.
+        
+        [Header("Instant Win Settings")]
+        public Image screenFlashImage;       // 화면 번쩍임 효과용 이미지
+        public GameObject instantResultPanel; // 결과 표시 패널
+        public TextMeshProUGUI instantResultText; // 결과 텍스트
+        public float instantWinDelay = 1.5f; // 결과 표시 후 대기 시간
         
         
         private List<Button> activeFightButtons = new List<Button>();
@@ -160,12 +166,18 @@ namespace Manager
 
         public void Initialize(List<string> monsterIds)
         {
+            // 전투 진입 시 UI를 일단 모두 숨김 (깜빡임 방지)
+            if (baseCmdContainer) baseCmdContainer.SetActive(false);
+            if (fightCmdContainer) fightCmdContainer.SetActive(false);
+            if (commandPanel) commandPanel.SetActive(false);
+            if (subMenuContainer) subMenuContainer.SetActive(false);
+
             isAutoMode = false;         
             reserveAutoOff = false;     
             autoModeButton.gameObject.SetActive(false);
 
             isFightMode = false;        
-            Time.timeScale = 1.0f;      
+            Time.timeScale = 1.0f;
 
             currentBaseBtnIndex = 0;
             currentFightBtnIndex = 0;
@@ -181,9 +193,7 @@ namespace Manager
             InitializeSlots();
 
             if (monsterIds == null || monsterIds.Count == 0) return;
-
-            SoundManager.Instance.PlayBGM(BgmID.Encounter);
-
+            
             int maxSpawnLimit = Mathf.Min(monsterIds.Count, 6);
             int spawnCount = Random.Range(1, maxSpawnLimit + 1); 
 
@@ -199,10 +209,46 @@ namespace Manager
 
             if (activePlayers.Count == 0) return; 
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate(enemyFrontRowContainer as RectTransform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(playerFrontRowContainer as RectTransform);
+            // =========================================================
+            // 인스턴트 윈 조건 체크 및 분기
+            // =========================================================
+            if (CheckInstantWinCondition())
+            {
+                Debug.Log("조건 만족: 인스턴트 전투 실행");
+                
+                // 유닛들의 모습(Sprite)을 숨김
+                SetBattleVisualsActive(false);
 
-            StartCoroutine(SetupBattle());
+                StartCoroutine(ProcessInstantWin());
+            }
+            else
+            {
+                float screenPy = 216f;
+                raycastScreen.transform.DOLocalMoveY(screenPy, 0.3f).SetEase(Ease.OutElastic).OnComplete(() =>
+                {
+                    raycastScreen.transform.localPosition = new Vector3(0, screenPy, 0);
+                    // 정상 전투라면 반드시 유닛들을 보이게 설정
+                    SetBattleVisualsActive(true);
+
+                    // 조건 불만족 시 기존 정상 전투 진입
+                    SoundManager.Instance.PlayBGM(BgmID.Encounter);
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(enemyFrontRowContainer as RectTransform);
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(playerFrontRowContainer as RectTransform);
+                    StartCoroutine(SetupBattle());
+                    
+                });
+            }
+        }
+
+        // 전투 유닛 및 슬롯 컨테이너 표시/숨김 제어
+        void SetBattleVisualsActive(bool isActive)
+        {
+            if (enemyFrontRowContainer) enemyFrontRowContainer.gameObject.SetActive(isActive);
+            if (enemyBackRowContainer) enemyBackRowContainer.gameObject.SetActive(isActive);
+            if (playerFrontRowContainer) playerFrontRowContainer.gameObject.SetActive(isActive);
+            if (playerBackRowContainer) playerBackRowContainer.gameObject.SetActive(isActive);
+            
+            // if (battleBackgroundImage) battleBackgroundImage.SetActive(isActive);
         }
 
         void SpawnParty()
@@ -494,6 +540,130 @@ namespace Manager
                 else
                     EventSystem.current.SetSelectedGameObject(attackButton);
             }
+        }
+
+        // 인스턴트 전투 처리 메인 루틴
+        IEnumerator ProcessInstantWin()
+        {
+            // 1. 화면 번쩍임 효과 (Flash)
+            if (screenFlashImage != null)
+            {
+                screenFlashImage.color = new Color(1, 1, 1, 0);
+                Sequence flashSeq = DOTween.Sequence();
+                flashSeq.Append(screenFlashImage.DOFade(1.0f, 0.1f));
+                flashSeq.Append(screenFlashImage.DOFade(0.0f, 0.3f));
+                yield return flashSeq.WaitForCompletion();
+            }
+
+            // 3. 내부 시뮬레이션 (애니메이션 없이 계산만 수행)
+            SimulateAutoBattleLogic();
+
+            // 4. 결과 텍스트 구성
+            int totalExp = 0;
+            int totalGold = 0;
+            List<string> dropItems = new List<string>();
+
+            // foreach (var m in activeMonsters)
+            // {
+            //     // 몬스터가 죽었다고 가정하고 보상 계산
+            //     // (실제 드랍 로직에 따라 수정 필요)
+            //     totalExp += m.sourceData.rewardExp;
+            //     totalGold += m.sourceData.rewardGold;
+            //     // 아이템 드랍 로직은 별도로 호출하거나 여기서 처리
+            // }
+
+            // 5. 결과 표시
+            if (instantResultPanel)
+            {
+                instantResultPanel.SetActive(true);
+                instantResultText.text = $"<size=120%>순옥살!</size>\n\n" +
+                                         $"EXP +{totalExp} / GOLD +{totalGold}\n" +
+                                         $"적들을 이미 죽어 있다.";
+            }
+            
+            SoundManager.Instance.PlaySFX(SfxID.Attack_Sword); // 타격음 한번 재생
+
+            // 6. 잠시 대기 후 종료
+            yield return new WaitForSeconds(instantWinDelay);
+
+            if (instantResultPanel) instantResultPanel.SetActive(false);
+
+            // 7. 전투 종료 처리
+            // 몬스터들을 비활성화하거나 Destroy 처리해야 함
+            ClearCombatField(); 
+            DungeonStateManager.Instance.ChangeState(GameState.Exploration);
+        }
+
+        // 인스턴트 킬 시뮬레이션 로직: 아군 선공으로 적이 전멸할 때까지 반복
+        void SimulateAutoBattleLogic()
+        {
+            bool battleEnded = false;
+            int safetyBreak = 0; // 무한 루프 방지
+
+            while (!battleEnded && safetyBreak < 100)
+            {
+                safetyBreak++;
+
+                // 1. 아군 공격 턴
+                foreach (var player in activePlayers)
+                {
+                    if (player.currentHp <= 0) continue;
+
+                    // 살아있는 적 중 하나 랜덤 타겟
+                    var target = activeMonsters.FirstOrDefault(m => m.currentHp > 0);
+                    if (target == null) 
+                    {
+                        battleEnded = true; 
+                        break; 
+                    }
+
+                    // 데미지 계산 (기존 CalculateDamage 재활용)
+                    // CombatAction을 가짜로 만들어서 전달
+                    CombatAction fakeAction = new CombatAction(player.gameObject, target.gameObject, ActionType.Attack, 0);
+                    int dmg = CalculateDamage(player.gameObject, target.gameObject, fakeAction, false, 1.0f);
+
+                    // HP 즉시 차감 (애니메이션 함수 호출 X)
+                    target.currentHp = Mathf.Max(0, target.currentHp - dmg);
+                }
+
+                if (battleEnded) break;
+
+                // 2. 적군 반격 턴 (살아남은 적이 있다면)
+                foreach (var monster in activeMonsters)
+                {
+                    if (monster.currentHp <= 0) continue;
+
+                    var target = activePlayers.FirstOrDefault(p => p.currentHp > 0);
+                    if (target == null) break;
+
+                    CombatAction fakeAction = new CombatAction(monster.gameObject, target.gameObject, ActionType.Attack, 0);
+                    int dmg = CalculateDamage(monster.gameObject, target.gameObject, fakeAction, false, 1.0f);
+                    
+                    target.currentHp = Mathf.Max(0, target.currentHp - dmg);
+                    // 아군 UI(HP바) 갱신이 필요하다면 여기서 호출하거나, 탐험 복귀 시 갱신됨
+                }
+            }
+        }
+
+        // 인스턴트 킬 조건 검사
+        bool CheckInstantWinCondition()
+        {
+            // 아직 몬스터나 플레이어가 세팅되지 않았으면 패스
+            if (activeMonsters.Count == 0 || activePlayers.Count == 0) return false;
+
+            int pCount = activePlayers.Count;
+            int mCount = activeMonsters.Count;
+
+            // 조건 1: 적 그룹의 수가 아군보다 작아야 함
+            if (mCount >= pCount) return false;
+
+            // 조건 2: 적 평균 레벨 <= 아군 평균 레벨
+            float pAvgLevel = (float)activePlayers.Average(p => ((PlayerController)p).level);
+            float mAvgLevel = (float)activeMonsters.Average(m => m.level); 
+
+            if (mAvgLevel > pAvgLevel) return false;
+
+            return true;
         }
 
         private bool CheckUnionAttackCondition(PlayerController actor)
@@ -1116,7 +1286,7 @@ namespace Manager
             action.itemData = currentSelectedItem; 
             if (currentSelectedItem is SkillData skill) action.skillData = skill;
 
-            // [추가] 즉시 실행되는 행동(AllAllies, Self 등)도 Auto 모드를 위해 저장
+            // 즉시 실행되는 행동(AllAllies, Self 등)도 Auto 모드를 위해 저장
             if (lastPlayerActions.ContainsKey(currentPlayerIndex))
                 lastPlayerActions[currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, target);
             else
@@ -2198,7 +2368,7 @@ namespace Manager
             // 2. 애니메이션: 타겟 앞으로 모이기
             GameObject target = action.target;
             Vector3 targetBasePos = target.transform.position;
-            Vector3 rallyPoint = targetBasePos + new Vector3(0, -140.0f, 0); 
+            Vector3 rallyPoint = targetBasePos + new Vector3(0, -0.9f, 0); 
 
             Dictionary<PlayerController, Vector3> originPositions = new Dictionary<PlayerController, Vector3>();
             Sequence moveSeq = DOTween.Sequence();
@@ -2206,7 +2376,7 @@ namespace Manager
             foreach (var p in partners)
             {
                 originPositions[p] = p.transform.position; 
-                Vector3 randomOffset = new Vector3(Random.Range(-0.5f, 0.5f), 0, 0);
+                Vector3 randomOffset = new Vector3(Random.Range(-1f, 1f), 0, 0);
                 moveSeq.Join(p.transform.DOMove(rallyPoint + randomOffset, 0.3f).SetEase(Ease.OutBack));
             }
             yield return moveSeq.WaitForCompletion();
@@ -3103,13 +3273,21 @@ namespace Manager
 
         void InitializeSlots()
         {
+            // 파괴되거나 null인 슬롯 참조를 리스트에서 제거
+            frontSlots.RemoveAll(slot => slot == null);
+            backSlots.RemoveAll(slot => slot == null);
+            playerFrontSlots.RemoveAll(slot => slot == null);
+            playerBackSlots.RemoveAll(slot => slot == null);
+
             if (frontSlots.Count == 0) CreateSlotsFor(enemyFrontRowContainer, frontSlots);
             if (backSlots.Count == 0) CreateSlotsFor(enemyBackRowContainer, backSlots);
-            ClearSlotContents(frontSlots); ClearSlotContents(backSlots);
+            ClearSlotContents(frontSlots); 
+            ClearSlotContents(backSlots);
 
             if (playerFrontSlots.Count == 0) CreateSlotsFor(playerFrontRowContainer, playerFrontSlots);
             if (playerBackSlots.Count == 0) CreateSlotsFor(playerBackRowContainer, playerBackSlots);
-            ClearSlotContents(playerFrontSlots); ClearSlotContents(playerBackSlots);
+            ClearSlotContents(playerFrontSlots); 
+            ClearSlotContents(playerBackSlots);
         }
 
         void CreateSlotsFor(Transform container, List<Transform> slotList)
@@ -3215,8 +3393,10 @@ namespace Manager
         private void ClearCombatField()
         {
             activeMonsters.Clear();
-            foreach (Transform child in enemyFrontRowContainer) Destroy(child.gameObject);
-            foreach (Transform child in enemyBackRowContainer) Destroy(child.gameObject);
+            
+            ClearSlotContents(frontSlots);
+            ClearSlotContents(backSlots);
+            
         }
 
         IEnumerator ProcessEnemyRowShift()
@@ -3428,7 +3608,12 @@ namespace Manager
             while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return)) yield return null;
 
             logPanel.SetActive(false);
-            DungeonStateManager.Instance.ChangeState(GameState.Exploration);
+            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.OutElastic).OnComplete(() => {
+                    raycastScreen.transform.localPosition = Vector3.zero;
+                    DungeonStateManager.Instance.ChangeState(GameState.Exploration);
+                }
+            );
+            
         }
 
         private void ClearParty()
