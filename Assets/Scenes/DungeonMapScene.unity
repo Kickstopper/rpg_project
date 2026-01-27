@@ -1749,6 +1749,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 458826975}
   m_CullTransparentMesh: 1
+--- !u!114 &477143651 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 368070584653764048, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+  m_PrefabInstance: {fileID: 1925991827}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &531591510 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 645996742513993428, guid: beee0a64d8af03d40855188208769f2c, type: 3}
@@ -4388,7 +4399,15 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
+    - target: {fileID: 1099050578756993401, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1977504675}
     - target: {fileID: 1259634916856298176, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1977504675}
+    - target: {fileID: 1399594074398958986, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
@@ -4397,6 +4416,10 @@ PrefabInstance:
       value: UI_Battle
       objectReference: {fileID: 0}
     - target: {fileID: 1693207331828656488, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1977504675}
+    - target: {fileID: 1759623589632408355, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
@@ -4409,6 +4432,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1433639888}
     - target: {fileID: 2953374270303622950, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1977504675}
+    - target: {fileID: 3173398134411288857, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1977504675}
+    - target: {fileID: 3202232617566948337, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
@@ -4512,6 +4543,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
+    - target: {fileID: 7275907031342135747, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1977504675}
     - target: {fileID: 7483852075534066200, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -4525,6 +4560,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1977504675}
     - target: {fileID: 8473745722402554721, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1977504675}
+    - target: {fileID: 9059719273858226867, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
@@ -4994,6 +5033,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   raycastScreen: {fileID: 2039851762}
+  combatBG: {fileID: 477143651}
   baseCmdContainer: {fileID: 251505309}
   fightCmdContainer: {fileID: 251505310}
   btnContainer: {fileID: 357663283}
@@ -5051,6 +5091,10 @@ MonoBehaviour:
   currentCmdTargetColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   moveSourceColor: {r: 0, g: 1, b: 1, a: 1}
   moveTargetColor: {r: 1, g: 0, b: 1, a: 1}
+  colorNormal: {r: 1, g: 1, b: 1, a: 1}
+  colorGrayout: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  colorHighlight: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  colorHighlightDisabled: {r: 1, g: 0.5, b: 0, a: 1}
   state: 0
   activeMonsters: []
   activePlayers: []

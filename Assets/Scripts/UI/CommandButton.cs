@@ -8,10 +8,12 @@ namespace UI
         Shoot, Reload, 
         Skill, 
         Item, Move, Guard, Next,
-        Union_Attack, Last_Stand, Rolling_Vulcan,
         Menu_Gun,     // Gun ▶ (Shoot, Reload)
         Menu_Extra,   // Extra ▶ (Item, Move, Guard, Next)
-        Menu_Tactics  // Tactics ▶ (Union, Last_Stand)
+        Menu_Tactics,  // Tactics ▶ (Union, Last_Stand)
+        Union_Attack, Last_Stand, Rolling_Vulcan, 
+        Penetration, Power_Charge, Anima, 
+        Burner, Freezer, Stunner, Pulser,
     }
     public class CommandButton : MonoBehaviour
     {

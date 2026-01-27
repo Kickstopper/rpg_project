@@ -22,6 +22,7 @@ namespace Manager
 
         [Header("UI References")]
         public GameObject raycastScreen;
+        public Image combatBG;
         public GameObject baseCmdContainer;   // 1단계 메뉴 (Fight, Talk...)
         public GameObject fightCmdContainer;  // 2단계 메뉴 (Attack, Move...)
         public RectTransform btnContainer; //fightCmdContainer의 버튼이 붙는 트랜스폼 (Inspector 할당)
@@ -100,6 +101,12 @@ namespace Manager
         public Color currentCmdTargetColor = Color.gray;
         public Color moveSourceColor = Color.gray;   // 이동하려는 내 캐릭터 색상
         public Color moveTargetColor = Color.cyan;  // 커서가 가리키는 대상 색상
+
+        [Header("Button Colors")]
+        public Color colorNormal = Color.white;          // 일반 텍스트
+        public Color colorGrayout = Color.gray;          // 사용 불가 텍스트
+        public Color colorHighlight = Color.yellow;      // 포커스 (사용 가능)
+        public Color colorHighlightDisabled = new Color(1f, 0.5f, 0.0f); // 포커스 (사용 불가) - 주황색
 
         [Header("Slot Management")]
         // 몬스터들의 슬롯을 관리할 리스트 (0,1,2: 전열 / 0,1,2: 후열)
@@ -576,9 +583,9 @@ namespace Manager
             if (instantResultPanel)
             {
                 instantResultPanel.SetActive(true);
-                instantResultText.text = $"<size=120%>순옥살!</size>\n\n" +
+                instantResultText.text = $"<size=120%>YOU는 SHOCK!!</size>\n\n" +
                                          $"EXP +{totalExp} / GOLD +{totalGold}\n" +
-                                         $"적들을 이미 죽어 있다.";
+                                         $"적들을 이미 죽어 있다...";
             }
             
             SoundManager.Instance.PlaySFX(SfxID.Attack_Sword); // 타격음 한번 재생
@@ -929,10 +936,13 @@ namespace Manager
             
             if (menuType == ActionType.Menu_Gun)
             {
+                // Shoot 버튼: 쏠 수 없으면 아예 비활성화
                 bool canShoot = actor.CanShootGun() && actor.currentGunAmmo > 0;
-                bool canReload = (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits);
                 AddSubButton(ActionType.Shoot, canShoot, subButtons); 
-                AddSubButton(ActionType.Reload, canReload, subButtons);
+
+                // Reload 버튼: 총이 있다면 항상 표시 및 활성화 (포커스 이동 위해)
+                bool hasGun = (actor.currentGun != null);
+                AddSubButton(ActionType.Reload, hasGun, subButtons);
             }
             else if (menuType == ActionType.Menu_Extra)
             {
@@ -971,8 +981,50 @@ namespace Manager
             currentMenuButtons = subButtons;
             isSubMenuActive = true;
             currentFightBtnIndex = 0;
-            
+
+            // 버튼들의 초기 색상 상태 갱신 (선택되지 않은 버튼들의 Grayout 처리)
+            RefreshButtonVisuals(currentMenuButtons);
             if (currentMenuButtons.Count > 0) StartCoroutine(SelectButtonDelayed(currentMenuButtons, 0));
+        }
+
+        // 리스트 내 모든 버튼의 시각적 상태(텍스트 색상) 갱신
+        void RefreshButtonVisuals(List<Button> buttons)
+        {
+            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+            
+            foreach (var btn in buttons)
+            {
+                CommandButton cmdBtn = btn.GetComponent<CommandButton>();
+                if (cmdBtn == null) continue;
+
+                TextMeshProUGUI txt = btn.GetComponentInChildren<TextMeshProUGUI>();
+                if (txt == null) continue;
+
+                // 1. 버튼의 사용 가능 여부 판별
+                bool isUsable = IsCommandUsable(actor, cmdBtn.type);
+
+                // 2. 현재 선택된 버튼인지 확인 (선택된 버튼은 UpdateSelection에서 처리하므로 여기서는 비선택 상태만)
+                // 하지만 일관성을 위해 전체 적용 후 UpdateSelection이 덮어쓰도록 함.
+                txt.color = isUsable ? colorNormal : colorGrayout;
+            }
+        }
+
+        // 커맨드 사용 가능 여부 판별 로직
+        bool IsCommandUsable(PlayerController actor, ActionType type)
+        {
+            switch (type)
+            {
+                case ActionType.Reload:
+                    // 총이 있고, 탄환이 꽉 차지 않았을 때만 사용 가능
+                    return (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits);
+                
+                case ActionType.Shoot:
+                    return actor.CanShootGun() && actor.currentGunAmmo > 0;
+
+                // 필요한 경우 다른 커맨드 조건도 추가
+                default:
+                    return true;
+            }
         }
 
         // 서브 메뉴 버튼 추가 헬퍼
@@ -1039,7 +1091,18 @@ namespace Manager
             if (changed) UpdateSelection(currentList, currentIndex);
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-                currentList[currentIndex].onClick.Invoke();
+            {
+                // 버튼이 상호작용 가능할 때만 실행
+                if (currentList[currentIndex].interactable)
+                {
+                    currentList[currentIndex].onClick.Invoke();
+                }
+                else
+                {
+                    // 비활성화된 버튼을 누르면 거부 사운드 재생
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                }
+            }
         }
 
         void UpdateSelection(List<Button> list, int index)
@@ -1120,9 +1183,22 @@ namespace Manager
         public void OnFightCommand_Reload()
         {
             inputCooldown = 0.2f;
-
             PlayerController currentActor = activePlayers[currentPlayerIndex] as PlayerController;
-            int speed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty; // 일반 속도
+
+            // 실행 차단: 이미 탄환이 가득 찬 경우
+            if (currentActor.currentGun != null && currentActor.currentGunAmmo >= currentActor.currentGun.maxHits)
+            {
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); // 거부 효과음
+                if (logPanel) 
+                { 
+                    logPanel.SetActive(true); 
+                    logText.text = "탄환이 이미 가득 찼습니다."; 
+                    StartCoroutine(HideLogAfterDelay(1.0f));
+                }
+                return;
+            }
+
+            int speed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty; 
 
             CombatAction action = new CombatAction(
                 currentActor.gameObject, 
@@ -2590,11 +2666,14 @@ namespace Manager
             
             ShowLog("롤링 발칸!!");
             // SoundManager.Instance.PlaySFX(SfxID.Skill_Ultimate); 
-
+            Color bgColor = combatBG.color;
+            
             // 1. 데이터 준비
             List<PlayerController> participants = currentUnionParticipants;
             int totalAmmo = participants.Sum(p => p.currentGunAmmo);
             
+           
+
             // 2. 무지개 빛 효과 시작
             Coroutine rainbowRoutine = StartCoroutine(ProcessRainbowEffect(participants));
 
@@ -2631,6 +2710,8 @@ namespace Manager
             // 4. 마무리
             if (rainbowRoutine != null) StopCoroutine(rainbowRoutine);
             
+            combatBG.color = bgColor;
+
             foreach (var p in participants)
             {
                 p.currentGunAmmo = 0;
@@ -2728,7 +2809,7 @@ namespace Manager
             float hueOffsetStep = 0.1f; 
             
             // [설정] 색상이 변하는 속도
-            float speed = 1.0f; 
+            float speed = 1.0f;
 
             while (true)
             {
@@ -2747,8 +2828,9 @@ namespace Manager
                     float localHue = (globalHue + (i * hueOffsetStep)) % 1.0f;
                     
                     Color rainbow = Color.HSVToRGB(localHue, 1f, 1f); // 채도(S)와 명도(V)는 최대로
-                    rainbow.a = 0.5f;
+                    rainbow.a = 0.3f;
                     players[i].SetHighlightColor(rainbow);
+                    combatBG.color = rainbow * Color.gray;
                 }
                 yield return null;
             }
@@ -3608,7 +3690,7 @@ namespace Manager
             while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return)) yield return null;
 
             logPanel.SetActive(false);
-            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.OutElastic).OnComplete(() => {
+            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.InCirc).OnComplete(() => {
                     raycastScreen.transform.localPosition = Vector3.zero;
                     DungeonStateManager.Instance.ChangeState(GameState.Exploration);
                 }
