@@ -1488,12 +1488,12 @@ namespace UI.DungeonMapScene
             if (Input.GetKey(KeyCode.S)) MoveBackward(moveSpeed);
             bool isRotating = false;
 
-            if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.A)) 
+            if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) 
             {
                 TurnLeft(rotSpeed); // 이 함수 내부에서 _dirX, _dirY가 바뀜
                 isRotating = true;
             }
-            if (Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.D)) 
+            if (Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) 
             {
                 TurnRight(rotSpeed);
                 isRotating = true;
@@ -1658,14 +1658,15 @@ namespace UI.DungeonMapScene
             // 회전은 이동 중에 입력되면 씹히는 것이 자연스러우므로 _isMoving 체크 유지
             if (!_isMoving)
             {
-                if (Input.GetKeyDown(KeyCode.Q)) AttemptTurnLeft();
-                if (Input.GetKeyDown(KeyCode.E)) AttemptTurnRight();
+                if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.LeftArrow)) AttemptTurnLeft();
+                if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.RightArrow)) AttemptTurnRight();
             }
 
             // --- 2. 전진 (W) : 더블 탭 홀드 시 달리기 ---
             // 이동 중이라도 W를 다시 누르면 달리기 상태(_isRunning)를 갱신해야 함
             // 그래야 첫 걸음(걷기) 후에 멈추지 않고 바로 달릴 수 있음
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
+            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) || 
+                Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow))
             {
                 if (Time.time - _lastWPressTime <= doubleTapThreshold)
                 {
@@ -1678,15 +1679,16 @@ namespace UI.DungeonMapScene
                 _lastWPressTime = Time.time;
             }
             
-            if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
+            if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || 
+                Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow))
             {
                 _isRunning = false;
             }
 
             if (!_isMoving) 
             {
-                if (Input.GetKey(KeyCode.W)) AttemptMoveForward();
-                if (Input.GetKey(KeyCode.S)) AttemptMoveBackward(); 
+                if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) AttemptMoveForward();
+                if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) AttemptMoveBackward(); 
             }
 
 

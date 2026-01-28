@@ -1099,6 +1099,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acdcb6d037bd65943bf47ddde9d1d82e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &225051833 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6349699224223713963, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+  m_PrefabInstance: {fileID: 1925991827}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &229478682
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4535,6 +4540,14 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
+    - target: {fileID: 6708805988194676213, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6708805988194676213, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6918532843515057839, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -4547,6 +4560,14 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
+    - target: {fileID: 7407348654410349754, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7407348654410349754, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7483852075534066200, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -4559,6 +4580,14 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1977504675}
+    - target: {fileID: 8470441303888833273, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8470441303888833273, guid: beee0a64d8af03d40855188208769f2c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8473745722402554721, guid: beee0a64d8af03d40855188208769f2c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -5034,6 +5063,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   raycastScreen: {fileID: 2039851762}
   combatBG: {fileID: 477143651}
+  BattleUI: {fileID: 225051833}
   baseCmdContainer: {fileID: 251505309}
   fightCmdContainer: {fileID: 251505310}
   btnContainer: {fileID: 357663283}

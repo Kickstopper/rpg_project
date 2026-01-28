@@ -23,6 +23,7 @@ namespace Manager
         [Header("UI References")]
         public GameObject raycastScreen;
         public Image combatBG;
+        public GameObject BattleUI;
         public GameObject baseCmdContainer;   // 1단계 메뉴 (Fight, Talk...)
         public GameObject fightCmdContainer;  // 2단계 메뉴 (Attack, Move...)
         public RectTransform btnContainer; //fightCmdContainer의 버튼이 붙는 트랜스폼 (Inspector 할당)
@@ -178,6 +179,7 @@ namespace Manager
             if (fightCmdContainer) fightCmdContainer.SetActive(false);
             if (commandPanel) commandPanel.SetActive(false);
             if (subMenuContainer) subMenuContainer.SetActive(false);
+            SetEnemyVisualsActive(false);
 
             isAutoMode = false;         
             reserveAutoOff = false;     
@@ -224,38 +226,53 @@ namespace Manager
                 Debug.Log("조건 만족: 인스턴트 전투 실행");
                 
                 // 유닛들의 모습(Sprite)을 숨김
-                SetBattleVisualsActive(false);
-
+                SetPlayerVisualsActive(false);
                 StartCoroutine(ProcessInstantWin());
             }
             else
             {
                 float screenPy = 216f;
-                raycastScreen.transform.DOLocalMoveY(screenPy, 0.3f).SetEase(Ease.OutElastic).OnComplete(() =>
-                {
-                    raycastScreen.transform.localPosition = new Vector3(0, screenPy, 0);
-                    // 정상 전투라면 반드시 유닛들을 보이게 설정
-                    SetBattleVisualsActive(true);
+                float duration = 0.3f;
 
-                    // 조건 불만족 시 기존 정상 전투 진입
-                    SoundManager.Instance.PlayBGM(BgmID.Encounter);
-                    LayoutRebuilder.ForceRebuildLayoutImmediate(enemyFrontRowContainer as RectTransform);
-                    LayoutRebuilder.ForceRebuildLayoutImmediate(playerFrontRowContainer as RectTransform);
-                    StartCoroutine(SetupBattle());
-                    
-                });
+                // 초기 위치 설정
+                BattleUI.transform.localPosition = new Vector3(0, -screenPy, 0);
+                raycastScreen.transform.localPosition = Vector3.zero;
+                SetPlayerVisualsActive(true);
+
+                DOTween.Sequence()
+                    .Join(raycastScreen.transform.DOLocalMoveY(screenPy, duration).SetEase(Ease.OutBounce))
+                    .Join(BattleUI.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutBounce))
+                    .OnComplete(() => 
+                    {
+                        // 종료 후 위치 확정 (Floating point 오차 방지)
+                        raycastScreen.transform.localPosition = new Vector3(0, screenPy, 0);
+                        BattleUI.transform.localPosition = Vector3.zero;
+
+                        // 후속 로직 실행
+                        SetEnemyVisualsActive(true);
+                        SoundManager.Instance.PlayBGM(BgmID.Encounter);
+                        
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(enemyFrontRowContainer as RectTransform);
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(playerFrontRowContainer as RectTransform);
+                        
+                        StartCoroutine(SetupBattle());
+                    });
             }
         }
 
         // 전투 유닛 및 슬롯 컨테이너 표시/숨김 제어
-        void SetBattleVisualsActive(bool isActive)
+        void SetEnemyVisualsActive(bool isActive)
         {
             if (enemyFrontRowContainer) enemyFrontRowContainer.gameObject.SetActive(isActive);
             if (enemyBackRowContainer) enemyBackRowContainer.gameObject.SetActive(isActive);
+            
+        }
+
+        void SetPlayerVisualsActive(bool isActive)
+        {
             if (playerFrontRowContainer) playerFrontRowContainer.gameObject.SetActive(isActive);
             if (playerBackRowContainer) playerBackRowContainer.gameObject.SetActive(isActive);
             
-            // if (battleBackgroundImage) battleBackgroundImage.SetActive(isActive);
         }
 
         void SpawnParty()
@@ -3690,12 +3707,16 @@ namespace Manager
             while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return)) yield return null;
 
             logPanel.SetActive(false);
-            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.InCirc).OnComplete(() => {
+            float duration = 0.5f;
+            DOTween.Sequence()
+                .Join(raycastScreen.transform.DOLocalMoveY(0f, duration).SetEase(Ease.InCirc))
+                .Join(BattleUI.transform.DOLocalMoveY(-216f, duration).SetEase(Ease.InCirc))
+                .OnComplete(() =>
+                {
                     raycastScreen.transform.localPosition = Vector3.zero;
+                    BattleUI.transform.localPosition = new Vector3(0, -216f);
                     DungeonStateManager.Instance.ChangeState(GameState.Exploration);
-                }
-            );
-            
+                });
         }
 
         private void ClearParty()
