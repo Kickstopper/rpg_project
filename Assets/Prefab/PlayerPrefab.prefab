@@ -319,7 +319,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4544698828093742712
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1159,6 +1159,7 @@ MonoBehaviour:
   sourceData:
     id: 
     name: 
+    exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
@@ -1192,6 +1193,7 @@ MonoBehaviour:
   currentGun: {fileID: 0}
   currentAmmo: {fileID: 0}
   currentGunAmmo: 0
+  currentEXP: 0
   currentStatusEffects: []
   currentRow: 0
   isCommander: 0

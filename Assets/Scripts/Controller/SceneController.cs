@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+using Manager;
 namespace Controller 
 {
     public static class GameScene
@@ -96,7 +97,8 @@ namespace Controller
         public void OnClickLoadGame()
         {
             // 로드 창 활성화
-            confirmWindow.SetActive(true);
+            //confirmWindow.SetActive(true);
+            SaveManager.Instance.LoadGame();
         }
 
         public void OnClickQuit()

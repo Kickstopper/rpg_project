@@ -79,7 +79,7 @@ namespace Manager
 
             // 맵 상태(방문 여부, 아이템 획득 등) 관리
             // ID를 string 대신 int(MapData.mapID)를 쓰거나, string으로 변환해서 사용
-            string mapIDKey = data.mapID.ToString(); 
+            string mapIDKey = data.mapID; 
 
             var mapState = GameManager.Instance.GetDungeonMapState(mapIDKey);
             
@@ -110,6 +110,14 @@ namespace Manager
             }
             Debug.LogWarning($"테마를 찾을 수 없습니다: {themeName}, 기본 테마를 반환합니다.");
             return allThemes.Count > 0 ? allThemes[0] : null;
+        }
+
+        public void UpdateStartPosition(int px, int py, Direction dir)
+        {
+            if (CurrentMapData == null) return;
+            CurrentMapData.startX = px;
+            CurrentMapData.startY = py;
+            CurrentMapData.startDirection = dir;
         }
     }
 }

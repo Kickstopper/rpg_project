@@ -1,7 +1,7 @@
 {
     "width": 9,
     "height": 9,
-    "mapID": 3,
+    "mapID": "dummy",
     "themeName": "DummyTheme",
     "startX": 4,
     "startY": 0,

@@ -397,6 +397,8 @@ namespace UI.DungeonMapScene
             // 초기 논리 좌표 설정
             _logicX = Mathf.FloorToInt(_posX);
             _logicY = Mathf.FloorToInt(_posY);
+
+            MapManager.Instance.UpdatePlayerPosition(_logicX, _logicY, _worldMap.startDirection, _worldMap.mapID);
         }
 
         private void InitializeWallDatabaseDummy()
@@ -522,6 +524,7 @@ namespace UI.DungeonMapScene
             bool animUpdated = UpdateWallAnimations();
 
             if (isInputLocked) return;
+            if (Input.GetKeyDown(KeyCode.L)) SaveManager.Instance.SaveGame();
 
             // 시점 입력 처리 및 변경 확인
             bool lookUpdated = HandleLookInput();
@@ -2328,6 +2331,9 @@ namespace UI.DungeonMapScene
         // 플레이어가 한 칸 이동할 때마다 호출 (Move 함수 내부)
         private void OnStepTaken()
         {
+            // 저장을 위한 현재 위치를 업데이트
+            MapManager.Instance.UpdatePlayerPosition(_logicX, _logicY, _worldMap.startDirection, _worldMap.mapID);
+
             stepsUntilNextBattle--;
             
             // 걸을 때마다 게이지와 깜빡임 속도 갱신

@@ -41,6 +41,8 @@ namespace Controller
 
         public int currentGunAmmo = 0; // 현재 탄환 수
 
+        public int currentEXP; // 현재 경험치
+
         private List<ArmorData> currentArmors = new List<ArmorData>();
         
         // 상태 이상 (Status Effect)
@@ -78,13 +80,6 @@ namespace Controller
             currentGun = null;
             currentAmmo = null;
             currentGunAmmo = 0;
-            
-            learnedSkillIds.Clear();
-            equippedArmorIds.Clear();
-            RefreshArmorStats();
-
-            sourceData = null;
-            currentStatusEffects.Clear();
             
             // 1. 그래픽 숨기기 (스프라이트, UI 등)
             UpdateUI();
@@ -147,6 +142,56 @@ namespace Controller
             // 3. 방어구 장착
             equippedArmorIds = new List<string>(data.initialArmorIds);
             RefreshArmorStats();
+        }
+
+        public CharacterSaveData ToSaveData()
+        {
+            CharacterSaveData data = new CharacterSaveData();
+
+            // 기본 정보
+            data.characterId = sourceData.id;
+            data.level = this.level;
+            data.currentHp = this.currentHp;
+            data.currentMp = this.currentMp;
+            data.exp = this.currentEXP;
+
+            // 장비 정보
+            data.weaponId = this.equippedWeaponId;
+            data.gunId = this.equippedGunId;
+            data.ammoId = this.equippedAmmoId;
+            data.armorIds = new List<string>(this.equippedArmorIds);
+
+            // 스킬 정보
+            data.learnedSkillIds = new List<string>(this.learnedSkillIds);
+
+            // enum을 string으로 변환
+            data.align = this.align.ToString();
+            data.row = this.currentRow.ToString();
+
+            return data;
+        }
+
+        // 저장된 데이터를 불러와서 내 상태 덮어쓰기
+        public void LoadFromSaveData(CharacterSaveData data)
+        {
+            // 1. 레벨 및 기본 스탯 설정
+            this.level = data.level;
+            this.currentHp = data.currentHp;
+            this.currentMp = data.currentMp;
+            this.currentEXP = data.exp;
+
+            // 2. 장비 장착
+            EquipWeapon(data.weaponId);
+            EquipGun(data.gunId, data.ammoId);
+            
+            this.equippedArmorIds = new List<string>(data.armorIds);
+            RefreshArmorStats();
+
+            // 3. 스킬 목록 복구
+            this.learnedSkillIds = new List<string>(data.learnedSkillIds);
+
+            // 4. 기타 상태
+            if (System.Enum.TryParse(data.align, out Align parsedAlign)) this.align = parsedAlign;
         }
 
         private string GetAlignString(Align align)
@@ -351,6 +396,11 @@ namespace Controller
         public override ResistanceData GetResistances()
         {
             return sourceData.resistances; 
+        }
+
+        public void AddExp(int exp)
+        {
+            currentEXP += exp;
         }
 
         // [BattleEntity 구현] 데미지 처리

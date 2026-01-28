@@ -40,9 +40,7 @@ public class MonsterDatabase : ScriptableObject
         public ResistanceData resistances; // 물리, 화염, 빙결 내성 등
 
         [Header("Rewards")]
-        public int expReward;       // 경험치
-        public int goldReward;      // 돈
-        // public List<string> dropItemIds; // 드랍 아이템 ID 리스트
+        public List<string> dropItemIds; // 드랍 아이템 ID 리스트
     }
     
     [Header("몬스터 리스트")]

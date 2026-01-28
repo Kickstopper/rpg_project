@@ -169,6 +169,14 @@ namespace Manager
         private WaitForSeconds wait01 = new WaitForSeconds(0.1f);
         private WaitForSeconds wait05 = new WaitForSeconds(0.5f);
         private WaitForSeconds wait10 = new WaitForSeconds(1f);
+
+        public struct BattleReward
+        {
+            public int totalExp;      // 파티가 획득한 총 경험치
+            public int expPerMember;  // 개인당 돌아가는 경험치
+            public int totalGold;     // 획득한 총 골드
+            public List<string> dropItems; // 획득한 아이템 ID 목록
+        }
         
         void Awake() { if (Instance == null) Instance = this; }
 
@@ -275,10 +283,15 @@ namespace Manager
             
         }
 
+        // CombatManager.cs 내부
+
         void SpawnParty()
         {
             activePlayers.Clear();
             allSlotControllers.Clear();
+
+            // 파티 매니저가 가진 현재 멤버 수만큼 루프 (최대 6명 제한)
+            int count = Mathf.Min(PartyManager.Instance.currentPartyData.Count, 6);
 
             for (int i = 0; i < 6; i++)
             {
@@ -293,13 +306,29 @@ namespace Manager
                 PlayerController pc = go.GetComponent<PlayerController>();
                 allSlotControllers.Add(pc);
 
-                var data = PartyManager.Instance.GetMemberData(i);
-                if (data != null)
+                CharacterSaveData savedData = PartyManager.Instance.GetMemberSaveData(i);
+                
+                if (savedData != null)
                 {
-                    pc.Initialize(data, isFront ? RowType.Front : RowType.Back);
-                    pc.columnIndex = i; 
-                    pc.gameObject.name = pc.sourceData.name;
-                    activePlayers.Add(pc);
+                    // 1. ID로 기본 정보(DB Entry) 가져오기 (이미지, 기본 스탯 등)
+                    var entry = PartyManager.Instance.GetEntryById(savedData.characterId);
+                    
+                    if (entry != null)
+                    {
+                        // 2. 기본 초기화 (Entry 기반)
+                        pc.Initialize(entry, isFront ? RowType.Front : RowType.Back);
+                        
+                        // 3. 저장된 상태(레벨, HP, 장비 등) 덮어쓰기
+                        pc.LoadFromSaveData(savedData);
+
+                        pc.columnIndex = i; 
+                        pc.gameObject.name = pc.sourceData.name;
+                        activePlayers.Add(pc);
+                    }
+                    else
+                    {
+                         pc.InitializeEmpty(i);
+                    }
                 }
                 else
                 {
@@ -566,6 +595,79 @@ namespace Manager
             }
         }
 
+        BattleReward CalculateRewards(List<MonsterController> monsters, List<PlayerController> players)
+        {
+            BattleReward reward = new BattleReward();
+            reward.dropItems = new List<string>();
+
+            // ---------------------------------------------------------
+            // 1. 경험치 계산 (몬스터 레벨 총합 - 파티 레벨 총합)
+            // ---------------------------------------------------------
+            int monsterTotalLv = monsters.Sum(m => m.sourceData.stats.level);
+            int partyTotalLv = players.Sum(p => p.level);
+            
+            // 생존한 파티원 수 (경험치 분배 대상)
+            // 만약 죽은 동료는 경험치를 못 받는다면: p.currentHp > 0 조건 추가
+            int livingMemberCount = players.Count(p => p.currentHp > 0); 
+
+            // [보정 로직]
+            // 단순히 (적 - 아군)만 하면 아군이 셀 때 0이 되므로, 
+            // '기본 경험치(적 레벨 합 * 10)'에 '레벨 차이 보정치'를 더하는 방식을 추천합니다.
+            // 작성자님의 의도("차이로 결정")를 살려: (적 총합 * X) + (적 총합 - 아군 총합) * Y
+            
+            // 여기서는 심플하게: (적 레벨 합 * 15) + (적 레벨 합 - 아군 레벨 합) * 5
+            // 레벨 차이가 +면 보너스, -면 페널티
+            int baseExp = monsterTotalLv * 15;
+            int diffBonus = (monsterTotalLv - partyTotalLv) * 5;
+            
+            reward.totalExp = Mathf.Max(10, baseExp + diffBonus); // 최소 10 EXP는 보장
+
+            if (livingMemberCount > 0)
+                reward.expPerMember = reward.totalExp / livingMemberCount;
+            else
+                reward.expPerMember = 0;
+
+            // ---------------------------------------------------------
+            // 2. 골드 계산 (레벨 비례 랜덤 + 꽝 포함)
+            // ---------------------------------------------------------
+            int calculatedGold = 0;
+            foreach (var m in monsters)
+            {
+                // 30% 확률로 골드 없음 (꽝)
+                if (UnityEngine.Random.value < 0.3f) continue;
+
+                int lv = m.sourceData.stats.level;
+                // 최소: 레벨 * 5, 최대: 레벨 * 15
+                int gold = UnityEngine.Random.Range(lv * 5, lv * 15);
+                calculatedGold += gold;
+            }
+            reward.totalGold = calculatedGold;
+
+            // ---------------------------------------------------------
+            // 3. 아이템 계산 (랜덤 인덱스 + 꽝 포함)
+            // ---------------------------------------------------------
+            foreach (var m in monsters)
+            {
+                List<string> dropTable = m.sourceData.dropItemIds; // MonsterEntry에 있다고 가정
+                
+                if (dropTable == null || dropTable.Count == 0) continue;
+
+                // 40% 확률로 아이템 드롭 없음 (꽝)
+                if (UnityEngine.Random.value < 0.4f) continue;
+
+                // 리스트에서 랜덤 선택
+                int randomIndex = UnityEngine.Random.Range(0, dropTable.Count);
+                string itemId = dropTable[randomIndex];
+                
+                if (!string.IsNullOrEmpty(itemId))
+                {
+                    reward.dropItems.Add(itemId);
+                }
+            }
+
+            return reward;
+        }
+
         // 인스턴트 전투 처리 메인 루틴
         IEnumerator ProcessInstantWin()
         {
@@ -583,28 +685,29 @@ namespace Manager
             SimulateAutoBattleLogic();
 
             // 4. 결과 텍스트 구성
-            int totalExp = 0;
-            int totalGold = 0;
-            List<string> dropItems = new List<string>();
+            List<MonsterController> allMonsters = activeMonsters.OfType<MonsterController>().ToList();
+            List<PlayerController> allPlayers = activePlayers.OfType<PlayerController>().ToList();
+            
+            BattleReward reward = CalculateRewards(allMonsters, allPlayers);
 
-            // foreach (var m in activeMonsters)
-            // {
-            //     // 몬스터가 죽었다고 가정하고 보상 계산
-            //     // (실제 드랍 로직에 따라 수정 필요)
-            //     totalExp += m.sourceData.rewardExp;
-            //     totalGold += m.sourceData.rewardGold;
-            //     // 아이템 드랍 로직은 별도로 호출하거나 여기서 처리
-            // }
+            foreach(var p in allPlayers)
+            {
+                if (p.currentHp > 0) {
+                    p.AddExp(reward.expPerMember); 
+                }
+            }
+            InventoryManager.Instance.AddGold(reward.totalGold);
+            foreach(var itemId in reward.dropItems) InventoryManager.Instance.AddItem(itemId, 1);
 
             // 5. 결과 표시
             if (instantResultPanel)
             {
-                instantResultPanel.transform.localScale = Vector3.one;
                 instantResultPanel.SetActive(true);
-                instantResultPanel.transform.DOScale(1.1f, instantWinDelay).SetEase(Ease.Flash);
+                string itemTxt = reward.dropItems.Count > 0 ? $"\nDrops: {reward.dropItems.Count}" : "";
+                
                 instantResultText.text = $"<size=120%>YOU는 SHOCK!!</size>\n\n" +
-                                         $"EXP +{totalExp} / GOLD +{totalGold}\n" +
-                                         $"적들을 이미 죽어 있다...";
+                                         $"EXP +{reward.totalExp}\nGOLD +{reward.totalGold}{itemTxt}\n" +
+                                         $"적들은 이미 죽어 있다...";
             }
             
             SoundManager.Instance.PlaySFX(SfxID.Attack_Sword); // 타격음 한번 재생
@@ -3702,23 +3805,56 @@ namespace Manager
             if (commandPanel) commandPanel.SetActive(false);
             if (logPanel) logPanel.SetActive(true);
 
-            if (isWin) { logText.text = "승리는 나의 것!"; SoundManager.Instance.PlayBGM(BgmID.Victory); }
-            else logText.text = "패배는 너의 것!";
+            if (isWin)
+            {
+                SoundManager.Instance.PlayBGM(BgmID.Victory);
+                
+                // -----------------------------------------------------
+                // 보상 계산 및 지급
+                // -----------------------------------------------------
+                List<MonsterController> allMonsters = activeMonsters.OfType<MonsterController>().ToList();
+                List<PlayerController> allPlayers = activePlayers.OfType<PlayerController>().ToList();
+
+                BattleReward reward = CalculateRewards(allMonsters, allPlayers);
+
+                // 1. 경험치 지급
+                foreach(var p in allPlayers)
+                {
+                    if (p.currentHp > 0) // 살아있는 멤버만
+                    {
+                        p.AddExp(reward.expPerMember); 
+                        Debug.Log($"{p.entityName} EXP +{reward.expPerMember}");
+                    }
+                }
+
+                // 2. 골드 지급
+                InventoryManager.Instance.AddGold(reward.totalGold);
+
+                // 3. 아이템 지급
+                foreach(var itemId in reward.dropItems)
+                {
+                    InventoryManager.Instance.AddItem(itemId, 1);
+                }
+
+                // 4. 결과 로그 출력
+                logText.text = "승리는 버닝 썬!";
+                // string itemLog = reward.dropItems.Count > 0 ? $"\nItems: {string.Join(", ", reward.dropItems)}" : "";
+                // logText.text = $"VICTORY!\nEXP: +{reward.totalExp} ({reward.expPerMember}/ea)\nGOLD: +{reward.totalGold}G{itemLog}";
+            }
+            else 
+            {
+                logText.text = "패배는 너의 것!";
+            }
 
             yield return wait05;
             while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return)) yield return null;
 
             logPanel.SetActive(false);
-            float duration = 0.5f;
-            DOTween.Sequence()
-                .Join(raycastScreen.transform.DOLocalMoveY(0f, duration).SetEase(Ease.InCirc))
-                .Join(BattleUI.transform.DOLocalMoveY(-216f, duration).SetEase(Ease.InCirc))
-                .OnComplete(() =>
-                {
+            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.OutElastic).OnComplete(() => {
                     raycastScreen.transform.localPosition = Vector3.zero;
-                    BattleUI.transform.localPosition = new Vector3(0, -216f);
                     DungeonStateManager.Instance.ChangeState(GameState.Exploration);
-                });
+                }
+            );
         }
 
         private void ClearParty()

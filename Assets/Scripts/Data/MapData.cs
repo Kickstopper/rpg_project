@@ -9,7 +9,7 @@ namespace Data
     {
         public int width;
         public int height;
-        public int mapID;
+        public string mapID;
         public string themeName; // JSON에서 불러올 테마 이름
         
         public int startX; // 플레이어의 시작 좌표

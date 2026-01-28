@@ -20,7 +20,7 @@ namespace UI.MapEditorScene
         int inputStartY = 0;
         Direction inputStartDirection = Direction.North; 
 
-        int inputID = 1;
+        string inputID;
         DungeonTheme inputTheme;
 
         [MenuItem("Tools/Dungeon Map Editor")]
@@ -32,11 +32,11 @@ namespace UI.MapEditorScene
         void OnEnable()
         {
             // 초기화 시 기본값 설정 (테마는 null로 시작하거나 기본 테마 로드 가능)
-            if (mapData == null) InitializeMap(10, 10, 1, null, 0, 0, 0);
+            if (mapData == null) InitializeMap(10, 10, "default", null, 0, 0, 0);
         }
 
         // 2. 크기를 인자로 받아 초기화하도록 수정
-        void InitializeMap(int w, int h, int id, DungeonTheme theme, int startX, int startY, Direction startDir)
+        void InitializeMap(int w, int h, string id, DungeonTheme theme, int startX, int startY, Direction startDir)
         {
             mapData = new MapData();
             mapData.width = w;
@@ -79,7 +79,7 @@ namespace UI.MapEditorScene
 
             // 1. Map ID 입력
             GUILayout.Label("ID:", GUILayout.Width(20));
-            inputID = EditorGUILayout.IntField(inputID, GUILayout.Width(30));
+            inputID = EditorGUILayout.TextField(inputID, GUILayout.Width(80));
 
             // 2. 시작 위치 및 방향 입력
             GUILayout.Space(10);
