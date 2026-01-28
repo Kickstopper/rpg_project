@@ -3006,7 +3006,7 @@ MonoBehaviour:
   gridBaseTurnDuration: 0.15
   gridBaseMoveDuration: 0.2
   runMultiplier: 2
-  lightingIntensity: 4
+  lightingIntensity: 3.5
   useGridLighting: 1
   wireframeColor: {r: 0, g: 0.9019608, b: 1, a: 1}
   floorWireframeColor: {r: 0, g: 0, b: 1, a: 1}

@@ -599,7 +599,9 @@ namespace Manager
             // 5. 결과 표시
             if (instantResultPanel)
             {
+                instantResultPanel.transform.localScale = Vector3.one;
                 instantResultPanel.SetActive(true);
+                instantResultPanel.transform.DOScale(1.1f, instantWinDelay).SetEase(Ease.Flash);
                 instantResultText.text = $"<size=120%>YOU는 SHOCK!!</size>\n\n" +
                                          $"EXP +{totalExp} / GOLD +{totalGold}\n" +
                                          $"적들을 이미 죽어 있다...";

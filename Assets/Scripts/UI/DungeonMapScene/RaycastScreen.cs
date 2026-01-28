@@ -110,7 +110,7 @@ namespace UI.DungeonMapScene
         public float runMultiplier = 2.0f; // Shift 누르면 2배 빨라짐
 
         [Header("Lighting Settings")]
-        public float lightingIntensity = 1.0f; 
+        public float lightingIntensity = 3.5f; 
         public bool useGridLighting = true; // true면 그리드 단위로 밝기 끊어짐
 
         [Header("Scanner Effect Settings")]
