@@ -267,32 +267,34 @@ namespace Manager
             }
             else
             {
-                float screenPy = 216f;
-                float duration = 0.3f;
-
-                // 초기 위치 설정
-                BattleUI.transform.localPosition = new Vector3(0, -screenPy, 0);
-                raycastScreen.transform.localPosition = Vector3.zero;
                 SetPlayerVisualsActive(true);
+                if (raycastScreen)
+                {
+                    float screenPy = 216f;
+                    float duration = 0.3f;
 
-                DOTween.Sequence()
-                    .Join(raycastScreen.transform.DOLocalMoveY(screenPy, duration).SetEase(Ease.OutBounce))
-                    .Join(BattleUI.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutBounce))
-                    .OnComplete(() => 
-                    {
-                        // 종료 후 위치 확정 (Floating point 오차 방지)
-                        raycastScreen.transform.localPosition = new Vector3(0, screenPy, 0);
-                        BattleUI.transform.localPosition = Vector3.zero;
+                    // 초기 위치 설정
+                    BattleUI.transform.localPosition = new Vector3(0, -screenPy, 0);
+                    raycastScreen.transform.localPosition = Vector3.zero;
 
-                        // 후속 로직 실행
-                        SetEnemyVisualsActive(true);
-                        SoundManager.Instance.PlayBGM(BgmID.Encounter);
-                        
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(enemyFrontRowContainer as RectTransform);
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(playerFrontRowContainer as RectTransform);
-                        
-                        StartCoroutine(SetupBattle());
-                    });
+                    DOTween.Sequence()
+                        .Join(raycastScreen.transform.DOLocalMoveY(screenPy, duration).SetEase(Ease.OutBounce))
+                        .Join(BattleUI.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutBounce))
+                        .OnComplete(() => 
+                        {
+                            // 종료 후 위치 확정 (Floating point 오차 방지)
+                            raycastScreen.transform.localPosition = new Vector3(0, screenPy, 0);
+                            BattleUI.transform.localPosition = Vector3.zero;
+
+                            // 후속 로직 실행
+                            StartCoroutine(SetupBattle());
+                        });
+                }
+                else
+                {
+                    StartCoroutine(SetupBattle());
+                }
+                
             }
         }
 
@@ -365,6 +367,11 @@ namespace Manager
 
         IEnumerator SetupBattle()
         {
+            SetEnemyVisualsActive(true);
+            SoundManager.Instance.PlayBGM(BgmID.Encounter);
+            
+            LayoutRebuilder.ForceRebuildLayoutImmediate(enemyFrontRowContainer as RectTransform);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(playerFrontRowContainer as RectTransform);
             yield return wait10;
             PreparePlayerTurn();
         }
