@@ -127,11 +127,11 @@ namespace UI.DungeonMapScene
         [Header("References")]
         public GameObject screenContainer;
         public GridMap miniMap; 
-        public GameObject autoMap;
+        public GameObject autoMapContainer;
+        public AutoMapRenderer autoMapRenderer; // autoMap에 포함된 렌더러
         public GameObject controllerPanel;
         public DialogueUI dialogueUI; // 인스펙터에서 할당
         
-        private AutoMapRenderer autoMapRenderer; // autoMap에 포함된 렌더러
         private DungeonMapState currentMapState; // 현재 오토맵의 상태
         
         // 심도 조명 계산용 고정 좌표
@@ -226,10 +226,10 @@ namespace UI.DungeonMapScene
             Render();
 
             // 1. 던전 상태 이벤트 구독
-            DungeonStateManager.Instance.OnStateChanged += OnGameStateChanged;
+            GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
             
-            // 2. 초기 상태 확인
-            OnGameStateChanged(DungeonStateManager.Instance.CurrentState);
+            // 2. 초기 상태
+            OnGameStateChanged(GameState.Exploration);
         }
 
         // 스크립트가 꺼지거나 씬이 바뀔 때 안전하게 상태 초기화
@@ -349,12 +349,8 @@ namespace UI.DungeonMapScene
             _worldMap = LevelManager.Instance.CurrentMapData;
             currentMapState = LevelManager.Instance.CurrentMapState;
             
-            if (autoMap != null)
-            {
-                autoMap.SetActive(false);
-                autoMapRenderer = autoMap.GetComponent<AutoMapRenderer>();
-                autoMapRenderer.DrawFullMap(_worldMap, currentMapState);
-            }
+            autoMapContainer.SetActive(false);
+            autoMapRenderer.DrawFullMap(_worldMap, currentMapState);
 
             if (miniMap != null)
             {
@@ -495,8 +491,8 @@ namespace UI.DungeonMapScene
         {
             _pulseTween?.Kill();
             
-            if (DungeonStateManager.Instance != null)
-                DungeonStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
         }
 
         // [핵심] 상태가 바뀔 때마다 자동으로 호출되는 함수
@@ -519,18 +515,23 @@ namespace UI.DungeonMapScene
         void Update()
         {
             if (!canRender) return;
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
+                return;  
+            } 
             
             // 애니메이션 상태 업데이트 및 변경 여부 확인
             bool animUpdated = UpdateWallAnimations();
 
             if (isInputLocked) return;
-            if (Input.GetKeyDown(KeyCode.L)) SaveManager.Instance.SaveGame();
 
             // 시점 입력 처리 및 변경 확인
             bool lookUpdated = HandleLookInput();
 
             if (Input.GetKeyDown(KeyCode.Tab)) ToggleMovementMode();
-            if (Input.GetKeyDown(KeyCode.M)) autoMap.SetActive(!autoMap.activeSelf);
+            
+            if (Input.GetKeyDown(KeyCode.M)) autoMapContainer.SetActive(!autoMapContainer.activeSelf);
             if (Input.GetKeyDown(KeyCode.P))
             {
                 // 애너글리프 토글
@@ -2238,6 +2239,8 @@ namespace UI.DungeonMapScene
                 float miniMapDuration = (Mathf.Abs(directionStep) == 2) ? 0.2f : 0.1f;
                 miniMap.SetDirection(_direction, miniMapDuration);
             }
+
+            UpdateMapDiscovery(gridX, gridY);
         }
 
         /*
@@ -2387,7 +2390,7 @@ namespace UI.DungeonMapScene
         {
             _pulseTween?.Kill();
             
-            DungeonStateManager.Instance.StartEncounter(currentTheme.monsterList);
+            GameStateManager.Instance.StartEncounter(currentTheme.monsterList);
             ResetEncounterSteps();
         }
     }

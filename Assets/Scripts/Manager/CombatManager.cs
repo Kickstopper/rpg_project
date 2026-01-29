@@ -170,6 +170,8 @@ namespace Manager
         private WaitForSeconds wait05 = new WaitForSeconds(0.5f);
         private WaitForSeconds wait10 = new WaitForSeconds(1f);
 
+        private bool isBattleState = false; // 현재 전투 상태인지 아닌지
+
         public struct BattleReward
         {
             public int totalExp;      // 파티가 획득한 총 경험치
@@ -179,6 +181,32 @@ namespace Manager
         }
         
         void Awake() { if (Instance == null) Instance = this; }
+
+        void Start()
+        {
+            GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
+            OnGameStateChanged(GameStateManager.Instance.CurrentState);
+        }
+
+        void OnDestroy()
+        {
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+        }
+
+        // 상태가 바뀔 때마다 자동으로 호출되는 함수
+        void OnGameStateChanged(GameState newState)
+        {
+            if (newState == GameState.Battle)
+            {
+                //SoundManager.Instance.PlayBGM();
+                isBattleState = true;
+            }
+            else
+            {
+                isBattleState = false;
+            }
+        }
 
         public void Initialize(List<string> monsterIds)
         {
@@ -282,8 +310,6 @@ namespace Manager
             if (playerBackRowContainer) playerBackRowContainer.gameObject.SetActive(isActive);
             
         }
-
-        // CombatManager.cs 내부
 
         void SpawnParty()
         {
@@ -533,6 +559,8 @@ namespace Manager
         
         void Update()
         {
+            if (!isBattleState) return;
+            
             if (isAutoMode)
             {
                 if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift))
@@ -720,7 +748,7 @@ namespace Manager
             // 7. 전투 종료 처리
             // 몬스터들을 비활성화하거나 Destroy 처리해야 함
             ClearCombatField(); 
-            DungeonStateManager.Instance.ChangeState(GameState.Exploration);
+            GameStateManager.Instance.ChangeState(GameState.Exploration);
         }
 
         // 인스턴트 킬 시뮬레이션 로직: 아군 선공으로 적이 전멸할 때까지 반복
@@ -2057,7 +2085,7 @@ namespace Manager
             {
                 logText.text = "무사히 도망쳤다!";
                 yield return wait10;
-                DungeonStateManager.Instance.ChangeState(GameState.Exploration);
+                GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
             else
             {
@@ -3852,7 +3880,7 @@ namespace Manager
             logPanel.SetActive(false);
             raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.OutElastic).OnComplete(() => {
                     raycastScreen.transform.localPosition = Vector3.zero;
-                    DungeonStateManager.Instance.ChangeState(GameState.Exploration);
+                    GameStateManager.Instance.ChangeState(GameState.Exploration);
                 }
             );
         }
