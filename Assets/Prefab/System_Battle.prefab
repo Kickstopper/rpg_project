@@ -1298,8 +1298,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
-        m_MethodName: OnCommandButton_Escape
+        m_TargetAssemblyTypeName: Controller.CombatController, Assembly-CSharp
+        m_MethodName: OnBaseCommand_Escape
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

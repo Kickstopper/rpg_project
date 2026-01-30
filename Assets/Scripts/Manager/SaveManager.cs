@@ -47,6 +47,7 @@ namespace Manager
             data.dungeonId = MapManager.Instance.currentDungeonId;
             data.playerPosX = MapManager.Instance.currentPx;
             data.playerPosY = MapManager.Instance.currentPy;
+            data.playerDirection = MapManager.Instance.currentDirection;
             
             // 2. 인벤토리 & 골드 저장
             data.gold = InventoryManager.Instance.GetGold();

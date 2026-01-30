@@ -168,7 +168,7 @@ namespace Controller
             originalColor = targetColor;
         }
 
-        // 이동 애니메이션용 색상 설정 (CombatController에서 Lerp할 때 사용)
+        // 이동 애니메이션용 색상 설정
         public void SetColor(Color color)
         {
             if (preferredImage != null)
@@ -270,7 +270,7 @@ namespace Controller
         {
             Debug.Log($"{sourceData.name} 사망");
             gameObject.SetActive(false);
-            controller.activeMonsters.Remove(this);
+            controller?.activeMonsters.Remove(this);
         }
     }
 }

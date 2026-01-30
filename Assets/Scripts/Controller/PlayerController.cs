@@ -126,8 +126,6 @@ namespace Controller
                 this.equippedArmorIds = new List<string>(runtimeData.equippedArmorIds);
                 this.learnedSkillIds = new List<string>(runtimeData.learnedSkills);
                 
-                // 저장된 장비 정보를 바탕으로 방어구 스탯 등 재계산
-                RefreshArmorStats(); 
             }
             else
             {
@@ -147,11 +145,32 @@ namespace Controller
                 this.equippedArmorIds = new List<string>(dbEntry.initialArmorIds);
                 this.learnedSkillIds = new List<string>(dbEntry.initialSkillIds);
                 
-                RefreshArmorStats();
+                
             }
 
-            // 3. 파생 스탯(MaxHP, Atk 등) 최종 계산
+            RefreshArmorStats();
+
+             // 3. 파생 스탯(MaxHP, Atk 등) 최종 계산
             InitializeStats(); 
+
+            // ---------------------------------------------------------------
+            // 4. 현재 HP/MP 적용 (Max 계산 후 적용해야 안전함)
+            // ---------------------------------------------------------------
+            if (runtimeData != null && runtimeData.level > 0)
+            {
+                // [로드] 저장된 HP/MP 사용
+                // (저장된 값이 Max보다 클 경우를 대비해 Clamp 처리 추천)
+                this.currentHp = Mathf.Min(runtimeData.currentHp, this.maxHp);
+                this.currentMp = Mathf.Min(runtimeData.currentMp, this.maxMp);
+            }
+            else
+            {
+                // [신규] 풀피로 시작
+                this.currentHp = this.maxHp;
+                this.currentMp = this.maxMp;
+            }
+
+           
             
             // UI 게이지 갱신
             UpdateUI();
@@ -159,7 +178,8 @@ namespace Controller
 
         private void InitializeStats()
         {
-            Debug.Log("InitializeStats 미구현");
+            maxHp = sourceData.stats.vit * 10; 
+            maxMp = sourceData.stats.mag * 5;
         }
 
         // 런타임 데이터가 "최신" 혹은 "유효"한지 판단하는 헬퍼 함수

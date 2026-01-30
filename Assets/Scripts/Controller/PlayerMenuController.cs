@@ -67,6 +67,10 @@ namespace Controller
                     allMenuBtns[currentBtnIndex].onClick.Invoke();
                 }
             }
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
+            {
+                GameStateManager.Instance.ChangeState(GameState.Exploration);
+            }
         }
 
         void UpdateSelection(int index)

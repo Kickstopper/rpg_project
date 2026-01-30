@@ -34,11 +34,16 @@ namespace Manager
 
         public void LoadFromSave(List<CharacterSaveData> saveDatas)
         {
+            // 기존에 남아있던 파티 데이터(초기화 데이터 등)를 비움.
+            partyData.Clear();
+            
             foreach(var save in saveDatas)
             {
                 var data = new RuntimeCharacterData(charDB.GetEntry(save.characterId));
                 data.name = save.name;
                 data.level = save.level;
+                data.maxHp = save.maxHp;
+                data.maxMp = save.maxMp;
                 data.currentHp = save.currentHp;
                 data.currentMp = save.currentMp;
                 data.currentExp = save.exp;

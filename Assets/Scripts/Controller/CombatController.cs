@@ -211,6 +211,7 @@ namespace Controller
             if (fightCmdContainer) fightCmdContainer.SetActive(false);
             if (commandPanel) commandPanel.SetActive(false);
             if (subMenuContainer) subMenuContainer.SetActive(false);
+            SetEnemyVisualsActive(false);
             
             isAutoMode = false;         
             reserveAutoOff = false;     
@@ -266,7 +267,6 @@ namespace Controller
             }
             else
             {
-                SetEnemyVisualsActive(false);
                 SetPlayerVisualsActive(true);
                 if (raycastScreen)
                 {
@@ -1268,7 +1268,11 @@ namespace Controller
             StartCoroutine(SelectButtonDelayed(activeFightButtons, currentFightBtnIndex));
         }
 
-        public void OnBaseCommand_Escape() { OnCommandButton_Escape(); }
+        public void OnBaseCommand_Escape() 
+        { 
+            StartCoroutine(ProcessRunAttempt());
+        }
+        
         public void OnBaseCommand_Talk() { Debug.Log("대화하기 (미구현)"); }
 
         public void OnBaseCommand_Auto()
@@ -2057,8 +2061,6 @@ namespace Controller
             }
         }
 
-        public void OnCommandButton_Escape() { StartCoroutine(ProcessRunAttempt()); }
-
         // 회피 애니메이션
         IEnumerator ProcessDodgeAnimation(Transform targetTransform)
         {
@@ -2070,6 +2072,7 @@ namespace Controller
         IEnumerator ProcessRunAttempt()
         {
             state = BattleState.Processing; 
+            
             commandPanel.SetActive(false);
             if (targetCursor) targetCursor.gameObject.SetActive(false);
             if (logPanel) { logPanel.SetActive(true); logText.text = "도망치는 중..."; }
@@ -2078,6 +2081,14 @@ namespace Controller
 
             if (CalculateEscapeSuccess())
             {
+                SetEnemyVisualsActive(false);
+                
+                raycastScreen.transform.DOLocalMoveY(0f, 0.1f).SetEase(Ease.OutElastic).OnComplete(() => {
+                        raycastScreen.transform.localPosition = Vector3.zero;
+                    }
+                );
+                yield return wait01;
+                
                 logText.text = "무사히 도망쳤다!";
                 yield return wait10;
                 GameStateManager.Instance.ChangeState(GameState.Exploration);

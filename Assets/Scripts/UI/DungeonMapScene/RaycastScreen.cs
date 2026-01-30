@@ -1476,6 +1476,8 @@ namespace UI.DungeonMapScene
             // 2. 플레이어 아이콘 이동 (방문 여부와 상관없이 매번 호출)
             // 텍스처를 건드리는 게 아니라 위의 아이콘만 슥 움직임
             autoMapRenderer.UpdatePlayerIcon(x, y, (Direction)_direction);
+            MapManager.Instance.UpdatePlayerPosition(x, y, (Direction)_direction, _worldMap.mapID);
+
         }
 
         // =========================================================
@@ -2335,7 +2337,7 @@ namespace UI.DungeonMapScene
         private void OnStepTaken()
         {
             // 저장을 위한 현재 위치를 업데이트
-            MapManager.Instance.UpdatePlayerPosition(_logicX, _logicY, _worldMap.startDirection, _worldMap.mapID);
+            MapManager.Instance.UpdatePlayerPosition(_logicX, _logicY, (Direction)_direction, _worldMap.mapID);
 
             stepsUntilNextBattle--;
             
