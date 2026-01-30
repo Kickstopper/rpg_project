@@ -2749,6 +2749,7 @@ MonoBehaviour:
   autoMapRenderer: {fileID: 1471981309}
   controllerPanel: {fileID: 1247510302}
   dialogueUI: {fileID: 1072940000}
+  combatController: {fileID: 4190865138417798969}
   isInputLocked: 0
   illusionTextureIds: 
   isGridMove: 1
@@ -3537,7 +3538,7 @@ Transform:
   m_GameObject: {fileID: 1739329287}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.10737, y: 1.37963, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4844,6 +4845,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e31f071411c2bf740a974e73476d9d62, type: 3}
+--- !u!114 &4190865138417798969 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1903263384692325993, guid: e31f071411c2bf740a974e73476d9d62, type: 3}
+  m_PrefabInstance: {fileID: 4190865138417798968}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bebbd84bf8ac9f644ac7fc8d119eef0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

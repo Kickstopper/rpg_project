@@ -1,31 +1,15 @@
 using System.Collections.Generic;
-using Controller;
+using Manager;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Manager
+namespace Controller
 {
-    public class PlayerMenuManager : MonoBehaviour
+    public class PlayerMenuController : MonoBehaviour
     {
-        public static PlayerMenuManager Instance;
-
         public List<Button> allMenuBtns;
         private int currentBtnIndex;
 
         private bool isMenuOpen = false;
-
-        void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-                transform.SetParent(null);
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
 
         void Start()
         {

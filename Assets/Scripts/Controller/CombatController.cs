@@ -5,21 +5,19 @@ using System.Collections.Generic;
 using System.Collections;
 using UI.DungeonMapScene;
 using TMPro;
-using Controller;
 using UnityEngine.EventSystems;
 using Data;
 using UI;
 using DG.Tweening;
 using Helper;
+using Manager;
 
-namespace Manager
+namespace Controller
 {
     public enum BattleState { Start, PlayerInput, EnemyInput, Processing, Won, Lost }
     
-    public class CombatManager : MonoBehaviour
+    public class CombatController : MonoBehaviour
     {
-        public static CombatManager Instance;
-
         [Header("UI References")]
         public GameObject raycastScreen;
         public Image combatBG;
@@ -180,8 +178,6 @@ namespace Manager
             public List<string> dropItems; // 획득한 아이템 ID 목록
         }
         
-        void Awake() { if (Instance == null) Instance = this; }
-
         void Start()
         {
             GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
@@ -215,8 +211,7 @@ namespace Manager
             if (fightCmdContainer) fightCmdContainer.SetActive(false);
             if (commandPanel) commandPanel.SetActive(false);
             if (subMenuContainer) subMenuContainer.SetActive(false);
-            SetEnemyVisualsActive(false);
-
+            
             isAutoMode = false;         
             reserveAutoOff = false;     
             autoModeButton.gameObject.SetActive(false);
@@ -252,7 +247,11 @@ namespace Manager
             
             SpawnParty();
 
-            if (activePlayers.Count == 0) return; 
+            if (activePlayers.Count == 0)
+            {
+                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                return;  
+            }  
 
             // =========================================================
             // 인스턴트 윈 조건 체크 및 분기
@@ -267,6 +266,7 @@ namespace Manager
             }
             else
             {
+                SetEnemyVisualsActive(false);
                 SetPlayerVisualsActive(true);
                 if (raycastScreen)
                 {
@@ -319,7 +319,7 @@ namespace Manager
             allSlotControllers.Clear();
 
             // 파티 매니저가 가진 현재 멤버 수만큼 루프 (최대 6명 제한)
-            int count = Mathf.Min(PartyManager.Instance.currentPartyData.Count, 6);
+            int count = Mathf.Min(PartyManager.Instance.partyData.Count, 6);
 
             for (int i = 0; i < 6; i++)
             {
@@ -334,34 +334,22 @@ namespace Manager
                 PlayerController pc = go.GetComponent<PlayerController>();
                 allSlotControllers.Add(pc);
 
-                CharacterSaveData savedData = PartyManager.Instance.GetMemberSaveData(i);
-                
-                if (savedData != null)
+                if (i < count)
                 {
-                    // 1. ID로 기본 정보(DB Entry) 가져오기 (이미지, 기본 스탯 등)
-                    var entry = PartyManager.Instance.GetEntryById(savedData.characterId);
-                    
-                    if (entry != null)
-                    {
-                        // 2. 기본 초기화 (Entry 기반)
-                        pc.Initialize(entry, isFront ? RowType.Front : RowType.Back);
-                        
-                        // 3. 저장된 상태(레벨, HP, 장비 등) 덮어쓰기
-                        pc.LoadFromSaveData(savedData);
+                    // PartyManager에서 실시간 데이터 가져오기
+                    var runtimeData = PartyManager.Instance.GetMember(i);
+                    var dbEntry = PartyManager.Instance.GetOriginalEntry(runtimeData.characterId);
 
-                        pc.columnIndex = i; 
-                        pc.gameObject.name = pc.sourceData.name;
+                    if (runtimeData != null && dbEntry != null)
+                    {
+                        // 실시간 데이터로 초기화
+                        pc.Initialize(runtimeData, dbEntry, (i < 3) ? RowType.Front : RowType.Back);
+                        pc.columnIndex = i;
                         activePlayers.Add(pc);
                     }
-                    else
-                    {
-                         pc.InitializeEmpty(i);
-                    }
+                    else pc.InitializeEmpty(i);
                 }
-                else
-                {
-                    pc.InitializeEmpty(i);
-                }
+                else pc.InitializeEmpty(i);
             }
         }
 
@@ -3575,7 +3563,7 @@ namespace Manager
             MonsterController controller = newMonsterObj.GetComponentInChildren<MonsterController>();
             if (controller == null) { Destroy(newMonsterObj); return; }
 
-            controller.Initialize(entry);
+            controller.Initialize(entry, this);
             newMonsterObj.name = $"{controller.sourceData.race} {controller.sourceData.name}";
 
             if (controller.currentHp <= 0) { Destroy(newMonsterObj); return; }
@@ -3852,14 +3840,22 @@ namespace Manager
 
                 BattleReward reward = CalculateRewards(allMonsters, allPlayers);
 
-                // 1. 경험치 지급
-                foreach(var p in allPlayers)
+                // 1. 전투 결과를 PartyManager에 반영
+                for(int i = 0; i < activePlayers.Count; i++)
                 {
-                    if (p.currentHp > 0) // 살아있는 멤버만
-                    {
-                        p.AddExp(reward.expPerMember); 
-                        Debug.Log($"{p.entityName} EXP +{reward.expPerMember}");
-                    }
+                    // activePlayers 리스트는 죽은 캐릭터도 포함하고 있어야 함 (hp 0인 상태로)
+                    // 만약 activePlayers에서 제거했다면 allSlotControllers를 순회해야 함.
+                    
+                    PlayerController pc = activePlayers[i] as PlayerController;
+                    if (pc == null) continue;
+
+                    PartyManager.Instance.UpdateMemberStatus(
+                        pc.columnIndex,                      // 이 인덱스가 파티 순서와 일치해야 함
+                        pc.currentHp,
+                        pc.currentMp,
+                        pc.currentExp + reward.expPerMember, // 보상으로 얻은 경험치 포함
+                        pc.level                             // 레벨업 했다면 반영
+                    );
                 }
 
                 // 2. 골드 지급

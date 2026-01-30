@@ -5,8 +5,8 @@ using TMPro;
 using System.Collections.Generic;
 using Manager;
 using Data;
-using Data.Database;
 using DG.Tweening;
+using static Data.Database.CharacterDatabase;
 
 namespace Controller
 {
@@ -22,7 +22,7 @@ namespace Controller
         public TextMeshProUGUI alignText;        // 성향
         
         [Header("Runtime Data")]
-        public CharacterDatabase.CharacterEntry sourceData; 
+        public CharacterEntry sourceData; 
 
         // 현재 배운 스킬 목록 (ID)
         public List<string> learnedSkillIds = new List<string>();
@@ -41,7 +41,7 @@ namespace Controller
 
         public int currentGunAmmo = 0; // 현재 탄환 수
 
-        public int currentEXP; // 현재 경험치
+        public int currentExp; // 현재 경험치
 
         private List<ArmorData> currentArmors = new List<ArmorData>();
         
@@ -66,7 +66,7 @@ namespace Controller
         public void InitializeEmpty(int colIndex)
         {
             IsEmpty = true;
-            this.columnIndex = colIndex;
+            columnIndex = colIndex;
 
             align = Align.None;
 
@@ -74,6 +74,8 @@ namespace Controller
 
             currentHp = 0;
             currentMp = 0;
+            maxHp = 0;
+            maxMp = 0;
 
             currentWeapon = null;
             
@@ -88,111 +90,92 @@ namespace Controller
             this.name = $"Empty_Slot_{colIndex}";
         }
 
-        // 초기화 함수 (CombatManager가 호출)
-        public void Initialize(CharacterDatabase.CharacterEntry data, RowType row)
+        
+        // RuntimeData를 받는 초기화 함수
+        public void Initialize(RuntimeCharacterData runtimeData, CharacterEntry dbEntry, RowType row)
         {
-            IsEmpty = false; // 데이터가 있으면 False
+            // 1. 불변 데이터(DB) 초기화
+            // runtimeData가 있든 없든, 캐릭터의 '정체성'(이름, 이미지, 기본 스탯 정보)은 DB가 기준입니다.
+            this.sourceData = dbEntry;
+            this.entityName = dbEntry.name;
+            this.currentRow = row;
 
-            sourceData = data;
-            currentRow = row;
-            entityName = data.name;
+            // UI 초기화 (이름, 이미지 등)
+            if (nameText) nameText.text = entityName;
+            if (alignText) alignText.text = GetAlignString(dbEntry.align);
+            if (portraitImage) portraitImage.sprite = dbEntry.portraitImage;
             
-            align = data.align;
-
-            isCommander = data.isCommander;
-
-            // HP/MP 설정
-            maxHp = data.maxHp;
-            maxMp = data.maxMp;
-            currentHp = maxHp;
-            currentMp = maxMp;
-
-            // UI 설정
-            if (portraitImage && data.portraitImage)
+            // 2. 가변 데이터(Status) 적용
+            if (IsRuntimeDataValid(runtimeData))
             {
-                portraitImage.gameObject.SetActive(true);
-                portraitImage.sprite = data.portraitImage;
-                portraitImage.color = Color.white;
-                portraitImage.SetNativeSize();
+                // A. 저장된 데이터(runtimeData)가 유효하다면 -> 상태 덮어쓰기 (로드)
+                Debug.Log($"[{entityName}] 저장된 상태를 불러옵니다. (Lv.{runtimeData.level})");
+                
+                this.level = runtimeData.level;
+                this.maxHp = runtimeData.maxHp;
+                this.maxMp = runtimeData.maxMp;
+                this.currentHp = runtimeData.currentHp;
+                this.currentMp = runtimeData.currentMp;
+                this.currentExp = runtimeData.currentExp;
+                this.align = runtimeData.align;
+
+                // 장비 및 스킬 복구
+                EquipWeapon(runtimeData.equippedWeaponId);
+                EquipGun(runtimeData.equippedGunId, runtimeData.equippedAmmoId);
+                
+                this.equippedArmorIds = new List<string>(runtimeData.equippedArmorIds);
+                this.learnedSkillIds = new List<string>(runtimeData.learnedSkills);
+                
+                // 저장된 장비 정보를 바탕으로 방어구 스탯 등 재계산
+                RefreshArmorStats(); 
             }
-            
-            nameText.text = data.name;
-            nameText.alignment = TextAlignmentOptions.TopLeft;
+            else
+            {
+                // B. 저장된 데이터가 없거나 유효하지 않다면 -> DB 초기값 사용 (새 게임/신규 생성)
+                Debug.Log($"[{entityName}] 초기 설정으로 생성합니다.");
 
-            alignText.text = GetAlignString(align);
-            
-            level = data.stats.level;
+                this.level = dbEntry.stats.level;
+                this.maxHp = this.currentHp = dbEntry.maxHp; // 초기 체력은 MaxHP
+                this.maxMp = this.currentMp = dbEntry.maxMp;
+                this.currentExp = 0;
+                this.align = dbEntry.align;
 
-            highlightImage.gameObject.SetActive(true);
-            highlightImage.color = Color.clear;
+                // 초기 장비 및 스킬
+                EquipWeapon(dbEntry.initialWeaponId);
+                EquipGun(dbEntry.initialGunId, dbEntry.initialAmmoId);
+                
+                this.equippedArmorIds = new List<string>(dbEntry.initialArmorIds);
+                this.learnedSkillIds = new List<string>(dbEntry.initialSkillIds);
+                
+                RefreshArmorStats();
+            }
+
+            // 3. 파생 스탯(MaxHP, Atk 등) 최종 계산
+            InitializeStats(); 
             
+            // UI 게이지 갱신
             UpdateUI();
-
-            // -----------------------------------------------------
-            // 초기 스킬 및 장비 로드
-            // -----------------------------------------------------
-            
-            // 1. 스킬 복사 (Reference가 아닌 값 복사를 위해 리스트 새로 생성)
-            learnedSkillIds = new List<string>(data.initialSkillIds);
-
-            // 2. 무기 장착
-            EquipWeapon(data.initialWeaponId);
-            EquipGun(data.initialGunId, data.initialAmmoId);
-
-            // 3. 방어구 장착
-            equippedArmorIds = new List<string>(data.initialArmorIds);
-            RefreshArmorStats();
         }
 
-        public CharacterSaveData ToSaveData()
+        private void InitializeStats()
         {
-            CharacterSaveData data = new CharacterSaveData();
-
-            // 기본 정보
-            data.characterId = sourceData.id;
-            data.level = this.level;
-            data.currentHp = this.currentHp;
-            data.currentMp = this.currentMp;
-            data.exp = this.currentEXP;
-
-            // 장비 정보
-            data.weaponId = this.equippedWeaponId;
-            data.gunId = this.equippedGunId;
-            data.ammoId = this.equippedAmmoId;
-            data.armorIds = new List<string>(this.equippedArmorIds);
-
-            // 스킬 정보
-            data.learnedSkillIds = new List<string>(this.learnedSkillIds);
-
-            // enum을 string으로 변환
-            data.align = this.align.ToString();
-            data.row = this.currentRow.ToString();
-
-            return data;
+            Debug.Log("InitializeStats 미구현");
         }
 
-        // 저장된 데이터를 불러와서 내 상태 덮어쓰기
-        public void LoadFromSaveData(CharacterSaveData data)
+        // 런타임 데이터가 "최신" 혹은 "유효"한지 판단하는 헬퍼 함수
+        private bool IsRuntimeDataValid(RuntimeCharacterData data)
         {
-            // 1. 레벨 및 기본 스탯 설정
-            this.level = data.level;
-            this.currentHp = data.currentHp;
-            this.currentMp = data.currentMp;
-            this.currentEXP = data.exp;
-
-            // 2. 장비 장착
-            EquipWeapon(data.weaponId);
-            EquipGun(data.gunId, data.ammoId);
+            if (data == null) return false;
             
-            this.equippedArmorIds = new List<string>(data.armorIds);
-            RefreshArmorStats();
+            // 데이터는 있지만 레벨이 0이라면 비정상(초기화 안 된 객체)으로 간주
+            if (data.level <= 0) return false;
 
-            // 3. 스킬 목록 복구
-            this.learnedSkillIds = new List<string>(data.learnedSkillIds);
+            // ID가 일치하지 않으면 다른 캐릭터 데이터이므로 무효
+            if (sourceData != null && data.characterId != sourceData.id) return false;
 
-            // 4. 기타 상태
-            if (System.Enum.TryParse(data.align, out Align parsedAlign)) this.align = parsedAlign;
+            return true;
         }
+
 
         private string GetAlignString(Align align)
         {
@@ -400,7 +383,7 @@ namespace Controller
 
         public void AddExp(int exp)
         {
-            currentEXP += exp;
+            currentExp += exp;
         }
 
         // [BattleEntity 구현] 데미지 처리
@@ -423,7 +406,7 @@ namespace Controller
             {
                 Debug.Log($"{entityName} 쓰러짐...");
                 // Player는 비활성화 대신 사망 상태(Dead State) 처리 필요
-                InitializeEmpty(this.columnIndex);
+                InitializeEmpty(columnIndex);
             }
         }
         
@@ -448,6 +431,8 @@ namespace Controller
             }
             else
             {
+                if (alignText) alignText.text = GetAlignString(align);
+
                 if (hpSlider)
                 {
                     hpSlider.gameObject.SetActive(true);

@@ -11,7 +11,9 @@ namespace Controller
     {
         [Header("UI References")]
         public Transform contentTransform; 
-        public GameObject itemSlotPrefab;  
+        public GameObject itemSlotPrefab;
+
+        public CombatController controller;
         
         [Header("Tabs")]
         public Button btnTabRecover;
@@ -85,7 +87,7 @@ namespace Controller
         public void Close()
         {
             gameObject.SetActive(false);
-            CombatManager.Instance.OnPopupMenuClosed();
+            controller.OnPopupMenuClosed();
         }
 
         void SwitchTab(int categoryIndex)
@@ -160,8 +162,8 @@ namespace Controller
         {
             // 선택 후 닫기
             gameObject.SetActive(false);
-            CombatManager.Instance.OnPopupMenuClosed(); 
-            CombatManager.Instance.OnPopupItemSelected(itemData);
+            controller.OnPopupMenuClosed(); 
+            controller.OnPopupItemSelected(itemData);
         }
 
         IEnumerator SelectFirstItem()

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Controller;
 public enum GameState
 {
     TitleScreen,
@@ -21,6 +22,8 @@ namespace Manager
         public GameObject explorationCanvas; // 탐험용 UI
         public GameObject combatCanvas;      // 전투용 UI (커맨드, 적 이미지 등)
         public GameObject menuCanvas;        // 메뉴 UI
+
+        public CombatController currentCombatController; 
 
         // 상태 변경 알림 이벤트
         public event Action<GameState> OnStateChanged;
@@ -50,7 +53,6 @@ namespace Manager
             this.combatCanvas = combat;
             this.menuCanvas = menu;
 
-            // UI가 연결되었으니 현재 상태에 맞춰 화면 갱신
             RefreshUIState();
         }
 
@@ -68,7 +70,6 @@ namespace Manager
             OnStateChanged?.Invoke(newState);
         }
 
-        // [분리] UI 갱신 로직을 별도 함수로 분리 (참조가 끊겼을 때 안전하게 처리)
         private void RefreshUIState()
         {
             // 아직 UI가 연결되지 않았다면 무시
@@ -94,15 +95,35 @@ namespace Manager
                     break;
             }
         }
+        // [신규] 현재 씬의 전투 컨트롤러 참조
         
+
+        // [수정] UI 등록 시 컨트롤러도 함께 등록받음
+        public void RegisterSceneComponents(GameObject expl, GameObject cbt, GameObject menu, CombatController controller)
+        {
+            this.explorationCanvas = expl;
+            this.combatCanvas = cbt;
+            this.menuCanvas = menu;
+            this.currentCombatController = controller;
+
+            RefreshUIState();
+        }
+
         // 적을 만났을 때 호출
         public void StartEncounter(List<string> monsterList)
         {
             Debug.Log("적 출현!");
-            CombatManager.Instance.Initialize(monsterList);
-
-            // 상태 전환
-            ChangeState(GameState.Battle);
+            
+            if (currentCombatController != null)
+            {
+                currentCombatController.Initialize(monsterList);
+                ChangeState(GameState.Battle);
+            }
+            else
+            {
+                Debug.LogError("CombatController가 연결되지 않았습니다!");
+            }
         }
+        
     }
 }

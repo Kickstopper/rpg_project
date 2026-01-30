@@ -53,13 +53,9 @@ namespace Manager
             data.inventory = InventoryManager.Instance.GetSaveData(); 
 
             // 3. 파티원 정보 저장
-            // CombatManager의 activePlayers나 PartyManager의 리스트를 참조
-            foreach (var entity in CombatManager.Instance.activePlayers)
+            foreach(var i in PartyManager.Instance.partyData)
             {
-                if (entity is PlayerController pc)
-                {
-                    data.partyMembers.Add(pc.ToSaveData()); 
-                }
+                data.partyMembers.Add(i.ToSaveData());
             }
 
             // 4. 이벤트 플래그 저장 (FlagManager가 있다면 가져옴)

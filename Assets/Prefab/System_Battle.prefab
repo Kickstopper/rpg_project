@@ -2065,6 +2065,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentTransform: {fileID: 2752421738825663161}
   skillSlotPrefab: {fileID: 940030084927157362, guid: aac485338bd864e4a8c8291fae269e91, type: 3}
+  controller: {fileID: 1903263384692325993}
   btnTabMagic: {fileID: 760796688291917019}
   btnTabRecover: {fileID: 7613027691096184110}
   btnTabAssist: {fileID: 533917349373551451}
@@ -4898,6 +4899,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentTransform: {fileID: 9154151435968974932}
   itemSlotPrefab: {fileID: 940030084927157362, guid: d8e7812773ea79641832c31d9f782fb2, type: 3}
+  controller: {fileID: 1903263384692325993}
   btnTabRecover: {fileID: 9148361085793154629}
   btnTabBuff: {fileID: 2295539720131858416}
   btnTabAttack: {fileID: 73516237560303479}
@@ -10619,7 +10621,7 @@ GameObject:
   - component: {fileID: 7404759238677247422}
   - component: {fileID: 1903263384692325993}
   m_Layer: 0
-  m_Name: CombatManager
+  m_Name: CombatController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

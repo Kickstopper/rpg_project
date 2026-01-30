@@ -44,6 +44,7 @@ namespace Data
     public class CharacterSaveData
     {
         public string characterId; // DB에서 원본 데이터를 찾기 위한 ID (예: "char_warrior")
+        public string name;
         public int level;
 
         public string align;
@@ -51,7 +52,9 @@ namespace Data
         public string row;
 
         public int currentHp;
+        public int maxHp;
         public int currentMp;
+        public int maxMp;
         public int exp;
         
         // 장비 상태

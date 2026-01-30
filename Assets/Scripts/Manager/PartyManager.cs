@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Data;
 using Data.Database;
 using UnityEngine;
+using static Data.Database.CharacterDatabase;
 
 namespace Manager
 {
@@ -9,78 +10,90 @@ namespace Manager
     {
         public static PartyManager Instance;
         
-        [Header("Database")]
         public CharacterDatabase charDB;
 
-        public List<CharacterSaveData> currentPartyData = new List<CharacterSaveData>();
+        // ID 목록 대신 실제 데이터 리스트 사용
+        public List<RuntimeCharacterData> partyData = new List<RuntimeCharacterData>();
 
         void Awake()
         {
-            if (Instance == null) { 
+            if (Instance == null) 
+            { 
                 Instance = this; 
                 transform.SetParent(null);
                 DontDestroyOnLoad(gameObject); 
                 
-                Initialize(); 
+                if (partyData.Count == 0)
+                {
+                    Debug.Log("테스트 모드: 파티 데이터를 초기화합니다.");
+                    StartNewGame();
+                }
             }
             else Destroy(gameObject);
         }
 
-        // 1. 새 게임 시작: DB의 초기 설정(Initial Loadout)을 읽어와서 SaveData 생성
-        public void Initialize()
+        public void LoadFromSave(List<CharacterSaveData> saveDatas)
         {
-            currentPartyData.Clear();
+            foreach(var save in saveDatas)
+            {
+                var data = new RuntimeCharacterData(charDB.GetEntry(save.characterId));
+                data.name = save.name;
+                data.level = save.level;
+                data.currentHp = save.currentHp;
+                data.currentMp = save.currentMp;
+                data.currentExp = save.exp;
+                data.equippedWeaponId = save.weaponId;
+                data.equippedGunId = save.gunId;
+                data.equippedAmmoId = save.ammoId;
+                data.equippedArmorIds = save.armorIds;
+                data.learnedSkills = save.learnedSkillIds;
+                data.row = save.row;
+                if (System.Enum.TryParse(save.align, out Align parsedAlign)) data.align = parsedAlign;
+                
+                partyData.Add(data);
+            }
+        }
 
-            // 초기 파티원 ID (기획에 따라 변경)
-            string[] starterIds = { "chr000", "chr001", "chr002", "chr003", "chr004", "chr005" };
+        // 새 게임 시작: 초기 멤버 세팅
+        public void StartNewGame()
+        {
+            partyData.Clear();
+            string[] starterIds = { "chr000", "chr001", "chr002", "chr003" }; // 기획에 따라 변경
 
-            foreach (string id in starterIds)
+            foreach (var id in starterIds)
             {
                 var entry = charDB.GetEntry(id);
-                if (entry == null) continue;
-
-                // Entry 정보를 기반으로 초기 상태 데이터 생성
-                CharacterSaveData newData = new CharacterSaveData();
-                newData.characterId = entry.id;
-                newData.level = entry.stats.level;
-                newData.currentHp = entry.maxHp; // 최대 체력으로 시작
-                newData.currentMp = entry.maxMp;
-                
-                // 초기 장비
-                newData.weaponId = entry.initialWeaponId;
-                newData.gunId = entry.initialGunId;
-                newData.ammoId = entry.initialAmmoId;
-                newData.armorIds = new List<string>(entry.initialArmorIds);
-                
-                // 초기 스킬
-                newData.learnedSkillIds = new List<string>(entry.initialSkillIds);
-
-                currentPartyData.Add(newData);
+                if (entry != null)
+                {
+                    partyData.Add(new RuntimeCharacterData(entry));
+                }
             }
-            
-            Debug.Log("새 게임 파티 초기화 완료");
         }
 
-        // 2. 게임 로드: 저장된 리스트를 그대로 적용
-        public void LoadFromSave(List<CharacterSaveData> loadedData)
+        // 특정 인덱스의 데이터 반환 (전투나 메뉴에서 호출)
+        public RuntimeCharacterData GetMember(int index)
         {
-            if (loadedData == null) return;
-            
-            currentPartyData = loadedData;
-            Debug.Log($"파티 데이터 로드 완료: {currentPartyData.Count}명");
+            if (index < 0 || index >= partyData.Count) return null;
+            return partyData[index];
         }
 
-        // 3. 특정 슬롯의 데이터 반환 (CombatManager 등에서 사용)
-        public CharacterSaveData GetMemberSaveData(int index)
-        {
-            if (index < 0 || index >= currentPartyData.Count) return null;
-            return currentPartyData[index];
-        }
-
-        // ID로 기본 정보(Entry) 찾기 헬퍼
-        public CharacterDatabase.CharacterEntry GetEntryById(string id)
+        // ID로 원본 DB 데이터 찾기 헬퍼
+        public CharacterEntry GetOriginalEntry(string id)
         {
             return charDB.GetEntry(id);
+        }
+
+        // 전투 종료 후 상태 업데이트
+        public void UpdateMemberStatus(int index, int hp, int mp, int exp, int level)
+        {
+            if (index < 0 || index >= partyData.Count) return;
+
+            var member = partyData[index];
+            member.currentHp = hp;
+            member.currentMp = mp;
+            member.currentExp = exp;
+            member.level = level;
+            // 필요 시 장비나 스킬 변경 사항도 여기서 업데이트
         }
     }
 }
