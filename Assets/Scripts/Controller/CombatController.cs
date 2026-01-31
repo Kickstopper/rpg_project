@@ -318,36 +318,103 @@ namespace Controller
             activePlayers.Clear();
             allSlotControllers.Clear();
 
-            // 파티 매니저가 가진 현재 멤버 수만큼 루프 (최대 6명 제한)
-            int count = Mathf.Min(PartyManager.Instance.partyData.Count, 6);
+            // ---------------------------------------------------------
+            // 1단계: 배치 시뮬레이션 (누가 어디에 설지 미리 결정)
+            // ---------------------------------------------------------
+            
+            // 6개의 슬롯에 들어갈 데이터 배열 (null이면 빈자리)
+            RuntimeCharacterData[] slotAssignments = new RuntimeCharacterData[6];
+            
+            // 자리를 잡지 못한 캐릭터들을 모아둘 리스트
+            List<RuntimeCharacterData> pendingCharacters = new List<RuntimeCharacterData>();
 
+            int partyCount = PartyManager.Instance.partyData.Count;
+
+            // [Pass 1] 선호하는 위치에 우선 배치
+            for (int i = 0; i < partyCount; i++)
+            {
+                var member = PartyManager.Instance.GetMember(i);
+                if (member == null) continue;
+
+                // 데이터상의 위치를 인덱스로 변환
+                // 전열(0,1,2), 후열(3,4,5)
+                int rowIndex = (member.row == RowType.Front) ? 0 : 3;
+                int colIndex = (int)member.column; // Left(0), Center(1), Right(2)
+                
+                // 안전장치: 컬럼이 범위를 벗어나면 Center(1)로 보정하거나 Clamp
+                colIndex = Mathf.Clamp(colIndex, 0, 2);
+
+                int targetSlotIndex = rowIndex + colIndex;
+
+                // 자리가 비어있다면 -> 배정
+                if (slotAssignments[targetSlotIndex] == null)
+                {
+                    slotAssignments[targetSlotIndex] = member;
+                }
+                else
+                {
+                    // 자리가 이미 있다면 -> 대기열로 이동
+                    pendingCharacters.Add(member);
+                }
+            }
+
+            // [Pass 2] 남은 빈자리에 대기 인원 배치
+            foreach (var pendingMember in pendingCharacters)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    // 빈 자리를 발견하면
+                    if (slotAssignments[i] == null)
+                    {
+                        slotAssignments[i] = pendingMember;
+
+                        // 실제 배치된 위치에 맞춰 데이터 갱신 (저장 시 반영되도록)
+                        bool isFront = (i < 3);
+                        pendingMember.row = isFront ? RowType.Front : RowType.Back;
+                        pendingMember.column = (ColumnType)(isFront ? i : i - 3);
+                        
+                        break; // 배치 완료했으니 다음 대기 인원으로
+                    }
+                }
+            }
+
+            // ---------------------------------------------------------
+            // 2단계: 결정된 배치대로 실제 오브젝트 생성 (Instantiate)
+            // ---------------------------------------------------------
             for (int i = 0; i < 6; i++)
             {
+                // 1. 타겟 슬롯 Transform 찾기
                 bool isFront = (i < 3);
-                List<Transform> targetSlots = isFront ? playerFrontSlots : playerBackSlots;
-                int slotIndex = isFront ? i : (i - 3);
-                Transform targetSlot = targetSlots[slotIndex];
+                int localIndex = isFront ? i : (i - 3);
+                Transform targetSlot = isFront ? playerFrontSlots[localIndex] : playerBackSlots[localIndex];
 
+                // 2. 프리팹 생성
                 GameObject go = Instantiate(playerPrefab, targetSlot);
                 go.transform.localPosition = Vector3.zero;
 
                 PlayerController pc = go.GetComponent<PlayerController>();
                 allSlotControllers.Add(pc);
 
-                if (i < count)
+                // 3. 데이터 주입
+                RuntimeCharacterData assignedData = slotAssignments[i];
+
+                if (assignedData != null)
                 {
-                    // PartyManager에서 실시간 데이터 가져오기
-                    var runtimeData = PartyManager.Instance.GetMember(i);
-                    if (runtimeData != null && runtimeData.currentHp > 0)
-                    {
-                        // 실시간 데이터로 초기화
-                        pc.Initialize(runtimeData, (i < 3) ? RowType.Front : RowType.Back);
-                        pc.columnIndex = i;
-                        activePlayers.Add(pc);
-                    }
-                    else pc.InitializeEmpty(i);
+                    // 실제 캐릭터 초기화
+                    pc.Initialize(assignedData, assignedData.row, this);
+                    
+                    pc.columnIndex = i;
+                    pc.currentRow = assignedData.row;
+                    pc.currentColumn = assignedData.column;
+
+                    pc.gameObject.name = pc.sourceData.name;
+                    activePlayers.Add(pc);
                 }
-                else pc.InitializeEmpty(i);
+                else
+                {
+                    // 빈 슬롯 초기화
+                    pc.InitializeEmpty(i);
+                }
             }
         }
 
@@ -3555,19 +3622,27 @@ namespace Controller
             var entry = monsterDB.GetEntry(id);
             if (entry == null) return;
 
+            // 1. 선호하는 열(Row) 선택
             List<Transform> targetSlots = (entry.preferredRow == RowType.Front) ? frontSlots : backSlots;
+            
+            // 꽉 찼으면 다른 열로
             if (IsRowFull(targetSlots))
             {
                 targetSlots = (targetSlots == frontSlots) ? backSlots : frontSlots;
-                if (IsRowFull(targetSlots)) return;
+                if (IsRowFull(targetSlots)) return; // 자리 없음
             }
 
+            // 2. 빈 자리 찾기 (랜덤 또는 순차)
+            // ColumnType에 맞춰 배치하려면 여기서 특정 인덱스를 선호하게 할 수 있음
+            // 예: "Center 우선" 로직 등. 지금은 랜덤 빈자리 유지.
             List<int> emptyIndices = new List<int>();
-            for (int i = 0; i < targetSlots.Count; i++) if (targetSlots[i].childCount == 0) emptyIndices.Add(i);
+            for (int i = 0; i < targetSlots.Count; i++) 
+                if (targetSlots[i].childCount == 0) emptyIndices.Add(i);
 
             int randomIndex = emptyIndices[Random.Range(0, emptyIndices.Count)];
             Transform selectedSlot = targetSlots[randomIndex];
 
+            // 3. 생성
             GameObject prefabToUse = (entry.prefab != null) ? entry.prefab : defaultMonsterPrefab;
             if (prefabToUse == null) return;
 
@@ -3582,10 +3657,18 @@ namespace Controller
 
             if (controller.currentHp <= 0) { Destroy(newMonsterObj); return; }
 
-            controller.SetPositionInfo(randomIndex);
+            // [중요] 배치된 위치 정보를 컨트롤러에 주입
             bool isFront = (targetSlots == frontSlots);
+            
+            controller.SetPositionInfo(randomIndex); // 기존 인덱스 설정
+            
+            // 신규: Enum 정보 설정
+            controller.currentRow = isFront ? RowType.Front : RowType.Back;
+            controller.currentColumn = (ColumnType)randomIndex; // 0, 1, 2 -> Left, Center, Right 매핑
+
             controller.SetRowAppearance(isFront); 
             controller.SetAnaglyphDepth(isFront); 
+            
             activeMonsters.Add(controller);
         }
 

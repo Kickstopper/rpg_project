@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UI.DungeonMapScene;
+using Data;
 
 namespace Controller
 {
@@ -17,6 +18,9 @@ namespace Controller
         private Color backRowColor = new Color(0.6f, 0.6f, 0.6f, 1f); 
         private Color frontRowColor = Color.white;
         private Button button;
+
+        public RowType currentRow;
+        public ColumnType currentColumn;
 
         private Material instanceMaterial;
         private const float FRONT_OFFSET = 0.01f;
@@ -124,6 +128,8 @@ namespace Controller
 
         public void Initialize(MonsterDatabase.MonsterEntry data, CombatController controller)
         {
+            this.controller = controller;
+            
             sourceData = data;
             entityName = $"{data.name}_{data.id}"; // 부모 필드 사용
 

@@ -2,6 +2,16 @@ using System.Collections.Generic;
 
 namespace Data
 {
+    public enum RowType { Front, Back }
+
+    public enum ColumnType { Left, Center, Right }
+
+    public enum Align { 
+        None,
+        Lawful_Good, Neutral_Good, Chaotic_Good,
+        Lawful_Neutral, True_Neutral, Chaotic_Neutral,
+        Lawful_Evil, Neutral_Evil, Chaotic_Evil 
+    }
     [System.Serializable]
     public class RuntimeCharacterData
     {
@@ -24,6 +34,7 @@ namespace Data
         public int currentExp; // 현재 누적 경험치
 
         public RowType row;
+        public ColumnType column;
         
         // 장비 상태
         public string equippedWeaponId;

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Manager;
 using Data;
 using DG.Tweening;
-using UnityEditor.VersionControl;
 
 namespace Controller
 {
@@ -22,6 +21,8 @@ namespace Controller
         public TextMeshProUGUI messageText;
         public TextMeshProUGUI nameText;         // 이름 텍스트
         public TextMeshProUGUI alignText;        // 성향
+
+        public Button selectButton;
         
         [Header("Runtime Data")]
         public RuntimeCharacterData sourceData; 
@@ -50,10 +51,13 @@ namespace Controller
         // 상태 이상 (Status Effect)
         public List<string> currentStatusEffects = new List<string>();
 
-        // 현재 위치 (전열/후열) - 전투 매니저가 세팅해줌
-        public RowType currentRow; 
+        // 현재 위치 전투 매니저가 세팅해줌
+        public RowType currentRow; // Front 또는 Back
+        public ColumnType currentColumn; // 왼쪽, 오른쪽 또는 가운데
 
         public bool isCommander;
+
+        private CombatController controller;
 
         // [BattleEntity 구현] 스탯 반환 (레벨 및 장비 보정 포함)
         public override int GetTotalStr() => sourceData.stats.str + level; 
@@ -94,8 +98,10 @@ namespace Controller
 
         
         // RuntimeData를 받는 초기화 함수
-        public void Initialize(RuntimeCharacterData runtimeData, RowType row)
+        public void Initialize(RuntimeCharacterData runtimeData, RowType row, CombatController controller)
         {
+            this.controller = controller;
+
             // 데이터 초기화
             this.sourceData = runtimeData;
             this.entityName = runtimeData.name;
@@ -134,6 +140,12 @@ namespace Controller
             
             // UI 게이지 갱신
             UpdateUI();
+
+            if (selectButton != null)
+            {
+                selectButton.onClick.RemoveAllListeners();
+                selectButton.onClick.AddListener(OnClicked);
+            }
         }
 
         // 전투가 끝난 뒤의 상태 변화를 최신 상태로 업데이트해서 저장
@@ -396,6 +408,11 @@ namespace Controller
         public void SetMessage(string message)
         {
             messageText.SetText(message);
+        }
+
+        void OnClicked()
+        {
+            controller.OnTargetSelected(this);
         }
         
         protected override void UpdateUI()
