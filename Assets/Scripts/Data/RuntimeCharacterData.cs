@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Data.Database;
 
 namespace Data
 {
@@ -8,6 +7,7 @@ namespace Data
     {
         // 원본 데이터 참조 (이름, 기본 스탯 등)
         public string characterId;
+        public bool isParty;
 
         public string name;
 
@@ -21,10 +21,9 @@ namespace Data
         public int maxHp;
         public int currentMp;
         public int maxMp;
-        public int level;
         public int currentExp; // 현재 누적 경험치
 
-        public string row;
+        public RowType row;
         
         // 장비 상태
         public string equippedWeaponId;
@@ -37,24 +36,28 @@ namespace Data
         public List<string> learnedSkills = new();
         public bool isCommander;
 
-        public RuntimeCharacterData(CharacterDatabase.CharacterEntry entry)
+        public RuntimeCharacterData(CharacterSaveData save)
         {
-            characterId = entry.id;
-            name = entry.name;
-            align = entry.align;
-            stats = entry.stats;
-            resistances = entry.resistances;
-            isCommander = entry.isCommander;
+            characterId = save.characterId;
+            name = save.name;
+            
+            if (System.Enum.TryParse(save.align, out Align parsedAlign)) align = parsedAlign;
+            if (System.Enum.TryParse(save.row, out RowType parsedRow)) row = parsedRow;
 
-            level = entry.stats.level;
-            currentHp = maxHp = entry.maxHp;
-            currentMp = maxMp = entry.maxMp;
-            currentExp = 0;
+            stats = save.stats;
+            resistances = save.resistances;
+            isCommander = save.isCommander;
 
-            equippedWeaponId = entry.initialWeaponId;
-            equippedGunId = entry.initialGunId;
-            equippedAmmoId = entry.initialAmmoId;
-            learnedSkills = new List<string>(entry.initialSkillIds);
+            currentHp = save.currentHp;
+            currentMp = save.currentMp; 
+            maxHp = save.maxHp;
+            maxMp = save.maxMp;
+            currentExp = save.exp;
+
+            equippedWeaponId = save.weaponId;
+            equippedGunId = save.gunId;
+            equippedAmmoId = save.ammoId;
+            learnedSkills = new List<string>(save.learnedSkillIds);
         }
 
         public CharacterSaveData ToSaveData()
@@ -63,22 +66,26 @@ namespace Data
 
             data.characterId = this.characterId;
             data.name = this.name;
-            data.level = this.level;
             data.align = this.align.ToString();
-            
-            data.learnedSkillIds = this.learnedSkills;
             
             data.weaponId = this.equippedWeaponId;
             data.gunId = this.equippedGunId;
             data.ammoId = this.equippedAmmoId;
             data.armorIds = this.equippedArmorIds;
-            data.currentHp = this.currentHp;
+            
             data.maxHp = this.maxHp;
             data.maxMp = this.maxMp;
+            data.currentHp = this.currentHp;
             data.currentMp = this.currentMp;
+            
             data.exp = this.currentExp;
-            data.row = this.row;
-
+            
+            data.row = this.row.ToString();
+            
+            data.resistances = this.resistances;
+            data.stats = this.stats;
+            data.learnedSkillIds = this.learnedSkills;
+            
             return data;
         }
 

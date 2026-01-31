@@ -338,12 +338,10 @@ namespace Controller
                 {
                     // PartyManager에서 실시간 데이터 가져오기
                     var runtimeData = PartyManager.Instance.GetMember(i);
-                    var dbEntry = PartyManager.Instance.GetOriginalEntry(runtimeData.characterId);
-
-                    if (runtimeData != null && dbEntry != null)
+                    if (runtimeData != null && runtimeData.currentHp > 0)
                     {
                         // 실시간 데이터로 초기화
-                        pc.Initialize(runtimeData, dbEntry, (i < 3) ? RowType.Front : RowType.Back);
+                        pc.Initialize(runtimeData, (i < 3) ? RowType.Front : RowType.Back);
                         pc.columnIndex = i;
                         activePlayers.Add(pc);
                     }
@@ -3860,13 +3858,7 @@ namespace Controller
                     PlayerController pc = activePlayers[i] as PlayerController;
                     if (pc == null) continue;
 
-                    PartyManager.Instance.UpdateMemberStatus(
-                        pc.columnIndex,                      // 이 인덱스가 파티 순서와 일치해야 함
-                        pc.currentHp,
-                        pc.currentMp,
-                        pc.currentExp + reward.expPerMember, // 보상으로 얻은 경험치 포함
-                        pc.level                             // 레벨업 했다면 반영
-                    );
+                    pc.UpdateData(reward.expPerMember);
                 }
 
                 // 2. 골드 지급

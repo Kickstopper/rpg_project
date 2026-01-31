@@ -14,15 +14,15 @@ namespace Controller
     {
         [Header("UI Objects")]
         public Image bgImage;         // 배경의 사각형 이미지
+        public Image portraitImage;
         public Image highlightImage;         // 하이라이트 사각형 이미지
-        public Image portraitImage;       // 캐릭터 얼굴
         public Slider hpSlider;       // HP 게이지
         public Slider mpSlider;       // SP 게이지
         public TextMeshProUGUI nameText;         // 이름 텍스트
         public TextMeshProUGUI alignText;        // 성향
         
         [Header("Runtime Data")]
-        public CharacterEntry sourceData; 
+        public RuntimeCharacterData sourceData; 
 
         // 현재 배운 스킬 목록 (ID)
         public List<string> learnedSkillIds = new List<string>();
@@ -92,110 +92,64 @@ namespace Controller
 
         
         // RuntimeData를 받는 초기화 함수
-        public void Initialize(RuntimeCharacterData runtimeData, CharacterEntry dbEntry, RowType row)
+        public void Initialize(RuntimeCharacterData runtimeData, RowType row)
         {
-            // 1. 불변 데이터(DB) 초기화
-            // runtimeData가 있든 없든, 캐릭터의 '정체성'(이름, 이미지, 기본 스탯 정보)은 DB가 기준입니다.
-            this.sourceData = dbEntry;
-            this.entityName = dbEntry.name;
+            // 데이터 초기화
+            this.sourceData = runtimeData;
+            this.entityName = runtimeData.name;
             this.currentRow = row;
+            this.level = runtimeData.stats.level;
+            this.maxHp = runtimeData.maxHp;
+            this.maxMp = runtimeData.maxMp;
+            this.currentHp = runtimeData.currentHp;
+            this.currentMp = runtimeData.currentMp;
+            this.currentExp = runtimeData.currentExp;
+            this.align = runtimeData.align;
 
             // UI 초기화 (이름, 이미지 등)
             if (nameText) nameText.text = entityName;
-            if (alignText) alignText.text = GetAlignString(dbEntry.align);
-            if (portraitImage) portraitImage.sprite = dbEntry.portraitImage;
+            if (alignText) alignText.text = GetAlignString(align);
             
-            // 2. 가변 데이터(Status) 적용
-            if (IsRuntimeDataValid(runtimeData))
-            {
-                // A. 저장된 데이터(runtimeData)가 유효하다면 -> 상태 덮어쓰기 (로드)
-                Debug.Log($"[{entityName}] 저장된 상태를 불러옵니다. (Lv.{runtimeData.level})");
-                
-                this.level = runtimeData.level;
-                this.maxHp = runtimeData.maxHp;
-                this.maxMp = runtimeData.maxMp;
-                this.currentHp = runtimeData.currentHp;
-                this.currentMp = runtimeData.currentMp;
-                this.currentExp = runtimeData.currentExp;
-                this.align = runtimeData.align;
-
-                // 장비 및 스킬 복구
-                EquipWeapon(runtimeData.equippedWeaponId);
-                EquipGun(runtimeData.equippedGunId, runtimeData.equippedAmmoId);
-                
-                this.equippedArmorIds = new List<string>(runtimeData.equippedArmorIds);
-                this.learnedSkillIds = new List<string>(runtimeData.learnedSkills);
-                
-            }
-            else
-            {
-                // B. 저장된 데이터가 없거나 유효하지 않다면 -> DB 초기값 사용 (새 게임/신규 생성)
-                Debug.Log($"[{entityName}] 초기 설정으로 생성합니다.");
-
-                this.level = dbEntry.stats.level;
-                this.maxHp = this.currentHp = dbEntry.maxHp; // 초기 체력은 MaxHP
-                this.maxMp = this.currentMp = dbEntry.maxMp;
-                this.currentExp = 0;
-                this.align = dbEntry.align;
-
-                // 초기 장비 및 스킬
-                EquipWeapon(dbEntry.initialWeaponId);
-                EquipGun(dbEntry.initialGunId, dbEntry.initialAmmoId);
-                
-                this.equippedArmorIds = new List<string>(dbEntry.initialArmorIds);
-                this.learnedSkillIds = new List<string>(dbEntry.initialSkillIds);
-                
-                
-            }
+            // 장비 및 스킬 복구
+            EquipWeapon(runtimeData.equippedWeaponId);
+            EquipGun(runtimeData.equippedGunId, runtimeData.equippedAmmoId);
+            
+            this.equippedArmorIds = new List<string>(runtimeData.equippedArmorIds);
+            this.learnedSkillIds = new List<string>(runtimeData.learnedSkills);
 
             RefreshArmorStats();
 
-             // 3. 파생 스탯(MaxHP, Atk 등) 최종 계산
+            // 파생 스탯(MaxHP, Atk 등) 최종 계산
             InitializeStats(); 
 
-            // ---------------------------------------------------------------
-            // 4. 현재 HP/MP 적용 (Max 계산 후 적용해야 안전함)
-            // ---------------------------------------------------------------
-            if (runtimeData != null && runtimeData.level > 0)
-            {
-                // [로드] 저장된 HP/MP 사용
-                // (저장된 값이 Max보다 클 경우를 대비해 Clamp 처리 추천)
-                this.currentHp = Mathf.Min(runtimeData.currentHp, this.maxHp);
-                this.currentMp = Mathf.Min(runtimeData.currentMp, this.maxMp);
-            }
-            else
-            {
-                // [신규] 풀피로 시작
-                this.currentHp = this.maxHp;
-                this.currentMp = this.maxMp;
-            }
-
-           
             
             // UI 게이지 갱신
             UpdateUI();
         }
 
+        // 전투가 끝난 뒤의 상태 변화를 최신 상태로 업데이트해서 저장
+        public void UpdateData(int expReward)
+        {
+            sourceData.currentExp += expReward;
+
+            bool levelUp = false; //레벨업 조건 미정
+            if (levelUp)
+            {
+                sourceData.stats.level += 1; //획득한 exp에 따라 레벨 상승이 2 이상이 될 수 있다
+                // 레벨이 오르면 현재의 HP와 MP를 MAX로 한다
+                sourceData.currentHp = sourceData.maxHp = sourceData.stats.str * (level + 1);
+                sourceData.currentMp = currentMp = sourceData.stats.mag * (level + 1);
+            }
+            else
+            {
+                sourceData.currentHp = currentHp;
+                sourceData.currentMp = currentMp;
+            }
+        }
+
         private void InitializeStats()
         {
-            maxHp = sourceData.stats.vit * 10; 
-            maxMp = sourceData.stats.mag * 5;
         }
-
-        // 런타임 데이터가 "최신" 혹은 "유효"한지 판단하는 헬퍼 함수
-        private bool IsRuntimeDataValid(RuntimeCharacterData data)
-        {
-            if (data == null) return false;
-            
-            // 데이터는 있지만 레벨이 0이라면 비정상(초기화 안 된 객체)으로 간주
-            if (data.level <= 0) return false;
-
-            // ID가 일치하지 않으면 다른 캐릭터 데이터이므로 무효
-            if (sourceData != null && data.characterId != sourceData.id) return false;
-
-            return true;
-        }
-
 
         private string GetAlignString(Align align)
         {

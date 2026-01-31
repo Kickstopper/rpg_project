@@ -47,6 +47,11 @@ namespace Data
         public string name;
         public int level;
 
+        public StatData stats;
+        public ResistanceData resistances;
+
+        public bool isCommander;
+
         public string align;
 
         public string row;

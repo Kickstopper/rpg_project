@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Data;
 using Data.Database;
 using UnityEngine;
-using static Data.Database.CharacterDatabase;
 
 namespace Manager
 {
@@ -26,7 +25,7 @@ namespace Manager
                 if (partyData.Count == 0)
                 {
                     Debug.Log("테스트 모드: 파티 데이터를 초기화합니다.");
-                    StartNewGame();
+                    SetDefaultCharacterData();
                 }
             }
             else Destroy(gameObject);
@@ -39,38 +38,24 @@ namespace Manager
             
             foreach(var save in saveDatas)
             {
-                var data = new RuntimeCharacterData(charDB.GetEntry(save.characterId));
-                data.name = save.name;
-                data.level = save.level;
-                data.maxHp = save.maxHp;
-                data.maxMp = save.maxMp;
-                data.currentHp = save.currentHp;
-                data.currentMp = save.currentMp;
-                data.currentExp = save.exp;
-                data.equippedWeaponId = save.weaponId;
-                data.equippedGunId = save.gunId;
-                data.equippedAmmoId = save.ammoId;
-                data.equippedArmorIds = save.armorIds;
-                data.learnedSkills = save.learnedSkillIds;
-                data.row = save.row;
-                if (System.Enum.TryParse(save.align, out Align parsedAlign)) data.align = parsedAlign;
-                
+                var data = new RuntimeCharacterData(save);
                 partyData.Add(data);
             }
         }
 
         // 새 게임 시작: 초기 멤버 세팅
-        public void StartNewGame()
+        public void SetDefaultCharacterData()
         {
             partyData.Clear();
-            string[] starterIds = { "chr000", "chr001", "chr002", "chr003" }; // 기획에 따라 변경
-
+            string[] starterIds = { PartyID.CHARACTER_00, PartyID.CHARACTER_01, PartyID.CHARACTER_02,
+                                    PartyID.CHARACTER_03, PartyID.CHARACTER_04, PartyID.CHARACTER_05 };
+            
             foreach (var id in starterIds)
             {
-                var entry = charDB.GetEntry(id);
-                if (entry != null)
+                var data = DefaultCharacterData.GetDefaultCharacterData(id);
+                if (data != null)
                 {
-                    partyData.Add(new RuntimeCharacterData(entry));
+                    partyData.Add(data);
                 }
             }
         }
@@ -80,25 +65,6 @@ namespace Manager
         {
             if (index < 0 || index >= partyData.Count) return null;
             return partyData[index];
-        }
-
-        // ID로 원본 DB 데이터 찾기 헬퍼
-        public CharacterEntry GetOriginalEntry(string id)
-        {
-            return charDB.GetEntry(id);
-        }
-
-        // 전투 종료 후 상태 업데이트
-        public void UpdateMemberStatus(int index, int hp, int mp, int exp, int level)
-        {
-            if (index < 0 || index >= partyData.Count) return;
-
-            var member = partyData[index];
-            member.currentHp = hp;
-            member.currentMp = mp;
-            member.currentExp = exp;
-            member.level = level;
-            // 필요 시 장비나 스킬 변경 사항도 여기서 업데이트
         }
     }
 }
