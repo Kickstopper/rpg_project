@@ -27,8 +27,8 @@ namespace Controller
         private List<GameObject> currentSlots = new List<GameObject>();
 
         // 탭 버튼 색상 설정 (활성/비활성)
-        private Color activeTabColor = Color.white;
-        private Color inactiveTabColor = new Color(0.7f, 0.7f, 0.7f, 1f); // 약간 어둡게
+        private Color activeTabColor = new Color32(149, 0, 140, 255);
+        private Color inactiveTabColor = new Color32(0,0,136, 255);
 
         void Start()
         {

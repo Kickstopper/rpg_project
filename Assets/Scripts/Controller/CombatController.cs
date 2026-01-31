@@ -1805,6 +1805,7 @@ namespace Controller
             isSelectingTarget = false;
             commandPanel.SetActive(true);
             
+            currentPlayer.SetMessage("생각중...");
             if (logPanel) logPanel.SetActive(true);
             logText.text = $"명령 대기: {currentPlayer.sourceData.name}";
             if (targetCursor) targetCursor.gameObject.SetActive(false);
@@ -2038,7 +2039,11 @@ namespace Controller
 
         void ResetPlayerSlotHighlights()
         {
-            foreach (PlayerController player in allSlotControllers) player.ResetHighlightColor();
+            foreach (PlayerController player in allSlotControllers)
+            {
+                player.SetMessage(string.Empty);
+                player.ResetHighlightColor();
+            } 
         }
 
         void RefreshMoveHighlights(int cursorSlotIndex)

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Manager;
 using Data;
 using DG.Tweening;
-using static Data.Database.CharacterDatabase;
+using UnityEditor.VersionControl;
 
 namespace Controller
 {
@@ -18,6 +18,8 @@ namespace Controller
         public Image highlightImage;         // 하이라이트 사각형 이미지
         public Slider hpSlider;       // HP 게이지
         public Slider mpSlider;       // SP 게이지
+        public GameObject messagePanel;
+        public TextMeshProUGUI messageText;
         public TextMeshProUGUI nameText;         // 이름 텍스트
         public TextMeshProUGUI alignText;        // 성향
         
@@ -391,10 +393,17 @@ namespace Controller
             }
         }
         
+        public void SetMessage(string message)
+        {
+            messageText.SetText(message);
+        }
+        
         protected override void UpdateUI()
         {
             if (IsEmpty)
             {
+                if (messagePanel) messagePanel.SetActive(false);
+                if (messageText) messageText.SetText(string.Empty);
                 // 비활성화 시 진행 중인 트윈(애니메이션)이 있다면 즉시 중단
                 if (hpSlider != null) hpSlider.DOKill();
                 if (mpSlider != null) mpSlider.DOKill();
@@ -412,6 +421,8 @@ namespace Controller
             }
             else
             {
+                if (messagePanel) messagePanel.SetActive(true);
+                if (messageText) messageText.SetText(string.Empty);
                 if (alignText) alignText.text = GetAlignString(align);
 
                 if (hpSlider)
