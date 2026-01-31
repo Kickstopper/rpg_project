@@ -60,6 +60,29 @@ namespace Data
             learnedSkills = new List<string>(save.learnedSkillIds);
         }
 
+        public RuntimeCharacterData(Database.CharacterDatabase.CharacterEntry entry)
+        {
+            characterId = entry.id;
+            name = entry.name;
+            align = entry.align;
+            stats = entry.stats;
+            resistances = entry.resistances;
+            isCommander = entry.isCommander;
+
+            currentHp = maxHp = entry.maxHp;
+            currentMp = maxMp = entry.maxMp;
+            currentExp = 0;
+
+            row = RowType.Front; 
+
+            equippedWeaponId = entry.initialWeaponId;
+            equippedGunId = entry.initialGunId;
+            equippedAmmoId = entry.initialAmmoId;
+            equippedArmorIds = new List<string>(entry.initialArmorIds);
+            
+            learnedSkills = new List<string>(entry.initialSkillIds);
+        }
+
         public CharacterSaveData ToSaveData()
         {
             CharacterSaveData data = new();

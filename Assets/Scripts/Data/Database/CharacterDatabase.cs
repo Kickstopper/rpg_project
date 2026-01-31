@@ -9,10 +9,36 @@ namespace Data.Database
         public class CharacterEntry
         {
             public string id;
+            public string name;
+
+            public int exp;
+
+            public bool isCommander;
             
             [Header("Visual")]
             public Sprite portraitImage;
             public Sprite standingImage;
+
+            [Header("Combat Stats")]
+            public Align align;
+            public StatData stats;
+            public ResistanceData resistances;
+            
+            // ----------------------------------------------------------
+            // 초기 세팅 및 아이템/스킬 참조 ID
+            // ----------------------------------------------------------
+            [Header("Initial Loadout (IDs)")]
+            // 이 캐릭터가 처음 생성될 때 가지고 있을 스킬 ID 목록
+            public List<string> initialSkillIds = new List<string>();
+
+            // 초기 장비 ID (없으면 비워둠)
+            public string initialWeaponId;
+            public string initialGunId;
+            public string initialAmmoId;
+            public List<string> initialArmorIds = new List<string>(); // 투구, 갑옷 등 여러 개일 수 있으므로 리스트
+
+            public int maxHp; 
+            public int maxMp;
             
         }
 

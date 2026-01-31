@@ -109,6 +109,13 @@ namespace Controller
             // UI 초기화 (이름, 이미지 등)
             if (nameText) nameText.text = entityName;
             if (alignText) alignText.text = GetAlignString(align);
+
+            // DB에서 이미지(Sprite) 가져오기
+            var dbEntry = PartyManager.Instance.charDB.GetEntry(runtimeData.characterId);
+            if (dbEntry != null && portraitImage)
+            {
+                portraitImage.sprite = dbEntry.portraitImage;
+            }
             
             // 장비 및 스킬 복구
             EquipWeapon(runtimeData.equippedWeaponId);

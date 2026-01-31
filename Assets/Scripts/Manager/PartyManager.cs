@@ -47,15 +47,24 @@ namespace Manager
         public void SetDefaultCharacterData()
         {
             partyData.Clear();
-            string[] starterIds = { PartyID.CHARACTER_00, PartyID.CHARACTER_01, PartyID.CHARACTER_02,
-                                    PartyID.CHARACTER_03, PartyID.CHARACTER_04, PartyID.CHARACTER_05 };
+            string[] starterIds = { 
+                PartyID.CHARACTER_00, PartyID.CHARACTER_01, PartyID.CHARACTER_02,
+                PartyID.CHARACTER_03, PartyID.CHARACTER_04, PartyID.CHARACTER_05 
+            };
             
             foreach (var id in starterIds)
             {
-                var data = DefaultCharacterData.GetDefaultCharacterData(id);
-                if (data != null)
+                var entry = charDB.GetEntry(id);
+                if (entry != null)
                 {
-                    partyData.Add(data);
+                    RuntimeCharacterData newData = new RuntimeCharacterData(entry);
+                    partyData.Add(newData);
+                }
+                else
+                {
+                    Debug.LogWarning($"초기 캐릭터 ID [{id}]를 DB에서 찾을 수 없습니다.");
+                    // 비상용 하드코딩 데이터
+                    // partyData.Add(DefaultCharacterData.GetDefaultCharacterData(id));
                 }
             }
         }

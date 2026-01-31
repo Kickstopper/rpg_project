@@ -278,8 +278,8 @@ namespace Controller
                     raycastScreen.transform.localPosition = Vector3.zero;
 
                     DOTween.Sequence()
-                        .Join(raycastScreen.transform.DOLocalMoveY(screenPy, duration).SetEase(Ease.OutBounce))
-                        .Join(BattleUI.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutBounce))
+                        .Join(raycastScreen.transform.DOLocalMoveY(screenPy, duration).SetEase(Ease.InBounce))
+                        .Join(BattleUI.transform.DOLocalMoveY(0f, duration).SetEase(Ease.InBounce))
                         .OnComplete(() => 
                         {
                             // 종료 후 위치 확정 (Floating point 오차 방지)
@@ -2081,7 +2081,7 @@ namespace Controller
             {
                 SetEnemyVisualsActive(false);
                 
-                raycastScreen.transform.DOLocalMoveY(0f, 0.1f).SetEase(Ease.OutElastic).OnComplete(() => {
+                raycastScreen.transform.DOLocalMoveY(0f, 0.1f).SetEase(Ease.InQuint).OnComplete(() => {
                         raycastScreen.transform.localPosition = Vector3.zero;
                     }
                 );
@@ -3884,7 +3884,7 @@ namespace Controller
             while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return)) yield return null;
 
             logPanel.SetActive(false);
-            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.OutElastic).OnComplete(() => {
+            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.InBounce).OnComplete(() => {
                     raycastScreen.transform.localPosition = Vector3.zero;
                     GameStateManager.Instance.ChangeState(GameState.Exploration);
                 }
