@@ -21,6 +21,7 @@ namespace Controller
         public TextMeshProUGUI messageText;
         public TextMeshProUGUI nameText;         // 이름 텍스트
         public TextMeshProUGUI alignText;        // 성향
+        public TextMeshProUGUI spiritText;       // 빙의한 신의 이름
 
         public Button selectButton;
         
@@ -105,6 +106,8 @@ namespace Controller
             // 데이터 초기화
             this.sourceData = runtimeData;
             this.entityName = runtimeData.name;
+            this.gameObject.name = entityName;
+            
             this.currentRow = row;
             this.level = runtimeData.stats.level;
             this.maxHp = runtimeData.maxHp;
@@ -170,6 +173,11 @@ namespace Controller
 
         private void InitializeStats()
         {
+        }
+
+        private string GetSpiritName(string spirit)
+        {
+            return sourceData.spiritId;
         }
 
         private string GetAlignString(Align align)
@@ -434,6 +442,7 @@ namespace Controller
                     nameText.alignment = TextAlignmentOptions.Center;
                 }
                 if (alignText) alignText.text = string.Empty;
+                if (spiritText) spiritText.text = string.Empty;
                 if (portraitImage) portraitImage.gameObject.SetActive(false);
             }
             else
@@ -441,6 +450,7 @@ namespace Controller
                 if (messagePanel) messagePanel.SetActive(true);
                 if (messageText) messageText.SetText(string.Empty);
                 if (alignText) alignText.text = GetAlignString(align);
+                if (spiritText) spiritText.text = GetSpiritName(sourceData.spiritId);
 
                 if (hpSlider)
                 {

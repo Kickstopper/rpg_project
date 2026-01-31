@@ -11,6 +11,8 @@ namespace Data.Database
             public string id;
             public string name;
 
+            public string spiritId;
+            
             public int exp;
 
             public bool isCommander;

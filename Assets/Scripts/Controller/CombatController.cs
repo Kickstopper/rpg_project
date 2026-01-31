@@ -97,15 +97,14 @@ namespace Controller
         private int currentMoveSlotIndex = 0; // 0~2: 전열, 3~5: 후열
 
         [Header("Highlight Colors")]
-        public Color currentCmdTargetColor = Color.gray;
-        public Color moveSourceColor = Color.gray;   // 이동하려는 내 캐릭터 색상
-        public Color moveTargetColor = Color.cyan;  // 커서가 가리키는 대상 색상
+        private Color currentTargetColor = new Color32(0, 161, 182, 255);
+        private Color moveSourceColor = Color.gray;   // 이동하려는 내 캐릭터 색상
 
         [Header("Button Colors")]
-        public Color colorNormal = Color.white;          // 일반 텍스트
-        public Color colorGrayout = Color.gray;          // 사용 불가 텍스트
-        public Color colorHighlight = Color.yellow;      // 포커스 (사용 가능)
-        public Color colorHighlightDisabled = new Color(1f, 0.5f, 0.0f); // 포커스 (사용 불가) - 주황색
+        private Color colorNormal = Color.white;          // 일반 텍스트
+        private Color colorGrayout = Color.gray;          // 사용 불가 텍스트
+        private Color colorHighlight = Color.yellow;      // 포커스 (사용 가능)
+        private Color colorHighlightDisabled = new Color(1f, 0.5f, 0.0f); // 포커스 (사용 불가) - 주황색
 
         [Header("Slot Management")]
         // 몬스터들의 슬롯을 관리할 리스트 (0,1,2: 전열 / 0,1,2: 후열)
@@ -278,8 +277,8 @@ namespace Controller
                     raycastScreen.transform.localPosition = Vector3.zero;
 
                     DOTween.Sequence()
-                        .Join(raycastScreen.transform.DOLocalMoveY(screenPy, duration).SetEase(Ease.InBounce))
-                        .Join(BattleUI.transform.DOLocalMoveY(0f, duration).SetEase(Ease.InBounce))
+                        .Join(raycastScreen.transform.DOLocalMoveY(screenPy, duration).SetEase(Ease.OutBounce))
+                        .Join(BattleUI.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutBounce))
                         .OnComplete(() => 
                         {
                             // 종료 후 위치 확정 (Floating point 오차 방지)
@@ -1614,7 +1613,7 @@ namespace Controller
             foreach (var p in currentUnionParticipants)
             {
                 // 이미지 알파값을 조절하여 깜빡임 (LoopType.Yoyo)
-                p.SetHighlightColor(currentCmdTargetColor);
+                p.SetHighlightColor(currentTargetColor);
                 Image img = p.highlightImage;
                 if (img)
                 {
@@ -1865,7 +1864,7 @@ namespace Controller
             }
 
             RefreshCommandButtons(currentPlayer);
-            currentPlayer.SetHighlightColor(currentCmdTargetColor);
+            currentPlayer.SetHighlightColor(currentTargetColor);
 
             if (isAutoMode)
             {
@@ -2077,6 +2076,8 @@ namespace Controller
 
             ShowLog("WAITING...");
 
+            (activePlayers[currentPlayerIndex] as PlayerController).SetHighlightColor(currentTargetColor);
+
             if (targetCursor) targetCursor.gameObject.SetActive(false);
             
             inputCooldown = 0.2f;
@@ -2094,6 +2095,8 @@ namespace Controller
             if (targetCursor) targetCursor.gameObject.SetActive(false);
 
             ShowLog("WAITING...");
+
+            (activePlayers[currentPlayerIndex] as PlayerController).SetHighlightColor(currentTargetColor);
 
             SetContainerInteractable(fightCmdContainer, true);
             inputCooldown = 0.2f; 
@@ -2133,7 +2136,7 @@ namespace Controller
             if (targetSlot != null)
             {
                 PlayerController targetChar = targetSlot.GetComponentInChildren<PlayerController>();
-                if (targetChar != null) targetChar.SetHighlightColor(moveTargetColor);
+                if (targetChar != null) targetChar.SetHighlightColor(currentTargetColor);
             }
         }
 

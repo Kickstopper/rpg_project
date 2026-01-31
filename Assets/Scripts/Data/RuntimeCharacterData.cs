@@ -23,6 +23,8 @@ namespace Data
 
         public Align align;
 
+        public string spiritId;
+
         public StatData stats;
         public ResistanceData resistances;
         
@@ -55,6 +57,8 @@ namespace Data
             if (System.Enum.TryParse(save.align, out Align parsedAlign)) align = parsedAlign;
             if (System.Enum.TryParse(save.row, out RowType parsedRow)) row = parsedRow;
 
+            spiritId = save.spiritId;
+
             stats = save.stats;
             resistances = save.resistances;
             isCommander = save.isCommander;
@@ -76,6 +80,7 @@ namespace Data
             characterId = entry.id;
             name = entry.name;
             align = entry.align;
+            spiritId = entry.spiritId;
             stats = entry.stats;
             resistances = entry.resistances;
             isCommander = entry.isCommander;
@@ -100,6 +105,7 @@ namespace Data
 
             data.characterId = this.characterId;
             data.name = this.name;
+            data.spiritId = this.spiritId;
             data.align = this.align.ToString();
             
             data.weaponId = this.equippedWeaponId;

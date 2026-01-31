@@ -54,6 +54,8 @@ namespace Data
 
         public string align;
 
+        public string spiritId;
+
         public string row;
 
         public int currentHp;
