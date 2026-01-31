@@ -226,9 +226,9 @@ namespace Controller
             
             state = BattleState.Start;
 
-            if (logPanel) { logPanel.SetActive(false); logText.SetText(string.Empty); }
-            if (messagePanel) { messagePanel.SetActive(false); messageText.SetText(string.Empty); }
-            
+            HideLog();
+            HideMessage();
+
             activeMonsters.Clear(); 
             ClearParty();           
             InitializeSlots();
@@ -334,7 +334,7 @@ namespace Controller
             for (int i = 0; i < partyCount; i++)
             {
                 var member = PartyManager.Instance.GetMember(i);
-                if (member == null) continue;
+                if (member == null || member.currentHp <= 0) continue;
 
                 // 데이터상의 위치를 인덱스로 변환
                 // 전열(0,1,2), 후열(3,4,5)
@@ -456,8 +456,7 @@ namespace Controller
                 isSelectingTarget = true;
                 
                 commandPanel.SetActive(false);
-                if (logPanel) { logPanel.SetActive(true); logText.text = "SELECT TARGET"; }
-                
+                ShowLog("SELECT TARGET");
                 currentTargetIndex = 0;
                 UpdateTargetHighlight();
                 inputCooldown = 0.2f;
@@ -500,7 +499,7 @@ namespace Controller
                 reserveAutoOff = false;
                 autoModeButton.gameObject.SetActive(false);
                 Time.timeScale = 1.0f; 
-                if (logPanel) logPanel.SetActive(false); 
+                HideLog();
             }
 
             StartCoroutine(PreparePlayerTurnRoutine());
@@ -1009,6 +1008,9 @@ namespace Controller
             AddButtonToActiveList(ActionType.Menu_Extra, true);
             // 6. Tactics Menu ▶ (Union, LastStand, RollingVulcan)
             AddButtonToActiveList(ActionType.Menu_Tactics, showTacticsMenu);
+            
+            // 7. Next
+            AddButtonToActiveList(ActionType.Next, true);
 
             // ---------------------------------------------------------
             // 4. UI 갱신 준비
@@ -1143,7 +1145,7 @@ namespace Controller
 
             // 2. 서브 메뉴 리스트 구성
             List<Button> subButtons = new List<Button>();
-            
+            float posY = -112f;
             if (menuType == ActionType.Menu_Gun)
             {
                 // Shoot 버튼: 쏠 수 없으면 아예 비활성화
@@ -1156,12 +1158,13 @@ namespace Controller
             }
             else if (menuType == ActionType.Menu_Extra)
             {
+                posY -= 32f;
                 AddSubButton(ActionType.Move, true, subButtons);
                 AddSubButton(ActionType.Guard, true, subButtons);
-                AddSubButton(ActionType.Next, true, subButtons);
             }
             else if (menuType == ActionType.Menu_Tactics)
             {
+                posY -= 64f;
                 bool canUnion = CheckUnionAttackCondition(actor);
                 bool canLastStand = CheckLastStandCondition(actor); 
                 bool canRollingVulcan = CheckRollingVulcanCondition(actor);
@@ -1185,6 +1188,9 @@ namespace Controller
                 }
                 
                 ResizeContainer(subMenuContainer.GetComponent<RectTransform>(), subButtons.Count);
+
+                // 서브 메뉴의 높이를 메인 메뉴의 카테고리 버튼과 일치시킴
+                subMenuContainer.transform.parent.transform.localPosition = new Vector3(0, posY, 0);
             }
 
             // 4. 상태 전환
@@ -1388,7 +1394,7 @@ namespace Controller
             if (!actor.CanShootGun())
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); 
-                if (logPanel) { logPanel.SetActive(true); logText.text = "CANNOT USE GUN\n(Need Gun & Ammo)"; }
+                ShowLog("CANNOT USE GUN");
                 return;
             }
             PrepareWeaponAction(actor.currentGun, ActionType.Shoot);
@@ -1403,12 +1409,8 @@ namespace Controller
             if (currentActor.currentGun != null && currentActor.currentGunAmmo >= currentActor.currentGun.maxHits)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); // 거부 효과음
-                if (logPanel) 
-                { 
-                    logPanel.SetActive(true); 
-                    logText.text = "탄환이 이미 가득 찼습니다."; 
-                    StartCoroutine(HideLogAfterDelay(1.0f));
-                }
+                ShowLog("NO NEED TO RELOAD");
+                StartCoroutine(HideLogAfterDelay(1.0f));
                 return;
             }
 
@@ -1457,11 +1459,11 @@ namespace Controller
 
             if (actor.learnedSkillIds.Count == 0)
             {
-                if (logPanel) { logPanel.SetActive(true); logText.text = "사용할 수 있는 스킬이 없습니다"; }
+                ShowLog("NO SKILLS AVAILABLE");
             }
             else
             {
-                if (logPanel) { logPanel.SetActive(true); logText.text = "사용할 스킬을 선택하세요"; }
+                ShowLog("CHOOSE A SKILL");
                 SetContainerInteractable(fightCmdContainer, false);
                 battleSkillUI.Show(actor.learnedSkillIds, actor);
             } 
@@ -1472,11 +1474,11 @@ namespace Controller
             if (battleItemUI == null) return;
             if (InventoryManager.Instance.GetAllItemIds().Count == 0)
             {
-                if (logPanel) { logPanel.SetActive(true); logText.text = "사용할 수 있는 아이템이 없습니다"; }
+                ShowLog("NO ITEM AVAILABLE");
             }
             else
             {
-                if (logPanel) { logPanel.SetActive(true); logText.text = "사용할 아이템을 선택하세요"; }
+                ShowLog("SELECT ITEM");
                 SetContainerInteractable(fightCmdContainer, false);
                 battleItemUI.Show();
             }
@@ -1540,7 +1542,8 @@ namespace Controller
             
             if (validTargets.Count == 0)
             {
-                if (logPanel) { logPanel.SetActive(true); logText.text = "No Target!"; StartCoroutine(HideLogAfterDelay(1.0f)); }
+                ShowLog("NO TARGET!");
+                StartCoroutine(HideLogAfterDelay(1.0f));
                 return; 
             }
             
@@ -1566,7 +1569,7 @@ namespace Controller
         IEnumerator HideLogAfterDelay(float delay)
         {
             yield return new WaitForSeconds(delay);
-            if(logPanel) logPanel.SetActive(false);
+            HideLog();
         }
 
         void QueuePolymorphicAction(GameObject target)
@@ -1638,7 +1641,8 @@ namespace Controller
             {
                 // 전열이 없으면 전체 대상으로 확장? 아니면 불가능 메시지?
                 // 여기서는 편의상 후열까지 포함하거나 메시지 출력
-                if (logPanel) { logPanel.SetActive(true); logText.text = "전열에 적이 없습니다!"; StartCoroutine(HideLogAfterDelay(1.0f)); }
+                ShowLog("NO ENEMIES IN THE FRONT LINE!");
+                StartCoroutine(HideLogAfterDelay(1.0f));
                 CancelUnionSelection(); // 취소 처리
                 return;
             }
@@ -1649,7 +1653,7 @@ namespace Controller
             
             // UI 숨기기
             commandPanel.SetActive(false);
-            if (logPanel) { logPanel.SetActive(true); logText.text = "SELECT TARGET (Union)"; }
+            ShowLog("SELECT TARGET");
             inputCooldown = 0.2f;
         }
 
@@ -1873,8 +1877,9 @@ namespace Controller
             commandPanel.SetActive(true);
             
             currentPlayer.SetMessage("생각중...");
-            if (logPanel) logPanel.SetActive(true);
-            logText.text = $"명령 대기: {currentPlayer.sourceData.name}";
+            
+            ShowLog("WATING...");
+
             if (targetCursor) targetCursor.gameObject.SetActive(false);
 
             if (isFightMode)
@@ -1990,7 +1995,8 @@ namespace Controller
             isSelectingMoveTarget = true;
             
             commandPanel.SetActive(false);
-            if (logPanel) { logPanel.SetActive(true); logText.text = "이동할 위치를 선택하세요."; }
+
+            ShowLog("CHOOSE YOUR PLACE");
 
             currentMoveSlotIndex = GetPlayerSlotIndex(currentActor.transform.parent);
             UpdateMoveCursor();
@@ -2069,8 +2075,8 @@ namespace Controller
             baseCmdContainer.SetActive(false);
             fightCmdContainer.SetActive(true);
 
-            if (logPanel) logPanel.SetActive(true); 
-            logText.SetText($"명령 대기: {activePlayers[currentPlayerIndex].entityName}");
+            ShowLog("WAITING...");
+
             if (targetCursor) targetCursor.gameObject.SetActive(false);
             
             inputCooldown = 0.2f;
@@ -2086,8 +2092,8 @@ namespace Controller
             fightCmdContainer.SetActive(true);
             
             if (targetCursor) targetCursor.gameObject.SetActive(false);
-            if (logPanel) logPanel.SetActive(true); 
-            logText.SetText($"명령 대기: {activePlayers[currentPlayerIndex].entityName}");
+
+            ShowLog("WAITING...");
 
             SetContainerInteractable(fightCmdContainer, true);
             inputCooldown = 0.2f; 
@@ -2145,7 +2151,7 @@ namespace Controller
             
             commandPanel.SetActive(false);
             if (targetCursor) targetCursor.gameObject.SetActive(false);
-            if (logPanel) { logPanel.SetActive(true); logText.text = "도망치는 중..."; }
+            ShowLog("ESCAPE!");
 
             yield return wait10;
 
@@ -2159,14 +2165,16 @@ namespace Controller
                 );
                 yield return wait01;
                 
-                logText.text = "무사히 도망쳤다!";
+                ShowMessage("휴~ 도망쳤다.");
                 yield return wait10;
+                HideMessage();
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
             else
             {
-                logText.text = "도망치지 못했다!\n적에게 틈을 보이고 말았다.";
+                ShowMessage("칙쇼!! 잡혀버렸다!");
                 yield return wait10;
+                HideMessage();
                 actionQueue.Clear(); 
                 ProcessTurn();
             }
@@ -2340,7 +2348,7 @@ namespace Controller
             state = BattleState.Processing; 
             
             commandPanel.SetActive(false);
-            if (logPanel) logPanel.SetActive(false);
+            HideLog();
             HideTurnOrderUI();
 
             actionQueue = actionQueue.OrderByDescending(x => x.speed).ToList();
@@ -2449,14 +2457,13 @@ namespace Controller
                 case ActionType.Rolling_Vulcan: yield return HandleRollingVulcan(action); break;
 
                 case ActionType.Next:
-                    ShowLog($"{action.actor.name}은(는) 기회를 엿보고 있다...");
+                    ShowLog($"{action.actor.name} IS WATCHING FOR OPPORTUNITY...");
                     // 별도의 애니메이션 없이 짧게 대기
                     yield return wait05; 
                     break;
             }
             yield return wait01;
-            if (logPanel) logPanel.SetActive(false);
-            logText.SetText(string.Empty);
+            HideLog();
         }
 
         IEnumerator HandleItemAction(CombatAction action)
@@ -2470,7 +2477,7 @@ namespace Controller
                 // UseItem이 false를 반환하면 아이템이 없다는 뜻 (예: 앞선 캐릭터가 마지막 1개를 써버림)
                 if (!InventoryManager.Instance.UseItem(consumable.id))
                 {
-                    ShowLog($"{item.dataName} 부족! 행동 취소.");
+                    ShowLog($"NOT ENOUGH {item.dataName}");
                     yield return wait10;
                     yield break; // 아이템 효과 발동 없이 종료
                 }
@@ -2481,7 +2488,7 @@ namespace Controller
             TargetScope scope = (item != null) ? item.targetScope : TargetScope.OneAlly;
             List<GameObject> targets = GetTargetsByScope(scope, action);
 
-            ShowLog($"{action.actor.name}의 아이템 사용: {item.dataName} (대상: {targets.Count}명)");
+            ShowLog($"USE {item.dataName}");
 
             // 모든 대상에게 효과 적용
             foreach (var target in targets)
@@ -2527,7 +2534,7 @@ namespace Controller
                     // 현재 HP가 코스트보다 적으면 발동 실패 (자살 방지 or 불발 처리)
                     if (actor.currentHp <= skill.costValue)
                     {
-                        ShowLog("HP 부족! 스킬 실패.");
+                        ShowLog("FAILED! NOT ENOUGH HP!");
                         yield return wait10;
                         yield break;
                     }
@@ -2538,7 +2545,7 @@ namespace Controller
                 {
                     if (actor.currentMp < skill.costValue)
                     {
-                        ShowLog("MP 부족! 스킬 실패.");
+                        ShowLog("FAILED! NOT ENOUGH MP!");
                         yield return wait10;
                         yield break;
                     }
@@ -2551,7 +2558,7 @@ namespace Controller
             TargetScope scope = (skill != null) ? skill.targetScope : TargetScope.FrontSingle;
             List<GameObject> targets = GetTargetsByScope(scope, action);
 
-            ShowLog($"{action.actor.name}의 스킬 발동: {skill.dataName} (대상: {targets.Count}명)");
+            ShowLog($"{action.actor.name}'S SKILL': {skill.dataName}");
 
             foreach (var target in targets)
             {
@@ -2595,9 +2602,9 @@ namespace Controller
         IEnumerator HandleGuardAction(CombatAction action)
         {
             SetGuardState(action.actor, true);
-            ShowLog($"{action.actor.name}의 방어 태세!");
+            ShowLog($"{action.actor.name} IS GUARDING...");
             yield return wait05;
-            if (logPanel) logPanel.SetActive(false);
+            HideLog();
         }
 
         IEnumerator HandleUnionAttack(CombatAction action)
@@ -2609,7 +2616,7 @@ namespace Controller
                 if (action.target == null)
                 {
                     Debug.Log("Union Attack 취소: 유효한 타겟 없음");
-                    ShowLog("유효한 타겟 없음");
+                    ShowLog("NO VALID TARGET!");
                     currentUnionParticipants.Clear(); 
                     yield return wait05;
                     yield break;
@@ -2642,7 +2649,7 @@ namespace Controller
             // 파트너 부족 시 취소 (본인 포함 2명 이상이어야 함)
             if (partners.Count < 2) 
             {
-                ShowLog("협동 공격 실패!");
+                ShowLog("UNION ATTACK FAILED!");
                 currentUnionParticipants.Clear(); 
                 yield break;
             }
@@ -2715,7 +2722,7 @@ namespace Controller
             // =========================================================
             // 5. 타겟 위치에 따른 파티 포메이션 변경
             // =========================================================
-            ShowLog("Formation Changing...");
+            ShowLog("FORMATION CHANGING...");
 
             // 타겟 몬스터의 열(Column) 인덱스 확인
             // (Target이 몬스터가 아닐 경우, 기본값 1(Center)로 처리)
@@ -2878,27 +2885,32 @@ namespace Controller
             yield return seq.WaitForCompletion();
             
             yield return wait05;
-            if (logPanel) logPanel.SetActive(false);
+            HideLog();
         }
 
         // Rolling Vulcan 실행 코루틴
         IEnumerator HandleRollingVulcan(CombatAction action)
         {
-            ShowLog("얘들아 롤링 발칸이다!");
+            var leader = action.actor.GetComponent<PlayerController>();
+            int index = leader.columnIndex;
+            leader.SetMessage("안돼겠다! 롤링 발칸이다!");
+            yield return wait10;
+            foreach(PlayerController pc in activePlayers)
+            {
+                if (pc.columnIndex == index) continue;
+                pc.SetMessage("알았어! OK!!");
+            }
             yield return wait10;
             
-            ShowLog("알았어! OK!!");
-            yield return wait10;
+            ResetCharacterMessage();
             
-            ShowLog("롤링 발칸!!");
+            ShowMessage("롤링 발칸~~~!!");
             // SoundManager.Instance.PlaySFX(SfxID.Skill_Ultimate); 
             Color bgColor = combatBG.color;
             
             // 1. 데이터 준비
             List<PlayerController> participants = currentUnionParticipants;
             int totalAmmo = participants.Sum(p => p.currentGunAmmo);
-            
-           
 
             // 2. 무지개 빛 효과 시작
             Coroutine rainbowRoutine = StartCoroutine(ProcessRainbowEffect(participants));
@@ -2945,6 +2957,7 @@ namespace Controller
             }
             
             currentUnionParticipants.Clear();
+            HideMessage();
             yield return wait05;
         }
 
@@ -3103,6 +3116,12 @@ namespace Controller
             else if (actor.TryGetComponent(out MonsterController mc)) mc.isGuarding = state;
         }
 
+        void ShowCharacterMessage(PlayerController pc, string msg)
+        {
+            if (pc == null) return;
+            pc.SetMessage(msg);
+        }
+
         // 장전 코루틴
         IEnumerator HandleReloadAction(CombatAction action)
         {
@@ -3112,14 +3131,15 @@ namespace Controller
                 // 탄환 최대치로 충전
                 actor.currentGunAmmo = actor.currentGun.maxHits;
                 
-                ShowLog("RELOADED FULL AMMO!");
+                ShowCharacterMessage(actor, "탄환 장전 완료!");
                 // SoundManager.Instance.PlaySFX(SfxID.Reload); // 장전 효과음
                 
                 // 간단한 연출 위로 살짝 뛰기
                 yield return actor.transform.DOLocalMoveY(10f, 0.2f).SetLoops(2, LoopType.Yoyo).WaitForCompletion();
+                
+                ShowCharacterMessage(actor, string.Empty);
             }
             yield return wait05;
-            if (logPanel) logPanel.SetActive(false);
         }
 
         IEnumerator HandleAttackAction(CombatAction action)
@@ -3167,21 +3187,29 @@ namespace Controller
                 if (pc.currentGunAmmo <= 0)
                 {
                     Debug.Log($"[Auto] {action.actor.name}: 탄환 부족으로 사격 실패");
-                    ShowLog($"{action.actor.name} 탄환 부족!\nReload 필요!");
+                    ShowLog($"{action.actor.name} 재장전 필요!");
+                    ShowCharacterMessage(pc, "이런! 탄환이 부족해!");
                     
                     // 실패 효과음
                     SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); 
 
                     // 메시지를 읽을 시간을 주고 턴 종료 (공격 애니메이션 실행 X)
                     yield return wait10; 
+                    ShowCharacterMessage(pc, string.Empty);
                     yield break; 
                 }
             }
+            else
+            {
+                pc?.SetMessage(Random.Range(0f, 1f) < 0.5f ? "받아라!" : "얍!");
+            }
 
-            string actStr = (action.type == ActionType.Shoot) ? "의 사격!" : "의 참격!";
+            string actStr = (action.type == ActionType.Shoot) ? "'S SHOOT!" : "'S SMASH!";
             ShowLog($"{action.actor.name}{actStr}");
             yield return wait05;
 
+            pc?.SetMessage(string.Empty);
+            
             // 등장 및 공격 모션 통합
             Vector3 originalPos = action.actor.transform.localPosition;
             Vector3 originalScale = action.actor.transform.localScale;
@@ -3209,7 +3237,8 @@ namespace Controller
 
                 float qteDuration = 2.0f; 
                 float timer = 0f;
-                if (logPanel) logText.text = "SHOOT IT IN THE HEAD!! (Space/Enter)";
+                ShowLog("READY!");
+                ShowCharacterMessage(pc, "죽어!");
                 while (timer < qteDuration && currentHits < maxHits)
                 {
                     timer += Time.deltaTime;
@@ -3223,11 +3252,13 @@ namespace Controller
                         hitsPerformed++; // 실제 발사 수 증가
                         BattleEntity actorEntity = action.actor.GetComponent<BattleEntity>();
                         if (actorEntity) actorEntity.nextTurnSpeedPenalty += 500;
-                        if (logPanel) logText.text = $"Combo! ({currentHits}/{maxHits})";
+                        ShowLog($"SHOOT OUT! ({currentHits}/{maxHits})");
+                        
                         SoundManager.Instance.PlaySFX(SfxID.Attack_Gun); 
                     }
                     yield return null; 
                 }
+                ShowCharacterMessage(pc, string.Empty);
                 if (qteTimingSlider) qteTimingSlider.gameObject.SetActive(false);
                 if (currentHits > 0) yield return wait01;
             }
@@ -3290,26 +3321,46 @@ namespace Controller
             if (CheckEvasion(action.actor, target, posEvaBonus))
             {
                 Debug.Log($"{target.name} 회피!");
+                var targetEntity = target.GetComponent<BattleEntity>();
+                if (targetEntity is PlayerController pc)
+                {
+                    pc.SetMessage("어림없지!");
+                    yield return wait05;
+                    pc.SetMessage(string.Empty);
+                } 
                 yield return StartCoroutine(ProcessDodgeAnimation(target.transform));
                 yield break; 
             }
 
             if (CheckReflection(target, action.type))
             {
-                ShowLog("반사!");
+                ShowLog("REFLECT!");
                 SpawnVFX(vfxReflectPrefab, target.transform.position);
                 int reflectDmg = CalculateDamage(action.actor, action.actor, action, false, 1.0f);
-                ApplyDamage(action.actor, reflectDmg, false); 
+                ApplyDamage(action.actor, reflectDmg, false);
+                var targetEntity = target.GetComponent<BattleEntity>();
+                if (targetEntity is PlayerController pc)
+                {
+                    pc.SetMessage("반사다!");
+                    yield return wait05;
+                    pc.SetMessage(string.Empty);
+                } 
                 yield break;
             }
 
             if (CheckAbsorption(target, action.type))
             {
-                ShowLog("흡수!");
+                ShowLog("ABSORB!");
                 SpawnVFX(vfxAbsorbPrefab, target.transform.position);
                 int absorbAmount = CalculateDamage(action.actor, target, action, false, 1.0f);
                 var targetEntity = target.GetComponent<BattleEntity>();
-                if (targetEntity is PlayerController pc) pc.Recover(absorbAmount, 0);
+                if (targetEntity is PlayerController pc)
+                {
+                    pc.Recover(absorbAmount, 0);
+                    pc.SetMessage("흡수해주마!");
+                    yield return wait05;
+                    pc.SetMessage(string.Empty);
+                } 
                 else if (targetEntity is MonsterController mc) mc.currentHp = Mathf.Min(mc.currentHp + absorbAmount, mc.maxHp);
                 yield break; 
             }
@@ -3322,13 +3373,16 @@ namespace Controller
                     bool isCrit = CheckCritical(action.actor, target, action);
                     int originalDamage = CalculateDamage(action.actor, target, action, isCrit, posDmgMult);
                     int splitDamage = Mathf.Max(1, originalDamage / defenders.Count);
-                    ShowLog("방어!");
+                    ShowLog("DEFENSE!");
                     foreach (var defender in defenders)
                     {
+                        defender.SetMessage("막아!");
                         ApplyDamage(defender.gameObject, splitDamage, false);
                         SpawnVFX(vfxGuardHitPrefab, defender.transform.position);
                     }
                     yield return wait01;
+                    
+                    foreach(var defender in defenders) defender.SetMessage(string.Empty);
                     yield break; 
                 }
             }
@@ -3344,8 +3398,15 @@ namespace Controller
             BattleEntity defenderEntity = target.GetComponent<BattleEntity>();
             if (defenderEntity != null && defenderEntity.isGuarding)
             {
+                PlayerController defender = null;
+                if (defenderEntity is PlayerController pc) {
+                    defender = pc; 
+                    pc.SetMessage("윽!");
+                }
                 SpawnVFX(vfxGuardHitPrefab, target.transform.position);
                 yield return wait01;
+                
+                if (defender) defender.SetMessage(string.Empty);
             }
             else
             {
@@ -3503,7 +3564,10 @@ namespace Controller
         }
 
         void ShowLog(string msg) { if (logPanel) { logPanel.SetActive(true); logText.SetText(msg); } }
-
+        void HideLog() { if (logPanel) { logPanel.SetActive(false); logText.SetText(string.Empty); }}
+        void ShowMessage(string msg) { if (messagePanel) { messagePanel.SetActive(true); messageText.SetText(msg); } }
+        void HideMessage() { if (messagePanel) { messagePanel.SetActive(false); messageText.SetText(string.Empty); }}
+        void ResetCharacterMessage() { foreach(PlayerController pc in activePlayers) pc.SetMessage(string.Empty); }
         void GetWeaponInfo(CombatAction action, out int min, out int max, out TargetScope scope)
         {
             min = 1; max = 1; scope = TargetScope.FrontSingle; 
@@ -3540,10 +3604,10 @@ namespace Controller
                 int originIndex = GetPlayerSlotIndex(originSlotTransform);
                 if (targetIndex < 3 || originIndex < 3)
                 {
-                    if (logPanel) { logPanel.SetActive(true); logText.SetText("LAST STAND 발동중.\n이동 불가!"); }
+                    ShowLog("YOU CAN NOT MOVE!");
                     SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                     yield return wait10; 
-                    if (logPanel) logPanel.SetActive(false);
+                    HideLog();
                     yield break; 
                 }
             }
@@ -3551,8 +3615,7 @@ namespace Controller
             if (targetSlotTransform == originSlotTransform) yield break;
 
             PlayerController targetChar = targetSlotTransform.GetComponentInChildren<PlayerController>();
-
-            if (messagePanel) { messagePanel.SetActive(true); messageText.SetText((targetChar != null && !targetChar.IsEmpty) ? "위치 교대!" : "자리 이동!"); }
+            ShowMessage((targetChar != null && !targetChar.IsEmpty) ? "위치 교대!" : "자리 이동!");
             Debug.Log($"[Action] {actor.name} 이동: {originSlotTransform.name} -> {targetSlotTransform.name}");
 
             int actorListIndex = allSlotControllers.IndexOf(actor);
@@ -3576,7 +3639,7 @@ namespace Controller
             
             yield return seq.WaitForCompletion();
             yield return wait05; 
-            if (messagePanel) messagePanel.SetActive(false);
+            HideMessage();
         }
 
         void InitializeSlots()
@@ -3923,7 +3986,6 @@ namespace Controller
         {
             state = isWin ? BattleState.Won : BattleState.Lost;
             if (commandPanel) commandPanel.SetActive(false);
-            if (logPanel) logPanel.SetActive(true);
 
             if (isWin)
             {
@@ -3959,19 +4021,19 @@ namespace Controller
                 }
 
                 // 4. 결과 로그 출력
-                logText.text = "승리는 버닝 썬!";
+                ShowMessage("승리는 버닝 썬!");
                 // string itemLog = reward.dropItems.Count > 0 ? $"\nItems: {string.Join(", ", reward.dropItems)}" : "";
                 // logText.text = $"VICTORY!\nEXP: +{reward.totalExp} ({reward.expPerMember}/ea)\nGOLD: +{reward.totalGold}G{itemLog}";
             }
             else 
             {
-                logText.text = "패배는 너의 것!";
+                ShowMessage("패배는 너의 것!");
             }
 
             yield return wait05;
             while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return)) yield return null;
 
-            logPanel.SetActive(false);
+            HideMessage();
             raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.InBounce).OnComplete(() => {
                     raycastScreen.transform.localPosition = Vector3.zero;
                     GameStateManager.Instance.ChangeState(GameState.Exploration);
