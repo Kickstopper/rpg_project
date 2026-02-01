@@ -4,9 +4,8 @@ using System;
 using Controller;
 public enum GameState
 {
-    TitleScreen,
-    Exploration, // Pseudo-3D 던전 탐험 모드
-    WorldMap,    // 월드맵
+    None,
+    Exploration, // 월드맵 또는 Pseudo-3D 던전 탐험 모드
     Battle,      // 전투 모드
     PlayerMenu,        // 메뉴/인벤토리
     Event,       // 이벤트
@@ -95,10 +94,8 @@ namespace Manager
                     break;
             }
         }
-        // [신규] 현재 씬의 전투 컨트롤러 참조
-        
 
-        // [수정] UI 등록 시 컨트롤러도 함께 등록받음
+        // UI 등록 시 컨트롤러도 함께 등록받음
         public void RegisterSceneComponents(GameObject expl, GameObject cbt, GameObject menu, CombatController controller)
         {
             this.explorationCanvas = expl;

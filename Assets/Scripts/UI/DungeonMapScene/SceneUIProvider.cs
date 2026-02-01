@@ -9,7 +9,7 @@ public class SceneUIProvider : MonoBehaviour
     public GameObject combatCanvas; // 이게 BattleSystem 프리팹의 캔버스
     public GameObject menuCanvas;
 
-    // [신규] 인스펙터에서 연결하거나 Start에서 찾음
+    // 인스펙터에서 연결하거나 Start에서 찾음
     public CombatController combatController; 
 
     void Start()

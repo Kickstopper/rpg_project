@@ -10,62 +10,86 @@ namespace UI
         public Color colorLeft = Color.red;   // 그라데이션 시작 색상
         public Color colorRight = Color.blue; // 그라데이션 끝 색상
 
+        public Color ColorLeft 
+        { 
+            get => colorLeft; 
+            set { if(colorLeft != value) { colorLeft = value; graphic?.SetVerticesDirty(); } } 
+        }
+
+        public Color ColorRight 
+        { 
+            get => colorRight; 
+            set { if(colorRight != value) { colorRight = value; graphic?.SetVerticesDirty(); } } 
+        }
+
+        [SerializeField]
         [Range(-180f, 180f)]
-        public float angle = 0f; // 그라데이션 각도 (-180 ~ 180도)
+        private float m_Angle = 0f;
+
+        public float angle
+        {
+            get => m_Angle;
+            set
+            {
+                // 값이 같으면 갱신하지 않음 (최적화)
+                if (m_Angle == value) return;
+                
+                m_Angle = value;
+                
+                // 그래픽 컴포넌트에 메쉬를 다시 그려야 한다고 알림
+                if (graphic != null)
+                {
+                    graphic.SetVerticesDirty();
+                }
+            }
+        }
+
+        private readonly List<UIVertex> m_VertexList = new List<UIVertex>(); // 재사용을 위한 리스트
 
         public override void ModifyMesh(VertexHelper vh)
         {
-            if (!IsActive())
-                return;
+            if (!IsActive()) return;
 
-            List<UIVertex> vertexList = new List<UIVertex>();
-            vh.GetUIVertexStream(vertexList);
+            m_VertexList.Clear();
+            vh.GetUIVertexStream(m_VertexList);
 
-            int count = vertexList.Count;
+            int count = m_VertexList.Count;
             if (count == 0) return;
 
-            // 1. 각도를 라디안으로 변환 및 방향 벡터 계산
-            // angle이 0이면 (1, 0) -> 가로 방향 (기존과 동일)
-            // angle이 90이면 (0, 1) -> 세로 방향
-            float rad = angle * Mathf.Deg2Rad;
+            float rad = m_Angle * Mathf.Deg2Rad;
             float cos = Mathf.Cos(rad);
             float sin = Mathf.Sin(rad);
 
-            // 2. 회전된 축을 기준으로 최소/최대값 찾기 (Min/Max Projection)
             float minV = float.MaxValue;
             float maxV = float.MinValue;
 
+            // 1차 루프: Min/Max 찾기
             for (int i = 0; i < count; i++)
             {
-                Vector3 pos = vertexList[i].position;
-                
-                // 내적(Dot Product)을 통해 그라데이션 방향 축에서의 위치값 계산
-                // 공식: x * cos(θ) + y * sin(θ)
+                Vector3 pos = m_VertexList[i].position;
                 float val = (pos.x * cos) + (pos.y * sin);
-
                 if (val > maxV) maxV = val;
                 if (val < minV) minV = val;
             }
 
             float range = maxV - minV;
+            // 나눗셈을 곱셈으로 치환하기 위해 역수 계산
+            float invRange = (range > 0.001f) ? 1.0f / range : 0f;
 
-            // 3. 각 버텍스에 색상 적용
+            // 2차 루프: 색상 적용
             for (int i = 0; i < count; i++)
             {
-                UIVertex v = vertexList[i];
-                
-                // 현재 버텍스의 회전된 축 상의 위치
+                UIVertex v = m_VertexList[i];
                 float val = (v.position.x * cos) + (v.position.y * sin);
-
-                // 0 ~ 1 사이 값으로 정규화 (t)
-                float t = (range == 0) ? 0 : (val - minV) / range;
+                
+                float t = (val - minV) * invRange;
 
                 v.color = Color.Lerp(colorLeft, colorRight, t);
-                vertexList[i] = v;
+                m_VertexList[i] = v;
             }
 
             vh.Clear();
-            vh.AddUIVertexTriangleStream(vertexList);
+            vh.AddUIVertexTriangleStream(m_VertexList);
         }
         
         // 인스펙터에서 값을 바꿀 때 즉시 갱신되도록 처리 (에디터 편의성)

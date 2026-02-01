@@ -102,6 +102,7 @@ namespace Manager
             {
                 LevelManager.Instance.LoadLevelFromJson(data.dungeonId);
                 LevelManager.Instance.UpdateStartPosition(data.playerPosX, data.playerPosY, data.playerDirection);
+                GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
 
             // 휘발성 저장(중단 데이터)이라면 로드 후 즉시 삭제

@@ -229,7 +229,7 @@ namespace UI.DungeonMapScene
             GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
             
             // 2. 초기 상태
-            OnGameStateChanged(GameState.Exploration);
+            GameStateManager.Instance.ChangeState(GameState.Exploration);
         }
 
         // 스크립트가 꺼지거나 씬이 바뀔 때 안전하게 상태 초기화

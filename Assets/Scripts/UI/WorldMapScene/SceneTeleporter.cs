@@ -84,7 +84,7 @@ namespace UI.WorldMapScene
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
             {
-                var moveScript = player.GetComponent<WorldMapMovement>();
+                var moveScript = player.GetComponent<WorldMapMovementController>();
                 if (moveScript != null) moveScript.enabled = false;
 
                 var rb = player.GetComponent<Rigidbody>();
