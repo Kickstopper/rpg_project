@@ -92,12 +92,11 @@ namespace Controller
         private List<Transform> playerBackSlots = new();
 
         //이동 모드 관련 변수
-        private PlayerController lastHighlightedPlayer; // 마지막으로 하이라이트된 플레이어를 기억할 변수
         private bool isSelectingMoveTarget = false;
         private int currentMoveSlotIndex = 0; // 0~2: 전열, 3~5: 후열
 
         [Header("Highlight Colors")]
-        private Color currentTargetColor = new Color32(0, 161, 182, 255);
+        private Color currentTargetColor = new Color32(128, 0, 178, 255);
         private Color moveSourceColor = Color.gray;   // 이동하려는 내 캐릭터 색상
 
         [Header("Button Colors")]
@@ -393,6 +392,14 @@ namespace Controller
 
                 PlayerController pc = go.GetComponent<PlayerController>();
                 allSlotControllers.Add(pc);
+
+                // 생성된 플레이어 버튼의 자동 내비게이션 비활성화
+                if (pc.selectButton != null)
+                {
+                    Navigation nav = new Navigation();
+                    nav.mode = Navigation.Mode.None;
+                    pc.selectButton.navigation = nav;
+                }
 
                 // 3. 데이터 주입
                 RuntimeCharacterData assignedData = slotAssignments[i];
@@ -794,6 +801,8 @@ namespace Controller
                 instantResultText.text = $"<size=120%>YOU는 SHOCK!!</size>\n\n" +
                                          $"EXP +{reward.totalExp}\nGOLD +{reward.totalGold}{itemTxt}\n" +
                                          $"적들은 이미 죽어 있다...";
+                
+                instantResultPanel.transform.DOScale(1.1f, instantWinDelay);
             }
             
             SoundManager.Instance.PlaySFX(SfxID.Attack_Sword); // 타격음 한번 재생
@@ -801,8 +810,11 @@ namespace Controller
             // 6. 잠시 대기 후 종료
             yield return new WaitForSeconds(instantWinDelay);
 
-            if (instantResultPanel) instantResultPanel.SetActive(false);
-
+            if (instantResultPanel)
+            {
+                instantResultPanel.transform.localScale = Vector3.one;
+                instantResultPanel.SetActive(false);
+            } 
             // 7. 전투 종료 처리
             // 몬스터들을 비활성화하거나 Destroy 처리해야 함
             ClearCombatField(); 
@@ -1877,7 +1889,7 @@ namespace Controller
             
             currentPlayer.SetMessage("생각중...");
             
-            ShowLog("WATING...");
+            ShowLog("WAITING...");
 
             if (targetCursor) targetCursor.gameObject.SetActive(false);
 
@@ -2162,7 +2174,7 @@ namespace Controller
             {
                 SetEnemyVisualsActive(false);
                 
-                raycastScreen.transform.DOLocalMoveY(0f, 0.1f).SetEase(Ease.InQuint).OnComplete(() => {
+                raycastScreen.transform.DOLocalMoveY(0f, 0.1f).SetEase(Ease.OutSine).OnComplete(() => {
                         raycastScreen.transform.localPosition = Vector3.zero;
                     }
                 );
@@ -2171,6 +2183,8 @@ namespace Controller
                 ShowMessage("휴~ 도망쳤다.");
                 yield return wait10;
                 HideMessage();
+                HideLog();
+                autoModeButton.gameObject.SetActive(false);
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
             else
@@ -2896,12 +2910,12 @@ namespace Controller
         {
             var leader = action.actor.GetComponent<PlayerController>();
             int index = leader.columnIndex;
-            leader.SetMessage("안돼겠다! 롤링 발칸이다!");
+            leader.SetMessage("안되겠다! 롤링 발칸이다!");
             yield return wait10;
             foreach(PlayerController pc in activePlayers)
             {
-                if (pc.columnIndex == index) continue;
-                pc.SetMessage("알았어! OK!!");
+                if (pc.columnIndex == index) pc.SetMessage(string.Empty);
+                else pc.SetMessage("알았어! OK!!");
             }
             yield return wait10;
             
@@ -3204,12 +3218,12 @@ namespace Controller
             }
             else
             {
-                pc?.SetMessage(Random.Range(0f, 1f) < 0.5f ? "받아라!" : "얍!");
+                pc?.SetMessage(Random.Range(0f, 1f) < 0.5f ? "오라오라!" : "흐이짜!");
             }
 
             string actStr = (action.type == ActionType.Shoot) ? "'S SHOOT!" : "'S SMASH!";
             ShowLog($"{action.actor.name}{actStr}");
-            yield return wait05;
+            yield return wait10;
 
             pc?.SetMessage(string.Empty);
             
@@ -3723,6 +3737,14 @@ namespace Controller
 
             if (controller.currentHp <= 0) { Destroy(newMonsterObj); return; }
 
+            // 몬스터 버튼의 자동 내비게이션 비활성화
+            if (controller.selectButton != null)
+            {
+                Navigation nav = new Navigation();
+                nav.mode = Navigation.Mode.None;
+                controller.selectButton.navigation = nav;
+            }
+
             // [중요] 배치된 위치 정보를 컨트롤러에 주입
             bool isFront = (targetSlots == frontSlots);
             
@@ -4037,7 +4059,10 @@ namespace Controller
             while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return)) yield return null;
 
             HideMessage();
-            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.InBounce).OnComplete(() => {
+            HideLog();
+            autoModeButton.gameObject.SetActive(false);
+
+            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.OutSine).OnComplete(() => {
                     raycastScreen.transform.localPosition = Vector3.zero;
                     GameStateManager.Instance.ChangeState(GameState.Exploration);
                 }
@@ -4046,7 +4071,6 @@ namespace Controller
 
         private void ClearParty()
         {
-            lastHighlightedPlayer = null; 
             activePlayers.Clear();
         }
     }

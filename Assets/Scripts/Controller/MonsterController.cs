@@ -17,7 +17,7 @@ namespace Controller
         // Monster 전용 필드
         private Color backRowColor = new Color(0.6f, 0.6f, 0.6f, 1f); 
         private Color frontRowColor = Color.white;
-        private Button button;
+        public Button selectButton;
 
         public RowType currentRow;
         public ColumnType currentColumn;
@@ -151,11 +151,11 @@ namespace Controller
             
             gameObject.name = entityName;
 
-            button = GetComponent<Button>();
-            if (button != null)
+            selectButton = GetComponent<Button>();
+            if (selectButton != null)
             {
-                button.onClick.RemoveAllListeners();
-                button.onClick.AddListener(OnClicked);
+                selectButton.onClick.RemoveAllListeners();
+                selectButton.onClick.AddListener(OnClicked);
             }
         }
 

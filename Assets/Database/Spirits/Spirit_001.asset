@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0347f80ab29208248bdd1838e8310914, type: 3}
+  m_Name: Spirit_001
+  m_EditorClassIdentifier: Assembly-CSharp::Data.SpiritData
+  id: spirit_001
+  entityName: "\uAC00\uBE0C\uB9AC\uC5D8"
+  align: 5
+  stats:
+    level: 1
+    str: 3
+    mag: 3
+    intel: 3
+    vit: 3
+    agi: 3
+    luc: 3
+  resistances:
+    physical: 0
+    fire: 0
+    ice: 0
+    elec: 0
+    force: 0
+    havoc: 0
+  skills:
+  - {fileID: 11400000, guid: 82eaa2f43f0a9714ebafe8cc542cccba, type: 2}
+  - {fileID: 11400000, guid: 68622656e07521b4d99c6f3f610af226, type: 2}

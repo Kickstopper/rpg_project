@@ -15,6 +15,7 @@ MonoBehaviour:
   entries:
   - id: chr_00
     name: "\uB098\uBB38\uD76C"
+    spiritId: spirit_000
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -64,10 +65,11 @@ MonoBehaviour:
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []
-    maxHp: 15
-    maxMp: 15
+    maxHp: 50
+    maxMp: 50
   - id: chr_01
     name: "\uACE0\uB450\uC2EC"
+    spiritId: spirit_001
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -93,10 +95,11 @@ MonoBehaviour:
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []
-    maxHp: 15
-    maxMp: 15
+    maxHp: 50
+    maxMp: 50
   - id: chr_02
     name: "\uAE40\uD61C\uC790"
+    spiritId: spirit_002
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -122,10 +125,11 @@ MonoBehaviour:
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []
-    maxHp: 15
-    maxMp: 15
+    maxHp: 50
+    maxMp: 50
   - id: chr_03
     name: "\uC724\uC5EC\uC625"
+    spiritId: spirit_003
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -151,10 +155,11 @@ MonoBehaviour:
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []
-    maxHp: 15
-    maxMp: 15
+    maxHp: 50
+    maxMp: 50
   - id: chr_04
     name: "\uAE40\uC601\uC625"
+    spiritId: spirit_004
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -180,10 +185,11 @@ MonoBehaviour:
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []
-    maxHp: 15
-    maxMp: 15
+    maxHp: 50
+    maxMp: 50
   - id: chr_05
     name: "\uAE40\uC218\uBBF8"
+    spiritId: spirit_005
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -209,10 +215,11 @@ MonoBehaviour:
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []
-    maxHp: 15
-    maxMp: 15
+    maxHp: 50
+    maxMp: 50
   - id: chr_06
     name: P6
+    spiritId: spirit_006
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 21300000, guid: de3b970acb33b374d9ab84c2ccfd9d39, type: 3}
@@ -238,5 +245,5 @@ MonoBehaviour:
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []
-    maxHp: 15
-    maxMp: 15
+    maxHp: 50
+    maxMp: 50

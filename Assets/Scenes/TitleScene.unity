@@ -533,7 +533,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager.PartyManager
   charDB: {fileID: 11400000, guid: 89d0e2e30bc8d6c40985b195be7ff30d, type: 2}
-  currentPartyData: []
+  partyData: []
 --- !u!1 &493481231
 GameObject:
   m_ObjectHideFlags: 0
@@ -921,6 +921,7 @@ MonoBehaviour:
   explorationCanvas: {fileID: 0}
   combatCanvas: {fileID: 0}
   menuCanvas: {fileID: 0}
+  currentCombatController: {fileID: 0}
   canHardSave: 0
 --- !u!1 &920790046
 GameObject:
@@ -1386,6 +1387,7 @@ MonoBehaviour:
   armorDB: {fileID: 11400000, guid: 2dc361ff1ddaba54bb35b15e3d00d63c, type: 2}
   skillDB: {fileID: 11400000, guid: 35a359d39da6e5a48ab617a4fbd2f4f0, type: 2}
   cosumableDB: {fileID: 11400000, guid: 80437589caeff4941b86f8487644af32, type: 2}
+  spiritDB: {fileID: 11400000, guid: f63d6a6019dd7b646b75b3c4d5367abe, type: 2}
 --- !u!1 &1208232139
 GameObject:
   m_ObjectHideFlags: 0

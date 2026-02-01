@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 708931218f786bc4382253260b58e5da, type: 3}
+  m_Name: SpiritDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::Data.Database.SpiritDatabase
+  db:
+  - {fileID: 11400000, guid: f3692344d0c57754eba4af9ad188d841, type: 2}
+  - {fileID: 11400000, guid: ddd14683b4727674fb60e588fa614822, type: 2}
+  - {fileID: 11400000, guid: 8b06908e64ba5934d81d8026edd06c3f, type: 2}
+  - {fileID: 11400000, guid: 9f1d884de60b9af4499b86f8109f6661, type: 2}
+  - {fileID: 11400000, guid: d62550939688dd6448d3e559ae010f73, type: 2}
+  - {fileID: 11400000, guid: 3e1e02d8db99a214d95b5327e85c8492, type: 2}

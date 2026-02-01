@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Manager;
 using Data;
 using DG.Tweening;
+using System.Linq;
+using Helper;
 
 namespace Controller
 {
@@ -27,6 +29,8 @@ namespace Controller
         
         [Header("Runtime Data")]
         public RuntimeCharacterData sourceData; 
+        public SpiritData spiritData;
+        public StatData currentStats;
 
         // 현재 배운 스킬 목록 (ID)
         public List<string> learnedSkillIds = new List<string>();
@@ -61,11 +65,11 @@ namespace Controller
         private CombatController controller;
 
         // [BattleEntity 구현] 스탯 반환 (레벨 및 장비 보정 포함)
-        public override int GetTotalStr() => sourceData.stats.str + level; 
-        public override int GetTotalAgi() => sourceData.stats.agi + level;
-        public override int GetTotalMag() => sourceData.stats.mag + level;
-        public override int GetTotalLuc() => sourceData.stats.luc + level;
-        public override int GetTotalVit() => sourceData.stats.vit + level;
+        public override int GetTotalStr() => currentStats.str; 
+        public override int GetTotalAgi() => currentStats.agi;
+        public override int GetTotalMag() => currentStats.mag;
+        public override int GetTotalLuc() => currentStats.luc;
+        public override int GetTotalVit() => currentStats.vit;
 
         public bool IsEmpty { get; private set; } = false;
 
@@ -89,6 +93,8 @@ namespace Controller
             currentGun = null;
             currentAmmo = null;
             currentGunAmmo = 0;
+
+            spiritData = null;
             
             // 1. 그래픽 숨기기 (스프라이트, UI 등)
             UpdateUI();
@@ -116,10 +122,43 @@ namespace Controller
             this.currentMp = runtimeData.currentMp;
             this.currentExp = runtimeData.currentExp;
             this.align = runtimeData.align;
+            
+            this.spiritData = DatabaseManager.Instance.GetSpirit(runtimeData.spiritId);
+
+            // 3. 데이터 융합
+            if (this.spiritData != null)
+            {
+                // A. 스탯 평균화
+                this.currentStats = CalculateAverageStats(runtimeData.stats, spiritData.stats);
+                
+                // B. 성향 평균화
+                this.align = AlignmentSystem.GetAverageAlign(runtimeData.align, spiritData.align);
+
+                // C. 스킬 합치기
+                this.learnedSkillIds = runtimeData.learnedSkills.Union(spiritData.skills.Select(s => s.id)).ToList();
+            }
+            else
+            {
+                // 스피릿이 없으면 본체 데이터 그대로 사용
+                this.currentStats = runtimeData.stats; // 참조 복사
+                this.align = runtimeData.align;
+                this.learnedSkillIds = new List<string>(runtimeData.learnedSkills);
+            }
+
+            // 4. 레벨 및 HP/MP 설정 (평균화된 스탯 기준)
+            this.level = currentStats.level;
+            
+            // MaxHP/MP 계산 (InitializeStats에서 수행하겠지만, 초기값 세팅)
+            // 주의: currentStats가 변경되었으므로 MaxHP도 바뀔 수 있음
+            InitializeStats(); 
+
+            // 현재 HP/MP는 비율에 맞춰 조정하거나, max를 넘지 않게 클램핑
+            this.currentHp = Mathf.Min(runtimeData.currentHp, this.maxHp);
+            this.currentMp = Mathf.Min(runtimeData.currentMp, this.maxMp);
+            this.currentExp = runtimeData.currentExp;
 
             // UI 초기화 (이름, 이미지 등)
             if (nameText) nameText.text = entityName;
-            if (alignText) alignText.text = GetAlignString(align);
 
             // DB에서 이미지(Sprite) 가져오기
             var dbEntry = PartyManager.Instance.charDB.GetEntry(runtimeData.characterId);
@@ -133,7 +172,6 @@ namespace Controller
             EquipGun(runtimeData.equippedGunId, runtimeData.equippedAmmoId);
             
             this.equippedArmorIds = new List<string>(runtimeData.equippedArmorIds);
-            this.learnedSkillIds = new List<string>(runtimeData.learnedSkills);
 
             RefreshArmorStats();
 
@@ -150,6 +188,34 @@ namespace Controller
                 selectButton.onClick.AddListener(OnClicked);
             }
         }
+
+        // =========================================================
+        // [헬퍼 함수] 데이터 융합 로직
+        // =========================================================
+
+        private StatData CalculateAverageStats(StatData charStats, StatData spiritStats)
+        {
+            StatData result = new StatData();
+            
+            // 평균값 계산 (올림 처리: Mathf.CeilToInt)
+            result.level = Mathf.CeilToInt((charStats.level + spiritStats.level) / 2f);
+            result.str = Mathf.CeilToInt((charStats.str + spiritStats.str) / 2f);
+            result.mag = Mathf.CeilToInt((charStats.mag + spiritStats.mag) / 2f);
+            result.intel = Mathf.CeilToInt((charStats.intel + spiritStats.intel) / 2f);
+            result.vit = Mathf.CeilToInt((charStats.vit + spiritStats.vit) / 2f);
+            result.agi = Mathf.CeilToInt((charStats.agi + spiritStats.agi) / 2f);
+            result.luc = Mathf.CeilToInt((charStats.luc + spiritStats.luc) / 2f);
+
+            return result;
+        }
+
+        private void InitializeStats()
+        {
+            // currentStats를 기반으로 파생 스탯(MaxHP, MaxMP) 재계산
+            this.maxHp = this.currentStats.vit * 20;
+            this.maxMp = this.currentStats.mag * 30;
+        }
+
 
         // 전투가 끝난 뒤의 상태 변화를 최신 상태로 업데이트해서 저장
         public void UpdateData(int expReward)
@@ -170,46 +236,7 @@ namespace Controller
                 sourceData.currentMp = currentMp;
             }
         }
-
-        private void InitializeStats()
-        {
-        }
-
-        private string GetSpiritName(string spirit)
-        {
-            return sourceData.spiritId;
-        }
-
-        private string GetAlignString(Align align)
-        {
-            switch(align)
-            {
-                case Align.Chaotic_Evil:
-                    return "C/E";
-                case Align.Chaotic_Neutral:
-                    return "C/N";
-                case Align.Chaotic_Good:
-                    return "C/G";
-
-                case Align.Lawful_Evil:
-                    return "L/E";
-                case Align.Lawful_Neutral:
-                    return "L/N";
-                case Align.Lawful_Good:
-                    return "L/G";
-
-                case Align.Neutral_Evil:
-                    return "N/E";
-                case Align.True_Neutral:
-                    return "T.N.";
-                case Align.Neutral_Good:
-                    return "N/G";
-                
-                default:
-                    return "None";
-            }
-        }
-
+        
         // 회복 함수
         public void Recover(int hpAmount, int mpAmount)
         {
@@ -349,13 +376,19 @@ namespace Controller
         // =========================================================
         public override int GetAttack()
         {
-            int statAtk = sourceData.stats.str;
+            int statAtk = currentStats.str;
             int levelBonus = level;
-
-            // 무기 공격력 합산
             int weaponBonus = (currentWeapon != null) ? currentWeapon.attackPower : 0;
-
             return statAtk + levelBonus + weaponBonus;
+        }
+
+        public override int GetDefense()
+        {
+            int statDef = currentStats.vit;
+            int levelBonus = Mathf.FloorToInt(level * 0.5f);
+            int armorBonus = 0;
+            foreach (var armor in currentArmors) armorBonus += armor.defense;
+            return statDef + levelBonus + armorBonus;
         }
 
         public override int GetMagicAttack()
@@ -364,21 +397,6 @@ namespace Controller
             return GetTotalMag();
         }
 
-        public override int GetDefense()
-        {
-            int statDef = sourceData.stats.vit;
-            int levelBonus = Mathf.FloorToInt(level * 0.5f);
-
-            // 모든 방어구의 방어력 합산
-            int armorBonus = 0;
-            foreach (var armor in currentArmors)
-            {
-                armorBonus += armor.defense;
-            }
-
-            return statDef + levelBonus + armorBonus;
-        }
-        
         public override ResistanceData GetResistances()
         {
             return sourceData.resistances; 
@@ -449,8 +467,8 @@ namespace Controller
             {
                 if (messagePanel) messagePanel.SetActive(true);
                 if (messageText) messageText.SetText(string.Empty);
-                if (alignText) alignText.text = GetAlignString(align);
-                if (spiritText) spiritText.text = GetSpiritName(sourceData.spiritId);
+                if (alignText) alignText.text = AlignmentSystem.GetAlignString(align);
+                if (spiritText && spiritData) spiritText.text = spiritData.entityName;
 
                 if (hpSlider)
                 {

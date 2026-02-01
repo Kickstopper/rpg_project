@@ -1,5 +1,6 @@
 using UnityEngine;
 using Data;
+using Data.Database;
 
 namespace Manager
 {
@@ -12,8 +13,8 @@ namespace Manager
         public AmmoDatabase ammoDB;
         public ArmorDatabase armorDB;
         public SkillDatabase skillDB;
-
         public ConsumableDatabase cosumableDB;
+        public SpiritDatabase spiritDB;
 
         void Awake()
         {
@@ -27,6 +28,7 @@ namespace Manager
                 ammoDB.Initialize();
                 armorDB.Initialize();
                 skillDB.Initialize();
+                spiritDB.Initialize();
             }
             else
             {
@@ -40,5 +42,6 @@ namespace Manager
         public ArmorData GetArmor(string id) => armorDB.GetItem(id);
         public SkillData GetSkill(string id) => skillDB.GetItem(id);
         public ConsumableItemData GetConsumable(string id) => cosumableDB.GetItem(id);
+        public SpiritData GetSpirit(string id) => spiritDB.GetData(id);
     }
 }
