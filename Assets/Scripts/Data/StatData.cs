@@ -12,10 +12,10 @@ public struct StatData
 
 [System.Serializable]
 public struct ResistanceData {
-    public float physical; // 물리 내성 (1.0 = 100%)
+    public float phys; // 물리 내성 (1.0 = 100%)
     public float fire;     // 화염 내성
     public float ice;      // 빙결 내성
     public float elec;     // 전격 내성
     public float force;    // 염동 내성
-    public float havoc;    // 정신 내성
+    public float psyche;    // 정신 내성
 }

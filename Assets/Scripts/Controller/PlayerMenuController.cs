@@ -3,20 +3,21 @@ using DG.Tweening;
 using Manager;
 using TMPro;
 using UI;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 namespace Controller
 {
     public class PlayerMenuController : MonoBehaviour
     {
-        private enum MenuState { None, Status, Skill, Item, Equip, Move, System, Suspend}
+        private enum MenuState { Main, Status, Skill, Item, Equip, Move, System, Suspend}
 
         private MenuState currentState;
         public List<Button> allMenuBtns;
         private int currentBtnIndex;
 
         private bool isMenuOpen = false;
+
+        public GameObject statusUI;
 
         [Header("Background")]
         public SimpleGradient background;
@@ -62,7 +63,7 @@ namespace Controller
                 StartTween();
 
                 isMenuOpen = true;
-                currentState = MenuState.None;
+                currentState = MenuState.Main;
                 currentBtnIndex = 0;
                 UpdateSelection(currentBtnIndex, false); // 최초에는 무음으로 첫 번째 버튼에 포커스
             }
@@ -140,6 +141,7 @@ namespace Controller
             // 취소 키
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
             {
+                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
                 ResetInputTimer();
                 OnClickCancelButton();
             }
@@ -147,6 +149,10 @@ namespace Controller
 
         void HandleMenuNavigation(ref int currentBtnIndex)
         {
+            if (currentState != MenuState.Main)
+            {
+                return;
+            } 
             if (allMenuBtns == null || allMenuBtns.Count == 0) return;
             bool changed = false;
 
@@ -181,7 +187,7 @@ namespace Controller
             // 메뉴 취소 키 (나가기)
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
             {
-                ResetInputTimer();
+                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
         }
@@ -212,9 +218,20 @@ namespace Controller
         public void OnClick_Status()
         {
             currentState = MenuState.Status;
+            statusUI.SetActive(true);
             UpdatePopupMessage();
             ResetInputTimer();
-            Debug.Log("STATUS 미구현");
+        }
+
+        public void CloseStatusUI()
+        {
+            statusUI.SetActive(false);
+            
+            currentState = MenuState.Main;
+            ResetInputTimer();
+            UpdateSelection(currentBtnIndex); // 마지막으로 선택했던 메인 메뉴 버튼에 다시 포커스
+            
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
         }
         
         public void OnClick_Equip()
@@ -318,7 +335,7 @@ namespace Controller
         // 팝업 닫기
         private void ClosePopup()
         {
-            currentState = MenuState.None; // 상태 초기화
+            currentState = MenuState.Main; // 상태 초기화
             confirmPopup.SetActive(false);
             isPopupOpen = false;
             allMenuBtns[currentBtnIndex].Select(); // 메뉴로 포커스 복귀

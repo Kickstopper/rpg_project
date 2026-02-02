@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 634378004782985950}
   - component: {fileID: 2204781563935935785}
   - component: {fileID: 7420215860516149239}
+  - component: {fileID: 6407314566388536907}
   m_Layer: 0
   m_Name: ItemSlotPrefab
   m_TagString: Untagged
@@ -138,6 +139,20 @@ MonoBehaviour:
   m_EffectColor: {r: 0.15294118, g: 0.15294118, b: 0.15294118, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
+--- !u!114 &6407314566388536907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940030084927157362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19416ff571c2a32409638b088ad08d62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Controller.SimpleListItemController
+  nameText: {fileID: 980361744341035279}
+  costText: {fileID: 445272908256512286}
 --- !u!1 &5430962088907935339
 GameObject:
   m_ObjectHideFlags: 0

@@ -515,7 +515,7 @@ namespace UI.DungeonMapScene
         void Update()
         {
             if (!canRender) return;
-            if (Input.GetKeyDown(KeyCode.C))
+            if (Input.GetKeyDown(KeyCode.Tab))
             {
                 GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
                 return;  
@@ -1736,7 +1736,7 @@ namespace UI.DungeonMapScene
             _currentPitch = Mathf.Clamp(_currentPitch, -maxPitch, maxPitch);
 
             // 예시: 상호작용 로직
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 if (_currentPitch < -maxPitch * 0.8f)
                 {

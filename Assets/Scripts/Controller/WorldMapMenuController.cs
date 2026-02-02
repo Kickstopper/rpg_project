@@ -8,43 +8,19 @@ namespace Controller
         [Header("UI 연결")]
         public GameObject menuPanel;
 
-        [Header("플레이어 연결")]
-        public WorldMapMovementController playerMovement;
-
-        private bool isMenuOpen = false;
-
-        void Start()
-        {
-            if (menuPanel != null)
-                menuPanel.SetActive(false);
-        }
-
         void Update()
         {
-            if (isMenuOpen && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift)))
-            {
-                HideMenu();
-            }
+            if (GameStateManager.Instance.CurrentState != GameState.Exploration) return;
             
-            if (!isMenuOpen && Input.GetKeyDown(KeyCode.C))
+            if (Input.GetKeyDown(KeyCode.Tab))
             {
-                ShowMenu();
-            }
-        }
-
-        private void HideMenu()
-        {
-            isMenuOpen = false;
-            GameStateManager.Instance.ChangeState(GameState.Exploration);
-            if (playerMovement != null) playerMovement.canMove = true;
+                ShowMenu(); 
+            } 
         }
 
         private void ShowMenu()
         {
-            isMenuOpen = true;
-            // 1. 메뉴 패널 끄고 켜기
             GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
-            if (playerMovement != null) playerMovement.canMove = false;
         }
 
     }

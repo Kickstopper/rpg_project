@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 namespace Data
@@ -14,6 +13,8 @@ namespace Data
         Lawful_Neutral, True_Neutral, Chaotic_Neutral,
         Lawful_Evil, Neutral_Evil, Chaotic_Evil 
     }
+
+    public enum StatusEffect { Good, Asleep, Confused, Blind, Poison, Paralyzed, Adamism }
     [System.Serializable]
     public class RuntimeCharacterData
     {
@@ -24,6 +25,8 @@ namespace Data
         public string name;
 
         public Align align;
+
+        public StatusEffect statusEffect;
 
         public string spiritId;
 
@@ -36,6 +39,7 @@ namespace Data
         public int currentMp;
         public int maxMp;
         public int currentExp; // 현재 누적 경험치
+        public int nextExp;
 
         public RowType row;
         public ColumnType column;
@@ -130,6 +134,14 @@ namespace Data
             
             return data;
         }
+
+        public int GetTotalAttack(){ return 0;}
+        public int GetHitRate(){ return 0;}
+        public int GetGunAttack(){ return 0;}
+        public int GetGunHitRate(){ return 0;}
+        public int GetTotalDefense(){ return 0;}
+        public int GetEvasion(){ return 0;}
+        public int GetMagicPower(){ return 0;}
 
         public RuntimeCharacterData() { }
     }

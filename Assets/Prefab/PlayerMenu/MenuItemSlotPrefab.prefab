@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 307622597236084002}
   - component: {fileID: 634378004782985950}
   - component: {fileID: 2204781563935935785}
-  - component: {fileID: 4982357349180820158}
-  - component: {fileID: 7819424819215470069}
+  - component: {fileID: 7420215860516149239}
+  - component: {fileID: 1933641551344779041}
   m_Layer: 0
-  m_Name: SkillSlotPrefab
+  m_Name: MenuItemSlotPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -93,7 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -102,7 +102,7 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 0, g: 0, b: 0.53333336, a: 1}
-    m_HighlightedColor: {r: 0.2509804, g: 0.6627451, b: 0.68235296, a: 1}
+    m_HighlightedColor: {r: 0.2509804, g: 0.6602186, b: 0.68235296, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.2509804, g: 0.6627451, b: 0.68235296, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &4982357349180820158
+--- !u!114 &7420215860516149239
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -139,7 +139,7 @@ MonoBehaviour:
   m_EffectColor: {r: 0.15294118, g: 0.15294118, b: 0.15294118, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
---- !u!114 &7819424819215470069
+--- !u!114 &1933641551344779041
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -165,7 +165,7 @@ GameObject:
   - component: {fileID: 6754559679319604756}
   - component: {fileID: 445272908256512286}
   m_Layer: 0
-  m_Name: Cost
+  m_Name: Quantity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

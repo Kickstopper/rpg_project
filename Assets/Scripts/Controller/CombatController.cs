@@ -2173,19 +2173,22 @@ namespace Controller
             if (CalculateEscapeSuccess())
             {
                 SetEnemyVisualsActive(false);
-                
-                raycastScreen.transform.DOLocalMoveY(0f, 0.1f).SetEase(Ease.OutSine).OnComplete(() => {
-                        raycastScreen.transform.localPosition = Vector3.zero;
-                    }
-                );
-                yield return wait01;
-                
                 ShowMessage("휴~ 도망쳤다.");
                 yield return wait10;
                 HideMessage();
                 HideLog();
                 autoModeButton.gameObject.SetActive(false);
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                
+                float duration = 0.1f;
+                float battleUIPy = -216f;
+                DOTween.Sequence()
+                .Join(raycastScreen.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutSine))
+                .Join(BattleUI.transform.DOLocalMoveY(battleUIPy, duration).SetEase(Ease.OutSine))
+                .OnComplete(() => 
+                {
+                    raycastScreen.transform.localPosition = Vector3.zero;
+                    GameStateManager.Instance.ChangeState(GameState.Exploration);
+                });
             }
             else
             {
@@ -3973,15 +3976,15 @@ namespace Controller
 
         private float GetResistanceValue(BaseRootData data,ResistanceData resist)
         {
-            if (data == null) return resist.physical; 
+            if (data == null) return resist.phys; 
             switch(data.element)
             {
                 case ElementType.Fire: return resist.fire;
                 case ElementType.Ice: return resist.ice;
                 case ElementType.Elec: return resist.elec;
                 case ElementType.Force: return resist.force;
-                case ElementType.Havoc: return resist.havoc;
-                default: return resist.physical;
+                case ElementType.Psyche: return resist.psyche;
+                default: return resist.phys;
             }
         }
 
@@ -4062,11 +4065,16 @@ namespace Controller
             HideLog();
             autoModeButton.gameObject.SetActive(false);
 
-            raycastScreen.transform.DOLocalMoveY(0f, 0.3f).SetEase(Ease.OutSine).OnComplete(() => {
+            float duration = 0.3f;
+            float battleUIPy = -216f;
+            DOTween.Sequence()
+                .Join(raycastScreen.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutSine))
+                .Join(BattleUI.transform.DOLocalMoveY(battleUIPy, duration).SetEase(Ease.OutSine))
+                .OnComplete(() => 
+                {
                     raycastScreen.transform.localPosition = Vector3.zero;
                     GameStateManager.Instance.ChangeState(GameState.Exploration);
-                }
-            );
+                });
         }
 
         private void ClearParty()

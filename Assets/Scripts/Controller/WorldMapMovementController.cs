@@ -1,3 +1,4 @@
+using Manager;
 using UnityEngine;
 
 namespace Controller
@@ -6,9 +7,6 @@ namespace Controller
     {
         public float moveSpeed = 10f;
         
-        // 외부에서 이동 가능 여부를 제어할 변수
-        public bool canMove = true; 
-
         private Rigidbody rb;
 
         void Start()
@@ -18,8 +16,7 @@ namespace Controller
 
         void FixedUpdate()
         {
-            // 이동 불가능 상태라면 코드를 실행하지 않고 리턴
-            if (!canMove) return;
+            if (GameStateManager.Instance.CurrentState != GameState.Exploration) return;
 
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");

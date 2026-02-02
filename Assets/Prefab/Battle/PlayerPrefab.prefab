@@ -90,7 +90,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 1, g: 0, b: 1, a: 1}
   colorRight: {r: 0, g: 0.24872494, b: 1, a: 1}
-  angle: -61
+  m_Angle: 0
 --- !u!1 &1376732056654466155
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,7 +421,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.78431374}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1401,7 +1401,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UI.SimpleGradient
   colorLeft: {r: 0, g: 0.06781911, b: 0.4641509, a: 1}
   colorRight: {r: 0.11597536, g: 0.115236685, b: 0.3132075, a: 1}
-  angle: -60
+  m_Angle: 0
 --- !u!114 &1678176533427284992
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1548,6 +1548,7 @@ MonoBehaviour:
     isParty: 0
     name: 
     align: 0
+    statusEffect: 0
     spiritId: 
     stats:
       level: 0
@@ -1569,6 +1570,7 @@ MonoBehaviour:
     currentMp: 0
     maxMp: 0
     currentExp: 0
+    nextExp: 0
     row: 0
     column: 0
     equippedWeaponId: 
@@ -1577,6 +1579,15 @@ MonoBehaviour:
     equippedArmorIds: []
     learnedSkills: []
     isCommander: 0
+  spiritData: {fileID: 0}
+  currentStats:
+    level: 0
+    str: 0
+    mag: 0
+    intel: 0
+    vit: 0
+    agi: 0
+    luc: 0
   learnedSkillIds: []
   equippedWeaponId: 
   equippedGunId: 
@@ -1605,7 +1616,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 0, g: 0, b: 0.534, a: 1}
   colorRight: {r: 0, g: 0, b: 0.091, a: 1}
-  angle: -60
+  m_Angle: 0
 --- !u!1 &6923753880825221758
 GameObject:
   m_ObjectHideFlags: 0
@@ -1995,7 +2006,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.78431374}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2102,4 +2113,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 1, g: 1, b: 0, a: 1}
   colorRight: {r: 0, g: 1, b: 0, a: 1}
-  angle: -61
+  m_Angle: 0
