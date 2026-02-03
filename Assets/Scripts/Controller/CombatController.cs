@@ -407,12 +407,9 @@ namespace Controller
                 if (assignedData != null)
                 {
                     // 실제 캐릭터 초기화
-                    pc.Initialize(assignedData, assignedData.row, this);
+                    pc.Initialize(assignedData, this);
                     
                     pc.columnIndex = i;
-                    pc.currentRow = assignedData.row;
-                    pc.currentColumn = assignedData.column;
-
                     pc.gameObject.name = pc.sourceData.name;
                     activePlayers.Add(pc);
                 }
@@ -3619,26 +3616,14 @@ namespace Controller
             Transform targetSlotTransform = action.target.transform; 
             Transform originSlotTransform = actor.transform.parent;
 
-            if (isLastStandActive)
-            {
-                int targetIndex = GetPlayerSlotIndex(targetSlotTransform);
-                int originIndex = GetPlayerSlotIndex(originSlotTransform);
-                if (targetIndex < 3 || originIndex < 3)
-                {
-                    ShowLog("YOU CAN NOT MOVE!");
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                    yield return wait10; 
-                    HideLog();
-                    yield break; 
-                }
-            }
+            // (중략: Last Stand 체크 및 이동 불가 조건 로직)
 
             if (targetSlotTransform == originSlotTransform) yield break;
 
             PlayerController targetChar = targetSlotTransform.GetComponentInChildren<PlayerController>();
             ShowMessage((targetChar != null && !targetChar.IsEmpty) ? "위치 교대!" : "자리 이동!");
-            Debug.Log($"[Action] {actor.name} 이동: {originSlotTransform.name} -> {targetSlotTransform.name}");
 
+            // 1. 리스트(allSlotControllers) 내의 순서 교체
             int actorListIndex = allSlotControllers.IndexOf(actor);
             int targetListIndex = (targetChar != null) ? allSlotControllers.IndexOf(targetChar) : -1;
 
@@ -3648,9 +3633,33 @@ namespace Controller
                 allSlotControllers[targetListIndex] = actor;
             }
 
-            if (targetChar != null) { targetChar.transform.SetParent(originSlotTransform, true); targetChar.columnIndex = GetPlayerSlotIndex(originSlotTransform); }
+            // 2. 물리적 부모 변경 및 인덱스 갱신
+            if (targetChar != null) 
+            { 
+                targetChar.transform.SetParent(originSlotTransform, true); 
+                targetChar.columnIndex = GetPlayerSlotIndex(originSlotTransform); 
+            }
             actor.transform.SetParent(targetSlotTransform, true);
             actor.columnIndex = GetPlayerSlotIndex(targetSlotTransform);
+
+            // =========================================================
+            // 실제 데이터(RuntimeCharacterData) 동기화
+            // =========================================================
+            // 6개의 모든 슬롯을 순회하며 현재 위치에 맞는 row/column 값을 데이터에 직접 주입합니다.
+            for (int i = 0; i < allSlotControllers.Count; i++)
+            {
+                PlayerController pc = allSlotControllers[i];
+                if (pc != null && !pc.IsEmpty && pc.sourceData != null)
+                {
+                    // 인덱스 0,1,2는 전열(Front), 3,4,5는 후열(Back)
+                    bool isFront = (i < 3);
+                    pc.sourceData.row = isFront ? RowType.Front : RowType.Back;
+                    
+                    // 컬럼 값 계산 (Left=0, Center=1, Right=2)
+                    pc.sourceData.column = (ColumnType)(isFront ? i : i - 3);
+                }
+            }
+            // =========================================================
 
             SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
 

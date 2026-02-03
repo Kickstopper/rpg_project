@@ -18,6 +18,7 @@ namespace Controller
         private bool isMenuOpen = false;
 
         public GameObject statusUI;
+        public GameObject moveUI;
 
         [Header("Background")]
         public SimpleGradient background;
@@ -253,9 +254,18 @@ namespace Controller
         public void OnClick_Move()
         {
             currentState = MenuState.Move;
-            UpdatePopupMessage();
+            moveUI.SetActive(true);
             ResetInputTimer();
-            Debug.Log("MOVE 미구현");
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+        }
+
+        public void CloseMoveUI()
+        {
+            moveUI.SetActive(false);
+            currentState = MenuState.Main;
+            ResetInputTimer();
+            UpdateSelection(currentBtnIndex);
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
         }
 
         public void OnClick_System()

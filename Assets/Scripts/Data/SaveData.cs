@@ -57,6 +57,7 @@ namespace Data
         public string spiritId;
 
         public string row;
+        public string column;
 
         public int currentHp;
         public int maxHp;

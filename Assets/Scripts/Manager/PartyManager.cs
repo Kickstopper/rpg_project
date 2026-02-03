@@ -75,5 +75,42 @@ namespace Manager
             if (index < 0 || index >= partyData.Count) return null;
             return partyData[index];
         }
+        
+        // 파티의 전투 대열을 바꿈
+        public void SwapMemberPosition(int idxA, int idxB)
+        {
+            // 각 인덱스에 해당하는 캐릭터 찾기
+            RuntimeCharacterData charA = GetCharacterAtSlot(idxA);
+            RuntimeCharacterData charB = GetCharacterAtSlot(idxB);
+
+            // 인덱스를 Row/Column으로 변환
+            RowType rowA = (idxA < 3) ? RowType.Front : RowType.Back;
+            ColumnType colA = (ColumnType)(idxA % 3);
+
+            RowType rowB = (idxB < 3) ? RowType.Front : RowType.Back;
+            ColumnType colB = (ColumnType)(idxB % 3);
+
+            // 데이터 적용
+            if (charA != null)
+            {
+                charA.row = rowB;
+                charA.column = colB;
+            }
+            
+            if (charB != null)
+            {
+                charB.row = rowA;
+                charB.column = colA;
+            }
+        }
+
+        // 특정 슬롯에 있는 캐릭터를 찾는 헬퍼 함수
+        private RuntimeCharacterData GetCharacterAtSlot(int index)
+        {
+            RowType r = (index < 3) ? RowType.Front : RowType.Back;
+            ColumnType c = (ColumnType)(index % 3);
+            
+            return partyData.Find(ch => ch.row == r && ch.column == c);
+        }
     }
 }

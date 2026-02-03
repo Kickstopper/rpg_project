@@ -62,6 +62,7 @@ namespace Data
             
             if (System.Enum.TryParse(save.align, out Align parsedAlign)) align = parsedAlign;
             if (System.Enum.TryParse(save.row, out RowType parsedRow)) row = parsedRow;
+            if (System.Enum.TryParse(save.column, out ColumnType parsedCol)) column = parsedCol;
 
             spiritId = save.spiritId;
 
@@ -95,7 +96,8 @@ namespace Data
             currentMp = maxMp = entry.maxMp;
             currentExp = 0;
 
-            row = RowType.Front; 
+            row = RowType.Front;
+            column = ColumnType.Center;
 
             equippedWeaponId = entry.initialWeaponId;
             equippedGunId = entry.initialGunId;
@@ -127,6 +129,7 @@ namespace Data
             data.exp = this.currentExp;
             
             data.row = this.row.ToString();
+            data.column = this.column.ToString();
             
             data.resistances = this.resistances;
             data.stats = this.stats;

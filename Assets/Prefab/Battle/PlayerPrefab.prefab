@@ -1559,12 +1559,12 @@ MonoBehaviour:
       agi: 0
       luc: 0
     resistances:
-      physical: 0
+      phys: 0
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      havoc: 0
+      psyche: 0
     currentHp: 0
     maxHp: 0
     currentMp: 0
@@ -1842,7 +1842,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}

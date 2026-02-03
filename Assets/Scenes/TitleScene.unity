@@ -2741,6 +2741,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2008646961}
     m_Modifications:
+    - target: {fileID: 2276180923185947015, guid: 0eaf7cd2e3ca2cf43b3bcc415f87d52f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2276180923185947015, guid: 0eaf7cd2e3ca2cf43b3bcc415f87d52f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2276180923185947015, guid: 0eaf7cd2e3ca2cf43b3bcc415f87d52f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2605106941435709879, guid: 0eaf7cd2e3ca2cf43b3bcc415f87d52f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2605106941435709879, guid: 0eaf7cd2e3ca2cf43b3bcc415f87d52f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5536291015018315296, guid: 0eaf7cd2e3ca2cf43b3bcc415f87d52f, type: 3}
       propertyPath: m_Name
       value: SaveLoadPanel

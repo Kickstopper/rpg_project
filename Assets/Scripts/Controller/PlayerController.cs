@@ -105,16 +105,22 @@ namespace Controller
 
         
         // RuntimeData를 받는 초기화 함수
-        public void Initialize(RuntimeCharacterData runtimeData, RowType row, CombatController controller)
+        public void Initialize(RuntimeCharacterData runtimeData, CombatController controller)
         {
             this.controller = controller;
+
+            if (runtimeData == null)
+            {
+                InitializeEmpty(columnIndex);
+            }
 
             // 데이터 초기화
             this.sourceData = runtimeData;
             this.entityName = runtimeData.name;
             this.gameObject.name = entityName;
             
-            this.currentRow = row;
+            this.currentRow = runtimeData.row;
+            this.currentColumn = runtimeData.column;
             this.level = runtimeData.stats.level;
             this.maxHp = runtimeData.maxHp;
             this.maxMp = runtimeData.maxMp;
@@ -438,7 +444,7 @@ namespace Controller
 
         void OnClicked()
         {
-            controller.OnTargetSelected(this);
+            controller?.OnTargetSelected(this);
         }
         
         protected override void UpdateUI()

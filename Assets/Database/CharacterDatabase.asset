@@ -30,12 +30,12 @@ MonoBehaviour:
       agi: 3
       luc: 3
     resistances:
-      physical: 0
+      phys: 0
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      havoc: 0
+      psyche: 0
     initialSkillIds:
     - skl_000
     - skl_001
@@ -63,164 +63,14 @@ MonoBehaviour:
       agi: 5
       luc: 4
     resistances:
-      physical: 0
+      phys: 0
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      havoc: 0
+      psyche: 0
     initialSkillIds: []
     initialWeaponId: sword_000
-    initialGunId: gun_000
-    initialAmmoId: ammo_000
-    initialArmorIds: []
-    maxHp: 50
-    maxMp: 50
-  - id: chr_02
-    name: "\uAE40\uD61C\uC790"
-    spiritId: spirit_002
-    exp: 0
-    isCommander: 0
-    portraitImage: {fileID: 0}
-    standingImage: {fileID: 0}
-    align: 5
-    stats:
-      level: 1
-      str: 3
-      mag: 3
-      intel: 3
-      vit: 2
-      agi: 5
-      luc: 2
-    resistances:
-      physical: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      havoc: 0
-    initialSkillIds: []
-    initialWeaponId: sword_000
-    initialGunId: gun_000
-    initialAmmoId: ammo_000
-    initialArmorIds: []
-    maxHp: 50
-    maxMp: 50
-  - id: chr_03
-    name: "\uC724\uC5EC\uC625"
-    spiritId: spirit_003
-    exp: 0
-    isCommander: 0
-    portraitImage: {fileID: 0}
-    standingImage: {fileID: 0}
-    align: 6
-    stats:
-      level: 1
-      str: 3
-      mag: 3
-      intel: 3
-      vit: 3
-      agi: 3
-      luc: 3
-    resistances:
-      physical: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      havoc: 0
-    initialSkillIds: []
-    initialWeaponId: 
-    initialGunId: gun_000
-    initialAmmoId: ammo_000
-    initialArmorIds: []
-    maxHp: 50
-    maxMp: 50
-  - id: chr_04
-    name: "\uAE40\uC601\uC625"
-    spiritId: spirit_004
-    exp: 0
-    isCommander: 0
-    portraitImage: {fileID: 0}
-    standingImage: {fileID: 0}
-    align: 8
-    stats:
-      level: 1
-      str: 5
-      mag: 2
-      intel: 2
-      vit: 3
-      agi: 4
-      luc: 2
-    resistances:
-      physical: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      havoc: 0
-    initialSkillIds: []
-    initialWeaponId: 
-    initialGunId: gun_000
-    initialAmmoId: ammo_000
-    initialArmorIds: []
-    maxHp: 50
-    maxMp: 50
-  - id: chr_05
-    name: "\uAE40\uC218\uBBF8"
-    spiritId: spirit_005
-    exp: 0
-    isCommander: 0
-    portraitImage: {fileID: 0}
-    standingImage: {fileID: 0}
-    align: 9
-    stats:
-      level: 2
-      str: 4
-      mag: 4
-      intel: 4
-      vit: 4
-      agi: 4
-      luc: 4
-    resistances:
-      physical: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      havoc: 0
-    initialSkillIds: []
-    initialWeaponId: 
-    initialGunId: gun_000
-    initialAmmoId: ammo_000
-    initialArmorIds: []
-    maxHp: 50
-    maxMp: 50
-  - id: chr_06
-    name: P6
-    spiritId: spirit_006
-    exp: 0
-    isCommander: 0
-    portraitImage: {fileID: 21300000, guid: de3b970acb33b374d9ab84c2ccfd9d39, type: 3}
-    standingImage: {fileID: 21300000, guid: b3ec6733117635647bf811957034913c, type: 3}
-    align: 7
-    stats:
-      level: 1
-      str: 2
-      mag: 3
-      intel: 4
-      vit: 3
-      agi: 2
-      luc: 4
-    resistances:
-      physical: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      havoc: 0
-    initialSkillIds: []
-    initialWeaponId: 
     initialGunId: gun_000
     initialAmmoId: ammo_000
     initialArmorIds: []
