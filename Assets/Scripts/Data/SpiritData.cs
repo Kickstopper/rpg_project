@@ -10,6 +10,7 @@ namespace Data
     [CreateAssetMenu(fileName = "Spirit", menuName = "RPG/Spirit")]
     public class SpiritData : ScriptableObject
     {
+        public Sprite portraitImage;
         public string id;
         public string entityName;
         public Align align;

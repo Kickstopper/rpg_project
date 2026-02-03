@@ -9,7 +9,7 @@ namespace Controller
 {
     public class PlayerMenuController : MonoBehaviour
     {
-        private enum MenuState { Main, Status, Skill, Item, Equip, Move, System, Suspend}
+        private enum MenuState { Main, Status, Skill, Item, Move, Equip, Memory, System, Suspend}
 
         private MenuState currentState;
         public List<Button> allMenuBtns;
@@ -205,6 +205,14 @@ namespace Controller
             UpdatePopupMessage();
             ResetInputTimer();
             Debug.Log("SKILL 미구현");
+        }
+
+        public void OnClick_Memory()
+        {
+            currentState = MenuState.Memory;
+            UpdatePopupMessage();
+            ResetInputTimer();
+            Debug.Log("MEMORY 미구현");
         }
 
         public void OnClick_Item()

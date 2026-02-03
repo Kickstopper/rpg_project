@@ -11,6 +11,8 @@ namespace Controller
     public class StatusUIController : MonoBehaviour
     {
         public PlayerMenuController menuController;
+        public GameObject spiritStatusUI;
+        public SpiritStatusUIController spiritUIController;
 
         [Header("Header Info")]
         public TextMeshProUGUI nameText;
@@ -61,6 +63,8 @@ namespace Controller
         private List<RuntimeCharacterData> partyMembers;
         private int currentIndex = 0;
 
+        private bool hasSpirit;
+
         void OnEnable()
         {
             // 메뉴가 열릴 때 데이터 로드
@@ -74,6 +78,7 @@ namespace Controller
 
         void Update()
         {
+            if (spiritStatusUI.activeSelf) return;
             HandleInput();
         }
 
@@ -88,6 +93,8 @@ namespace Controller
             {
                 ChangeCharacter(1);
             }
+
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) ShowSpiritStatusUI();
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
             {
@@ -110,6 +117,31 @@ namespace Controller
 
             SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
             RefreshUI();
+        }
+
+        private void ShowSpiritStatusUI()
+        {
+            if (spiritStatusUI)
+            {
+                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                spiritStatusUI.SetActive(true);
+            }
+            else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            
+        }
+
+        public void CloseSpiritStatusUI()
+        {
+            if (spiritStatusUI)
+            {
+                spiritStatusUI.SetActive(false);
+            }
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+        }
+
+        public void OnClick_SpiritViewButton()
+        {
+            ShowSpiritStatusUI();
         }
 
         private void RefreshUI()
@@ -148,8 +180,8 @@ namespace Controller
             UpdateSliderAndText(hpSlider, hpText, charData.currentHp, charData.maxHp);
             UpdateSliderAndText(mpSlider, mpText, charData.currentMp, charData.maxMp);
 
-            // 3. Base Stats (최대치를 99 또는 999로 가정하고 슬라이더 비율 설정)
-            float maxStatVal = 100f; // 스탯 최대값이 99라면
+            // 3. Base Stats
+            float maxStatVal = 50f;
             UpdateStat(strSlider, strText, charData.stats.str, maxStatVal);
             UpdateStat(magSlider, magText, charData.stats.mag, maxStatVal);
             UpdateStat(intSlider, intText, charData.stats.intel, maxStatVal);
@@ -174,6 +206,8 @@ namespace Controller
                 SpiritData spirit = DatabaseManager.Instance.GetSpirit(charData.spiritId);
                 if (spirit != null)
                 {
+                    hasSpirit = true;
+                    spiritUIController.Initialze(spirit);
                     List<SkillData> spiritSkills = spirit.skills;
                     foreach(var skill in spiritSkills)
                     {
@@ -185,7 +219,9 @@ namespace Controller
                     spiritText.text = spirit.entityName;
                     
                 }
+                else hasSpirit = false;
             }
+            else hasSpirit = false;
             UpdateSkillList(skills);
         }
 

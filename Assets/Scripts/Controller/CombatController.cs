@@ -3259,6 +3259,7 @@ namespace Controller
                 float timer = 0f;
                 ShowLog("READY!");
                 ShowCharacterMessage(pc, "죽어!");
+                int delay = CalculateActionDelay(action);
                 while (timer < qteDuration && currentHits < maxHits)
                 {
                     timer += Time.deltaTime;
@@ -3271,7 +3272,7 @@ namespace Controller
                         currentHits++;
                         hitsPerformed++; // 실제 발사 수 증가
                         BattleEntity actorEntity = action.actor.GetComponent<BattleEntity>();
-                        if (actorEntity) actorEntity.nextTurnSpeedPenalty += 500;
+                        if (actorEntity) actorEntity.nextTurnSpeedPenalty += delay;
                         ShowLog($"SHOOT OUT! ({currentHits}/{maxHits})");
                         
                         SoundManager.Instance.PlaySFX(SfxID.Attack_Gun); 
