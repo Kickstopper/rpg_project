@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2509d072dc88eee4e99bc80b884fd02e, type: 3}
+  m_Name: ForceBall_H
+  m_EditorClassIdentifier: 
+  id: skl_028
+  dataName: "\uD3EC\uC2A4\uBCFCH"
+  description: "\uD3EC\uC2A4 \uC18D\uC131\uC758 \uAC15 \uB370\uBBF8\uC9C0"
+  icon: {fileID: 0}
+  effectType: 0
+  effectValue: 15
+  element: 4
+  targetScope: 1
+  useType: 2
+  actionDelay: 0
+  effectPrefab: {fileID: 0}
+  useHpCost: 0
+  costValue: 10
+  hitRate: 0

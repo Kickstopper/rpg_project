@@ -3,12 +3,12 @@ using TMPro;
 using UnityEngine;
 namespace Controller
 {
-    public class ItemInfoController : MonoBehaviour
+    public class SkillInfoController : MonoBehaviour
     {
         public TextMeshProUGUI descriptionText;
         public TextMeshProUGUI targetScopeText;
 
-        public void UpdateInfo(BaseItemData item)
+        public void UpdateInfo(SkillData item)
         {
             if (item == null) 
             {

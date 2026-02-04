@@ -212,20 +212,29 @@ namespace Controller
             allMenuBtns[index].Select();
             if (sound) SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
         }
-        
+
         public void OnClick_Skill()
         {
             currentState = MenuState.Skill;
-            UpdatePopupMessage();
+            skillUI.SetActive(true);
             ResetInputTimer();
-            Debug.Log("SKILL 미구현");
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+        }
+
+        public void CloseSkillUI()
+        {
+            skillUI.SetActive(false);
+            currentState = MenuState.Main;
+            ResetInputTimer();
+            UpdateSelection(currentBtnIndex);
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
         }
 
         public void OnClick_Memory()
         {
-            currentState = MenuState.Memory;
-            UpdatePopupMessage();
-            ResetInputTimer();
+            // currentState = MenuState.Memory;
+            // UpdatePopupMessage();
+            // ResetInputTimer();
             Debug.Log("MEMORY 미구현");
         }
 
@@ -269,9 +278,9 @@ namespace Controller
         
         public void OnClick_Equip()
         {
-            currentState = MenuState.Equip;
-            UpdatePopupMessage();
-            ResetInputTimer();
+            // currentState = MenuState.Equip;
+            // UpdatePopupMessage();
+            // ResetInputTimer();
             Debug.Log("EQUIP 미구현");
         }
         
