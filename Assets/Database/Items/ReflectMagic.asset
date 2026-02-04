@@ -20,6 +20,7 @@ MonoBehaviour:
   effectValue: 11
   element: 6
   targetScope: 7
+  useType: 2
   actionDelay: 0
   effectPrefab: {fileID: 0}
   price: 0

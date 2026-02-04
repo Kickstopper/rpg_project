@@ -73,6 +73,15 @@ namespace Controller
 
         public bool IsEmpty { get; private set; } = false;
 
+        void Start()
+        {
+            if (selectButton != null)
+            {
+                selectButton.onClick.RemoveAllListeners();
+                selectButton.onClick.AddListener(OnClicked);
+            }
+        }
+
         // 빈 슬롯용 초기화 함수
         public void InitializeEmpty(int colIndex)
         {
@@ -112,6 +121,7 @@ namespace Controller
             if (runtimeData == null)
             {
                 InitializeEmpty(columnIndex);
+                return;
             }
 
             // 데이터 초기화
@@ -122,13 +132,10 @@ namespace Controller
             this.currentRow = runtimeData.row;
             this.currentColumn = runtimeData.column;
             this.level = runtimeData.stats.level;
-            this.maxHp = runtimeData.maxHp;
-            this.maxMp = runtimeData.maxMp;
-            this.currentHp = runtimeData.currentHp;
-            this.currentMp = runtimeData.currentMp;
+            
             this.currentExp = runtimeData.currentExp;
             this.align = runtimeData.align;
-            
+
             this.spiritData = DatabaseManager.Instance.GetSpirit(runtimeData.spiritId);
 
             // 3. 데이터 융합
@@ -155,8 +162,8 @@ namespace Controller
             this.level = currentStats.level;
             
             // MaxHP/MP 계산 (InitializeStats에서 수행하겠지만, 초기값 세팅)
-            // 주의: currentStats가 변경되었으므로 MaxHP도 바뀔 수 있음
             InitializeStats(); 
+
 
             // 현재 HP/MP는 비율에 맞춰 조정하거나, max를 넘지 않게 클램핑
             this.currentHp = Mathf.Min(runtimeData.currentHp, this.maxHp);
@@ -187,18 +194,11 @@ namespace Controller
             
             // UI 게이지 갱신
             UpdateUI();
-
-            if (selectButton != null)
-            {
-                selectButton.onClick.RemoveAllListeners();
-                selectButton.onClick.AddListener(OnClicked);
-            }
         }
 
         // =========================================================
         // [헬퍼 함수] 데이터 융합 로직
         // =========================================================
-
         private StatData CalculateAverageStats(StatData charStats, StatData spiritStats)
         {
             StatData result = new StatData();
@@ -218,8 +218,8 @@ namespace Controller
         private void InitializeStats()
         {
             // currentStats를 기반으로 파생 스탯(MaxHP, MaxMP) 재계산
-            this.maxHp = this.currentStats.vit * 20;
-            this.maxMp = this.currentStats.mag * 30;
+            this.maxHp = sourceData.maxHp = this.currentStats.vit * 20;
+            this.maxMp = sourceData.maxMp =  this.currentStats.mag * 30;
         }
 
 

@@ -18,7 +18,7 @@ namespace Data
 
         [Header("Attribute & Scope")]
         public ElementType damageElement = ElementType.Physical; 
-        public TargetScope attackRange = TargetScope.FrontSingle; // [중요] 공격 범위
+        public TargetScope attackRange = TargetScope.Front_Single_Enemy; // [중요] 공격 범위
 
         [Header("Multi-Hit")]
         public int minHits = 1; // 최소 공격 횟수

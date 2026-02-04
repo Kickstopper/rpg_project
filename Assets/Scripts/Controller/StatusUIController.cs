@@ -157,7 +157,7 @@ namespace Controller
             levelText.text = charData.stats.level.ToString();
             expText.text = charData.currentExp.ToString();
             nextExpText.text = charData.nextExp.ToString(); 
-            alignText.text = charData.align.ToString().ToUpper();
+            alignText.text = charData.align.ToString().ToUpper().Replace("_", " ");;
 
             if (charData.statusEffect != StatusEffect.Good)
             {
@@ -195,9 +195,9 @@ namespace Controller
             gunText.text = charData.GetGunAttack().ToString();     // 총 공격력
             gunHitText.text = charData.GetGunHitRate().ToString(); // 총 명중률
             defText.text = charData.GetTotalDefense().ToString();
-            evaText.text = charData.GetEvasion().ToString();
+            evaText.text = charData.GetEvasion().ToString();       // 물리 회피율
             magPowText.text = charData.GetMagicPower().ToString(); // 마법 위력
-            // magFxText.text = charData.GetMagicEffect().ToString(); // 마법 효과
+            magFxText.text = charData.GetMagicEffect().ToString(); // 마법 효과(명중률 등)
 
             // 5. Spirit 및 Skills (ScrollView 갱신)
             List<string> skills = new(charData.learnedSkills);

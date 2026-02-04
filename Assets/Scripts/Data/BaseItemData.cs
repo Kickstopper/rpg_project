@@ -2,25 +2,27 @@ using UnityEngine;
 
 // 속성 타입을 열거형으로 정의 (ResistanceData 필드와 매칭용)
 public enum ElementType { Physical, Fire, Ice, Elec, Force, Psyche, None }
+public enum UseType { All, Exploration, Battle, Passive }
 
 // 행동 범위
 public enum TargetScope 
 { 
     // --- [적 대상] ---
-    FrontSingle,        // 전열 적 1명 지정
-    AnySingle,          // 전체 적 중 1명 지정 (OneEnemy 통합)
+    Front_Single_Enemy,        // 전열 적 1명 지정
+    Single_Enemy,          // 전체 적 중 1명 지정 (OneEnemy 통합)
     
-    FrontRandom,        // 전열 적 랜덤 (다단 히트 등)
-    AnyRandom,          // 전체 적 랜덤 (다단 히트 등)
+    Random_Front_Enemy,        // 전열 적 랜덤 (다단 히트 등)
+    Random_Enemy,          // 전체 적 랜덤 (다단 히트 등)
     
-    FrontAll,           // 전열 적 전체 (광역기)
-    AnyAll,             // 전체 적 전체 (광역기)
+    Front_Enemies,           // 전열 적 전체 (광역기)
+    All_Enemies,             // 전체 적 전체 (광역기)
 
     // --- [아군 대상] ---
     Self,               // 사용자 자신
-    OneAlly,            // 아군 1명 (회복, 버프)
-    AllAllies,          // 아군 전체 (광역 힐/버프)
-    DeadAlly,           // 죽은 아군 (부활)
+    One_Ally,            // 아군 1명 (회복, 버프)
+    All_Allies,          // 아군 전체 (광역 힐/버프)
+    Dead_Ally,           // 죽은 아군 (부활)
+    All_Dead_Allies,      // 모든 죽은 아군 (부활)
 }
 
 public enum EffectType 
@@ -62,6 +64,8 @@ namespace Data
         public int effectValue; // 회복량 또는 데미지
         public ElementType element;
         public TargetScope targetScope;
+
+        public UseType useType;
 
         public int actionDelay = 0; // 사용했을 때의 딜레이 (행동 속도 지연)
 

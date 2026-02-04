@@ -16,10 +16,13 @@ namespace Controller
         private int currentBtnIndex;
 
         private bool isMenuOpen = false;
+        private bool isAlertMode = false;
 
         public GameObject statusUI;
         public GameObject moveUI;
-
+        public GameObject skillUI;
+        public GameObject itemUI;
+        
         [Header("Background")]
         public SimpleGradient background;
 
@@ -36,13 +39,13 @@ namespace Controller
         private float lastInputTime; // 마지막으로 입력이 처리된 시간
 
         // 입력을 처리할 수 있는 상태인지 확인하는 프로퍼티
-        private bool CanProcessInput => Time.time >= lastInputTime + inputDelay;
+        public bool CanProcessInput => Time.time >= lastInputTime + inputDelay;
 
         // 입력 성공 시 쿨타임을 갱신
         private void ResetInputTimer() => lastInputTime = Time.time;
 
         private bool isPopupOpen = false;     // 팝업이 열려있는지 확인
-
+        public bool IsPopupOpen => isPopupOpen;
         void Start()
         {
             GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
@@ -108,25 +111,36 @@ namespace Controller
         // 팝업에서의 키보드 조작
         void HandlePopupNavigation()
         {
-            // 방향키 조작
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) 
+            // 알림 모드가 아닐 때만 방향키로 Yes/No 선택 가능
+            if (!isAlertMode)
             {
-                popupYesBtn.Select();
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
-                ResetInputTimer(); // 조작 시에도 쿨타임 적용
-            }
-            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) 
-            {
-                popupNoBtn.Select();
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
-                ResetInputTimer();
+                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) 
+                {
+                    popupYesBtn.Select();
+                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+                    ResetInputTimer(); 
+                }
+                else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) 
+                {
+                    popupNoBtn.Select();
+                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+                    ResetInputTimer();
+                }
             }
 
             // 확인 키
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                GameObject currentSelected = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+                // 알림 모드일 때는 확인 키를 누르면 무조건 닫기(No버튼 동작) 수행
+                if (isAlertMode)
+                {
+                    ResetInputTimer();
+                    OnClickCancelButton(); // 팝업 닫기
+                    return;
+                }
 
+                // 일반 모드일 때는 선택된 버튼에 따라 동작
+                GameObject currentSelected = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
                 if (currentSelected == popupYesBtn.gameObject)
                 {
                     ResetInputTimer();
@@ -142,7 +156,6 @@ namespace Controller
             // 취소 키
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
             {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
                 ResetInputTimer();
                 OnClickCancelButton();
             }
@@ -219,9 +232,20 @@ namespace Controller
         public void OnClick_Item()
         {
             currentState = MenuState.Item;
+            itemUI.SetActive(true);
             UpdatePopupMessage();
             ResetInputTimer();
-            Debug.Log("ITEM 미구현");
+        }
+
+        public void CloseItemUI()
+        {
+            itemUI.SetActive(false);
+            
+            currentState = MenuState.Main;
+            ResetInputTimer();
+            UpdateSelection(currentBtnIndex); // 마지막으로 선택했던 메인 메뉴 버튼에 다시 포커스
+            
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
         }
 
         public void OnClick_Status()
@@ -334,8 +358,6 @@ namespace Controller
                     break;
 
                 case MenuState.Item:
-                    Debug.Log("아이템 사용 로직 실행");
-                    // 추후 구현: ItemManager.UseItem(...);
                     ClosePopup();
                     break;
                     
@@ -350,13 +372,45 @@ namespace Controller
             }
         }
 
+        public void ShowAlertPopup(string message)
+        {
+            popupMessage.SetText(message);
+            confirmPopup.SetActive(true);
+            
+            // AlertPopup은 선택이 아닌 단순 알림 용도이므로 YES버튼은 끄고 NO버튼의 문자는 확인(OK)으로 바꿈.
+            popupYesBtn.gameObject.SetActive(false); 
+            popupNoBtn.Select();
+            var tmp = popupNoBtn.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp) tmp.text = "OK";
+            isPopupOpen = true;
+            isAlertMode = true;
+
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+
+            ResetInputTimer();
+        }
+
         // 팝업 닫기
         private void ClosePopup()
         {
-            currentState = MenuState.Main; // 상태 초기화
+            // 알림 모드였다면 상태(currentState)를 초기화하지 않음 (Item 등 현재 상태 유지)
+            if (!isAlertMode)
+            {
+                currentState = MenuState.Main;
+            }
+
             confirmPopup.SetActive(false);
+            popupYesBtn.gameObject.SetActive(true); // 버튼 복구
+            var tmp = popupNoBtn.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp) tmp.text = "NO"; // 버튼 표시 문자 복구
             isPopupOpen = false;
-            allMenuBtns[currentBtnIndex].Select(); // 메뉴로 포커스 복귀
+            isAlertMode = false;
+
+            // 메인 메뉴 상태라면 메인 버튼으로 포커스 복귀
+            if (currentState == MenuState.Main && allMenuBtns.Count > currentBtnIndex)
+            {
+                allMenuBtns[currentBtnIndex].Select();
+            }
         }
 
         // NO 버튼

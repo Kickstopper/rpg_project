@@ -435,16 +435,16 @@ namespace Controller
         private void PrepareWeaponAction(WeaponData weapon, ActionType actionType)
         {
             BattleEntity currentActor = activePlayers[currentPlayerIndex];
-            TargetScope scope = TargetScope.FrontSingle; 
+            TargetScope scope = TargetScope.Front_Single_Enemy; 
             
             if (weapon != null) scope = weapon.attackRange;
             else if (actionType == ActionType.Shoot) return; 
 
-            if (scope == TargetScope.FrontSingle || scope == TargetScope.AnySingle)
+            if (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Single_Enemy)
             {
                 validTargets = activeMonsters.Where(m => m.currentHp > 0).ToList();
 
-                if (scope == TargetScope.FrontSingle)
+                if (scope == TargetScope.Front_Single_Enemy)
                 {
                     validTargets = validTargets.Where(m => m.transform.parent.parent == enemyFrontRowContainer).ToList();
                     if (validTargets.Count == 0) validTargets = activeMonsters.Where(m => m.currentHp > 0).ToList();
@@ -1522,13 +1522,13 @@ namespace Controller
             TargetScope scope = item.targetScope;
 
             // 대상을 직접 찍어야 하는 경우만 StartItemTargetSelection 호출
-            if (scope == TargetScope.AnySingle || scope == TargetScope.OneAlly || scope == TargetScope.DeadAlly || scope == TargetScope.FrontSingle)
+            if (scope == TargetScope.Single_Enemy || scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally || scope == TargetScope.Front_Single_Enemy)
             {
                 StartItemTargetSelection(scope); 
             }
             else
             {
-                // AllAllies, Self, FrontAll, AnyAll 등은 대상 선택 없이 즉시 사용 예약
+                // All_Allies, Self, Front_Enemies, All_Enemies 등은 대상 선택 없이 즉시 사용 예약
                 
                 // 아이템 선택 키 입력이 다음 턴의 명령 선택(Attack 등)으로 이어지지 않도록 쿨타임 부여
                 inputCooldown = 0.2f; 
@@ -1541,11 +1541,11 @@ namespace Controller
         void StartItemTargetSelection(TargetScope scope)
         {
             validTargets.Clear();
-            if (scope == TargetScope.AnySingle)
+            if (scope == TargetScope.Single_Enemy)
                 validTargets.AddRange(activeMonsters.Where(m => m != null && m.currentHp > 0));
-            else if (scope == TargetScope.OneAlly) 
+            else if (scope == TargetScope.One_Ally) 
                 validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp > 0));
-            else if (scope == TargetScope.DeadAlly)
+            else if (scope == TargetScope.Dead_Ally)
                 validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp <= 0));
             
             if (validTargets.Count == 0)
@@ -1587,7 +1587,7 @@ namespace Controller
             action.itemData = currentSelectedItem; 
             if (currentSelectedItem is SkillData skill) action.skillData = skill;
 
-            // 즉시 실행되는 행동(AllAllies, Self 등)도 Auto 모드를 위해 저장
+            // 즉시 실행되는 행동(All_Allies, Self 등)도 Auto 모드를 위해 저장
             if (lastPlayerActions.ContainsKey(currentPlayerIndex))
                 lastPlayerActions[currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, target);
             else
@@ -1932,11 +1932,11 @@ namespace Controller
             }
 
             // 스코프 확인
-            TargetScope scope = TargetScope.FrontSingle; 
+            TargetScope scope = TargetScope.Front_Single_Enemy; 
             switch (actionType)
             {
-                case ActionType.Attack: scope = (actor.currentWeapon != null) ? actor.currentWeapon.attackRange : TargetScope.FrontSingle; break;
-                case ActionType.Shoot: scope = (actor.currentGun != null) ? actor.currentGun.attackRange : TargetScope.FrontSingle; break;
+                case ActionType.Attack: scope = (actor.currentWeapon != null) ? actor.currentWeapon.attackRange : TargetScope.Front_Single_Enemy; break;
+                case ActionType.Shoot: scope = (actor.currentGun != null) ? actor.currentGun.attackRange : TargetScope.Front_Single_Enemy; break;
                 case ActionType.Skill:
                 case ActionType.Item: if (autoData != null) scope = autoData.targetScope; break;
             }
@@ -1945,13 +1945,13 @@ namespace Controller
             GameObject finalTarget = null;
 
             // 아군 대상(회복/버프) 스코프인지 확인
-            bool isAllyScope = (scope == TargetScope.OneAlly || scope == TargetScope.AllAllies || 
-                                scope == TargetScope.Self || scope == TargetScope.DeadAlly);
+            bool isAllyScope = (scope == TargetScope.One_Ally || scope == TargetScope.All_Allies || 
+                                scope == TargetScope.Self || scope == TargetScope.Dead_Ally);
 
             if (isAllyScope)
             {
                 // 아군 대상인 경우: 무조건 저장된 타겟(autoTarget) 사용
-                // (OneAlly인 경우 지정했던 아군, AllAllies/Self인 경우 null 혹은 본인이 들어있음)
+                // (One_Ally인 경우 지정했던 아군, All_Allies/Self인 경우 null 혹은 본인이 들어있음)
                 finalTarget = autoTarget;
             }
             else
@@ -1960,7 +1960,7 @@ namespace Controller
                 // (공격 대상은 매번 바뀌거나 죽을 수 있으므로 랜덤이 일반적)
                 List<BattleEntity> candidates = new List<BattleEntity>();
                 var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
-                bool targetFrontOnly = (scope == TargetScope.FrontSingle || scope == TargetScope.FrontRandom || scope == TargetScope.FrontAll);
+                bool targetFrontOnly = (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Random_Front_Enemy || scope == TargetScope.Front_Enemies);
 
                 foreach (var m in livingMonsters)
                 {
@@ -2502,7 +2502,7 @@ namespace Controller
             
             // TargetScope에 따라 다중 타겟 가져오기
             // (QueuePolymorphicAction에서 target을 null로 보냈어도 여기서 찾음)
-            TargetScope scope = (item != null) ? item.targetScope : TargetScope.OneAlly;
+            TargetScope scope = (item != null) ? item.targetScope : TargetScope.One_Ally;
             List<GameObject> targets = GetTargetsByScope(scope, action);
 
             ShowLog($"USE {item.dataName}");
@@ -2572,7 +2572,7 @@ namespace Controller
             }
             
             // 다중 타겟 처리
-            TargetScope scope = (skill != null) ? skill.targetScope : TargetScope.FrontSingle;
+            TargetScope scope = (skill != null) ? skill.targetScope : TargetScope.Front_Single_Enemy;
             List<GameObject> targets = GetTargetsByScope(scope, action);
 
             ShowLog($"{action.actor.name}'S SKILL': {skill.dataName}");
@@ -3303,7 +3303,7 @@ namespace Controller
                 }
                 hitsPerformed++; // 실제 발사 수 증가
                 yield return wait01;
-                if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll) break;
+                if (scope == TargetScope.Front_Enemies || scope == TargetScope.All_Enemies) break;
             }
 
             // 탄환 차감 적용
@@ -3494,35 +3494,35 @@ namespace Controller
             var livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList(); // 아군 생존자
 
             // 1. 단일 지정 (이미 타겟이 정해진 경우)
-            if (scope == TargetScope.FrontSingle || scope == TargetScope.AnySingle || 
-                scope == TargetScope.OneAlly || scope == TargetScope.DeadAlly)
+            if (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Single_Enemy || 
+                scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally)
             {
                 if (action.target != null) targets.Add(action.target);
             }
             // 2. 적 랜덤 / 전체
-            else if (scope == TargetScope.FrontRandom || scope == TargetScope.AnyRandom)
+            else if (scope == TargetScope.Random_Front_Enemy || scope == TargetScope.Random_Enemy)
             {
                 List<GameObject> candidates = new List<GameObject>();
                 foreach(var m in livingMonsters) 
                 {
                     bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
-                    if (scope == TargetScope.FrontRandom && !isFront) continue;
+                    if (scope == TargetScope.Random_Front_Enemy && !isFront) continue;
                     candidates.Add(m.gameObject);
                 }
                 if (candidates.Count > 0) targets.Add(candidates[Random.Range(0, candidates.Count)]);
             }
-            else if (scope == TargetScope.FrontAll || scope == TargetScope.AnyAll)
+            else if (scope == TargetScope.Front_Enemies || scope == TargetScope.All_Enemies)
             {
                 foreach(var m in livingMonsters) 
                 {
                     bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
-                    if (scope == TargetScope.FrontAll && !isFront) continue;
+                    if (scope == TargetScope.Front_Enemies && !isFront) continue;
                     targets.Add(m.gameObject);
                 }
-                if (scope == TargetScope.FrontAll && targets.Count == 0) targets.AddRange(livingMonsters.Select(m => m.gameObject));
+                if (scope == TargetScope.Front_Enemies && targets.Count == 0) targets.AddRange(livingMonsters.Select(m => m.gameObject));
             }
-            // 3. 아군 관련 타겟 (AllAllies, Self 등)
-            else if (scope == TargetScope.AllAllies)
+            // 3. 아군 관련 타겟 (All_Allies, Self 등)
+            else if (scope == TargetScope.All_Allies)
             {
                 // 아군 전체 추가
                 foreach (var p in livingPlayers) targets.Add(p.gameObject);
@@ -3588,7 +3588,7 @@ namespace Controller
         void ResetCharacterMessage() { foreach(PlayerController pc in activePlayers) pc.SetMessage(string.Empty); }
         void GetWeaponInfo(CombatAction action, out int min, out int max, out TargetScope scope)
         {
-            min = 1; max = 1; scope = TargetScope.FrontSingle; 
+            min = 1; max = 1; scope = TargetScope.Front_Single_Enemy; 
             var pActor = action.actor.GetComponent<PlayerController>();
             WeaponData weapon = null;
             if (pActor != null) weapon = (action.type == ActionType.Shoot) ? pActor.currentGun : pActor.currentWeapon;

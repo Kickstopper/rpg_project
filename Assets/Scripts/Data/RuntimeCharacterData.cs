@@ -145,6 +145,7 @@ namespace Data
         public int GetTotalDefense(){ return 0;}
         public int GetEvasion(){ return 0;}
         public int GetMagicPower(){ return 0;}
+        public int GetMagicEffect() {return 0; }
 
         public RuntimeCharacterData() { }
     }
