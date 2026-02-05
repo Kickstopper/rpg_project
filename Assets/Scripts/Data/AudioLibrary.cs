@@ -21,6 +21,7 @@ namespace Data
         Monster_Dead_F, // 몬스터 죽음 (여)
         Attack_Gun,     // 총 공격
         Attack_Magic,   // 마법 공격
+        PC_Boot,        // 컴퓨터 부팅
 
     }
 

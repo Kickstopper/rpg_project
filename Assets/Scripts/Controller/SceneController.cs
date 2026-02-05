@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Manager;
 using Data;
-using Unity.VisualScripting;
 namespace Controller 
 {
     public static class GameScene
@@ -21,6 +20,7 @@ namespace Controller
         [SerializeField] private GameObject confirmWindow; // 확인 팝업 연결
         
         [Header("UI Settings")]
+        public GameObject UI_Canvas;
         public Image targetImage; // 이미지가 표시될 UI Image 컴포넌트
         public SaveLoadUIController saveLoadUI;
         public List<Button> allMenuBtns;
@@ -34,9 +34,17 @@ namespace Controller
         public List<Sprite> backgroundImages; // 배경 이미지 목록
         public float fadeDuration = 1.5f; // 페이드 인/아웃 걸리는 시간
         public float displayDuration = 3.0f; // 이미지가 완전히 보이는 시간
-        
 
-        private void Start()
+        private bool isEnable = false;     // 팝업이 열려있는지 확인
+        public bool IsEnable => isEnable;
+
+        void Start()
+        {
+            if (UI_Canvas) UI_Canvas.SetActive(false);
+        }
+
+
+        public void ShowAnimation()
         {
             if (targetImage != null && backgroundImages.Count > 0)
             {
@@ -46,7 +54,10 @@ namespace Controller
             {
                 Debug.LogError("이미지 혹은 스프라이트 리스트가 비어있습니다.");
             }
+        }
 
+        private void CheckSuspendSaveData()
+        {
             bool hasSuspend = SaveManager.Instance.HasSuspendData();
 
             // 중단 데이터가 있으면 '이어하기' 표시
@@ -59,8 +70,19 @@ namespace Controller
 
         void Update()
         {
-            if (saveLoadUI.gameObject.activeSelf) return;
+            if (!isEnable && Input.anyKeyDown)
+            {
+                StopAllCoroutines();
+                targetImage.sprite = backgroundImages[backgroundImages.Count-1];
+                targetImage.color = Color.white;
+                targetImage.SetNativeSize();
+                CheckSuspendSaveData();
+                UI_Canvas.SetActive(true);
 
+                isEnable = true;
+                return;
+            }
+            else if (!isEnable || saveLoadUI.gameObject.activeSelf) return;
             HandleMenuNavigation(ref currentBtnIndex);
         }
 
@@ -86,6 +108,13 @@ namespace Controller
 
                 // 5. 다음 이미지 인덱스 계산 (리스트 끝에 도달하면 0번으로 돌아감)
                 currentBtnIndex = (currentBtnIndex + 1) % backgroundImages.Count;
+
+                if (!isEnable)
+                {
+                    CheckSuspendSaveData();
+                    UI_Canvas.SetActive(true);
+                    isEnable = true;
+                }
             }
         }
 
