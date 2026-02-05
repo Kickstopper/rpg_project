@@ -71,7 +71,7 @@ namespace Controller
             // 1. Header Info
             nameText.text = data.entityName;
             levelText.text = data.stats.level.ToString();
-            alignText.text = data.align.ToString().ToUpper();
+            alignText.text = data.align.ToString().ToUpper().Replace("_", " ");
 
             resistPhysText.text = ((int)data.resistances.phys).ToString();
             resistFireText.text = ((int)data.resistances.fire).ToString();

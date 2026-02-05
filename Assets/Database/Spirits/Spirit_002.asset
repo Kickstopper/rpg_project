@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0347f80ab29208248bdd1838e8310914, type: 3}
   m_Name: Spirit_002
   m_EditorClassIdentifier: Assembly-CSharp::Data.SpiritData
+  portraitImage: {fileID: 0}
   id: spirit_002
   entityName: "\uC774\uC288\uD0C0\uB974"
-  align: 5
+  align: 2
   stats:
     level: 1
     str: 3
@@ -24,12 +25,12 @@ MonoBehaviour:
     agi: 3
     luc: 3
   resistances:
-    physical: 0
+    phys: 0
     fire: 0
     ice: 0
     elec: 0
     force: 0
-    havoc: 0
+    psyche: 0
   skills:
   - {fileID: 11400000, guid: 6111adbbad8ab814599c2a718012d738, type: 2}
   - {fileID: 11400000, guid: 1a8a8bc6ac32f6a4a9f7d59ef9fa6610, type: 2}

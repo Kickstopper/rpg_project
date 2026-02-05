@@ -157,7 +157,7 @@ namespace Controller
             levelText.text = charData.stats.level.ToString();
             expText.text = charData.currentExp.ToString();
             nextExpText.text = charData.nextExp.ToString(); 
-            alignText.text = charData.align.ToString().ToUpper().Replace("_", " ");;
+            alignText.text = charData.align.ToString().ToUpper().Replace("_", " ");
 
             if (charData.statusEffect != StatusEffect.Good)
             {

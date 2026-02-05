@@ -15,7 +15,7 @@ MonoBehaviour:
   portraitImage: {fileID: 0}
   id: spirit_000
   entityName: "\uC544\uB9C8\uD14C\uB77C\uC2A4"
-  align: 5
+  align: 2
   stats:
     level: 1
     str: 3

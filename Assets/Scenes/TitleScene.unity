@@ -3675,10 +3675,10 @@ MonoBehaviour:
     memoryEnd: 0
   - text: 'Award Modular BIOS v4.51PG, An Energy Star Ally
 
-      Copyright (C)
-      1984-95, Award Software, Inc.
+      Copyright (C) 1984-95,
+      Award Software, Inc.
 
-      
+
 
       PENTIUM-S CPU at 133MHz'
     preDelay: 0
@@ -3843,7 +3843,7 @@ MonoBehaviour:
 
       .
 
-      FUCK
+      FCUK
       YOU!'
     preDelay: 3
     isMemoryCheck: 0

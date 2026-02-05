@@ -599,6 +599,12 @@ namespace UI.DungeonMapScene
 
         private void Render()
         {
+            // 버퍼를 투명값(0,0,0,0)으로 초기화하여 이전 프레임 잔상 제거
+            Array.Clear(_buffer, 0, _buffer.Length);
+
+            // 깊이 버퍼도 초기화 (안전장치)
+            Array.Clear(_zBuffer, 0, _zBuffer.Length);
+
             if (useAnaglyph)
             {
                 float originalX = _posX;
@@ -610,20 +616,25 @@ namespace UI.DungeonMapScene
                 // 1. Left Eye
                 _posX = originalX - _planeX * stereoSeparation;
                 _posY = originalY - _planeY * stereoSeparation;
-                PerformRenderPass(step); // step 전달
+                PerformRenderPass(step); 
                 Array.Copy(_buffer, _leftEyeBuffer, _buffer.Length);
+                
+                // 왼쪽 눈 그린 뒤 버퍼를 다시 비워야 오른쪽 눈이 깨끗하게 그려짐
+                Array.Clear(_buffer, 0, _buffer.Length); 
 
                 // 2. Right Eye
                 _posX = originalX + _planeX * stereoSeparation;
                 _posY = originalY + _planeY * stereoSeparation;
-                PerformRenderPass(step); // step 전달
+                PerformRenderPass(step); 
 
-                // 3. Merge (기존과 동일)
+                // 3. Merge
                 for (int i = 0; i < _buffer.Length; i++)
                 {
                     Color left = _leftEyeBuffer[i];
                     Color right = _buffer[i];
-                    _buffer[i] = new Color(left.r, right.g, right.b, 1.0f);
+                    // 투명도 고려하여 병합 (둘 다 투명하면 투명)
+                    float alpha = Mathf.Max(left.a, right.a);
+                    _buffer[i] = new Color(left.r, right.g, right.b, alpha);
                 }
 
                 _posX = originalX;
@@ -1031,8 +1042,7 @@ namespace UI.DungeonMapScene
                     for (int x = 0; x < screenWidth; x += step) 
                     {
                         Color color = GetCeilingColor(floorX, floorY, rowDistance);
-                        
-                        // 가로로 채우기 (Filling Loop)
+
                         for (int s = 0; s < step; s++)
                         {
                             if (x + s < screenWidth) 
@@ -1254,7 +1264,7 @@ namespace UI.DungeonMapScene
             Vector2 pos = Vector2.zero;
             backgroundImage.transform.localPosition = pos;
             
-            _screenTexture = new Texture2D(screenWidth, screenHeight);
+            _screenTexture = new Texture2D(screenWidth, screenHeight, TextureFormat.RGBA32, false);
             _screenTexture.filterMode = FilterMode.Point; // 도트 느낌 살리기
 
             Material mat;
