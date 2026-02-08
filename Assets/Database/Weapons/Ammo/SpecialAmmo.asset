@@ -9,27 +9,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5d70a450204a3f4eb511088e2bcc8ad, type: 3}
-  m_Name: DefaultSword
+  m_Script: {fileID: 11500000, guid: 84edbd8d2af6f4942ae8c84ce29e41b8, type: 3}
+  m_Name: SpecialAmmo
   m_EditorClassIdentifier: 
-  id: sword_000
-  dataName: "\uC7AD\uB098\uC774\uD504"
-  description: "\uAC00\uC7A5 \uBCF4\uD1B5\uC758 \uAC80"
+  id: ammo_001
+  dataName: "\uD2B9\uBCC4\uD0C4"
+  description: "\uAC00\uC7A5 \uBCF4\uD1B5\uC758 \uD0C4"
   icon: {fileID: 0}
-  effectType: 0
+  effectType: 19
   effectValue: 0
   element: 0
-  targetScope: 0
-  useType: 0
+  targetScope: 4
+  useType: 2
   actionDelay: 0
   effectPrefab: {fileID: 0}
-  price: 0
+  price: 100
   isSellable: 1
-  type: 0
-  attackPower: 5
-  hitRateBonus: 5
-  scalingStatName: 
-  damageElement: 0
-  attackRange: 0
-  minHits: 1
-  maxHits: 1
+  damageBonus: 10
+  hitRateBonus: 7
+  statusEffectChance: 0

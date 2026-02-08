@@ -1,0 +1,448 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using Manager;
+using Data;
+using System.Linq;
+
+namespace Controller
+{
+    public enum EquipSlotType { Melee, Gun, Ammo, Head, Body, Hands, Feet, Acc }
+
+    public class EquipUIController : MonoBehaviour
+    {
+        public PlayerMenuController menuController;
+
+        [Header("Slot Buttons")]
+        public EquipSlotUI[] equipSlots; 
+
+        [Header("Item List (Popup)")]
+        public GameObject itemListPanel;      
+        public Transform itemContent;         
+        public ScrollRect itemScrollRect;
+        public GameObject itemSlotPrefab;     
+
+        [Header("Info Windows")]
+        public TextMeshProUGUI itemInfoText;  
+        
+        [Header("Stat Texts")]
+        public TextMeshProUGUI atkText;    
+        public TextMeshProUGUI hitText;    
+        public TextMeshProUGUI gunText;    
+        public TextMeshProUGUI gunHitText; 
+        public TextMeshProUGUI magPowText; 
+        public TextMeshProUGUI magFxText;  
+        public TextMeshProUGUI defText;    
+        public TextMeshProUGUI evaText;    
+
+        private RuntimeCharacterData currentCharacter;
+        private int currentSlotIndex = 0;
+        
+        private bool isSelectingItem = false;
+        private int currentItemIndex = 0;
+        private List<Button> displayedButtons = new List<Button>(); 
+        private List<string> displayedItemIds = new List<string>(); 
+
+        private float inputCooldown = 0f; 
+
+        void OnEnable()
+        {
+            if (PartyManager.Instance.partyData.Count > 0)
+            {
+                currentCharacter = PartyManager.Instance.partyData[0];
+                InitUI();
+            }
+        }
+
+        public void SetCharacter(RuntimeCharacterData character)
+        {
+            currentCharacter = character;
+            InitUI();
+        }
+
+        private void InitUI()
+        {
+            isSelectingItem = false;
+            itemListPanel.SetActive(false);
+            currentSlotIndex = 0;
+            inputCooldown = 0f; // 초기화
+
+            RefreshSlotButtons();
+            UpdateStatDisplay();
+            
+            SelectSlot(0);
+        }
+
+        void Update()
+        {
+            if (inputCooldown > 0)
+            {
+                inputCooldown -= Time.deltaTime;
+                return;
+            }
+
+            if (isSelectingItem)
+                HandleItemListInput();
+            else
+                HandleSlotInput();
+        }
+
+        private void HandleSlotInput()
+        {
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) MoveSlotCursor(-1);
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) MoveSlotCursor(1);
+
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            {
+                OpenItemList(equipSlots[currentSlotIndex].type);
+                inputCooldown = 0.2f;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                menuController.CloseEquipUI(); 
+            }
+        }
+
+        private void MoveSlotCursor(int dir)
+        {
+            currentSlotIndex = (currentSlotIndex + dir + equipSlots.Length) % equipSlots.Length;
+            SelectSlot(currentSlotIndex);
+        }
+
+        private void SelectSlot(int index)
+        {
+            equipSlots[index].button.Select();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            string itemId = GetEquippedId(equipSlots[index].type);
+            UpdateItemInfoText(itemId);
+        }
+
+        private void RefreshSlotButtons()
+        {
+            for (int i = 0; i < equipSlots.Length; i++)
+            {
+                string itemId = GetEquippedId(equipSlots[i].type);
+                string itemName = "Empty";
+                BaseRootData itemData = DatabaseManager.Instance.GetItem(itemId);
+                if (itemData != null) itemName = itemData.dataName;
+                equipSlots[i].UpdateText(itemName);
+            }
+        }
+
+        private string GetEquippedId(EquipSlotType type)
+        {
+            switch (type)
+            {
+                case EquipSlotType.Melee: return currentCharacter.equippedWeaponId;
+                case EquipSlotType.Gun: return currentCharacter.equippedGunId;
+                case EquipSlotType.Ammo: return currentCharacter.equippedAmmoId;
+                case EquipSlotType.Head: return GetArmorIdBySlot(ArmorData.ArmorSlot.Helmet);
+                case EquipSlotType.Body: return GetArmorIdBySlot(ArmorData.ArmorSlot.Body);
+                case EquipSlotType.Hands: return GetArmorIdBySlot(ArmorData.ArmorSlot.Gloves);
+                case EquipSlotType.Feet: return GetArmorIdBySlot(ArmorData.ArmorSlot.Boots);
+                case EquipSlotType.Acc: return GetArmorIdBySlot(ArmorData.ArmorSlot.Accessory);
+                default: return "";
+            }
+        }
+
+        private string GetArmorIdBySlot(ArmorData.ArmorSlot slotType)
+        {
+            foreach (string id in currentCharacter.equippedArmorIds)
+            {
+                ArmorData armor = DatabaseManager.Instance.GetArmor(id);
+                if (armor != null && armor.slot == slotType) return id;
+            }
+            return "";
+        }
+
+        private void UpdateStatDisplay()
+        {
+             // 기본 스탯
+            int str = currentCharacter.stats.str;
+            int vit = currentCharacter.stats.vit;
+            int mag = currentCharacter.stats.mag;
+            int agi = currentCharacter.stats.agi;
+            int luc = currentCharacter.stats.luc;
+
+            WeaponData weapon = DatabaseManager.Instance.GetWeapon(currentCharacter.equippedWeaponId);
+            WeaponData gun = DatabaseManager.Instance.GetWeapon(currentCharacter.equippedGunId);
+            AmmoData ammo = DatabaseManager.Instance.GetAmmo(currentCharacter.equippedAmmoId);
+            List<ArmorData> armors = new List<ArmorData>();
+            foreach(var id in currentCharacter.equippedArmorIds)
+            {
+                var a = DatabaseManager.Instance.GetArmor(id);
+                if(a) armors.Add(a);
+            }
+
+            int atk = str + currentCharacter.stats.level; 
+            if (weapon != null) atk += weapon.attackPower;
+            
+            int hit = 100 + (agi * 2); 
+            if (weapon != null) hit += weapon.hitRateBonus;
+
+            int gunAtk = 0;
+            int gunHit = 0;
+            if (gun != null)
+            {
+                gunAtk = gun.attackPower;
+                if (gun.scalingStatName == "AGI") gunAtk += agi;
+                else gunAtk += luc;
+
+                if (ammo != null) gunAtk += ammo.damageBonus;
+
+                gunHit = 100 + (agi * 2) + gun.hitRateBonus;
+                if (ammo != null) gunHit += ammo.hitRateBonus;
+            }
+
+            int def = vit + (currentCharacter.stats.level / 2);
+            int eva = agi;
+            foreach(var armor in armors)
+            {
+                def += armor.defense;
+                eva += armor.evasionMod;
+            }
+
+            int magPow = mag + (currentCharacter.stats.level); 
+            int magFx = mag; 
+
+            atkText.text = atk.ToString();
+            hitText.text = hit.ToString();
+            gunText.text = gunAtk.ToString();
+            gunHitText.text = gunHit.ToString();
+            magPowText.text = magPow.ToString();
+            magFxText.text = magFx.ToString(); 
+            defText.text = def.ToString();
+            evaText.text = eva.ToString();
+        }
+
+        // =================================================================================
+        // 2. 아이템 리스트 표시
+        // =================================================================================
+
+        private void OpenItemList(EquipSlotType slotType)
+        {
+            isSelectingItem = true;
+            itemListPanel.SetActive(true);
+            
+            foreach (Transform child in itemContent) Destroy(child.gameObject);
+            itemContent.DetachChildren(); 
+            
+            displayedButtons.Clear();
+            displayedItemIds.Clear();
+
+            CreateListItem(slotType, "", "REMOVE", 0);
+
+            List<string> uniqueItemIds = InventoryManager.Instance.GetAllItemIds().Distinct().ToList();
+
+            foreach (string itemId in uniqueItemIds)
+            {
+                if (!IsItemMatchSlot(itemId, slotType)) continue;
+
+                int count = InventoryManager.Instance.GetItemCount(itemId);
+                if (count > 0)
+                {
+                    BaseRootData data = DatabaseManager.Instance.GetItem(itemId);
+                    if (data != null)
+                    {
+                        CreateListItem(slotType, itemId, data.dataName, count);
+                    }
+                }
+            }
+            
+            currentItemIndex = 0;
+            if (displayedButtons.Count > 0)
+            {
+                UpdateItemSelection();
+            }
+        }
+
+        private void CreateListItem(EquipSlotType slotType, string itemId, string text, int count)
+        {
+            GameObject go = Instantiate(itemSlotPrefab, itemContent);
+            var btn = go.GetComponent<Button>();
+            var slotUI = go.GetComponent<SimpleListItemController>();
+
+            slotUI.SetData(text, count);
+
+            btn.onClick.AddListener(() => OnItemClicked(itemId, slotType));
+
+            displayedButtons.Add(btn);
+            displayedItemIds.Add(itemId);
+        }
+
+        private bool IsItemMatchSlot(string itemId, EquipSlotType slotType)
+        {
+             if (string.IsNullOrEmpty(itemId)) return false;
+            
+            WeaponData w = DatabaseManager.Instance.GetWeapon(itemId);
+            if (w != null)
+            {
+                if (slotType == EquipSlotType.Melee && w.type == WeaponType.Melee) return true;
+                if (slotType == EquipSlotType.Gun && w.type == WeaponType.Gun) return true;
+                return false;
+            }
+            AmmoData am = DatabaseManager.Instance.GetAmmo(itemId);
+            if (am != null) return slotType == EquipSlotType.Ammo;
+            
+            ArmorData ar = DatabaseManager.Instance.GetArmor(itemId);
+            if (ar != null)
+            {
+                if (slotType == EquipSlotType.Head && ar.slot == ArmorData.ArmorSlot.Helmet) return true;
+                if (slotType == EquipSlotType.Body && ar.slot == ArmorData.ArmorSlot.Body) return true;
+                if (slotType == EquipSlotType.Hands && ar.slot == ArmorData.ArmorSlot.Gloves) return true;
+                if (slotType == EquipSlotType.Feet && ar.slot == ArmorData.ArmorSlot.Boots) return true;
+                if (slotType == EquipSlotType.Acc && ar.slot == ArmorData.ArmorSlot.Accessory) return true;
+                return false;
+            }
+            return false;
+        }
+
+        // =================================================================================
+        // 3. 아이템 선택 및 장착
+        // =================================================================================
+
+        private void HandleItemListInput()
+        {
+            if (displayedButtons.Count == 0) return;
+
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            {
+                currentItemIndex--;
+                if (currentItemIndex < 0) currentItemIndex = displayedButtons.Count - 1;
+                UpdateItemSelection();
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                currentItemIndex++;
+                if (currentItemIndex >= displayedButtons.Count) currentItemIndex = 0;
+                UpdateItemSelection();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                CloseItemList();
+            }
+
+        }
+
+        private void UpdateItemSelection()
+        {
+            if (displayedButtons.Count == 0) return;
+            displayedButtons[currentItemIndex].Select();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            
+            string itemId = displayedItemIds[currentItemIndex];
+            UpdateItemInfoText(itemId);
+
+            if (itemScrollRect != null)
+                SnapTo(displayedButtons[currentItemIndex].transform as RectTransform);
+        }
+
+        private void SnapTo(RectTransform target)
+        {
+            Canvas.ForceUpdateCanvases();
+            Vector2 targetLocalPosition = target.localPosition;
+            float newY = -targetLocalPosition.y - (itemScrollRect.viewport.rect.height / 2);
+            float maxY = itemContent.GetComponent<RectTransform>().rect.height - itemScrollRect.viewport.rect.height;
+            newY = Mathf.Clamp(newY, 0, maxY > 0 ? maxY : 0);
+            itemContent.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, newY);
+        }
+
+        private void OnItemClicked(string newItemId, EquipSlotType slotType)
+        {
+            // 쿨타임 중이면 무시 (이벤트 시스템 중복 호출 방지용 안전장치)
+            if (inputCooldown > 0) return;
+
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+
+            // 1. 기존 장착 아이템 해제 (인벤토리 복구)
+            string oldItemId = GetEquippedId(slotType);
+            if (!string.IsNullOrEmpty(oldItemId))
+            {
+                InventoryManager.Instance.AddItem(oldItemId, 1);
+                UnequipItemFromMe(slotType, oldItemId);
+            }
+
+            // 2. 새 아이템 장착 (인벤토리 차감)
+            if (!string.IsNullOrEmpty(newItemId))
+            {
+                InventoryManager.Instance.UseItem(newItemId); 
+                EquipItemToMe(slotType, newItemId);
+            }
+
+            CloseItemList();
+            
+            // 리스트 닫은 직후 쿨타임 설정 -> HandleSlotInput에서 다시 열리는 것 방지
+            inputCooldown = 0.2f; 
+            
+            RefreshSlotButtons();
+            UpdateStatDisplay();
+        }
+
+        private void CloseItemList()
+        {
+            isSelectingItem = false;
+            itemListPanel.SetActive(false);
+            
+            // 닫을 때도 쿨타임을 주어 실수로 바로 다시 열거나 다른 조작 방지
+            inputCooldown = 0.2f; 
+            
+            SelectSlot(currentSlotIndex); 
+        }
+
+        private void EquipItemToMe(EquipSlotType type, string id)
+        {
+            switch (type)
+            {
+                case EquipSlotType.Melee: currentCharacter.equippedWeaponId = id; break;
+                case EquipSlotType.Gun: currentCharacter.equippedGunId = id; break;
+                case EquipSlotType.Ammo: currentCharacter.equippedAmmoId = id; break;
+                default: currentCharacter.equippedArmorIds.Add(id); break; 
+            }
+        }
+
+        private void UnequipItemFromMe(EquipSlotType type, string id)
+        {
+            switch (type)
+            {
+                case EquipSlotType.Melee: currentCharacter.equippedWeaponId = ""; break;
+                case EquipSlotType.Gun: currentCharacter.equippedGunId = ""; break;
+                case EquipSlotType.Ammo: currentCharacter.equippedAmmoId = ""; break;
+                default: currentCharacter.equippedArmorIds.Remove(id); break;
+            }
+        }
+
+        private void UpdateItemInfoText(string itemId)
+        {
+            if (string.IsNullOrEmpty(itemId))
+            {
+                itemInfoText.text = "Empty Slot";
+                return;
+            }
+            BaseRootData data = DatabaseManager.Instance.GetItem(itemId);
+            if (data != null)
+            {
+                string stats = "";
+                if(data is WeaponData w) stats = $"ATK: {w.attackPower} HIT: {w.hitRateBonus}";
+                else if(data is ArmorData a) stats = $"DEF: {a.defense} EVA: {a.evasionMod}";
+                else if(data is AmmoData am) stats = $"DMG+: {am.damageBonus}";
+                itemInfoText.text = $"{data.dataName}\n{stats}\n{data.description}";
+            }
+        }
+    }
+
+    [System.Serializable]
+    public class EquipSlotUI
+    {
+        public Button button;
+        public TextMeshProUGUI nameText;
+        public EquipSlotType type;
+
+        public void UpdateText(string text)
+        {
+            if (nameText) nameText.text = text;
+        }
+    }
+}

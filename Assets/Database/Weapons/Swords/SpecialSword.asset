@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5d70a450204a3f4eb511088e2bcc8ad, type: 3}
-  m_Name: DefaultSword
+  m_Name: SpecialSword
   m_EditorClassIdentifier: 
-  id: sword_000
-  dataName: "\uC7AD\uB098\uC774\uD504"
-  description: "\uAC00\uC7A5 \uBCF4\uD1B5\uC758 \uAC80"
+  id: sword_001
+  dataName: "\uB871\uC18C\uB4DC"
+  description: "\uAE34 \uAC80"
   icon: {fileID: 0}
   effectType: 0
   effectValue: 0
   element: 0
   targetScope: 0
-  useType: 0
+  useType: 2
   actionDelay: 0
   effectPrefab: {fileID: 0}
   price: 0
   isSellable: 1
   type: 0
-  attackPower: 5
-  hitRateBonus: 5
+  attackPower: 9
+  hitRateBonus: 4
   scalingStatName: 
   damageElement: 0
   attackRange: 0

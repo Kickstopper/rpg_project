@@ -40,10 +40,15 @@ MonoBehaviour:
     - skl_000
     - skl_001
     - skl_002
-    initialWeaponId: 
-    initialGunId: gun_000
-    initialAmmoId: ammo_000
-    initialArmorIds: []
+    initialWeaponId: sword_001
+    initialGunId: gun_001
+    initialAmmoId: ammo_001
+    initialArmorIds:
+    - head_000
+    - body_000
+    - hands_000
+    - legs_000
+    - acc_000
     maxHp: 60
     maxMp: 60
   - id: chr_01
@@ -70,10 +75,15 @@ MonoBehaviour:
       force: 0
       psyche: 0
     initialSkillIds: []
-    initialWeaponId: sword_000
-    initialGunId: gun_000
-    initialAmmoId: ammo_000
-    initialArmorIds: []
+    initialWeaponId: sword_001
+    initialGunId: gun_001
+    initialAmmoId: ammo_001
+    initialArmorIds:
+    - head_000
+    - legs_000
+    - body_000
+    - hands_000
+    - acc_000
     maxHp: 60
     maxMp: 60
   - id: chr_02

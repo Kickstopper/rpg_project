@@ -6,12 +6,12 @@ namespace Controller
     public class SimpleListItemController : MonoBehaviour
     {
         public TextMeshProUGUI nameText;
-        public TextMeshProUGUI costText;
+        public TextMeshProUGUI valueText;
 
-        public void SetData(string name, int cost)
+        public void SetData(string name, int value)
         {
             nameText.text = name;
-            costText.text = $"{cost}"; 
+            valueText.text = $"{value}"; 
         }
     }
 }

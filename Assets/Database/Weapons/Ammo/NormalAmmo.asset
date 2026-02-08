@@ -16,9 +16,15 @@ MonoBehaviour:
   dataName: "\uD1B5\uC0C1\uD0C4"
   description: "\uAC00\uC7A5 \uBCF4\uD1B5\uC758 \uD0C4"
   icon: {fileID: 0}
+  effectType: 19
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 2
+  actionDelay: 0
+  effectPrefab: {fileID: 0}
   price: 100
   isSellable: 1
-  damageBonus: 1
-  hitRateBonus: 1
-  element: 0
+  damageBonus: 7
+  hitRateBonus: 7
   statusEffectChance: 0

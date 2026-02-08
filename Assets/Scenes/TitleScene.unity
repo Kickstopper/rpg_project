@@ -1222,7 +1222,7 @@ MonoBehaviour:
   m_Content: {fileID: 249169708}
   m_Horizontal: 0
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
@@ -3661,7 +3661,7 @@ MonoBehaviour:
   typeSpeed: 0.01
   lineDelay: 0.1
   cursorChar: _
-  cursorBlinkRate: 0.5
+  cursorBlinkRate: 0.1
   fadeDuration: 1.5
   skipFadeDuration: 0.3
   bootSequence:
@@ -3677,8 +3677,6 @@ MonoBehaviour:
 
       Copyright (C) 1984-95,
       Award Software, Inc.
-
-
 
       PENTIUM-S CPU at 133MHz'
     preDelay: 0
@@ -3705,7 +3703,9 @@ MonoBehaviour:
     memoryEnd: 0
   - text: 'Press DEL to enter SETUP
 
-      08/15/95-i430FX-2A59CF54C-00'
+      08/15/95-i430FX-2A59CF54C-00
+
+'
     preDelay: 0
     isMemoryCheck: 0
     memoryStart: 0
@@ -3717,8 +3717,10 @@ MonoBehaviour:
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: HIMEM is testing extended memory...done.
-    preDelay: 0
+  - text: 'HIMEM is testing extended memory...done.
+
+'
+    preDelay: 1
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
@@ -3742,12 +3744,14 @@ MonoBehaviour:
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: Mouse Driver V8.20 installed.
+  - text: 'Mouse Driver V8.20 installed.
+
+'
     preDelay: 0
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: C:\>_
+  - text: C:\>
     preDelay: 2
     isMemoryCheck: 0
     memoryStart: 0
@@ -3755,7 +3759,7 @@ MonoBehaviour:
   - text: 'C:\>cd GAMES
 
       C:\GAMES>cd MEGATEM'
-    preDelay: 0
+    preDelay: 1
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
@@ -3768,7 +3772,7 @@ MonoBehaviour:
 
       Copyright (c) Rational
       Systems, Inc. 1990-1994'
-    preDelay: 1
+    preDelay: 2
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0

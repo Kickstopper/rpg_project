@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Controller.SimpleListItemController
   nameText: {fileID: 980361744341035279}
-  costText: {fileID: 445272908256512286}
+  valueText: {fileID: 445272908256512286}
 --- !u!1 &5430962088907935339
 GameObject:
   m_ObjectHideFlags: 0

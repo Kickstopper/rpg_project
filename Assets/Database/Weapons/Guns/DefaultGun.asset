@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: DefaultGun
   m_EditorClassIdentifier: 
   id: gun_000
-  dataName: 
+  dataName: "\uB9AC\uBCFC\uBC84"
   description: "\uAC00\uC7A5 \uBCF4\uD1B5\uC758 \uCD1D"
   icon: {fileID: 0}
   effectType: 19
   effectValue: 0
   element: 0
   targetScope: 1
+  useType: 2
+  actionDelay: 0
   effectPrefab: {fileID: 0}
   price: 0
   isSellable: 1

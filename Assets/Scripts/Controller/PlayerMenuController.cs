@@ -22,6 +22,7 @@ namespace Controller
         public GameObject moveUI;
         public GameObject skillUI;
         public GameObject itemUI;
+        public GameObject equipUI;
         
         [Header("Background")]
         public SimpleGradient background;
@@ -278,10 +279,20 @@ namespace Controller
         
         public void OnClick_Equip()
         {
-            // currentState = MenuState.Equip;
-            // UpdatePopupMessage();
-            // ResetInputTimer();
-            Debug.Log("EQUIP 미구현");
+            currentState = MenuState.Equip;
+            equipUI.SetActive(true);
+            UpdatePopupMessage();
+            ResetInputTimer();
+        }
+
+        public void CloseEquipUI()
+        {
+            equipUI.SetActive(false);
+            currentState = MenuState.Main;
+            ResetInputTimer();
+            UpdateSelection(currentBtnIndex); // 마지막으로 선택했던 메인 메뉴 버튼에 다시 포커스
+            
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
         }
         
         public void OnClick_Move()
