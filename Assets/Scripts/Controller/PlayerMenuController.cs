@@ -1,16 +1,17 @@
 using System.Collections.Generic;
+using Data;
 using DG.Tweening;
 using Manager;
 using TMPro;
 using UI;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 namespace Controller
 {
     public class PlayerMenuController : MonoBehaviour
     {
-        private enum MenuState { Main, Status, Skill, Item, Move, Equip, Memory, System, Suspend}
-
+        private enum MenuState { Main, Status, Skill, Item, Move, Equip, Memory, System, Suspend, SelectEquipChar }
         private MenuState currentState;
         public List<Button> allMenuBtns;
         private int currentBtnIndex;
@@ -23,6 +24,7 @@ namespace Controller
         public GameObject skillUI;
         public GameObject itemUI;
         public GameObject equipUI;
+        public GameObject playerPrefab;
         
         [Header("Background")]
         public SimpleGradient background;
@@ -38,6 +40,12 @@ namespace Controller
         [Header("Input Settings")]
         [SerializeField] private float inputDelay = 0.15f; // 입력 간 지연 시간
         private float lastInputTime; // 마지막으로 입력이 처리된 시간
+
+        [Header("Party Visuals")]
+        public Transform[] partySlots; // 6개의 슬롯 (0~5)
+        private PlayerController[] spawnedControllers = new PlayerController[6];
+        private int currentPartySelectIndex = 0;
+        public Color charHighlightColor = Color.yellow; // 선택 시 하이라이트 색상
 
         // 입력을 처리할 수 있는 상태인지 확인하는 프로퍼티
         public bool CanProcessInput => Time.time >= lastInputTime + inputDelay;
@@ -64,19 +72,19 @@ namespace Controller
         {
             if (newState == GameState.PlayerMenu)
             {
-                // 배경 화면 애니메이션 시작
                 StartTween();
-
                 isMenuOpen = true;
                 currentState = MenuState.Main;
                 currentBtnIndex = 0;
-                UpdateSelection(currentBtnIndex, false); // 최초에는 무음으로 첫 번째 버튼에 포커스
+                
+                // 메뉴 진입 시 파티 슬롯 갱신
+                RefreshPartyFormation();
+
+                UpdateSelection(currentBtnIndex, false); 
             }
             else
             {
-                // 배경 화면 애니메이션 멈춤
                 StopTween();
-
                 isMenuOpen = false;
             }
         }
@@ -98,11 +106,18 @@ namespace Controller
         void Update()
         {
             if (!isMenuOpen) return;
-            if (!CanProcessInput) return; // 쿨타임 중이면 모든 입력 무시
+            if (!CanProcessInput) return; 
 
             if (isPopupOpen) 
             {
                 HandlePopupNavigation();
+                return;
+            }
+
+            // 캐릭터 선택 상태일 때의 조작 처리
+            if (currentState == MenuState.SelectEquipChar)
+            {
+                HandleCharacterSelection();
                 return;
             }
 
@@ -118,13 +133,13 @@ namespace Controller
                 if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) 
                 {
                     popupYesBtn.Select();
-                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                     ResetInputTimer(); 
                 }
                 else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) 
                 {
                     popupNoBtn.Select();
-                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                     ResetInputTimer();
                 }
             }
@@ -164,10 +179,9 @@ namespace Controller
 
         void HandleMenuNavigation(ref int currentBtnIndex)
         {
-            if (currentState != MenuState.Main)
-            {
-                return;
-            } 
+            if (currentState != MenuState.Main) return;
+            
+            // ... (기존 메인 메뉴 조작 로직 동일) ...
             if (allMenuBtns == null || allMenuBtns.Count == 0) return;
             bool changed = false;
 
@@ -186,32 +200,150 @@ namespace Controller
             {
                 UpdateSelection(currentBtnIndex);
                 ResetInputTimer();
-                return; // 이동 시에는 여기서 종료
+                return; 
             }
 
-            // 메뉴 확인 키
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 if (allMenuBtns[currentBtnIndex].interactable)
                 {
-                    ResetInputTimer(); // 버튼 실행 직전 타이머 리셋
+                    ResetInputTimer(); 
                     allMenuBtns[currentBtnIndex].onClick.Invoke();
                 }
             }
             
-            // 메뉴 취소 키 (나가기)
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
             {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
+        }
+
+        // 파티 슬롯 갱신 (MoveUI 로직 차용)
+        private void RefreshPartyFormation()
+        {
+            var party = PartyManager.Instance.partyData;
+            RuntimeCharacterData[] slotAssignments = new RuntimeCharacterData[6];
+            List<RuntimeCharacterData> pending = new List<RuntimeCharacterData>();
+
+            // 1. 위치 충돌 해결 및 배치 계산
+            foreach (var member in party)
+            {
+                int idx = GetIndexFromRowColumn(member.row, member.column);
+                if (slotAssignments[idx] == null) slotAssignments[idx] = member;
+                else pending.Add(member);
+            }
+
+            foreach (var member in pending)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    if (slotAssignments[i] == null)
+                    {
+                        slotAssignments[i] = member;
+                        break;
+                    }
+                }
+            }
+
+            // 2. 프리팹 생성 및 초기화
+            for (int i = 0; i < 6; i++)
+            {
+                if (partySlots.Length <= i) break;
+
+                // 기존 오브젝트 제거
+                foreach (Transform child in partySlots[i]) Destroy(child.gameObject);
+                spawnedControllers[i] = null;
+
+                if (slotAssignments[i] != null)
+                {
+                    GameObject go = Instantiate(playerPrefab, partySlots[i]);
+                    go.transform.localPosition = Vector3.zero;
+                    
+                    PlayerController pc = go.GetComponent<PlayerController>();
+                    // 메뉴 화면용 초기화 (CombatController는 null)
+                    pc.Initialize(slotAssignments[i], null);
+                    
+                    // 파티 슬롯의 캐릭터 버튼은 클릭되지 않도록 설정 (직접 조작하므로)
+                    if(pc.selectButton) pc.selectButton.interactable = false;
+
+                    spawnedControllers[i] = pc;
+                }
+            }
+        }
+
+        private int GetIndexFromRowColumn(RowType row, ColumnType col)
+        {
+            int rowIndex = (row == RowType.Front) ? 0 : 3;
+            return rowIndex + (int)col;
+        }
+
+        // 캐릭터 선택 조작 (방향키)
+        private void HandleCharacterSelection()
+        {
+            bool moved = false;
+
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { if (currentPartySelectIndex % 3 > 0) { currentPartySelectIndex--; moved = true; } }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { if (currentPartySelectIndex % 3 < 2) { currentPartySelectIndex++; moved = true; } }
+            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) { if (currentPartySelectIndex >= 3) { currentPartySelectIndex -= 3; moved = true; } }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) { if (currentPartySelectIndex < 3) { currentPartySelectIndex += 3; moved = true; } }
+
+            if (moved)
+            {
+                UpdatePartyHighlight();
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ResetInputTimer();
+            }
+
+            // 확인 키: 해당 캐릭터로 장비창 열기
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            {
+                if (spawnedControllers[currentPartySelectIndex] != null)
+                {
+                    OpenEquipUI(spawnedControllers[currentPartySelectIndex].sourceData);
+                }
+                else
+                {
+                    // 빈 슬롯 선택 시 에러음
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                }
+            }
+
+            // 취소 키: 메인 메뉴로 복귀
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                CancelCharacterSelection();
+            }
+        }
+
+        private void UpdatePartyHighlight()
+        {
+            // 모든 하이라이트 끄기
+            for(int i=0; i<6; i++) 
+                if(spawnedControllers[i] != null) spawnedControllers[i].ResetHighlightColor();
+
+            // 현재 선택된 캐릭터 하이라이트
+            if(spawnedControllers[currentPartySelectIndex] != null)
+                spawnedControllers[currentPartySelectIndex].SetHighlightColor(charHighlightColor);
+        }
+
+        private void CancelCharacterSelection()
+        {
+            // 하이라이트 초기화
+            for(int i=0; i<6; i++) 
+                if(spawnedControllers[i] != null) spawnedControllers[i].ResetHighlightColor();
+
+            currentState = MenuState.Main;
+            ResetInputTimer();
+            UpdateSelection(currentBtnIndex); // EQUIP 버튼 재선택
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
 
         void UpdateSelection(int index, bool sound = true)
         {
             if (allMenuBtns == null || allMenuBtns.Count == 0 || index < 0 || index >= allMenuBtns.Count) return;
             allMenuBtns[index].Select();
-            if (sound) SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+            if (sound) SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
         }
 
         public void OnClick_Skill()
@@ -219,7 +351,7 @@ namespace Controller
             currentState = MenuState.Skill;
             skillUI.SetActive(true);
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
         }
 
         public void CloseSkillUI()
@@ -228,7 +360,7 @@ namespace Controller
             currentState = MenuState.Main;
             ResetInputTimer();
             UpdateSelection(currentBtnIndex);
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
 
         public void OnClick_Memory()
@@ -255,7 +387,7 @@ namespace Controller
             ResetInputTimer();
             UpdateSelection(currentBtnIndex); // 마지막으로 선택했던 메인 메뉴 버튼에 다시 포커스
             
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
 
         public void OnClick_Status()
@@ -274,25 +406,60 @@ namespace Controller
             ResetInputTimer();
             UpdateSelection(currentBtnIndex); // 마지막으로 선택했던 메인 메뉴 버튼에 다시 포커스
             
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
         
         public void OnClick_Equip()
         {
-            currentState = MenuState.Equip;
-            equipUI.SetActive(true);
-            UpdatePopupMessage();
+            // 바로 UI를 열지 않고, 캐릭터 선택 모드로 진입
+            currentState = MenuState.SelectEquipChar;
+            
+            // 첫 번째 유효한 캐릭터를 찾아 포커스
+            currentPartySelectIndex = 0;
+            for(int i=0; i<6; i++) {
+                if(spawnedControllers[i] != null) { currentPartySelectIndex = i; break; }
+            }
+
+            UpdatePartyHighlight();
+            
+            // 버튼 포커스 시각적 해제 (캐릭터 포커스와 겹치지 않게)
+            EventSystem.current.SetSelectedGameObject(null);
+            
             ResetInputTimer();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
         }
 
+        // 실제 장비창 열기
+        private void OpenEquipUI(RuntimeCharacterData charData)
+        {
+            currentState = MenuState.Equip;
+            equipUI.SetActive(true);
+            
+            // EquipUIController에 선택된 캐릭터 전달
+            EquipUIController equipController = equipUI.GetComponentInChildren<EquipUIController>();
+            if(equipController != null)
+            {
+                equipController.SetCharacter(charData);
+            }
+
+            UpdatePopupMessage();
+            ResetInputTimer();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+        }
+
+        // 장비창 닫기 -> 캐릭터 선택 화면으로 복귀
         public void CloseEquipUI()
         {
             equipUI.SetActive(false);
-            currentState = MenuState.Main;
-            ResetInputTimer();
-            UpdateSelection(currentBtnIndex); // 마지막으로 선택했던 메인 메뉴 버튼에 다시 포커스
             
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+            // 메인 메뉴가 아닌 캐릭터 선택 상태로 복귀
+            currentState = MenuState.SelectEquipChar;
+            
+            // 하이라이트 복구
+            UpdatePartyHighlight();
+            
+            ResetInputTimer();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
         
         public void OnClick_Move()
@@ -300,12 +467,16 @@ namespace Controller
             currentState = MenuState.Move;
             moveUI.SetActive(true);
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
         }
 
         public void CloseMoveUI()
         {
             moveUI.SetActive(false);
+            
+            // 변경된 위치 데이터를 다시 읽어와 파티 슬롯을 새로고침
+            RefreshPartyFormation();
+
             currentState = MenuState.Main;
             ResetInputTimer();
             UpdateSelection(currentBtnIndex);
@@ -330,7 +501,7 @@ namespace Controller
                 isPopupOpen = true;
                 popupNoBtn.Select();
                 ResetInputTimer();
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             }
         }
 
@@ -405,7 +576,7 @@ namespace Controller
             isPopupOpen = true;
             isAlertMode = true;
 
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
 
             ResetInputTimer();
         }

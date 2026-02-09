@@ -12,8 +12,11 @@ namespace Controller
 
     public class EquipUIController : MonoBehaviour
     {
+        [Header("Main Menu UI Controller")]
         public PlayerMenuController menuController;
-
+        
+        [Header("Name Texts")]
+        public TextMeshProUGUI nameText;
         [Header("Slot Buttons")]
         public EquipSlotUI[] equipSlots; 
 
@@ -46,27 +49,21 @@ namespace Controller
 
         private float inputCooldown = 0f; 
 
-        void OnEnable()
-        {
-            if (PartyManager.Instance.partyData.Count > 0)
-            {
-                currentCharacter = PartyManager.Instance.partyData[0];
-                InitUI();
-            }
-        }
-
         public void SetCharacter(RuntimeCharacterData character)
         {
+            Debug.Log(character.characterId);
             currentCharacter = character;
+            
             InitUI();
         }
 
         private void InitUI()
         {
+            nameText.text = currentCharacter.name;
             isSelectingItem = false;
             itemListPanel.SetActive(false);
             currentSlotIndex = 0;
-            inputCooldown = 0f; // 초기화
+            inputCooldown = 0f;
 
             RefreshSlotButtons();
             UpdateStatDisplay();
