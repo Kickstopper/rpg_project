@@ -70,6 +70,7 @@ namespace Controller
             if (PartyManager.Instance != null)
             {
                 partyMembers = PartyManager.Instance.partyData;
+                
                 if (currentIndex >= partyMembers.Count) currentIndex = 0;
                 RefreshUI();
             }

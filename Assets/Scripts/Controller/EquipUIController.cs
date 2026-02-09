@@ -47,17 +47,30 @@ namespace Controller
         private List<Button> displayedButtons = new List<Button>(); 
         private List<string> displayedItemIds = new List<string>(); 
 
-        private float inputCooldown = 0f; 
+        private List<RuntimeCharacterData> partyMembers;
+        private int currentIndex = 0;
+
+        private float inputCooldown = 0f;
+        
+        
 
         public void SetCharacter(RuntimeCharacterData character)
         {
-            Debug.Log(character.characterId);
-            currentCharacter = character;
+            if (PartyManager.Instance == null) return;
+            partyMembers = PartyManager.Instance.partyData;
+
+            // 전달받은 캐릭터가 파티 리스트의 몇 번째 인덱스인지 찾음
+            int foundIndex = partyMembers.IndexOf(character);
             
-            InitUI();
+            if (foundIndex != -1)
+            {
+                currentIndex = foundIndex;
+                currentCharacter = character;
+                RefreshUI();
+            }
         }
 
-        private void InitUI()
+        private void RefreshUI()
         {
             nameText.text = currentCharacter.name;
             isSelectingItem = false;
@@ -85,8 +98,35 @@ namespace Controller
                 HandleSlotInput();
         }
 
+        private void ChangeCharacter(int direction)
+        {
+            if (partyMembers == null || partyMembers.Count == 0) return;
+
+            currentIndex += direction;
+
+            // 리스트 순환 (Loop)
+            if (currentIndex < 0) currentIndex = partyMembers.Count - 1;
+            else if (currentIndex >= partyMembers.Count) currentIndex = 0;
+
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+
+            SetCharacter(partyMembers[currentIndex]);
+        }
+
         private void HandleSlotInput()
         {
+            if (!isSelectingItem)
+            {
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    ChangeCharacter(-1);
+                }
+                else if (Input.GetKeyDown(KeyCode.E))
+                {
+                    ChangeCharacter(1);
+                }
+            }
+
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) MoveSlotCursor(-1);
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) MoveSlotCursor(1);
 

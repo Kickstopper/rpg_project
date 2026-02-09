@@ -178,19 +178,52 @@ namespace Controller
         void HandleMenuNavigation(ref int currentBtnIndex)
         {
             if (currentState != MenuState.Main) return;
-            
-            // ... (기존 메인 메뉴 조작 로직 동일) ...
             if (allMenuBtns == null || allMenuBtns.Count == 0) return;
-            bool changed = false;
 
+            bool changed = false;
+            int columnCount = 5; // 5열 설정
+            int totalCount = allMenuBtns.Count;
+
+            // [상/하 이동] 행 단위 이동 (인덱스 +/- 5)
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
-                currentBtnIndex = (currentBtnIndex - 1 + allMenuBtns.Count) % allMenuBtns.Count;
+                // 위로 갈 공간이 있으면 이동
+                if (currentBtnIndex - columnCount >= 0)
+                {
+                    currentBtnIndex -= columnCount;
+                }
+                else
+                {
+                    // 맨 위라면 같은 열의 맨 아래 유효한 버튼으로 이동 (순환)
+                    int bottomIndex = currentBtnIndex + columnCount;
+                    if (bottomIndex < totalCount) currentBtnIndex = bottomIndex;
+                }
                 changed = true;
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
-                currentBtnIndex = (currentBtnIndex + 1) % allMenuBtns.Count;
+                // 아래로 갈 공간이 있으면 이동
+                if (currentBtnIndex + columnCount < totalCount)
+                {
+                    currentBtnIndex += columnCount;
+                }
+                else
+                {
+                    // 맨 아래라면 같은 열의 맨 위로 이동 (순환)
+                    currentBtnIndex = currentBtnIndex % columnCount;
+                }
+                changed = true;
+            }
+
+            // [좌/우 이동] 아이템 단위 이동 (인덱스 +/- 1)
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+            {
+                currentBtnIndex = (currentBtnIndex - 1 + totalCount) % totalCount;
+                changed = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            {
+                currentBtnIndex = (currentBtnIndex + 1) % totalCount;
                 changed = true;
             }
 
@@ -201,6 +234,7 @@ namespace Controller
                 return; 
             }
 
+            // 확인 키 (기존 로직 유지)
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 if (allMenuBtns[currentBtnIndex].interactable)
@@ -210,9 +244,10 @@ namespace Controller
                 }
             }
             
+            // 취소 키 (기존 로직 유지)
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
         }
@@ -369,12 +404,28 @@ namespace Controller
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
 
+        public void OnClick_Spirit()
+        {
+            // currentState = MenuState.Spirit;
+            // UpdatePopupMessage();
+            // ResetInputTimer();
+            Debug.Log("SPIRIT 미구현");
+        }
+
         public void OnClick_Memory()
         {
             // currentState = MenuState.Memory;
             // UpdatePopupMessage();
             // ResetInputTimer();
             Debug.Log("MEMORY 미구현");
+        }
+
+        public void OnClick_Tactics()
+        {
+            // currentState = MenuState.Tactics;
+            // UpdatePopupMessage();
+            // ResetInputTimer();
+            Debug.Log("TACTICS 미구현");
         }
 
         public void OnClick_Item()
@@ -522,9 +573,9 @@ namespace Controller
 
         public void OnClick_System()
         {
-            currentState = MenuState.System;
-            UpdatePopupMessage();
-            ResetInputTimer();
+            // currentState = MenuState.System;
+            // UpdatePopupMessage();
+            // ResetInputTimer();
             Debug.Log("SYSTEM 미구현");
         }
         
