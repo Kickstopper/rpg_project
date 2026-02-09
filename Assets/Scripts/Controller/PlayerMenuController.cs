@@ -11,8 +11,7 @@ namespace Controller
 {
     public class PlayerMenuController : MonoBehaviour
     {
-        private enum MenuState { Main, Status, Skill, Item, Move, Equip, Memory, System, Suspend, SelectEquipChar }
-        private MenuState currentState;
+        private enum MenuState { Main, Status, Skill, Item, Move, Equip, Memory, System, Suspend, SelectEquipChar, SelectStatusChar }        private MenuState currentState;
         public List<Button> allMenuBtns;
         private int currentBtnIndex;
 
@@ -114,8 +113,7 @@ namespace Controller
                 return;
             }
 
-            // 캐릭터 선택 상태일 때의 조작 처리
-            if (currentState == MenuState.SelectEquipChar)
+            if (currentState == MenuState.SelectEquipChar || currentState == MenuState.SelectStatusChar)
             {
                 HandleCharacterSelection();
                 return;
@@ -281,8 +279,8 @@ namespace Controller
         // 캐릭터 선택 조작 (방향키)
         private void HandleCharacterSelection()
         {
+            // ... (방향키 이동 및 하이라이트 로직은 기존과 동일) ...
             bool moved = false;
-
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { if (currentPartySelectIndex % 3 > 0) { currentPartySelectIndex--; moved = true; } }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { if (currentPartySelectIndex % 3 < 2) { currentPartySelectIndex++; moved = true; } }
             else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) { if (currentPartySelectIndex >= 3) { currentPartySelectIndex -= 3; moved = true; } }
@@ -291,21 +289,29 @@ namespace Controller
             if (moved)
             {
                 UpdatePartyHighlight();
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
                 ResetInputTimer();
             }
 
-            // 확인 키: 해당 캐릭터로 장비창 열기
+            // [핵심 수정] 확인 키 입력 시 상태에 따른 분기
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 if (spawnedControllers[currentPartySelectIndex] != null)
                 {
-                    OpenEquipUI(spawnedControllers[currentPartySelectIndex].sourceData);
+                    var targetChar = spawnedControllers[currentPartySelectIndex].sourceData;
+
+                    if (currentState == MenuState.SelectEquipChar)
+                    {
+                        OpenEquipUI(targetChar);
+                    }
+                    else if (currentState == MenuState.SelectStatusChar)
+                    {
+                        OpenStatusUI(targetChar);
+                    }
                 }
                 else
                 {
-                    // 빈 슬롯 선택 시 에러음
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
                 }
             }
 
@@ -392,21 +398,52 @@ namespace Controller
 
         public void OnClick_Status()
         {
-            currentState = MenuState.Status;
-            statusUI.SetActive(true);
-            UpdatePopupMessage();
+            currentState = MenuState.SelectStatusChar;
+            
+            // 첫 번째 유효한 캐릭터를 찾아 포커스 (Equip과 동일 로직)
+            currentPartySelectIndex = 0;
+            for(int i=0; i<6; i++) {
+                if(spawnedControllers[i] != null) { currentPartySelectIndex = i; break; }
+            }
+
+            UpdatePartyHighlight();
+            EventSystem.current.SetSelectedGameObject(null);
+            
             ResetInputTimer();
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
         }
 
+        // 실제 StatusUI 열기
+        private void OpenStatusUI(RuntimeCharacterData charData)
+        {
+            currentState = MenuState.Status;
+            statusUI.SetActive(true);
+
+            // StatusUIController에 선택된 캐릭터 전달
+            StatusUIController statusController = statusUI.GetComponentInChildren<StatusUIController>();
+            if (statusController != null)
+            {
+                statusController.SetTargetCharacter(charData);
+            }
+
+            UpdatePopupMessage();
+            ResetInputTimer();
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+        }
+
+        // 닫을 때 캐릭터 선택 화면으로 복귀
         public void CloseStatusUI()
         {
             statusUI.SetActive(false);
             
-            currentState = MenuState.Main;
-            ResetInputTimer();
-            UpdateSelection(currentBtnIndex); // 마지막으로 선택했던 메인 메뉴 버튼에 다시 포커스
+            // 메인 메뉴가 아닌 캐릭터 선택 상태로 복귀
+            currentState = MenuState.SelectStatusChar;
             
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            // 하이라이트 복구
+            UpdatePartyHighlight();
+            
+            ResetInputTimer();
+            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
         }
         
         public void OnClick_Equip()

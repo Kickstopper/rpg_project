@@ -67,11 +67,10 @@ namespace Controller
 
         void OnEnable()
         {
-            // 메뉴가 열릴 때 데이터 로드
             if (PartyManager.Instance != null)
             {
                 partyMembers = PartyManager.Instance.partyData;
-                currentIndex = 0; // 항상 첫 번째 멤버부터
+                if (currentIndex >= partyMembers.Count) currentIndex = 0;
                 RefreshUI();
             }
         }
@@ -80,6 +79,21 @@ namespace Controller
         {
             if (spiritStatusUI.activeSelf) return;
             HandleInput();
+        }
+
+        public void SetTargetCharacter(RuntimeCharacterData targetChar)
+        {
+            if (PartyManager.Instance == null) return;
+            partyMembers = PartyManager.Instance.partyData;
+
+            // 전달받은 캐릭터가 파티 리스트의 몇 번째 인덱스인지 찾음
+            int foundIndex = partyMembers.IndexOf(targetChar);
+            
+            if (foundIndex != -1)
+            {
+                currentIndex = foundIndex;
+                RefreshUI();
+            }
         }
 
         private void HandleInput()

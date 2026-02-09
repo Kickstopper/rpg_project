@@ -73,6 +73,8 @@ namespace Controller
 
         public bool IsEmpty { get; private set; } = false;
 
+        private float animDuration;
+
         void Start()
         {
             if (selectButton != null)
@@ -114,9 +116,10 @@ namespace Controller
 
         
         // RuntimeData를 받는 초기화 함수
-        public void Initialize(RuntimeCharacterData runtimeData, CombatController controller)
+        public void Initialize(RuntimeCharacterData runtimeData, CombatController controller, float animDuration = 0.3f)
         {
             this.controller = controller;
+            this.animDuration = animDuration;
 
             if (runtimeData == null)
             {
@@ -481,9 +484,9 @@ namespace Controller
                     hpSlider.gameObject.SetActive(true);
                     hpSlider.maxValue = maxHp;
 
-                    // 즉시 변경 대신 DOValue 사용 (0.5초 동안 부드럽게 변경)
+                    // 즉시 변경 대신 DOValue 사용
                     hpSlider.DOKill(); // 기존 애니메이션이 있다면 취소하여 겹침 방지
-                    hpSlider.DOValue(currentHp, 0.5f).SetEase(Ease.OutCubic);
+                    hpSlider.DOValue(currentHp, animDuration).SetEase(Ease.OutCubic);
                 }
 
                 if (mpSlider)
@@ -493,7 +496,7 @@ namespace Controller
 
                     // MP도 동일하게 적용
                     mpSlider.DOKill();
-                    mpSlider.DOValue(currentMp, 0.5f).SetEase(Ease.OutCubic);
+                    mpSlider.DOValue(currentMp, animDuration).SetEase(Ease.OutCubic);
                 }
             }
         }

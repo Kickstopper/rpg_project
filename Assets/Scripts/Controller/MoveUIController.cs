@@ -82,7 +82,7 @@ namespace Controller
                     var member = currentSlotData[i];
                     
                     if (member == null) pc.InitializeEmpty(i);
-                    else pc.Initialize(member, null);
+                    else pc.Initialize(member, null, 0);
 
                     spawnedControllers[i] = pc;
                 }
