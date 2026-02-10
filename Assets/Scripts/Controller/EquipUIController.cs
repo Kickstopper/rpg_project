@@ -161,7 +161,7 @@ namespace Controller
             for (int i = 0; i < equipSlots.Length; i++)
             {
                 string itemId = GetEquippedId(equipSlots[i].type);
-                string itemName = "Empty";
+                string itemName = "EMPTY";
                 BaseRootData itemData = DatabaseManager.Instance.GetItem(itemId);
                 if (itemData != null) itemName = itemData.dataName;
                 equipSlots[i].UpdateText(itemName);
@@ -455,7 +455,7 @@ namespace Controller
         {
             if (string.IsNullOrEmpty(itemId))
             {
-                itemInfoText.text = "Empty Slot";
+                itemInfoText.text = "EMPTY";
                 return;
             }
             BaseRootData data = DatabaseManager.Instance.GetItem(itemId);

@@ -71,7 +71,7 @@ namespace Controller
         {
             if (newState == GameState.PlayerMenu)
             {
-                StartTween();
+                //StartTween();
                 isMenuOpen = true;
                 currentState = MenuState.Main;
                 currentBtnIndex = 0;
@@ -83,7 +83,7 @@ namespace Controller
             }
             else
             {
-                StopTween();
+                //StopTween();
                 isMenuOpen = false;
             }
         }

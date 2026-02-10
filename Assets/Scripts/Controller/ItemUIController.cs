@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Manager;
 using Data;
-using System.Linq;
 using TMPro;
 
 namespace Controller
@@ -26,12 +25,12 @@ namespace Controller
 
         [Header("Highlight Colors")]
         public Color targetHighlightColor = Color.yellow; 
-        public Color disabledTextColor = Color.gray;   // 사용 불가 아이템 텍스트 색상
-        public Color enabledTextColor = Color.white;   // 사용 가능 아이템 텍스트 색상
+        public Color disabledTextColor = Color.gray;   
+        public Color enabledTextColor = Color.white;   
 
         private List<string> inventoryItemIds;
         private int currentItemIndex = 0;
-        private int currentPartyIndex = 0;
+        private int currentPartyIndex = 0; // 타겟 커서 인덱스
 
         private bool isSelectingTarget = false; 
         private ConsumableItemData selectedItemData;
@@ -98,17 +97,13 @@ namespace Controller
             itemContent.DetachChildren(); 
 
             inventoryItemIds = InventoryManager.Instance.GetAllItemIds();
-
-            // UseType 순으로 정렬 (All -> Exploration -> Battle -> Passive 순)
             inventoryItemIds.Sort((idA, idB) => 
             {
                 var itemA = DatabaseManager.Instance.GetConsumable(idA);
                 var itemB = DatabaseManager.Instance.GetConsumable(idB);
-                
                 if (itemA == null && itemB == null) return 0;
                 if (itemA == null) return 1;
                 if (itemB == null) return -1;
-                
                 return itemA.useType.CompareTo(itemB.useType);
             });
             
@@ -122,29 +117,14 @@ namespace Controller
                 {
                     int count = InventoryManager.Instance.GetItemCount(itemData.id);
                     slot.SetData(itemData.dataName, count);
-
-                    // 사용 가능 여부에 따른 Grayout 처리
-                    // Exploration 환경에서 사용 가능한 타입: All, Exploration
                     bool isUsable = (itemData.useType == UseType.All || itemData.useType == UseType.Exploration);
-                    
-                    // Button btn = go.GetComponent<Button>();
-                    // if (btn != null)
-                    // {
-                    //     btn.interactable = isUsable; // 버튼 상호작용 비활성화
-                    // }
-
-                    // 텍스트 색상 직접 변경
                     var texts = go.GetComponentsInChildren<TextMeshProUGUI>();
-                    foreach(var t in texts)
-                    {
-                        t.color = isUsable ? enabledTextColor : disabledTextColor;
-                    }
+                    foreach(var t in texts) t.color = isUsable ? enabledTextColor : disabledTextColor;
                 }
             }
 
             if (inventoryItemIds.Count > 0) 
             {
-                // 삭제 후 인덱스 보정
                 if (currentItemIndex >= inventoryItemIds.Count) currentItemIndex = inventoryItemIds.Count - 1;
                 UpdateItemSelection();
             }
@@ -175,7 +155,7 @@ namespace Controller
 
             if (menuController.IsPopupOpen) 
             {
-                wasPopupOpen = true; // 팝업이 열려있음을 기록
+                wasPopupOpen = true; 
                 return;
             }
 
@@ -247,20 +227,19 @@ namespace Controller
 
             if (selectedItemData == null) return;
 
-            // 1. 사용 불가 아이템(Battle, Passive) 체크
+            // 1. 사용 불가 아이템 체크
             if (selectedItemData.useType != UseType.All && selectedItemData.useType != UseType.Exploration)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 return;
             }
 
-            // 2. 부활 아이템 사용 조건 체크 (죽은 동료가 있는가?)
+            // 2. 부활 아이템 사용 조건 체크
             if (selectedItemData.effectType == EffectType.Revive_Empty || selectedItemData.effectType == EffectType.Revive_Fully)
             {
                 bool hasDeadMember = false;
                 foreach (var pc in partyControllers)
                 {
-                    // 빈 슬롯이 아니고, HP가 0 이하인 멤버가 하나라도 있는지 확인
                     if (!pc.IsEmpty && pc.currentHp <= 0)
                     {
                         hasDeadMember = true;
@@ -270,13 +249,11 @@ namespace Controller
 
                 if (!hasDeadMember)
                 {
-                    // 죽은 동료가 없으면 알림 팝업 호출 후 리턴
                     menuController.ShowAlertPopup("죽은 동료가 없습니다.");
                     return;
                 }
             }
 
-            // 조건 통과 시 타겟 선택 모드로 진입
             isSelectingTarget = true;
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             ApplyTargetHighlight();
@@ -284,50 +261,108 @@ namespace Controller
 
         private void ApplyTargetHighlight()
         {
+            // 초기 진입 시 커서 위치 설정 및 하이라이트
             foreach (var pc in partyControllers) pc.ResetHighlightColor();
 
             TargetScope scope = selectedItemData.targetScope;
 
-            switch (scope)
+            // 전체 대상은 모두 하이라이트
+            if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies)
             {
-                case TargetScope.One_Ally:
-                    currentPartyIndex = GetFirstValidMemberIndex();
-                    if(currentPartyIndex != -1) partyControllers[currentPartyIndex].SetHighlightColor(targetHighlightColor);
-                    break;
-                case TargetScope.All_Allies:
-                    foreach (var pc in partyControllers) if (!pc.IsEmpty) pc.SetHighlightColor(targetHighlightColor);
-                    break;
-                case TargetScope.Dead_Ally:
-                    currentPartyIndex = GetFirstDeadMemberIndex();
-                    if (currentPartyIndex != -1) partyControllers[currentPartyIndex].SetHighlightColor(targetHighlightColor);
-                    break;
-                case TargetScope.All_Dead_Allies: 
-                    foreach (var pc in partyControllers) if (!pc.IsEmpty && pc.currentHp <= 0) pc.SetHighlightColor(targetHighlightColor);
-                    break;
-                case TargetScope.Self:
-                    foreach (var pc in partyControllers) if (!pc.IsEmpty && pc.sourceData.isCommander) pc.SetHighlightColor(targetHighlightColor);
-                    break;
+                foreach (var pc in partyControllers) 
+                {
+                    if (pc.IsEmpty) continue;
+                    
+                    // 죽은 자 전체 대상
+                    if (scope == TargetScope.All_Dead_Allies && pc.currentHp > 0) continue;
+                    
+                    pc.SetHighlightColor(targetHighlightColor);
+                }
+                return;
             }
+
+            // 단일 대상 (초기 커서 위치 계산)
+            if (scope == TargetScope.One_Ally)
+            {
+                // 살아있는 첫 번째 아군
+                int validIdx = GetFirstValidMemberIndex();
+                currentPartyIndex = (validIdx != -1) ? validIdx : 0;
+            }
+            else if (scope == TargetScope.Dead_Ally)
+            {
+                // 죽은 첫 번째 아군
+                int deadIdx = GetFirstDeadMemberIndex();
+                currentPartyIndex = (deadIdx != -1) ? deadIdx : 0;
+            }
+            else // Self 등
+            {
+                currentPartyIndex = 0;
+            }
+
+            // 현재 커서 위치 하이라이트
+            UpdatePartyCursorVisuals();
         }
 
+        // 3x2 그리드 네비게이션 적용
         private void HandlePartyNavigation()
         {
             TargetScope scope = selectedItemData.targetScope;
             
-            if (scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally)
+            // 단일 대상일 때만 커서 이동 가능
+            if (scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally || scope == TargetScope.Self)
             {
-                if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) MovePartyCursor(-1);
-                else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) MovePartyCursor(1);
+                bool moved = false;
+
+                // [좌/우]
+                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+                {
+                    if (currentPartyIndex % 3 > 0) { currentPartyIndex--; moved = true; }
+                }
+                else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+                {
+                    if (currentPartyIndex % 3 < 2) { currentPartyIndex++; moved = true; }
+                }
+                // [상/하]
+                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+                {
+                    if (currentPartyIndex >= 3) { currentPartyIndex -= 3; moved = true; }
+                }
+                else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+                {
+                    if (currentPartyIndex < 3) { currentPartyIndex += 3; moved = true; }
+                }
+
+                if (moved)
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    UpdatePartyCursorVisuals();
+                }
             }
 
+            // 확인
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 UseItemOnTarget();
             }
 
+            // 취소
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
             {
                 CancelTargetSelection();
+            }
+        }
+
+        // 커서 위치만 업데이트하는 함수
+        private void UpdatePartyCursorVisuals()
+        {
+            // 전체 초기화
+            foreach (var pc in partyControllers) pc.ResetHighlightColor();
+
+            // 현재 커서 위치만 하이라이트 (유효성 검사는 실행 시 수행)
+            // 단, 빈 슬롯이라도 커서는 표시할 수 있어야 함 (SkillUI와 동일 동작)
+            if (currentPartyIndex >= 0 && currentPartyIndex < 6)
+            {
+                partyControllers[currentPartyIndex].SetHighlightColor(targetHighlightColor);
             }
         }
 
@@ -336,43 +371,20 @@ namespace Controller
             isSelectingTarget = false;
             foreach (var pc in partyControllers) pc.ResetHighlightColor(); 
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-        }
-
-        private void MovePartyCursor(int dir)
-        {
-            partyControllers[currentPartyIndex].ResetHighlightColor();
-            
-            int nextIdx = currentPartyIndex;
-            for (int i = 0; i < 6; i++)
-            {
-                nextIdx = (nextIdx + dir + 6) % 6;
-                if (!partyControllers[nextIdx].IsEmpty)
-                {
-                    if (selectedItemData.targetScope == TargetScope.Dead_Ally && partyControllers[nextIdx].currentHp > 0) continue;
-                    if (selectedItemData.targetScope == TargetScope.One_Ally && partyControllers[nextIdx].currentHp <= 0) continue; 
-                    break;
-                }
-            }
-            
-            currentPartyIndex = nextIdx;
-            partyControllers[currentPartyIndex].SetHighlightColor(targetHighlightColor);
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            // 아이템 리스트로 포커스 복귀
+            UpdateItemSelection();
         }
 
         private void UseItemOnTarget()
         {
-            bool success = false;
             TargetScope scope = selectedItemData.targetScope;
+            bool success = false;
 
+            // 전체 대상 처리
             if (scope == TargetScope.All_Allies)
             {
                 foreach (var pc in partyControllers) if (!pc.IsEmpty) ApplyEffect(pc);
                 success = true;
-            }
-            else if (scope == TargetScope.Self)
-            {
-                var cmdr = partyControllers.FirstOrDefault(p => !p.IsEmpty && p.sourceData.isCommander);
-                if (cmdr != null) { ApplyEffect(cmdr); success = true; }
             }
             else if (scope == TargetScope.All_Dead_Allies)
             {
@@ -381,9 +393,17 @@ namespace Controller
             }
             else
             {
-                if (partyControllers[currentPartyIndex].IsEmpty) return;
-                ApplyEffect(partyControllers[currentPartyIndex]);
-                success = true;
+                // 단일 대상 유효성 검사 (SkillUI의 IsValidTarget 로직과 유사)
+                if (IsValidTarget(currentPartyIndex))
+                {
+                    ApplyEffect(partyControllers[currentPartyIndex]);
+                    success = true;
+                }
+                else
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    return; // 실패 시 리턴
+                }
             }
 
             if (success)
@@ -406,6 +426,26 @@ namespace Controller
                 if (itemInfo) itemInfo.ResetText();
                 UpdateItemSelection();
             }
+        }
+
+        // 타겟 유효성 검사 함수
+        private bool IsValidTarget(int index)
+        {
+            // 인덱스 범위 체크
+            if (index < 0 || index >= partyControllers.Length) return false;
+            
+            PlayerController target = partyControllers[index];
+            if (target.IsEmpty) return false;
+
+            TargetScope scope = selectedItemData.targetScope;
+
+            // 부활 아이템인데 대상이 살아있음
+            if ((scope == TargetScope.Dead_Ally) && target.currentHp > 0) return false;
+
+            // 회복 아이템인데 대상이 죽어있음 (One_Ally는 보통 산 아군 대상)
+            if ((scope == TargetScope.One_Ally) && target.currentHp <= 0) return false;
+
+            return true;
         }
 
         private void ApplyEffect(PlayerController target)
