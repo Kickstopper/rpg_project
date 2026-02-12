@@ -123,6 +123,7 @@ namespace Controller
         public BattleState state;
         public List<BattleEntity> activeMonsters = new();
         // 전투 로직용 리스트 (데이터가 있는 캐릭터만)
+        private List<MonsterDatabase.MonsterEntry> encounterLog = new();
         public List<BattleEntity> activePlayers = new(); 
 
         // 렌더링 및 그리드 관리용 리스트 (Empty 포함, 총 6개 고정)
@@ -227,8 +228,9 @@ namespace Controller
             HideLog();
             HideMessage();
 
-            activeMonsters.Clear(); 
-            ClearParty();           
+            activeMonsters.Clear();
+            encounterLog.Clear();
+            ClearParty();
             InitializeSlots();
 
             if (monsterIds == null || monsterIds.Count == 0) return;
@@ -685,77 +687,64 @@ namespace Controller
             }
         }
 
-        BattleReward CalculateRewards(List<MonsterController> monsters, List<PlayerController> players)
+        BattleReward CalculateRewards(List<PlayerController> players)
         {
             BattleReward reward = new BattleReward();
             reward.dropItems = new List<string>();
 
-            // ---------------------------------------------------------
-            // 1. 경험치 계산 (몬스터 레벨 총합 - 파티 레벨 총합)
-            // ---------------------------------------------------------
-            int monsterTotalLv = monsters.Sum(m => m.sourceData.stats.level);
-            int partyTotalLv = players.Sum(p => p.level);
+            long totalMonsterExp = 0;
             
-            // 생존한 파티원 수 (경험치 분배 대상)
-            // 만약 죽은 동료는 경험치를 못 받는다면: p.currentHp > 0 조건 추가
-            int livingMemberCount = players.Count(p => p.currentHp > 0); 
+            // 이제 Controller가 아니라 데이터(Entry)를 직접 순회합니다.
+            foreach (var entry in encounterLog)
+            {
+                // 경험치 계산
+                totalMonsterExp += GetMonsterExp(entry.stats.level);
+                
+                // 아이템 드롭 로직 (sourceData 대신 entry 사용)
+                List<string> dropTable = entry.dropItemIds;
+                if (dropTable != null && dropTable.Count > 0 && Random.value >= 0.4f)
+                {
+                    reward.dropItems.Add(dropTable[Random.Range(0, dropTable.Count)]);
+                }
+            }
 
-            // [보정 로직]
-            // 단순히 (적 - 아군)만 하면 아군이 셀 때 0이 되므로, 
-            // '기본 경험치(적 레벨 합 * 10)'에 '레벨 차이 보정치'를 더하는 방식을 추천합니다.
-            // 작성자님의 의도("차이로 결정")를 살려: (적 총합 * X) + (적 총합 - 아군 총합) * Y
+            // 레벨 보정 로직을 위한 평균 레벨 계산
+            float partyAvgLv = (players.Count > 0) ? (float)players.Average(p => p.level) : 1;
+            // 몬스터 평균 레벨도 entry를 통해 계산
+            float monsterAvgLv = (encounterLog.Count > 0) ? (float)encounterLog.Average(m => m.stats.level) : 1;
             
-            // 여기서는 심플하게: (적 레벨 합 * 15) + (적 레벨 합 - 아군 레벨 합) * 5
-            // 레벨 차이가 +면 보너스, -면 페널티
-            int baseExp = monsterTotalLv * 15;
-            int diffBonus = (monsterTotalLv - partyTotalLv) * 5;
-            
-            reward.totalExp = Mathf.Max(10, baseExp + diffBonus); // 최소 10 EXP는 보장
+            float levelBonusRatio = Mathf.Clamp(monsterAvgLv / partyAvgLv, 0.5f, 1.5f);
+            reward.totalExp = Mathf.FloorToInt(totalMonsterExp * levelBonusRatio);
 
+            int livingMemberCount = players.Count(p => p.currentHp > 0);
             if (livingMemberCount > 0)
                 reward.expPerMember = reward.totalExp / livingMemberCount;
             else
                 reward.expPerMember = 0;
 
-            // ---------------------------------------------------------
-            // 2. 골드 계산 (레벨 비례 랜덤 + 꽝 포함)
-            // ---------------------------------------------------------
             int calculatedGold = 0;
-            foreach (var m in monsters)
+            foreach (var entry in encounterLog)
             {
-                // 30% 확률로 골드 없음 (꽝)
-                if (UnityEngine.Random.value < 0.3f) continue;
-
-                int lv = m.sourceData.stats.level;
-                // 최소: 레벨 * 5, 최대: 레벨 * 15
-                int gold = UnityEngine.Random.Range(lv * 5, lv * 15);
-                calculatedGold += gold;
+                if (Random.value < 0.3f) continue;
+                int lv = entry.stats.level;
+                calculatedGold += Random.Range(lv * 10, lv * 30); 
             }
             reward.totalGold = calculatedGold;
 
-            // ---------------------------------------------------------
-            // 3. 아이템 계산 (랜덤 인덱스 + 꽝 포함)
-            // ---------------------------------------------------------
-            foreach (var m in monsters)
-            {
-                List<string> dropTable = m.sourceData.dropItemIds; // MonsterEntry에 있다고 가정
-                
-                if (dropTable == null || dropTable.Count == 0) continue;
-
-                // 40% 확률로 아이템 드롭 없음 (꽝)
-                if (UnityEngine.Random.value < 0.4f) continue;
-
-                // 리스트에서 랜덤 선택
-                int randomIndex = UnityEngine.Random.Range(0, dropTable.Count);
-                string itemId = dropTable[randomIndex];
-                
-                if (!string.IsNullOrEmpty(itemId))
-                {
-                    reward.dropItems.Add(itemId);
-                }
-            }
-
             return reward;
+        }
+
+        // 몬스터 경험치 계산 헬퍼 함수
+        int GetMonsterExp(int level)
+        {
+            float exponent = 2.2f; // LevelSystem과 동일하게 맞춤
+            float baseExp = 15f;   // 1레벨 몬스터가 주는 경험치 (플레이어 1->2 필요 경험치가 100이라면 약 15% 정도)
+
+            // 공식: 15 * (Level ^ 2.2)
+            // Lv 1 = 15
+            // Lv 10 = 2,377
+            // Lv 50 = 82,382 (플레이어 요구량의 약 15% 유지)
+            return Mathf.FloorToInt(baseExp * Mathf.Pow(level, exponent));
         }
 
         // 인스턴트 전투 처리 메인 루틴
@@ -775,14 +764,12 @@ namespace Controller
             SimulateAutoBattleLogic();
 
             // 4. 결과 텍스트 구성
-            List<MonsterController> allMonsters = activeMonsters.OfType<MonsterController>().ToList();
             List<PlayerController> allPlayers = activePlayers.OfType<PlayerController>().ToList();
             
-            BattleReward reward = CalculateRewards(allMonsters, allPlayers);
-
+            BattleReward reward = CalculateRewards(allPlayers);
             foreach(var p in allPlayers)
             {
-                if (p.currentHp > 0) {
+                if (p != null && p.currentHp > 0) {
                     p.AddExp(reward.expPerMember); 
                 }
             }
@@ -3705,6 +3692,8 @@ namespace Controller
             SoundManager.Instance.PlaySFX(SfxID.Encounter);
             var entry = monsterDB.GetEntry(id);
             if (entry == null) return;
+            // 생성된 몬스터의 데이터를 로그에 기록 (보상 계산용)
+            encounterLog.Add(entry);
 
             // 1. 선호하는 열(Row) 선택
             List<Transform> targetSlots = (entry.preferredRow == RowType.Front) ? frontSlots : backSlots;
@@ -4023,21 +4012,15 @@ namespace Controller
                 // -----------------------------------------------------
                 // 보상 계산 및 지급
                 // -----------------------------------------------------
-                List<MonsterController> allMonsters = activeMonsters.OfType<MonsterController>().ToList();
                 List<PlayerController> allPlayers = activePlayers.OfType<PlayerController>().ToList();
 
-                BattleReward reward = CalculateRewards(allMonsters, allPlayers);
-
+                BattleReward reward = CalculateRewards(allPlayers);
                 // 1. 전투 결과를 PartyManager에 반영
-                for(int i = 0; i < activePlayers.Count; i++)
+                foreach(var p in allPlayers)
                 {
-                    // activePlayers 리스트는 죽은 캐릭터도 포함하고 있어야 함 (hp 0인 상태로)
-                    // 만약 activePlayers에서 제거했다면 allSlotControllers를 순회해야 함.
-                    
-                    PlayerController pc = activePlayers[i] as PlayerController;
-                    if (pc == null) continue;
-
-                    pc.UpdateData(reward.expPerMember);
+                    if (p != null && p.currentHp > 0) {
+                        p.AddExp(reward.expPerMember); 
+                    }
                 }
 
                 // 2. 골드 지급

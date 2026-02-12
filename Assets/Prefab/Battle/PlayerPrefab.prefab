@@ -1533,6 +1533,7 @@ MonoBehaviour:
   isMagicReflect: 0
   isPhysicalAbsorb: 0
   isMagicAbsorb: 0
+  expTable: {fileID: 11400000, guid: 0a109a7319f60bb47bb30d455147ed4f, type: 2}
   bgImage: {fileID: 3565750124405715318}
   portraitImage: {fileID: 4412860075172480683}
   highlightImage: {fileID: 1366179664587526029}

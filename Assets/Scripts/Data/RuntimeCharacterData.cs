@@ -39,8 +39,10 @@ namespace Data
         public int currentMp;
         public int maxMp;
         public int currentExp; // 현재 누적 경험치
-        public int nextExp;
-
+        
+        [System.NonSerialized] 
+        public ExpTable expTable;
+        
         public RowType row;
         public ColumnType column;
         
@@ -95,6 +97,7 @@ namespace Data
             currentHp = maxHp = entry.maxHp;
             currentMp = maxMp = entry.maxMp;
             currentExp = 0;
+            expTable = entry.expTable;
 
             row = RowType.Front;
             column = ColumnType.Center;
@@ -146,6 +149,25 @@ namespace Data
         public int GetEvasion(){ return 0;}
         public int GetMagicPower(){ return 0;}
         public int GetMagicEffect() {return 0; }
+
+        // UI나 전투 로직은 이 함수만 호출하면 됨
+        public int GetRequiredExpForNextLevel() {
+            if (expTable != null) {
+                return expTable.GetRequiredExp(stats.level);
+            }
+            return 999999; // 안전장치
+        }
+
+        // 경험치 퍼센트 (UI용 헬퍼 함수)
+        public float GetExpPercent() {
+            int prevReq = (stats.level == 1) ? 0 : expTable.GetRequiredExp(stats.level - 1);
+            int nextReq = GetRequiredExpForNextLevel();
+            
+            // 분모가 0이 되는 것을 방지
+            if (nextReq - prevReq <= 0) return 0f;
+
+            return (float)(currentExp - prevReq) / (nextReq - prevReq);
+        }
 
         public RuntimeCharacterData() { }
     }

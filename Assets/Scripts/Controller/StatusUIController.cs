@@ -171,7 +171,7 @@ namespace Controller
             nameText.text = charData.name;
             levelText.text = charData.stats.level.ToString();
             expText.text = charData.currentExp.ToString();
-            nextExpText.text = charData.nextExp.ToString(); 
+            nextExpText.text = charData.GetRequiredExpForNextLevel().ToString(); 
             alignText.text = charData.align.ToString().ToUpper().Replace("_", " ");
 
             if (charData.statusEffect != StatusEffect.Good)

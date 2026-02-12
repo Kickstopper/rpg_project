@@ -16,6 +16,7 @@ MonoBehaviour:
   - id: chr_00
     name: "\uBBF8\uC2A4\uD130-K"
     spiritId: spirit_000
+    expTable: {fileID: 11400000, guid: 0a109a7319f60bb47bb30d455147ed4f, type: 2}
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -54,6 +55,7 @@ MonoBehaviour:
   - id: chr_01
     name: "\uC624\uC624\uAC00\uBBF8 \uBBF8\uCE58\uC624"
     spiritId: spirit_001
+    expTable: {fileID: 11400000, guid: 29b10d8d523d03547bd72504aa972be3, type: 2}
     exp: 0
     isCommander: 1
     portraitImage: {fileID: 0}
@@ -89,6 +91,7 @@ MonoBehaviour:
   - id: chr_02
     name: "\uC774\uB204\uC774 \uD558\uC774\uB124"
     spiritId: spirit_002
+    expTable: {fileID: 11400000, guid: 280fb2ad8c3aaee4ebdaf4877cd2fc15, type: 2}
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -119,6 +122,7 @@ MonoBehaviour:
   - id: chr_03
     name: "\uC2E0\uC8E0 \uC2DC\uC548"
     spiritId: spirit_003
+    expTable: {fileID: 11400000, guid: 1ea0c1c5d7db1654eb1169b3e2c94047, type: 2}
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -149,6 +153,7 @@ MonoBehaviour:
   - id: chr_04
     name: "\uCE74\uBBF8\uBAA8\uB9AC \uCE74\uC774"
     spiritId: spirit_004
+    expTable: {fileID: 11400000, guid: 00d47d8b2275ee84d8a74dd7e91456eb, type: 2}
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}
@@ -179,6 +184,7 @@ MonoBehaviour:
   - id: chr_05
     name: "\uB370\uC6B0\uC5D0\uC2A4 "
     spiritId: spirit_005
+    expTable: {fileID: 11400000, guid: 99fb91fac017d1c4bb1210f0d98b1daa, type: 2}
     exp: 0
     isCommander: 0
     portraitImage: {fileID: 0}

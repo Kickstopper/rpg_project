@@ -13,6 +13,9 @@ namespace Controller
 {
     public class PlayerController : BattleEntity, IBattleTarget
     {
+        [SerializeField]
+        private ExpTable expTable;
+
         [Header("UI Objects")]
         public Image bgImage;         // 배경의 사각형 이미지
         public Image portraitImage;
@@ -234,27 +237,6 @@ namespace Controller
             this.maxHp = sourceData.maxHp = this.currentStats.vit * 20;
             this.maxMp = sourceData.maxMp =  this.currentStats.mag * 30;
         }
-
-
-        // 전투가 끝난 뒤의 상태 변화를 최신 상태로 업데이트해서 저장
-        public void UpdateData(int expReward)
-        {
-            sourceData.currentExp += expReward;
-
-            bool levelUp = false; //레벨업 조건 미정
-            if (levelUp)
-            {
-                sourceData.stats.level += 1; //획득한 exp에 따라 레벨 상승이 2 이상이 될 수 있다
-                // 레벨이 오르면 현재의 HP와 MP를 MAX로 한다
-                sourceData.currentHp = sourceData.maxHp = sourceData.stats.str * (level + 1);
-                sourceData.currentMp = currentMp = sourceData.stats.mag * (level + 1);
-            }
-            else
-            {
-                sourceData.currentHp = currentHp;
-                sourceData.currentMp = currentMp;
-            }
-        }
         
         // 회복 함수
         public void Recover(int hpAmount, int mpAmount)
@@ -420,9 +402,40 @@ namespace Controller
             return sourceData.resistances; 
         }
 
-        public void AddExp(int exp)
+        public void AddExp(int amount)
         {
-            currentExp += exp;
+            currentExp += amount;
+            sourceData.currentExp = currentExp;
+            // 레벨업 조건을 만족하는 동안 계속 반복
+            while (true)
+            {
+                int requiredExp = expTable.GetRequiredExp(level);
+
+                if (level >= 99) break;
+
+                if (currentExp < requiredExp) 
+                {
+                    break; 
+                }
+
+                level++; 
+                
+                OnLevelUp();
+            }
+            
+            UpdateUI();
+        }
+
+        void OnLevelUp()
+        {
+            
+            sourceData.stats.level = level;
+            
+            // 스탯 증가, HP 회복 등 처리
+            maxHp += 10;
+            currentHp = maxHp;
+            // 이펙트 재생 등...
+            Debug.Log($"레벨 업! 현재 레벨: {level}");
         }
 
         // [BattleEntity 구현] 데미지 처리

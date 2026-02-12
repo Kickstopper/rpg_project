@@ -33,12 +33,23 @@ namespace Manager
 
         public void LoadFromSave(List<CharacterSaveData> saveDatas)
         {
-            // 기존에 남아있던 파티 데이터(초기화 데이터 등)를 비움.
             partyData.Clear();
             
             foreach(var save in saveDatas)
             {
                 var data = new RuntimeCharacterData(save);
+
+                var entry = charDB.GetEntry(data.characterId);
+                
+                if (entry != null)
+                {
+                    data.expTable = entry.expTable;
+                }
+                else
+                {
+                    Debug.LogError($"ID [{data.characterId}]에 해당하는 캐릭터 데이터를 DB에서 찾을 수 없습니다.");
+                }
+
                 partyData.Add(data);
             }
         }

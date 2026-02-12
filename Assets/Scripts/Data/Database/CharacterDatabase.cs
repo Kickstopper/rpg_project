@@ -13,6 +13,7 @@ namespace Data.Database
 
             public string spiritId;
             
+            public ExpTable expTable;
             public int exp;
 
             public bool isCommander;
