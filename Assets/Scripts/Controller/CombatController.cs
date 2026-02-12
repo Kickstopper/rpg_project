@@ -407,7 +407,7 @@ namespace Controller
                 if (assignedData != null)
                 {
                     // 실제 캐릭터 초기화
-                    pc.Initialize(assignedData, this);
+                    pc.Initialize(assignedData, this, true);
                     
                     pc.columnIndex = i;
                     pc.gameObject.name = pc.sourceData.name;
@@ -2411,7 +2411,7 @@ namespace Controller
 
                 bool isActorDead = false;
                 if (action.actor == null || !action.actor.activeSelf) isActorDead = true;
-                else if (action.actor.TryGetComponent(out BattleEntity be) && !be.IsAlive) isActorDead = true;
+                else if (action.actor.TryGetComponent(out IBattleTarget ib) && !ib.IsAlive) isActorDead = true;
                 if (isActorDead) continue; 
 
                 int delay = CalculateActionDelay(action);
@@ -2487,43 +2487,51 @@ namespace Controller
         {
             BaseRootData item = action.itemData;
 
-            // 실제 인벤토리에서 아이템 차감 시도
-            // ConsumableItemData인지 확인 후 차감
+            // 아이템 소모 로직
             if (item is ConsumableItemData consumable)
             {
-                // UseItem이 false를 반환하면 아이템이 없다는 뜻 (예: 앞선 캐릭터가 마지막 1개를 써버림)
                 if (!InventoryManager.Instance.UseItem(consumable.id))
                 {
                     ShowLog($"NOT ENOUGH {item.dataName}");
                     yield return wait10;
-                    yield break; // 아이템 효과 발동 없이 종료
+                    yield break; 
                 }
             }
             
-            // TargetScope에 따라 다중 타겟 가져오기
-            // (QueuePolymorphicAction에서 target을 null로 보냈어도 여기서 찾음)
             TargetScope scope = (item != null) ? item.targetScope : TargetScope.One_Ally;
             List<GameObject> targets = GetTargetsByScope(scope, action);
 
             ShowLog($"USE {item.dataName}");
 
-            // 모든 대상에게 효과 적용
-            foreach (var target in targets)
+            foreach (var targetObj in targets)
             {
-                ApplyItemEffect(target, item);
-                // 공격 스킬인 경우 피격 모션/이펙트 처리
-                if (item.effectType == EffectType.Special_Atk || item.effectType == EffectType.Magic_Atk)
+                // 공격 계열 vs 보조 계열 분기 처리
+                bool isAttack = item.effectType == EffectType.Special_Atk || item.effectType == EffectType.Magic_Atk;
+
+                if (isAttack)
                 {
-                    // 데미지/이펙트 처리는 ApplyItemEffect 내부 혹은 별도 로직이 필요할 수 있음
-                    // 여기서는 ApplyItemEffect가 데미지를 주는 경우(Special_Atk 등)를 포함한다고 가정
+                    // 공격: CombatController의 데미지 공식 및 연출 사용
                     SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
-                    SpawnVFX(vfxMagicPrefab, target.transform.position);
+                    SpawnVFX(vfxMagicPrefab, targetObj.transform.position);
+                    
+                    // 아이템의 고정 데미지(effectValue)를 그대로 줄지, 계산식을 탈지는 기획에 따라 다름
+                    // 여기서는 ApplyDamage를 통해 피격 연출(OnDamageTaken)까지 연결
+                    ApplyDamage(targetObj, item.effectValue, false);
                 }
-                else if (item.effectType == EffectType.Recover_HP || item.effectType == EffectType.Recover_MP ||
-                         item.effectType == EffectType.Revive_Empty ||item.effectType == EffectType.Revive_Fully)
+                else
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
-                    SpawnVFX(vfxMagicPrefab, target.transform.position);
+                    // 회복/보조: EffectManager에게 데이터 처리 위임
+                    var battleTarget = targetObj.GetComponent<IBattleTarget>();
+                    if (battleTarget != null)
+                    {
+                        bool success = EffectManager.Instance.ApplyEffect(battleTarget, item);
+                        
+                        if (success)
+                        {
+                            SoundManager.Instance.PlaySFX(SfxID.Attack_Magic); // 회복 사운드로 교체 필요
+                            SpawnVFX(vfxMagicPrefab, targetObj.transform.position); // 회복 이펙트로 교체 필요
+                        }
+                    }
                 }
             }
             
@@ -2532,88 +2540,72 @@ namespace Controller
 
         IEnumerator HandleSkillAction(CombatAction action)
         {
-            // [스킬 타겟 자동 변경 로직]
+            // 스킬 타겟 자동 변경 로직
             if (action.target == null || !IsAlive(action.target))
             {
                 action.target = FindNearestLivingTarget(action.actor);
-                if (action.target == null) yield break; // 대상 없으면 취소
+                if (action.target == null) yield break; 
             }
 
             SkillData skill = action.itemData as SkillData; 
             PlayerController actor = action.actor.GetComponent<PlayerController>();
 
-            // 비용 지불 (HP 또는 MP)
+            // 비용 지불 로직
             if (actor != null && skill != null)
             {
-                // HP 코스트인 경우
                 if (skill.useHpCost)
                 {
-                    // 현재 HP가 코스트보다 적으면 발동 실패 (자살 방지 or 불발 처리)
-                    if (actor.currentHp <= skill.costValue)
-                    {
-                        ShowLog("FAILED! NOT ENOUGH HP!");
-                        yield return wait10;
-                        yield break;
-                    }
+                    if (actor.currentHp <= skill.costValue) { /* 실패 처리 */ yield break; }
                     actor.currentHp -= skill.costValue;
                 }
-                // MP 코스트인 경우
                 else
                 {
-                    if (actor.currentMp < skill.costValue)
-                    {
-                        ShowLog("FAILED! NOT ENOUGH MP!");
-                        yield return wait10;
-                        yield break;
-                    }
-                    Debug.Log("MP COST : " + skill.costValue);
+                    if (actor.currentMp < skill.costValue) { /* 실패 처리 */ yield break; }
                     actor.currentMp -= skill.costValue;
                 }
             }
             
-            // 다중 타겟 처리
             TargetScope scope = (skill != null) ? skill.targetScope : TargetScope.Front_Single_Enemy;
             List<GameObject> targets = GetTargetsByScope(scope, action);
 
-            ShowLog($"{action.actor.name}'S SKILL': {skill.dataName}");
+            ShowLog($"{action.actor.name}'S SKILL: {skill.dataName}");
 
-            foreach (var target in targets)
+            foreach (var targetObj in targets)
             {
-                ApplyItemEffect(target, skill);
-                
-                // 공격 스킬인 경우 피격 모션/이펙트 처리
-                if (skill.effectType == EffectType.Special_Atk || skill.effectType == EffectType.Magic_Atk)
+                // 공격 계열 vs 보조 계열 분기
+                bool isAttack = skill.effectType == EffectType.Special_Atk || skill.effectType == EffectType.Magic_Atk;
+
+                if (isAttack)
                 {
-                    // 데미지/이펙트 처리는 ApplyItemEffect 내부 혹은 별도 로직이 필요할 수 있음
-                    // 여기서는 ApplyItemEffect가 데미지를 주는 경우(Special_Atk 등)를 포함한다고 가정
+                    // 공격: CombatController의 데미지 계산(속성, 방어력 등) 및 연출 사용
                     SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
-                    SpawnVFX(vfxMagicPrefab, target.transform.position);
+                    SpawnVFX(vfxMagicPrefab, targetObj.transform.position);
+
+                    // CalculateDamage를 통해 상성/방어력 계산 적용
+                    // (스킬 위력은 skill.effectValue가 CalculateDamage 내부에서 참조됨)
+                    bool isCrit = CheckCritical(action.actor, targetObj, action);
+                    int dmg = CalculateDamage(action.actor, targetObj, action, isCrit, 1.0f);
+                    
+                    ApplyDamage(targetObj, dmg, isCrit);
                 }
-                else if (skill.effectType == EffectType.Recover_HP || skill.effectType == EffectType.Recover_MP ||
-                         skill.effectType == EffectType.Revive_Empty ||skill.effectType == EffectType.Revive_Fully)
+                else
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
-                    SpawnVFX(vfxMagicPrefab, target.transform.position);
+                    // 회복/부활/보조: EffectManager 사용
+                    var battleTarget = targetObj.GetComponent<IBattleTarget>();
+                    if (battleTarget != null)
+                    {
+                        bool success = EffectManager.Instance.ApplyEffect(battleTarget, skill);
+                        
+                        if (success)
+                        {
+                            SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
+                            SpawnVFX(vfxMagicPrefab, targetObj.transform.position);
+                        }
+                    }
                 }
             }
 
             yield return wait05;
-        }
-
-        void ApplyItemEffect(GameObject target, BaseRootData item)
-        {
-            var pTarget = target.GetComponent<PlayerController>();
-            switch (item.effectType)
-            {
-                case EffectType.Recover_HP: if (pTarget) pTarget.Recover(item.effectValue, 0); break;
-                case EffectType.Recover_MP: if (pTarget) pTarget.Recover(0, item.effectValue); break;
-                case EffectType.Revive_Empty:
-                case EffectType.Revive_Fully: if (pTarget && pTarget.currentHp <= 0) pTarget.Revive(item.effectValue); break;
-                case EffectType.Special_Atk:
-                case EffectType.Magic_Atk: ApplyDamage(target, item.effectValue, false); break;
-                case EffectType.Reflect_Phys: if (pTarget) pTarget.isPhysicalReflect = true; break;
-                case EffectType.Reflect_Magic: if (pTarget) pTarget.isMagicReflect = true; break;
-            }
         }
 
         IEnumerator HandleGuardAction(CombatAction action)
@@ -2626,7 +2618,6 @@ namespace Controller
 
         IEnumerator HandleUnionAttack(CombatAction action)
         {
-            // 타겟 유효성 검사
             if (action.target == null || !IsAlive(action.target))
             {
                 action.target = FindNearestLivingTarget(action.actor);
@@ -3605,7 +3596,7 @@ namespace Controller
             return Mathf.RoundToInt(rawDmg);
         }
 
-        bool IsAlive(GameObject obj) { return obj != null && obj.activeSelf && (obj.GetComponent<BattleEntity>()?.IsAlive ?? false); }
+        bool IsAlive(GameObject obj) { return obj != null && obj.activeSelf && (obj.GetComponent<IBattleTarget>()?.IsAlive ?? false); }
 
         // 아군 위치 이동(Move) 애니메이션
         IEnumerator PerformMove(CombatAction action)

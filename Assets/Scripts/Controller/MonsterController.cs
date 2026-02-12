@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UI.DungeonMapScene;
 using Data;
+using Manager;
 
 namespace Controller
 {
-    public class MonsterController : BattleEntity
+    public class MonsterController : BattleEntity, IBattleTarget
     {
         private CombatController controller;
         public MonsterDatabase.MonsterEntry sourceData;
@@ -21,6 +22,17 @@ namespace Controller
 
         public RowType currentRow;
         public ColumnType currentColumn;
+
+        // [IBattleTarget 구현]
+        public string Name => sourceData != null ? sourceData.name : "";
+        public new bool IsAlive => currentHp > 0; // BattleEntity의 currentHp 사용
+        public bool IsMaxHp => currentHp >= maxHp;
+        public bool IsMaxMp => currentMp >= maxMp;
+
+        public int CurrentHp => currentHp;
+        public int MaxHp => maxHp;
+        public int CurrentMp => currentMp;
+        public int MaxMp => maxMp;
 
         private Material instanceMaterial;
         private const float FRONT_OFFSET = 0.01f;
@@ -266,6 +278,36 @@ namespace Controller
             }
 
             if (currentHp <= 0) Die();
+        }
+
+        public void ApplyHpChange(int amount)
+        {
+            currentHp = Mathf.Clamp(currentHp + amount, 0, maxHp);
+        }
+
+        public void ApplyMpChange(int amount)
+        {
+            currentMp = Mathf.Clamp(currentMp + amount, 0, maxMp);
+        }
+
+        public void ApplyRevive(int percent)
+        {
+            // 몬스터 부활 로직 (필요하다면)
+            int healAmount = Mathf.FloorToInt(maxHp * (percent / 100f));
+            currentHp = healAmount;
+            gameObject.SetActive(true);
+        }
+
+        public void ApplyStatusEffect(StatusEffect effect)
+        {
+            // 몬스터 상태이상 로직 구현
+        }
+
+        public void RefreshView()
+        {
+            // 몬스터는 보통 UI바가 없거나, 피격 시에만 연출이 나오므로
+            // 필요한 경우 여기서 HP Bar 갱신 등을 호출
+            UpdateUI();
         }
 
         protected override void UpdateUI()

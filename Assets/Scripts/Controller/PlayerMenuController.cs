@@ -77,7 +77,7 @@ namespace Controller
                 currentBtnIndex = 0;
                 
                 // 메뉴 진입 시 파티 슬롯 갱신
-                RefreshPartyFormation();
+                RefreshPartyUI();
 
                 UpdateSelection(currentBtnIndex, false); 
             }
@@ -253,7 +253,7 @@ namespace Controller
         }
 
         // 파티 슬롯 갱신 (MoveUI 로직 차용)
-        private void RefreshPartyFormation()
+        private void RefreshPartyUI()
         {
             var party = PartyManager.Instance.partyData;
             RuntimeCharacterData[] slotAssignments = new RuntimeCharacterData[6];
@@ -398,6 +398,10 @@ namespace Controller
         public void CloseSkillUI()
         {
             skillUI.SetActive(false);
+
+            // 변경된 위치 데이터를 다시 읽어와 파티 슬롯을 새로고침
+            RefreshPartyUI();
+
             currentState = MenuState.Main;
             ResetInputTimer();
             UpdateSelection(currentBtnIndex);
@@ -439,7 +443,10 @@ namespace Controller
         public void CloseItemUI()
         {
             itemUI.SetActive(false);
-            
+
+            // 변경된 위치 데이터를 다시 읽어와 파티 슬롯을 새로고침
+            RefreshPartyUI();
+
             currentState = MenuState.Main;
             ResetInputTimer();
             UpdateSelection(currentBtnIndex); // 마지막으로 선택했던 메인 메뉴 버튼에 다시 포커스
@@ -563,7 +570,7 @@ namespace Controller
             moveUI.SetActive(false);
             
             // 변경된 위치 데이터를 다시 읽어와 파티 슬롯을 새로고침
-            RefreshPartyFormation();
+            RefreshPartyUI();
 
             currentState = MenuState.Main;
             ResetInputTimer();

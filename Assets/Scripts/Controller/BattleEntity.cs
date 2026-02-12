@@ -133,8 +133,5 @@ namespace Controller
         public abstract int GetDefense();
         public abstract ResistanceData GetResistances();
         public abstract void SetSelectionState(bool isSelected);
-        
-        // 생존 확인 헬퍼
-        public bool IsAlive => currentHp > 0;
     }
 }

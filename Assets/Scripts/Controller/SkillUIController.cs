@@ -82,88 +82,40 @@ namespace Controller
             }
         }
 
-        // =================================================================================
-        // 1. 시전자 선택 (SelectCaster) - 3x2 그리드 방식 적용
-        // =================================================================================
         private void HandleCasterSelection()
         {
             bool moved = false;
-
-            // [좌/우] 인덱스 +/- 1 (행 내부 이동)
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-            {
-                if (currentCasterIndex % 3 > 0) 
-                { 
-                    currentCasterIndex--; 
-                    moved = true; 
-                }
-            }
-            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-            {
-                if (currentCasterIndex % 3 < 2) 
-                { 
-                    currentCasterIndex++; 
-                    moved = true; 
-                }
-            }
-            // [상/하] 인덱스 +/- 3 (열 간 이동)
-            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
-            {
-                if (currentCasterIndex >= 3) 
-                { 
-                    currentCasterIndex -= 3; 
-                    moved = true; 
-                }
-            }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-            {
-                if (currentCasterIndex < 3) 
-                { 
-                    currentCasterIndex += 3; 
-                    moved = true; 
-                }
-            }
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { if (currentCasterIndex % 3 > 0) { currentCasterIndex--; moved = true; } }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { if (currentCasterIndex % 3 < 2) { currentCasterIndex++; moved = true; } }
+            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) { if (currentCasterIndex >= 3) { currentCasterIndex -= 3; moved = true; } }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) { if (currentCasterIndex < 3) { currentCasterIndex += 3; moved = true; } }
 
             if (moved)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
-                RefreshSkillList(currentCasterIndex); // 커서 이동 시 스킬 리스트 갱신
+                RefreshSkillList(currentCasterIndex); 
                 UpdateVisuals();
             }
 
-            // 확인: 해당 캐릭터의 스킬 리스트로 이동
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                // 빈 슬롯이면 진행 불가
-                if (partyControllers[currentCasterIndex].IsEmpty) 
+                if (partyControllers[currentCasterIndex].IsEmpty || currentSkillIds.Count == 0)
                 {
                     SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                     return;
                 }
-
-                // 스킬이 없으면 진행 불가
-                if (currentSkillIds.Count == 0)
-                {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                    return;
-                }
-
                 SoundManager.Instance.PlaySFX(SfxID.UI_Click);
                 currentState = SkillUIState.SelectSkill;
                 currentSkillIndex = 0;
                 UpdateVisuals();
             }
 
-            // 취소: 메뉴 닫기
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
             {
                 menuController.CloseSkillUI();
             }
         }
 
-        // =================================================================================
-        // 2. 스킬 선택 (SelectSkill) - 기존 수직 리스트 유지
-        // =================================================================================
         private void HandleSkillSelection()
         {
             if (currentSkillIds.Count == 0) return;
@@ -179,10 +131,7 @@ namespace Controller
                 UpdateSkillScroll();
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-            {
-                AttemptSelectSkill();
-            }
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) AttemptSelectSkill();
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
             {
@@ -210,26 +159,26 @@ namespace Controller
 
         private void AttemptSelectSkill()
         {
+            // 유효성 검사 로직
             string skillId = currentSkillIds[currentSkillIndex];
             selectedSkillData = DatabaseManager.Instance.GetSkill(skillId);
             currentCaster = partyControllers[currentCasterIndex];
 
-            if (selectedSkillData == null) return;  
+            if (selectedSkillData == null) return;
 
-            // 조건 1: 사용 타입 체크
             if (selectedSkillData.useType != UseType.All && selectedSkillData.useType != UseType.Exploration)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 return;
             }
 
-            // 조건 2: Cost 체크
             bool isMpCost = !selectedSkillData.useHpCost;
             int cost = selectedSkillData.costValue;
 
             if (isMpCost && currentCaster.currentMp < cost)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                // "MP 부족" 메시지 등을 띄울 수 있음
                 return;
             }
             else if (!isMpCost && currentCaster.currentHp <= cost)
@@ -238,7 +187,6 @@ namespace Controller
                 return;
             }
 
-            // 조건 3: 부활 스킬 체크 (죽은 아군 없음)
             if (selectedSkillData.targetScope == TargetScope.Dead_Ally || selectedSkillData.targetScope == TargetScope.All_Dead_Allies)
             {
                 if (GetFirstDeadMemberIndex() == -1)
@@ -248,60 +196,25 @@ namespace Controller
                 }
             }
 
-            // 타겟 선택 모드 진입
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             currentState = SkillUIState.SelectTarget;
-            
             InitializeTargetCursor();
             UpdateVisuals();
         }
 
-        // =================================================================================
-        // 3. 타겟 선택 (SelectTarget) - 3x2 그리드 방식 적용
-        // =================================================================================
         private void HandleTargetSelection()
         {
+            // 타겟 선택 로직
             TargetScope scope = selectedSkillData.targetScope;
             bool canMove = (scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally);
 
             if (canMove)
             {
                 bool moved = false;
-
-                // [좌/우]
-                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-                {
-                    if (currentTargetIndex % 3 > 0) 
-                    { 
-                        currentTargetIndex--; 
-                        moved = true; 
-                    }
-                }
-                else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-                {
-                    if (currentTargetIndex % 3 < 2) 
-                    { 
-                        currentTargetIndex++; 
-                        moved = true; 
-                    }
-                }
-                // [상/하]
-                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
-                {
-                    if (currentTargetIndex >= 3) 
-                    { 
-                        currentTargetIndex -= 3; 
-                        moved = true; 
-                    }
-                }
-                else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-                {
-                    if (currentTargetIndex < 3) 
-                    { 
-                        currentTargetIndex += 3; 
-                        moved = true; 
-                    }
-                }
+                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { if (currentTargetIndex % 3 > 0) { currentTargetIndex--; moved = true; } }
+                else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { if (currentTargetIndex % 3 < 2) { currentTargetIndex++; moved = true; } }
+                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) { if (currentTargetIndex >= 3) { currentTargetIndex -= 3; moved = true; } }
+                else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) { if (currentTargetIndex < 3) { currentTargetIndex += 3; moved = true; } }
 
                 if (moved)
                 {
@@ -310,21 +223,12 @@ namespace Controller
                 }
             }
 
-            // 확인: 스킬 사용 시도
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                // 타겟 유효성 검사 (빈 슬롯, 이미 죽은/산 대상 등)
-                if (IsValidTarget(currentTargetIndex))
-                {
-                    UseSkill();
-                }
-                else
-                {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                }
+                if (IsValidTarget(currentTargetIndex)) UseSkill();
+                else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             }
 
-            // 취소
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
@@ -333,58 +237,62 @@ namespace Controller
             }
         }
 
-        // 선택한 타겟 인덱스가 유효한지 검사
         private bool IsValidTarget(int index)
         {
             if (partyControllers[index].IsEmpty) return false;
-
-            TargetScope scope = selectedSkillData.targetScope;
             PlayerController target = partyControllers[index];
+            TargetScope scope = selectedSkillData.targetScope;
 
-            // 부활 스킬인데 대상이 살아있음
             if ((scope == TargetScope.Dead_Ally) && target.currentHp > 0) return false;
-            
-            // 회복/버프 스킬인데 대상이 죽어있음
             if ((scope == TargetScope.One_Ally) && target.currentHp <= 0) return false;
 
             return true;
         }
 
+        // EffectManager를 사용하여 스킬 발동
         private void UseSkill()
         {
             bool success = false;
             TargetScope scope = selectedSkillData.targetScope;
 
-            // 1. 효과 적용
-            if (scope == TargetScope.All_Allies)
+            // 1. 효과 적용 시도
+            if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies)
             {
-                foreach (var pc in partyControllers) if (!pc.IsEmpty) ApplyEffect(pc);
-                success = true;
+                // 전체 대상: 한 명이라도 성공하면 OK
+                foreach (var pc in partyControllers)
+                {
+                    if (pc.IsEmpty) continue;
+                    
+                    if (EffectManager.Instance.ApplyEffect(pc, selectedSkillData))
+                    {
+                        success = true;
+                    }
+                }
             }
             else if (scope == TargetScope.Self)
             {
-                ApplyEffect(currentCaster);
-                success = true;
-            }
-            else if (scope == TargetScope.All_Dead_Allies)
-            {
-                foreach (var pc in partyControllers) if (!pc.IsEmpty && pc.currentHp <= 0) ApplyEffect(pc);
-                success = true;
-            }
-            else // 단일 타겟
-            {
-                if (!partyControllers[currentTargetIndex].IsEmpty)
+                if (EffectManager.Instance.ApplyEffect(currentCaster, selectedSkillData))
                 {
-                    ApplyEffect(partyControllers[currentTargetIndex]);
                     success = true;
                 }
             }
+            else // 단일 타겟 (One_Ally, Dead_Ally)
+            {
+                if (!partyControllers[currentTargetIndex].IsEmpty)
+                {
+                    if (EffectManager.Instance.ApplyEffect(partyControllers[currentTargetIndex], selectedSkillData))
+                    {
+                        success = true;
+                    }
+                }
+            }
 
-            // 2. 비용 차감 및 UI 갱신
+            // 2. 결과 처리
             if (success)
             {
                 SoundManager.Instance.PlaySFX(SfxID.Attack_Magic); 
 
+                // 코스트 차감 (시전자)
                 if (selectedSkillData.useHpCost)
                     currentCaster.Recover(-selectedSkillData.costValue, 0);
                 else
@@ -393,38 +301,21 @@ namespace Controller
                 currentCaster.sourceData.currentHp = currentCaster.currentHp;
                 currentCaster.sourceData.currentMp = currentCaster.currentMp;
 
+                // UI 갱신 (MP 소모 반영)
                 RefreshSkillList(currentCasterIndex); 
+                
+                // 상태: 스킬 선택 화면으로 돌아가기 (연속 사용을 위해)
+                // 만약 타겟 선택 상태를 유지하고 싶다면 currentState 변경 안함
                 currentState = SkillUIState.SelectSkill; 
                 UpdateVisuals();
             }
-        }
-
-        private void ApplyEffect(PlayerController target)
-        {
-            int val = selectedSkillData.effectValue;
-            switch(selectedSkillData.effectType)
+            else
             {
-                case EffectType.Recover_HP: 
-                    target.Recover(val, 0); 
-                    break;
-                case EffectType.Recover_MP: 
-                    target.Recover(0, val); 
-                    break;
-                case EffectType.Revive_Empty:
-                case EffectType.Revive_Fully:
-                    if(target.currentHp <= 0) {
-                        target.Revive(val);
-                        target.sourceData.currentHp = target.currentHp;
-                    }
-                    break;
+                // 실패 (모두 만피이거나 조건 불만족)
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             }
-            target.sourceData.currentHp = target.currentHp;
-            target.sourceData.currentMp = target.currentMp;
         }
 
-        // =================================================================================
-        // 시각적 처리 및 헬퍼 함수
-        // =================================================================================
         private void UpdateVisuals()
         {
             // 1. 모든 하이라이트 초기화
@@ -464,15 +355,10 @@ namespace Controller
             TargetScope scope = selectedSkillData.targetScope;
             Color blinkColor = Color.Lerp(Color.clear, targetHighlightColor, Mathf.PingPong(Time.time * 5f, 1f));
 
-            if (scope == TargetScope.All_Allies)
+            if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies)
             {
                 foreach (var pc in partyControllers) 
                     if (!pc.IsEmpty) pc.SetHighlightColor(blinkColor);
-            }
-            else if (scope == TargetScope.All_Dead_Allies)
-            {
-                foreach (var pc in partyControllers) 
-                    if (!pc.IsEmpty && pc.currentHp <= 0) pc.SetHighlightColor(blinkColor);
             }
             else if (scope == TargetScope.Self)
             {
@@ -480,7 +366,6 @@ namespace Controller
             }
             else // 단일 타겟
             {
-                // 현재 커서가 가리키는 대상 점멸 (빈 슬롯도 커서가 가면 점멸은 하되 선택 불가)
                 partyControllers[currentTargetIndex].SetHighlightColor(blinkColor);
             }
         }
@@ -543,7 +428,7 @@ namespace Controller
                 GameObject go = Instantiate(partyPrefab, partySlots[i]);
                 partyControllers[i] = go.GetComponent<PlayerController>();
 
-                if (member != null) partyControllers[i].Initialize(member, null);
+                if (member != null) partyControllers[i].Initialize(member, null, true);
                 else partyControllers[i].InitializeEmpty(i);
             }
         }
@@ -558,13 +443,11 @@ namespace Controller
             }
             else if (scope == TargetScope.Dead_Ally || scope == TargetScope.All_Dead_Allies)
             {
-                // 죽은 아군이 있으면 그곳으로, 없으면 0번 (어차피 UseSkill에서 막힘)
                 int deadIdx = GetFirstDeadMemberIndex();
                 currentTargetIndex = (deadIdx != -1) ? deadIdx : 0;
             }
             else
             {
-                // 기본적으로 0번(전열 왼쪽) 혹은 첫 번째 유효 멤버
                 int validIdx = GetFirstValidMemberIndex();
                 currentTargetIndex = (validIdx != -1) ? validIdx : 0;
             }

@@ -11,7 +11,7 @@ using Helper;
 
 namespace Controller
 {
-    public class PlayerController : BattleEntity
+    public class PlayerController : BattleEntity, IBattleTarget
     {
         [Header("UI Objects")]
         public Image bgImage;         // 배경의 사각형 이미지
@@ -71,9 +71,19 @@ namespace Controller
         public override int GetTotalLuc() => currentStats.luc;
         public override int GetTotalVit() => currentStats.vit;
 
+        public string Name => sourceData != null ? sourceData.name : "";
+        public bool IsAlive => sourceData != null && sourceData.currentHp > 0;
+        public bool IsMaxHp => sourceData != null && sourceData.currentHp >= sourceData.maxHp;
+        public bool IsMaxMp => sourceData != null && sourceData.currentMp >= sourceData.maxMp;
+
+        public int CurrentHp => sourceData != null ? sourceData.currentHp : 0;
+        public int MaxHp => sourceData != null ? sourceData.maxHp : 0;
+        public int CurrentMp => sourceData != null ? sourceData.currentMp : 0;
+        public int MaxMp => sourceData != null ? sourceData.maxMp : 0;
+
         public bool IsEmpty { get; private set; } = false;
 
-        private float animDuration;
+        private bool hasAnimation = false;
 
         void Start()
         {
@@ -116,10 +126,10 @@ namespace Controller
 
         
         // RuntimeData를 받는 초기화 함수
-        public void Initialize(RuntimeCharacterData runtimeData, CombatController controller, float animDuration = 0.3f)
+        public void Initialize(RuntimeCharacterData runtimeData, CombatController controller, bool hasAnimation = false)
         {
+            this.hasAnimation = hasAnimation;
             this.controller = controller;
-            this.animDuration = animDuration;
 
             if (runtimeData == null)
             {
@@ -270,7 +280,6 @@ namespace Controller
             int healAmount = Mathf.FloorToInt(sourceData.maxHp * (percent / 100f));
             currentHp = healAmount;
             
-            // 죽은 상태(Dead) 플래그 해제 및 UI 복구 로직 필요
             gameObject.SetActive(true); 
             UpdateUI();
             Debug.Log($"{sourceData.name} 부활!");
@@ -449,6 +458,44 @@ namespace Controller
         {
             controller?.OnTargetSelected(this);
         }
+
+        public void ApplyHpChange(int amount)
+        {
+            if (sourceData == null) return;
+            sourceData.currentHp = Mathf.Clamp(sourceData.currentHp + amount, 0, sourceData.maxHp);
+            currentHp = sourceData.currentHp; 
+        }
+
+        public void ApplyMpChange(int amount)
+        {
+            if (sourceData == null) return;
+            sourceData.currentMp = Mathf.Clamp(sourceData.currentMp + amount, 0, sourceData.maxMp);
+            currentMp = sourceData.currentMp;
+        }
+
+        public void ApplyRevive(int percent)
+        {
+            if (sourceData == null) return;
+            int healAmount = Mathf.FloorToInt(sourceData.maxHp * (percent / 100f));
+            if (healAmount < 1) healAmount = 1;
+            
+            sourceData.currentHp = healAmount;
+            currentHp = sourceData.currentHp;
+            
+            // 부활 시 게임오브젝트 활성화 등 상태 복구
+            gameObject.SetActive(true);
+        }
+
+        public void ApplyStatusEffect(StatusEffect effect)
+        {
+            if (sourceData == null) return;
+            sourceData.statusEffect = effect;
+        }
+
+        public void RefreshView()
+        {
+            UpdateUI(); 
+        }
         
         protected override void UpdateUI()
         {
@@ -486,7 +533,8 @@ namespace Controller
 
                     // 즉시 변경 대신 DOValue 사용
                     hpSlider.DOKill(); // 기존 애니메이션이 있다면 취소하여 겹침 방지
-                    hpSlider.DOValue(currentHp, animDuration).SetEase(Ease.OutCubic);
+                    if (hasAnimation) hpSlider.DOValue(currentHp, 0.3f).SetEase(Ease.OutCubic);
+                    else hpSlider.value = currentHp;
                 }
 
                 if (mpSlider)
@@ -496,7 +544,8 @@ namespace Controller
 
                     // MP도 동일하게 적용
                     mpSlider.DOKill();
-                    mpSlider.DOValue(currentMp, animDuration).SetEase(Ease.OutCubic);
+                    if (hasAnimation) mpSlider.DOValue(currentMp, 0.3f).SetEase(Ease.OutCubic);
+                    else mpSlider.value = currentMp;
                 }
             }
         }

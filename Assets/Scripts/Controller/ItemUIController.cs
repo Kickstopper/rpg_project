@@ -144,7 +144,7 @@ namespace Controller
                 GameObject go = Instantiate(partyPrefab, partySlots[i]);
                 partyControllers[i] = go.GetComponent<PlayerController>();
 
-                if (member != null) partyControllers[i].Initialize(member, null);
+                if (member != null) partyControllers[i].Initialize(member, null, true);
                 else partyControllers[i].InitializeEmpty(i);
             }
         }
@@ -377,98 +377,56 @@ namespace Controller
 
         private void UseItemOnTarget()
         {
-            TargetScope scope = selectedItemData.targetScope;
-            bool success = false;
+            // 1. 데이터 유효성 체크
+            if (selectedItemData == null) return;
 
-            // 전체 대상 처리
-            if (scope == TargetScope.All_Allies)
+            // 2. 효과 적용 시도 (EffectManager 위임)
+            // 타겟을 인터페이스로 가져옴
+            PlayerController targetPC = partyControllers[currentPartyIndex];
+            IBattleTarget battleTarget = targetPC;
+
+            // 2. EffectManager 호출 (데이터 수정 -> UI 갱신 자동 수행)
+            if (EffectManager.Instance.ApplyEffect(battleTarget, selectedItemData))
             {
-                foreach (var pc in partyControllers) if (!pc.IsEmpty) ApplyEffect(pc);
-                success = true;
-            }
-            else if (scope == TargetScope.All_Dead_Allies)
-            {
-                foreach (var pc in partyControllers) if (!pc.IsEmpty && pc.currentHp <= 0) ApplyEffect(pc);
-                success = true;
+                // A. 아이템 소모 (인벤토리 반영)
+                InventoryManager.Instance.UseItem(selectedItemData.id);
+                
+                // B. 효과음 재생
+                // 아이템 타입에 따라 다른 소리를 낼 수도 있습니다.
+                SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
+
+                // C. UI 리스트 갱신 (수량 변화 반영)
+                RefreshItemList(); 
+
+                // D. 연속 사용 처리 로직 (UX)
+                int remainingCount = InventoryManager.Instance.GetItemCount(selectedItemData.id);
+
+                if (remainingCount > 0)
+                {
+                    // 아이템이 아직 남았다면 타겟팅 모드를 유지.
+                    // 아이템 정보창(수량)을 즉시 갱신.
+                    if (itemInfo) itemInfo.UpdateInfo(selectedItemData); 
+                }
+                else
+                {
+                    // 아이템을 다 썼다면 타겟팅을 풀고 아이템 리스트로 포커스를 돌려줌.
+                    CancelTargetSelection();
+                    
+                    // 리스트 인덱스 안전 장치 (방금 쓴 아이템이 사라졌으므로 커서 위치 조정)
+                    if (inventoryItemIds.Count > 0)
+                    {
+                        currentItemIndex = Mathf.Clamp(currentItemIndex, 0, inventoryItemIds.Count - 1);
+                        UpdateItemSelection();
+                    }
+                }
             }
             else
             {
-                // 단일 대상 유효성 검사 (SkillUI의 IsValidTarget 로직과 유사)
-                if (IsValidTarget(currentPartyIndex))
-                {
-                    ApplyEffect(partyControllers[currentPartyIndex]);
-                    success = true;
-                }
-                else
-                {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                    return; // 실패 시 리턴
-                }
+                // 실패 처리 (예: HP가 가득 찬 대상에게 회복약 사용 시도)
+                // "효과가 없다" 메시지를 띄우거나 취소음을 재생합니다.
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                // 필요하다면: menuController.ShowAlertPopup("효과가 없습니다.");
             }
-
-            if (success)
-            {
-                InventoryManager.Instance.UseItem(selectedItemData.id);
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
-                RefreshItemList(); 
-
-                if (inventoryItemIds.Count > 0)
-                {
-                    currentItemIndex = Mathf.Clamp(currentItemIndex, 0, inventoryItemIds.Count - 1);
-                }
-                else
-                {
-                    currentItemIndex = 0;
-                }
-
-                isSelectingTarget = false;
-                foreach (var pc in partyControllers) pc.ResetHighlightColor();
-                if (itemInfo) itemInfo.ResetText();
-                UpdateItemSelection();
-            }
-        }
-
-        // 타겟 유효성 검사 함수
-        private bool IsValidTarget(int index)
-        {
-            // 인덱스 범위 체크
-            if (index < 0 || index >= partyControllers.Length) return false;
-            
-            PlayerController target = partyControllers[index];
-            if (target.IsEmpty) return false;
-
-            TargetScope scope = selectedItemData.targetScope;
-
-            // 부활 아이템인데 대상이 살아있음
-            if ((scope == TargetScope.Dead_Ally) && target.currentHp > 0) return false;
-
-            // 회복 아이템인데 대상이 죽어있음 (One_Ally는 보통 산 아군 대상)
-            if ((scope == TargetScope.One_Ally) && target.currentHp <= 0) return false;
-
-            return true;
-        }
-
-        private void ApplyEffect(PlayerController target)
-        {
-            int hpRec = 0;
-            int mpRec = 0;
-
-            if (selectedItemData.effectType == EffectType.Recover_HP) hpRec = selectedItemData.effectValue;
-            if (selectedItemData.effectType == EffectType.Recover_MP) mpRec = selectedItemData.effectValue;
-            
-            if (selectedItemData.effectType == EffectType.Revive_Empty || selectedItemData.effectType == EffectType.Revive_Fully)
-            {
-                if (target.currentHp <= 0)
-                {
-                    target.Revive(selectedItemData.effectValue);
-                    target.sourceData.currentHp = target.currentHp;
-                    return; 
-                }
-            }
-
-            target.Recover(hpRec, mpRec);
-            target.sourceData.currentHp = target.currentHp;
-            target.sourceData.currentMp = target.currentMp;
         }
 
         private int GetFirstValidMemberIndex() => System.Array.FindIndex(partyControllers, p => !p.IsEmpty && p.currentHp > 0);
