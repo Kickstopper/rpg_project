@@ -105,7 +105,7 @@ namespace UI.DungeonMapScene
         private Tween _pulseTween;
         
         [Header("Movement Settings")]
-        public float gridBaseTurnDuration = .1f; 
+        public float gridBaseTurnDuration = .2f; 
         public float gridBaseMoveDuration = .2f;
         public float runMultiplier = 2.0f; // Shift 누르면 2배 빨라짐
 
@@ -126,6 +126,7 @@ namespace UI.DungeonMapScene
 
         [Header("References")]
         public GameObject screenContainer;
+        public CompassUI compassUI;
         public GridMap miniMap; 
         public GameObject autoMapContainer;
         public AutoMapRenderer autoMapRenderer; // autoMap에 포함된 렌더러
@@ -379,6 +380,8 @@ namespace UI.DungeonMapScene
 
             // 시작 위치 설정
             _direction = (int)_worldMap.startDirection;
+
+            if (compassUI != null) compassUI.SetDirection(_direction);
             
             UpdateMapDiscovery(_worldMap.startX, _worldMap.startY);
 
@@ -1468,6 +1471,9 @@ namespace UI.DungeonMapScene
             // B. 오토맵 발견 처리 & 아이콘 스냅
             UpdateMapDiscovery(nearestGridX, nearestGridY);
 
+            // 나침반 즉시 동기화
+            if (compassUI != null) compassUI.SetDirection(_direction);
+
             // 5. 화면 렌더링
             Render();
         }
@@ -2007,6 +2013,9 @@ namespace UI.DungeonMapScene
                 // 2. 맵 데이터 로드 (기본 startX, startY로 세팅됨)
                 LoadMapData();
             }
+            
+            // 나침반 초기화
+            if (compassUI != null) compassUI.SetDirection(_direction);
 
             PrecomputeTexturePixels();
             Render();
@@ -2182,6 +2191,13 @@ namespace UI.DungeonMapScene
             // 2. 시간(Duration) 설정: 180도 회전은 90도보다 2배 오래 걸려야 속도가 같음
             float baseDuration = CurrentTurnDuration;
             float duration = (Mathf.Abs(directionStep) == 2) ? baseDuration * 2.0f : baseDuration;
+
+            // 나침반 애니메이션 실행
+            // directionStep: 1(우회전), -1(좌회전), 2(뒤로)
+            if (compassUI != null) 
+            {
+                compassUI.AnimateTurn(nextDirIdx, directionStep, duration);
+            }
 
             float elapsed = 0f;
 
