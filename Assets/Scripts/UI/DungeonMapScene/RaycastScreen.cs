@@ -99,9 +99,9 @@ namespace UI.DungeonMapScene
         public TextMeshProUGUI dangerText;
         public Image fillImage; // 슬라이더의 Fill 영역 이미지 (색상 변경용)
         
-        public Color safeColor = Color.green;
-        public Color warningColor = Color.yellow;
-        public Color dangerColor = Color.red;
+        public Color32 safeColor = Color.green;
+        public Color32 warningColor = Color.yellow;
+        public Color32 dangerColor = Color.red;
         private Tween _pulseTween;
         
         [Header("Movement Settings")]
@@ -113,10 +113,12 @@ namespace UI.DungeonMapScene
         public float lightingIntensity = 3.5f; 
         public bool useGridLighting = true; // true면 그리드 단위로 밝기 끊어짐
 
+        private int precalcLightScale = 255;
+
         [Header("Scanner Effect Settings")]
-        public Color wireframeColor = Color.green; // 벽 와이어프레임 색상
-        public Color floorWireframeColor = new Color(0f, 0.5f, 0f); // 바닥/천장 와이어프레임
-        public Color pulseColor = Color.white;
+        public Color32 wireframeColor = Color.green; // 벽 와이어프레임 색상
+        public Color32 floorWireframeColor = new Color(0f, 0.5f, 0f); // 바닥/천장 와이어프레임
+        public Color32 pulseColor = Color.white;
         public float scanSpeed = 15.0f; 
         public float maxScanDistance = 20.0f; 
         public float pulseWidth = 0.5f; // 경계선의 두께 (조절 가능)
@@ -187,11 +189,8 @@ namespace UI.DungeonMapScene
         private int _ceilTexIdx; // 천장 텍스쳐 인덱스 
         private int _floorTexIdx; // 바닥 텍스쳐 인덱스
 
-        // [최적화] 딕셔너리 대신 1차원 배열로 모든 텍스처 픽셀을 캐싱
-        private Color[] _flatTexturePixels; 
-
-        // 화면 버퍼
-        private Color[] _buffer;    // 화면에 그려질 픽셀 색상 배열
+        private Color32[] _buffer;    // 화면에 그려질 픽셀 색상 배열
+        private Color32[] _flatTexturePixels;
         private float[] _zBuffer;   // 깊이 버퍼 (스프라이트 가림 처리용)
         
         // 유니티 컴포넌트
@@ -207,7 +206,7 @@ namespace UI.DungeonMapScene
         void Start()
         {
             // 버퍼 메모리 할당
-            _buffer = new Color[screenWidth * screenHeight];
+            _buffer = new Color32[screenWidth * screenHeight];
             _leftEyeBuffer = new Color[screenWidth * screenHeight]; // 애너글리프용
             _zBuffer = new float[screenWidth];
 
@@ -412,43 +411,45 @@ namespace UI.DungeonMapScene
         // [최적화 핵심] 모든 텍스처를 하나의 거대한 1차원 색상 배열로 변환
         private void PrecomputeTexturePixels()
         {
-            int totalPixels = _textures.Length * texWidth * texHeight;
-            _flatTexturePixels = new Color[totalPixels];
+            if (!Mathf.IsPowerOfTwo(texWidth) || !Mathf.IsPowerOfTwo(texHeight))
+            {
+                Debug.LogError($"[RaycastScreen] 텍스처 크기는 반드시 2의 승수여야 합니다! 현재: {texWidth}x{texHeight}");
+                return;
+            }
+            // 전체 배열 크기 = (텍스처 개수) * (가로) * (세로)
+            int pixelsPerTexture = texWidth * texHeight;
+            int totalPixels = _textures.Length * pixelsPerTexture;
+            
+            // 최적화: Color32 사용 (메모리 절약)
+            _flatTexturePixels = new Color32[totalPixels]; 
 
             for (int i = 0; i < _textures.Length; i++)
             {
-                //텍스처 사이즈 불일치 체크
-                if (_textures[i].width != texWidth || _textures[i].height != texHeight)
-                {
-                    Debug.LogError($"Texture Size Mismatch! Index: {i}, Name: {_textures[i].name}. Expected {texWidth}x{texHeight}");
-                    continue;
-                }
+                // 1. 현재 텍스처의 픽셀들을 가져옴
+                Color[] sourcePixels = _textures[i].GetPixels();
 
-                Color[] pixels = _textures[i].GetPixels(); // 텍스처 전체 픽셀 가져오기
-                // 1차원 배열의 해당 위치에 복사
-                // 위치: (텍스처번호 * 전체픽셀수)
-                Array.Copy(pixels, 0, _flatTexturePixels, i * texWidth * texHeight, pixels.Length);
+                // 2. 오프셋 계산
+                // 이 텍스처가 전체 배열의 어디서부터 시작해야 하는지 결정
+                int offset = i * pixelsPerTexture;
+
+                // 3. 픽셀 복사 (Color -> Color32 변환)
+                for (int p = 0; p < sourcePixels.Length; p++)
+                {
+                    // _flatTexturePixels의 [시작점 + p] 위치에 저장
+                    _flatTexturePixels[offset + p] = (Color32)sourcePixels[p];
+                }
             }
         }
 
         // 최적화된 1차원 배열에서 색상을 가져오는 함수
-        // O(1) 접근 속도로 매우 빠름
-        private Color GetPixelFast(int texIdx, int x, int y)
+        private Color32 GetPixelFast(int texIdx, int x, int y)
         {
-            // 텍스처 인덱스 체크
-            if (texIdx < 0 || texIdx >= _textures.Length) return Color.magenta;
+            if (texIdx < 0 || texIdx >= _textures.Length) return new Color32(255, 0, 255, 255);
 
-            // 좌표가 범위를 벗어나지 않도록 비트 마스킹 (Wrapping)
-            // 예: x가 -1이면 31이 되고, 32면 0이 됨. (texWidth가 2의 제곱수여야 함)
-            // texWidth가 32라면 (texWidth - 1)은 이진수로 11111.
             x = x & (texWidth - 1); 
             y = y & (texHeight - 1);
 
             int index = (texIdx * texWidth * texHeight) + (y * texWidth) + x;
-
-            // (선택) 혹시 모를 배열 전체 범위 체크
-            if (index < 0 || index >= _flatTexturePixels.Length) return Color.magenta;
-
             return _flatTexturePixels[index];
         }
 
@@ -633,11 +634,11 @@ namespace UI.DungeonMapScene
                 // 3. Merge
                 for (int i = 0; i < _buffer.Length; i++)
                 {
-                    Color left = _leftEyeBuffer[i];
-                    Color right = _buffer[i];
+                    Color32 left = _leftEyeBuffer[i];
+                    Color32 right = _buffer[i];
                     // 투명도 고려하여 병합 (둘 다 투명하면 투명)
-                    float alpha = Mathf.Max(left.a, right.a);
-                    _buffer[i] = new Color(left.r, right.g, right.b, alpha);
+                    byte alpha = (byte)Mathf.Max(left.a, right.a);
+                    _buffer[i] = new Color32(left.r, right.g, right.b, alpha);
                 }
 
                 _posX = originalX;
@@ -649,7 +650,10 @@ namespace UI.DungeonMapScene
                 PerformRenderPass(1); 
             }
             
-            _screenTexture.SetPixels(_buffer);
+            _screenTexture.LoadRawTextureData(
+                System.Runtime.InteropServices.Marshal.UnsafeAddrOfPinnedArrayElement(_buffer, 0),
+                _buffer.Length * 4 // byte size
+            );
             _screenTexture.Apply();
 
             UpdateBackgroundUV();
@@ -826,19 +830,21 @@ namespace UI.DungeonMapScene
                 // ---------------------------------------------------------
                 // 7. 조명(Gamma) 계산
                 // ---------------------------------------------------------
-                float gamma = 0f;
+                // 조명(Gamma) 값을 0~255 정수로 미리 계산
+                int lightScale = 255;
                 if (useGridLighting)
                 {
                     float distX = Mathf.Abs(mapX - _logicX);
                     float distY = Mathf.Abs(mapY - _logicY);
-                    float dist = Mathf.Max(distX, distY); // Chebyshev Distance
-                    gamma = Mathf.Clamp(lightingIntensity / (dist + 1.0f), 0f, 1f);
+                    float dist = Mathf.Max(distX, distY);
+                    // 0.0~1.0 float를 0~255 int로 변환
+                    lightScale = (int)(Mathf.Clamp(lightingIntensity / (dist + 1.0f), 0f, 1f) * 255);
                 }
                 else
                 {
-                    gamma = Mathf.Clamp(lightingIntensity / perpWallDist, 0f, 1f); 
+                    lightScale = (int)(Mathf.Clamp(lightingIntensity / perpWallDist, 0f, 1f) * 255);
                 }
-
+                if (side == 1) lightScale = (lightScale * 230) >> 8; // 약 0.9배 (230/256)
                 // ---------------------------------------------------------
                 // 8. 수직선 그리기 (Texture Mapping Loop)
                 // ---------------------------------------------------------
@@ -848,9 +854,7 @@ namespace UI.DungeonMapScene
 
                 for (int y = drawStart; y < drawEnd; y++)
                 {
-                    int texY = (int)texPos & (texHeight - 1);
-                    texPos += stepVal;
-                    Color color;
+                    Color32 color;
 
                     if (renderWireframe)
                     {
@@ -876,38 +880,35 @@ namespace UI.DungeonMapScene
                             sampleTexX = (int)(texX + wave) & (texWidth - 1); 
                         }
 
-                        // 텍스처 반복(Wrap) 처리 (음수나 범위를 벗어날 경우 대비)
-                        // 비트 연산(&)을 쓰려면 texWidth가 2의 n승이어야 함. (예: 64)
-                        sampleTexX = sampleTexX & (texWidth - 1);
+                        // 텍스처 Y 좌표 계산 (비트 연산 활용을 위해 texHeight는 2의 승수여야 함)
+                        int d = y * 256 - screenHeight * 128 + lineHeight * 128 - (int)_currentPitch * 256 + (int)_currentJumpOffset * 256;
+                        int texY = ((d * texHeight) / lineHeight) / 256;
+                        
+                        color = GetPixelFast(hitTexId, texX, texY);
 
-                        // 텍스처 픽셀 가져오기 (Fast Access)
-                        color = GetPixelFast(hitTexId, sampleTexX, texY);
-
-                        // 측면 그림자 (Side 1)
-                        if (side == 1) 
-                        { 
-                            color.r *= 0.9f; color.g *= 0.9f; color.b *= 0.9f; 
-                        } 
-
-                        // 거리별 조명 적용
-                        color.r *= gamma; color.g *= gamma; color.b *= gamma;
-                    }
-
-                    // -----------------------------------------------------
-                    // [최적화 핵심] 계산된 1개의 픽셀을 step만큼 가로로 채우기
-                    // -----------------------------------------------------
-                    int bufferIndexBase = y * screenWidth + x;
-                    
-                    for (int s = 0; s < step; s++)
-                    {
-                        // 화면 범위를 벗어나지 않는지 확인
-                        if (x + s < screenWidth)
+                        // [중요 3] 정수 비트 연산으로 조명 적용 (매우 빠름)
+                        // Color32 구조체는 r,g,b가 byte입니다.
+                        if (lightScale < 255)
                         {
-                            _buffer[bufferIndexBase + s] = color;
+                            color.r = (byte)((color.r * lightScale) >> 8); // 나누기 256 대신 비트 시프트
+                            color.g = (byte)((color.g * lightScale) >> 8);
+                            color.b = (byte)((color.b * lightScale) >> 8);
+                        }
+
+                        // 버퍼에 쓰기
+                        int bufferIndex = y * screenWidth + x;
+                        
+                        // Step 처리 (가로로 픽셀 복사)
+                        for (int s = 0; s < step; s++)
+                        {
+                            if (x + s < screenWidth)
+                            {
+                                _buffer[bufferIndex + s] = color;
+                                _zBuffer[x + s] = perpWallDist; // 깊이 버퍼
+                            }
                         }
                     }
                 }
-
                 // ---------------------------------------------------------
                 // 9. Z-Buffer 채우기 (스프라이트 깊이 판정용)
                 // ---------------------------------------------------------
@@ -973,6 +974,11 @@ namespace UI.DungeonMapScene
                 float posZ = 0.5f * screenHeight * heightScale;
                 float rowDistance = posZ / p;
 
+                if (!useGridLighting) 
+                {
+                    precalcLightScale = (int)(Mathf.Clamp(lightingIntensity / rowDistance, 0f, 1f) * 255);
+                }
+
                 // 레이 방향 계산
                 float rayDirX0 = _dirX - _planeX;
                 float rayDirY0 = _dirY - _planeY;
@@ -989,12 +995,13 @@ namespace UI.DungeonMapScene
                 floorStepX *= step;
                 floorStepY *= step;
 
-                float floorX = _posX + rowDistance * rayDirX0 + (floorStepX * 0 / step); // 초기값 보정 미세조정 필요없음
-                float floorY = _posY + rowDistance * rayDirY0 + (floorStepY * 0 / step);
+                // 초기 시작점은 0번째 스텝이므로 floorStep을 더할 필요가 없음
+                float floorX = _posX + rowDistance * rayDirX0; 
+                float floorY = _posY + rowDistance * rayDirY0;
 
                 for (int x = 0; x < screenWidth; x += step) 
                 {
-                    Color color = GetFloorColor(floorX, floorY, rowDistance);
+                    Color32 color = GetFloorColor(floorX, floorY, rowDistance);
                     
                     // 가로로 채우기
                     for (int s = 0; s < step; s++)
@@ -1024,6 +1031,11 @@ namespace UI.DungeonMapScene
                     // posZ 계산에 heightScale 곱하기
                     float posZ = 0.5f * screenHeight * heightScale;
                     float rowDistance = posZ / p;
+
+                    if (!useGridLighting) 
+                    {
+                        precalcLightScale = (int)(Mathf.Clamp(lightingIntensity / rowDistance, 0f, 1f) * 255);
+                    }
                     
                     // 천장은 바닥과 레이 계산 로직이 동일
                     float rayDirX0 = _dirX - _planeX;
@@ -1044,7 +1056,7 @@ namespace UI.DungeonMapScene
                     // 루프에서 step 사용
                     for (int x = 0; x < screenWidth; x += step) 
                     {
-                        Color color = GetCeilingColor(floorX, floorY, rowDistance);
+                        Color32 color = GetCeilingColor(floorX, floorY, rowDistance);
 
                         for (int s = 0; s < step; s++)
                         {
@@ -1060,28 +1072,14 @@ namespace UI.DungeonMapScene
         }
 
         // [헬퍼 함수] 바닥 색상 계산 (기존 루프 안의 내용을 복사해서 정리)
-        private Color GetFloorColor(float worldX, float worldY, float rowDistance)
+        private Color32 GetFloorColor(float worldX, float worldY, float rowDistance)
         {
             int cellX = (int)(worldX);
             int cellY = (int)(worldY);
             int tx = (int)(texWidth * (worldX - cellX)) & (texWidth - 1);
             int ty = (int)(texHeight * (worldY - cellY)) & (texHeight - 1);
 
-            Color color;
-            float gamma = 0f;
-
-            // 조명 계산
-            if (useGridLighting)
-            {
-                float distX = Mathf.Abs(cellX - _logicX);
-                float distY = Mathf.Abs(cellY - _logicY);
-                float dist = Mathf.Max(distX, distY);
-                gamma = Mathf.Clamp(lightingIntensity / (dist + 1.0f), 0f, 1f);
-            }
-            else
-            {
-                gamma = Mathf.Clamp(lightingIntensity / rowDistance, 0f, 1f);
-            }
+            Color32 color;
 
             // 스캔 효과 및 텍스처
             if (_isScanning && rowDistance < _currentScanRadius)
@@ -1097,18 +1095,21 @@ namespace UI.DungeonMapScene
             else
             {
                 color = GetPixelFast(_floorTexIdx, tx, ty);
+                // 감마 적용
+                int lightScale = useGridLighting ? (int)(Mathf.Clamp(lightingIntensity / rowDistance, 0f, 1f) * 255) : precalcLightScale;
+        
+                if (lightScale < 255) {
+                    color.r = (byte)((color.r * lightScale) >> 8);
+                    color.g = (byte)((color.g * lightScale) >> 8);
+                    color.b = (byte)((color.b * lightScale) >> 8);
+                }
             }
-
-            // 감마 적용
-            if (color != Color.black)
-            {
-                color.r *= gamma; color.g *= gamma; color.b *= gamma;
-            }
+            
             return color;
         }
 
         // [헬퍼 함수] 천장 색상 계산
-        private Color GetCeilingColor(float worldX, float worldY, float rowDistance)
+        private Color32 GetCeilingColor(float worldX, float worldY, float rowDistance)
         {
             // 바닥 로직과 유사하지만 텍스처 ID와 와이어프레임 색상 등이 다를 수 있음
             // 여기서는 편의상 바닥 로직을 재사용하되 텍스처만 _ceilTexIdx 사용
@@ -1118,21 +1119,8 @@ namespace UI.DungeonMapScene
             int tx = (int)(texWidth * (worldX - cellX)) & (texWidth - 1);
             int ty = (int)(texHeight * (worldY - cellY)) & (texHeight - 1);
 
-            Color color;
-            float gamma = 0f;
-
-            if (useGridLighting)
-            {
-                float distX = Mathf.Abs(cellX - _logicX);
-                float distY = Mathf.Abs(cellY - _logicY);
-                float dist = Mathf.Max(distX, distY);
-                gamma = Mathf.Clamp(lightingIntensity / (dist + 1.0f), 0f, 1f);
-            }
-            else
-            {
-                gamma = Mathf.Clamp(lightingIntensity / rowDistance, 0f, 1f);
-            }
-
+            Color32 color;
+            
             if (_isScanning && rowDistance < _currentScanRadius)
             {
                 float distToScanEdge = Mathf.Abs(rowDistance - _currentScanRadius);
@@ -1146,12 +1134,15 @@ namespace UI.DungeonMapScene
             else
             {
                 color = GetPixelFast(_ceilTexIdx, tx, ty);
+                int lightScale = useGridLighting ? (int)(Mathf.Clamp(lightingIntensity / rowDistance, 0f, 1f) * 255) : precalcLightScale;
+    
+                if (lightScale < 255) {
+                    color.r = (byte)((color.r * lightScale) >> 8);
+                    color.g = (byte)((color.g * lightScale) >> 8);
+                    color.b = (byte)((color.b * lightScale) >> 8);
+                }
             }
 
-            if (color != Color.black)
-            {
-                color.r *= gamma; color.g *= gamma; color.b *= gamma;
-            }
             return color;
         }
 
@@ -1220,6 +1211,7 @@ namespace UI.DungeonMapScene
                 int drawStartX = Mathf.Max(-spriteWidth / 2 + spriteScreenX, 0);
                 int drawEndX = Mathf.Min(spriteWidth / 2 + spriteScreenX, screenWidth);
 
+                int lightScale = (int)(gamma * 255);
                 // 화면의 스프라이트에 대해 수직 스트라이프 반복
                 for (int stripe = drawStartX; stripe < drawEndX; stripe += step) {
                     int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * _textures[_sprtData[spriteIdx].texIdx].width / spriteWidth) / 256;
@@ -1233,22 +1225,34 @@ namespace UI.DungeonMapScene
                             int texY = d * _textures[_sprtData[spriteIdx].texIdx].height / spriteHeight / 256;
                             if (texY < 0) texY = 0;
                             
-                            Color color = GetPixelFast(_sprtData[spriteIdx].texIdx, texX, texY);
-                            if (color.a != 0) {
-                                Color oldColor = _buffer[y * screenWidth + stripe];
+                            Color32 color = GetPixelFast(_sprtData[spriteIdx].texIdx, texX, texY);
 
-                                color.r *= gamma;
-                                color.g *= gamma;
-                                color.b *= gamma;
+                            // 투명한 픽셀은 그리지 않음 (알파값 0이면 스킵)
+                            if (color.a > 0) 
+                            {
+                                // 조명 적용
+                                if (lightScale < 255)
+                                {
+                                    color.r = (byte)((color.r * lightScale) >> 8);
+                                    color.g = (byte)((color.g * lightScale) >> 8);
+                                    color.b = (byte)((color.b * lightScale) >> 8);
+                                }
 
-                                Color mixedColor = oldColor * (1 - color.a) + color * color.a; 
-                                _buffer[y * screenWidth + stripe] = mixedColor;
+                                // 버퍼에 쓰기
+                                int bufferIdx = y * screenWidth + stripe;
+                                _buffer[bufferIdx] = color; // 알파 블렌딩 없이 덮어쓰기 (성능 우선)
                                 
+                                // Step 처리 (각 픽셀별로 깊이 검사 수행)
                                 for (int s = 0; s < step; s++)
                                 {
-                                    if (stripe + s < drawEndX && stripe + s < screenWidth)
+                                    int currentX = stripe + s;
+                                    if (currentX < drawEndX && currentX < screenWidth)
                                     {
-                                         _buffer[y * screenWidth + (stripe + s)] = mixedColor;
+                                        // 픽셀별로 깊이(ZBuffer)를 확인
+                                        if (transformY < _zBuffer[currentX]) 
+                                        {
+                                            _buffer[bufferIdx + s] = color;
+                                        }
                                     }
                                 }
                             }
@@ -1531,7 +1535,7 @@ namespace UI.DungeonMapScene
             }
             else
             {
-                miniMap.TranslateToNewPosition((int)_posX, (int)_posY);
+                miniMap.TranslateToNewPosition(Mathf.FloorToInt(_posX), Mathf.FloorToInt(_posY));
             }
             autoMapRenderer.UpdatePlayerIconFree(_posX, _posY, _dirX, _dirY);
         }
@@ -1842,8 +1846,8 @@ namespace UI.DungeonMapScene
         private void MovePlayer(Vector2Int moveDir)
         {
             // 현재 위치
-            int currentX = (int)_posX;
-            int currentY = (int)_posY;
+            int currentX = Mathf.FloorToInt(_posX);
+            int currentY = Mathf.FloorToInt(_posY);
 
             int targetX = currentX + moveDir.x;
             int targetY = currentY + moveDir.y;
@@ -1980,6 +1984,12 @@ namespace UI.DungeonMapScene
             if (_moveCoroutine != null) StopCoroutine(_moveCoroutine);
 
             LoadMapData(entryWarp);
+            // [안전장치] 첫 번째 텍스처의 크기로 텍스처 사이즈 설정을 덮어씌움
+            if (_textures != null && _textures.Length > 0)
+            {
+                texWidth = _textures[0].width;
+                texHeight = _textures[0].height;
+            }
             
             _isMoving = false;
             _isScanning = false;
@@ -2039,8 +2049,8 @@ namespace UI.DungeonMapScene
 
                 // 이동 목표 위치 계산 (벽 안쪽 좌표)
                 // 현재 위치에서 moveDir만큼 더한 그리드의 '시각적 중심(OffsetPosition)'을 구함
-                int targetGridX = (int)_posX + moveDir.x;
-                int targetGridY = (int)_posY + moveDir.y;
+                int targetGridX = Mathf.FloorToInt(_posX) + moveDir.x;
+                int targetGridY = Mathf.FloorToInt(_posY) + moveDir.y;
                 Vector2 targetPos = GetOffsetPosition(targetGridX, targetGridY, _direction);
 
                 fadeOverlay.alpha = 0f;

@@ -75,7 +75,7 @@ namespace Controller
                 StopAllCoroutines();
                 targetImage.sprite = backgroundImages[backgroundImages.Count-1];
                 targetImage.color = Color.white;
-                targetImage.SetNativeSize();
+                targetImage.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
                 CheckSuspendSaveData();
                 UI_Canvas.SetActive(true);
 
@@ -95,7 +95,7 @@ namespace Controller
             {
                 // 1. 현재 순서의 이미지로 교체
                 targetImage.sprite = backgroundImages[currentBtnIndex];
-                targetImage.SetNativeSize();
+                targetImage.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
 
                 // 2. Fade In (투명 -> 불투명)
                 yield return StartCoroutine(FadeEffect(0f, 1f));
