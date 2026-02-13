@@ -13,11 +13,12 @@ namespace UI.DungeonMapScene
         public RectTransform playerIcon; // 인스펙터에서 PlayerIcon UI 연결
 
         [Header("맵 설정")]
-        public int cellSize = 16;
-        public int wallThickness = 2;
+        private int cellSize = 28;
+        private int wallThickness = 2;
 
         [Header("색상 설정")]
-        public Color fogColor = Color.black; // 안개 색상 (투명도 1)
+        public Color fogColor = Color.black; // 안개 색상
+        public Color defaultColor = Color.white;
         public Color[] floorColors;
         public Color[] wallColors;
 
@@ -42,7 +43,7 @@ namespace UI.DungeonMapScene
 
             if (mapTexture == null || mapTexture.width != texWidth || mapTexture.height != texHeight)
             {
-                mapTexture = new Texture2D(texWidth, texHeight);
+                mapTexture = new Texture2D(texWidth, texHeight, TextureFormat.RGBA32, false);
                 mapTexture.filterMode = FilterMode.Point;
                 mapTexture.wrapMode = TextureWrapMode.Clamp;
             }
@@ -96,38 +97,45 @@ namespace UI.DungeonMapScene
         {
             if (currentMapData == null || currentMapState == null) return;
 
-            // 이미 방문했다면 굳이 텍스처를 갱신할 필요 없음 (성능 최적화)
-            // 단, '처음 방문' 시에는 반드시 그려야 함
-            // 여기서는 외부에서 state를 업데이트하고 호출한다고 가정하므로 바로 그린다.
-            
+            // 1. 해당 좌표의 셀 데이터 가져오기
             CellData cell = currentMapData.GetCell(x, y);
+            
+            // 2. 만약 현재 상태(mapState)에서 해당 셀이 방문된 상태라면 그리기 수행
+            // (이미 방문했더라도 텍스처가 갱신 안 된 경우를 대비해 다시 그림)
             if (cell != null)
             {
                 DrawCellGraphic(cell);
-                mapTexture.Apply(); // 변경 사항 적용
+                mapTexture.Apply(); // GPU에 텍스처 업데이트 전달
             }
         }
-        
-        // 실제 맵 그래픽 그리기 (이전 코드의 DrawCell 로직)
+
+        // 맵 그래픽 그리기 (바닥을 먼저 꽉 채워서 안개를 지움)
         void DrawCellGraphic(CellData cell)
         {
             int startX = cell.x * cellSize;
             int startY = cell.y * cellSize;
 
-            // 1. 바닥
+            // 1. 바닥 채우기 (Alpha 1.0f로 안개 완벽 제거)
             Color fColor = (cell.value > -1 && cell.value < floorColors.Length) 
-                ? floorColors[cell.value] : Color.gray;
-            fColor.a = 1.0f; 
+                ? floorColors[cell.value] : defaultColor;
 
-            for (int y = 0; y < cellSize; y++)
-                for (int x = 0; x < cellSize; x++)
-                    mapTexture.SetPixel(startX + x, startY + y, fColor);
+            // 성능 향상을 위해 배열로 한 번에 채우기
+            Color[] fillColors = new Color[cellSize * cellSize];
+            for (int i = 0; i < fillColors.Length; i++) fillColors[i] = fColor;
+            mapTexture.SetPixels(startX, startY, cellSize, cellSize, fillColors);
 
-            // 2. 벽 (North, East, South, West)
-            DrawWallLine(cell.wallTextureIDs[0], startX, startY + cellSize - wallThickness, cellSize, wallThickness);
-            DrawWallLine(cell.wallTextureIDs[1], startX + cellSize - wallThickness, startY, wallThickness, cellSize);
-            DrawWallLine(cell.wallTextureIDs[2], startX, startY, cellSize, wallThickness);
-            DrawWallLine(cell.wallTextureIDs[3], startX, startY, wallThickness, cellSize);
+            // 2. 벽 그리기
+            // Index 0: 왼쪽 (West)
+            DrawWallLine(cell.wallTextureIDs[0], startX, startY, wallThickness, cellSize);
+            
+            // Index 1: 위쪽 (North)
+            DrawWallLine(cell.wallTextureIDs[1], startX, startY + cellSize - wallThickness, cellSize, wallThickness);
+            
+            // Index 2: 오른쪽 (East)
+            DrawWallLine(cell.wallTextureIDs[2], startX + cellSize - wallThickness, startY, wallThickness, cellSize);
+            
+            // Index 3: 아래쪽 (South)
+            DrawWallLine(cell.wallTextureIDs[3], startX, startY, cellSize, wallThickness);
         }
 
         // 안개 그래픽 그리기 (검은색 채우기)
@@ -149,16 +157,14 @@ namespace UI.DungeonMapScene
 
         void DrawWallLine(int wallID, int x, int y, int width, int height)
         {
-            Color wColor = Color.white;
+            Color wColor = defaultColor;
             if (wallID < 0)
             {
-                wColor = Color.blue;
-                wColor.a = 0.9f;
+                //wColor = Color.white;
             }
             else if (wallID < wallColors.Length)
             {
                 wColor =  wallColors[wallID];
-                wColor.a = 1.0f;
             }
 
             for (int py = 0; py < height; py++)

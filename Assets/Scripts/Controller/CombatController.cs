@@ -43,7 +43,10 @@ namespace Controller
         public GameObject instantResultPanel; // 결과 표시 패널
         public TextMeshProUGUI instantResultText; // 결과 텍스트
         public float instantWinDelay = 1.5f; // 결과 표시 후 대기 시간
-        
+
+        [Header("Escape Settings")]
+        public int guaranteedEscapeAttempts = 3; // 몇 번째 시도부터 무조건 성공할지 설정
+        private int currentEscapeAttempts = 0;   // 현재 전투에서의 시도 횟수
         
         private List<Button> activeFightButtons = new List<Button>();
         private int currentFightBtnIndex = 0; // fight 메뉴용 인덱스
@@ -227,6 +230,9 @@ namespace Controller
 
             HideLog();
             HideMessage();
+
+            // 도망 횟수 초기화
+            currentEscapeAttempts = 0; 
 
             activeMonsters.Clear();
             encounterLog.Clear();
@@ -1335,7 +1341,9 @@ namespace Controller
         }
 
         public void OnBaseCommand_Escape() 
-        { 
+        {
+            currentEscapeAttempts++;
+            Debug.Log($"도망 시도: {currentEscapeAttempts}/{guaranteedEscapeAttempts}"); 
             StartCoroutine(ProcessRunAttempt());
         }
         
@@ -3980,6 +3988,12 @@ namespace Controller
 
         bool CalculateEscapeSuccess()
         {
+            // 설정된 횟수 이상 시도했다면 무조건 성공
+            if (currentEscapeAttempts >= guaranteedEscapeAttempts)
+            {
+                return true;
+            }
+
             List<BattleEntity> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
             if (livingPlayers.Count == 0) return false;
 
