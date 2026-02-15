@@ -48,6 +48,8 @@ namespace Manager
             data.playerPosX = MapManager.Instance.currentPx;
             data.playerPosY = MapManager.Instance.currentPy;
             data.playerDirection = MapManager.Instance.currentDirection;
+            // 던전 탐색 상태 저장
+            data.dungeonMapStates = MapManager.Instance.GetAllMapStates();
             
             // 2. 인벤토리 & 골드 저장
             data.gold = InventoryManager.Instance.GetGold();
@@ -89,13 +91,17 @@ namespace Manager
             // 2. 파티원 복구
             // 기존 파티 클리어 후 재생성 로직 필요
             PartyManager.Instance.LoadFromSave(data.partyMembers);
-
             
             // 맵 매니저 설정
             if (MapManager.Instance != null)
             {
+                if (data.dungeonMapStates != null && data.dungeonMapStates.Count > 0)
+                {
+                    MapManager.Instance.LoadMapStates(data.dungeonMapStates);
+                }
                 MapManager.Instance.UpdatePlayerPosition(data.playerPosX, data.playerPosY, data.playerDirection, data.dungeonId);
             }
+            // 던전 탐색 상태 복구
 
             // 3. 씬 이동 및 위치 복구
             if (data.sceneName == GameScene.DUNGEON_MAP_SCENE)

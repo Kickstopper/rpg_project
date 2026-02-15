@@ -27,6 +27,7 @@ namespace Data
         public int playerPosY;
 
         public Direction playerDirection;
+        public List<DungeonMapState> dungeonMapStates = new List<DungeonMapState>();
 
         // 3. 자산 및 인벤토리
         public int gold;

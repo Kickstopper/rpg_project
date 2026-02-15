@@ -72,6 +72,8 @@ namespace Manager
             }
         }
 
+        
+
         // 3. 레벨 적용 로직
         private void SetCurrentLevel(MapData data)
         {
@@ -81,17 +83,17 @@ namespace Manager
             // ID를 string 대신 int(MapData.mapID)를 쓰거나, string으로 변환해서 사용
             string mapIDKey = data.mapID; 
 
-            var mapState = GameManager.Instance.GetDungeonMapState(mapIDKey);
-            
-            if (mapState != null) 
+            DungeonMapState mapState = MapManager.Instance.GetMapState(mapIDKey);
+
+            if (mapState != null)
             {
                 CurrentMapState = mapState;
             }
             else
             {
-                // 새 상태 생성
-                CurrentMapState = new DungeonMapState(data.width, data.height, mapIDKey);
-                GameManager.Instance.AddDungeonMapState(mapIDKey, CurrentMapState);
+                CurrentMapState = new DungeonMapState(CurrentMapData.width, CurrentMapData.height, mapIDKey);
+                
+                MapManager.Instance.RegisterMapState(CurrentMapState);
             }
             
             // 플레이어 시작 위치 설정 (MapData에 있는 정보 활용)

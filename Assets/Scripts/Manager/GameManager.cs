@@ -8,8 +8,6 @@ namespace Manager
     {
         public static GameManager Instance;
 
-        private Dictionary<string, DungeonMapState> allDiscoveredMaps = new();
-        
         private void Awake()
         {
             if (Instance == null)
@@ -24,19 +22,6 @@ namespace Manager
             {
                 Destroy(gameObject);
             }
-        }
-
-        public DungeonMapState GetDungeonMapState(string id)
-        {
-            if (allDiscoveredMaps.ContainsKey(id)) return allDiscoveredMaps[id];
-            return null;
-        }
-
-        public void AddDungeonMapState(string id, DungeonMapState mapState)
-        {
-            if (allDiscoveredMaps.ContainsKey(id)) return;
-
-            allDiscoveredMaps[id] = mapState;
         }
 
     }
