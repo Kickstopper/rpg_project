@@ -10,15 +10,6 @@ using TMPro;
 
 namespace UI.DungeonMapScene
 {
-    // 각 타일(좌표)마다 가질 상태 정보
-    public class TileAnimState
-    {
-        public bool isAnimating;    // 애니메이션 대상인가?
-        public bool showAlt;        // 현재 B 텍스처를 보여줄 차례인가?
-        public float timer;         // 다음 변경까지 남은 시간
-        public WallAnimConfig config; // 참조할 설정
-    }
-
     public class RaycastScreen : MonoBehaviour
     {
         [Header("Display Settings")]
@@ -784,7 +775,7 @@ namespace UI.DungeonMapScene
                 else           perpWallDist = (sideDistY - deltaDistY);
 
                 // =========================================================
-                // [수정: 위치 이동] 실린더 효과를 여기서 적용해야 벽의 높이가 변합니다.
+                // 실린더 효과를 여기서 적용해야 벽의 높이가 변합니다.
                 // =========================================================
                 if (useCylinderEffect)
                 {
@@ -1841,7 +1832,7 @@ namespace UI.DungeonMapScene
         }
 
         /*
-        * 핵심 이동 로직: 인덱스 매핑 수정 (0:West, 1:North, 2:East, 3:South)
+        * 핵심 이동 로직 (0:West, 1:North, 2:East, 3:South)
         */
         private void MovePlayer(Vector2Int moveDir)
         {

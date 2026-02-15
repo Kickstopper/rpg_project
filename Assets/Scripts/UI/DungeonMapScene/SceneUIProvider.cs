@@ -22,7 +22,7 @@ public class SceneUIProvider : MonoBehaviour
 
         if (GameStateManager.Instance != null)
         {
-            // [수정] 매니저에게 컨트롤러까지 함께 등록
+            // 매니저에게 컨트롤러까지 함께 등록
             GameStateManager.Instance.RegisterSceneComponents(
                 explorationCanvas, 
                 combatCanvas, 

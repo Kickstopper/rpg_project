@@ -700,7 +700,6 @@ namespace Controller
 
             long totalMonsterExp = 0;
             
-            // 이제 Controller가 아니라 데이터(Entry)를 직접 순회합니다.
             foreach (var entry in encounterLog)
             {
                 // 경험치 계산
@@ -3631,7 +3630,6 @@ namespace Controller
             // =========================================================
             // 실제 데이터(RuntimeCharacterData) 동기화
             // =========================================================
-            // 6개의 모든 슬롯을 순회하며 현재 위치에 맞는 row/column 값을 데이터에 직접 주입합니다.
             for (int i = 0; i < allSlotControllers.Count; i++)
             {
                 PlayerController pc = allSlotControllers[i];

@@ -392,7 +392,6 @@ namespace Controller
                 InventoryManager.Instance.UseItem(selectedItemData.id);
                 
                 // B. 효과음 재생
-                // 아이템 타입에 따라 다른 소리를 낼 수도 있습니다.
                 SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
 
                 // C. UI 리스트 갱신 (수량 변화 반영)
@@ -423,7 +422,6 @@ namespace Controller
             else
             {
                 // 실패 처리 (예: HP가 가득 찬 대상에게 회복약 사용 시도)
-                // "효과가 없다" 메시지를 띄우거나 취소음을 재생합니다.
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 // 필요하다면: menuController.ShowAlertPopup("효과가 없습니다.");
             }

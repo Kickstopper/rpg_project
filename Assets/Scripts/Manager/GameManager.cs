@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using Data;
+﻿using UnityEngine;
 
 namespace Manager
 {
-    public class GameManager : MonoBehaviour
+    public class GameSettingManager : MonoBehaviour
     {
-        public static GameManager Instance;
+        public static GameSettingManager Instance;
+        public bool useAnaglyph = false;
 
         private void Awake()
         {

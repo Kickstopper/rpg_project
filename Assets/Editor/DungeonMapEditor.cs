@@ -31,11 +31,11 @@ namespace UI.MapEditorScene
 
         void OnEnable()
         {
-            // 초기화 시 기본값 설정 (테마는 null로 시작하거나 기본 테마 로드 가능)
+            // 초기화 시 기본값 설정
             if (mapData == null) InitializeMap(10, 10, "default", null, 0, 0, 0);
         }
 
-        // 2. 크기를 인자로 받아 초기화하도록 수정
+        // 2. 크기를 인자로 받아 초기화
         void InitializeMap(int w, int h, string id, DungeonTheme theme, int startX, int startY, Direction startDir)
         {
             mapData = new MapData();

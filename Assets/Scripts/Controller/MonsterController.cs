@@ -55,10 +55,7 @@ namespace Controller
         // 매 프레임 옵션 변경 감지
         private void Update()
         {
-            // RaycastScreen의 static 변수라고 가정 (접근 방식에 따라 수정 필요)
-            bool currentGlobalState = RaycastScreen.useAnaglyph;
-
-            // 옵션값이 이전 프레임과 달라졌을 때만 머티리얼 갱신 (성능 최적화)
+            bool currentGlobalState = GameSettingManager.Instance.useAnaglyph;
             if (currentGlobalState != lastGlobalState)
             {
                 UpdateAnaglyphVisuals(false);
@@ -82,7 +79,7 @@ namespace Controller
             }
 
             // 1. 현재 글로벌 설정 가져오기
-            bool useEffect = RaycastScreen.useAnaglyph;
+            bool useEffect = GameSettingManager.Instance.useAnaglyph;
             
             // 상태 동기화
             lastGlobalState = useEffect;

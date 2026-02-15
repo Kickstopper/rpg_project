@@ -2950,7 +2950,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 176609355ede45a44b785e286f1a003b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  raycastScreen: {fileID: 1276210526}
+  raycastScreen: {fileID: 0}
   autoMapPanel: {fileID: 1471981307}
   freeMoveToggleBtnIcon: {fileID: 1049451160}
   gridModeColor: {r: 1, g: 0, b: 0, a: 1}
@@ -3076,106 +3076,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!1 &1276210524
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1276210525}
-  - component: {fileID: 1276210526}
-  m_Layer: 0
-  m_Name: RaycastScreen
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1276210525
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1276210524}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2039851763}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1276210526
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1276210524}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40cc78f2525d94690adf7bf12137bde3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  screenMaterial: {fileID: 0}
-  useWallDistortion: 0
-  distortionFreq: 0.5
-  distortionAmp: 2
-  useCylinderEffect: 0
-  cylinderStrength: 3
-  stereoSeparation: 0.05
-  fadeOverlay: {fileID: 1028032715}
-  fadeDuration: 0.5
-  bumpDuration: 0.2
-  bumpIntensity: 0.3
-  lookSpeed: 300
-  maxPitch: 150
-  autoCenterLook: 1
-  wallAnimations: []
-  backgroundImage: {fileID: 1919549474}
-  backwardOffset: 0.499
-  fovScale: 1
-  doubleTapThreshold: 0.3
-  jumpDuration: 0.6
-  jumpHeight: 20
-  minSteps: 15
-  maxSteps: 30
-  dangerSlider: {fileID: 77270347}
-  dangerText: {fileID: 13807144}
-  fillImage: {fileID: 271217979}
-  safeColor: {r: 0, g: 1, b: 0, a: 1}
-  warningColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  dangerColor: {r: 1, g: 0, b: 0, a: 1}
-  gridBaseTurnDuration: 0.2
-  gridBaseMoveDuration: 0.2
-  runMultiplier: 2
-  lightingIntensity: 3.5
-  useGridLighting: 1
-  wireframeColor: {r: 0, g: 0.9019608, b: 1, a: 1}
-  floorWireframeColor: {r: 0, g: 0, b: 1, a: 1}
-  pulseColor: {r: 1, g: 1, b: 1, a: 1}
-  scanSpeed: 15
-  maxScanDistance: 20
-  pulseWidth: 0.2
-  scanWaitTime: 2
-  returnSpeedMultiplier: 1.5
-  screenContainer: {fileID: 2039851762}
-  compassUI: {fileID: 1351563562}
-  miniMap: {fileID: 2086873637}
-  autoMapContainer: {fileID: 581309548}
-  autoMapRenderer: {fileID: 1471981309}
-  controllerPanel: {fileID: 1247510302}
-  dialogueUI: {fileID: 1072940000}
-  isInputLocked: 0
-  illusionTextureIds: 
-  isGridMove: 1
 --- !u!1 &1287241526
 GameObject:
   m_ObjectHideFlags: 0
@@ -4115,6 +4015,110 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1700503534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1700503535}
+  - component: {fileID: 1700503536}
+  m_Layer: 0
+  m_Name: RaycastController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1700503535
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700503534}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2039851763}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1, y: 1}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1700503536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700503534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79b9b25d71743d14baf5e25aa31ee4e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Controller.RaycastingController
+  renderSettings:
+    screenMaterial: {fileID: 0}
+    screenWidth: 512
+    screenHeight: 256
+    screenScale: {x: 12.8, y: 7.2}
+    useWallDistortion: 0
+    distortionFreq: 0.5
+    distortionAmp: 2
+    useCylinderEffect: 0
+    cylinderStrength: 3
+    useAnaglyph: 0
+    stereoSeparation: 0.05
+    lightingIntensity: 3.5
+    useGridLighting: 1
+    wireframeColor:
+      serializedVersion: 2
+      rgba: 4278255360
+    floorWireframeColor:
+      serializedVersion: 2
+      rgba: 4278222848
+    pulseColor:
+      serializedVersion: 2
+      rgba: 4294967295
+    scanSpeed: 15
+    maxScanDistance: 20
+    pulseWidth: 0.5
+    scanWaitTime: 2
+    returnSpeedMultiplier: 1.5
+  backwardOffset: 0.499
+  fovScale: 1
+  screenImage: {fileID: 2114126939}
+  backgroundImage: {fileID: 1919549474}
+  compassUI: {fileID: 1351563562}
+  miniMap: {fileID: 2086873637}
+  autoMapRenderer: {fileID: 1471981309}
+  dialogueUI: {fileID: 1072940000}
+  autoMapContainer: {fileID: 581309548}
+  fadeOverlay: {fileID: 1028032715}
+  doubleTapThreshold: 0.3
+  moveDuration: 0.2
+  turnDuration: 0.2
+  encounterSystem:
+    minSteps: 15
+    maxSteps: 30
+    dangerSlider: {fileID: 77270347}
+    dangerText: {fileID: 13807144}
+    fillImage: {fileID: 271217979}
+    safeColor:
+      serializedVersion: 2
+      rgba: 4278255360
+    warningColor:
+      serializedVersion: 2
+      rgba: 4278512639
+    dangerColor:
+      serializedVersion: 2
+      rgba: 4278190335
 --- !u!1 &1702242400 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 881246946369469409, guid: dec9ee85c5fe41148a23d534c76f098b, type: 3}
@@ -5284,7 +5288,8 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1919549476}
-  - {fileID: 1276210525}
+  - {fileID: 2114126941}
+  - {fileID: 1700503535}
   m_Father: {fileID: 1863840029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -5360,6 +5365,78 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding: {x: 1220, y: 660, z: 1220, w: 660}
   m_Softness: {x: 0, y: 0}
+--- !u!1 &2114126938
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2114126941}
+  - component: {fileID: 2114126940}
+  - component: {fileID: 2114126939}
+  m_Layer: 0
+  m_Name: RaycastScreen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2114126939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114126938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &2114126940
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114126938}
+  m_CullTransparentMesh: 1
+--- !u!224 &2114126941
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114126938}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2039851763}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &61542035373122066
 PrefabInstance:
   m_ObjectHideFlags: 0
