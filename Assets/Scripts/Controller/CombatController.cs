@@ -22,6 +22,7 @@ namespace Controller
         public GameObject raycastScreen;
         public Image combatBG;
         public GameObject BattleUI;
+        public Transform damagePopupContainer;
         public GameObject baseCmdContainer;   // 1단계 메뉴 (Fight, Talk...)
         public GameObject fightCmdContainer;  // 2단계 메뉴 (Attack, Move...)
         public RectTransform btnContainer; //fightCmdContainer의 버튼이 붙는 트랜스폼 (Inspector 할당)
@@ -61,6 +62,7 @@ namespace Controller
         [Header("Prefabs")]
         public GameObject defaultMonsterPrefab;
         public GameObject playerPrefab;
+        public GameObject damagePopupPrefab;
         public GameObject vfxSlashPrefab;  // 물리 공격용
         public GameObject vfxGunPrefab;  // 총 공격용
         public GameObject vfxMagicPrefab;  // 마법 공격용
@@ -777,7 +779,9 @@ namespace Controller
                     // 데미지 계산 (기존 CalculateDamage 재활용)
                     // CombatAction을 가짜로 만들어서 전달
                     CombatAction fakeAction = new CombatAction(player.gameObject, target.gameObject, ActionType.Attack, 0);
-                    int dmg = CalculateDamage(player.gameObject, target.gameObject, fakeAction, false, 1.0f);
+                    BattleEntity pEntity = player.GetComponent<BattleEntity>();
+                    BattleEntity tEntity = target.GetComponent<BattleEntity>();
+                    int dmg = CombatCalculator.CalculateDamage(pEntity, tEntity, fakeAction, false, 1.0f);
 
                     // HP 즉시 차감 (애니메이션 함수 호출 X)
                     target.currentHp = Mathf.Max(0, target.currentHp - dmg);
@@ -794,8 +798,9 @@ namespace Controller
                     if (target == null) break;
 
                     CombatAction fakeAction = new CombatAction(monster.gameObject, target.gameObject, ActionType.Attack, 0);
-                    int dmg = CalculateDamage(monster.gameObject, target.gameObject, fakeAction, false, 1.0f);
-                    
+                    BattleEntity mEntity = monster.GetComponent<BattleEntity>();
+                    BattleEntity ptEntity = target.GetComponent<BattleEntity>();
+                    int dmg = CombatCalculator.CalculateDamage(mEntity, ptEntity, fakeAction, false, 1.0f);
                     target.currentHp = Mathf.Max(0, target.currentHp - dmg);
                     // 아군 UI(HP바) 갱신이 필요하다면 여기서 호출하거나, 탐험 복귀 시 갱신됨
                 }
@@ -2218,27 +2223,6 @@ namespace Controller
             }
         }
 
-        BattleEntity FindEntityInRow(Transform frontContainer, bool isTargetFront, int startCol, int direction)
-        {
-            var rowEntities = validTargets.Where(m => (m.transform.parent.parent == frontContainer) == isTargetFront).OrderBy(m => m.columnIndex).ToList();
-            if (rowEntities.Count == 0) return null;
-
-            BattleEntity current = validTargets[currentTargetIndex];
-            int currentIndexInRow = rowEntities.IndexOf(current);
-            if (currentIndexInRow == -1) return null;
-
-            int nextIndex = currentIndexInRow + direction;
-            if (nextIndex >= 0 && nextIndex < rowEntities.Count) return rowEntities[nextIndex];
-            return null; 
-        }
-
-        BattleEntity FindClosestEntityInRow(Transform frontContainer, bool isTargetFront, int targetCol)
-        {
-            var targetRowEntities = validTargets.Where(m => (m.transform.parent.parent == frontContainer) == isTargetFront).ToList();
-            if (targetRowEntities.Count == 0) return null;
-            return targetRowEntities.OrderBy(m => Mathf.Abs(m.columnIndex - targetCol)).First();
-        }
-
         void UpdateTargetHighlight()
         {
             foreach (var monster in validTargets) monster.SetSelectionState(false);
@@ -2518,8 +2502,11 @@ namespace Controller
 
                     // CalculateDamage를 통해 상성/방어력 계산 적용
                     // (스킬 위력은 skill.effectValue가 CalculateDamage 내부에서 참조됨)
-                    bool isCrit = CheckCritical(action.actor, targetObj, action);
-                    int dmg = CalculateDamage(action.actor, targetObj, action, isCrit, 1.0f);
+                    BattleEntity attackerEntity = action.actor.GetComponent<BattleEntity>();
+                    BattleEntity targetEntity = targetObj.GetComponent<BattleEntity>();
+
+                    bool isCrit = CombatCalculator.CheckCritical(attackerEntity, targetEntity, action);
+                    int dmg = CombatCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCrit, 1.0f);
                     
                     ApplyDamage(targetObj, dmg, isCrit);
                 }
@@ -2647,7 +2634,9 @@ namespace Controller
             float dmgMultiplier = 1.5f; 
             if (allSameAlign) dmgMultiplier = 2.0f; 
 
-            int dmg = CalculateDamage(leader.gameObject, target, action, isCrit, dmgMultiplier);
+            BattleEntity leaderEntity = leader.GetComponent<BattleEntity>();
+            BattleEntity targetEntity = target.GetComponent<BattleEntity>();
+            int dmg = CombatCalculator.CalculateDamage(leaderEntity, targetEntity, action, isCrit, dmgMultiplier);
             dmg = Mathf.RoundToInt(dmg * (float)totalStr / leader.GetTotalStr()); 
             
             ApplyDamage(target, dmg, isCrit);
@@ -2874,7 +2863,8 @@ namespace Controller
                         if (enemy.currentHp <= 0) continue;
                         
                         PlayerController shooter = participants[i % participants.Count];
-                        int dmg = CalculateGunDamage(shooter, enemy.gameObject, false);
+                        BattleEntity enemyEntity = enemy.gameObject.GetComponent<BattleEntity>();
+                        int dmg = CombatCalculator.CalculateGunDamage(shooter, enemyEntity, false);
                         
                         ApplyDamage(enemy.gameObject, dmg, false);
                         SpawnVFX(vfxGunPrefab, enemy.transform.position);
@@ -3249,29 +3239,21 @@ namespace Controller
             yield return wait01;
         }
 
-        // 유닛 애니메이션 통합 함수
-        IEnumerator AnimateUnitVisual(Transform target, Vector3 toPos, Vector3 toScale, float duration = 0.15f)
-        {
-            Sequence seq = DOTween.Sequence();
-            seq.Join(target.DOLocalMove(toPos, duration).SetEase(Ease.OutQuad));
-            seq.Join(target.DOScale(toScale, duration).SetEase(Ease.OutQuad));
-            yield return seq.WaitForCompletion();
-        }
-
         IEnumerator ProcessSingleHit(CombatAction action, GameObject target)
         {
             // 위치 보정 계산 호출
             CombatPosition atkPos = GetUnitPosition(action.actor);
             CombatPosition defPos = GetUnitPosition(target);
             WeaponType wType = WeaponType.Melee;
-            PlayerController pActor = action.actor.GetComponent<PlayerController>();
-            if (action.type == ActionType.Shoot || (pActor?.currentWeapon?.type == WeaponType.Gun)) 
-                wType = WeaponType.Gun;
-            GetPositionalModifiers(action.actor, target, action, out float posDmgMult, out float posEvaBonus);
-
-            // 회피 체크 호출
+            
             BattleEntity attackerEntity = action.actor.GetComponent<BattleEntity>();
             BattleEntity targetEntity = target.GetComponent<BattleEntity>();
+            PlayerController pActor = action.actor.GetComponent<PlayerController>();
+            
+            if (action.type == ActionType.Shoot || (pActor?.currentWeapon?.type == WeaponType.Gun)) 
+                wType = WeaponType.Gun;
+            
+            CombatCalculator.GetPositionalModifiers(atkPos, defPos, wType, out float posDmgMult, out float posEvaBonus);
 
             if (CombatCalculator.CheckEvasion(attackerEntity, targetEntity, posEvaBonus))
             {
@@ -3322,8 +3304,9 @@ namespace Controller
                 List<PlayerController> defenders = activePlayers.Where(p => p.currentHp > 0 && p.columnIndex < 3).Select(p => p as PlayerController).ToList();
                 if (defenders.Count > 0)
                 {
-                    bool isCrit = CheckCritical(action.actor, target, action);
-                    int originalDamage = CalculateDamage(action.actor, target, action, isCrit, posDmgMult);
+                    
+                    bool isCrit = CombatCalculator.CheckCritical(attackerEntity, targetEntity, action);
+                    int originalDamage = CombatCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCrit, posDmgMult);
                     int splitDamage = Mathf.Max(1, originalDamage / defenders.Count);
                     ShowLog("DEFENSE!");
                     foreach (var defender in defenders)
@@ -3388,37 +3371,34 @@ namespace Controller
 
         void ApplyDamage(GameObject target, int damage, bool isCritical)
         {
-            // 1. 타겟이 없거나, 비활성화 상태라면 아무것도 하지 않고 리턴
             if (target == null || !target.activeInHierarchy) return;
 
             var entity = target.GetComponent<BattleEntity>();
-            if (entity != null)
+            if (entity == null) return;
+
+            // 몬스터인 경우에만 데미지 팝업 표시
+            if (entity is MonsterController)
             {
-                entity.TriggerHitShake(isCritical); 
-                StartCoroutine(entity.OnDamageTaken(damage)); 
+                if (damagePopupPrefab != null && damagePopupContainer != null)
+                {
+                    GameObject popupObj = Instantiate(damagePopupPrefab, damagePopupContainer);
+                    
+                    popupObj.transform.position = target.transform.position; 
+                    popupObj.transform.localPosition += new Vector3(0, 50f, 0); 
+                    
+                    float randomX = Random.Range(-20f, 20f);
+                    popupObj.transform.localPosition += new Vector3(randomX, 0, 0);
+
+                    var popupScript = popupObj.GetComponent<DamagePopupController>();
+                    if (popupScript != null)
+                    {
+                        popupScript.Setup(damage, isCritical);
+                    }
+                }
             }
-        }
 
-        bool CheckAbsorption(GameObject target, ActionType type)
-        {
-            var entity = target.GetComponent<BattleEntity>();
-            if (entity == null) return false;
-            bool isPhysical = (type == ActionType.Attack || type == ActionType.Shoot);
-            bool isMagic = (type == ActionType.Skill); 
-            if (isPhysical && entity.isPhysicalAbsorb) return true;
-            if (isMagic && entity.isMagicAbsorb) return true;
-            return false;
-        }
-
-        bool CheckReflection(GameObject target, ActionType type)
-        {
-            var entity = target.GetComponent<BattleEntity>();
-            if (entity == null) return false;
-            bool isPhysical = (type == ActionType.Attack || type == ActionType.Shoot);
-            bool isMagic = (type == ActionType.Skill); 
-            if (isPhysical && entity.isPhysicalReflect) return true;
-            if (isMagic && entity.isMagicReflect) return true;
-            return false;
+            entity.TriggerHitShake(isCritical); 
+            StartCoroutine(entity.OnDamageTaken(damage)); 
         }
 
         List<GameObject> GetTargetsByScope(TargetScope scope, CombatAction action)
@@ -3473,13 +3453,13 @@ namespace Controller
         // [Union 참가 가능 파트너 찾기]
         List<PlayerController> GetValidUnionPartners(PlayerController leader)
         {
-            List<PlayerController> partners = new List<PlayerController>();
+            List<PlayerController> partners = new List<PlayerController>(6);
             partners.Add(leader); // 리더(자기 자신) 포함
 
             // 리더가 전열(0, 1, 2)이 아니면 불가
             if (leader.columnIndex >= 3) return partners;
 
-            // [변경] 현재 캐릭터의 왼쪽(-1), 오른쪽(+1) 이웃만 검사
+            // 현재 캐릭터의 왼쪽(-1), 오른쪽(+1) 이웃만 검사
             int[] neighborIndices = { leader.columnIndex - 1, leader.columnIndex + 1 };
 
             foreach (int i in neighborIndices)
@@ -3496,13 +3476,14 @@ namespace Controller
                 if (!CombatCalculator.IsAlignCompatible(leader.align, p.align)) continue;
 
                 // 3. 행동 예약 상태 체크. 이미 행동 큐에 등록된 행동이 있는지 확인
-                CombatAction reservedAction = actionQueue.Find(a => a.actor == p.gameObject);
-
-                // 조건: 행동이 아직 예약되지 않았거나(미행동), 예약된 행동이 'Next'인 경우만 가능
-                if (reservedAction == null || reservedAction.type == ActionType.Next)
-                {
-                    partners.Add(p);
+                bool isBusy = false;
+                foreach(var action in actionQueue) {
+                    // 조건: 행동이 아직 예약되지 않았거나(미행동), 예약된 행동이 'Next'인 경우만 가능
+                    if (action.actor == p.gameObject && action.type != ActionType.Next) {
+                        isBusy = true; break; 
+                    }
                 }
+                if (!isBusy) partners.Add(p);
             }
 
             return partners;
@@ -3520,16 +3501,6 @@ namespace Controller
             WeaponData weapon = null;
             if (pActor != null) weapon = (action.type == ActionType.Shoot) ? pActor.currentGun : pActor.currentWeapon;
             if (weapon != null) { min = weapon.minHits; max = weapon.maxHits; scope = weapon.attackRange; }
-        }
-
-        int CalculateGunDamage(PlayerController attacker, GameObject defender, bool isCritical)
-        {
-            int baseAtk = attacker.GetGunAttack();
-            int def = 0;
-            if (defender.TryGetComponent(out MonsterController mc)) def = mc.GetTotalVit();
-            float rawDmg = Mathf.Max(1, baseAtk - (def * 0.5f));
-            if (isCritical) rawDmg *= 1.5f; 
-            return Mathf.RoundToInt(rawDmg);
         }
 
         bool IsAlive(GameObject obj) { return obj != null && obj.activeSelf && (obj.GetComponent<IBattleTarget>()?.IsAlive ?? false); }
@@ -3686,12 +3657,12 @@ namespace Controller
                 controller.selectButton.navigation = nav;
             }
 
-            // [중요] 배치된 위치 정보를 컨트롤러에 주입
+            // 배치된 위치 정보를 컨트롤러에 주입
             bool isFront = (targetSlots == frontSlots);
             
             controller.SetPositionInfo(randomIndex); // 기존 인덱스 설정
             
-            // 신규: Enum 정보 설정
+            // Enum 정보 설정
             controller.currentRow = isFront ? RowType.Front : RowType.Back;
             controller.currentColumn = (ColumnType)randomIndex; // 0, 1, 2 -> Left, Center, Right 매핑
 
@@ -3803,155 +3774,6 @@ namespace Controller
                 pos.columnIndex = mc.columnIndex; 
             }
             return pos;
-        }
-
-        void GetPositionalModifiers(GameObject attacker, GameObject defender, CombatAction action, out float damageMultiplier, out float evasionBonus)
-        {
-            damageMultiplier = 1.0f;
-            evasionBonus = 0f;
-
-            CombatPosition atkPos = GetUnitPosition(attacker);
-            CombatPosition defPos = GetUnitPosition(defender);
-
-            WeaponType wType = WeaponType.Melee;
-            PlayerController pActor = attacker.GetComponent<PlayerController>();
-            if (pActor != null)
-            {
-                if (action.type == ActionType.Shoot) wType = WeaponType.Gun;
-                else if (pActor.currentWeapon != null && pActor.currentWeapon.type == WeaponType.Gun) wType = WeaponType.Gun;
-            }
-
-            if (wType == WeaponType.Melee)
-            {
-                if (!atkPos.isFrontRow) damageMultiplier *= 0.7f;
-                if (!defPos.isFrontRow) { damageMultiplier *= 0.8f; evasionBonus += 0.1f; }
-            }
-
-            int colDiff = Mathf.Abs(atkPos.columnIndex - defPos.columnIndex);
-            if (colDiff == 1) damageMultiplier *= 0.95f; 
-            else if (colDiff >= 2) { damageMultiplier *= 0.90f; evasionBonus += 0.05f; }
-        }
-
-        private bool CheckEvasion(GameObject attackerObj, GameObject defenderObj, float evasionBonus)
-        {
-            var attacker = attackerObj.GetComponent<BattleEntity>();
-            var defender = defenderObj.GetComponent<BattleEntity>();
-            if (attacker == null || defender == null) return false;
-
-            int attackerAgi = attacker.GetTotalAgi();
-            int attackerLuc = attacker.GetTotalLuc();
-            int defenderAgi = defender.GetTotalAgi();
-            int defenderLuc = defender.GetTotalLuc();
-
-            float baseEvasionChance = 0.05f; 
-            float agiBonus = Mathf.Clamp((defenderAgi - attackerAgi) * 0.01f, -0.2f, 0.2f);
-            float lucBonus = Mathf.Clamp((defenderLuc - attackerLuc) * 0.005f, -0.1f, 0.1f);
-            float totalChance = Mathf.Clamp(baseEvasionChance + agiBonus + lucBonus + evasionBonus, 0f, 0.9f);
-
-            return Random.value < totalChance;
-        }
-        
-        private bool CheckCritical(GameObject attackerObj, GameObject defenderObj, CombatAction action)
-        {
-            var attacker = attackerObj.GetComponent<BattleEntity>();
-            var defender = defenderObj.GetComponent<BattleEntity>();
-            if (attacker == null || defender == null) return false;
-
-            bool isMagic = (action.skillData != null && action.skillData.element != ElementType.Physical);
-            int atkLuc = attacker.GetTotalLuc();
-            int atkMainStat = isMagic ? attacker.GetMagicAttack() : attacker.GetAttack();
-            int defLuc = defender.GetTotalLuc();
-            int defAgi = defender.GetTotalAgi();
-
-            float baseCritChance = 0.05f; 
-            float lucBonus = (atkLuc - defLuc) * 0.002f; 
-            float statBonus = (atkMainStat - defAgi) * 0.001f; 
-            float totalChance = Mathf.Clamp(baseCritChance + lucBonus + statBonus, 0f, 0.7f);
-
-            return Random.value < totalChance;
-        }
-
-        public int CalculateDamage(GameObject attackerObj, GameObject defenderObj, CombatAction action, bool isCritical, float damageMultiplier)
-        {
-            var attacker = attackerObj.GetComponent<BattleEntity>();
-            var defender = defenderObj.GetComponent<BattleEntity>();
-            if (attacker == null || defender == null) return 0;
-
-            int baseAtk = attacker.GetTotalStr(); 
-            int skillPower = 0;
-            if (action.type == ActionType.Skill || action.type == ActionType.Item)
-                if (action.itemData != null) skillPower = action.itemData.effectValue; 
-
-            int totalAtk = baseAtk + skillPower;
-            bool isGuarding = defender.isGuarding;
-            float resistanceValue = GetResistanceValue(action.skillData, defender.GetResistances()); 
-            int totalDef = defender.GetDefense();
-            
-            float rawDamage = Mathf.Max(1, totalAtk - (totalDef * 0.5f));
-            // 성향 상성 보정 추가
-            // StatData에 align이 있다고 가정 (sourceData.align)
-            Align attAlign = attacker.align;
-            Align defAlign = defender.align;
-
-            float alignBonus = AlignmentSystem.GetDamageModifier(attAlign, defAlign);
-            
-            // 기존 Multiplier에 곱하기
-            rawDamage *= damageMultiplier * alignBonus;
-
-    // 디버그용 (필요시)
-    // if (alignBonus > 1.0f) Debug.Log("상성 우위! 데미지 증가");
-
-            float resistanceMultiplier = 1.0f - resistanceValue;
-            float randomVar = Random.Range(0.9f, 1.1f);
-            int finalDamage = Mathf.RoundToInt(rawDamage * resistanceMultiplier * randomVar);
-
-            if (isCritical) finalDamage *= 2;
-            if (isGuarding) { finalDamage = Mathf.FloorToInt(finalDamage * 0.5f); Debug.Log("방어 성공! 데미지 50% 감소"); }
-            if (finalDamage < 1) finalDamage = 1;
-
-            return finalDamage;
-        }
-
-        private float GetResistanceValue(BaseRootData data,ResistanceData resist)
-        {
-            if (data == null) return resist.phys; 
-            switch(data.element)
-            {
-                case ElementType.Fire: return resist.fire;
-                case ElementType.Ice: return resist.ice;
-                case ElementType.Elec: return resist.elec;
-                case ElementType.Force: return resist.force;
-                case ElementType.Psyche: return resist.psyche;
-                default: return resist.phys;
-            }
-        }
-
-        bool CalculateEscapeSuccess()
-        {
-            // 설정된 횟수 이상 시도했다면 무조건 성공
-            if (currentEscapeAttempts >= guaranteedEscapeAttempts)
-            {
-                return true;
-            }
-
-            List<BattleEntity> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
-            if (livingPlayers.Count == 0) return false;
-
-            float playerAvgAgi = (float)livingPlayers.Average(p => p.GetTotalAgi());
-            float playerAvgLuc = (float)livingPlayers.Average(p => p.GetTotalLuc());
-
-            List<BattleEntity> livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
-            if (livingMonsters.Count == 0) return true; 
-
-            float enemyAvgAgi = (float)livingMonsters.Average(m => m.GetTotalAgi());
-            float enemyAvgLuc = (float)livingMonsters.Average(m => m.GetTotalLuc());
-
-            float baseChance = 50f;
-            float agiBonus = (playerAvgAgi - enemyAvgAgi) * 2.0f;
-            float lucBonus = (playerAvgLuc - enemyAvgLuc) * 1.0f;
-            float finalChance = Mathf.Clamp(baseChance + agiBonus + lucBonus, 10f, 100f);
-
-            return Random.Range(0f, 100f) < finalChance;
         }
 
         IEnumerator EndBattleRoutine(bool isWin)

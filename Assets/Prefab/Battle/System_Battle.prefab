@@ -214,6 +214,41 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 2
+--- !u!1 &188238491565916683
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8238016265576625859}
+  m_Layer: 0
+  m_Name: DamagePopupContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &8238016265576625859
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 188238491565916683}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6129727179164803609}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &327746516671595006
 GameObject:
   m_ObjectHideFlags: 0
@@ -750,7 +785,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 0.5, g: 0, b: 0, a: 0.5019608}
   colorRight: {r: 0.5019608, g: 0, b: 0.5, a: 0.5019608}
-  angle: -60
+  m_Angle: 0
 --- !u!114 &79318565336281123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2180,6 +2215,7 @@ RectTransform:
   - {fileID: 7347451199153016165}
   - {fileID: 7137071373792476439}
   - {fileID: 2285515569279649803}
+  - {fileID: 8238016265576625859}
   - {fileID: 8653870214554675582}
   - {fileID: 2051469266359347114}
   - {fileID: 5204639302124873641}
@@ -3354,7 +3390,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 1, g: 0.81688017, b: 0, a: 0.5019608}
   colorRight: {r: 1, g: 0, b: 0, a: 0.5019608}
-  angle: 162
+  m_Angle: 0
 --- !u!1 &2480530676390067148
 GameObject:
   m_ObjectHideFlags: 0
@@ -3990,7 +4026,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 0, g: 0, b: 0.53333336, a: 1}
   colorRight: {r: 0, g: 0, b: 0.09019608, a: 1}
-  angle: -60
+  m_Angle: 0
 --- !u!114 &7941464239599248411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4694,7 +4730,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 0, g: 0, b: 0.53333336, a: 1}
   colorRight: {r: 0, g: 0, b: 0.09019608, a: 1}
-  angle: -60
+  m_Angle: 0
 --- !u!114 &3701288028351797884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6362,7 +6398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 0, g: 0, b: 0.53333336, a: 1}
   colorRight: {r: 0, g: 0, b: 0.256, a: 1}
-  angle: -60
+  m_Angle: 0
 --- !u!114 &7158198334068713843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7099,7 +7135,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 0, g: 0, b: 0.5, a: 0.5019608}
   colorRight: {r: 0, g: 0.6, b: 1, a: 0.5019608}
-  angle: -60
+  m_Angle: 0
 --- !u!114 &1625175418812248378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9425,7 +9461,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 0, g: 0, b: 0.53333336, a: 1}
   colorRight: {r: 0, g: 0, b: 0.256, a: 1}
-  angle: -60
+  m_Angle: 0
 --- !u!114 &122156954380833054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10657,6 +10693,7 @@ MonoBehaviour:
   raycastScreen: {fileID: 0}
   combatBG: {fileID: 2358689599513272998}
   BattleUI: {fileID: 8457423944824698811}
+  damagePopupContainer: {fileID: 8238016265576625859}
   baseCmdContainer: {fileID: 9092860672288129397}
   fightCmdContainer: {fileID: 5136619547675322153}
   btnContainer: {fileID: 8439238137182738173}
@@ -10694,8 +10731,10 @@ MonoBehaviour:
   instantResultPanel: {fileID: 4474836925546506070}
   instantResultText: {fileID: 6129033664232938187}
   instantWinDelay: 1.5
+  guaranteedEscapeAttempts: 3
   defaultMonsterPrefab: {fileID: 5675693360896444327, guid: 5886499ad23134b40a1350463fb19b81, type: 3}
   playerPrefab: {fileID: 6815253905712193029, guid: d7f43cf7a138ea1439eaeabd115425df, type: 3}
+  damagePopupPrefab: {fileID: 232750575524275144, guid: 59e4eadd13f26a04995aed381e0232dd, type: 3}
   vfxSlashPrefab: {fileID: 7405688537336936215, guid: 7c7486c5695c3ba489d13e3922f0c1f8, type: 3}
   vfxGunPrefab: {fileID: 7405688537336936215, guid: c653612a10f1bfd4987b27887f13aef8, type: 3}
   vfxMagicPrefab: {fileID: 7405688537336936215, guid: 0ee5f5d0414c76e47b2d7409a5ad57e7, type: 3}
@@ -10711,13 +10750,6 @@ MonoBehaviour:
   enemyBackRowContainer: {fileID: 141581246210455962}
   playerFrontRowContainer: {fileID: 2485679292146773683}
   playerBackRowContainer: {fileID: 2323448093114049133}
-  currentCmdTargetColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  moveSourceColor: {r: 0, g: 1, b: 1, a: 1}
-  moveTargetColor: {r: 1, g: 0, b: 1, a: 1}
-  colorNormal: {r: 1, g: 1, b: 1, a: 1}
-  colorGrayout: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  colorHighlight: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  colorHighlightDisabled: {r: 1, g: 0.5, b: 0, a: 1}
   state: 0
   activeMonsters: []
   activePlayers: []
@@ -11923,7 +11955,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorLeft: {r: 0, g: 0, b: 0.53333336, a: 1}
   colorRight: {r: 0, g: 0, b: 0.09019608, a: 1}
-  angle: 0
+  m_Angle: 0
 --- !u!114 &4607569229874659346
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UI.DungeonMapScene;
 using Data;
 using Manager;
+using TMPro;
 
 namespace Controller
 {
@@ -25,7 +26,7 @@ namespace Controller
 
         // [IBattleTarget 구현]
         public string Name => sourceData != null ? sourceData.name : "";
-        public new bool IsAlive => currentHp > 0; // BattleEntity의 currentHp 사용
+        public bool IsAlive => currentHp > 0;
         public bool IsMaxHp => currentHp >= maxHp;
         public bool IsMaxMp => currentMp >= maxMp;
 

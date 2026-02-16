@@ -93,17 +93,28 @@ namespace Controller
         void Update()
         {
             if (!_canRender) return;
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
+                return;  
+            }
             
             if (Input.GetKeyDown(KeyCode.O)) 
             {
                 ToggleMovementMode();
                 return;
             }
-            if (Input.GetKeyDown(KeyCode.M)) autoMapContainer.SetActive(!autoMapContainer.activeSelf);
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                autoMapContainer.SetActive(!autoMapContainer.activeSelf);
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.P)) 
             {
                 GameSettingManager.Instance.useAnaglyph = !GameSettingManager.Instance.useAnaglyph;
                 Debug.Log($"Anaglyph: {GameSettingManager.Instance.useAnaglyph}");
+                return;
             }
 
             // 입력 처리 분기

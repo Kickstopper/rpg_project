@@ -92,8 +92,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entityName: 
   level: 1
-  currentHp: 0
-  currentMp: 0
+  align: 0
+  _currentHp: 0
+  _currentMp: 0
   maxHp: 0
   maxMp: 0
   columnIndex: 0
@@ -113,6 +114,8 @@ MonoBehaviour:
     portrait: {fileID: 0}
     prefab: {fileID: 0}
     preferredRow: 0
+    preferredCol: 0
+    align: 0
     stats:
       level: 0
       str: 0
@@ -122,15 +125,17 @@ MonoBehaviour:
       agi: 0
       luc: 0
     resistances:
-      physical: 0
+      phys: 0
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      havoc: 0
-    expReward: 0
-    goldReward: 0
+      psyche: 0
+    dropItemIds: []
   baseAnaglyphMaterial: {fileID: 2100000, guid: e1386aaf0e2e7e94ebe62e2e5427a515, type: 2}
+  selectButton: {fileID: 0}
+  currentRow: 0
+  currentColumn: 0
 --- !u!114 &7568836264752897540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,15 +288,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 00000000
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
