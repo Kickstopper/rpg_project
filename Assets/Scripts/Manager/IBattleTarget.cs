@@ -6,8 +6,6 @@ namespace Manager
     // EffectManager가 데이터를 조작하기 위한 인터페이스
     public interface IBattleTarget
     {
-        string Name { get; }
-        
         // 상태 확인
         bool IsAlive { get; }
         bool IsMaxHp { get; }

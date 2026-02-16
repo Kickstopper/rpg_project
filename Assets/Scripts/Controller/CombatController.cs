@@ -23,6 +23,7 @@ namespace Controller
         public Image combatBG;
         public GameObject BattleUI;
         public Transform damagePopupContainer;
+        public CombatResultUI combatResultUI;
         public GameObject baseCmdContainer;   // 1단계 메뉴 (Fight, Talk...)
         public GameObject fightCmdContainer;  // 2단계 메뉴 (Attack, Move...)
         public RectTransform btnContainer; //fightCmdContainer의 버튼이 붙는 트랜스폼 (Inspector 할당)
@@ -420,7 +421,7 @@ namespace Controller
                     pc.Initialize(assignedData, this, true);
                     
                     pc.columnIndex = i;
-                    pc.gameObject.name = pc.sourceData.name;
+                    pc.gameObject.name = pc.entityName;
                     activePlayers.Add(pc);
                 }
                 else
@@ -718,7 +719,7 @@ namespace Controller
             foreach(var p in allPlayers)
             {
                 if (p != null && p.currentHp > 0) {
-                    p.AddExp(reward.expPerMember); 
+                    p.ApplyExperience(reward.expPerMember); 
                 }
             }
             InventoryManager.Instance.AddGold(reward.totalGold);
@@ -3785,42 +3786,56 @@ namespace Controller
             {
                 SoundManager.Instance.PlayBGM(BgmID.Victory);
                 
-                // -----------------------------------------------------
-                // 보상 계산 및 지급
-                // -----------------------------------------------------
                 List<PlayerController> allPlayers = activePlayers.OfType<PlayerController>().ToList();
-
                 BattleReward reward = CombatCalculator.CalculateRewards(allPlayers, encounterLog);
-                // 1. 전투 결과를 PartyManager에 반영
-                foreach(var p in allPlayers)
+
+                // 경험치 반영 전 상태 스냅샷 저장
+                Dictionary<PlayerController, (int oldLv, int oldExp, int oldMaxExp)> preBattleStates = new Dictionary<PlayerController, (int, int, int)>();
+                
+                foreach(var pc in allPlayers)
                 {
-                    if (p != null && p.currentHp > 0) {
-                        p.AddExp(reward.expPerMember); 
+                    if (pc != null && pc.currentHp > 0) 
+                    {
+                        int oldLevel = pc.sourceData.stats.level;
+                        int maxExp = CombatCalculator.GetMaxExpForLevel(oldLevel); // Spirit의 영향이 없는 원본 데이터의 Level을 사용함
+                        preBattleStates.Add(pc, (oldLevel, pc.sourceData.currentExp, maxExp));
                     }
                 }
 
-                // 2. 골드 지급
-                InventoryManager.Instance.AddGold(reward.totalGold);
-
-                // 3. 아이템 지급
-                foreach(var itemId in reward.dropItems)
+                // 실제 데이터 반영 (PartyManager 데이터 수정)
+                foreach(var p in allPlayers)
                 {
-                    InventoryManager.Instance.AddItem(itemId, 1);
+                    if (p != null && p.currentHp > 0) {
+                        p.ApplyExperience(reward.expPerMember); 
+                    }
+                }
+                
+                InventoryManager.Instance.AddGold(reward.totalGold);
+                foreach(var itemId in reward.dropItems) InventoryManager.Instance.AddItem(itemId, 1);
+
+                // 결과 UI 표시
+                bool isResultClosed = false;
+
+                if (combatResultUI != null)
+                {
+                    combatResultUI.Show(reward, allPlayers, preBattleStates, () => {
+                        isResultClosed = true;
+                    });
+                }
+                else
+                {
+                    isResultClosed = true; 
                 }
 
-                // 4. 결과 로그 출력
-                ShowMessage("승리는 버닝 썬!");
-                // string itemLog = reward.dropItems.Count > 0 ? $"\nItems: {string.Join(", ", reward.dropItems)}" : "";
-                // logText.text = $"VICTORY!\nEXP: +{reward.totalExp} ({reward.expPerMember}/ea)\nGOLD: +{reward.totalGold}G{itemLog}";
+                yield return new WaitUntil(() => isResultClosed);
             }
             else 
             {
                 ShowMessage("패배는 너의 것!");
+                yield return wait05;
             }
 
-            yield return wait05;
-            while (!Input.GetKeyDown(KeyCode.Space) && !Input.GetKeyDown(KeyCode.Return)) yield return null;
-
+            // 종료 처리
             HideMessage();
             HideLog();
             autoModeButton.gameObject.SetActive(false);

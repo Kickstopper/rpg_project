@@ -207,7 +207,7 @@ namespace Helper
 
             foreach (var entry in encounterLog)
             {
-                totalMonsterExp += GetMonsterExp(entry.stats.level);
+                totalMonsterExp += GetMaxExpForLevel(entry.stats.level);
                 
                 // 골드
                 if (Random.value >= 0.7f) // 30% 확률
@@ -238,7 +238,7 @@ namespace Helper
         }
 
         // 몬스터 경험치 계산 헬퍼 함수
-        private static int GetMonsterExp(int level)
+        public static int GetMaxExpForLevel(int level)
         {
             float exponent = 2.2f; // LevelSystem과 동일하게 맞춤
             float baseExp = 15f;   // 1레벨 몬스터가 주는 경험치 (플레이어 1->2 필요 경험치가 100이라면 약 15% 정도)
@@ -249,5 +249,6 @@ namespace Helper
             // Lv 50 = 82,382 (플레이어 요구량의 약 15% 유지)
             return Mathf.FloorToInt(baseExp * Mathf.Pow(level, exponent));
         }
+
     }
 }

@@ -190,7 +190,6 @@ namespace Controller
             resistForceText.text = ((int)charData.resistances.force).ToString();
             resistPsychText.text = ((int)charData.resistances.psyche).ToString();
 
-
             // 2. Vitals (HP/MP)
             UpdateSliderAndText(hpSlider, hpText, charData.currentHp, charData.maxHp);
             UpdateSliderAndText(mpSlider, mpText, charData.currentMp, charData.maxMp);
@@ -223,16 +222,15 @@ namespace Controller
                 {
                     hasSpirit = true;
                     spiritUIController.Initialze(spirit);
-                    List<SkillData> spiritSkills = spirit.skills;
-                    foreach(var skill in spiritSkills)
-                    {
-                        if (!skills.Contains(skill.id))
-                        {
-                            skills.Add(skill.id);
-                        }
-                    }
                     spiritText.text = spirit.entityName;
-                    
+                    // List<SkillData> spiritSkills = spirit.skills;
+                    // foreach(var skill in spiritSkills)
+                    // {
+                    //     if (!skills.Contains(skill.id))
+                    //     {
+                    //         skills.Add(skill.id);
+                    //     }
+                    // }
                 }
                 else hasSpirit = false;
             }

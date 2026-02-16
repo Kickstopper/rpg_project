@@ -31,11 +31,12 @@ namespace Controller
         public Button selectButton;
         
         [Header("Runtime Data")]
-        public RuntimeCharacterData sourceData; 
+        public RuntimeCharacterData sourceData; // 캐릭터의 고유 데이터
         public SpiritData spiritData;
-        public StatData currentStats;
+        public StatData currentStats; // 캐릭터 단독 또는 캐릭터와 스피릿의 융합 스탯
+        public ResistanceData resist; // 캐릭터 단독 또는 캐릭터와 스피릿의 융합 내성
 
-        // 현재 배운 스킬 목록 (ID)
+        // 스킬 목록 (나와 Spirit의 스킬 ID)
         public List<string> learnedSkillIds = new List<string>();
 
         // 현재 장착 장비 (ID)
@@ -52,37 +53,31 @@ namespace Controller
 
         public int currentGunAmmo = 0; // 현재 탄환 수
 
-        public int currentExp; // 현재 경험치
-
         private List<ArmorData> currentArmors = new List<ArmorData>();
         
         // 상태 이상 (Status Effect)
         public List<string> currentStatusEffects = new List<string>();
 
-        // 현재 위치 전투 매니저가 세팅해줌
-        public RowType currentRow; // Front 또는 Back
-        public ColumnType currentColumn; // 왼쪽, 오른쪽 또는 가운데
-
         public bool isCommander;
 
         private CombatController controller;
 
-        // [BattleEntity 구현] 스탯 반환 (레벨 및 장비 보정 포함)
+        // [BattleEntity 구현] 스탯 반환 (스피릿 융합된 스탯 + 장비 보정)
         public override int GetTotalStr() => currentStats.str; 
         public override int GetTotalAgi() => currentStats.agi;
         public override int GetTotalMag() => currentStats.mag;
         public override int GetTotalLuc() => currentStats.luc;
         public override int GetTotalVit() => currentStats.vit;
 
-        public string Name => sourceData != null ? sourceData.name : "";
-        public bool IsAlive => sourceData != null && sourceData.currentHp > 0;
-        public bool IsMaxHp => sourceData != null && sourceData.currentHp >= sourceData.maxHp;
-        public bool IsMaxMp => sourceData != null && sourceData.currentMp >= sourceData.maxMp;
+        // [IBattleTarget 구현]
+        public bool IsAlive => currentHp > 0;
+        public bool IsMaxHp => currentHp >= maxHp;
+        public bool IsMaxMp => currentMp >= maxMp;
 
-        public int CurrentHp => sourceData != null ? sourceData.currentHp : 0;
-        public int MaxHp => sourceData != null ? sourceData.maxHp : 0;
-        public int CurrentMp => sourceData != null ? sourceData.currentMp : 0;
-        public int MaxMp => sourceData != null ? sourceData.maxMp : 0;
+        public int CurrentHp => currentHp;
+        public int MaxHp => maxHp;
+        public int CurrentMp => currentMp;
+        public int MaxMp => maxMp;
 
         public bool IsEmpty { get; private set; } = false;
 
@@ -144,13 +139,6 @@ namespace Controller
             this.sourceData = runtimeData;
             this.entityName = runtimeData.name;
             this.gameObject.name = entityName;
-            
-            this.currentRow = runtimeData.row;
-            this.currentColumn = runtimeData.column;
-            this.level = runtimeData.stats.level;
-            
-            this.currentExp = runtimeData.currentExp;
-            this.align = runtimeData.align;
 
             this.spiritData = DatabaseManager.Instance.GetSpirit(runtimeData.spiritId);
 
@@ -165,12 +153,24 @@ namespace Controller
 
                 // C. 스킬 합치기
                 this.learnedSkillIds = runtimeData.learnedSkills.Union(spiritData.skills.Select(s => s.id)).ToList();
+
+                // D. 내성 합치기
+                this.resist = runtimeData.resistances;
             }
             else
             {
-                // 스피릿이 없으면 본체 데이터 그대로 사용
-                this.currentStats = runtimeData.stats; // 참조 복사
+                // 스피릿이 없으면 본체 데이터 복사해서 사용
+                this.currentStats = new StatData {
+                    level = runtimeData.stats.level,
+                    str = runtimeData.stats.str,
+                    vit = runtimeData.stats.vit,
+                    intel = runtimeData.stats.intel,
+                    agi = runtimeData.stats.agi,
+                    luc = runtimeData.stats.luc,
+                    mag = runtimeData.stats.mag
+                };
                 this.align = runtimeData.align;
+                this.resist = runtimeData.resistances;
                 this.learnedSkillIds = new List<string>(runtimeData.learnedSkills);
             }
 
@@ -184,7 +184,6 @@ namespace Controller
             // 현재 HP/MP는 비율에 맞춰 조정하거나, max를 넘지 않게 클램핑
             this.currentHp = Mathf.Min(runtimeData.currentHp, this.maxHp);
             this.currentMp = Mathf.Min(runtimeData.currentMp, this.maxMp);
-            this.currentExp = runtimeData.currentExp;
 
             // UI 초기화 (이름, 이미지 등)
             if (nameText) nameText.text = entityName;
@@ -219,7 +218,6 @@ namespace Controller
         {
             StatData result = new StatData();
             
-            // 평균값 계산 (올림 처리: Mathf.CeilToInt)
             result.level = Mathf.CeilToInt((charStats.level + spiritStats.level) / 2f);
             result.str = Mathf.CeilToInt((charStats.str + spiritStats.str) / 2f);
             result.mag = Mathf.CeilToInt((charStats.mag + spiritStats.mag) / 2f);
@@ -234,8 +232,8 @@ namespace Controller
         private void InitializeStats()
         {
             // currentStats를 기반으로 파생 스탯(MaxHP, MaxMP) 재계산
-            this.maxHp = sourceData.maxHp = this.currentStats.vit * 20;
-            this.maxMp = sourceData.maxMp =  this.currentStats.mag * 30;
+            this.maxHp = this.currentStats.vit * 20;
+            this.maxMp = this.currentStats.mag * 30;
         }
         
         // 회복 함수
@@ -243,13 +241,13 @@ namespace Controller
         {
             if (hpAmount > 0)
             {
-                currentHp = Mathf.Min(currentHp + hpAmount, sourceData.maxHp);
+                currentHp = Mathf.Min(currentHp + hpAmount, maxHp);
                 // 회복 연출 (텍스트 등)
-                Debug.Log($"{sourceData.name} HP {hpAmount} 회복");
+                Debug.Log($"{entityName} HP {hpAmount} 회복");
             }
             if (mpAmount > 0)
             {
-                currentMp = Mathf.Min(currentMp + mpAmount, sourceData.maxMp);
+                currentMp = Mathf.Min(currentMp + mpAmount, maxMp);
             }
             UpdateUI();
         }
@@ -259,12 +257,12 @@ namespace Controller
         {
             if (currentHp > 0) return; // 이미 살아있음
 
-            int healAmount = Mathf.FloorToInt(sourceData.maxHp * (percent / 100f));
+            int healAmount = Mathf.FloorToInt(maxHp * (percent / 100f));
             currentHp = healAmount;
             
             gameObject.SetActive(true); 
             UpdateUI();
-            Debug.Log($"{sourceData.name} 부활!");
+            Debug.Log($"{entityName} 부활!");
         }
 
         public void SetHighlightColor(Color color)
@@ -399,43 +397,47 @@ namespace Controller
 
         public override ResistanceData GetResistances()
         {
-            return sourceData.resistances; 
+            return resist; 
         }
 
-        public void AddExp(int amount)
+        // 경험치 획득 및 데이터 갱신 로직
+        public void ApplyExperience(int earnedExp)
         {
-            currentExp += amount;
-            sourceData.currentExp = currentExp;
-            // 레벨업 조건을 만족하는 동안 계속 반복
+            sourceData.currentExp += earnedExp;
+            
             while (true)
             {
-                int requiredExp = expTable.GetRequiredExp(level);
+                int requiredExp = CombatCalculator.GetMaxExpForLevel(sourceData.stats.level);
 
-                if (level >= 99) break;
-
-                if (currentExp < requiredExp) 
+                if (sourceData.currentExp >= requiredExp)
                 {
-                    break; 
+                    // 레벨 업!
+                    sourceData.currentExp -= requiredExp;
+                    sourceData.stats.level++;
+                    
+                    // 스탯 상승 (임시)
+                    sourceData.stats.str++;
+                    sourceData.stats.vit++;
+                    sourceData.stats.mag++;
+                    sourceData.stats.agi++;
+                    sourceData.stats.luc++;
+                    sourceData.stats.intel++;
+
+                    // HP/MP 완전 회복 및 Max 수치 재계산
+                    InitializeStats(); 
+                    
+                    sourceData.currentHp = sourceData.maxHp;
+                    sourceData.currentMp = sourceData.maxMp;
+                    sourceData.maxHp = this.maxHp;
+                    sourceData.maxMp = this.maxMp;
                 }
-
-                level++; 
-                
-                OnLevelUp();
+                else
+                {
+                    break; // 레벨업 조건 불충족 시 종료
+                }
             }
-            
-            UpdateUI();
-        }
 
-        void OnLevelUp()
-        {
-            
-            sourceData.stats.level = level;
-            
-            // 스탯 증가, HP 회복 등 처리
-            maxHp += 10;
-            currentHp = maxHp;
-            // 이펙트 재생 등...
-            Debug.Log($"레벨 업! 현재 레벨: {level}");
+            Debug.Log($"[Level Up Logic] {entityName} Updated -> Lv.{level}, Exp: {sourceData.currentExp}");
         }
 
         // [BattleEntity 구현] 데미지 처리
@@ -474,26 +476,20 @@ namespace Controller
 
         public void ApplyHpChange(int amount)
         {
-            if (sourceData == null) return;
-            sourceData.currentHp = Mathf.Clamp(sourceData.currentHp + amount, 0, sourceData.maxHp);
-            currentHp = sourceData.currentHp; 
+            currentHp = Mathf.Clamp(currentHp + amount, 0, maxHp);
         }
 
         public void ApplyMpChange(int amount)
         {
-            if (sourceData == null) return;
-            sourceData.currentMp = Mathf.Clamp(sourceData.currentMp + amount, 0, sourceData.maxMp);
-            currentMp = sourceData.currentMp;
+            currentMp = Mathf.Clamp(currentMp + amount, 0, maxMp);
         }
 
         public void ApplyRevive(int percent)
         {
-            if (sourceData == null) return;
-            int healAmount = Mathf.FloorToInt(sourceData.maxHp * (percent / 100f));
+            int healAmount = Mathf.FloorToInt(maxHp * (percent / 100f));
             if (healAmount < 1) healAmount = 1;
             
-            sourceData.currentHp = healAmount;
-            currentHp = sourceData.currentHp;
+            currentHp = healAmount;
             
             // 부활 시 게임오브젝트 활성화 등 상태 복구
             gameObject.SetActive(true);

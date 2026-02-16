@@ -25,7 +25,6 @@ namespace Controller
         public ColumnType currentColumn;
 
         // [IBattleTarget 구현]
-        public string Name => sourceData != null ? sourceData.name : "";
         public bool IsAlive => currentHp > 0;
         public bool IsMaxHp => currentHp >= maxHp;
         public bool IsMaxMp => currentMp >= maxMp;
