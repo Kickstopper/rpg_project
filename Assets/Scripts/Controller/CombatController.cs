@@ -693,65 +693,6 @@ namespace Controller
             }
         }
 
-        BattleReward CalculateRewards(List<PlayerController> players)
-        {
-            BattleReward reward = new BattleReward();
-            reward.dropItems = new List<string>();
-
-            long totalMonsterExp = 0;
-            
-            foreach (var entry in encounterLog)
-            {
-                // 경험치 계산
-                totalMonsterExp += GetMonsterExp(entry.stats.level);
-                
-                // 아이템 드롭 로직 (sourceData 대신 entry 사용)
-                List<string> dropTable = entry.dropItemIds;
-                if (dropTable != null && dropTable.Count > 0 && Random.value >= 0.4f)
-                {
-                    reward.dropItems.Add(dropTable[Random.Range(0, dropTable.Count)]);
-                }
-            }
-
-            // 레벨 보정 로직을 위한 평균 레벨 계산
-            float partyAvgLv = (players.Count > 0) ? (float)players.Average(p => p.level) : 1;
-            // 몬스터 평균 레벨도 entry를 통해 계산
-            float monsterAvgLv = (encounterLog.Count > 0) ? (float)encounterLog.Average(m => m.stats.level) : 1;
-            
-            float levelBonusRatio = Mathf.Clamp(monsterAvgLv / partyAvgLv, 0.5f, 1.5f);
-            reward.totalExp = Mathf.FloorToInt(totalMonsterExp * levelBonusRatio);
-
-            int livingMemberCount = players.Count(p => p.currentHp > 0);
-            if (livingMemberCount > 0)
-                reward.expPerMember = reward.totalExp / livingMemberCount;
-            else
-                reward.expPerMember = 0;
-
-            int calculatedGold = 0;
-            foreach (var entry in encounterLog)
-            {
-                if (Random.value < 0.3f) continue;
-                int lv = entry.stats.level;
-                calculatedGold += Random.Range(lv * 10, lv * 30); 
-            }
-            reward.totalGold = calculatedGold;
-
-            return reward;
-        }
-
-        // 몬스터 경험치 계산 헬퍼 함수
-        int GetMonsterExp(int level)
-        {
-            float exponent = 2.2f; // LevelSystem과 동일하게 맞춤
-            float baseExp = 15f;   // 1레벨 몬스터가 주는 경험치 (플레이어 1->2 필요 경험치가 100이라면 약 15% 정도)
-
-            // 공식: 15 * (Level ^ 2.2)
-            // Lv 1 = 15
-            // Lv 10 = 2,377
-            // Lv 50 = 82,382 (플레이어 요구량의 약 15% 유지)
-            return Mathf.FloorToInt(baseExp * Mathf.Pow(level, exponent));
-        }
-
         // 인스턴트 전투 처리 메인 루틴
         IEnumerator ProcessInstantWin()
         {
@@ -771,7 +712,7 @@ namespace Controller
             // 4. 결과 텍스트 구성
             List<PlayerController> allPlayers = activePlayers.OfType<PlayerController>().ToList();
             
-            BattleReward reward = CalculateRewards(allPlayers);
+            BattleReward reward = CombatCalculator.CalculateRewards(allPlayers, encounterLog);
             foreach(var p in allPlayers)
             {
                 if (p != null && p.currentHp > 0) {
@@ -2161,7 +2102,7 @@ namespace Controller
 
             yield return wait10;
 
-            if (CalculateEscapeSuccess())
+            if (CombatCalculator.CalculateEscapeSuccess(activePlayers, activeMonsters, currentEscapeAttempts, guaranteedEscapeAttempts))
             {
                 SetEnemyVisualsActive(false);
                 ShowMessage("휴~ 도망쳤다.");
@@ -3319,12 +3260,22 @@ namespace Controller
 
         IEnumerator ProcessSingleHit(CombatAction action, GameObject target)
         {
+            // 위치 보정 계산 호출
+            CombatPosition atkPos = GetUnitPosition(action.actor);
+            CombatPosition defPos = GetUnitPosition(target);
+            WeaponType wType = WeaponType.Melee;
+            PlayerController pActor = action.actor.GetComponent<PlayerController>();
+            if (action.type == ActionType.Shoot || (pActor?.currentWeapon?.type == WeaponType.Gun)) 
+                wType = WeaponType.Gun;
             GetPositionalModifiers(action.actor, target, action, out float posDmgMult, out float posEvaBonus);
 
-            if (CheckEvasion(action.actor, target, posEvaBonus))
+            // 회피 체크 호출
+            BattleEntity attackerEntity = action.actor.GetComponent<BattleEntity>();
+            BattleEntity targetEntity = target.GetComponent<BattleEntity>();
+
+            if (CombatCalculator.CheckEvasion(attackerEntity, targetEntity, posEvaBonus))
             {
                 Debug.Log($"{target.name} 회피!");
-                var targetEntity = target.GetComponent<BattleEntity>();
                 if (targetEntity is PlayerController pc)
                 {
                     pc.SetMessage("어림없지!");
@@ -3335,13 +3286,12 @@ namespace Controller
                 yield break; 
             }
 
-            if (CheckReflection(target, action.type))
+            if (CombatCalculator.CheckReflection(targetEntity, action.type))
             {
                 ShowLog("REFLECT!");
                 SpawnVFX(vfxReflectPrefab, target.transform.position);
-                int reflectDmg = CalculateDamage(action.actor, action.actor, action, false, 1.0f);
+                int reflectDmg = CombatCalculator.CalculateDamage(attackerEntity, attackerEntity, action, false, 1.0f);
                 ApplyDamage(action.actor, reflectDmg, false);
-                var targetEntity = target.GetComponent<BattleEntity>();
                 if (targetEntity is PlayerController pc)
                 {
                     pc.SetMessage("반사다!");
@@ -3351,12 +3301,11 @@ namespace Controller
                 yield break;
             }
 
-            if (CheckAbsorption(target, action.type))
+            if (CombatCalculator.CheckAbsorption(targetEntity, action.type))
             {
                 ShowLog("ABSORB!");
                 SpawnVFX(vfxAbsorbPrefab, target.transform.position);
-                int absorbAmount = CalculateDamage(action.actor, target, action, false, 1.0f);
-                var targetEntity = target.GetComponent<BattleEntity>();
+                int absorbAmount = CombatCalculator.CalculateDamage(attackerEntity, targetEntity, action, false, 1.0f);
                 if (targetEntity is PlayerController pc)
                 {
                     pc.Recover(absorbAmount, 0);
@@ -3390,13 +3339,13 @@ namespace Controller
                 }
             }
 
-            bool isCritical = CheckCritical(action.actor, target, action);
+            bool isCritical = CombatCalculator.CheckCritical(attackerEntity, targetEntity, action);
             int damage = 0;
 
-            if (action.type == ActionType.Shoot && action.actor.GetComponent<PlayerController>())
-                damage = CalculateGunDamage(action.actor.GetComponent<PlayerController>(), target, isCritical);
+            if (action.type == ActionType.Shoot && pActor != null)
+                damage = CombatCalculator.CalculateGunDamage(pActor, targetEntity, isCritical);
             else
-                damage = CalculateDamage(action.actor, target, action, isCritical, posDmgMult);
+                damage = CombatCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCritical, posDmgMult);
 
             BattleEntity defenderEntity = target.GetComponent<BattleEntity>();
             if (defenderEntity != null && defenderEntity.isGuarding)
@@ -3521,13 +3470,6 @@ namespace Controller
             return targets;
         }
 
-        // [성향 호환성 체크 헬퍼]
-        bool IsAlignCompatible(Align a, Align b)
-        {
-            // 같거나, 둘 중 하나라도 Neutral(True_Neutral)이면 호환
-            return a == b || a == Align.True_Neutral || b == Align.True_Neutral;
-        }
-
         // [Union 참가 가능 파트너 찾기]
         List<PlayerController> GetValidUnionPartners(PlayerController leader)
         {
@@ -3551,7 +3493,7 @@ namespace Controller
                 if (p == null || p.IsEmpty || p.currentHp <= 0) continue;
 
                 // 2. 성향(Align) 호환성 체크
-                if (!IsAlignCompatible(leader.align, p.align)) continue;
+                if (!CombatCalculator.IsAlignCompatible(leader.align, p.align)) continue;
 
                 // 3. 행동 예약 상태 체크. 이미 행동 큐에 등록된 행동이 있는지 확인
                 CombatAction reservedAction = actionQueue.Find(a => a.actor == p.gameObject);
@@ -4026,7 +3968,7 @@ namespace Controller
                 // -----------------------------------------------------
                 List<PlayerController> allPlayers = activePlayers.OfType<PlayerController>().ToList();
 
-                BattleReward reward = CalculateRewards(allPlayers);
+                BattleReward reward = CombatCalculator.CalculateRewards(allPlayers, encounterLog);
                 // 1. 전투 결과를 PartyManager에 반영
                 foreach(var p in allPlayers)
                 {

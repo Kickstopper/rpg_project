@@ -261,7 +261,6 @@ namespace Controller
             }
             else
             {
-                // [추가된 로직] 이동이 막혔다면, 워프인지 확인합니다.
                 WarpData validWarp = CheckForWarp(_player.LogicX, _player.LogicY, tx, ty, moveVec);
 
                 if (validWarp != null)
@@ -285,7 +284,6 @@ namespace Controller
             if (_currentMap == null) return null;
 
             Direction inputDir = VectorToDirection(moveDir);
-            WarpData validWarp = null;
 
             // 1. 현재 위치(Source) 검사: "방 안쪽 벽에 있는 워프인가?"
             WarpData currentWarp = _currentMap.GetWarpAt(currentX, currentY);
@@ -414,8 +412,21 @@ namespace Controller
 
         private IEnumerator TurnRoutine(int dirStep)
         {
-            if (compassUI) compassUI.AnimateTurn(_player.DirectionIdx, dirStep, turnDuration);
+            // 1. 현재 방향과 이동할 다음 방향을 미리 계산
+            int currentDir = _player.DirectionIdx;
+            // (a % n + n) % n 은 음수 나머지 처리를 위한 공식.
+            int nextDir = ((currentDir + dirStep) % 4 + 4) % 4;
+
+            // 2. UI에게 "Current에서 Next로 회전하라"고 지시
+            if (compassUI) 
+            {
+                compassUI.AnimateTurn(currentDir, nextDir, dirStep, turnDuration);
+            }
+
+            // 3. 실제 플레이어 데이터 회전 (기존 로직 유지)
             yield return StartCoroutine(_player.RotateGridRoutine(dirStep, turnDuration, null));
+            
+            // 4. 보정 (혹시 모를 오차 방지)
             if (miniMap) miniMap.SetDirection(_player.DirectionIdx, 0.1f);
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
         }
@@ -446,7 +457,8 @@ namespace Controller
             }
             
             if (miniMap != null) miniMap.Initialize(_currentMap);
-
+            if (compassUI) compassUI.SetDirection(_player.DirectionIdx);
+            Debug.Log("TARGET DIR : " + (_currentMap.startDirection).ToString() + ", PLAYER DIR : " + ((Direction)_player.DirectionIdx).ToString());
             if (autoMapContainer != null)
             {
                 autoMapContainer.SetActive(false);

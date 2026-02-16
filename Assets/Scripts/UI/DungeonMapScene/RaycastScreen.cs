@@ -2197,7 +2197,7 @@ namespace UI.DungeonMapScene
             // directionStep: 1(우회전), -1(좌회전), 2(뒤로)
             if (compassUI != null) 
             {
-                compassUI.AnimateTurn(nextDirIdx, directionStep, duration);
+                compassUI.AnimateTurn(prevDirIdx, nextDirIdx, directionStep, duration);
             }
 
             float elapsed = 0f;

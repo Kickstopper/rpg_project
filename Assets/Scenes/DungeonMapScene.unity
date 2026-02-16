@@ -3441,7 +3441,7 @@ MonoBehaviour:
   - {fileID: 2037381704}
   - {fileID: 1786915513}
   - {fileID: 358138223}
-  spacing: 150
+  spacing: 250
 --- !u!114 &1351563563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4073,7 +4073,6 @@ MonoBehaviour:
     distortionAmp: 2
     useCylinderEffect: 0
     cylinderStrength: 3
-    useAnaglyph: 0
     stereoSeparation: 0.05
     lightingIntensity: 3.5
     useGridLighting: 1
