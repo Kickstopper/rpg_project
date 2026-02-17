@@ -20,7 +20,7 @@ namespace Data
         // 1. 기본 정보
         public string saveTime;
         public string sceneName;
-        public string dungeonId; // 현재 맵 이름
+        public string dungeonId; // 현재 맵 ID
         
         // 2. 플레이어 위치
         public int playerPosX;
@@ -39,6 +39,11 @@ namespace Data
 
         // 5. 이벤트 플래그
         public List<string> eventFlags = new List<string>();
+
+        // 6. 가진 앱과 인스톨된 앱
+        public List<AppFeature> ownedApps;
+        public List<AppFeature> installedApps;
+        public int maxAppMemory;
     }
 
     [Serializable]

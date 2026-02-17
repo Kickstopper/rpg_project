@@ -2,7 +2,8 @@ using UnityEngine;
 using System.IO;
 using Controller;
 using Data;
-using UnityEngine.SceneManagement; // PlayerController 접근용
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 namespace Manager
 {
     public class SaveManager : MonoBehaviour
@@ -64,6 +65,11 @@ namespace Manager
             // 4. 이벤트 플래그 저장 (FlagManager가 있다면 가져옴)
             data.eventFlags = FlagManager.Instance.GetSaveData();
 
+            // 5. 앱과 메모리 정보
+            data.maxAppMemory = AppManager.Instance.maxMemory;
+            data.ownedApps = new List<AppFeature>(AppManager.Instance.ownedFeatures);
+            data.installedApps = new List<AppFeature>(AppManager.Instance.installedFeatures);
+
             // 파일 쓰기
             string json = JsonUtility.ToJson(data, true);
             File.WriteAllText(GetSavePath(slotIndex), json);
@@ -101,9 +107,14 @@ namespace Manager
                 }
                 MapManager.Instance.UpdatePlayerPosition(data.playerPosX, data.playerPosY, data.playerDirection, data.dungeonId);
             }
-            // 던전 탐색 상태 복구
 
-            // 3. 씬 이동 및 위치 복구
+            // 3. 앱과 메모리 정보
+            data.maxAppMemory = AppManager.Instance.maxMemory;
+            data.ownedApps = new List<AppFeature>(AppManager.Instance.ownedFeatures);
+            data.installedApps = new List<AppFeature>(AppManager.Instance.installedFeatures);
+
+            // 던전 탐색 상태 복구
+            // 4. 씬 이동 및 위치 복구
             if (data.sceneName == GameScene.DUNGEON_MAP_SCENE)
             {
                 LevelManager.Instance.LoadLevelFromJson(data.dungeonId);

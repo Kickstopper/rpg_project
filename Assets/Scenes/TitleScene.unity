@@ -461,6 +461,7 @@ Transform:
   - {fileID: 1753277293}
   - {fileID: 823262837}
   - {fileID: 368130273}
+  - {fileID: 744971245}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &249169707
@@ -1620,6 +1621,60 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &744971244
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 744971245}
+  - component: {fileID: 744971246}
+  m_Layer: 0
+  m_Name: AppManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &744971245
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 744971244}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 222930936}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &744971246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 744971244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 061e66682c664544aba8392f55c40034, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Manager.AppManager
+  maxMemory: 10
+  appDatabase:
+  - {fileID: 11400000, guid: 2ec96027e0150394c80bcf8ec05b50f6, type: 2}
+  - {fileID: 11400000, guid: 875912a9819b6b245ae0e54bd9cfc61a, type: 2}
+  - {fileID: 11400000, guid: cefca8a2e97f17e40ab0a7517d394dcd, type: 2}
+  - {fileID: 11400000, guid: 3033774bcf45dcd458b67bb977fbbfa6, type: 2}
+  - {fileID: 11400000, guid: 484d98ce6299154429972dd7943e8054, type: 2}
+  - {fileID: 11400000, guid: fcedda8f1ebfed94eb8db02addf7d512, type: 2}
+  ownedFeatures: 010000000300000004000000
+  installedFeatures: 010000000300000004000000
 --- !u!1 &823262836
 GameObject:
   m_ObjectHideFlags: 0

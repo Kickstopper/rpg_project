@@ -33,6 +33,13 @@ namespace UI.DungeonMapScene
         {
             _currentTheme = theme;
             ResetSteps();
+            SetVisible(AppManager.Instance.IsInstalled(AppFeature.MobSensor));
+        }
+
+        private void SetVisible(bool visible)
+        {
+            dangerSlider.gameObject.SetActive(visible);
+            dangerText.gameObject.SetActive(visible);
         }
 
         public void ResetSteps()
@@ -55,6 +62,7 @@ namespace UI.DungeonMapScene
 
         private void UpdateUI()
         {
+            if(!AppManager.Instance.IsInstalled(AppFeature.MobSensor)) return;
             if (dangerSlider == null || fillImage == null) return;
 
             float ratio = 1.0f - ((float)_stepsUntilNextBattle / _initialSteps);

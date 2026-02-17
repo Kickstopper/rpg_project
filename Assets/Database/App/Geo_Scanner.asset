@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ddf923dd0365ba4b805542e4dc938b9, type: 3}
+  m_Name: Geo_Scanner
+  m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
+  appName: GEO SCANNER
+  description: "\uC9C0\uD615\uC744 \uC2A4\uCE94\uD558\uC5EC \uBCF4\uC774\uC9C0 \uC54A\uB294
+    \uAE38\uC744 \uCC3E\uC2B5\uB2C8\uB2E4."
+  icon: {fileID: 0}
+  featureType: 5
+  memoryCost: 4

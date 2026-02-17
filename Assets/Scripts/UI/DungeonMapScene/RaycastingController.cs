@@ -106,6 +106,7 @@ namespace Controller
             }
             if (Input.GetKeyDown(KeyCode.M))
             {
+                if (!AppManager.Instance.IsInstalled(AppFeature.AutoMapper)) return;
                 autoMapContainer.SetActive(!autoMapContainer.activeSelf);
                 return;
             }
@@ -207,8 +208,11 @@ namespace Controller
 
             // 2. Action - 기타 기능
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
-            if (Input.GetKeyDown(KeyCode.M)) autoMapContainer.SetActive(!autoMapContainer.activeSelf);
-
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                if (!AppManager.Instance.IsInstalled(AppFeature.AutoMapper)) return;
+                autoMapContainer.SetActive(!autoMapContainer.activeSelf);
+            } 
             if (Input.GetKeyDown(KeyCode.P))
             {
                 GameSettingManager.Instance.useAnaglyph = !GameSettingManager.Instance.useAnaglyph;
@@ -467,9 +471,16 @@ namespace Controller
                 _player.SetMapData(_currentMap, _currentMap.startX, _currentMap.startY, _currentMap.startDirection);
             }
             
-            if (miniMap != null) miniMap.Initialize(_currentMap);
-            if (compassUI) compassUI.SetDirection(_player.DirectionIdx);
-            Debug.Log("TARGET DIR : " + (_currentMap.startDirection).ToString() + ", PLAYER DIR : " + ((Direction)_player.DirectionIdx).ToString());
+            if (miniMap != null)
+            {
+                miniMap.Initialize(_currentMap);
+                miniMap.gameObject.SetActive(AppManager.Instance.IsInstalled(AppFeature.LocalRadar));
+            }
+            if (compassUI)
+            {
+                compassUI.SetDirection(_player.DirectionIdx);
+                compassUI.gameObject.SetActive(AppManager.Instance.IsInstalled(AppFeature.GyroCompass));   
+            }
             if (autoMapContainer != null)
             {
                 autoMapContainer.SetActive(false);
