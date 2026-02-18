@@ -769,9 +769,9 @@ RectTransform:
   - {fileID: 1920012254}
   m_Father: {fileID: 128677749}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 60, y: 120}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 10}
   m_SizeDelta: {x: 120, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &77270347
@@ -5329,10 +5329,10 @@ RectTransform:
   - {fileID: 58888420}
   m_Father: {fileID: 128677749}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 60, y: 60}
-  m_SizeDelta: {x: 1280, y: 720}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2086873637
 MonoBehaviour:
@@ -5347,7 +5347,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spacing: 0
-  viewSize: 9
+  mapSize: 7
+  visibleSize: 5
+  rectScale: 3
+  parentRT: {fileID: 2086873636}
   gridPrefab: {fileID: 2873164270439364527, guid: 3b14602e6186c456ca8156bac5dddc0a, type: 3}
   arrowPrefab: {fileID: 8936402495519818880, guid: fec19776124ef4b10a94acd1a105c197, type: 3}
 --- !u!114 &2086873638
@@ -5362,7 +5365,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Padding: {x: 1220, y: 660, z: 1220, w: 660}
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
   m_Softness: {x: 0, y: 0}
 --- !u!1 &2114126938
 GameObject:
