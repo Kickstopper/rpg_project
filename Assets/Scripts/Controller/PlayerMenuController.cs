@@ -294,7 +294,7 @@ namespace Controller
                     go.transform.localPosition = Vector3.zero;
                     
                     PlayerController pc = go.GetComponent<PlayerController>();
-                    // 메뉴 화면용 초기화 (CombatController는 null)
+                    // 메뉴 화면용 초기화 (BattleManager는 null)
                     pc.Initialize(slotAssignments[i], null);
                     
                     // 파티 슬롯의 캐릭터 버튼은 클릭되지 않도록 설정 (직접 조작하므로)

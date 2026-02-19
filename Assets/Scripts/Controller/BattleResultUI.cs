@@ -8,7 +8,7 @@ using Data;
 
 namespace Controller
 {
-    public class CombatResultUI : MonoBehaviour
+    public class BattleResultUI : MonoBehaviour
     {
         [Header("Reward Info")]
         public TextMeshProUGUI goldText;
@@ -29,7 +29,7 @@ namespace Controller
         
         private bool isClosing = false;
 
-        public void Show(CombatController.BattleReward reward, List<PlayerController> partyMembers, 
+        public void Show(BattleManager.BattleReward reward, List<PlayerController> partyMembers, 
                         Dictionary<PlayerController, (int oldLv, int oldExp, int oldMaxExp)> preBattleStates, 
                         System.Action onCloseCallback)
         {

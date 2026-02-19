@@ -224,7 +224,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8238016265576625859}
   m_Layer: 0
-  m_Name: DamagePopupContainer
+  m_Name: EffectContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -371,8 +371,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Guard
         m_Mode: 1
         m_Arguments:
@@ -519,8 +519,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_LastStand
         m_Mode: 1
         m_Arguments:
@@ -667,8 +667,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_shoot
         m_Mode: 1
         m_Arguments:
@@ -1063,8 +1063,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnBaseCommand_Fight
         m_Mode: 1
         m_Arguments:
@@ -1332,8 +1332,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Controller.CombatController, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnBaseCommand_Escape
         m_Mode: 1
         m_Arguments:
@@ -1602,8 +1602,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Rolling_Vulcan
         m_Mode: 1
         m_Arguments:
@@ -1628,6 +1628,57 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 13
   button: {fileID: 914962744406574234}
+--- !u!1 &1041430624732567945
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1423192853013366643}
+  - component: {fileID: 2026097407857020551}
+  m_Layer: 0
+  m_Name: BattleVisualController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1423192853013366643
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041430624732567945}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8570161410329549391}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2026097407857020551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1041430624732567945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ffbc632e4d22ce41bd05d4faac7e1c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleVisualController
+  vfxSlashPrefab: {fileID: 7405688537336936215, guid: 7c7486c5695c3ba489d13e3922f0c1f8, type: 3}
+  vfxGunPrefab: {fileID: 7405688537336936215, guid: c653612a10f1bfd4987b27887f13aef8, type: 3}
+  vfxMagicPrefab: {fileID: 7405688537336936215, guid: 0ee5f5d0414c76e47b2d7409a5ad57e7, type: 3}
+  vfxGuardHitPrefab: {fileID: 7405688537336936215, guid: 6dc6624beff7575439c1fbeef41310ed, type: 3}
+  vfxReflectPrefab: {fileID: 7405688537336936215, guid: f2183626627725b4b81fd7a8016f4235, type: 3}
+  vfxAbsorbPrefab: {fileID: 7405688537336936215, guid: 2ca0461892faed842b464c926396fcd7, type: 3}
+  vfxContainer: {fileID: 8238016265576625859}
 --- !u!1 &1106862988069777363
 GameObject:
   m_ObjectHideFlags: 0
@@ -2220,7 +2271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentTransform: {fileID: 2752421738825663161}
   skillSlotPrefab: {fileID: 940030084927157362, guid: aac485338bd864e4a8c8291fae269e91, type: 3}
-  controller: {fileID: 1903263384692325993}
+  battleManager: {fileID: 6760945191955151476}
   btnTabMagic: {fileID: 760796688291917019}
   btnTabRecover: {fileID: 7613027691096184110}
   btnTabAssist: {fileID: 533917349373551451}
@@ -2349,7 +2400,7 @@ GameObject:
   - component: {fileID: 3687072972335226115}
   - component: {fileID: 6056385896796279582}
   m_Layer: 0
-  m_Name: UI_Battle
+  m_Name: Battle_UI_Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2370,7 +2421,6 @@ RectTransform:
   - {fileID: 8275191289066450245}
   - {fileID: 7347451199153016165}
   - {fileID: 7137071373792476439}
-  - {fileID: 2285515569279649803}
   - {fileID: 8238016265576625859}
   - {fileID: 8653870214554675582}
   - {fileID: 2051469266359347114}
@@ -2704,8 +2754,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Next
         m_Mode: 1
         m_Arguments:
@@ -3159,9 +3209,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
-        m_MethodName: OnFightCommand_Rolling_Vulcan
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
+        m_MethodName: OnFightCommand_Attack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3835,8 +3885,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Reload
         m_Mode: 1
         m_Arguments:
@@ -4551,8 +4601,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Attack
         m_Mode: 1
         m_Arguments:
@@ -4700,8 +4750,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Menu_Gun
         m_Mode: 1
         m_Arguments:
@@ -4759,43 +4809,6 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 640, y: -361}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &3011577163660086191
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2285515569279649803}
-  m_Layer: 0
-  m_Name: VFX_Layer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2285515569279649803
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3011577163660086191}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3947177538560949837}
-  - {fileID: 6714796998559431861}
-  m_Father: {fileID: 6129727179164803609}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &3101476235890700041
@@ -5257,7 +5270,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentTransform: {fileID: 9154151435968974932}
   itemSlotPrefab: {fileID: 940030084927157362, guid: d8e7812773ea79641832c31d9f782fb2, type: 3}
-  controller: {fileID: 1903263384692325993}
+  battleManager: {fileID: 6760945191955151476}
   btnTabRecover: {fileID: 9148361085793154629}
   btnTabBuff: {fileID: 2295539720131858416}
   btnTabAttack: {fileID: 73516237560303479}
@@ -5667,7 +5680,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8570161410329549391}
   m_Layer: 0
-  m_Name: System_Battle
+  m_Name: Battle_UI_Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5687,6 +5700,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7404759238677247422}
+  - {fileID: 8433041994049511491}
+  - {fileID: 1423192853013366643}
   - {fileID: 6129727179164803609}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6023,9 +6038,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
-        m_MethodName: OnFightCommand_Rolling_Vulcan
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
+        m_MethodName: OnFightCommand_Attack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6340,7 +6355,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4294012495270883111
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6584,8 +6599,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnBaseCommand_Talk
         m_Mode: 1
         m_Arguments:
@@ -7265,8 +7280,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnBaseCommand_Auto
         m_Mode: 1
         m_Arguments:
@@ -7399,8 +7414,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnCommandButton_Move
         m_Mode: 1
         m_Arguments:
@@ -8139,9 +8154,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
-        m_MethodName: OnFightCommand_Rolling_Vulcan
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
+        m_MethodName: OnFightCommand_Attack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8622,7 +8637,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5713310615697886990
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8938,8 +8953,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Item
         m_Mode: 1
         m_Arguments:
@@ -9086,9 +9101,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
-        m_MethodName: OnFightCommand_Rolling_Vulcan
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
+        m_MethodName: OnFightCommand_Attack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9456,8 +9471,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Menu_Extra
         m_Mode: 1
         m_Arguments:
@@ -9865,9 +9880,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
-        m_MethodName: OnFightCommand_Rolling_Vulcan
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
+        m_MethodName: OnFightCommand_Attack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10064,7 +10079,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -17, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &7273740071859263020
 CanvasRenderer:
@@ -11165,7 +11180,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -7, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &2441107864763919643
 CanvasRenderer:
@@ -11636,9 +11651,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7404759238677247422}
-  - component: {fileID: 1903263384692325993}
+  - component: {fileID: 6760945191955151476}
   m_Layer: 0
-  m_Name: CombatController
+  m_Name: BattleManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11659,7 +11674,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8570161410329549391}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1903263384692325993
+--- !u!114 &6760945191955151476
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -11668,64 +11683,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 6434790317563756546}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bebbd84bf8ac9f644ac7fc8d119eef0b, type: 3}
+  m_Script: {fileID: 11500000, guid: 146eebf91b5e5e24a84e66c9445dbfec, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  raycastScreen: {fileID: 0}
-  combatBG: {fileID: 2358689599513272998}
-  BattleUI: {fileID: 8457423944824698811}
+  m_EditorClassIdentifier: Assembly-CSharp::Controller.BattleManager
+  uiController: {fileID: 1616790773360827174}
+  visualController: {fileID: 2026097407857020551}
   damagePopupContainer: {fileID: 8238016265576625859}
-  combatResultUI: {fileID: 8680405692058152159}
-  baseCmdContainer: {fileID: 9092860672288129397}
-  fightCmdContainer: {fileID: 5136619547675322153}
-  btnContainer: {fileID: 8439238137182738173}
-  subMenuContainer: {fileID: 3105543782756506099}
-  baseButtons:
-  - {fileID: 8545209901766464133}
-  - {fileID: 8108839297138187606}
-  - {fileID: 1583182192347177217}
-  - {fileID: 3306659759716669445}
-  allFightButtons:
-  - {fileID: 8358700966342731720}
-  - {fileID: 6829970414638649122}
-  - {fileID: 4004921614572426645}
-  - {fileID: 2173907803216321437}
-  - {fileID: 8045127398935510398}
-  - {fileID: 1739087028103297627}
-  - {fileID: 5183999315008673870}
-  - {fileID: 8294947501866102226}
-  - {fileID: 1846460752260933957}
-  - {fileID: 3745210481555288706}
-  - {fileID: 8925941514272234875}
-  - {fileID: 5069071512670826331}
-  - {fileID: 413421511386538155}
-  - {fileID: 2110261845038982297}
-  battleSkillUI: {fileID: 1885553050605240501}
-  battleItemUI: {fileID: 5676846122207927085}
-  commandPanel: {fileID: 4660565689378489612}
-  logPanel: {fileID: 661441812553838288}
-  logText: {fileID: 8287812819376642579}
-  messagePanel: {fileID: 4503892745266028113}
-  messageText: {fileID: 6125938526447343552}
-  qteTimingSlider: {fileID: 4019049488780649018}
-  autoModeButton: {fileID: 2501375592036893921}
-  screenFlashImage: {fileID: 3755014892532533432}
-  instantResultPanel: {fileID: 4474836925546506070}
-  instantResultText: {fileID: 6129033664232938187}
-  instantWinDelay: 1.5
   guaranteedEscapeAttempts: 3
   defaultMonsterPrefab: {fileID: 5675693360896444327, guid: 5886499ad23134b40a1350463fb19b81, type: 3}
   playerPrefab: {fileID: 6815253905712193029, guid: d7f43cf7a138ea1439eaeabd115425df, type: 3}
   damagePopupPrefab: {fileID: 232750575524275144, guid: 59e4eadd13f26a04995aed381e0232dd, type: 3}
-  vfxSlashPrefab: {fileID: 7405688537336936215, guid: 7c7486c5695c3ba489d13e3922f0c1f8, type: 3}
-  vfxGunPrefab: {fileID: 7405688537336936215, guid: c653612a10f1bfd4987b27887f13aef8, type: 3}
-  vfxMagicPrefab: {fileID: 7405688537336936215, guid: 0ee5f5d0414c76e47b2d7409a5ad57e7, type: 3}
-  vfxGuardHitPrefab: {fileID: 7405688537336936215, guid: 6dc6624beff7575439c1fbeef41310ed, type: 3}
-  vfxReflectPrefab: {fileID: 7405688537336936215, guid: f2183626627725b4b81fd7a8016f4235, type: 3}
-  vfxAbsorbPrefab: {fileID: 7405688537336936215, guid: 2ca0461892faed842b464c926396fcd7, type: 3}
   baseFirstButton: {fileID: 796697833738351785}
   attackButton: {fileID: 2855301995010279726}
-  targetCursor: {fileID: 0}
   cursorOffset: {x: 0, y: 50, z: 0}
   monsterDB: {fileID: 11400000, guid: 5a02d40de261d314a98aeca05c430997, type: 2}
   enemyFrontRowContainer: {fileID: 335355996539375992}
@@ -11734,9 +11703,6 @@ MonoBehaviour:
   playerBackRowContainer: {fileID: 2323448093114049133}
   state: 0
   activeMonsters: []
-  activePlayers: []
-  allSlotControllers: []
-  actionQueue: []
 --- !u!1 &6496873924842671710
 GameObject:
   m_ObjectHideFlags: 0
@@ -12223,76 +12189,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 2
---- !u!1 &6827618108496139353
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6714796998559431861}
-  m_Layer: 0
-  m_Name: Effect_Back
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &6714796998559431861
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6827618108496139353}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2285515569279649803}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &6925031605758289425
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3947177538560949837}
-  m_Layer: 0
-  m_Name: Effect_Front
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &3947177538560949837
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6925031605758289425}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2285515569279649803}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &6946777005027633175
 GameObject:
   m_ObjectHideFlags: 0
@@ -12552,8 +12448,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Skill
         m_Mode: 1
         m_Arguments:
@@ -13423,6 +13319,101 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &7601360240490981890
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8433041994049511491}
+  - component: {fileID: 1616790773360827174}
+  m_Layer: 0
+  m_Name: BattleUIController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8433041994049511491
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7601360240490981890}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8570161410329549391}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1616790773360827174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7601360240490981890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c6bdd744ba1c1347a4ba9685ae57ffa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleUIController
+  raycastScreen: {fileID: 0}
+  BattleUIContainer: {fileID: 1715430918976484311}
+  qteTimingSlider: {fileID: 4019049488780649018}
+  autoModeButton: {fileID: 2501375592036893921}
+  resultUI: {fileID: 8680405692058152159}
+  background: {fileID: 2358689599513272998}
+  targetCursor: {fileID: 0}
+  screenFlashImage: {fileID: 3755014892532533432}
+  instantResultPanel: {fileID: 4474836925546506070}
+  instantResultText: {fileID: 6129033664232938187}
+  instantWinDelay: 1.5
+  baseCmdContainer: {fileID: 9092860672288129397}
+  fightCmdContainer: {fileID: 5136619547675322153}
+  fightBtnContainer: {fileID: 8439238137182738173}
+  fightSubMenuContainer: {fileID: 3105543782756506099}
+  baseButtons:
+  - {fileID: 8545209901766464133}
+  - {fileID: 8108839297138187606}
+  - {fileID: 1583182192347177217}
+  - {fileID: 3306659759716669445}
+  allFightButtons:
+  - {fileID: 8358700966342731720}
+  - {fileID: 6829970414638649122}
+  - {fileID: 4004921614572426645}
+  - {fileID: 2173907803216321437}
+  - {fileID: 8045127398935510398}
+  - {fileID: 1739087028103297627}
+  - {fileID: 5183999315008673870}
+  - {fileID: 8294947501866102226}
+  - {fileID: 1846460752260933957}
+  - {fileID: 3745210481555288706}
+  - {fileID: 8925941514272234875}
+  - {fileID: 5069071512670826331}
+  - {fileID: 413421511386538155}
+  - {fileID: 2110261845038982297}
+  - {fileID: 5824150780815256745}
+  - {fileID: 4777721601391571829}
+  - {fileID: 1149861320171266974}
+  - {fileID: 320432135975644250}
+  - {fileID: 4543484338012804927}
+  - {fileID: 5159117605373134407}
+  - {fileID: 1405360017672518324}
+  battleSkillUI: {fileID: 1885553050605240501}
+  battleItemUI: {fileID: 5676846122207927085}
+  commandPanel: {fileID: 4660565689378489612}
+  logPanel: {fileID: 661441812553838288}
+  logText: {fileID: 8287812819376642579}
+  messagePanel: {fileID: 4503892745266028113}
+  messageText: {fileID: 6125938526447343552}
+  activeFightButtons: []
+  currentMenuButtons: []
 --- !u!1 &7612120272407534229
 GameObject:
   m_ObjectHideFlags: 0
@@ -13653,8 +13644,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Union_Attack
         m_Mode: 1
         m_Arguments:
@@ -14246,9 +14237,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
-        m_MethodName: OnFightCommand_Rolling_Vulcan
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
+        m_MethodName: OnFightCommand_Attack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -14285,7 +14276,7 @@ GameObject:
   - component: {fileID: 8609715907166564499}
   - component: {fileID: 8680405692058152159}
   m_Layer: 0
-  m_Name: CombatResultUI
+  m_Name: BattleResultUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14706,9 +14697,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
-        m_MethodName: OnFightCommand_Rolling_Vulcan
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
+        m_MethodName: OnFightCommand_Attack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15116,8 +15107,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903263384692325993}
-        m_TargetAssemblyTypeName: Manager.CombatManager, Assembly-CSharp
+      - m_Target: {fileID: 6760945191955151476}
+        m_TargetAssemblyTypeName: Controller.BattleManager, Assembly-CSharp
         m_MethodName: OnFightCommand_Menu_Tactics
         m_Mode: 1
         m_Arguments:

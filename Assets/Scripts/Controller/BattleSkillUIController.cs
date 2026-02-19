@@ -14,7 +14,7 @@ namespace Controller
         public Transform contentTransform; 
         public GameObject skillSlotPrefab;
 
-        public CombatController controller;
+        public BattleManager battleManager;
         
         [Header("Tabs")]
         public Button btnTabMagic;
@@ -96,7 +96,7 @@ namespace Controller
             currentSkillIds = null;
             currentActor = null; // 초기화
             gameObject.SetActive(false);
-            controller.OnPopupMenuClosed();
+            battleManager.OnPopupMenuClosed();
         }
 
         void SwitchTab(int categoryIndex)
@@ -202,8 +202,8 @@ namespace Controller
         void OnItemClicked(BaseRootData itemData)
         {
             gameObject.SetActive(false);
-            controller.OnPopupMenuClosed(); 
-            controller.OnPopupItemSelected(itemData);
+            battleManager.OnPopupMenuClosed(); 
+            battleManager.OnPopupItemSelected(itemData);
         }
 
         IEnumerator SelectFirstItem()

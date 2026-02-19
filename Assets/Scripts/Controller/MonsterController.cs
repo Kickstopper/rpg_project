@@ -5,13 +5,12 @@ using UnityEngine.UI;
 using UI.DungeonMapScene;
 using Data;
 using Manager;
-using TMPro;
 
 namespace Controller
 {
     public class MonsterController : BattleEntity, IBattleTarget
     {
-        private CombatController controller;
+        private BattleManager controller;
         public MonsterDatabase.MonsterEntry sourceData;
         [Header("VFX")]
         public Material baseAnaglyphMaterial; // 여기에 'Mat_Anaglyph'를 연결.
@@ -42,7 +41,7 @@ namespace Controller
         private bool cachedIsFront = false;      // 내가 전열인지 후열인지 기억
         private bool lastGlobalState = false;    // 최적화: 이전 프레임의 옵션 상태 기억
 
-        // 외부(CombatController)에서 호출하는 함수
+        // 외부(BattleManager)에서 호출하는 함수
         public void SetAnaglyphDepth(bool isFront)
         {
             // 1. 내 위치 상태 저장
@@ -135,7 +134,7 @@ namespace Controller
             return sourceData.resistances; 
         }
 
-        public void Initialize(MonsterDatabase.MonsterEntry data, CombatController controller)
+        public void Initialize(MonsterDatabase.MonsterEntry data, BattleManager controller)
         {
             this.controller = controller;
             

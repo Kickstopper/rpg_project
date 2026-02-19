@@ -60,7 +60,7 @@ namespace Controller
 
         public bool isCommander;
 
-        private CombatController controller;
+        private BattleManager controller;
 
         // [BattleEntity 구현] 스탯 반환 (스피릿 융합된 스탯 + 장비 보정)
         public override int GetTotalStr() => currentStats.str; 
@@ -124,7 +124,7 @@ namespace Controller
 
         
         // RuntimeData를 받는 초기화 함수
-        public void Initialize(RuntimeCharacterData runtimeData, CombatController controller, bool hasAnimation = false)
+        public void Initialize(RuntimeCharacterData runtimeData, BattleManager controller, bool hasAnimation = false)
         {
             this.hasAnimation = hasAnimation;
             this.controller = controller;

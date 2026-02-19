@@ -27420,7 +27420,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3755744248724282692}
   m_Layer: 0
-  m_Name: System_PlayerMenu
+  m_Name: PlayerMenu_UI_Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

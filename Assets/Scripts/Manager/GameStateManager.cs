@@ -22,7 +22,7 @@ namespace Manager
         public GameObject combatCanvas;      // 전투용 UI (커맨드, 적 이미지 등)
         public GameObject menuCanvas;        // 메뉴 UI
 
-        public CombatController currentCombatController; 
+        public BattleManager currentBattleManager; 
 
         // 상태 변경 알림 이벤트
         public event Action<GameState> OnStateChanged;
@@ -96,12 +96,12 @@ namespace Manager
         }
 
         // UI 등록 시 컨트롤러도 함께 등록받음
-        public void RegisterSceneComponents(GameObject expl, GameObject cbt, GameObject menu, CombatController controller)
+        public void RegisterSceneComponents(GameObject expl, GameObject cbt, GameObject menu, BattleManager manager)
         {
             this.explorationCanvas = expl;
             this.combatCanvas = cbt;
             this.menuCanvas = menu;
-            this.currentCombatController = controller;
+            this.currentBattleManager = manager;
 
             RefreshUIState();
         }
@@ -111,14 +111,14 @@ namespace Manager
         {
             Debug.Log("적 출현!");
             
-            if (currentCombatController != null)
+            if (currentBattleManager != null)
             {
-                currentCombatController.Initialize(monsterList);
+                currentBattleManager.Initialize(monsterList);
                 ChangeState(GameState.Battle);
             }
             else
             {
-                Debug.LogError("CombatController가 연결되지 않았습니다!");
+                Debug.LogError("BattleManager가 연결되지 않았습니다!");
             }
         }
         

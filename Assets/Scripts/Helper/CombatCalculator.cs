@@ -149,7 +149,7 @@ namespace Helper
         // -------------------------------------------------------
         // [위치 보정]
         // -------------------------------------------------------
-        public static void GetPositionalModifiers(CombatController.CombatPosition atkPos, CombatController.CombatPosition defPos, WeaponType wType, out float damageMultiplier, out float evasionBonus)
+        public static void GetPositionalModifiers(BattleManager.CombatPosition atkPos, BattleManager.CombatPosition defPos, WeaponType wType, out float damageMultiplier, out float evasionBonus)
         {
             damageMultiplier = 1.0f;
             evasionBonus = 0f;
@@ -197,9 +197,9 @@ namespace Helper
             return Random.Range(0f, 100f) < finalChance;
         }
 
-        public static CombatController.BattleReward CalculateRewards(List<PlayerController> players, List<MonsterDatabase.MonsterEntry> encounterLog)
+        public static BattleManager.BattleReward CalculateRewards(List<PlayerController> players, List<MonsterDatabase.MonsterEntry> encounterLog)
         {
-            CombatController.BattleReward reward = new CombatController.BattleReward();
+            BattleManager.BattleReward reward = new BattleManager.BattleReward();
             reward.dropItems = new List<string>();
 
             long totalMonsterExp = 0;
