@@ -20,6 +20,7 @@ namespace Controller
     {
         [Header("UI References")]
         public BattleUIController uiController; // 인스펙터에서 할당
+        public BattleFieldController fieldController; // 인스펙터에서 할당
         public BattleVisualController visualController; // 인스펙터에서 할당
         public Transform damagePopupContainer;
         
@@ -45,42 +46,15 @@ namespace Controller
 
         public Vector3 cursorOffset = new Vector3(0, 50, 0); // 몬스터 머리 위 오프셋
 
-        // 타겟팅 로직 변수
-        private List<BattleEntity> validTargets = new();
-        private int currentTargetIndex = 0;
-
-        [Header("Managers & Data")]
-        public MonsterDatabase monsterDB;
-        // PartyManager.Instance 사용
-
-        [Header("Spawn Points")]
-        public Transform enemyFrontRowContainer;
-        public Transform enemyBackRowContainer;
-        public Transform playerFrontRowContainer;
-        public Transform playerBackRowContainer;
-
-        [Header("Player Slots")]
-        //아군 슬롯 리스트
-        private List<Transform> playerFrontSlots = new();
-        private List<Transform> playerBackSlots = new();
-
+        
         //이동 모드 관련 변수
         private bool isSelectingMoveTarget = false;
         private int currentMoveSlotIndex = 0; // 0~2: 전열, 3~5: 후열
-
-        [Header("Highlight Colors")]
-        private Color currentTargetColor = new Color32(128, 0, 178, 255);
-        private Color moveSourceColor = Color.gray;   // 이동하려는 내 캐릭터 색상
 
         [Header("Button Colors")]
         private Color colorNormal = Color.white;          // 일반 텍스트
         private Color colorGrayout = Color.gray;          // 사용 불가 텍스트
 
-        [Header("Slot Management")]
-        // 몬스터들의 슬롯을 관리할 리스트 (0,1,2: 전열 / 0,1,2: 후열)
-        private List<Transform> frontSlots = new();
-        private List<Transform> backSlots = new();
-        
         private BaseRootData currentSelectedItem; // 현재 사용하려는 아이템
         private bool isAutoMode = false; // 오토 모드 활성화 여부
         // 오토 모드 종료 예약 플래그
@@ -92,18 +66,12 @@ namespace Controller
         // [핵심 변수] 전투 상태 및 리스트
         // -------------------------------------------------------
         public BattleState state;
-        [HideInInspector] public List<BattleEntity> activeMonsters = new();
-        // 전투 로직용 리스트 (데이터가 있는 캐릭터만)
-        private List<MonsterDatabase.MonsterEntry> encounterLog = new();
-        private List<BattleEntity> activePlayers = new(); 
-
-        // 렌더링 및 그리드 관리용 리스트 (Empty 포함, 총 6개 고정)
-        private List<PlayerController> allSlotControllers = new();
+        
 
         private List<CombatAction> actionQueue = new(); // 이번 턴의 모든 행동
 
         // 입력 제어용 변수
-        private int currentPlayerIndex = 0; // 지금 누구 차례?
+        
         private ActionType currentSelectedAction;
         private bool isSelectingTarget = false;
 
@@ -130,9 +98,6 @@ namespace Controller
         private List<PlayerController> currentUnionParticipants = new List<PlayerController>();
         private bool isUnionAttackUsedThisTurn = false;
         
-        // 점멸 효과 트윈 저장용 (취소 시 멈추기 위해)
-        private List<Tween> blinkTweens = new List<Tween>();
-
         // 자주 쓰는 딜레이 캐싱
         private WaitForSeconds wait01 = new WaitForSeconds(0.1f);
         private WaitForSeconds wait05 = new WaitForSeconds(0.5f);
@@ -178,9 +143,7 @@ namespace Controller
         {
             // 전투 진입 시 UI를 일단 모두 숨김 (깜빡임 방지)
             uiController.Initialize();
-
-            
-            SetEnemyVisualsActive(false);
+            fieldController.SetEnemyVisualsActive(false);
             
             isAutoMode = false;         
             reserveAutoOff = false;     
@@ -198,10 +161,7 @@ namespace Controller
             // 도망 횟수 초기화
             currentEscapeAttempts = 0; 
 
-            activeMonsters.Clear();
-            encounterLog.Clear();
-            ClearParty();
-            InitializeSlots();
+            fieldController.InitializeSlots();
 
             if (monsterIds == null || monsterIds.Count == 0) return;
             
@@ -213,12 +173,12 @@ namespace Controller
             for (int i = 0; i < spawnCount; i++)
             {
                 int randomIndex = Random.Range(0, monsterIds.Count);
-                SpawnMonster(monsterIds[randomIndex]);
+                fieldController.SpawnMonster(monsterIds[randomIndex]);
             }
             
-            SpawnParty();
+            fieldController.SpawnParty();
 
-            if (activePlayers.Count == 0)
+            if (fieldController.ActivePlayerCount() == 0)
             {
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
                 return;  
@@ -232,157 +192,29 @@ namespace Controller
                 Debug.Log("조건 만족: 인스턴트 전투 실행");
                 
                 // 유닛들의 모습(Sprite)을 숨김
-                SetPlayerVisualsActive(false);
+                fieldController.SetPlayerVisualsActive(false);
                 StartCoroutine(ProcessInstantWin());
             }
             else
             {
-                SetPlayerVisualsActive(true);
+                fieldController.SetPlayerVisualsActive(true);
                 uiController.ShowBattleStartAnimation(()=> { 
                     StartCoroutine(SetupBattle()); 
                 });
             }
         }
 
-        // 전투 유닛 및 슬롯 컨테이너 표시/숨김 제어
-        void SetEnemyVisualsActive(bool isActive)
-        {
-            if (enemyFrontRowContainer) enemyFrontRowContainer.gameObject.SetActive(isActive);
-            if (enemyBackRowContainer) enemyBackRowContainer.gameObject.SetActive(isActive);
-            
-        }
-
-        void SetPlayerVisualsActive(bool isActive)
-        {
-            if (playerFrontRowContainer) playerFrontRowContainer.gameObject.SetActive(isActive);
-            if (playerBackRowContainer) playerBackRowContainer.gameObject.SetActive(isActive);
-            
-        }
-
-        void SpawnParty()
-        {
-            activePlayers.Clear();
-            allSlotControllers.Clear();
-
-            // ---------------------------------------------------------
-            // 1단계: 배치 시뮬레이션 (누가 어디에 설지 미리 결정)
-            // ---------------------------------------------------------
-            
-            // 6개의 슬롯에 들어갈 데이터 배열 (null이면 빈자리)
-            RuntimeCharacterData[] slotAssignments = new RuntimeCharacterData[6];
-            
-            // 자리를 잡지 못한 캐릭터들을 모아둘 리스트
-            List<RuntimeCharacterData> pendingCharacters = new List<RuntimeCharacterData>();
-
-            int partyCount = PartyManager.Instance.partyData.Count;
-
-            // [Pass 1] 선호하는 위치에 우선 배치
-            for (int i = 0; i < partyCount; i++)
-            {
-                var member = PartyManager.Instance.GetMember(i);
-                if (member == null || member.currentHp <= 0) continue;
-
-                // 데이터상의 위치를 인덱스로 변환
-                // 전열(0,1,2), 후열(3,4,5)
-                int rowIndex = (member.row == RowType.Front) ? 0 : 3;
-                int colIndex = (int)member.column; // Left(0), Center(1), Right(2)
-                
-                // 안전장치: 컬럼이 범위를 벗어나면 Center(1)로 보정하거나 Clamp
-                colIndex = Mathf.Clamp(colIndex, 0, 2);
-
-                int targetSlotIndex = rowIndex + colIndex;
-
-                // 자리가 비어있다면 -> 배정
-                if (slotAssignments[targetSlotIndex] == null)
-                {
-                    slotAssignments[targetSlotIndex] = member;
-                }
-                else
-                {
-                    // 자리가 이미 있다면 -> 대기열로 이동
-                    pendingCharacters.Add(member);
-                }
-            }
-
-            // [Pass 2] 남은 빈자리에 대기 인원 배치
-            foreach (var pendingMember in pendingCharacters)
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    // 빈 자리를 발견하면
-                    if (slotAssignments[i] == null)
-                    {
-                        slotAssignments[i] = pendingMember;
-
-                        // 실제 배치된 위치에 맞춰 데이터 갱신 (저장 시 반영되도록)
-                        bool isFront = (i < 3);
-                        pendingMember.row = isFront ? RowType.Front : RowType.Back;
-                        pendingMember.column = (ColumnType)(isFront ? i : i - 3);
-                        
-                        break; // 배치 완료했으니 다음 대기 인원으로
-                    }
-                }
-            }
-
-            // ---------------------------------------------------------
-            // 2단계: 결정된 배치대로 실제 오브젝트 생성 (Instantiate)
-            // ---------------------------------------------------------
-            for (int i = 0; i < 6; i++)
-            {
-                // 1. 타겟 슬롯 Transform 찾기
-                bool isFront = (i < 3);
-                int localIndex = isFront ? i : (i - 3);
-                Transform targetSlot = isFront ? playerFrontSlots[localIndex] : playerBackSlots[localIndex];
-
-                // 2. 프리팹 생성
-                GameObject go = Instantiate(playerPrefab, targetSlot);
-                go.transform.localPosition = Vector3.zero;
-
-                PlayerController pc = go.GetComponent<PlayerController>();
-                allSlotControllers.Add(pc);
-
-                // 생성된 플레이어 버튼의 자동 내비게이션 비활성화
-                if (pc.selectButton != null)
-                {
-                    Navigation nav = new Navigation();
-                    nav.mode = Navigation.Mode.None;
-                    pc.selectButton.navigation = nav;
-                }
-
-                // 3. 데이터 주입
-                RuntimeCharacterData assignedData = slotAssignments[i];
-
-                if (assignedData != null)
-                {
-                    // 실제 캐릭터 초기화
-                    pc.Initialize(assignedData, this, true);
-                    
-                    pc.columnIndex = i;
-                    pc.gameObject.name = pc.entityName;
-                    activePlayers.Add(pc);
-                }
-                else
-                {
-                    // 빈 슬롯 초기화
-                    pc.InitializeEmpty(i);
-                }
-            }
-        }
-
         IEnumerator SetupBattle()
         {
-            SetEnemyVisualsActive(true);
             SoundManager.Instance.PlayBGM(BgmID.Encounter);
             
-            LayoutRebuilder.ForceRebuildLayoutImmediate(enemyFrontRowContainer as RectTransform);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(playerFrontRowContainer as RectTransform);
-            yield return wait10;
+            yield return fieldController.Refresh();
             PreparePlayerTurn();
         }
 
         private void PrepareWeaponAction(WeaponData weapon, ActionType actionType)
         {
-            BattleEntity currentActor = activePlayers[currentPlayerIndex];
+            BattleEntity currentActor = fieldController.GetCurrentCharacter();
             TargetScope scope = TargetScope.Front_Single_Enemy; 
             
             if (weapon != null) scope = weapon.attackRange;
@@ -390,26 +222,29 @@ namespace Controller
 
             if (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Single_Enemy)
             {
-                validTargets = activeMonsters.Where(m => m.currentHp > 0).ToList();
+                var validTargets = fieldController.GetLivingMonsters();
 
                 if (scope == TargetScope.Front_Single_Enemy)
                 {
-                    validTargets = validTargets.Where(m => m.transform.parent.parent == enemyFrontRowContainer).ToList();
-                    if (validTargets.Count == 0) validTargets = activeMonsters.Where(m => m.currentHp > 0).ToList();
+                    validTargets = validTargets.Where(m => m.transform.parent.parent == fieldController.enemyFrontRowContainer).ToList();
+                    if (validTargets.Count == 0) validTargets = fieldController.GetLivingMonsters();
                 }
                 
-                validTargets = validTargets.OrderBy(m => m.transform.parent.parent == enemyBackRowContainer)
+                validTargets = validTargets.OrderBy(m => m.transform.parent.parent == fieldController.enemyBackRowContainer)
                                             .ThenBy(m => m.transform.position.x).ToList();
 
-                if (validTargets.Count == 0) return; 
+                if (validTargets.Count == 0) return;
 
+                fieldController.SetValidTargets(validTargets);
+                fieldController.currentTargetIndex = 0;
+                fieldController.UpdateValidTargetsHighlight();
+                
                 currentSelectedAction = actionType;
                 isSelectingTarget = true;
                 
                 uiController.SetCmdPanelVisible(false);
                 uiController.ShowLog("SELECT TARGET");
-                currentTargetIndex = 0;
-                UpdateTargetHighlight();
+                
                 inputCooldown = 0.2f;
             }
             else
@@ -433,7 +268,7 @@ namespace Controller
             if (isLastStandActive)
             {
                 isLastStandActive = false;
-                foreach (var p in activePlayers)
+                foreach (var p in fieldController.activePlayers)
                 {
                     if (p.columnIndex < 3)
                     {
@@ -458,113 +293,19 @@ namespace Controller
 
         IEnumerator PreparePlayerTurnRoutine()
         {
-            foreach (var player in activePlayers) player.ResetStatus(); 
-            foreach (var monster in activeMonsters) monster.ResetStatus(); 
+            fieldController.ResetPartyStatus();
+            fieldController.ResetMonstersStatus();
 
-            yield return StartCoroutine(ProcessEnemyRowShift());
-            yield return StartCoroutine(ProcessPlayerRowShift());
+            yield return fieldController.ProcessEnemyRowShift();
+            yield return fieldController.ProcessPlayerRowShift();
 
             state = BattleState.PlayerInput;
             actionQueue.Clear(); 
-            currentPlayerIndex = -1; 
+            fieldController.currentPlayerIndex = -1; 
             isFightMode = false;
 
-            CalculateAndShowTurnOrder();
+            fieldController.CalculateAndShowTurnOrder();
             NextPlayerInput();
-        }
-
-        IEnumerator ProcessPlayerRowShift()
-        {
-            for (int col = 0; col < 3; col++)
-            {
-                int frontIdx = col;
-                int backIdx = col + 3;
-
-                PlayerController frontPC = allSlotControllers[frontIdx];
-                PlayerController backPC = allSlotControllers[backIdx];
-
-                bool backCanMove = !backPC.IsEmpty && backPC.currentHp > 0;
-                if (!backCanMove) continue;
-
-                bool frontIsOpen = frontPC.IsEmpty || frontPC.currentHp <= 0;
-
-                if (frontIsOpen)
-                {
-                    yield return StartCoroutine(SwapPlayerSlots(frontIdx, backIdx));
-                }
-            }
-        }
-
-        // 슬롯 교체 애니메이션
-        IEnumerator SwapPlayerSlots(int frontIdx, int backIdx)
-        {
-            PlayerController frontPC = allSlotControllers[frontIdx];
-            PlayerController backPC = allSlotControllers[backIdx];
-
-            Transform frontSlot = playerFrontSlots[frontIdx]; 
-            Transform backSlot = playerBackSlots[backIdx - 3];
-
-            Debug.Log($"[전진] {backPC.name}가 전열로 이동");
-
-            allSlotControllers[frontIdx] = backPC;
-            allSlotControllers[backIdx] = frontPC;
-
-            backPC.columnIndex = frontIdx;
-            frontPC.columnIndex = backIdx;
-
-            // 부모 변경
-            backPC.transform.SetParent(frontSlot, true);
-            frontPC.transform.SetParent(backSlot, true);
-
-            // 두 캐릭터를 동시에 이동
-            Sequence seq = DOTween.Sequence();
-            seq.Join(backPC.transform.DOLocalMove(Vector3.zero, 0.4f).SetEase(Ease.InOutSine));
-            seq.Join(frontPC.transform.DOLocalMove(Vector3.zero, 0.4f).SetEase(Ease.InOutSine));
-            
-            yield return seq.WaitForCompletion();
-        }
-
-        void CalculateAndShowTurnOrder()
-        {
-            activePlayers.Sort((a, b) => 
-            {
-                // 1. 사망자 처리 (죽은 사람은 뒤로)
-                bool aAlive = a.currentHp > 0;
-                bool bAlive = b.currentHp > 0;
-                if (aAlive && !bAlive) return -1; // a 생존, b 사망 -> a가 앞
-                if (!aAlive && bAlive) return 1;  // a 사망, b 생존 -> b가 앞
-                if (!aAlive && !bAlive) return 0;
-
-                // 2. 속도 계산 (AGI - Penalty)
-                // Next나 Gun으로 인한 nextTurnSpeedPenalty가 여기서 반영.
-                int speedA = a.GetTotalAgi() - a.nextTurnSpeedPenalty;
-                int speedB = b.GetTotalAgi() - b.nextTurnSpeedPenalty;
-                
-                // 3. 속도 비교 (내림차순: 속도 높은 사람이 먼저)
-                if (speedA != speedB) return speedB.CompareTo(speedA);
-
-                // 4. 동점일 경우 행운(LUC) 비교
-                return b.GetTotalLuc().CompareTo(a.GetTotalLuc());
-            });
-
-            // 정렬된 순서대로 UI 텍스트 갱신
-            int orderCounter = 1;
-            foreach (var player in activePlayers)
-            {
-                if (player.turnOrderText != null)
-                {
-                    if (player.currentHp > 0)
-                    {
-                        player.turnOrderText.gameObject.SetActive(true);
-                        player.turnOrderText.text = orderCounter.ToString();
-                        orderCounter++;
-                    }
-                    else
-                    {
-                        player.turnOrderText.gameObject.SetActive(false);
-                    }
-                }
-            }
         }
         
         void Update()
@@ -641,9 +382,8 @@ namespace Controller
             SimulateAutoBattleLogic();
 
             // 결과 텍스트 구성
-            List<PlayerController> allPlayers = activePlayers.OfType<PlayerController>().ToList();
-            
-            BattleReward reward = CombatCalculator.CalculateRewards(allPlayers, encounterLog);
+            List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
+            BattleReward reward = CombatCalculator.CalculateRewards(allPlayers, fieldController.encounterLog);
             foreach(var p in allPlayers)
             {
                 if (p != null && p.currentHp > 0) {
@@ -661,7 +401,7 @@ namespace Controller
             uiController.HideInstantWinPanel();
 
             // 전투 종료 처리
-            ClearCombatField(); 
+            fieldController.ClearMonsterField(); 
             GameStateManager.Instance.ChangeState(GameState.Exploration);
         }
 
@@ -676,12 +416,12 @@ namespace Controller
                 safetyBreak++;
 
                 // 1. 아군 공격 턴
-                foreach (var player in activePlayers)
+                foreach (var player in fieldController.activePlayers)
                 {
                     if (player.currentHp <= 0) continue;
 
                     // 살아있는 적 중 하나 랜덤 타겟
-                    var target = activeMonsters.FirstOrDefault(m => m.currentHp > 0);
+                    var target = fieldController.activeMonsters.FirstOrDefault(m => m.currentHp > 0);
                     if (target == null) 
                     {
                         battleEnded = true; 
@@ -702,11 +442,11 @@ namespace Controller
                 if (battleEnded) break;
 
                 // 2. 적군 반격 턴 (살아남은 적이 있다면)
-                foreach (var monster in activeMonsters)
+                foreach (var monster in fieldController.activeMonsters)
                 {
                     if (monster.currentHp <= 0) continue;
 
-                    var target = activePlayers.FirstOrDefault(p => p.currentHp > 0);
+                    var target = fieldController.activePlayers.FirstOrDefault(p => p.currentHp > 0);
                     if (target == null) break;
 
                     CombatAction fakeAction = new CombatAction(monster.gameObject, target.gameObject, ActionType.Attack, 0);
@@ -725,17 +465,16 @@ namespace Controller
             // 앱이 설치되지 않았으면 패스
             if (!AppManager.Instance.IsInstalled(AppFeature.KillSwitch)) return false;
             // 아직 몬스터나 플레이어가 세팅되지 않았으면 패스
-            if (activeMonsters.Count == 0 || activePlayers.Count == 0) return false;
-
-            int pCount = activePlayers.Count;
-            int mCount = activeMonsters.Count;
+            int mCount = fieldController.GetLivingMonsters().Count;
+            int pCount = fieldController.GetLivingParty().Count;
+            if (mCount == 0 || pCount == 0) return false;
 
             // 조건 1: 적 그룹의 수가 아군보다 작아야 함
             if (mCount >= pCount) return false;
 
             // 조건 2: 적 평균 레벨 <= 아군 평균 레벨
-            float pAvgLevel = (float)activePlayers.Average(p => ((PlayerController)p).level);
-            float mAvgLevel = (float)activeMonsters.Average(m => m.level); 
+            float pAvgLevel = (float)fieldController.activePlayers.Average(p => ((PlayerController)p).level);
+            float mAvgLevel = (float)fieldController.activeMonsters.Average(m => m.level); 
 
             if (mAvgLevel > pAvgLevel) return false;
 
@@ -752,69 +491,59 @@ namespace Controller
         {
             bool isFrontRow = (actor.columnIndex < 3);
             bool isFirstFrontRowInput = true;
-            for (int i = 0; i < currentPlayerIndex; i++) {
-                 if (activePlayers[i] is PlayerController prevPlayer) {
+            for (int i = 0; i < fieldController.currentPlayerIndex; i++) {
+                 if (fieldController.activePlayers[i] is PlayerController prevPlayer) {
                     if (prevPlayer.currentHp > 0 && prevPlayer.columnIndex < 3) {
                         isFirstFrontRowInput = false; break;
                     }
                 }
             }
-            int frontLivingCount = allSlotControllers.Take(3).Count(p => p != null && !p.IsEmpty && p.currentHp > 0);
+            int frontLivingCount = fieldController.GetFrontLivingCharacterCount();
             
             return isFrontRow && isFirstFrontRowInput && (frontLivingCount == 3);
         }
 
         // Rolling Vulcan 발동 조건 검사
-        bool CheckRollingVulcanCondition(PlayerController leader)
+    public bool CheckRollingVulcanCondition(PlayerController leader)
+    {
+        // 조건 3: 첫 번째 행동 지정 상태
+        if (fieldController.currentPlayerIndex != 0) return false;
+
+        // 생존자 리스트 확인
+        var livingPlayers = fieldController.GetLivingParty();
+        int count = livingPlayers.Count;
+
+        // 최소 인원 4명 이상이면 5명, 6명도 허용
+        if (count < 4) return false;
+
+        // 조건 1-2: 모든 생존자가 장비(gun_099) 및 탄환(Max) 확인
+        foreach (var p in livingPlayers)
         {
-            // 조건 3: 첫 번째 행동 지정 상태
-            if (currentPlayerIndex != 0) return false;
-
-            // 생존자 리스트 확인
-            var livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
-            int count = livingPlayers.Count;
-
-            // 최소 인원 4명 이상이면 5명, 6명도 허용
-            if (count < 4) return false;
-
-            // 조건 1-2: 모든 생존자가 장비(gun_099) 및 탄환(Max) 확인
-            foreach (var p in livingPlayers)
-            {
-                var pc = p as PlayerController;
-                if (pc.equippedGunId != "gun_000") return false;
-                if (pc.currentGun == null || pc.currentGunAmmo < pc.currentGun.maxHits) return false;
-            }
-
-            // 조건 2: "인접한 두 열"이 꽉 찼는지 확인 (사각형 형성 여부)
-            // 0열(좌측), 1열(중앙), 2열(우측) 각각 전후열이 모두 찼는지 검사
-            bool col0Full = IsSlotActive(0) && IsSlotActive(3); // 좌측 열 완성?
-            bool col1Full = IsSlotActive(1) && IsSlotActive(4); // 중앙 열 완성?
-            bool col2Full = IsSlotActive(2) && IsSlotActive(5); // 우측 열 완성?
-
-            // Case A: 좌측 + 중앙 열이 꽉 참 (0열, 1열) -> 사각형 OK
-            bool isLeftSquare = col0Full && col1Full;
-
-            // Case B: 중앙 + 우측 열이 꽉 참 (1열, 2열) -> 사각형 OK
-            bool isRightSquare = col1Full && col2Full;
-
-            // 둘 중 하나라도 만족하면 조건 통과
-            if (isLeftSquare || isRightSquare)
-            {
-                return true;
-            }
-
-            return false;
+            var pc = p as PlayerController;
+            if (pc.equippedGunId != "gun_000") return false;
+            if (pc.currentGun == null || pc.currentGunAmmo < pc.currentGun.maxHits) return false;
         }
 
-        // [헬퍼 함수] 해당 슬롯 인덱스의 플레이어가 전투 가능한 상태인지 확인
-        bool IsSlotActive(int index)
+        // 조건 2: "인접한 두 열"이 꽉 찼는지 확인 (사각형 형성 여부)
+        // 0열(좌측), 1열(중앙), 2열(우측) 각각 전후열이 모두 찼는지 검사
+        bool col0Full = fieldController.IsSlotActive(0) && fieldController.IsSlotActive(3); // 좌측 열 완성?
+        bool col1Full = fieldController.IsSlotActive(1) && fieldController.IsSlotActive(4); // 중앙 열 완성?
+        bool col2Full = fieldController.IsSlotActive(2) && fieldController.IsSlotActive(5); // 우측 열 완성?
+
+        // Case A: 좌측 + 중앙 열이 꽉 참 (0열, 1열) -> 사각형 OK
+        bool isLeftSquare = col0Full && col1Full;
+
+        // Case B: 중앙 + 우측 열이 꽉 참 (1열, 2열) -> 사각형 OK
+        bool isRightSquare = col1Full && col2Full;
+
+        // 둘 중 하나라도 만족하면 조건 통과
+        if (isLeftSquare || isRightSquare)
         {
-            if (index < 0 || index >= allSlotControllers.Count) return false;
-            PlayerController pc = allSlotControllers[index];
-            
-            // pc가 존재하고, 빈 슬롯이 아니며, 체력이 0보다 커야 함
-            return pc != null && !pc.IsEmpty && pc.currentHp > 0;
+            return true;
         }
+
+        return false;
+    }
 
         // 메인 메뉴 버튼 갱신 및 순서 정렬
         void RefreshCommandButtons(PlayerController actor)
@@ -920,12 +649,12 @@ namespace Controller
                     // 메인 메뉴라면 이전 캐릭터로
                     if (isFightMode)
                     {
-                        if (currentPlayerIndex == 0) ShowBaseMenu();
+                        if (fieldController.currentPlayerIndex == 0) ShowBaseMenu();
                         else GoToPreviousPlayer();
                     }
                     else
                     {
-                        if (actionQueue.Count > 0 || currentPlayerIndex > 0) GoToPreviousPlayer();
+                        if (actionQueue.Count > 0 || fieldController.currentPlayerIndex > 0) GoToPreviousPlayer();
                     }
                 }
                 return;
@@ -971,7 +700,7 @@ namespace Controller
         void OpenSubMenu(ActionType menuType)
         {
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
-            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController actor = fieldController.GetCurrentCharacter() as PlayerController;
 
             // 1. 메인 메뉴 인터랙션 비활성화
             uiController.SetFightCmdInteractable(false);
@@ -1023,7 +752,7 @@ namespace Controller
         // 리스트 내 모든 버튼의 시각적 상태(텍스트 색상) 갱신
         void RefreshButtonVisuals(List<Button> buttons)
         {
-            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController actor = fieldController.GetCurrentCharacter() as PlayerController;
             
             foreach (var btn in buttons)
             {
@@ -1193,13 +922,13 @@ namespace Controller
 
         public void OnFightCommand_Attack()
         {
-            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController actor = fieldController.GetCurrentCharacter();
             PrepareWeaponAction(actor.currentWeapon, ActionType.Attack);
         }
 
         public void OnFightCommand_shoot()
         {
-            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController actor = fieldController.GetCurrentCharacter();
             if (!actor.CanShootGun())
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); 
@@ -1212,7 +941,7 @@ namespace Controller
         public void OnFightCommand_Reload()
         {
             inputCooldown = 0.2f;
-            PlayerController currentActor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController currentActor = fieldController.GetCurrentCharacter();
 
             // 실행 차단: 이미 탄환이 가득 찬 경우
             if (currentActor.currentGun != null && currentActor.currentGunAmmo >= currentActor.currentGun.maxHits)
@@ -1241,7 +970,7 @@ namespace Controller
             inputCooldown = 0.2f;
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
 
-            PlayerController currentActor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController currentActor = fieldController.GetCurrentCharacter();
 
             // 이번 턴의 속도는 평소대로 계산 (현재 턴 순서는 이미 정해져 있으므로)
             int currentSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty;
@@ -1263,7 +992,7 @@ namespace Controller
 
         public void OnFightCommand_Skill()
         {
-            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController actor = fieldController.GetCurrentCharacter();
 
             if (actor.learnedSkillIds.Count == 0)
             {
@@ -1328,15 +1057,8 @@ namespace Controller
 
         void StartItemTargetSelection(TargetScope scope)
         {
-            validTargets.Clear();
-            if (scope == TargetScope.Single_Enemy)
-                validTargets.AddRange(activeMonsters.Where(m => m != null && m.currentHp > 0));
-            else if (scope == TargetScope.One_Ally) 
-                validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp > 0));
-            else if (scope == TargetScope.Dead_Ally)
-                validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp <= 0));
-            
-            if (validTargets.Count == 0)
+            fieldController.SetValidTargetsByTargetScope(scope);
+            if (fieldController.validTargets.Count == 0)
             {
                 uiController.ShowLog("NO TARGET!");
                 StartCoroutine(HideLogAfterDelay(1.0f));
@@ -1351,8 +1073,8 @@ namespace Controller
             else 
                 currentSelectedAction = ActionType.Item;
             
-            currentTargetIndex = 0; 
-            UpdateTargetHighlight();
+            fieldController.currentTargetIndex = 0; 
+            fieldController.UpdateValidTargetsHighlight();
             inputCooldown = 0.2f;
 
             uiController.SetFightCmdInteractable(false);
@@ -1366,16 +1088,16 @@ namespace Controller
 
         void QueuePolymorphicAction(GameObject target)
         {
-            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController actor = fieldController.GetCurrentCharacter();
             CombatAction action = new CombatAction(actor.gameObject, target, currentSelectedAction, actor.GetTotalAgi());
             action.itemData = currentSelectedItem; 
             if (currentSelectedItem is SkillData skill) action.skillData = skill;
 
             // 즉시 실행되는 행동(All_Allies, Self 등)도 Auto 모드를 위해 저장
-            if (lastPlayerActions.ContainsKey(currentPlayerIndex))
-                lastPlayerActions[currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, target);
+            if (lastPlayerActions.ContainsKey(fieldController.currentPlayerIndex))
+                lastPlayerActions[fieldController.currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, target);
             else
-                lastPlayerActions.Add(currentPlayerIndex, (currentSelectedAction, currentSelectedItem, target));
+                lastPlayerActions.Add(fieldController.currentPlayerIndex, (currentSelectedAction, currentSelectedItem, target));
 
             actionQueue.Add(action);
             NextPlayerInput();
@@ -1384,7 +1106,7 @@ namespace Controller
         public void OnFightCommand_Guard()
         {
             inputCooldown = 0.2f;
-            PlayerController currentActor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController currentActor = fieldController.GetCurrentCharacter();
             int guardSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
             currentActor.nextTurnSpeedPenalty = 0; 
 
@@ -1396,24 +1118,13 @@ namespace Controller
         public void OnFightCommand_Union_Attack()
         {
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
-            PlayerController leader = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController leader = fieldController.GetCurrentCharacter();
 
             // 1. 참가자 확정 및 저장
             currentUnionParticipants = GetValidUnionPartners(leader);
 
             // 2. 참가자들 깜빡임 효과 (Visual Feedback)
-            blinkTweens.Clear();
-            foreach (var p in currentUnionParticipants)
-            {
-                // 이미지 알파값을 조절하여 깜빡임 (LoopType.Yoyo)
-                p.SetHighlightColor(currentTargetColor);
-                Image img = p.highlightImage;
-                if (img)
-                {
-                    Tween t = img.DOFade(0.4f, 0.3f).SetLoops(-1, LoopType.Yoyo);
-                    blinkTweens.Add(t);
-                }
-            }
+            fieldController.ShowBlinkHighlight(currentUnionParticipants);
 
             // 3. 타겟 선택 시작 (전열 몬스터만 선택 가능하게 하거나, 전체 선택)
             // 조건: "전열의 몬스터 타겟을 하나 선택"
@@ -1423,13 +1134,9 @@ namespace Controller
 
         void StartUnionTargetSelection()
         {
-            validTargets.Clear();
-            // 전열 몬스터만 필터링
-            validTargets = activeMonsters
-                .Where(m => m.currentHp > 0 && m.transform.parent.parent == enemyFrontRowContainer)
-                .ToList();
+            fieldController.SetValidMonsterTargets();
 
-            if (validTargets.Count == 0)
+            if (fieldController.validTargets.Count == 0)
             {
                 // 전열이 없으면 전체 대상으로 확장? 아니면 불가능 메시지?
                 // 여기서는 편의상 후열까지 포함하거나 메시지 출력
@@ -1440,8 +1147,8 @@ namespace Controller
             }
 
             isSelectingTarget = true;
-            currentTargetIndex = 0;
-            UpdateTargetHighlight();
+            fieldController.currentTargetIndex = 0;
+            fieldController.UpdateValidTargetsHighlight();
             
             // UI 숨기기
             uiController.SetCmdPanelVisible(false);
@@ -1452,25 +1159,19 @@ namespace Controller
         // 취소 시 깜빡임 멈춤
         void CancelUnionSelection()
         {
-            StopBlinkEffects();
+            fieldController.StopBlinkEffects();
             currentUnionParticipants.Clear();
             // ... 기존 취소 로직(CancelTargetSelection) 호출 ...
             CancelTargetSelection();
         }
 
-        void StopBlinkEffects()
-        {
-            foreach (var t in blinkTweens) t.Kill(true); // 트윈 즉시 종료 및 원상복구
-            blinkTweens.Clear();
-            // 알파값 완전 복구
-            foreach (var p in activePlayers) (p as PlayerController).ResetHighlightColor();
-        }
+        
 
         public void OnFightCommand_LastStand()
         {
             inputCooldown = 0.2f;
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
-            PlayerController leader = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController leader = fieldController.GetCurrentCharacter();
 
             CombatAction leaderAction = new CombatAction(leader.gameObject, leader.gameObject, ActionType.Last_Stand, 9999);
             actionQueue.Add(leaderAction);
@@ -1486,10 +1187,10 @@ namespace Controller
             inputCooldown = 0.2f;
 
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
-            PlayerController leader = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController leader = fieldController.GetCurrentCharacter();
 
             // 1. 참가자 확정
-            currentUnionParticipants = GetRollingVulcanParticipants();
+            currentUnionParticipants = fieldController.GetRollingVulcanParticipants();
             
             // 안전 장치
             if (currentUnionParticipants.Count < 4) 
@@ -1506,53 +1207,6 @@ namespace Controller
             NextPlayerInput();
         }
 
-        // Rolling Vulcan 참가자 선별 (사각형 형성 멤버만 추출)
-        List<PlayerController> GetRollingVulcanParticipants()
-        {
-            List<PlayerController> participants = new List<PlayerController>();
-
-            // 각 열의 전/후열이 모두 찼는지 확인
-            bool col0Full = IsSlotActive(0) && IsSlotActive(3); // 좌측 열
-            bool col1Full = IsSlotActive(1) && IsSlotActive(4); // 중앙 열
-            bool col2Full = IsSlotActive(2) && IsSlotActive(5); // 우측 열
-
-            // 사각형 형성 여부
-            bool isLeftSquare = col0Full && col1Full; // 0,1열 (좌측 사각형)
-            bool isRightSquare = col1Full && col2Full; // 1,2열 (우측 사각형)
-
-            List<int> validIndices = new List<int>();
-
-            // 우선순위: 6명(양쪽 모두) -> 왼쪽 -> 오른쪽
-            if (isLeftSquare && isRightSquare)
-            {
-                // 6명 전원 참가
-                validIndices.AddRange(new int[] { 0, 1, 2, 3, 4, 5 });
-            }
-            else if (isLeftSquare)
-            {
-                // 좌측 4명만 참가 (0, 1, 3, 4)
-                validIndices.AddRange(new int[] { 0, 1, 3, 4 });
-            }
-            else if (isRightSquare)
-            {
-                // 우측 4명만 참가 (1, 2, 4, 5)
-                validIndices.AddRange(new int[] { 1, 2, 4, 5 });
-            }
-
-            // 인덱스를 실제 캐릭터 객체로 변환
-            foreach (int idx in validIndices)
-            {
-                if (idx < allSlotControllers.Count)
-                {
-                    var pc = allSlotControllers[idx];
-                    if (pc != null && pc.currentHp > 0)
-                        participants.Add(pc);
-                }
-            }
-
-            return participants;
-        }
-
         void ShowBaseMenu()
         {
             isFightMode = false; 
@@ -1565,7 +1219,7 @@ namespace Controller
         void GoToPreviousPlayer()
         {
             // 더 이상 뒤로 갈 수 없으면 리턴
-            if (actionQueue.Count == 0 && currentPlayerIndex <= 0) return;
+            if (actionQueue.Count == 0 && fieldController.currentPlayerIndex <= 0) return;
 
             bool keepRemoving = true;
 
@@ -1619,19 +1273,19 @@ namespace Controller
 
             // 4. 인덱스 재조정
             // 현재 큐에 남은 행동 수 - 1 위치로 이동 (NextPlayerInput에서 ++ 되므로)
-            currentPlayerIndex = actionQueue.Count - 1;
+            fieldController.currentPlayerIndex = actionQueue.Count - 1;
 
             NextPlayerInput();
         }
         
         void NextPlayerInput()
         {
-            ResetPlayerSlotHighlights();
+            fieldController.ResetPlayerSlotHighlights();
 
-            currentPlayerIndex++;
-            if (currentPlayerIndex >= activePlayers.Count) { ProcessTurn(); return; }
+            fieldController.currentPlayerIndex++;
+            if (fieldController.currentPlayerIndex >= fieldController.activePlayers.Count) { ProcessTurn(); return; }
 
-            PlayerController currentPlayer = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController currentPlayer = fieldController.GetCurrentCharacter();
             if (currentPlayer.currentHp <= 0) { NextPlayerInput(); return; }
 
             // Union Attack / Rolling Vulcan 참가자 스킵 처리
@@ -1657,7 +1311,7 @@ namespace Controller
             }
 
             RefreshCommandButtons(currentPlayer);
-            currentPlayer.SetHighlightColor(currentTargetColor);
+            fieldController.HighlightToCurrentCharacter();
 
             if (isAutoMode)
             {
@@ -1704,9 +1358,9 @@ namespace Controller
             GameObject autoTarget = null; // 저장된 타겟
 
             // 저장된 행동 불러오기
-            if (lastPlayerActions.ContainsKey(currentPlayerIndex))
+            if (lastPlayerActions.ContainsKey(fieldController.currentPlayerIndex))
             {
-                var info = lastPlayerActions[currentPlayerIndex];
+                var info = lastPlayerActions[fieldController.currentPlayerIndex];
                 actionType = info.type;
                 autoData = info.data; 
                 autoTarget = info.target; // 타겟 복원
@@ -1740,12 +1394,12 @@ namespace Controller
                 // 적 대상인 경우: 기존 로직대로 살아있는 몬스터 중 랜덤 선택
                 // (공격 대상은 매번 바뀌거나 죽을 수 있으므로 랜덤이 일반적)
                 List<BattleEntity> candidates = new List<BattleEntity>();
-                var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
+                var livingMonsters = fieldController.GetLivingMonsters();
                 bool targetFrontOnly = (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Random_Front_Enemy || scope == TargetScope.Front_Enemies);
 
                 foreach (var m in livingMonsters)
                 {
-                    bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
+                    bool isFront = (m.transform.parent.parent == fieldController.enemyFrontRowContainer);
                     if (targetFrontOnly && !isFront) continue;
                     candidates.Add(m);
                 }
@@ -1780,15 +1434,15 @@ namespace Controller
 
         public void OnCommandButton_Move()
         {
-            BattleEntity currentActor = activePlayers[currentPlayerIndex];
+            BattleEntity currentActor = fieldController.GetCurrentCharacter();
             isSelectingMoveTarget = true;
             
             uiController.SetCmdPanelVisible(false);
             uiController.ShowLog("CHOOSE YOUR PLACE");
 
-            currentMoveSlotIndex = GetPlayerSlotIndex(currentActor.transform.parent);
+            currentMoveSlotIndex = fieldController.GetPlayerSlotIndex(currentActor.transform.parent);
             UpdateMoveCursor();
-            RefreshMoveHighlights(currentMoveSlotIndex);
+            fieldController.RefreshMoveHighlights(currentMoveSlotIndex);
             inputCooldown = 0.2f;
             EventSystem.current.SetSelectedGameObject(null);
         }
@@ -1805,7 +1459,7 @@ namespace Controller
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                 UpdateMoveCursor();
-                RefreshMoveHighlights(currentMoveSlotIndex); 
+                fieldController.RefreshMoveHighlights(currentMoveSlotIndex); 
             }
 
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
@@ -1818,12 +1472,13 @@ namespace Controller
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Click);
-                BattleEntity currentActor = activePlayers[currentPlayerIndex];
-                int myCurrentIndex = GetPlayerSlotIndex(currentActor.transform.parent);
+                int myCurrentIndex = fieldController.GetCurrentChracterIndex();
 
                 if (currentMoveSlotIndex == myCurrentIndex) { CancelMoveSelection(); return; }
 
-                Transform targetSlot = GetPlayerSlotByIndex(currentMoveSlotIndex);
+                Transform targetSlot = fieldController.GetPlayerSlotByIndex(currentMoveSlotIndex);
+
+                BattleEntity currentActor = fieldController.GetCurrentCharacter();
                 int moveSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
                 currentActor.nextTurnSpeedPenalty = 0; 
 
@@ -1833,40 +1488,23 @@ namespace Controller
                 isSelectingMoveTarget = false;
                 
                 uiController.SetTargetCursorVisible(false);
-                ResetPlayerSlotHighlights();
+                fieldController.ResetPlayerSlotHighlights();
                 NextPlayerInput();
             }
-        }
-
-        int GetPlayerSlotIndex(Transform slot)
-        {
-            int index = playerFrontSlots.IndexOf(slot);
-            if (index != -1) return index; 
-            index = playerBackSlots.IndexOf(slot);
-            if (index != -1) return index + 3; 
-            return 0; 
-        }
-
-        Transform GetPlayerSlotByIndex(int index)
-        {
-            if (index < 0 || index >= 6) return null;
-            if (index < 3) { if (index < playerFrontSlots.Count) return playerFrontSlots[index]; }
-            else { int backIndex = index - 3; if (backIndex < playerBackSlots.Count) return playerBackSlots[backIndex]; }
-            return null; 
         }
 
         void CancelMoveSelection()
         {
             isSelectingMoveTarget = false;
             currentFightBtnIndex = 0;
-            ResetPlayerSlotHighlights();
+            fieldController.ResetPlayerSlotHighlights();
             uiController.SetCmdPanelVisible(true);
             uiController.SetBaseCmdVisible(false);
             uiController.SetFightCmdVisible(true);
 
             uiController.ShowLog("WAITING...");
 
-            (activePlayers[currentPlayerIndex] as PlayerController).SetHighlightColor(currentTargetColor);
+            fieldController.HighlightToCurrentCharacter();
 
             uiController.SetTargetCursorVisible(false);
             inputCooldown = 0.2f;
@@ -1881,47 +1519,20 @@ namespace Controller
             uiController.SetBaseCmdVisible(false);
             uiController.SetFightCmdVisible(true);
             uiController.SetTargetCursorVisible(false);
+            uiController.SetFightCmdInteractable(true);
             uiController.ShowLog("WAITING...");
 
-            (activePlayers[currentPlayerIndex] as PlayerController).SetHighlightColor(currentTargetColor);
-
-            uiController.SetFightCmdInteractable(true);
+            fieldController.HighlightToCurrentCharacter();
+            
             inputCooldown = 0.2f; 
             StartCoroutine(SelectButton(attackButton));
         }
 
         void UpdateMoveCursor()
         {
-            Transform slot = GetPlayerSlotByIndex(currentMoveSlotIndex);
+            Transform slot = fieldController.GetPlayerSlotByIndex(currentMoveSlotIndex);
             uiController.SetTargetCursorVisible(true);
             uiController.SetTargetCursorPosition(slot.position + cursorOffset);
-        }
-
-        void ResetPlayerSlotHighlights()
-        {
-            foreach (PlayerController player in allSlotControllers)
-            {
-                player.SetMessage(string.Empty);
-                player.ResetHighlightColor();
-            } 
-        }
-
-        void RefreshMoveHighlights(int cursorSlotIndex)
-        {
-            ResetPlayerSlotHighlights();
-            if (currentPlayerIndex < activePlayers.Count)
-            {
-                PlayerController sourcePlayer = activePlayers[currentPlayerIndex] as PlayerController;
-                sourcePlayer.SetHighlightColor(moveSourceColor);
-            }
-
-            if (cursorSlotIndex < 0) return;
-            Transform targetSlot = GetPlayerSlotByIndex(cursorSlotIndex);
-            if (targetSlot != null)
-            {
-                PlayerController targetChar = targetSlot.GetComponentInChildren<PlayerController>();
-                if (targetChar != null) targetChar.SetHighlightColor(currentTargetColor);
-            }
         }
 
         // 회피 애니메이션
@@ -1942,9 +1553,9 @@ namespace Controller
 
             yield return wait10;
 
-            if (CombatCalculator.CalculateEscapeSuccess(activePlayers, activeMonsters, currentEscapeAttempts, guaranteedEscapeAttempts))
+            if (CombatCalculator.CalculateEscapeSuccess(fieldController.activePlayers, fieldController.activeMonsters, currentEscapeAttempts, guaranteedEscapeAttempts))
             {
-                SetEnemyVisualsActive(false);
+                fieldController.SetEnemyVisualsActive(false);
                 uiController.ShowMessage("휴~ 도망쳤다.");
                 yield return wait10;
                 uiController.ShowBattleEndAnimation(()=>{ GameStateManager.Instance.ChangeState(GameState.Exploration); });
@@ -1965,9 +1576,10 @@ namespace Controller
             bool isCancel = (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape));
             if (isCancel || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                if (validTargets.Count > currentTargetIndex)
+                if (fieldController.validTargets.Count > fieldController.currentTargetIndex)
                 {
-                    validTargets[currentTargetIndex].SetSelectionState(false);
+                    var validTarget = fieldController.GetCurrentValidTarget();
+                    validTarget.SetSelectionState(false);
                     if (isCancel) 
                     {
                         if (currentSelectedAction == ActionType.Union_Attack)
@@ -1977,31 +1589,25 @@ namespace Controller
                     }
                     else 
                     {
-                        OnTargetSelected(validTargets[currentTargetIndex]);
+                        OnTargetSelected(validTarget);
                     }
                 }
                 return;
             }
 
-            // 2. 방향키 이동 로직
-            BattleEntity currentEntity = validTargets[currentTargetIndex];
-            
-            // 타겟 그룹 판별 (플레이어 대상인지 몬스터 대상인지)
-            Transform targetFrontContainer = (validTargets.Count > 0 && validTargets[0] is PlayerController) ? playerFrontRowContainer : enemyFrontRowContainer;
-            
             // 현재 타겟이 전열에 있는지 확인
-            bool isCurrentInFront = (currentEntity.transform.parent.parent == targetFrontContainer);
+            bool isCurrentInFront = fieldController.IsCurrentTargetInFront();
 
             // 현재 행(Row)과 다른 행(Row)의 타겟 리스트 분리
-            var currentRowTargets = validTargets.Where(m => (m.transform.parent.parent == targetFrontContainer) == isCurrentInFront)
+            var currentRowTargets = fieldController.validTargets.Where(m => (m.transform.parent.parent == fieldController.GetTargetFrontContainer()) == isCurrentInFront)
                                                 .OrderBy(m => m.columnIndex).ToList();
             
-            var otherRowTargets = validTargets.Where(m => (m.transform.parent.parent == targetFrontContainer) != isCurrentInFront)
+            var otherRowTargets = fieldController.validTargets.Where(m => (m.transform.parent.parent == fieldController.GetTargetFrontContainer()) != isCurrentInFront)
                                               .OrderBy(m => m.columnIndex).ToList();
 
             BattleEntity nextEntity = null;
             bool moved = false;
-
+            BattleEntity currentEntity = fieldController.GetCurrentValidTarget();
             // 좌우 키: 같은 행 내에서 순환
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
@@ -2040,15 +1646,9 @@ namespace Controller
             if (moved && nextEntity != null)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
-                currentTargetIndex = validTargets.IndexOf(nextEntity);
-                UpdateTargetHighlight();
+                fieldController.SetCurrentValidTargetIndex(nextEntity);
+                fieldController.UpdateValidTargetsHighlight();
             }
-        }
-
-        void UpdateTargetHighlight()
-        {
-            foreach (var monster in validTargets) monster.SetSelectionState(false);
-            if (validTargets.Count > 0) validTargets[currentTargetIndex].SetSelectionState(true);
         }
 
         public void OnTargetSelected(BattleEntity targetEntity)
@@ -2057,16 +1657,16 @@ namespace Controller
 
             if (currentSelectedAction == ActionType.Union_Attack)
             {
-                StopBlinkEffects();
+                fieldController.StopBlinkEffects();
             }
 
-            PlayerController actor = activePlayers[currentPlayerIndex] as PlayerController;
+            PlayerController actor = fieldController.GetCurrentCharacter();
 
             // 타겟 정보(targetEntity.gameObject)까지 함께 저장
-            if (lastPlayerActions.ContainsKey(currentPlayerIndex))
-                lastPlayerActions[currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, targetEntity.gameObject);
+            if (lastPlayerActions.ContainsKey(fieldController.currentPlayerIndex))
+                lastPlayerActions[fieldController.currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, targetEntity.gameObject);
             else
-                lastPlayerActions.Add(currentPlayerIndex, (currentSelectedAction, currentSelectedItem, targetEntity.gameObject));
+                lastPlayerActions.Add(fieldController.currentPlayerIndex, (currentSelectedAction, currentSelectedItem, targetEntity.gameObject));
             
             int finalSpeed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
             actor.nextTurnSpeedPenalty = 0;
@@ -2106,7 +1706,7 @@ namespace Controller
             
             uiController.SetCmdPanelVisible(false);
             uiController.HideLog();
-            HideTurnOrderUI();
+            fieldController.HideTurnOrderUI();
 
             actionQueue = actionQueue.OrderByDescending(x => x.speed).ToList();
             StartCoroutine(ExecuteActions());
@@ -2119,8 +1719,8 @@ namespace Controller
             state = BattleState.EnemyInput; 
             actionQueue.Clear(); 
 
-            List<BattleEntity> livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList();
-            foreach (MonsterController monster in activeMonsters)
+            List<BattleEntity> livingPlayers = fieldController.GetLivingParty();
+            foreach (MonsterController monster in fieldController.activeMonsters)
             {
                 if (monster.currentHp <= 0) continue;
                 
@@ -2137,11 +1737,6 @@ namespace Controller
             StartCoroutine(ExecuteActions());
         }
 
-        void HideTurnOrderUI()
-        {
-            foreach(var p in activePlayers) if(p.turnOrderText) p.turnOrderText.gameObject.SetActive(false);
-            foreach(var m in activeMonsters) if(m.turnOrderText) m.turnOrderText.gameObject.SetActive(false);
-        }
 
         IEnumerator ExecuteActions()
         {
@@ -2188,11 +1783,8 @@ namespace Controller
         bool CheckBattleEnd(out bool isWin)
         {
             isWin = false;
-            bool allEnemiesDead = activeMonsters.TrueForAll(m => m.currentHp <= 0);
-            if (allEnemiesDead) { isWin = true; return true; }
-
-            bool allPlayersDead = activePlayers.TrueForAll(p => p.currentHp <= 0);
-            if (allPlayersDead) { isWin = false; return true; }
+            if (fieldController.IsAllEnemiesDead()) { isWin = true; return true; }
+            if (fieldController.IsAllPartyDead()) { isWin = false; return true; }
             return false;
         }
 
@@ -2283,7 +1875,7 @@ namespace Controller
             // 스킬 타겟 자동 변경 로직
             if (action.target == null || !IsAlive(action.target))
             {
-                action.target = FindNearestLivingTarget(action.actor);
+                action.target = fieldController.FindNearestLivingTarget(action.actor);
                 if (action.target == null) yield break; 
             }
 
@@ -2363,7 +1955,7 @@ namespace Controller
         {
             if (action.target == null || !IsAlive(action.target))
             {
-                action.target = FindNearestLivingTarget(action.actor);
+                action.target = fieldController.FindNearestLivingTarget(action.actor);
                 if (action.target == null)
                 {
                     Debug.Log("Union Attack 취소: 유효한 타겟 없음");
@@ -2487,128 +2079,10 @@ namespace Controller
             }
 
             // 조건에 따른 진형 변경 실행
-            yield return StartCoroutine(ApplyFormationChange(targetCol));
+            yield return fieldController.ApplyFormationChange(targetCol);
             
             // [핵심] 정상 종료 시 목록 초기화
             currentUnionParticipants.Clear();
-        }
-
-        // 타겟 위치에 따른 진형 변경 분기 처리
-        IEnumerator ApplyFormationChange(int targetCol)
-        {
-            if (targetCol == 0) // 왼쪽 몬스터 공격
-            {
-                // 반시계 방향 회전 (Counter-Clockwise)
-                Debug.Log("[Formation] Left Target -> Rotate CCW");
-                yield return StartCoroutine(RotateParty(false));
-            }
-            else if (targetCol == 2) // 오른쪽 몬스터 공격
-            {
-                // 시계 방향 회전 (Clockwise)
-                Debug.Log("[Formation] Right Target -> Rotate CW");
-                yield return StartCoroutine(RotateParty(true));
-            }
-            else // 가운데(1) 또는 그 외
-            {
-                // 전열 3명 랜덤 셔플
-                Debug.Log("[Formation] Center Target -> Shuffle Front Row");
-                yield return StartCoroutine(ShuffleFrontRowOnly());
-            }
-        }
-
-        // 6명 전체 회전 로직
-        // 슬롯 배치: 전열(0,1,2), 후열(3,4,5)
-        // 시각적 배치:
-        // [0] [1] [2]  (Front)
-        // [3] [4] [5]  (Back)
-        IEnumerator RotateParty(bool clockwise)
-        {
-            // 새로운 순서를 담을 임시 배열
-            PlayerController[] newOrder = new PlayerController[6];
-
-            if (clockwise)
-            {
-                // 시계 방향 (0->1->2->5->4->3->0)
-                newOrder[1] = allSlotControllers[0]; // 0 -> 1
-                newOrder[2] = allSlotControllers[1]; // 1 -> 2
-                newOrder[5] = allSlotControllers[2]; // 2 -> 5 (전열우측 -> 후열우측)
-                newOrder[4] = allSlotControllers[5]; // 5 -> 4
-                newOrder[3] = allSlotControllers[4]; // 4 -> 3
-                newOrder[0] = allSlotControllers[3]; // 3 -> 0 (후열좌측 -> 전열좌측)
-            }
-            else
-            {
-                // 반시계 방향 (0->3->4->5->2->1->0)
-                newOrder[3] = allSlotControllers[0]; // 0 -> 3 (전열좌측 -> 후열좌측)
-                newOrder[4] = allSlotControllers[3]; // 3 -> 4
-                newOrder[5] = allSlotControllers[4]; // 4 -> 5
-                newOrder[2] = allSlotControllers[5]; // 5 -> 2 (후열우측 -> 전열우측)
-                newOrder[1] = allSlotControllers[2]; // 2 -> 1
-                newOrder[0] = allSlotControllers[1]; // 1 -> 0
-            }
-
-            // 변경 적용
-            yield return StartCoroutine(ApplyPartyReorder(newOrder.ToList()));
-        }
-
-        // 전열(0,1,2)만 섞는 로직
-        IEnumerator ShuffleFrontRowOnly()
-        {
-            // 현재 리스트 복사
-            List<PlayerController> newOrderList = new List<PlayerController>(allSlotControllers);
-            
-            // 전열 인덱스(0,1,2)만 추출하여 섞기
-            List<PlayerController> frontRow = new List<PlayerController>();
-            for(int i=0; i<3; i++) frontRow.Add(allSlotControllers[i]);
-
-            // Fisher-Yates Shuffle
-            for (int i = 0; i < frontRow.Count; i++)
-            {
-                PlayerController temp = frontRow[i];
-                int randomIndex = Random.Range(i, frontRow.Count);
-                frontRow[i] = frontRow[randomIndex];
-                frontRow[randomIndex] = temp;
-            }
-
-            // 섞인 결과를 다시 앞부분에 배치
-            for(int i=0; i<3; i++)
-            {
-                newOrderList[i] = frontRow[i];
-            }
-            // 후열(3,4,5)은 그대로 유지
-
-            yield return StartCoroutine(ApplyPartyReorder(newOrderList));
-        }
-
-        // [공통] 재배치 적용 및 애니메이션
-        IEnumerator ApplyPartyReorder(List<PlayerController> newOrderedControllers)
-        {
-            Sequence shuffleSeq = DOTween.Sequence();
-
-            for (int i = 0; i < 6; i++)
-            {
-                PlayerController pc = newOrderedControllers[i];
-                
-                // 목표 슬롯 결정
-                Transform targetSlot = (i < 3) ? playerFrontSlots[i] : playerBackSlots[i - 3];
-                
-                // 데이터 갱신
-                pc.columnIndex = i; 
-                
-                // 부모 변경 (WorldPositionStays=true로 하여 순간이동 방지)
-                pc.transform.SetParent(targetSlot, true);
-                
-                // 이동 애니메이션 (LocalPosition 0으로 부드럽게 이동)
-                shuffleSeq.Join(pc.transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.InOutQuad));
-            }
-            
-            // 메인 리스트 갱신
-            allSlotControllers = newOrderedControllers;
-
-            yield return shuffleSeq.WaitForCompletion();
-            
-            // UI 갱신
-            ResetPlayerSlotHighlights();
         }
 
         // Last Stand 집결 애니메이션
@@ -2617,10 +2091,7 @@ namespace Controller
             isLastStandActive = true; 
             uiController.ShowLog("LAST STAND!!");
 
-            List<PlayerController> frontRowMembers = activePlayers
-                .Where(p => p.currentHp > 0 && p.columnIndex < 3)
-                .Select(p => p as PlayerController)
-                .ToList();
+            List<PlayerController> frontRowMembers = fieldController.GetCharactersInFrontRow();
 
             Sequence seq = DOTween.Sequence();
 
@@ -2648,14 +2119,14 @@ namespace Controller
             int index = leader.columnIndex;
             leader.SetMessage("안되겠다! 롤링 발칸이다!");
             yield return wait10;
-            foreach(PlayerController pc in activePlayers)
+            foreach(PlayerController pc in fieldController.activePlayers)
             {
                 if (pc.columnIndex == index) pc.SetMessage(string.Empty);
                 else pc.SetMessage("알았어! OK!!");
             }
             yield return wait10;
             
-            ResetCharacterMessage();
+            fieldController.ResetCharacterMessage();
             
             uiController.ShowMessage("롤링 발칸~~~!!");
             // SoundManager.Instance.PlaySFX(SfxID.Skill_Ultimate); 
@@ -2674,8 +2145,8 @@ namespace Controller
             for (int i = 0; i < totalAmmo; i++)
             {
                 // 매 발사마다 살아있는 적 확인
-                List<BattleEntity> enemies = activeMonsters.Where(m => m.currentHp > 0).ToList();
-                
+                List<BattleEntity> enemies = fieldController.GetLivingMonsters();
+
                 // A. 적이 살아있을 때만 데미지 처리
                 if (enemies.Count > 0)
                 {
@@ -2696,7 +2167,7 @@ namespace Controller
                 SoundManager.Instance.PlaySFX(SfxID.Attack_Gun);
                 
                 // 회전 대기
-                yield return StartCoroutine(FastRotateParticipants(participants, true, shotInterval));
+                yield return fieldController.FastRotateParticipants(participants, true, shotInterval);
             }
 
             // 4. 마무리
@@ -2713,83 +2184,6 @@ namespace Controller
             currentUnionParticipants.Clear();
             uiController.HideMessage();
             yield return wait05;
-        }
-
-        // 롤링발칸 등에서 참여자들만 회전시키는 함수
-        IEnumerator FastRotateParticipants(List<PlayerController> participants, bool clockwise, float duration)
-        {
-            // 1. 전체 슬롯의 시계 방향 순서 정의 (0 -> 1 -> 2 -> 5 -> 4 -> 3)
-            int[] ringOrder = { 0, 1, 2, 5, 4, 3 };
-
-            // 2. 현재 참여자들이 위치한 인덱스만 추출 (순서 유지)
-            // 예: 4명(좌+중앙 열)인 경우 -> [0, 1, 4, 3] 추출됨
-            List<int> currentIndices = new List<int>();
-            foreach (int slotIdx in ringOrder)
-            {
-                // 해당 슬롯의 캐릭터가 참가자 명단에 있는지 확인
-                if (slotIdx < allSlotControllers.Count)
-                {
-                    PlayerController pc = allSlotControllers[slotIdx];
-                    if (participants.Contains(pc))
-                    {
-                        currentIndices.Add(slotIdx);
-                    }
-                }
-            }
-
-            // 만약 참여자가 1명 이하라면 회전 불필요
-            if (currentIndices.Count < 2) yield break;
-
-            // 3. 이동 목표 설정 (매핑)
-            // Key: 캐릭터, Value: 이동할 목표 슬롯 인덱스
-            Dictionary<PlayerController, int> moveMap = new Dictionary<PlayerController, int>();
-            int count = currentIndices.Count;
-
-            for (int i = 0; i < count; i++)
-            {
-                // 현재 슬롯의 주인
-                int currentSlotIdx = currentIndices[i];
-                PlayerController pc = allSlotControllers[currentSlotIdx];
-
-                // 목표 슬롯 찾기
-                // 시계 방향: 내 다음 순번의 슬롯으로 이동
-                // 반시계 방향: 내 이전 순번의 슬롯으로 이동
-                int nextIndex = clockwise ? (i + 1) : (i - 1);
-                
-                // 인덱스 보정 (Circular)
-                if (nextIndex >= count) nextIndex = 0;
-                if (nextIndex < 0) nextIndex = count - 1;
-
-                int targetSlotIdx = currentIndices[nextIndex];
-                moveMap.Add(pc, targetSlotIdx);
-            }
-
-            // 4. 데이터 갱신 및 애니메이션 실행
-            // 데이터 꼬임 방지를 위해 리스트 복제본 생성
-            List<PlayerController> nextAllSlots = new List<PlayerController>(allSlotControllers);
-            Sequence seq = DOTween.Sequence();
-
-            foreach (var kvp in moveMap)
-            {
-                PlayerController pc = kvp.Key;
-                int targetIdx = kvp.Value;
-
-                // A. 데이터 구조 상의 위치 변경 (임시 리스트에 기록)
-                nextAllSlots[targetIdx] = pc;
-
-                // B. 물리적 위치(부모) 및 인덱스 정보 변경
-                Transform targetSlot = (targetIdx < 3) ? playerFrontSlots[targetIdx] : playerBackSlots[targetIdx - 3];
-                pc.transform.SetParent(targetSlot, true);
-                pc.columnIndex = targetIdx;
-
-                // C. 애니메이션 (Duration 동안 이동)
-                seq.Join(pc.transform.DOLocalMove(Vector3.zero, duration).SetEase(Ease.Linear));
-            }
-
-            // 5. 실제 데이터 리스트 교체
-            allSlotControllers = nextAllSlots;
-
-            yield return seq.WaitForCompletion();
         }
 
         // 무지개 색상 효과 코루틴
@@ -2827,41 +2221,6 @@ namespace Controller
                 }
                 yield return null;
             }
-        }
-
-        // 빠른 회전 (사격 간격에 맞춘 속도)
-        IEnumerator FastRotateParty(bool clockwise, float duration)
-        {
-            // RotateParty 로직을 가져오되, DOTween 시간을 duration에 맞춤
-            // 로직은 기존 RotateParty와 동일하게 배열 재배치
-             PlayerController[] newOrder = new PlayerController[6];
-
-            if (clockwise)
-            {
-                newOrder[1] = allSlotControllers[0];
-                newOrder[2] = allSlotControllers[1];
-                newOrder[5] = allSlotControllers[2];
-                newOrder[4] = allSlotControllers[5];
-                newOrder[3] = allSlotControllers[4];
-                newOrder[0] = allSlotControllers[3];
-            }
-
-            // 위치 이동 (ApplyPartyReorder 변형)
-            Sequence seq = DOTween.Sequence();
-            for (int i = 0; i < 6; i++)
-            {
-                PlayerController pc = newOrder[i];
-                Transform targetSlot = (i < 3) ? playerFrontSlots[i] : playerBackSlots[i - 3];
-                
-                pc.columnIndex = i;
-                pc.transform.SetParent(targetSlot, true);
-                
-                // duration 만큼 빠르게 이동
-                seq.Join(pc.transform.DOLocalMove(Vector3.zero, duration).SetEase(Ease.Linear));
-            }
-            allSlotControllers = newOrder.ToList();
-            
-            yield return seq.WaitForCompletion();
         }
 
         void SetGuardState(GameObject actor, bool state)
@@ -2905,7 +2264,7 @@ namespace Controller
             if (action.target == null || !IsAlive(action.target))
             {
                 // 가장 가까운 살아있는 적을 찾는다
-                GameObject newTarget = FindNearestLivingTarget(action.actor);
+                GameObject newTarget = fieldController.FindNearestLivingTarget(action.actor);
 
                 if (newTarget != null)
                 {
@@ -3115,7 +2474,7 @@ namespace Controller
 
             if (isLastStandActive && target.GetComponent<PlayerController>() != null)
             {
-                List<PlayerController> defenders = activePlayers.Where(p => p.currentHp > 0 && p.columnIndex < 3).Select(p => p as PlayerController).ToList();
+                List<PlayerController> defenders = fieldController.GetCharactersInFrontRow();
                 if (defenders.Count > 0)
                 {
                     
@@ -3213,8 +2572,8 @@ namespace Controller
         List<GameObject> GetTargetsByScope(TargetScope scope, CombatAction action)
         {
             List<GameObject> targets = new List<GameObject>();
-            var livingMonsters = activeMonsters.Where(m => m.currentHp > 0).ToList();
-            var livingPlayers = activePlayers.Where(p => p.currentHp > 0).ToList(); // 아군 생존자
+            var livingMonsters = fieldController.GetLivingMonsters();
+            var livingPlayers = fieldController.GetLivingParty();
 
             // 1. 단일 지정 (이미 타겟이 정해진 경우)
             if (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Single_Enemy || 
@@ -3228,7 +2587,7 @@ namespace Controller
                 List<GameObject> candidates = new List<GameObject>();
                 foreach(var m in livingMonsters) 
                 {
-                    bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
+                    bool isFront = (m.transform.parent.parent == fieldController.enemyFrontRowContainer);
                     if (scope == TargetScope.Random_Front_Enemy && !isFront) continue;
                     candidates.Add(m.gameObject);
                 }
@@ -3238,7 +2597,7 @@ namespace Controller
             {
                 foreach(var m in livingMonsters) 
                 {
-                    bool isFront = (m.transform.parent.parent == enemyFrontRowContainer);
+                    bool isFront = (m.transform.parent.parent == fieldController.enemyFrontRowContainer);
                     if (scope == TargetScope.Front_Enemies && !isFront) continue;
                     targets.Add(m.gameObject);
                 }
@@ -3276,7 +2635,7 @@ namespace Controller
                 // 인덱스 범위 체크 (전열 0~2)
                 if (i < 0 || i > 2) continue;
 
-                PlayerController p = allSlotControllers[i];
+                PlayerController p = fieldController.allSlotControllers[i];
 
                 // 1. 기본 상태 체크 (존재함, 빈 슬롯 아님, 살아있음)
                 if (p == null || p.IsEmpty || p.currentHp <= 0) continue;
@@ -3298,7 +2657,6 @@ namespace Controller
             return partners;
         }
 
-        void ResetCharacterMessage() { foreach(PlayerController pc in activePlayers) pc.SetMessage(string.Empty); }
         void GetWeaponInfo(CombatAction action, out int min, out int max, out TargetScope scope)
         {
             min = 1; max = 1; scope = TargetScope.Front_Single_Enemy; 
@@ -3319,49 +2677,11 @@ namespace Controller
             Transform targetSlotTransform = action.target.transform; 
             Transform originSlotTransform = actor.transform.parent;
 
-            // (중략: Last Stand 체크 및 이동 불가 조건 로직)
-
             if (targetSlotTransform == originSlotTransform) yield break;
 
             PlayerController targetChar = targetSlotTransform.GetComponentInChildren<PlayerController>();
             uiController.ShowMessage((targetChar != null && !targetChar.IsEmpty) ? "위치 교대!" : "자리 이동!");
-
-            // 1. 리스트(allSlotControllers) 내의 순서 교체
-            int actorListIndex = allSlotControllers.IndexOf(actor);
-            int targetListIndex = (targetChar != null) ? allSlotControllers.IndexOf(targetChar) : -1;
-
-            if (actorListIndex != -1 && targetListIndex != -1)
-            {
-                allSlotControllers[actorListIndex] = targetChar;
-                allSlotControllers[targetListIndex] = actor;
-            }
-
-            // 2. 물리적 부모 변경 및 인덱스 갱신
-            if (targetChar != null) 
-            { 
-                targetChar.transform.SetParent(originSlotTransform, true); 
-                targetChar.columnIndex = GetPlayerSlotIndex(originSlotTransform); 
-            }
-            actor.transform.SetParent(targetSlotTransform, true);
-            actor.columnIndex = GetPlayerSlotIndex(targetSlotTransform);
-
-            // =========================================================
-            // 실제 데이터(RuntimeCharacterData) 동기화
-            // =========================================================
-            for (int i = 0; i < allSlotControllers.Count; i++)
-            {
-                PlayerController pc = allSlotControllers[i];
-                if (pc != null && !pc.IsEmpty && pc.sourceData != null)
-                {
-                    // 인덱스 0,1,2는 전열(Front), 3,4,5는 후열(Back)
-                    bool isFront = (i < 3);
-                    pc.sourceData.row = isFront ? RowType.Front : RowType.Back;
-                    
-                    // 컬럼 값 계산 (Left=0, Center=1, Right=2)
-                    pc.sourceData.column = (ColumnType)(isFront ? i : i - 3);
-                }
-            }
-            // =========================================================
+            fieldController.SwapPosition(actor, targetChar, targetSlotTransform);
 
             SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
 
@@ -3374,208 +2694,17 @@ namespace Controller
             uiController.HideMessage();
         }
 
-        void InitializeSlots()
-        {
-            // 파괴되거나 null인 슬롯 참조를 리스트에서 제거
-            frontSlots.RemoveAll(slot => slot == null);
-            backSlots.RemoveAll(slot => slot == null);
-            playerFrontSlots.RemoveAll(slot => slot == null);
-            playerBackSlots.RemoveAll(slot => slot == null);
-
-            if (frontSlots.Count == 0) CreateSlotsFor(enemyFrontRowContainer, frontSlots);
-            if (backSlots.Count == 0) CreateSlotsFor(enemyBackRowContainer, backSlots);
-            ClearSlotContents(frontSlots); 
-            ClearSlotContents(backSlots);
-
-            if (playerFrontSlots.Count == 0) CreateSlotsFor(playerFrontRowContainer, playerFrontSlots);
-            if (playerBackSlots.Count == 0) CreateSlotsFor(playerBackRowContainer, playerBackSlots);
-            ClearSlotContents(playerFrontSlots); 
-            ClearSlotContents(playerBackSlots);
-        }
-
-        void CreateSlotsFor(Transform container, List<Transform> slotList)
-        {
-            foreach (Transform child in container) Destroy(child.gameObject);
-            slotList.Clear();
-            for (int i = 0; i < 3; i++)
-            {
-                GameObject slot = new GameObject($"Slot_{i}");
-                slot.transform.SetParent(container, false);
-                slot.AddComponent<RectTransform>();
-                slotList.Add(slot.transform);
-            }
-        }
-
-        void ClearSlotContents(List<Transform> slotList)
-        {
-            foreach (var slot in slotList) foreach (Transform child in slot) Destroy(child.gameObject);
-        }
-
-        void SpawnMonster(string id)
-        {
-            SoundManager.Instance.PlaySFX(SfxID.Encounter);
-            var entry = monsterDB.GetEntry(id);
-            if (entry == null) return;
-            // 생성된 몬스터의 데이터를 로그에 기록 (보상 계산용)
-            encounterLog.Add(entry);
-
-            // 1. 선호하는 열(Row) 선택
-            List<Transform> targetSlots = (entry.preferredRow == RowType.Front) ? frontSlots : backSlots;
-            
-            // 꽉 찼으면 다른 열로
-            if (IsRowFull(targetSlots))
-            {
-                targetSlots = (targetSlots == frontSlots) ? backSlots : frontSlots;
-                if (IsRowFull(targetSlots)) return; // 자리 없음
-            }
-
-            // 2. 빈 자리 찾기 (랜덤 또는 순차)
-            // ColumnType에 맞춰 배치하려면 여기서 특정 인덱스를 선호하게 할 수 있음
-            // 예: "Center 우선" 로직 등. 지금은 랜덤 빈자리 유지.
-            List<int> emptyIndices = new List<int>();
-            for (int i = 0; i < targetSlots.Count; i++) 
-                if (targetSlots[i].childCount == 0) emptyIndices.Add(i);
-
-            int randomIndex = emptyIndices[Random.Range(0, emptyIndices.Count)];
-            Transform selectedSlot = targetSlots[randomIndex];
-
-            // 3. 생성
-            GameObject prefabToUse = (entry.prefab != null) ? entry.prefab : defaultMonsterPrefab;
-            if (prefabToUse == null) return;
-
-            GameObject newMonsterObj = Instantiate(prefabToUse, selectedSlot);
-            newMonsterObj.transform.localPosition = Vector3.zero;
-
-            MonsterController controller = newMonsterObj.GetComponentInChildren<MonsterController>();
-            if (controller == null) { Destroy(newMonsterObj); return; }
-
-            controller.Initialize(entry, this);
-            newMonsterObj.name = $"{controller.sourceData.race} {controller.sourceData.name}";
-
-            if (controller.currentHp <= 0) { Destroy(newMonsterObj); return; }
-
-            // 몬스터 버튼의 자동 내비게이션 비활성화
-            if (controller.selectButton != null)
-            {
-                Navigation nav = new Navigation();
-                nav.mode = Navigation.Mode.None;
-                controller.selectButton.navigation = nav;
-            }
-
-            // 배치된 위치 정보를 컨트롤러에 주입
-            bool isFront = (targetSlots == frontSlots);
-            
-            controller.SetPositionInfo(randomIndex); // 기존 인덱스 설정
-            
-            // Enum 정보 설정
-            controller.currentRow = isFront ? RowType.Front : RowType.Back;
-            controller.currentColumn = (ColumnType)randomIndex; // 0, 1, 2 -> Left, Center, Right 매핑
-
-            controller.SetRowAppearance(isFront); 
-            controller.SetAnaglyphDepth(isFront); 
-            
-            activeMonsters.Add(controller);
-        }
-
-        bool IsRowFull(List<Transform> slots)
-        {
-            foreach (var slot in slots) if (slot.childCount == 0) return false; 
-            return true; 
-        }
-
-        // 몬스터 전진 연출
-        IEnumerator CheckAndMoveForward(MonsterController monster)
-        {
-            if (frontSlots.Contains(monster.transform.parent)) yield break;
-
-            Transform myFrontSlot = frontSlots[monster.columnIndex];
-            bool isSlotEmpty = (myFrontSlot.childCount == 0);
-
-            if (!isSlotEmpty)
-            {
-                var frontMonster = myFrontSlot.GetChild(0).GetComponent<MonsterController>();
-                if (frontMonster != null && frontMonster.currentHp <= 0)
-                {
-                    activeMonsters.Remove(frontMonster);
-                    Destroy(frontMonster.gameObject);
-                    isSlotEmpty = true; 
-                }
-            }
-
-            if (isSlotEmpty)
-            {
-                Debug.Log($"[전진] {monster.sourceData.name} -> 전열 이동");
-                monster.transform.SetParent(myFrontSlot);
-                monster.SetAnaglyphDepth(true);
-
-                Sequence seq = DOTween.Sequence();
-                seq.Join(monster.transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.OutQuad));
-                seq.Join(monster.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutQuad));
-                // 색상 보간
-                Color startColor = new Color(0.6f, 0.6f, 0.6f, 1f);
-                seq.Join(DOVirtual.Color(startColor, Color.white, 0.5f, (c) => monster.SetColor(c)));
-
-                yield return seq.WaitForCompletion();
-            }
-        }
-
-        private void ClearCombatField()
-        {
-            activeMonsters.Clear();
-            
-            ClearSlotContents(frontSlots);
-            ClearSlotContents(backSlots);
-            
-        }
-
-        IEnumerator ProcessEnemyRowShift()
-        {
-            var backRowMonsters = activeMonsters.Where(m => backSlots.Contains(m.transform.parent)).OrderBy(m => m.columnIndex).ToList();
-            foreach (MonsterController monster in backRowMonsters) yield return StartCoroutine(CheckAndMoveForward(monster));
-        }
-
-        GameObject FindNearestLivingTarget(GameObject attacker)
-        {
-            GameObject bestTarget = null;
-            float closestDistance = float.MaxValue;
-            Vector3 attackerPos = attacker.transform.position;
-
-            if (attacker.GetComponent<PlayerController>() != null)
-            {
-                foreach (var monster in activeMonsters)
-                {
-                    if (monster != null && monster.currentHp > 0 && monster.gameObject.activeSelf)
-                    {
-                        float dist = Vector3.Distance(attackerPos, monster.transform.position);
-                        if (dist < closestDistance) { closestDistance = dist; bestTarget = monster.gameObject; }
-                    }
-                }
-            }
-            else if (attacker.GetComponent<MonsterController>() != null)
-            {
-                foreach (var player in activePlayers)
-                {
-                    if (player != null && player.currentHp > 0 && player.gameObject.activeSelf)
-                    {
-                        float dist = Vector3.Distance(attackerPos, player.transform.position);
-                        if (dist < closestDistance) { closestDistance = dist; bestTarget = player.gameObject; }
-                    }
-                }
-            }
-            return bestTarget;
-        }
-
         CombatPosition GetUnitPosition(GameObject unit)
         {
             CombatPosition pos = new CombatPosition();
             if (unit.TryGetComponent(out PlayerController pc))
             {
-                pos.isFrontRow = (pc.transform.parent.parent == playerFrontRowContainer);
+                pos.isFrontRow = fieldController.IsCharacterInFrontRow(pc);
                 pos.columnIndex = pc.transform.parent.GetSiblingIndex();
             }
             else if (unit.TryGetComponent(out MonsterController mc))
             {
-                pos.isFrontRow = (mc.transform.parent.parent == enemyFrontRowContainer);
+                pos.isFrontRow = fieldController.IsMonsterInFrontRow(mc);
                 pos.columnIndex = mc.columnIndex; 
             }
             return pos;
@@ -3590,8 +2719,8 @@ namespace Controller
             {
                 SoundManager.Instance.PlayBGM(BgmID.Victory);
                 
-                List<PlayerController> allPlayers = activePlayers.OfType<PlayerController>().ToList();
-                BattleReward reward = CombatCalculator.CalculateRewards(allPlayers, encounterLog);
+                List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
+                BattleReward reward = CombatCalculator.CalculateRewards(allPlayers, fieldController.encounterLog);
 
                 // 경험치 반영 전 상태 스냅샷 저장
                 Dictionary<PlayerController, (int oldLv, int oldExp, int oldMaxExp)> preBattleStates = new Dictionary<PlayerController, (int, int, int)>();
@@ -3632,10 +2761,6 @@ namespace Controller
             // 종료 처리
             uiController.ShowBattleEndAnimation(()=>{GameStateManager.Instance.ChangeState(GameState.Exploration);});
         }
-
-        private void ClearParty()
-        {
-            activePlayers.Clear();
-        }
+        
     }
 }

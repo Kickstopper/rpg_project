@@ -5702,6 +5702,7 @@ Transform:
   - {fileID: 7404759238677247422}
   - {fileID: 8433041994049511491}
   - {fileID: 1423192853013366643}
+  - {fileID: 7337861645011424436}
   - {fileID: 6129727179164803609}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -11687,6 +11688,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Controller.BattleManager
   uiController: {fileID: 1616790773360827174}
+  fieldController: {fileID: 8174008803012594333}
   visualController: {fileID: 2026097407857020551}
   damagePopupContainer: {fileID: 8238016265576625859}
   guaranteedEscapeAttempts: 3
@@ -11696,13 +11698,7 @@ MonoBehaviour:
   baseFirstButton: {fileID: 796697833738351785}
   attackButton: {fileID: 2855301995010279726}
   cursorOffset: {x: 0, y: 50, z: 0}
-  monsterDB: {fileID: 11400000, guid: 5a02d40de261d314a98aeca05c430997, type: 2}
-  enemyFrontRowContainer: {fileID: 335355996539375992}
-  enemyBackRowContainer: {fileID: 141581246210455962}
-  playerFrontRowContainer: {fileID: 2485679292146773683}
-  playerBackRowContainer: {fileID: 2323448093114049133}
   state: 0
-  activeMonsters: []
 --- !u!1 &6496873924842671710
 GameObject:
   m_ObjectHideFlags: 0
@@ -14575,6 +14571,65 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
+--- !u!1 &8744116574925741828
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7337861645011424436}
+  - component: {fileID: 8174008803012594333}
+  m_Layer: 0
+  m_Name: BattleFieldController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7337861645011424436
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8744116574925741828}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8570161410329549391}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8174008803012594333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8744116574925741828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8025b893667dd34991f6e305db09688, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleFieldController
+  manager: {fileID: 6760945191955151476}
+  monsterDB: {fileID: 11400000, guid: 5a02d40de261d314a98aeca05c430997, type: 2}
+  defaultMonsterPrefab: {fileID: 5675693360896444327, guid: 5886499ad23134b40a1350463fb19b81, type: 3}
+  playerPrefab: {fileID: 6815253905712193029, guid: d7f43cf7a138ea1439eaeabd115425df, type: 3}
+  enemyFrontRowContainer: {fileID: 335355996539375992}
+  enemyBackRowContainer: {fileID: 141581246210455962}
+  playerFrontRowContainer: {fileID: 2485679292146773683}
+  playerBackRowContainer: {fileID: 2323448093114049133}
+  allSlotControllers: []
+  activePlayers: []
+  activeMonsters: []
+  currentPlayerIndex: 0
+  encounterLog: []
+  validTargets: []
+  currentTargetIndex: 0
 --- !u!1 &8748749291119876111
 GameObject:
   m_ObjectHideFlags: 0

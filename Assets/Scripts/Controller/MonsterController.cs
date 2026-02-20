@@ -10,7 +10,7 @@ namespace Controller
 {
     public class MonsterController : BattleEntity, IBattleTarget
     {
-        private BattleManager controller;
+        private BattleManager manager;
         public MonsterDatabase.MonsterEntry sourceData;
         [Header("VFX")]
         public Material baseAnaglyphMaterial; // 여기에 'Mat_Anaglyph'를 연결.
@@ -134,9 +134,9 @@ namespace Controller
             return sourceData.resistances; 
         }
 
-        public void Initialize(MonsterDatabase.MonsterEntry data, BattleManager controller)
+        public void Initialize(MonsterDatabase.MonsterEntry data, BattleManager manager)
         {
-            this.controller = controller;
+            this.manager = manager;
             
             sourceData = data;
             entityName = $"{data.name}_{data.id}"; // 부모 필드 사용
@@ -232,7 +232,7 @@ namespace Controller
         // 몬스터가 클릭되었을 때 실행됨
         void OnClicked()
         {
-            controller.OnTargetSelected(this);
+            manager.OnTargetSelected(this);
         }
 
         // AI 행동 결정 함수
@@ -314,7 +314,6 @@ namespace Controller
         {
             Debug.Log($"{sourceData.name} 사망");
             gameObject.SetActive(false);
-            controller?.activeMonsters.Remove(this);
         }
     }
 }

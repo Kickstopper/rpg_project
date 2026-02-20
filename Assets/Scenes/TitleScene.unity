@@ -1722,7 +1722,7 @@ MonoBehaviour:
   explorationCanvas: {fileID: 0}
   combatCanvas: {fileID: 0}
   menuCanvas: {fileID: 0}
-  currentCombatController: {fileID: 0}
+  currentBattleManager: {fileID: 0}
   canHardSave: 0
 --- !u!1 &920790046
 GameObject:
