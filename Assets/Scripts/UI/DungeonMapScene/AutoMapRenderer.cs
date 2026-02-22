@@ -67,10 +67,10 @@ namespace UI.DungeonMapScene
             mapTexture.Apply();
             mapDisplay.texture = mapTexture;
             
-            // 1. 사이즈 확정
+            // 사이즈 확정
             mapDisplay.rectTransform.sizeDelta = new Vector2(texWidth, texHeight);
 
-            // 2. 화면 중앙 정렬
+            // 화면 중앙 정렬
             CenterMapPosition(texWidth, texHeight);
         }
 
@@ -79,14 +79,14 @@ namespace UI.DungeonMapScene
         {
             RectTransform rt = mapDisplay.rectTransform;
 
-            // 1. 앵커를 부모의 정중앙(Center)으로 설정
+            // 앵커를 부모의 정중앙(Center)으로 설정
             rt.anchorMin = new Vector2(0.5f, 0.5f);
             rt.anchorMax = new Vector2(0.5f, 0.5f);
 
-            // 2. 피벗은 (0, 0) 좌하단 유지 (아이콘 좌표 계산을 위해 필수!)
+            // 피벗은 (0, 0) 좌하단 유지 (아이콘 좌표 계산을 위해 필수!)
             rt.pivot = new Vector2(0f, 0f);
 
-            // 3. 위치 보정
+            // 위치 보정
             // Pivot이 좌하단이므로, (0,0)에 두면 맵의 왼쪽 아래 귀퉁이가 화면 중앙에 온다.
             // 따라서 맵 너비/높이의 절반만큼 왼쪽(-x), 아래(-y)로 이동시켜야 정중앙에 온다.
             rt.anchoredPosition = new Vector2(-width * 0.5f, -height * 0.5f);
@@ -97,10 +97,10 @@ namespace UI.DungeonMapScene
         {
             if (currentMapData == null || currentMapState == null) return;
 
-            // 1. 해당 좌표의 셀 데이터 가져오기
+            // 해당 좌표의 셀 데이터 가져오기
             CellData cell = currentMapData.GetCell(x, y);
             
-            // 2. 만약 현재 상태(mapState)에서 해당 셀이 방문된 상태라면 그리기 수행
+            // 만약 현재 상태(mapState)에서 해당 셀이 방문된 상태라면 그리기 수행
             // (이미 방문했더라도 텍스처가 갱신 안 된 경우를 대비해 다시 그림)
             if (cell != null)
             {
@@ -115,7 +115,7 @@ namespace UI.DungeonMapScene
             int startX = cell.x * cellSize;
             int startY = cell.y * cellSize;
 
-            // 1. 바닥 채우기 (Alpha 1.0f로 안개 완벽 제거)
+            // 바닥 채우기 (Alpha 1.0f로 안개 완벽 제거)
             Color fColor = (cell.value > -1 && cell.value < floorColors.Length) 
                 ? floorColors[cell.value] : defaultColor;
 
@@ -124,7 +124,7 @@ namespace UI.DungeonMapScene
             for (int i = 0; i < fillColors.Length; i++) fillColors[i] = fColor;
             mapTexture.SetPixels(startX, startY, cellSize, cellSize, fillColors);
 
-            // 2. 벽 그리기
+            // 벽 그리기
             // Index 0: 왼쪽 (West)
             DrawWallLine(cell.wallTextureIDs[0], startX, startY, wallThickness, cellSize);
             
@@ -177,10 +177,10 @@ namespace UI.DungeonMapScene
         {
             if (playerIcon == null) return;
 
-            // 1. 아이콘 활성화
+            // 아이콘 활성화
             playerIcon.gameObject.SetActive(true);
 
-            // 2. 픽셀 좌표 계산
+            // 픽셀 좌표 계산
             // RaycastScreen의 좌표계: 0.5가 셀의 중앙, 0.0이 셀의 경계선
             // 따라서 cellSize를 곱하기만 하면 픽셀 좌표가 나옴
             // (기존 int 버전은 정수 인덱스라 +0.5f를 해줬지만, 여기선 x, y가 이미 중앙값(x.5)을 가지고 있음)
@@ -189,7 +189,7 @@ namespace UI.DungeonMapScene
 
             playerIcon.anchoredPosition = new Vector2(px, py);
 
-            // 3. 방향 회전 (벡터 -> 각도)
+            // 방향 회전 (벡터 -> 각도)
             // 좌표계: North(0, 1) -> UI 0도
             // Atan2(1, 0) = 90도 -> -90 해야 0도
             float angleRad = Mathf.Atan2(dirY, dirX);
@@ -204,20 +204,20 @@ namespace UI.DungeonMapScene
         {
             if (playerIcon == null) return;
 
-            // 1. 아이콘 활성화 (혹시 꺼져있다면)
+            // 아이콘 활성화 (혹시 꺼져있다면)
             playerIcon.gameObject.SetActive(true);
             
-            // 2. 픽셀 좌표 계산
+            // 픽셀 좌표 계산
             // 맵의 피벗이 (0,0) 좌하단 기준일 때:
             // x * cellSize = 셀의 왼쪽 구석
             // + cellSize * 0.5f = 셀의 정중앙
             float px = (x * cellSize) + (cellSize * 0.5f);
             float py = (y * cellSize) + (cellSize * 0.5f);
 
-            // 3. 위치 이동 (AnchoredPosition 사용)
+            // 위치 이동 (AnchoredPosition 사용)
             playerIcon.anchoredPosition = new Vector2(px, py);
 
-            // 4. 방향 회전 (Z축 회전)
+            // 방향 회전 (Z축 회전)
             float rotationAngle = GetRotationFromDirection(dir);
             playerIcon.localRotation = Quaternion.Euler(0, 0, rotationAngle);
         }

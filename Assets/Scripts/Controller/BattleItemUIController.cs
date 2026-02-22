@@ -48,7 +48,7 @@ namespace Controller
         {
             if (gameObject.activeSelf)
             {
-                // 1. 탭 전환 (왼쪽/오른쪽)
+                // 탭 전환 (왼쪽/오른쪽)
                 if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Q)) // Q키도 허용
                 {
                     ChangeTab(-1);
@@ -58,7 +58,7 @@ namespace Controller
                     ChangeTab(1);
                 }
 
-                // 2. 닫기 (Cancel)
+                // 닫기 (Cancel)
                 if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
                 {
                     Close();
@@ -121,11 +121,11 @@ namespace Controller
 
         void RefreshList()
         {
-            // 1. 기존 리스트 삭제
+            // 기존 리스트 삭제
             foreach (Transform child in contentTransform) Destroy(child.gameObject);
             currentSlots.Clear();
 
-            // 2. 아이템 생성
+            // 아이템 생성
             List<string> allItemIds = InventoryManager.Instance.GetAllItemIds();
             foreach (string id in allItemIds)
             {
@@ -138,7 +138,7 @@ namespace Controller
                 }
             }
             
-            // 3. 리스트 갱신 후 첫 번째 아이템 선택 (포커스 이동)
+            // 리스트 갱신 후 첫 번째 아이템 선택 (포커스 이동)
             StartCoroutine(SelectFirstItem());
         }
 

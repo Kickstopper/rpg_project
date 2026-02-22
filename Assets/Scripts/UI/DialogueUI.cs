@@ -70,11 +70,11 @@ namespace UI
 
             var lineData = currentEventLines[currentLineIndex];
             
-            // 1. 텍스트 및 이름 설정
+            // 텍스트 및 이름 설정
             nameText.text = lineData.ContainsKey("Speaker") ? lineData["Speaker"] : "";
             contentText.text = lineData.ContainsKey("Text") ? lineData["Text"] : "";
 
-            // 2. 초상화 로드 변경 (Resources.Load 삭제)
+            // 초상화 로드 변경 (Resources.Load 삭제)
             string portraitID = lineData.ContainsKey("Portrait") ? lineData["Portrait"] : "";
         
             if (!string.IsNullOrEmpty(portraitID))
@@ -84,7 +84,7 @@ namespace UI
                 
                 if (entry != null)
                 {
-                    // 1. 얼굴 이미지 적용
+                    // 얼굴 이미지 적용
                     if (entry.portraitImage != null)
                     {
                         portraitImageUI.sprite = entry.portraitImage;
@@ -96,7 +96,7 @@ namespace UI
                         portraitImageUI.enabled = false;
                     }
 
-                    // 2. 전신 이미지 적용 (Standing)
+                    // 전신 이미지 적용 (Standing)
                     // 만약 전신 이미지가 등록되어 있다면 표시, 없으면 숨김
                     if (entry.standingImage != null)
                     {
@@ -120,7 +120,7 @@ namespace UI
                 standingImageUI.enabled = false;
             }
 
-            // 2. 텍스트 설정 및 타이핑 효과 시작
+            // 텍스트 설정 및 타이핑 효과 시작
             string fullText = lineData.ContainsKey("Text") ? lineData["Text"] : "";
             contentText.text = fullText; // 텍스트를 미리 다 넣어둠 (안 보일 뿐)
             contentText.maxVisibleCharacters = 0; // 글자 표시 개수를 0으로 초기화
@@ -172,12 +172,12 @@ namespace UI
             {
                 if (isTyping)
                 {
-                    // 1. 타이핑 중이라면 -> 즉시 완성 (Skip)
+                    // 타이핑 중이라면 -> 즉시 완성 (Skip)
                     CompleteTypingImmediately();
                 }
                 else
                 {
-                    // 2. 타이핑이 끝났다면 -> 다음 대사로
+                    // 타이핑이 끝났다면 -> 다음 대사로
                     AdvanceLine();
                 }
             }

@@ -37,11 +37,11 @@ namespace Controller
             this.onClosed = onCloseCallback;
             this.isClosing = false; // 초기화
 
-            // 1. 텍스트 설정
+            // 텍스트 설정
             goldText.text = $"{reward.totalGold} G";
             totalExpText.text = $"{reward.totalExp} EXP";
 
-            // 2. 아이템 슬롯 생성
+            // 아이템 슬롯 생성
             foreach(Transform child in itemContainer) Destroy(child.gameObject);
             
             Dictionary<string, int> itemCounts = new Dictionary<string, int>();
@@ -78,7 +78,7 @@ namespace Controller
                 }
             }
 
-            // 4. 버튼 이벤트 연결
+            // 버튼 이벤트 연결
             continueButton.onClick.RemoveAllListeners();
             continueButton.onClick.AddListener(OnContinueClicked);
 

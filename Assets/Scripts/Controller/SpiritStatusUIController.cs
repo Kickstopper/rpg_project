@@ -68,7 +68,7 @@ namespace Controller
         {
             UpdatePortraitImage(data);
 
-            // 1. Header Info
+            // Header Info
             nameText.text = data.entityName;
             levelText.text = data.stats.level.ToString();
             alignText.text = data.align.ToString().ToUpper().Replace("_", " ");
@@ -80,7 +80,7 @@ namespace Controller
             resistForceText.text = ((int)data.resistances.force).ToString();
             resistPsychText.text = ((int)data.resistances.psyche).ToString();
 
-            // 2. Base Stats
+            // Base Stats
             float maxStatVal = 50f;
             UpdateStat(strSlider, strText, data.stats.str, maxStatVal);
             UpdateStat(magSlider, magText, data.stats.mag, maxStatVal);
@@ -89,7 +89,7 @@ namespace Controller
             UpdateStat(agiSlider, agiText, data.stats.agi, maxStatVal);
             UpdateStat(lucSlider, lucText, data.stats.luc, maxStatVal);
 
-            // 3. Spirit 및 Skills (ScrollView 갱신)
+            // Spirit 및 Skills (ScrollView 갱신)
             UpdateSkillList(data.skills);
         }
 
@@ -119,13 +119,13 @@ namespace Controller
         // 스킬 리스트 갱신 함수
         private void UpdateSkillList(List<SkillData> skills)
         {
-            // 1. 기존 목록 삭제 (초기화)
+            // 기존 목록 삭제 (초기화)
             foreach (Transform child in skillContent)
             {
                 Destroy(child.gameObject);
             }
 
-            // 2. 스킬 목록 생성
+            // 스킬 목록 생성
             if (skills == null) return;
 
             foreach (var skillData in skills)

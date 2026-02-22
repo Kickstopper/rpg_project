@@ -227,14 +227,14 @@ namespace Controller
 
             if (selectedItemData == null) return;
 
-            // 1. 사용 불가 아이템 체크
+            // 사용 불가 아이템 체크
             if (selectedItemData.useType != UseType.All && selectedItemData.useType != UseType.Exploration)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 return;
             }
 
-            // 2. 부활 아이템 사용 조건 체크
+            // 부활 아이템 사용 조건 체크
             if (selectedItemData.effectType == EffectType.Revive_Empty || selectedItemData.effectType == EffectType.Revive_Fully)
             {
                 bool hasDeadMember = false;
@@ -377,27 +377,27 @@ namespace Controller
 
         private void UseItemOnTarget()
         {
-            // 1. 데이터 유효성 체크
+            // 데이터 유효성 체크
             if (selectedItemData == null) return;
 
-            // 2. 효과 적용 시도 (EffectManager 위임)
+            // 효과 적용 시도 (EffectManager 위임)
             // 타겟을 인터페이스로 가져옴
             PlayerController targetPC = partyControllers[currentPartyIndex];
             IBattleTarget battleTarget = targetPC;
 
-            // 2. EffectManager 호출 (데이터 수정 -> UI 갱신 자동 수행)
+            // EffectManager 호출 (데이터 수정 -> UI 갱신 자동 수행)
             if (EffectManager.Instance.ApplyEffect(battleTarget, selectedItemData))
             {
-                // A. 아이템 소모 (인벤토리 반영)
+                // 아이템 소모 (인벤토리 반영)
                 InventoryManager.Instance.UseItem(selectedItemData.id);
                 
-                // B. 효과음 재생
+                // 효과음 재생
                 SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
 
-                // C. UI 리스트 갱신 (수량 변화 반영)
+                // UI 리스트 갱신 (수량 변화 반영)
                 RefreshItemList(); 
 
-                // D. 연속 사용 처리 로직 (UX)
+                // 연속 사용 처리 로직 (UX)
                 int remainingCount = InventoryManager.Instance.GetItemCount(selectedItemData.id);
 
                 if (remainingCount > 0)

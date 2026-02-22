@@ -93,20 +93,20 @@ namespace Controller
 
             while (true) // 무한 반복
             {
-                // 1. 현재 순서의 이미지로 교체
+                // 현재 순서의 이미지로 교체
                 targetImage.sprite = backgroundImages[currentBtnIndex];
                 targetImage.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
 
-                // 2. Fade In (투명 -> 불투명)
+                // Fade In (투명 -> 불투명)
                 yield return StartCoroutine(FadeEffect(0f, 1f));
 
-                // 3. 대기 (이미지 감상 시간)
+                // 대기 (이미지 감상 시간)
                 yield return new WaitForSeconds(displayDuration);
 
-                // 4. Fade Out (불투명 -> 투명)
+                // Fade Out (불투명 -> 투명)
                 yield return StartCoroutine(FadeEffect(1f, 0f));
 
-                // 5. 다음 이미지 인덱스 계산 (리스트 끝에 도달하면 0번으로 돌아감)
+                // 다음 이미지 인덱스 계산 (리스트 끝에 도달하면 0번으로 돌아감)
                 currentBtnIndex = (currentBtnIndex + 1) % backgroundImages.Count;
 
                 if (!isEnable)

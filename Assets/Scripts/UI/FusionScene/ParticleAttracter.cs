@@ -35,29 +35,29 @@ public class ParticleAttractor : MonoBehaviour
         {
             Vector3 particlePos = particles[i].position;
             
-            // 1. 타겟까지의 거리와 방향 계산
+            // 타겟까지의 거리와 방향 계산
             float distance = Vector3.Distance(particlePos, targetPos);
             Vector3 directionToTarget = (targetPos - particlePos).normalized;
 
-            // 2. 도달했으면 파티클 삭제 (흡수)
+            // 도달했으면 파티클 삭제 (흡수)
             if (distance < stopDistance)
             {
                 particles[i].remainingLifetime = 0;
                 continue;
             }
 
-            // 3. 움직임 계산 (벡터 합성)
-            // A. 흡입력: 타겟 방향으로 이동
+            // 움직임 계산 (벡터 합성)
+            // 흡입력: 타겟 방향으로 이동
             Vector3 suctionVector = directionToTarget * suckSpeed;
 
-            // B. 회전력: 타겟 방향의 수직(Tangent) 방향 계산
+            // 회전력: 타겟 방향의 수직(Tangent) 방향 계산
             // (2D 게임이므로 앞/뒤(Z축)를 기준으로 수직 벡터를 구함)
             Vector3 rotationVector = Vector3.Cross(directionToTarget, Vector3.forward) * rotateSpeed;
             
             // 거리가 멀수록 회전 반경을 크게 하기 위해 거리 비례 적용 (선택 사항)
             // 가까워질수록 회전보다는 흡입력이 강해지도록 연출
             
-            // 4. 최종 위치 적용
+            // 최종 위치 적용
             // Time.deltaTime을 곱해 프레임 드랍에도 부드럽게 이동
             particles[i].position += (suctionVector + rotationVector) * Time.deltaTime;
         }

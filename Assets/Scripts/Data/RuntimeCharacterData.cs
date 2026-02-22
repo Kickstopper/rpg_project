@@ -14,6 +14,8 @@ namespace Data
         Lawful_Evil, Neutral_Evil, Chaotic_Evil 
     }
 
+    public enum StatType { STR, MAG, INT, VIT, AGI, LUC }
+
     public enum StatusEffect { Good, Asleep, Confused, Blind, Poison, Paralyzed, Adamism }
     [System.Serializable]
     public class RuntimeCharacterData

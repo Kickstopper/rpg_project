@@ -21,7 +21,7 @@ namespace Data
 
         private void Reset()
         {
-            // 1. 기본 스탯 초기화
+            // 기본 스탯 초기화
             stats = new StatData()
             {
                 level = 1,
@@ -30,7 +30,7 @@ namespace Data
             resistances = new ResistanceData();
             align = Align.True_Neutral;
 
-            // 2. [자동 ID 생성 로직]
+            // [자동 ID 생성 로직]
 #if UNITY_EDITOR
             string[] guids = AssetDatabase.FindAssets("t:SpiritData");
             

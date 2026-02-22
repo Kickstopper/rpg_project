@@ -21,7 +21,7 @@ namespace Controller
         public Image portraitImage;
         public Image highlightImage;         // 하이라이트 사각형 이미지
         public Slider hpSlider;       // HP 게이지
-        public Slider mpSlider;       // SP 게이지
+        public Slider mpSlider;       // MP 게이지
         public GameObject messagePanel;
         public TextMeshProUGUI messageText;
         public TextMeshProUGUI nameText;         // 이름 텍스트
@@ -36,10 +36,10 @@ namespace Controller
         public StatData currentStats; // 캐릭터 단독 또는 캐릭터와 스피릿의 융합 스탯
         public ResistanceData resist; // 캐릭터 단독 또는 캐릭터와 스피릿의 융합 내성
 
-        // 스킬 목록 (나와 Spirit의 스킬 ID)
+        // 스킬 목록
         public List<string> learnedSkillIds = new List<string>();
 
-        // 현재 장착 장비 (ID)
+        // 현재 장착 장비
         [Header("Equipment Slots")]
         public string equippedWeaponId; // 근접 무기
         public string equippedGunId;    // 총
@@ -55,21 +55,21 @@ namespace Controller
 
         private List<ArmorData> currentArmors = new List<ArmorData>();
         
-        // 상태 이상 (Status Effect)
+        // 상태 이상
         public List<string> currentStatusEffects = new List<string>();
 
         public bool isCommander;
 
         private BattleManager controller;
 
-        // [BattleEntity 구현] 스탯 반환 (스피릿 융합된 스탯 + 장비 보정)
+        // BattleEntity 구현. 스탯 반환 (스피릿 융합된 스탯 + 장비 보정)
         public override int GetTotalStr() => currentStats.str; 
         public override int GetTotalAgi() => currentStats.agi;
         public override int GetTotalMag() => currentStats.mag;
         public override int GetTotalLuc() => currentStats.luc;
         public override int GetTotalVit() => currentStats.vit;
 
-        // [IBattleTarget 구현]
+        // IBattleTarget 구현
         public bool IsAlive => currentHp > 0;
         public bool IsMaxHp => currentHp >= maxHp;
         public bool IsMaxMp => currentMp >= maxMp;
@@ -115,10 +115,10 @@ namespace Controller
 
             spiritData = null;
             
-            // 1. 그래픽 숨기기 (스프라이트, UI 등)
+            // 그래픽 숨기기 (스프라이트, UI 등)
             UpdateUI();
 
-            // 2. 이름표 변경 (디버깅용)
+            // 이름표 변경 (디버깅용)
             this.name = $"Empty_Slot_{colIndex}";
         }
 
@@ -142,19 +142,19 @@ namespace Controller
 
             this.spiritData = DatabaseManager.Instance.GetSpirit(runtimeData.spiritId);
 
-            // 3. 데이터 융합
+            // 데이터 융합
             if (this.spiritData != null)
             {
-                // A. 스탯 평균화
+                // 스탯 평균화
                 this.currentStats = CalculateAverageStats(runtimeData.stats, spiritData.stats);
                 
-                // B. 성향 평균화
+                // 성향 평균화
                 this.align = AlignmentSystem.GetAverageAlign(runtimeData.align, spiritData.align);
 
-                // C. 스킬 합치기
+                // 스킬 합치기
                 this.learnedSkillIds = runtimeData.learnedSkills.Union(spiritData.skills.Select(s => s.id)).ToList();
 
-                // D. 내성 합치기
+                // 내성 합치기
                 this.resist = runtimeData.resistances;
             }
             else
@@ -174,21 +174,18 @@ namespace Controller
                 this.learnedSkillIds = new List<string>(runtimeData.learnedSkills);
             }
 
-            // 4. 레벨 및 HP/MP 설정 (평균화된 스탯 기준)
+            // 스피릿과의 합성 상태에 따라 변화된 레벨값 할당
             this.level = currentStats.level;
             
-            // MaxHP/MP 계산 (InitializeStats에서 수행하겠지만, 초기값 세팅)
             InitializeStats(); 
 
-
-            // 현재 HP/MP는 비율에 맞춰 조정하거나, max를 넘지 않게 클램핑
             this.currentHp = Mathf.Min(runtimeData.currentHp, this.maxHp);
             this.currentMp = Mathf.Min(runtimeData.currentMp, this.maxMp);
 
-            // UI 초기화 (이름, 이미지 등)
+            // UI 초기화
             if (nameText) nameText.text = entityName;
 
-            // DB에서 이미지(Sprite) 가져오기
+            // DB에서 이미지 가져오기
             var dbEntry = PartyManager.Instance.charDB.GetEntry(runtimeData.characterId);
             if (dbEntry != null && portraitImage)
             {
@@ -203,28 +200,24 @@ namespace Controller
 
             RefreshArmorStats();
 
-            // 파생 스탯(MaxHP, Atk 등) 최종 계산
+            // 파생 스탯 최종 계산
             InitializeStats(); 
-
             
-            // UI 게이지 갱신
             UpdateUI();
         }
 
-        // =========================================================
-        // [헬퍼 함수] 데이터 융합 로직
-        // =========================================================
+        
+        // 스피릿과 캐릭터의 스탯을 하나로
         private StatData CalculateAverageStats(StatData charStats, StatData spiritStats)
         {
             StatData result = new StatData();
-            
             result.level = Mathf.CeilToInt((charStats.level + spiritStats.level) / 2f);
-            result.str = Mathf.CeilToInt((charStats.str + spiritStats.str) / 2f);
-            result.mag = Mathf.CeilToInt((charStats.mag + spiritStats.mag) / 2f);
-            result.intel = Mathf.CeilToInt((charStats.intel + spiritStats.intel) / 2f);
-            result.vit = Mathf.CeilToInt((charStats.vit + spiritStats.vit) / 2f);
-            result.agi = Mathf.CeilToInt((charStats.agi + spiritStats.agi) / 2f);
-            result.luc = Mathf.CeilToInt((charStats.luc + spiritStats.luc) / 2f);
+            result.str = charStats.str + spiritStats.str;
+            result.mag = charStats.mag + spiritStats.mag;
+            result.intel = charStats.intel + spiritStats.intel;
+            result.vit = charStats.vit + spiritStats.vit;
+            result.agi = charStats.agi + spiritStats.agi;
+            result.luc = charStats.luc + spiritStats.luc;
 
             return result;
         }
@@ -275,7 +268,7 @@ namespace Controller
             highlightImage.color = Color.clear;
         }
 
-        // [BattleEntity 구현] 선택 강조
+        // 선택 상태 표시
         public override void SetSelectionState(bool isSelected)
         {
             if (highlightCoroutine != null) StopCoroutine(highlightCoroutine);
@@ -301,7 +294,7 @@ namespace Controller
             }
         }
         
-        // 총 공격력 계산 (총 데미지 + 총알 데미지 + 스탯)
+        // 총 공격력 계산
         public int GetGunAttack()
         {
             if (currentGun == null || currentAmmo == null) return 0;
@@ -310,7 +303,7 @@ namespace Controller
             int ammoAtk = currentAmmo.damageBonus;
             int statBonus = 0;
 
-            // 총은 LUC이나 DEX(AGI) 영향을 받음
+            // 총은 LUC이나 AGI 영향을 받음
             if (currentGun.scalingStatName == "AGI") statBonus = GetTotalAgi();
             else if (currentGun.scalingStatName == "LUC") statBonus = GetTotalLuc();
             
@@ -323,9 +316,9 @@ namespace Controller
             return currentGun != null && currentAmmo != null;
         }
 
-        // =========================================================
+        
         // [장비 관리 메서드]
-        // =========================================================
+        
         public void EquipWeapon(string weaponId)
         {
             equippedWeaponId = weaponId;
@@ -343,7 +336,7 @@ namespace Controller
             equippedAmmoId = ammoId;
 
             if (!string.IsNullOrEmpty(gunId))
-                currentGun = DatabaseManager.Instance.GetWeapon(gunId); // GetWeapon 재활용 (WeaponData 타입이므로)
+                currentGun = DatabaseManager.Instance.GetWeapon(gunId);
             else
                 currentGun = null;
 
@@ -369,9 +362,9 @@ namespace Controller
             }
         }
 
-        // =========================================================
+        
         // 장비 스탯 반영
-        // =========================================================
+        
         public override int GetAttack()
         {
             int statAtk = currentStats.str;
@@ -415,21 +408,21 @@ namespace Controller
                     sourceData.currentExp -= requiredExp;
                     sourceData.stats.level++;
                     
-                    // 스탯 상승 (임시)
-                    sourceData.stats.str++;
-                    sourceData.stats.vit++;
-                    sourceData.stats.mag++;
-                    sourceData.stats.agi++;
-                    sourceData.stats.luc++;
-                    sourceData.stats.intel++;
+                    // // 스탯 상승 (임시)
+                    // sourceData.stats.str++;
+                    // sourceData.stats.vit++;
+                    // sourceData.stats.mag++;
+                    // sourceData.stats.agi++;
+                    // sourceData.stats.luc++;
+                    // sourceData.stats.intel++;
 
-                    // HP/MP 완전 회복 및 Max 수치 재계산
-                    InitializeStats(); 
+                    // // HP/MP 완전 회복 및 Max 수치 재계산
+                    // InitializeStats(); 
                     
-                    sourceData.currentHp = sourceData.maxHp;
-                    sourceData.currentMp = sourceData.maxMp;
-                    sourceData.maxHp = this.maxHp;
-                    sourceData.maxMp = this.maxMp;
+                    // sourceData.currentHp = sourceData.maxHp;
+                    // sourceData.currentMp = sourceData.maxMp;
+                    // sourceData.maxHp = this.maxHp;
+                    // sourceData.maxMp = this.maxMp;
                 }
                 else
                 {

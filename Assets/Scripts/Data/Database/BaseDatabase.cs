@@ -36,16 +36,16 @@ namespace Data
     #if UNITY_EDITOR
             items.Clear();
 
-            // 1. T 타입(예: WeaponData)의 모든 에셋 GUID를 찾는다.
+            // T 타입(예: WeaponData)의 모든 에셋 GUID를 찾는다.
             // "t:"는 타입 검색 필터.
             string[] guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}");
 
             foreach (string guid in guids)
             {
-                // 2. GUID를 파일 경로로 변환.
+                // GUID를 파일 경로로 변환.
                 string path = AssetDatabase.GUIDToAssetPath(guid);
 
-                // 3. 경로를 통해 실제 에셋을 로드.
+                // 경로를 통해 실제 에셋을 로드.
                 T asset = AssetDatabase.LoadAssetAtPath<T>(path);
 
                 if (asset != null)
@@ -54,10 +54,10 @@ namespace Data
                 }
             }
 
-            // 4. ID 순서대로 정렬 (선택 사항)
+            // ID 순서대로 정렬 (선택 사항)
             items = items.OrderBy(x => x.id).ToList();
 
-            // 5. 변경 사항 저장
+            // 변경 사항 저장
             EditorUtility.SetDirty(this);
             Debug.Log($"[Database] 프로젝트 전체에서 {items.Count}개의 {typeof(T).Name} 데이터를 찾아 등록했습니다.");
     #else

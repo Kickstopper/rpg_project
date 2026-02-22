@@ -17,27 +17,27 @@ namespace Data
     [Serializable]
     public class SaveData
     {
-        // 1. 기본 정보
+        // 기본 정보
         public string saveTime;
         public string sceneName;
         public string dungeonId; // 현재 맵 ID
         
-        // 2. 플레이어 위치
+        // 플레이어 위치
         public int playerPosX;
         public int playerPosY;
 
         public Direction playerDirection;
         public List<DungeonMapState> dungeonMapStates = new List<DungeonMapState>();
 
-        // 3. 자산 및 인벤토리
+        // 자산 및 인벤토리
         public int gold;
          // 아이템 ID 리스트
         public List<ItemSaveEntry> inventory = new List<ItemSaveEntry>();
 
-        // 4. 파티원 정보 리스트
+        // 파티원 정보 리스트
         public List<CharacterSaveData> partyMembers = new List<CharacterSaveData>();
 
-        // 5. 이벤트 플래그
+        // 이벤트 플래그
         public List<string> eventFlags = new List<string>();
 
         // 6. 가진 앱과 인스톨된 앱

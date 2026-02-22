@@ -35,7 +35,7 @@ namespace Manager
             }
         }
 
-        // 1. 테마 리스트를 딕셔너리로 변환 (빠른 검색)
+        // 테마 리스트를 딕셔너리로 변환 (빠른 검색)
         private void InitializeThemeMap()
         {
             themeMap = new Dictionary<string, DungeonTheme>();
@@ -48,7 +48,7 @@ namespace Manager
             }
         }
 
-        // 2. JSON 파일 로드 함수
+        // JSON 파일 로드 함수
         // 파일 위치: Assets/StreamingAssets/Levels/{fileName}.json
         public void LoadLevelFromJson(string fileName)
         {
@@ -74,7 +74,7 @@ namespace Manager
 
         
 
-        // 3. 레벨 적용 로직
+        // 레벨 적용 로직
         private void SetCurrentLevel(MapData data)
         {
             CurrentMapData = data;
@@ -103,7 +103,7 @@ namespace Manager
             Debug.Log($"레벨 로드 완료: ID {data.mapID}, Theme {data.themeName}");
         }
 
-        // 4. 테마 가져오기 헬퍼 함수
+        // 테마 가져오기 헬퍼 함수
         public DungeonTheme GetTheme(string themeName)
         {
             if (themeMap.TryGetValue(themeName, out DungeonTheme theme))

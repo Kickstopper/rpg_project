@@ -30,10 +30,10 @@ public class MatrixStream : MonoBehaviour
 
     private void Update()
     {
-        // 1. 물리적 낙하 (전체 위치 이동)
+        // 물리적 낙하 (전체 위치 이동)
         transform.Translate(Vector3.down * _fallSpeed * Time.deltaTime);
 
-        // 2. 화면 밖으로 완전히 나가면 리셋
+        // 화면 밖으로 완전히 나가면 리셋
         // 꼬리가 길어지므로 여유 있게 화면 높이의 1.5배 정도 내려가면 리셋
         if (transform.position.y < -Screen.height * 1.5f) 
         {
@@ -61,16 +61,16 @@ public class MatrixStream : MonoBehaviour
     {
         while (true)
         {
-            // 1. 새 글자 추가 (Head)
+            // 새 글자 추가 (Head)
             _chars.Add(GetRandomChar());
 
-            // 2. 최대 길이를 넘으면 맨 뒤(위쪽, Tail) 글자 삭제
+            // 최대 길이를 넘으면 맨 뒤(위쪽, Tail) 글자 삭제
             if (_chars.Count > _targetLength)
             {
                 _chars.RemoveAt(0);
             }
 
-            // 3. 기존 글자들 중 일부를 랜덤하게 변경 (글리치 효과)
+            // 기존 글자들 중 일부를 랜덤하게 변경 (글리치 효과)
             // 리스트가 비어있지 않다면
             if (_chars.Count > 0)
             {
@@ -82,7 +82,7 @@ public class MatrixStream : MonoBehaviour
                 if (Random.value > 0.9f) _chars[randomIdx] = GetRandomChar();
             }
 
-            // 4. 문자열 조립 및 적용
+            // 문자열 조립 및 적용
             _textComponent.text = GetStylizedString();
 
             // 생성 속도 (이 값이 작을수록 글자가 빨리 자라남)

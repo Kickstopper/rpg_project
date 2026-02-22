@@ -17,7 +17,7 @@ namespace Helper
         {
             if (attacker == null || defender == null) return 0;
 
-            // 1. 기본 공격력
+            // 기본 공격력
             int baseAtk = attacker.GetTotalStr();
             int skillPower = 0;
             if (action.type == ActionType.Skill || action.type == ActionType.Item)
@@ -27,18 +27,18 @@ namespace Helper
 
             int totalAtk = baseAtk + skillPower;
             
-            // 2. 방어력 및 저항
+            // 방어력 및 저항
             int totalDef = defender.GetDefense();
             float resistanceValue = GetResistanceValue(action.skillData, defender.GetResistances());
             float resistanceMultiplier = 1.0f - resistanceValue;
 
-            // 3. 기초 데미지 계산
+            // 기초 데미지 계산
             float rawDamage = Mathf.Max(1, totalAtk - (totalDef * 0.5f));
 
-            // 4. 성향(Alignment) 상성 보정
+            // 성향(Alignment) 상성 보정
             float alignBonus = AlignmentSystem.GetDamageModifier(attacker.align, defender.align);
             
-            // 5. 최종 연산
+            // 최종 연산
             rawDamage *= damageMultiplier * alignBonus;
             float randomVar = Random.Range(0.9f, 1.1f); // 10% 랜덤 분산
             
@@ -149,7 +149,7 @@ namespace Helper
         // -------------------------------------------------------
         // [위치 보정]
         // -------------------------------------------------------
-        public static void GetPositionalModifiers(BattleManager.CombatPosition atkPos, BattleManager.CombatPosition defPos, WeaponType wType, out float damageMultiplier, out float evasionBonus)
+        public static void GetPositionalModifiers(BattleFieldController.BattlePosition atkPos, BattleFieldController.BattlePosition defPos, WeaponType wType, out float damageMultiplier, out float evasionBonus)
         {
             damageMultiplier = 1.0f;
             evasionBonus = 0f;

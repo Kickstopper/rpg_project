@@ -27,9 +27,9 @@ namespace UI
                 CellData cell = mapData.cells[i];
                 Vector3 center = GetCellCenter(cell.x, cell.y);
 
-                // =========================================================
-                // 1. 바닥 그리기 (항상 회색)
-                // =========================================================
+                
+                // 바닥 그리기 (항상 회색)
+                
                 
                 // (1) 바닥 면 채우기 (Solid)
                 Gizmos.color = Color.gray; 
@@ -41,7 +41,7 @@ namespace UI
                 Gizmos.color = Color.black;
                 Gizmos.DrawWireCube(center, new Vector3(cellSize, 0.1f, cellSize));
 
-                // 2. 벽 그리기 로직 (isWall이 true일 때만 텍스처 검사)
+                // 벽 그리기 로직 (isWall이 true일 때만 텍스처 검사)
                 // 각 방향별로 텍스처 ID가 유효하면(-1 아님) 그 면을 그림
                 
                 // North (Z+)
@@ -61,13 +61,13 @@ namespace UI
                     DrawWallFace(center, Vector3.left, cell.wallTextureIDs[3]);
             }
 
-            // 3. 선택된 셀 하이라이트 (깜빡임 효과)
+            // 선택된 셀 하이라이트 (깜빡임 효과)
             if (selectedCoord.x >= 0 && selectedCoord.y >= 0)
             {
                 HighlightSelectedCell();
             }
 
-            // 4. 플레이어 시작 위치 및 방향 그리기
+            // 플레이어 시작 위치 및 방향 그리기
             DrawPlayerStart(); 
 
             // 워프 그리기
@@ -83,15 +83,15 @@ namespace UI
             {
                 Vector3 center = GetCellCenter(warp.sourceX, warp.sourceY);
                 
-                // 1. 워프 위치 표시 (보라색 구체)
+                // 워프 위치 표시 (보라색 구체)
                 Gizmos.color = new Color(1f, 0f, 1f, 0.6f); // 마젠타색, 반투명
                 Gizmos.DrawSphere(center + Vector3.up * (wallHeight * 0.5f), cellSize * 0.3f);
                 
-                // 2. 외곽선
+                // 외곽선
                 Gizmos.color = Color.white;
                 Gizmos.DrawWireSphere(center + Vector3.up * (wallHeight * 0.5f), cellSize * 0.35f);
 
-                // 3. 트리거 방향 표시 (어느 쪽에서 부딪혀야 하는지 화살표)
+                // 트리거 방향 표시 (어느 쪽에서 부딪혀야 하는지 화살표)
                 // 트리거 방향이 North라면, 플레이어는 남쪽에서 북쪽으로 이동하며 부딪힘.
                 // 따라서 화살표는 남쪽 -> 북쪽(벽 중심)을 가리키게 그림.
                 
@@ -121,12 +121,12 @@ namespace UI
             // 시작 위치의 중앙
             Vector3 center = GetCellCenter(x, y);
             
-            // 1. 시작 셀 전체를 청록색으로 표시
+            // 시작 셀 전체를 청록색으로 표시
             Gizmos.color = new Color(0, 1, 1, 0.5f); // 청록색, 반투명
             // 높이 0.2m 정도의 얇은 큐브를 그려 바닥과 구분
             Gizmos.DrawCube(center + Vector3.up * 0.1f, new Vector3(cellSize, 0.2f, cellSize)); 
 
-            // 2. 방향 화살표 그리기
+            // 방향 화살표 그리기
             Vector3 directionVector = GetDirectionVector(dir);
             
             Gizmos.color = Color.yellow; // 노란색 화살표
@@ -162,17 +162,17 @@ namespace UI
         // 단일 벽면을 그리는 함수
         void DrawWallFace(Vector3 cellCenter, Vector3 direction, int textureID)
         {
-            // 1. 색상 결정 (ID 범위 체크)
+            // 색상 결정 (ID 범위 체크)
             Color faceColor = (textureID < textureColors.Length) ? textureColors[textureID] : Color.white;
             Gizmos.color = faceColor;
 
-            // 2. 위치 계산 (중심에서 해당 방향 끝으로 이동)
+            // 위치 계산 (중심에서 해당 방향 끝으로 이동)
             // 벽의 중심점 = 셀 중심 + (방향 * (셀크기 절반 - 두께 절반))
             // 두께 절반을 빼는 이유는 벽이 셀 밖으로 튀어 나가지 않게 하기 위함 (Inner alignment)
             Vector3 faceCenter = cellCenter + (direction * ((cellSize * 0.5f) - (wallThickness * 0.5f)));
             faceCenter.y += wallHeight * 0.5f; // 높이 보정
 
-            // 3. 크기 계산
+            // 크기 계산
             Vector3 faceSize;
 
             // 북/남쪽 벽은 가로(X)가 넓고, 동/서쪽 벽은 세로(Z)가 넓어야 함
@@ -189,10 +189,10 @@ namespace UI
                 faceSize = new Vector3(wallThickness, wallHeight, cellSize);
             }
 
-            // 4. 큐브 그리기
+            // 큐브 그리기
             Gizmos.DrawCube(faceCenter, faceSize);
             
-            // 5. 외곽선 (잘 보이게 검은색)
+            // 외곽선 (잘 보이게 검은색)
             Gizmos.color = Color.black;
             Gizmos.DrawWireCube(faceCenter, faceSize);
         }

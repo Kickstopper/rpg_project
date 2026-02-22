@@ -72,9 +72,9 @@ namespace Controller
         protected Coroutine highlightCoroutine;
         protected Color originalColor; 
 
-        // =========================================================
-        // 1. 공통 로직 (그대로 상속받아 사용)
-        // =========================================================
+        
+        // 공통 로직 (그대로 상속받아 사용)
+        
         public void ResetStatus()
         {
             isGuarding = false;
@@ -112,9 +112,9 @@ namespace Controller
             transform.localPosition = originalPos;
         }
 
-        // =========================================================
-        // 2. 추상 메서드 (자식이 반드시 구현해야 함)
-        // =========================================================
+        
+        // 추상 메서드 (자식이 반드시 구현해야 함)
+        
         
         // 데미지 처리는 연출과 로직(UI갱신 vs 사망처리)이 다르므로 추상화
         public abstract IEnumerator OnDamageTaken(int damage);

@@ -10,7 +10,7 @@ namespace UI.MapEditorScene
         Vector2 scrollPos;
         CellData selectedCell;
 
-        // 1. 맵 크기 입력을 위한 변수
+        // 맵 크기 입력을 위한 변수
         int inputWidth = 10;
         int inputHeight = 10;
 
@@ -35,7 +35,7 @@ namespace UI.MapEditorScene
             if (mapData == null) InitializeMap(10, 10, "default", null, 0, 0, 0);
         }
 
-        // 2. 크기를 인자로 받아 초기화
+        // 크기를 인자로 받아 초기화
         void InitializeMap(int w, int h, string id, DungeonTheme theme, int startX, int startY, Direction startDir)
         {
             mapData = new MapData();
@@ -77,11 +77,11 @@ namespace UI.MapEditorScene
         {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            // 1. Map ID 입력
+            // Map ID 입력
             GUILayout.Label("ID:", GUILayout.Width(20));
             inputID = EditorGUILayout.TextField(inputID, GUILayout.Width(80));
 
-            // 2. 시작 위치 및 방향 입력
+            // 시작 위치 및 방향 입력
             GUILayout.Space(10);
             GUILayout.Label("Player Start:", EditorStyles.boldLabel, GUILayout.Width(80));
 
@@ -96,18 +96,18 @@ namespace UI.MapEditorScene
             inputStartDirection = (Direction)EditorGUILayout.EnumPopup(inputStartDirection, GUILayout.Width(60));
 
 
-            // 3. Width / Height 입력
+            // Width / Height 입력
             GUILayout.Label("W:", GUILayout.Width(20));
             inputWidth = EditorGUILayout.IntField(inputWidth, GUILayout.Width(30));
             GUILayout.Label("H:", GUILayout.Width(20));
             inputHeight = EditorGUILayout.IntField(inputHeight, GUILayout.Width(30));
 
-            // 4. DungeonTheme Object Field (드래그 앤 드롭 슬롯)
+            // DungeonTheme Object Field (드래그 앤 드롭 슬롯)
             GUILayout.Label("Theme:", GUILayout.Width(45));
             // typeof(DungeonTheme)를 사용하여 해당 타입의 에셋만 들어오게 함
             inputTheme = (DungeonTheme)EditorGUILayout.ObjectField(inputTheme, typeof(DungeonTheme), false, GUILayout.Width(150));
 
-            // 4. 생성 버튼
+            // 생성 버튼
             if (GUILayout.Button("Create", EditorStyles.toolbarButton, GUILayout.Width(50)))
             {
                 if (EditorUtility.DisplayDialog("Create New Map", 
@@ -124,8 +124,8 @@ namespace UI.MapEditorScene
             // 아이콘을 사용하고 싶다면 EditorGUIUtility.IconContent("Refresh") 사용 가능
             if (GUILayout.Button("Refresh", EditorStyles.toolbarButton, GUILayout.Width(60)))
             {
-                ApplyUIToData();    // 1. 입력값 데이터에 반영
-                UpdateVisualizer(); // 2. 화면 갱신
+                ApplyUIToData();    // 입력값 데이터에 반영
+                UpdateVisualizer(); // 화면 갱신
                 Debug.Log("Map Refreshed");
             }
 
@@ -253,11 +253,11 @@ namespace UI.MapEditorScene
                     int index = y * mapData.width + x;
                     CellData cell = mapData.cells[index];
 
-                    // 1. 버튼 배경색 설정 (선택 여부)
+                    // 버튼 배경색 설정 (선택 여부)
                     if (selectedCell == cell) GUI.backgroundColor = Color.cyan; 
                     else GUI.backgroundColor = cell.value > -1 ? Color.gray : Color.white;
 
-                    // 2. 버튼 그리기 (텍스트는 좌표 대신 비워두거나 필요시 표시)
+                    // 버튼 그리기 (텍스트는 좌표 대신 비워두거나 필요시 표시)
                     // 버튼을 누르면 선택 처리
                     if (GUILayout.Button($"{x},{y}", GUILayout.Width(45), GUILayout.Height(45)))
                     {
@@ -266,7 +266,7 @@ namespace UI.MapEditorScene
                         GUI.FocusControl(null); 
                     }
 
-                    // 3. [시각화 핵심] 버튼 위에 벽 그리기
+                    // [시각화 핵심] 버튼 위에 벽 그리기
                     // 방금 그린 버튼의 영역(Rect)을 가져옵니다.
                     Rect rect = GUILayoutUtility.GetLastRect();
                     float wallThickness = 4f; // 벽 두께
@@ -343,9 +343,9 @@ namespace UI.MapEditorScene
                 selectedCell.wallTextureIDs[2] = EditorGUILayout.IntField("→ Tex", selectedCell.wallTextureIDs[2]);
                 selectedCell.wallTextureIDs[3] = EditorGUILayout.IntField("↓ Tex", selectedCell.wallTextureIDs[3]);
 
-                // =========================================================
+                
                 // 텍스처 일괄 설정 버튼 (Quick Actions)
-                // =========================================================
+                
                 GUILayout.Space(5);
                 EditorGUILayout.BeginHorizontal();
                 
@@ -374,16 +374,16 @@ namespace UI.MapEditorScene
                 }
                 
                 EditorGUILayout.EndHorizontal();
-                // =========================================================
+                
 
                 GUILayout.Space(10);
                 selectedCell.value = EditorGUILayout.IntField("Value", selectedCell.value);
 
                 GUILayout.Space(20);
                 
-                // =========================================================
+                
                 // 워프 포털 설정 UI
-                // =========================================================
+                
                 GUILayout.Label("Warp / Portal Settings", EditorStyles.boldLabel);
 
                 // 현재 셀(x, y)에 존재하는 워프 데이터를 찾음

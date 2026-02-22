@@ -259,7 +259,7 @@ namespace Controller
             RuntimeCharacterData[] slotAssignments = new RuntimeCharacterData[6];
             List<RuntimeCharacterData> pending = new List<RuntimeCharacterData>();
 
-            // 1. 위치 충돌 해결 및 배치 계산
+            // 위치 충돌 해결 및 배치 계산
             foreach (var member in party)
             {
                 int idx = GetIndexFromRowColumn(member.row, member.column);
@@ -279,7 +279,7 @@ namespace Controller
                 }
             }
 
-            // 2. 프리팹 생성 및 초기화
+            // 프리팹 생성 및 초기화
             for (int i = 0; i < 6; i++)
             {
                 if (partySlots.Length <= i) break;

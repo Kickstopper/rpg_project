@@ -113,7 +113,7 @@ namespace Controller
         {
             float timer = 0f;
 
-            // 1. 텍스트 화면 페이드 아웃
+            // 텍스트 화면 페이드 아웃
             while (timer < skipFadeDuration)
             {
                 timer += Time.deltaTime;

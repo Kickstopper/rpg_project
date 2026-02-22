@@ -49,16 +49,16 @@ namespace Controller
             }
         }
 
-        // =========================================================
-        // [핵심] 그리드 모드 반복 이동 로직
-        // =========================================================
+        
+        // 그리드 모드 반복 이동 로직
+        
         private void HandleGridRepeat()
         {
-            // 1. 이미 이동(또는 회전) 중이라면 명령을 무시하고 대기
+            // 이미 이동(또는 회전) 중이라면 명령을 무시하고 대기
             // (RaycastScreen에 'public bool IsMoving => _isMoving;' 추가 필요)
             if (raycastScreen.IsMoving) return;
 
-            // 2. 버튼 상태에 따라 이동 명령 내리기
+            // 버튼 상태에 따라 이동 명령 내리기
             // (else if를 사용하여 대각선 이동 방지 - 우선순위: 전/후 -> 좌/우)
             
             if (_isForwardPressed)
@@ -79,9 +79,9 @@ namespace Controller
             }
         }
 
-        // =========================================================
+        
         // 이동 입력 처리 (ContinuousButton 이벤트와 연결)
-        // =========================================================
+        
 
         public void OnPressForward() 
         { 
@@ -126,9 +126,9 @@ namespace Controller
         }
         public void OnReleaseMoveRight() { _isMoveRightPressed = false; }
 
-        // =========================================================
+        
         // 기능 토글 (일반 Button OnClick과 연결)
-        // =========================================================
+        
 
         public void ToggleAutoMap()
         {
@@ -157,9 +157,9 @@ namespace Controller
             // Time.timeScale = isActive ? 0f : 1f;
         }
 
-        // =========================================================
+        
         // 내부 로직
-        // =========================================================
+        
 
         private void HandleFreeMove()
         {
@@ -169,7 +169,7 @@ namespace Controller
             if (_isBackwardPressed) raycastScreen.MoveBackward(freeMoveSpeed * dt);
             
             // 좌우 버튼을 회전으로 쓸지, 게걸음으로 쓸지는 기획에 따라 선택
-            // 1. 회전(Turn)으로 사용 시:
+            // 회전(Turn)으로 사용 시:
             if (_isTurnLeftPressed) raycastScreen.TurnLeft(freeRotateSpeed * dt);
             if (_isTurnRightPressed) raycastScreen.TurnRight(freeRotateSpeed * dt);
 
@@ -178,7 +178,7 @@ namespace Controller
             if (_isMoveRightPressed) raycastScreen.AttemptMoveRight();
 
 
-            // 2. 게걸음(Move)으로 사용 시 (주석 해제하여 사용):
+            // 게걸음(Move)으로 사용 시 (주석 해제하여 사용):
             // if (_isMoveLeftPressed) raycastScreen.MoveLeft(); // RaycastScreen에 FreeMove용 MoveLeft(float speed) 구현 필요
         }
 

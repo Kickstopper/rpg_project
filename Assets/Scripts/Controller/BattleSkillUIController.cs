@@ -154,7 +154,7 @@ namespace Controller
             if(texts.Length > 1) texts[1].text = $"{consumeText} {cost}";
 
             // ---------------------------------------------------------
-            // 1. 사용 가능 여부 판별 (로직은 그대로 유지)
+            // 사용 가능 여부 판별 (로직은 그대로 유지)
             // ---------------------------------------------------------
             bool canUse = true;
             if (currentActor != null)
@@ -173,14 +173,14 @@ namespace Controller
             // 버튼 상태 및 클릭 이벤트 처리
             // ---------------------------------------------------------
             
-            // 1. 버튼 자체는 항상 활성화 (그래야 포커스가 이동됨)
+            // 버튼 자체는 항상 활성화 (그래야 포커스가 이동됨)
             btn.interactable = true; 
 
-            // 2. 시각적 구분: 사용 불가면 글자색을 회색으로, 가능하면 흰색으로
+            // 시각적 구분: 사용 불가면 글자색을 회색으로, 가능하면 흰색으로
             Color textColor = canUse ? Color.white : Color.gray;
             foreach (var txt in texts) txt.color = textColor;
 
-            // 3. 클릭 리스너 내부에서 분기 처리
+            // 클릭 리스너 내부에서 분기 처리
             btn.onClick.AddListener(() => 
             {
                 if (canUse)

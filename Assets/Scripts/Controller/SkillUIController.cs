@@ -255,7 +255,7 @@ namespace Controller
             bool success = false;
             TargetScope scope = selectedSkillData.targetScope;
 
-            // 1. 효과 적용 시도
+            // 효과 적용 시도
             if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies)
             {
                 // 전체 대상: 한 명이라도 성공하면 OK
@@ -287,7 +287,7 @@ namespace Controller
                 }
             }
 
-            // 2. 결과 처리
+            // 결과 처리
             if (success)
             {
                 SoundManager.Instance.PlaySFX(SfxID.Attack_Magic); 
@@ -318,10 +318,10 @@ namespace Controller
 
         private void UpdateVisuals()
         {
-            // 1. 모든 하이라이트 초기화
+            // 모든 하이라이트 초기화
             foreach (var pc in partyControllers) pc.ResetHighlightColor();
 
-            // 2. 시전자 하이라이트
+            // 시전자 하이라이트
             if (currentState == SkillUIState.SelectCaster || currentState == SkillUIState.SelectSkill || currentState == SkillUIState.SelectTarget)
             {
                 if (!partyControllers[currentCasterIndex].IsEmpty)
@@ -330,7 +330,7 @@ namespace Controller
                 }
             }
 
-            // 3. 스킬 리스트 버튼 Focus
+            // 스킬 리스트 버튼 Focus
             var buttons = skillContent.GetComponentsInChildren<Button>();
             if (currentState == SkillUIState.SelectSkill && buttons.Length > currentSkillIndex)
             {
@@ -343,7 +343,7 @@ namespace Controller
                 UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
             }
 
-            // 4. 타겟 하이라이트
+            // 타겟 하이라이트
             if (currentState == SkillUIState.SelectTarget)
             {
                 HighlightTargets();

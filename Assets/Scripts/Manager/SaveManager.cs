@@ -34,9 +34,9 @@ namespace Manager
             return Path.Combine(Application.persistentDataPath, $"save_{slotIndex}.json");
         }
 
-        // =========================================================
+        
         // 저장 (Save)
-        // =========================================================
+        
         public void SaveGame(int slotIndex)
         {
             SaveData data = new SaveData();
@@ -44,7 +44,7 @@ namespace Manager
             data.saveTime = System.DateTime.Now.ToString();
             data.sceneName = SceneManager.GetActiveScene().name;
 
-            // 1. 플레이어 위치 저장 (탐험 모드일 때의 플레이어 오브젝트 참조 필요)
+            // 플레이어 위치 저장 (탐험 모드일 때의 플레이어 오브젝트 참조 필요)
             data.dungeonId = MapManager.Instance.currentDungeonId;
             data.playerPosX = MapManager.Instance.currentPx;
             data.playerPosY = MapManager.Instance.currentPy;
@@ -52,20 +52,20 @@ namespace Manager
             // 던전 탐색 상태 저장
             data.dungeonMapStates = MapManager.Instance.GetAllMapStates();
             
-            // 2. 인벤토리 & 골드 저장
+            // 인벤토리 & 골드 저장
             data.gold = InventoryManager.Instance.GetGold();
             data.inventory = InventoryManager.Instance.GetSaveData(); 
 
-            // 3. 파티원 정보 저장
+            // 파티원 정보 저장
             foreach(var i in PartyManager.Instance.partyData)
             {
                 data.partyMembers.Add(i.ToSaveData());
             }
 
-            // 4. 이벤트 플래그 저장 (FlagManager가 있다면 가져옴)
+            // 이벤트 플래그 저장 (FlagManager가 있다면 가져옴)
             data.eventFlags = FlagManager.Instance.GetSaveData();
 
-            // 5. 앱과 메모리 정보
+            // 앱과 메모리 정보
             data.maxAppMemory = AppManager.Instance.maxMemory;
             data.ownedApps = new List<AppFeature>(AppManager.Instance.ownedFeatures);
             data.installedApps = new List<AppFeature>(AppManager.Instance.installedFeatures);
@@ -77,9 +77,9 @@ namespace Manager
             Debug.Log($"[Slot {slotIndex}] 게임 저장 완료");
         }
 
-        // =========================================================
+        
         // 불러오기 (Load)
-        // =========================================================
+        
         public void LoadGame(int slotIndex)
         {
             string path = GetSavePath(slotIndex);
@@ -88,13 +88,13 @@ namespace Manager
             string json = File.ReadAllText(path);
             SaveData data = JsonUtility.FromJson<SaveData>(json);
 
-            // 1. 골드 및 인벤토리 복구
+            // 골드 및 인벤토리 복구
             InventoryManager.Instance.SetGold(data.gold);
             InventoryManager.Instance.LoadFromSaveData(data.inventory);
 
             FlagManager.Instance.LoadFromSaveData(data.eventFlags);
 
-            // 2. 파티원 복구
+            // 파티원 복구
             // 기존 파티 클리어 후 재생성 로직 필요
             PartyManager.Instance.LoadFromSave(data.partyMembers);
             
@@ -108,13 +108,13 @@ namespace Manager
                 MapManager.Instance.UpdatePlayerPosition(data.playerPosX, data.playerPosY, data.playerDirection, data.dungeonId);
             }
 
-            // 3. 앱과 메모리 정보
+            // 앱과 메모리 정보
             data.maxAppMemory = AppManager.Instance.maxMemory;
             data.ownedApps = new List<AppFeature>(AppManager.Instance.ownedFeatures);
             data.installedApps = new List<AppFeature>(AppManager.Instance.installedFeatures);
 
             // 던전 탐색 상태 복구
-            // 4. 씬 이동 및 위치 복구
+            // 씬 이동 및 위치 복구
             if (data.sceneName == GameScene.DUNGEON_MAP_SCENE)
             {
                 LevelManager.Instance.LoadLevelFromJson(data.dungeonId);

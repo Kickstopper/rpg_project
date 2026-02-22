@@ -192,7 +192,7 @@ namespace Controller
         {
             if (_inputLocked) return;
 
-            // 1. Look (Pitch) - 시점 변경
+            // Look (Pitch) - 시점 변경
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) _player.Pitch -= 300f * Time.deltaTime;
@@ -206,7 +206,7 @@ namespace Controller
             }
             _player.Pitch = Mathf.Clamp(_player.Pitch, -150f, 150f);
 
-            // 2. Action - 기타 기능
+            // Action - 기타 기능
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
             if (Input.GetKeyDown(KeyCode.M))
             {
@@ -219,7 +219,7 @@ namespace Controller
                 Debug.Log($"Anaglyph Mode: {GameSettingManager.Instance.useAnaglyph}");
             }
 
-            // 3. Running State Check (이동 중이어도 입력 받아야 함 -> 위치 이동)
+            // Running State Check (이동 중이어도 입력 받아야 함 -> 위치 이동)
             // W, S, 위, 아래 키 중 하나라도 눌리면 더블 탭 체크
             bool anyMoveKeyDown = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) || 
                                   Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow);
@@ -240,7 +240,7 @@ namespace Controller
                 _player.SetRunning(false);
             }
 
-            // 4. Movement Execution (이동은 멈춰있을 때만 가능)
+            // Movement Execution (이동은 멈춰있을 때만 가능)
             if (!_player.IsMoving)
             {
                 if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
@@ -265,7 +265,7 @@ namespace Controller
             int tx = _player.LogicX + moveVec.x;
             int ty = _player.LogicY + moveVec.y;
 
-            // 1. 이동 가능 여부 체크
+            // 이동 가능 여부 체크
             bool walkable = _player.IsWalkable(tx, ty, moveVec.x, moveVec.y);
             
             if (walkable)
@@ -300,14 +300,14 @@ namespace Controller
 
             Direction inputDir = VectorToDirection(moveDir);
 
-            // 1. 현재 위치(Source) 검사: "방 안쪽 벽에 있는 워프인가?"
+            // 현재 위치(Source) 검사: "방 안쪽 벽에 있는 워프인가?"
             WarpData currentWarp = _currentMap.GetWarpAt(currentX, currentY);
             if (currentWarp != null && currentWarp.isWallWarp && currentWarp.triggerDirection == inputDir)
             {
                 return currentWarp;
             }
 
-            // 2. 목표 위치(Target) 검사: "방 바깥쪽 벽(진입 시)에 있는 워프인가?"
+            // 목표 위치(Target) 검사: "방 바깥쪽 벽(진입 시)에 있는 워프인가?"
             // (맵 범위를 벗어나지 않았을 때만 검사)
             if (targetX >= 0 && targetX < _currentMap.width && targetY >= 0 && targetY < _currentMap.height)
             {
@@ -427,21 +427,21 @@ namespace Controller
 
         private IEnumerator TurnRoutine(int dirStep)
         {
-            // 1. 현재 방향과 이동할 다음 방향을 미리 계산
+            // 현재 방향과 이동할 다음 방향을 미리 계산
             int currentDir = _player.DirectionIdx;
             // (a % n + n) % n 은 음수 나머지 처리를 위한 공식.
             int nextDir = ((currentDir + dirStep) % 4 + 4) % 4;
 
-            // 2. UI에게 "Current에서 Next로 회전하라"고 지시
+            // UI에게 "Current에서 Next로 회전하라"고 지시
             if (compassUI) 
             {
                 compassUI.AnimateTurn(currentDir, nextDir, dirStep, turnDuration);
             }
 
-            // 3. 실제 플레이어 데이터 회전 (기존 로직 유지)
+            // 실제 플레이어 데이터 회전 (기존 로직 유지)
             yield return StartCoroutine(_player.RotateGridRoutine(dirStep, turnDuration, null));
             
-            // 4. 보정 (혹시 모를 오차 방지)
+            // 보정 (혹시 모를 오차 방지)
             if (miniMap) miniMap.SetDirection(_player.DirectionIdx, 0.1f);
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
         }

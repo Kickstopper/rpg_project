@@ -42,10 +42,10 @@ namespace Manager
         void Start()
         {
             SoundManager.Instance.PlayBGM(Data.BgmID.Fusion);
-            // 1. 몬스터 이미지 세팅 (시퀀스 시작 전 필수)
+            // 몬스터 이미지 세팅 (시퀀스 시작 전 필수)
             SetupMonstersFromDatabase();
 
-            // 2. 초기화 (투명도 등)
+            // 초기화 (투명도 등)
             SetAlpha(leftMonster, 1);
             SetAlpha(rightMonster, 1);
             resultMonster.gameObject.SetActive(false);
@@ -60,7 +60,7 @@ namespace Manager
                 audioSource = gameObject.AddComponent<AudioSource>();
             }
             
-            // 3. 시퀀스 시작
+            // 시퀀스 시작
             StartCoroutine(ProcessFusionSequence());
         }
 
@@ -115,14 +115,14 @@ namespace Manager
 
             yield return new WaitForSeconds(2f);
             PlayFusionParticles();
-            // 1. 두 몬스터 페이드 아웃
+            // 두 몬스터 페이드 아웃
             StartCoroutine(DissolveSprite(leftMonster, 1.5f)); 
             StartCoroutine(DissolveSprite(rightMonster, 1.5f));
 
             // 파티클이 중앙으로 모이는 시간만큼 대기
             yield return new WaitForSeconds(particleDuration);
             
-            // 3. 화면 화이트 아웃 (Flash)
+            // 화면 화이트 아웃 (Flash)
             SoundManager.Instance.PlaySFX(Data.SfxID.Explosion);
             yield return StartCoroutine(FadeImage(flashPanel, 0, 1, 0.2f)); // 빠르게 하얗게
             StopFusionParticles();
@@ -140,7 +140,7 @@ namespace Manager
 
             yield return new WaitForSeconds(3f);
 
-            // 4. 메시지 출력 (타자기 효과)
+            // 메시지 출력 (타자기 효과)
             yield return StartCoroutine(TypeWriterEffect(resultMessage));
         }
 

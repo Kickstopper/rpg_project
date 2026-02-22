@@ -27,9 +27,9 @@ namespace UI.WorldMapScene
 
         void Update()
         {
-            // 1. 플레이어가 범위 안에 있고(AND)
-            // 2. 이동 중이 아니고(AND)
-            // 3. 스페이스바(또는 엔터)를 눌렀다면?
+            // 플레이어가 범위 안에 있고(AND)
+            // 이동 중이 아니고(AND)
+            // 스페이스바(또는 엔터)를 눌렀다면?
             if (isPlayerInTrigger && !isTransporting && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)))
             {
                 StartTeleportSequence();

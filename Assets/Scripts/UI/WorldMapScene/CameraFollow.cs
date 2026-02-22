@@ -11,7 +11,7 @@ public class CameraFollow : MonoBehaviour
     {
         if (target != null)
         {
-            // 1. 에디터에서 잡아둔 구도(거리 차이)를 계산해둠.
+            // 에디터에서 잡아둔 구도(거리 차이)를 계산해둠.
             offset = transform.position - target.position;
         }
     }

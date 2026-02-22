@@ -220,7 +220,7 @@ namespace UI.DungeonMapScene
         // 원본 코드의 로직(Exit Check + Enter Check)과 인덱스 매핑을 복원
         public bool IsWalkable(float targetX, float targetY, float deltaX, float deltaY)
         {
-            // 1. 현재 위치 및 목표 위치 그리드 계산
+            // 현재 위치 및 목표 위치 그리드 계산
             int currentX = Mathf.FloorToInt(PosX);
             int currentY = Mathf.FloorToInt(PosY);
             int targetGridX = Mathf.FloorToInt(targetX);
@@ -230,7 +230,7 @@ namespace UI.DungeonMapScene
             if (_currentMap == null) return false;
 
             // ---------------------------------------------------------
-            // A. 맵 범위 체크
+            // 맵 범위 체크
             // ---------------------------------------------------------
             if (targetGridX < 0 || targetGridX >= _currentMap.width || 
                 targetGridY < 0 || targetGridY >= _currentMap.height)
@@ -273,7 +273,7 @@ namespace UI.DungeonMapScene
             }
 
             // ---------------------------------------------------------
-            // B. 현재 셀 탈출 검사 (Exit Check)
+            // 현재 셀 탈출 검사 (Exit Check)
             // ---------------------------------------------------------
             // 현재 셀 내부에 갇혀있는지 확인 (예: 내 방의 북쪽 벽이 막혀있음)
             if (currentX >= 0 && currentX < _currentMap.width && 
@@ -290,7 +290,7 @@ namespace UI.DungeonMapScene
             }
 
             // ---------------------------------------------------------
-            // C. 목표 셀 진입 검사 (Enter Check)
+            // 목표 셀 진입 검사 (Enter Check)
             // ---------------------------------------------------------
             CellData targetCell = _currentMap.GetCell(targetGridX, targetGridY);
             
@@ -308,21 +308,21 @@ namespace UI.DungeonMapScene
             return true;
         }
 
-        // =========================================================
+        
         // Free Move & Snap Logic
-        // =========================================================
+        
 
         // 자유 이동 (Free Move) - 충돌 처리 포함 (슬라이딩)
         public void MoveFree(float speed)
         {
-            // 1. X축 이동 시도
+            // X축 이동 시도
             float nextX = PosX + DirX * speed;
             if (IsWalkable(nextX, PosY, DirX * speed, 0))
             {
                 PosX = nextX;
             }
 
-            // 2. Y축 이동 시도
+            // Y축 이동 시도
             float nextY = PosY + DirY * speed;
             if (IsWalkable(PosX, nextY, 0, DirY * speed))
             {
@@ -352,7 +352,7 @@ namespace UI.DungeonMapScene
         // 그리드 모드로 복귀 시 위치 및 각도 보정 (Snap)
         public void SnapToGrid()
         {
-            // 1. 가장 가까운 정수 좌표로 스냅
+            // 가장 가까운 정수 좌표로 스냅
             int gridX = Mathf.RoundToInt(PosX);
             int gridY = Mathf.RoundToInt(PosY);
 
@@ -363,7 +363,7 @@ namespace UI.DungeonMapScene
                 gridY = Mathf.Clamp(gridY, 0, _currentMap.height - 1);
             }
 
-            // 2. 가장 가까운 4방향(N, E, S, W) 찾기
+            // 가장 가까운 4방향(N, E, S, W) 찾기
             int bestDir = 0;
             float maxDot = -2.0f;
 
@@ -379,7 +379,7 @@ namespace UI.DungeonMapScene
                 }
             }
 
-            // 3. 데이터 확정
+            // 데이터 확정
             DirectionIdx = bestDir;
             LogicX = gridX;
             LogicY = gridY;

@@ -11,15 +11,17 @@ using UnityEngine.UI;
 public class BattleFieldController : MonoBehaviour
 {
     [Header("Reference")]
-    public BattleManager manager;
-
+    public BattleManager manager; // 인스펙터에서 할당
     [Header("Managers & Data")]
     public MonsterDatabase monsterDB;
     
     [Header("Prefabs")]
+    // 인스펙터에서 할당
     public GameObject defaultMonsterPrefab;
     public GameObject playerPrefab;
+
     [Header("Spawn Points")]
+    // 인스펙터에서 할당
     public Transform enemyFrontRowContainer;
     public Transform enemyBackRowContainer;
     public Transform playerFrontRowContainer;
@@ -32,12 +34,12 @@ public class BattleFieldController : MonoBehaviour
     [Header("Highlight Colors")]
     private Color currentTargetColor = new Color32(128, 0, 178, 255);
     private Color moveSourceColor = Color.gray;   // 이동하려는 내 캐릭터 색상
+    
     // 렌더링 및 그리드 관리용 리스트 (Empty 포함, 총 6개 고정)
     [HideInInspector] public List<PlayerController> allSlotControllers = new();
     [HideInInspector] public List<BattleEntity> activePlayers = new(); 
     [HideInInspector] public List<BattleEntity> activeMonsters = new();
         
-
     [Header("Slot Management")]
     // 몬스터들의 슬롯을 관리할 리스트 (0,1,2: 전열 / 0,1,2: 후열)
     private List<Transform> frontSlots = new(); 
@@ -56,18 +58,13 @@ public class BattleFieldController : MonoBehaviour
     [HideInInspector] public List<BattleEntity> validTargets = new();
     [HideInInspector] public int currentTargetIndex = 0;
 
-    public bool IsCurrentTargetInFront()
+    [HideInInspector]
+    public struct BattlePosition
     {
-        BattleEntity currentEntity = GetCurrentValidTarget();
-
-        // 타겟 그룹 판별 (플레이어 대상인지 몬스터 대상인지)
-        Transform targetFrontContainer = GetTargetFrontContainer();
-        
-        // 현재 타겟이 전열에 있는지 확인
-        return (currentEntity.transform.parent.parent == targetFrontContainer);
-
+        public bool isFrontRow;
+        public int columnIndex; // 0:왼쪽, 1:가운데, 2:오른쪽
     }
-
+    
     private WaitForSeconds wait10 = new WaitForSeconds(1f);
 
     public void InitializeSlots()
@@ -192,12 +189,12 @@ public class BattleFieldController : MonoBehaviour
         // ---------------------------------------------------------
         for (int i = 0; i < 6; i++)
         {
-            // 1. 타겟 슬롯 Transform 찾기
+            // 타겟 슬롯 Transform 찾기
             bool isFront = (i < 3);
             int localIndex = isFront ? i : (i - 3);
             Transform targetSlot = isFront ? playerFrontSlots[localIndex] : playerBackSlots[localIndex];
 
-            // 2. 프리팹 생성
+            // 프리팹 생성
             GameObject go = Instantiate(playerPrefab, targetSlot);
             go.transform.localPosition = Vector3.zero;
 
@@ -212,7 +209,7 @@ public class BattleFieldController : MonoBehaviour
                 pc.selectButton.navigation = nav;
             }
 
-            // 3. 데이터 주입
+            // 데이터 주입
             RuntimeCharacterData assignedData = slotAssignments[i];
 
             if (assignedData != null)
@@ -240,7 +237,7 @@ public class BattleFieldController : MonoBehaviour
         // 생성된 몬스터의 데이터를 로그에 기록 (보상 계산용)
         encounterLog.Add(entry);
 
-        // 1. 선호하는 열(Row) 선택
+        // 선호하는 열(Row) 선택
         List<Transform> targetSlots = (entry.preferredRow == RowType.Front) ? frontSlots : backSlots;
         
         // 꽉 찼으면 다른 열로
@@ -250,7 +247,7 @@ public class BattleFieldController : MonoBehaviour
             if (IsRowFull(targetSlots)) return; // 자리 없음
         }
 
-        // 2. 빈 자리 찾기 (랜덤 또는 순차)
+        // 빈 자리 찾기 (랜덤 또는 순차)
         // ColumnType에 맞춰 배치하려면 여기서 특정 인덱스를 선호하게 할 수 있음
         // 예: "Center 우선" 로직 등. 지금은 랜덤 빈자리 유지.
         List<int> emptyIndices = new List<int>();
@@ -260,7 +257,7 @@ public class BattleFieldController : MonoBehaviour
         int randomIndex = emptyIndices[Random.Range(0, emptyIndices.Count)];
         Transform selectedSlot = targetSlots[randomIndex];
 
-        // 3. 생성
+        // 생성
         GameObject prefabToUse = (entry.prefab != null) ? entry.prefab : defaultMonsterPrefab;
         if (prefabToUse == null) return;
 
@@ -562,10 +559,10 @@ public class BattleFieldController : MonoBehaviour
     // 롤링발칸 등에서 참여자들만 회전시키는 함수
     public IEnumerator FastRotateParticipants(List<PlayerController> participants, bool clockwise, float duration)
     {
-        // 1. 전체 슬롯의 시계 방향 순서 정의 (0 -> 1 -> 2 -> 5 -> 4 -> 3)
+        // 전체 슬롯의 시계 방향 순서 정의 (0 -> 1 -> 2 -> 5 -> 4 -> 3)
         int[] ringOrder = { 0, 1, 2, 5, 4, 3 };
 
-        // 2. 현재 참여자들이 위치한 인덱스만 추출 (순서 유지)
+        // 현재 참여자들이 위치한 인덱스만 추출 (순서 유지)
         // 예: 4명(좌+중앙 열)인 경우 -> [0, 1, 4, 3] 추출됨
         List<int> currentIndices = new List<int>();
         foreach (int slotIdx in ringOrder)
@@ -584,7 +581,7 @@ public class BattleFieldController : MonoBehaviour
         // 만약 참여자가 1명 이하라면 회전 불필요
         if (currentIndices.Count < 2) yield break;
 
-        // 3. 이동 목표 설정 (매핑)
+        // 이동 목표 설정 (매핑)
         // Key: 캐릭터, Value: 이동할 목표 슬롯 인덱스
         Dictionary<PlayerController, int> moveMap = new Dictionary<PlayerController, int>();
         int count = currentIndices.Count;
@@ -608,7 +605,7 @@ public class BattleFieldController : MonoBehaviour
             moveMap.Add(pc, targetSlotIdx);
         }
 
-        // 4. 데이터 갱신 및 애니메이션 실행
+        // 데이터 갱신 및 애니메이션 실행
         // 데이터 꼬임 방지를 위해 리스트 복제본 생성
         List<PlayerController> nextAllSlots = new List<PlayerController>(allSlotControllers);
         Sequence seq = DOTween.Sequence();
@@ -618,19 +615,19 @@ public class BattleFieldController : MonoBehaviour
             PlayerController pc = kvp.Key;
             int targetIdx = kvp.Value;
 
-            // A. 데이터 구조 상의 위치 변경 (임시 리스트에 기록)
+            // 데이터 구조 상의 위치 변경 (임시 리스트에 기록)
             nextAllSlots[targetIdx] = pc;
 
-            // B. 물리적 위치(부모) 및 인덱스 정보 변경
+            // 물리적 위치(부모) 및 인덱스 정보 변경
             Transform targetSlot = (targetIdx < 3) ? playerFrontSlots[targetIdx] : playerBackSlots[targetIdx - 3];
             pc.transform.SetParent(targetSlot, true);
             pc.columnIndex = targetIdx;
 
-            // C. 애니메이션 (Duration 동안 이동)
+            // 애니메이션 (Duration 동안 이동)
             seq.Join(pc.transform.DOLocalMove(Vector3.zero, duration).SetEase(Ease.Linear));
         }
 
-        // 5. 실제 데이터 리스트 교체
+        // 실제 데이터 리스트 교체
         allSlotControllers = nextAllSlots;
 
         yield return seq.WaitForCompletion();
@@ -793,22 +790,22 @@ public class BattleFieldController : MonoBehaviour
     {
         activePlayers.Sort((a, b) => 
         {
-            // 1. 사망자 처리 (죽은 사람은 뒤로)
+            // 사망자 처리 (죽은 사람은 뒤로)
             bool aAlive = a.currentHp > 0;
             bool bAlive = b.currentHp > 0;
             if (aAlive && !bAlive) return -1; // a 생존, b 사망 -> a가 앞
             if (!aAlive && bAlive) return 1;  // a 사망, b 생존 -> b가 앞
             if (!aAlive && !bAlive) return 0;
 
-            // 2. 속도 계산 (AGI - Penalty)
+            // 속도 계산 (AGI - Penalty)
             // Next나 Gun으로 인한 nextTurnSpeedPenalty가 여기서 반영.
             int speedA = a.GetTotalAgi() - a.nextTurnSpeedPenalty;
             int speedB = b.GetTotalAgi() - b.nextTurnSpeedPenalty;
             
-            // 3. 속도 비교 (내림차순: 속도 높은 사람이 먼저)
+            // 속도 비교 (내림차순: 속도 높은 사람이 먼저)
             if (speedA != speedB) return speedB.CompareTo(speedA);
 
-            // 4. 동점일 경우 행운(LUC) 비교
+            // 동점일 경우 행운(LUC) 비교
             return b.GetTotalLuc().CompareTo(a.GetTotalLuc());
         });
 
@@ -896,6 +893,17 @@ public class BattleFieldController : MonoBehaviour
         // pc가 존재하고, 빈 슬롯이 아니며, 체력이 0보다 커야 함
         return pc != null && !pc.IsEmpty && pc.currentHp > 0;
     }
+    
+    public bool IsCurrentTargetInFront()
+    {
+        BattleEntity currentEntity = GetCurrentValidTarget();
+
+        // 타겟 그룹 판별 (플레이어 대상인지 몬스터 대상인지)
+        Transform targetFrontContainer = GetTargetFrontContainer();
+        
+        // 현재 타겟이 전열에 있는지 확인
+        return (currentEntity.transform.parent.parent == targetFrontContainer);
+    }
 
     public bool IsCharacterInFrontRow(PlayerController pc)
     {
@@ -973,9 +981,70 @@ public class BattleFieldController : MonoBehaviour
         return (validTargets.Count > 0 && validTargets[0] is PlayerController) ? playerFrontRowContainer : enemyFrontRowContainer;
     }
 
+    public List<GameObject> GetTargetsByScope(TargetScope scope, GameObject actor, GameObject specifiedTarget)
+    {
+        List<GameObject> targets = new List<GameObject>();
+        var livingMonsters = GetLivingMonsters();
+        var livingPlayers = GetLivingParty(); // 아군 생존자
+
+        if (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Single_Enemy || 
+            scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally)
+        {
+            if (specifiedTarget != null) targets.Add(specifiedTarget);
+        }
+        else if (scope == TargetScope.Random_Front_Enemy || scope == TargetScope.Random_Enemy)
+        {
+            List<GameObject> candidates = new List<GameObject>();
+            foreach(var m in livingMonsters) 
+            {
+                // 컨테이너 직접 비교 방식
+                bool isFront = IsMonsterInFrontRow(m);
+                if (scope == TargetScope.Random_Front_Enemy && !isFront) continue;
+                candidates.Add(m.gameObject);
+            }
+            if (candidates.Count > 0) targets.Add(candidates[Random.Range(0, candidates.Count)]);
+        }
+        else if (scope == TargetScope.Front_Enemies || scope == TargetScope.All_Enemies)
+        {
+            foreach(var m in livingMonsters) 
+            {
+                bool isFront = IsMonsterInFrontRow(m);
+                if (scope == TargetScope.Front_Enemies && !isFront) continue;
+                targets.Add(m.gameObject);
+            }
+            if (scope == TargetScope.Front_Enemies && targets.Count == 0) targets.AddRange(livingMonsters.Select(m => m.gameObject));
+        }
+        else if (scope == TargetScope.All_Allies)
+        {
+            foreach (var p in livingPlayers) targets.Add(p.gameObject);
+        }
+        else if (scope == TargetScope.Self)
+        {
+            if (actor != null) targets.Add(actor);
+        }
+        
+        return targets;
+    }
+
     public int GetFrontLivingCharacterCount()
     {
         return allSlotControllers.Take(3).Count(p => p != null && !p.IsEmpty && p.currentHp > 0);
+    }
+
+    public BattlePosition GetUnitPosition(GameObject unit)
+    {
+        BattlePosition pos = new BattlePosition();
+        if (unit.TryGetComponent(out PlayerController pc))
+        {
+            pos.isFrontRow = IsCharacterInFrontRow(pc);
+            pos.columnIndex = pc.transform.parent.GetSiblingIndex();
+        }
+        else if (unit.TryGetComponent(out MonsterController mc))
+        {
+            pos.isFrontRow = IsMonsterInFrontRow(mc);
+            pos.columnIndex = mc.columnIndex; 
+        }
+        return pos;
     }
 
     // 전투 유닛 및 슬롯 컨테이너 표시/숨김 제어

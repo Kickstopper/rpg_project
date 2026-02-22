@@ -254,10 +254,7 @@ namespace Controller
             evaText.text = eva.ToString();
         }
 
-        // =================================================================================
-        // 2. 아이템 리스트 표시
-        // =================================================================================
-
+        // 아이템 리스트 표시
         private void OpenItemList(EquipSlotType slotType)
         {
             isSelectingItem = true;
@@ -336,10 +333,7 @@ namespace Controller
             return false;
         }
 
-        // =================================================================================
-        // 3. 아이템 선택 및 장착
-        // =================================================================================
-
+        // 아이템 선택 및 장착
         private void HandleItemListInput()
         {
             if (displayedButtons.Count == 0) return;
@@ -394,7 +388,7 @@ namespace Controller
 
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
 
-            // 1. 기존 장착 아이템 해제 (인벤토리 복구)
+            // 기존 장착 아이템 해제 (인벤토리 복구)
             string oldItemId = GetEquippedId(slotType);
             if (!string.IsNullOrEmpty(oldItemId))
             {
@@ -402,7 +396,7 @@ namespace Controller
                 UnequipItemFromMe(slotType, oldItemId);
             }
 
-            // 2. 새 아이템 장착 (인벤토리 차감)
+            // 새 아이템 장착 (인벤토리 차감)
             if (!string.IsNullOrEmpty(newItemId))
             {
                 InventoryManager.Instance.UseItem(newItemId); 

@@ -108,7 +108,7 @@ namespace Controller
                 return;
             }
 
-            // 1. 이동 (좌우 화살표)
+            // 이동 (좌우 화살표)
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
                 ChangeFocus(-1);
@@ -118,13 +118,13 @@ namespace Controller
                 ChangeFocus(1);
             }
 
-            // 2. 선택 (Space / Enter / Z)
+            // 선택 (Space / Enter / Z)
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 SelectCurrentSlot();
             }
 
-            // 3. 취소 (Esc / Shift / X)
+            // 취소 (Esc / Shift / X)
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
             {
                 OnCancel();

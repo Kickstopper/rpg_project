@@ -216,10 +216,10 @@ namespace UI.DungeonMapScene
             CreateScreen();
             Render();
 
-            // 1. 던전 상태 이벤트 구독
+            // 던전 상태 이벤트 구독
             GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
             
-            // 2. 초기 상태
+            // 초기 상태
             GameStateManager.Instance.ChangeState(GameState.Exploration);
         }
 
@@ -250,7 +250,7 @@ namespace UI.DungeonMapScene
             int h = _worldMap.height;
             _tileAnimStates = new TileAnimState[w, h];
 
-            // 1. 테마(ScriptableObject)에 있는 설정을 딕셔너리로 변환
+            // 테마(ScriptableObject)에 있는 설정을 딕셔너리로 변환
             Dictionary<int, WallAnimConfig> animDict = new Dictionary<int, WallAnimConfig>();
             foreach (var cfg in theme.wallAnimations)
             {
@@ -261,7 +261,7 @@ namespace UI.DungeonMapScene
             // 애니메이션 설정이 하나도 없으면 루프 돌 필요 없음
             if (animDict.Count == 0) return;
 
-            // 2. 전체 맵 순회 및 상태 생성
+            // 전체 맵 순회 및 상태 생성
             for (int x = 0; x < w; x++)
             {
                 for (int y = 0; y < h; y++)
@@ -289,9 +289,9 @@ namespace UI.DungeonMapScene
             }
         }
 
-        // =========================================================
+        
         // 최하단의 배경 스크롤
-        // =========================================================
+        
         private void UpdateBackgroundUV()
         {
             if (backgroundImage == null) return;
@@ -311,9 +311,9 @@ namespace UI.DungeonMapScene
         }
 
         
-        // =========================================================
+        
         // Helper: 오프셋이 적용된 좌표 구하기
-        // =========================================================
+        
 
         /*
         * 그리드 좌표(x, y)와 바라볼 방향(dir)을 입력받아
@@ -321,13 +321,13 @@ namespace UI.DungeonMapScene
         */
         private Vector2 GetOffsetPosition(int gridX, int gridY, int dirIdx)
         {
-            // 1. 해당 그리드의 정중앙 좌표
+            // 해당 그리드의 정중앙 좌표
             Vector2 centerPos = new Vector2(gridX + 0.5f, gridY + 0.5f);
 
-            // 2. 바라보는 방향의 벡터 가져오기
+            // 바라보는 방향의 벡터 가져오기
             (Vector2 dirVec, Vector2 _) = GetVectorsForDirection(dirIdx);
 
-            // 3. 방향의 반대(-dirVec) 쪽으로 offset만큼 이동
+            // 방향의 반대(-dirVec) 쪽으로 offset만큼 이동
             // 예: 북쪽(-1, 0)을 보면, 위치는 중앙에서 남쪽(+1, 0)으로 살짝 밀려남
             return centerPos - (dirVec * backwardOffset);
         }
@@ -416,14 +416,14 @@ namespace UI.DungeonMapScene
 
             for (int i = 0; i < _textures.Length; i++)
             {
-                // 1. 현재 텍스처의 픽셀들을 가져옴
+                // 현재 텍스처의 픽셀들을 가져옴
                 Color[] sourcePixels = _textures[i].GetPixels();
 
-                // 2. 오프셋 계산
+                // 오프셋 계산
                 // 이 텍스처가 전체 배열의 어디서부터 시작해야 하는지 결정
                 int offset = i * pixelsPerTexture;
 
-                // 3. 픽셀 복사 (Color -> Color32 변환)
+                // 픽셀 복사 (Color -> Color32 변환)
                 for (int p = 0; p < sourcePixels.Length; p++)
                 {
                     // _flatTexturePixels의 [시작점 + p] 위치에 저장
@@ -472,7 +472,7 @@ namespace UI.DungeonMapScene
                             // 타이머 리셋
                             state.timer = UnityEngine.Random.Range(state.config.minInterval, state.config.maxInterval);
                             
-                            // [핵심] 화면이 바뀌어야 함을 알림
+                            // 화면이 바뀌어야 함을 알림
                             anyChanged = true; 
                         }
                     }
@@ -490,7 +490,7 @@ namespace UI.DungeonMapScene
                 GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
         }
 
-        // [핵심] 상태가 바뀔 때마다 자동으로 호출되는 함수
+        // 상태가 바뀔 때마다 자동으로 호출되는 함수
         void OnGameStateChanged(GameState newState)
         {
             if (newState == GameState.Exploration)
@@ -577,9 +577,9 @@ namespace UI.DungeonMapScene
             }
         }
 
-        // =========================================================
+        
         // Render Logic (Raycasting)
-        // =========================================================
+        
         // step이 1이면 정밀 렌더링, 2면 고속(반해상도) 렌더링
         private void PerformRenderPass(int step)
         {
@@ -608,7 +608,7 @@ namespace UI.DungeonMapScene
                 // [최적화] 3D 모드에서는 가로 해상도를 절반으로 낮춰서 연산량 보존
                 int step = 2; 
 
-                // 1. Left Eye
+                // Left Eye
                 _posX = originalX - _planeX * stereoSeparation;
                 _posY = originalY - _planeY * stereoSeparation;
                 PerformRenderPass(step); 
@@ -617,12 +617,12 @@ namespace UI.DungeonMapScene
                 // 왼쪽 눈 그린 뒤 버퍼를 다시 비워야 오른쪽 눈이 깨끗하게 그려짐
                 Array.Clear(_buffer, 0, _buffer.Length); 
 
-                // 2. Right Eye
+                // Right Eye
                 _posX = originalX + _planeX * stereoSeparation;
                 _posY = originalY + _planeY * stereoSeparation;
                 PerformRenderPass(step); 
 
-                // 3. Merge
+                // Merge
                 for (int i = 0; i < _buffer.Length; i++)
                 {
                     Color32 left = _leftEyeBuffer[i];
@@ -656,7 +656,7 @@ namespace UI.DungeonMapScene
             for (int x = 0; x < screenWidth; x += step)
             {
                 // ---------------------------------------------------------
-                // 1. 레이(Ray) 초기화
+                // 레이(Ray) 초기화
                 // ---------------------------------------------------------
                 float cameraX = 2 * x / (float)screenWidth - 1; // -1 ~ 1
                 float rayDirX = _dirX + _planeX * cameraX;
@@ -679,7 +679,7 @@ namespace UI.DungeonMapScene
                 int hitTexId = -1; 
 
                 // ---------------------------------------------------------
-                // 2. 초기 스텝 및 sideDist 계산
+                // 초기 스텝 및 sideDist 계산
                 // ---------------------------------------------------------
                 if (rayDirX < 0) { stepX = -1; sideDistX = (_posX - mapX) * deltaDistX; }
                 else             { stepX = 1;  sideDistX = (mapX + 1.0f - _posX) * deltaDistX; }
@@ -688,7 +688,7 @@ namespace UI.DungeonMapScene
                 else             { stepY = 1;  sideDistY = (mapY + 1.0f - _posY) * deltaDistY; }
 
                 // ---------------------------------------------------------
-                // 3. DDA 알고리즘 (벽 찾기)
+                // DDA 알고리즘 (벽 찾기)
                 // ---------------------------------------------------------
                 while (hit == 0)
                 {
@@ -716,7 +716,7 @@ namespace UI.DungeonMapScene
                     else 
                     {
                         // 벽 충돌 검사
-                        // A. 진입면 (Front Face)
+                        // 진입면 (Front Face)
                         CellData cell = _worldMap.GetCell(mapX, mapY);
                         if (cell != null && cell.HasWall())
                         {
@@ -729,7 +729,7 @@ namespace UI.DungeonMapScene
                             }
                         }
 
-                        // B. 이탈면 (Back Face) - 지나온 칸의 뒷면 확인
+                        // 이탈면 (Back Face) - 지나온 칸의 뒷면 확인
                         if (hit == 0)
                         {
                             cell = _worldMap.GetCell(prevMapX, prevMapY);
@@ -755,7 +755,7 @@ namespace UI.DungeonMapScene
                 }
 
                 // ---------------------------------------------------------
-                // 4. 텍스처 애니메이션 교체 로직
+                // 텍스처 애니메이션 교체 로직
                 // ---------------------------------------------------------
                 if (hitTexId != -1 && 
                     mapX >= 0 && mapX < _tileAnimStates.GetLength(0) &&
@@ -769,14 +769,14 @@ namespace UI.DungeonMapScene
                 }
 
                 // ---------------------------------------------------------
-                // 5. 거리 및 높이 계산
+                // 거리 및 높이 계산
                 // ---------------------------------------------------------
                 if (side == 0) perpWallDist = (sideDistX - deltaDistX);
                 else           perpWallDist = (sideDistY - deltaDistY);
 
-                // =========================================================
+                
                 // 실린더 효과를 여기서 적용해야 벽의 높이가 변합니다.
-                // =========================================================
+                
                 if (useCylinderEffect)
                 {
                     // cameraX: 화면 왼쪽(-1) ~ 중앙(0) ~ 오른쪽(1)
@@ -787,7 +787,7 @@ namespace UI.DungeonMapScene
                     
                     perpWallDist *= distortion;
                 }
-                // =========================================================
+                
 
                 // 스캔 효과용 플래그
                 bool renderWireframe = _isScanning && (perpWallDist < _currentScanRadius);
@@ -951,7 +951,7 @@ namespace UI.DungeonMapScene
             float heightScale = 0.66f / fovScale;
 
             // --------------------------------------------------------
-            // 1. 바닥 그리기 (y: 0 ~ horizon)
+            // 바닥 그리기 (y: 0 ~ horizon)
             // --------------------------------------------------------
             for (int y = 0; y < (int)horizon; ++y) 
             {
@@ -1006,7 +1006,7 @@ namespace UI.DungeonMapScene
             }
 
             // --------------------------------------------------------
-            // 2. 천장 그리기 (y: horizon ~ screenHeight)
+            // 천장 그리기 (y: horizon ~ screenHeight)
             // --------------------------------------------------------
             bool hasCeil = _ceilTexIdx != -1;
             if (hasCeil || _isScanning) // 천장이 있거나 스캔 중일 때
@@ -1190,8 +1190,8 @@ namespace UI.DungeonMapScene
                 int spriteHeight = (int)(screenHeight / transformY); 
                 if (spriteHeight <= 0) continue;
 
-                // 1. 벽과 마찬가지로 점프 높이만큼 아래로(-방향) 내린다.
-                // 2. transformY(깊이)로 나누지 않고, 화면 픽셀 단위로 그대로 뺀다.
+                // 벽과 마찬가지로 점프 높이만큼 아래로(-방향) 내린다.
+                // transformY(깊이)로 나누지 않고, 화면 픽셀 단위로 그대로 뺀다.
                 int vOffset = (int)(-_currentJumpOffset + _currentPitch); 
                 int drawStartY = -spriteHeight / 2 + screenHeight / 2 + vOffset;
                 if (drawStartY < 0) drawStartY = 0;
@@ -1286,9 +1286,9 @@ namespace UI.DungeonMapScene
             _rawImg.material = mat;
         }
 
-        // =========================================================
+        
         // 와이어프레임 스캔 효과 
-        // =========================================================
+        
         public void AttemptScan()
         {
             if (!_isScanning) StartCoroutine(ScanDungeonRoutine());
@@ -1379,9 +1379,9 @@ namespace UI.DungeonMapScene
             _isMoving = false; // 입력 잠금 해제
         }
 
-        // =========================================================
+        
         // 자유 이동과 그리드 단위 이동의 전환 
-        // =========================================================
+        
         // 모드 토글 (외부 버튼이나 키 입력으로 호출)
         public void ToggleMovementMode()
         {
@@ -1391,23 +1391,23 @@ namespace UI.DungeonMapScene
 
         private void SwitchToFreeMove()
         {
-            // 1. 실행 중인 그리드 이동/회전 코루틴 강제 종료
+            // 실행 중인 그리드 이동/회전 코루틴 강제 종료
             if (_isMoving) StopCoroutine(_moveCoroutine);
 
-            // 2. 입력 잠금 해제
+            // 입력 잠금 해제
             _isMoving = false;
             
-            // 3. 모드 변경
+            // 모드 변경
             isGridMove = false;
             Debug.Log("Switched to Free Move");
         }
 
         private void SwitchToGridMove()
         {
-            // 1. 현재 자유 이동 상태의 위치와 각도를 그리드에 맞게 '반올림(Snap)' 해야 함
+            // 현재 자유 이동 상태의 위치와 각도를 그리드에 맞게 '반올림(Snap)' 해야 함
             SnapToNearestGrid();
 
-            // 2. 모드 변경
+            // 모드 변경
             isGridMove = true;
             Debug.Log("Switched to Grid Move");
         }
@@ -1417,7 +1417,7 @@ namespace UI.DungeonMapScene
         */
         private void SnapToNearestGrid()
         {
-            // 1. 가장 가까운 그리드 좌표 계산
+            // 가장 가까운 그리드 좌표 계산
             int nearestGridX = Mathf.RoundToInt(_posX);
             int nearestGridY = Mathf.RoundToInt(_posY);
 
@@ -1428,7 +1428,7 @@ namespace UI.DungeonMapScene
                 nearestGridY = Mathf.Clamp(nearestGridY, 0, _worldMap.height - 1);
             }
 
-            // 2. 가장 가까운 4방향 찾기
+            // 가장 가까운 4방향 찾기
             int bestDir = 0;
             float maxDot = -2.0f;
 
@@ -1443,7 +1443,7 @@ namespace UI.DungeonMapScene
                 }
             }
             
-            // 3. 데이터 확정 (방향 및 위치)
+            // 데이터 확정 (방향 및 위치)
             _direction = bestDir;
             UpdateDirectionVectors(); 
 
@@ -1455,21 +1455,21 @@ namespace UI.DungeonMapScene
             _logicX = nearestGridX;
             _logicY = nearestGridY;
 
-            // 4. 시각적 요소 동기화
+            // 시각적 요소 동기화
             
-            // A. 미니맵 (GridMap) 즉시 스냅
+            // 미니맵 (GridMap) 즉시 스냅
             if (miniMap != null)
             {
                 miniMap.SnapToGrid(nearestGridX, nearestGridY, _direction);
             }
 
-            // B. 오토맵 발견 처리 & 아이콘 스냅
+            // 오토맵 발견 처리 & 아이콘 스냅
             UpdateMapDiscovery(nearestGridX, nearestGridY);
 
             // 나침반 즉시 동기화
             if (compassUI != null) compassUI.SetDirection(_direction);
 
-            // 5. 화면 렌더링
+            // 화면 렌더링
             Render();
         }
 
@@ -1478,22 +1478,22 @@ namespace UI.DungeonMapScene
         {
             var state = LevelManager.Instance.CurrentMapState;
 
-            // 1. Fog of War 밝히기 (데이터상 처음 방문일 때)
+            // Fog of War 밝히기 (데이터상 처음 방문일 때)
             if (!state.IsVisited(x, y))
             {
                 state.MarkVisited(x, y);
                 autoMapRenderer.RevealCell(x, y); // 맵 텍스처(바닥/벽)를 그림
             }
-            // 2. 플레이어 아이콘 이동 (방문 여부와 상관없이 매번 호출)
+            // 플레이어 아이콘 이동 (방문 여부와 상관없이 매번 호출)
             // 텍스처를 건드리는 게 아니라 위의 아이콘만 슥 움직임
             autoMapRenderer.UpdatePlayerIcon(x, y, (Direction)_direction);
             MapManager.Instance.UpdatePlayerPosition(x, y, (Direction)_direction, _worldMap.mapID);
 
         }
 
-        // =========================================================
+        
         // Free Move Input & Movement Logic (Key Logic)
-        // =========================================================
+        
         private void HandleFreeMoveInput()
         {
             float moveSpeed = Time.deltaTime * 3.0f;
@@ -1536,7 +1536,7 @@ namespace UI.DungeonMapScene
          */
         public void MoveForward(float moveSpeed)
         {
-            // 1. X축 이동 시도
+            // X축 이동 시도
             float deltaX = _dirX * moveSpeed;
             float nextPosX = _posX + deltaX;
 
@@ -1547,7 +1547,7 @@ namespace UI.DungeonMapScene
                 _posX = nextPosX;
             }
 
-            // 2. Y축 이동 시도 (슬라이딩 구현)
+            // Y축 이동 시도 (슬라이딩 구현)
             float deltaY = _dirY * moveSpeed;
             float nextPosY = _posY + deltaY;
 
@@ -1596,17 +1596,17 @@ namespace UI.DungeonMapScene
             int gridX = Mathf.FloorToInt(targetX);
             int gridY = Mathf.FloorToInt(targetY);
 
-            // 1. 맵 범위 체크
+            // 맵 범위 체크
             if (gridX < 0 || gridX >= _worldMap.width || gridY < 0 || gridY >= _worldMap.height) 
                 return false;
 
             CellData targetCell = _worldMap.GetCell(gridX, gridY);
             if (targetCell == null) return false;
 
-            // 2. 빈 공간(CORRIDOR)이거나 벽이 아니라면 통과
+            // 빈 공간(CORRIDOR)이거나 벽이 아니라면 통과
             if (!targetCell.HasWall()) return true;
 
-            // 3. 벽이라면, "진입하려는 면"의 텍스처를 확인해야 함
+            // 벽이라면, "진입하려는 면"의 텍스처를 확인해야 함
             // 현재 플레이어가 있는 셀(current)과 목표 셀(target)이 다를 때만 면 검사가 의미 있음
             // 하지만 Free Move에서는 같은 셀 내부에서도 벽 판정을 할 수 없으므로,
             // '다른 그리드로 넘어가는 순간' 혹은 '벽인 그리드 내부에 있으려 할 때'를 막아야 함.
@@ -1661,9 +1661,9 @@ namespace UI.DungeonMapScene
             _planeY = (float)(oldPlaneX * Mathf.Sin(rotSpeed) + _planeY * Mathf.Cos(rotSpeed));
         }
 
-        // =========================================================
+        
         // Grid Move Input & Movement Logic (Key Logic)
-        // =========================================================
+        
         private void HandleInput()
         {
             if (Input.GetKeyDown(KeyCode.Space)) AttemptJump();
@@ -1797,7 +1797,7 @@ namespace UI.DungeonMapScene
             if (!_isJumping) StartCoroutine(JumpCoroutine());
         }
 
-        // 2. UI 버튼과 키보드가 공통으로 호출할 '시도(Attempt)' 메서드 작성
+        // UI 버튼과 키보드가 공통으로 호출할 '시도(Attempt)' 메서드 작성
         // 모바일 UI 버튼의 OnClick 이벤트에 이 함수들을 연결.
         public void AttemptMoveForward() { if (!_isMoving) MoveFront(); }
         public void AttemptMoveBackward() { if (!_isMoving) MoveBack(); }
@@ -1847,7 +1847,7 @@ namespace UI.DungeonMapScene
             int blockedByTexId = -1; // 이동을 막은 벽의 텍스처 ID 저장용
 
             // ---------------------------------------------------------
-            // 1. [현재 칸]에서 나가는 방향의 벽(내벽) 검사
+            // [현재 칸]에서 나가는 방향의 벽(내벽) 검사
             // ---------------------------------------------------------
             if (currentX >= 0 && currentX < _worldMap.width && 
                 currentY >= 0 && currentY < _worldMap.height)
@@ -1877,7 +1877,7 @@ namespace UI.DungeonMapScene
             }
 
             // ---------------------------------------------------------
-            // 2. [목표 칸]으로 진입하는 방향의 벽(외벽) 검사
+            // [목표 칸]으로 진입하는 방향의 벽(외벽) 검사
             // ---------------------------------------------------------
             if (isPassable)
             {
@@ -1928,7 +1928,7 @@ namespace UI.DungeonMapScene
                 Direction inputDir = VectorToDirection(moveDir);
                 WarpData validWarp = null;
 
-                // 1. 현재 위치(Source) 검사: "이 방에서 나갈 때(안쪽 벽) 발동하는 워프인가?"
+                // 현재 위치(Source) 검사: "이 방에서 나갈 때(안쪽 벽) 발동하는 워프인가?"
                 WarpData currentWarp = _worldMap.GetWarpAt(currentX, currentY);
                 if (currentWarp != null && currentWarp.isWallWarp && currentWarp.triggerDirection == inputDir)
                 {
@@ -1936,7 +1936,7 @@ namespace UI.DungeonMapScene
                     Debug.Log($"[Wall Warp] 현재 위치({currentX},{currentY})에서 워프 발견!");
                 }
 
-                // 2. 목표 위치(Target) 검사: "저 방으로 들어갈 때(바깥 벽) 발동하는 워프인가?"
+                // 목표 위치(Target) 검사: "저 방으로 들어갈 때(바깥 벽) 발동하는 워프인가?"
                 // (현재 위치에서 워프를 못 찾았을 경우에만 검사)
                 if (validWarp == null)
                 {
@@ -1948,7 +1948,7 @@ namespace UI.DungeonMapScene
                     }
                 }
 
-                // 3. 워프 실행 또는 벽 충돌 처리
+                // 워프 실행 또는 벽 충돌 처리
                 if (validWarp != null)
                 {
                     Debug.Log($"[Wall Warp] {validWarp.targetMapName}으로 이동합니다.");
@@ -1988,7 +1988,7 @@ namespace UI.DungeonMapScene
             _currentPitch = 0f;
             isInputLocked = true;
 
-            // 1. 워프를 타고 왔다면 위치와 방향을 덮어씌움
+            // 워프를 타고 왔다면 위치와 방향을 덮어씌움
             if (entryWarp != null)
             {
                 _posX = entryWarp.targetX; // 0.5f 같은 오프셋이 필요하다면 GetOffsetPosition 활용
@@ -2011,7 +2011,7 @@ namespace UI.DungeonMapScene
             }
             else
             {
-                // 2. 맵 데이터 로드 (기본 startX, startY로 세팅됨)
+                // 맵 데이터 로드 (기본 startX, startY로 세팅됨)
                 LoadMapData();
             }
             
@@ -2052,10 +2052,10 @@ namespace UI.DungeonMapScene
                     elapsed += Time.deltaTime;
                     float t = Mathf.Clamp01(elapsed / fadeDuration);
                     
-                    // 1. 화면 점점 어둡게
+                    // 화면 점점 어둡게
                     fadeOverlay.alpha = t;
 
-                    // 2. 플레이어를 벽(워프) 쪽으로 이동시킴
+                    // 플레이어를 벽(워프) 쪽으로 이동시킴
                     _posX = Mathf.Lerp(startX, targetPos.x, t);
                     _posY = Mathf.Lerp(startY, targetPos.y, t);
 
@@ -2135,9 +2135,9 @@ namespace UI.DungeonMapScene
             };
         }
         
-        // =========================================================
+        
         // Direction & Rotation Logic
-        // =========================================================
+        
         /*
         * 현재 _direction(0~3) 값에 맞춰 벡터를 강제로 재설정 (오차 보정용)
         * Start()나 회전이 완전히 끝난 직후에 호출.
@@ -2181,7 +2181,7 @@ namespace UI.DungeonMapScene
             // 음수 나머지 연산 보정: (a % n + n) % n
             int nextDirIdx = ((_direction + directionStep) % 4 + 4) % 4;
 
-            // 1. 회전할 총 각도 계산
+            // 회전할 총 각도 계산
             // directionStep: 1(우회전) -> -90도, -1(좌회전) -> +90도, 2(뒤로) -> 180도
             // (Raycast 좌표계상: North(0,1) -> East(1,0) 은 시계방향 회전이므로 수학적으로는 각도가 감소함)
             float targetAngleDeg = 0f;
@@ -2189,7 +2189,7 @@ namespace UI.DungeonMapScene
             else if (directionStep == -1) targetAngleDeg = 90f;  // Left
             else if (Mathf.Abs(directionStep) == 2) targetAngleDeg = 180f; // 180 Turn (부호는 취향, 보통 180)
 
-            // 2. 시간(Duration) 설정: 180도 회전은 90도보다 2배 오래 걸려야 속도가 같음
+            // 시간(Duration) 설정: 180도 회전은 90도보다 2배 오래 걸려야 속도가 같음
             float baseDuration = CurrentTurnDuration;
             float duration = (Mathf.Abs(directionStep) == 2) ? baseDuration * 2.0f : baseDuration;
 
@@ -2202,7 +2202,7 @@ namespace UI.DungeonMapScene
 
             float elapsed = 0f;
 
-            // 3. 시작 상태 저장 (Start Snapshot)
+            // 시작 상태 저장 (Start Snapshot)
             // 현재 정확한 벡터들을 가져옴
             (Vector2 startDir, Vector2 startPlane) = GetVectorsForDirection(prevDirIdx);
 
@@ -2220,24 +2220,24 @@ namespace UI.DungeonMapScene
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / duration);
 
-                // 4. 현재 프레임의 각도 계산 (Lerp)
+                // 현재 프레임의 각도 계산 (Lerp)
                 float currentAngleDeg = Mathf.Lerp(0f, targetAngleDeg, t);
                 float rad = currentAngleDeg * Mathf.Deg2Rad; // 라디안 변환
 
-                // 5. 회전 행렬(Rotation Matrix) 적용
+                // 회전 행렬(Rotation Matrix) 적용
                 // 공식: x' = x cos - y sin, y' = x sin + y cos
                 float cos = Mathf.Cos(rad);
                 float sin = Mathf.Sin(rad);
 
-                // A. 방향 벡터 회전
+                // 방향 벡터 회전
                 _dirX = startDir.x * cos - startDir.y * sin;
                 _dirY = startDir.x * sin + startDir.y * cos;
 
-                // B. 카메라 평면 벡터 회전
+                // 카메라 평면 벡터 회전
                 _planeX = startPlane.x * cos - startPlane.y * sin;
                 _planeY = startPlane.x * sin + startPlane.y * cos;
 
-                // C. 위치 공전 (Orbit)
+                // 위치 공전 (Orbit)
                 // 오프셋 벡터를 회전시킨 뒤, 중심점에 더함
                 float currOffsetX = startOffset.x * cos - startOffset.y * sin;
                 float currOffsetY = startOffset.x * sin + startOffset.y * cos;
@@ -2343,7 +2343,7 @@ namespace UI.DungeonMapScene
         // 대화가 끝났을 때 호출될 콜백 메서드
         private void OnEventFinished()
         {
-            // 1. 조작 잠금 해제
+            // 조작 잠금 해제
             isInputLocked = false;
             dialogueUI.OnDialogueFinished -= OnEventFinished;
         }

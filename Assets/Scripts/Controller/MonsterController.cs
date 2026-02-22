@@ -44,10 +44,10 @@ namespace Controller
         // 외부(BattleManager)에서 호출하는 함수
         public void SetAnaglyphDepth(bool isFront)
         {
-            // 1. 내 위치 상태 저장
+            // 내 위치 상태 저장
             cachedIsFront = isFront;
 
-            // 2. 즉시 화면 갱신
+            // 즉시 화면 갱신
             UpdateAnaglyphVisuals(true); 
         }
 
@@ -77,13 +77,13 @@ namespace Controller
                 else return;
             }
 
-            // 1. 현재 글로벌 설정 가져오기
+            // 현재 글로벌 설정 가져오기
             bool useEffect = GameSettingManager.Instance.useAnaglyph;
             
             // 상태 동기화
             lastGlobalState = useEffect;
 
-            // 2. 오프셋 결정 로직
+            // 오프셋 결정 로직
             // 옵션이 꺼져있으면(false) -> 오프셋 0 (평면)
             // 옵션이 켜져있으면(true)  -> 내 위치(cachedIsFront)에 따른 오프셋 적용
             float finalOffset = 0f;
@@ -93,7 +93,7 @@ namespace Controller
                 finalOffset = cachedIsFront ? FRONT_OFFSET : BACK_OFFSET;
             }
 
-            // 3. 셰이더 적용
+            // 셰이더 적용
             instanceMaterial.SetFloat("_Offset", finalOffset);
         }
 

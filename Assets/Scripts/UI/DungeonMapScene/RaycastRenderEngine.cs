@@ -119,17 +119,17 @@ namespace UI.DungeonMapScene
         // 색상 병합 로직 및 눈 위치 보정
         private void RenderStereo(DungeonPlayer player, RenderSettings settings)
         {
-            // 1. 왼쪽 눈 (Red Channel)
+            // 왼쪽 눈 (Red Channel)
             PerformPass(player, settings, 2, true, -settings.stereoSeparation);
             
             Array.Copy(_buffer, _leftEyeBuffer, _buffer.Length);
             
             Array.Clear(_buffer, 0, _buffer.Length);
 
-            // 2. 오른쪽 눈 (Cyan: Green + Blue Channel)
+            // 오른쪽 눈 (Cyan: Green + Blue Channel)
             PerformPass(player, settings, 2, true, settings.stereoSeparation);
 
-            // 3. 병합 (Merge)
+            // 병합 (Merge)
             for (int i = 0; i < _buffer.Length; i++)
             {
                 Color32 left = _leftEyeBuffer[i];
@@ -372,7 +372,7 @@ namespace UI.DungeonMapScene
         {
             if (_sprtData == null || _sprtData.Length == 0) return;
 
-            // 1. 거리 계산 및 정렬
+            // 거리 계산 및 정렬
             for (int i = 0; i < _sprtData.Length; i++)
             {
                 _spriteSortList[i].index = i;
@@ -384,7 +384,7 @@ namespace UI.DungeonMapScene
             // 거리 기준 내림차순 정렬 (먼 것 -> 가까운 것)
             Array.Sort(_spriteSortList, (a, b) => b.distance.CompareTo(a.distance));
 
-            // 2. 투영 및 그리기
+            // 투영 및 그리기
             float invDet = 1.0f / (player.PlaneX * player.DirY - player.DirX * player.PlaneY);
 
             for (int i = 0; i < _sprtData.Length; i++)

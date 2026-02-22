@@ -167,7 +167,7 @@ namespace Controller
 
             UpdatePortraitImage(charData);
 
-            // 1. Header Info
+            // Header Info
             nameText.text = charData.name;
             levelText.text = charData.stats.level.ToString();
             expText.text = charData.currentExp.ToString();
@@ -190,11 +190,11 @@ namespace Controller
             resistForceText.text = ((int)charData.resistances.force).ToString();
             resistPsychText.text = ((int)charData.resistances.psyche).ToString();
 
-            // 2. Vitals (HP/MP)
+            // Vitals (HP/MP)
             UpdateSliderAndText(hpSlider, hpText, charData.currentHp, charData.maxHp);
             UpdateSliderAndText(mpSlider, mpText, charData.currentMp, charData.maxMp);
 
-            // 3. Base Stats
+            // Base Stats
             float maxStatVal = 50f;
             UpdateStat(strSlider, strText, charData.stats.str, maxStatVal);
             UpdateStat(magSlider, magText, charData.stats.mag, maxStatVal);
@@ -203,7 +203,7 @@ namespace Controller
             UpdateStat(agiSlider, agiText, charData.stats.agi, maxStatVal);
             UpdateStat(lucSlider, lucText, charData.stats.luc, maxStatVal);
 
-            // 4. Combat Stats
+            // Combat Stats
             atkText.text = charData.GetTotalAttack().ToString();
             atkHitText.text = charData.GetHitRate().ToString();
             gunText.text = charData.GetGunAttack().ToString();     // 총 공격력
@@ -213,7 +213,7 @@ namespace Controller
             magPowText.text = charData.GetMagicPower().ToString(); // 마법 위력
             magFxText.text = charData.GetMagicEffect().ToString(); // 마법 효과(명중률 등)
 
-            // 5. Spirit 및 Skills (ScrollView 갱신)
+            // Spirit 및 Skills (ScrollView 갱신)
             List<string> skills = new(charData.learnedSkills);
             if (!string.IsNullOrEmpty(charData.spiritId))
             {
@@ -277,13 +277,13 @@ namespace Controller
         // 스킬 리스트 갱신 함수
         private void UpdateSkillList(List<string> skills)
         {
-            // 1. 기존 목록 삭제 (초기화)
+            // 기존 목록 삭제 (초기화)
             foreach (Transform child in skillContent)
             {
                 Destroy(child.gameObject);
             }
 
-            // 2. 스킬 목록 생성
+            // 스킬 목록 생성
             if (skills == null) return;
 
             foreach (var skillId in skills)
@@ -295,7 +295,7 @@ namespace Controller
                 SkillData skillData = DatabaseManager.Instance.GetSkill(skillId);
                 if (skillData == null) continue;
 
-                // 3. SkillSlotUI 컴포넌트 가져오기
+                // SkillSlotUI 컴포넌트 가져오기
                 SimpleListItemController slotUI = item.GetComponent<SimpleListItemController>();
                 
                 if (slotUI != null)
