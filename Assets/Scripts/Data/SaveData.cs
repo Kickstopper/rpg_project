@@ -30,7 +30,7 @@ namespace Data
         public List<DungeonMapState> dungeonMapStates = new List<DungeonMapState>();
 
         // 자산 및 인벤토리
-        public int gold;
+        public int money;
          // 아이템 ID 리스트
         public List<ItemSaveEntry> inventory = new List<ItemSaveEntry>();
 

@@ -70,20 +70,20 @@ namespace UI
             // 플레이어 시작 위치 및 방향 그리기
             DrawPlayerStart(); 
 
-            // 워프 그리기
-            DrawWarps();
+            // 입구 그리기
+            DrawEntrances();
         }
 
-        // 워프 시각화 함수
-        void DrawWarps()
+        // 입구 시각화 함수
+        void DrawEntrances()
         {
-            if (mapData.warps == null) return;
+            if (mapData.entrances == null) return;
 
-            foreach (var warp in mapData.warps)
+            foreach (var entrance in mapData.entrances)
             {
-                Vector3 center = GetCellCenter(warp.sourceX, warp.sourceY);
+                Vector3 center = GetCellCenter(entrance.sourceX, entrance.sourceY);
                 
-                // 워프 위치 표시 (보라색 구체)
+                // 입구 위치 표시 (보라색 구체)
                 Gizmos.color = new Color(1f, 0f, 1f, 0.6f); // 마젠타색, 반투명
                 Gizmos.DrawSphere(center + Vector3.up * (wallHeight * 0.5f), cellSize * 0.3f);
                 
@@ -95,7 +95,7 @@ namespace UI
                 // 트리거 방향이 North라면, 플레이어는 남쪽에서 북쪽으로 이동하며 부딪힘.
                 // 따라서 화살표는 남쪽 -> 북쪽(벽 중심)을 가리키게 그림.
                 
-                Vector3 dirVec = GetDirectionVector(warp.triggerDirection);
+                Vector3 dirVec = GetDirectionVector(entrance.triggerDirection);
                 Vector3 arrowEnd = center + Vector3.up * (wallHeight * 0.5f);
                 // 화살표 시작점 (벽 중심에서 반대 방향으로 약간 떨어진 곳)
                 Vector3 arrowStart = arrowEnd - (dirVec * cellSize * 0.6f);

@@ -332,7 +332,7 @@ namespace UI.DungeonMapScene
             return centerPos - (dirVec * backwardOffset);
         }
 
-        private void LoadMapData(WarpData entryWarp = null)
+        private void LoadMapData(EntranceData entryEntrance = null)
         {
             // 몬스터 인카운터 설정
             ResetEncounterSteps();
@@ -345,12 +345,12 @@ namespace UI.DungeonMapScene
 
             if (miniMap != null)
             {
-                // entryWarp가 있을 경우, 기본 위치와 방향을 사용하지 않고 entryWarp에 설정된 것을 사용한다.
-                if (entryWarp != null)
+                // entryEntrance가 있을 경우, 기본 위치와 방향을 사용하지 않고 entryEntrance에 설정된 것을 사용한다.
+                if (entryEntrance != null)
                 {
-                    _worldMap.startDirection = entryWarp.targetDirection;
-                    _worldMap.startX = entryWarp.targetX;
-                    _worldMap.startY = entryWarp.targetY;
+                    _worldMap.startDirection = entryEntrance.targetDirection;
+                    _worldMap.startX = entryEntrance.targetX;
+                    _worldMap.startY = entryEntrance.targetY;
                 }
                 miniMap.Initialize(_worldMap);
             } 
@@ -1923,42 +1923,42 @@ namespace UI.DungeonMapScene
             }
             else
             {
-                // 현재 위치(Current)와 목표 위치(Target) 양쪽에서 워프를 검색합니다.
+                // 현재 위치(Current)와 목표 위치(Target) 양쪽에서 입구를 검색합니다.
         
                 Direction inputDir = VectorToDirection(moveDir);
-                WarpData validWarp = null;
+                EntranceData validEntrance = null;
 
-                // 현재 위치(Source) 검사: "이 방에서 나갈 때(안쪽 벽) 발동하는 워프인가?"
-                WarpData currentWarp = _worldMap.GetWarpAt(currentX, currentY);
-                if (currentWarp != null && currentWarp.isWallWarp && currentWarp.triggerDirection == inputDir)
+                // 현재 위치(Source) 검사: "이 방에서 나갈 때(안쪽 벽) 발동하는 입구인가?"
+                EntranceData currentEntrance = _worldMap.GetEntranceAt(currentX, currentY);
+                if (currentEntrance != null && currentEntrance.isWallEntrance && currentEntrance.triggerDirection == inputDir)
                 {
-                    validWarp = currentWarp;
-                    Debug.Log($"[Wall Warp] 현재 위치({currentX},{currentY})에서 워프 발견!");
+                    validEntrance = currentEntrance;
+                    Debug.Log($"[Wall Entrance] 현재 위치({currentX},{currentY})에서 입구 발견!");
                 }
 
-                // 목표 위치(Target) 검사: "저 방으로 들어갈 때(바깥 벽) 발동하는 워프인가?"
-                // (현재 위치에서 워프를 못 찾았을 경우에만 검사)
-                if (validWarp == null)
+                // 목표 위치(Target) 검사: "저 방으로 들어갈 때(바깥 벽) 발동하는 입구인가?"
+                // (현재 위치에서 입구를 못 찾았을 경우에만 검사)
+                if (validEntrance == null)
                 {
-                    WarpData targetWarp = _worldMap.GetWarpAt(targetX, targetY);
-                    if (targetWarp != null && targetWarp.isWallWarp && targetWarp.triggerDirection == inputDir)
+                    EntranceData targetEntrance = _worldMap.GetEntranceAt(targetX, targetY);
+                    if (targetEntrance != null && targetEntrance.isWallEntrance && targetEntrance.triggerDirection == inputDir)
                     {
-                        validWarp = targetWarp;
-                        Debug.Log($"[Wall Warp] 목표 위치({targetX},{targetY})에서 워프 발견!");
+                        validEntrance = targetEntrance;
+                        Debug.Log($"[Wall Entrance] 목표 위치({targetX},{targetY})에서 입구 발견!");
                     }
                 }
 
-                // 워프 실행 또는 벽 충돌 처리
-                if (validWarp != null)
+                // 입구 실행 또는 벽 충돌 처리
+                if (validEntrance != null)
                 {
-                    Debug.Log($"[Wall Warp] {validWarp.targetMapName}으로 이동합니다.");
+                    Debug.Log($"[Wall Entrance] {validEntrance.destinationID}으로 이동합니다.");
                     
                     // 이동하려던 방향(moveDir)을 함께 전달하여 페이드 아웃되는 동안 그 방향으로 걸어가는 연출을 실행
-                    StartCoroutine(TransitionToLevel(validWarp, moveDir));
+                    StartCoroutine(TransitionToLevel(validEntrance, moveDir));
                 }
                 else
                 {
-                    // 워프가 없으면 일반 벽 충돌
+                    // 입구가 없으면 일반 벽 충돌
                     SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                     if (!_isMoving) 
                     {
@@ -1969,12 +1969,12 @@ namespace UI.DungeonMapScene
         }
 
         // 레벨 데이터가 변경된 후(LoadLevelFromJson 호출 후) 실행할 재초기화 함수
-        // entryWarp: 워프를 통해 들어왔다면 해당 데이터, 아니면 null
-        public void ReloadMap(WarpData entryWarp = null)
+        // entryEntrance: 입구를 통해 들어왔다면 해당 데이터, 아니면 null
+        public void ReloadMap(EntranceData entryEntrance = null)
         {
             if (_moveCoroutine != null) StopCoroutine(_moveCoroutine);
 
-            LoadMapData(entryWarp);
+            LoadMapData(entryEntrance);
             // [안전장치] 첫 번째 텍스처의 크기로 텍스처 사이즈 설정을 덮어씌움
             if (_textures != null && _textures.Length > 0)
             {
@@ -1988,16 +1988,16 @@ namespace UI.DungeonMapScene
             _currentPitch = 0f;
             isInputLocked = true;
 
-            // 워프를 타고 왔다면 위치와 방향을 덮어씌움
-            if (entryWarp != null)
+            // 입구를 타고 왔다면 위치와 방향을 덮어씌움
+            if (entryEntrance != null)
             {
-                _posX = entryWarp.targetX; // 0.5f 같은 오프셋이 필요하다면 GetOffsetPosition 활용
-                _posY = entryWarp.targetY;
-                _direction = (int)entryWarp.targetDirection;
+                _posX = entryEntrance.targetX; // 0.5f 같은 오프셋이 필요하다면 GetOffsetPosition 활용
+                _posY = entryEntrance.targetY;
+                _direction = (int)entryEntrance.targetDirection;
 
                 // 논리 좌표 및 벡터 갱신
-                _logicX = entryWarp.targetX;
-                _logicY = entryWarp.targetY;
+                _logicX = entryEntrance.targetX;
+                _logicY = entryEntrance.targetY;
                 
                 // 방향 벡터 재계산 및 오프셋 적용
                 UpdateDirectionVectors();
@@ -2007,7 +2007,7 @@ namespace UI.DungeonMapScene
                 _posX = finalPos.x;
                 _posY = finalPos.y;
                 
-                Debug.Log($"Warp Spawned at ({_posX}, {_posY}) Dir: {_direction}");
+                Debug.Log($"Entrance Spawned at ({_posX}, {_posY}) Dir: {_direction}");
             }
             else
             {
@@ -2023,7 +2023,7 @@ namespace UI.DungeonMapScene
         }
 
         // moveDir 인자 추가 (이동하려는 방향)
-        private IEnumerator TransitionToLevel(WarpData warp, Vector2Int moveDir)
+        private IEnumerator TransitionToLevel(EntranceData entrance, Vector2Int moveDir)
         {
             isInputLocked = true;
 
@@ -2055,7 +2055,7 @@ namespace UI.DungeonMapScene
                     // 화면 점점 어둡게
                     fadeOverlay.alpha = t;
 
-                    // 플레이어를 벽(워프) 쪽으로 이동시킴
+                    // 플레이어를 벽(입구) 쪽으로 이동시킴
                     _posX = Mathf.Lerp(startX, targetPos.x, t);
                     _posY = Mathf.Lerp(startY, targetPos.y, t);
 
@@ -2072,10 +2072,10 @@ namespace UI.DungeonMapScene
             // -----------------------------------------------------
             // Phase 2: Data Load
             // -----------------------------------------------------
-            DungeonEventManager.Instance.SetCurrentMapID(warp.targetMapName);
-            LevelManager.Instance.LoadLevelFromJson(warp.targetMapName);
+            DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
+            LevelManager.Instance.LoadLevelFromJson(entrance.destinationID);
             
-            ReloadMap(warp); 
+            ReloadMap(entrance); 
 
             yield return null; 
 

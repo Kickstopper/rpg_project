@@ -98,7 +98,7 @@ namespace Controller
         {
             public int totalExp;      // 파티가 획득한 총 경험치
             public int expPerMember;  // 개인당 돌아가는 경험치
-            public int totalGold;     // 획득한 총 골드
+            public int totalMoney;     // 획득한 총 골드
             public List<string> dropItems; // 획득한 아이템 ID 목록
         }
         
@@ -376,7 +376,7 @@ namespace Controller
                     p.ApplyExperience(reward.expPerMember); 
                 }
             }
-            InventoryManager.Instance.AddGold(reward.totalGold);
+            InventoryManager.Instance.AddMoney(reward.totalMoney);
             foreach(var itemId in reward.dropItems) InventoryManager.Instance.AddItem(itemId, 1);
             
             SoundManager.Instance.PlaySFX(SfxID.Attack_Sword); // 타격음 한번 재생
@@ -2610,7 +2610,7 @@ namespace Controller
                     }
                 }
                 
-                InventoryManager.Instance.AddGold(reward.totalGold);
+                InventoryManager.Instance.AddMoney(reward.totalMoney);
                 foreach(var itemId in reward.dropItems) InventoryManager.Instance.AddItem(itemId, 1);
 
                 // 결과 UI 표시

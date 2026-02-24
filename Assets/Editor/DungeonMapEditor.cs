@@ -382,46 +382,48 @@ namespace UI.MapEditorScene
                 GUILayout.Space(20);
                 
                 
-                // 워프 포털 설정 UI
+                // 입구 포털 설정 UI
                 
-                GUILayout.Label("Warp / Portal Settings", EditorStyles.boldLabel);
+                GUILayout.Label("Door / Entrance / Portal Settings", EditorStyles.boldLabel);
 
-                // 현재 셀(x, y)에 존재하는 워프 데이터를 찾음
-                // (MapData에 warps 리스트가 초기화되어 있어야 함)
-                if (mapData.warps == null) mapData.warps = new System.Collections.Generic.List<WarpData>();
+                // 현재 셀(x, y)에 존재하는 입구 데이터를 찾음
+                // (MapData에 Entrances 리스트가 초기화되어 있어야 함)
+                if (mapData.entrances == null) mapData.entrances = new System.Collections.Generic.List<EntranceData>();
                 
-                WarpData existingWarp = mapData.warps.Find(w => w.sourceX == selectedCell.x && w.sourceY == selectedCell.y);
+                EntranceData existingEntrance = mapData.entrances.Find(w => w.sourceX == selectedCell.x && w.sourceY == selectedCell.y);
 
-                if (existingWarp != null)
+                if (existingEntrance != null)
                 {
-                    // --- 워프 데이터 편집 ---
+                    // 입구 데이터 편집
                     GUI.backgroundColor = new Color(0.8f, 0.8f, 1f);
                     EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                     
-                    GUILayout.Label($"Warp at ({existingWarp.sourceX}, {existingWarp.sourceY})", EditorStyles.miniBoldLabel);
+                    GUILayout.Label($"Entrance at ({existingEntrance.sourceX}, {existingEntrance.sourceY})", EditorStyles.miniBoldLabel);
+                    // 입구의 타입 (다른 던전맵으로의 입구인가 상점으로의 입구인가)
+                    existingEntrance.type = (EntranceType)EditorGUILayout.EnumPopup("Entrance Type", existingEntrance.type);
 
-                    existingWarp.isWallWarp = EditorGUILayout.Toggle("Is Wall Warp", existingWarp.isWallWarp);
+                    existingEntrance.isWallEntrance = EditorGUILayout.Toggle("Is Wall Entrance", existingEntrance.isWallEntrance);
                     
                     // 트리거 방향 (플레이어가 어느 방향으로 진입해야 하는가)
-                    existingWarp.triggerDirection = (Direction)EditorGUILayout.EnumPopup("Trigger Dir", existingWarp.triggerDirection);
+                    existingEntrance.triggerDirection = (Direction)EditorGUILayout.EnumPopup("Trigger Dir", existingEntrance.triggerDirection);
 
                     GUILayout.Space(5);
                     GUILayout.Label("Target Destination", EditorStyles.miniBoldLabel);
                     
-                    existingWarp.targetMapName = EditorGUILayout.TextField("Map Name", existingWarp.targetMapName);
+                    existingEntrance.destinationID = EditorGUILayout.TextField("Destination ID", existingEntrance.destinationID);
                     
                     EditorGUILayout.BeginHorizontal();
-                    existingWarp.targetX = EditorGUILayout.IntField("X", existingWarp.targetX);
-                    existingWarp.targetY = EditorGUILayout.IntField("Y", existingWarp.targetY);
+                    existingEntrance.targetX = EditorGUILayout.IntField("X", existingEntrance.targetX);
+                    existingEntrance.targetY = EditorGUILayout.IntField("Y", existingEntrance.targetY);
                     EditorGUILayout.EndHorizontal();
 
-                    existingWarp.targetDirection = (Direction)EditorGUILayout.EnumPopup("Face Dir", existingWarp.targetDirection);
+                    existingEntrance.targetDirection = (Direction)EditorGUILayout.EnumPopup("Face Dir", existingEntrance.targetDirection);
 
                     GUILayout.Space(10);
                     GUI.backgroundColor = new Color(1f, 0.5f, 0.5f);
-                    if (GUILayout.Button("Remove Warp"))
+                    if (GUILayout.Button("Remove Entrance"))
                     {
-                        mapData.warps.Remove(existingWarp);
+                        mapData.entrances.Remove(existingEntrance);
                         GUI.FocusControl(null); // 포커스 해제
                         GUI.changed = true;
                     }
@@ -430,21 +432,22 @@ namespace UI.MapEditorScene
                 }
                 else
                 {
-                    // --- 워프 추가 버튼 ---
-                    if (GUILayout.Button("Add Warp Portal"))
+                    // 입구 추가 버튼
+                    if (GUILayout.Button("Add Entrance Portal"))
                     {
-                        WarpData newWarp = new WarpData
+                        EntranceData newEntrance = new EntranceData
                         {
+                            type = EntranceType.Map,
                             sourceX = selectedCell.x,
                             sourceY = selectedCell.y,
-                            isWallWarp = true, // 기본값
+                            isWallEntrance = true,
                             triggerDirection = Direction.North,
-                            targetMapName = "NewMap",
+                            destinationID = "NewDestination",
                             targetX = 1,
                             targetY = 1,
                             targetDirection = Direction.North
                         };
-                        mapData.warps.Add(newWarp);
+                        mapData.entrances.Add(newEntrance);
                         GUI.changed = true;
                     }
                 }

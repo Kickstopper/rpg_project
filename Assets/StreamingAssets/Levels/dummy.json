@@ -899,11 +899,11 @@
             ]
         }
     ],
-    "warps": [
+    "entrances": [
         {
             "sourceX": 4,
             "sourceY": 0,
-            "isWallWarp": true,
+            "isWallEntrance": true,
             "triggerDirection": 2,
             "targetMapName": "basement",
             "targetX": 4,

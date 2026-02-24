@@ -11,7 +11,7 @@ namespace Controller
     public class BattleResultUI : MonoBehaviour
     {
         [Header("Reward Info")]
-        public TextMeshProUGUI goldText;
+        public TextMeshProUGUI moneyText;
         public TextMeshProUGUI totalExpText;
         
         [Header("Item List")]
@@ -38,7 +38,7 @@ namespace Controller
             this.isClosing = false; // 초기화
 
             // 텍스트 설정
-            goldText.text = $"{reward.totalGold} G";
+            moneyText.text = $"{reward.totalMoney} G";
             totalExpText.text = $"{reward.totalExp} EXP";
 
             // 아이템 슬롯 생성

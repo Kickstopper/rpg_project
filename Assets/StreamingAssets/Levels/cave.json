@@ -1781,7 +1781,7 @@
         {
             "x": 11,
             "y": 10,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -1794,7 +1794,7 @@
             "y": 10,
             "value": 0,
             "wallTextureIDs": [
-                3,
+                4,
                 -1,
                 -1,
                 3
@@ -2483,26 +2483,39 @@
             ]
         }
     ],
-    "warps": [
+    "entrances": [
         {
+            "type": 0,
             "sourceX": 9,
             "sourceY": 14,
-            "isWallWarp": true,
+            "isWallEntrance": true,
             "triggerDirection": 0,
-            "targetMapName": "basement",
+            "destinationID": "base",
             "targetX": 6,
             "targetY": 0,
             "targetDirection": 3
         },
         {
+            "type": 0,
             "sourceX": 5,
             "sourceY": 14,
-            "isWallWarp": true,
+            "isWallEntrance": true,
             "triggerDirection": 0,
-            "targetMapName": "basement",
+            "destinationID": "base",
             "targetX": 2,
             "targetY": 0,
             "targetDirection": 1
+        },
+        {
+            "type": 1,
+            "sourceX": 12,
+            "sourceY": 10,
+            "isWallEntrance": true,
+            "triggerDirection": 1,
+            "destinationID": "shop_00",
+            "targetX": 1,
+            "targetY": 1,
+            "targetDirection": 0
         }
     ]
 }

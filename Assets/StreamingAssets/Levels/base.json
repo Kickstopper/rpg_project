@@ -899,11 +899,11 @@
             ]
         }
     ],
-    "warps": [
+    "entrances": [
         {
             "sourceX": 2,
             "sourceY": 0,
-            "isWallWarp": true,
+            "isWallEntrance": true,
             "triggerDirection": 3,
             "targetMapName": "cave_f1",
             "targetX": 9,
@@ -913,7 +913,7 @@
         {
             "sourceX": 6,
             "sourceY": 0,
-            "isWallWarp": true,
+            "isWallEntrance": true,
             "triggerDirection": 1,
             "targetMapName": "cave_f1",
             "targetX": 5,
@@ -923,7 +923,7 @@
         {
             "sourceX": 4,
             "sourceY": 8,
-            "isWallWarp": true,
+            "isWallEntrance": true,
             "triggerDirection": 0,
             "targetMapName": "dungeon_map",
             "targetX": 4,

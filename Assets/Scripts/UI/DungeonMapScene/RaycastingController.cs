@@ -7,6 +7,7 @@ using Manager;
 using Data;
 using UI.DungeonMapScene;
 using UI;
+using UI.Shop;
 
 namespace Controller
 {
@@ -259,7 +260,7 @@ namespace Controller
             }
         }
 
-        // 워프 체크 로직 추가
+        // 입구 체크 로직 추가
         private void PerformMove(Vector2Int moveVec)
         {
             int tx = _player.LogicX + moveVec.x;
@@ -276,72 +277,72 @@ namespace Controller
             }
             else
             {
-                WarpData validWarp = CheckForWarp(_player.LogicX, _player.LogicY, tx, ty, moveVec);
+                EntranceData validEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, tx, ty, moveVec);
 
-                if (validWarp != null)
+                if (validEntrance != null)
                 {
-                    // 워프가 있다면 레벨 전환 시작
-                    Debug.Log($"[Warp] {validWarp.targetMapName}으로 이동합니다.");
-                    StartCoroutine(TransitionToLevel(validWarp, moveVec));
+                    // 입구가 있다면 레벨 전환 시작
+                    Debug.Log($"[Entrance] {validEntrance.destinationID}으로 이동합니다.");
+                    StartCoroutine(TransitionToOtherPlace(validEntrance, moveVec));
                 }
                 else
                 {
-                    // 워프도 없다면 벽 충돌 처리
+                    // 입구도 없다면 벽 충돌 처리
                     StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
                     SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                 }
             }
         }
 
-        // 워프 데이터 확인 메서드
-        private WarpData CheckForWarp(int currentX, int currentY, int targetX, int targetY, Vector2Int moveDir)
+        // 입구 데이터 확인 메서드
+        private EntranceData CheckForEntrance(int currentX, int currentY, int targetX, int targetY, Vector2Int moveDir)
         {
             if (_currentMap == null) return null;
 
             Direction inputDir = VectorToDirection(moveDir);
 
-            // 현재 위치(Source) 검사: "방 안쪽 벽에 있는 워프인가?"
-            WarpData currentWarp = _currentMap.GetWarpAt(currentX, currentY);
-            if (currentWarp != null && currentWarp.isWallWarp && currentWarp.triggerDirection == inputDir)
+            // 현재 위치(Source) 검사: "방 안쪽 벽에 있는 입구인가?"
+            EntranceData currentEntrance = _currentMap.GetEntranceAt(currentX, currentY);
+            if (currentEntrance != null && currentEntrance.isWallEntrance && currentEntrance.triggerDirection == inputDir)
             {
-                return currentWarp;
+                return currentEntrance;
             }
 
-            // 목표 위치(Target) 검사: "방 바깥쪽 벽(진입 시)에 있는 워프인가?"
+            // 목표 위치(Target) 검사: "방 바깥쪽 벽(진입 시)에 있는 입구인가?"
             // (맵 범위를 벗어나지 않았을 때만 검사)
             if (targetX >= 0 && targetX < _currentMap.width && targetY >= 0 && targetY < _currentMap.height)
             {
-                WarpData targetWarp = _currentMap.GetWarpAt(targetX, targetY);
-                if (targetWarp != null && targetWarp.isWallWarp && targetWarp.triggerDirection == inputDir)
+                EntranceData targetEntrance = _currentMap.GetEntranceAt(targetX, targetY);
+                if (targetEntrance != null && targetEntrance.isWallEntrance && targetEntrance.triggerDirection == inputDir)
                 {
-                    return targetWarp;
+                    return targetEntrance;
                 }
             }
 
             return null;
         }
 
-        // 레벨 전환 코루틴
-        private IEnumerator TransitionToLevel(WarpData warp, Vector2Int moveDir)
+        // 레벨 전환 및 상점 진입 코루틴
+        private IEnumerator TransitionToOtherPlace(EntranceData entrance, Vector2Int moveDir)
         {
             _inputLocked = true; // 입력 잠금
 
-            // -----------------------------------------------------
-            // Phase 1: 페이드 아웃 + 플레이어가 벽 쪽으로 걸어가는 연출
-            // -----------------------------------------------------
+            // 애니메이션으로 논리 좌표가 바뀌기 전의 타일 좌표
+            int preEntranceLogicX = _player.LogicX;
+            int preEntranceLogicY = _player.LogicY;
+
+            // 애니메이션 스타또!
             if (fadeOverlay != null)
             {
                 float elapsed = 0f;
-                float duration = 0.5f; // 페이드 시간
+                float duration = 0.5f; 
                 
                 float startX = _player.PosX;
                 float startY = _player.PosY;
 
-                // 목표 지점 (벽 안쪽) 계산
                 int targetGridX = _player.LogicX + moveDir.x;
                 int targetGridY = _player.LogicY + moveDir.y;
                 
-                // 플레이어의 GetOffsetPosition을 활용해 목표 좌표 계산
                 Vector2 targetPos = _player.GetOffsetPosition(targetGridX, targetGridY, _player.DirectionIdx);
 
                 fadeOverlay.alpha = 0f;
@@ -352,10 +353,9 @@ namespace Controller
                     elapsed += Time.deltaTime;
                     float t = Mathf.Clamp01(elapsed / duration);
                     
-                    // 화면 어둡게
                     fadeOverlay.alpha = t;
 
-                    // 플레이어 강제 이동 (시각적 연출)
+                    // 이때 논리 좌표 변경됨
                     _player.SetDirectPosition(
                         Mathf.Lerp(startX, targetPos.x, t),
                         Mathf.Lerp(startY, targetPos.y, t),
@@ -369,39 +369,70 @@ namespace Controller
 
             yield return new WaitForSeconds(0.2f);
 
-            // -----------------------------------------------------
-            // Phase 2: 데이터 로드 및 맵 변경
-            // -----------------------------------------------------
-            // 매니저를 통해 다음 맵 ID 설정 및 로드
-            if (DungeonEventManager.Instance) 
-                DungeonEventManager.Instance.SetCurrentMapID(warp.targetMapName);
-            
-            if (LevelManager.Instance) 
-                LevelManager.Instance.LoadLevelFromJson(warp.targetMapName);
-            
-            // 맵 데이터 갱신 및 플레이어 위치 재설정 (Warp 정보 전달)
-            LoadMapData(warp); 
-
-            yield return null; 
-
-            // -----------------------------------------------------
-            // Phase 3: 페이드 인
-            // -----------------------------------------------------
-            if (fadeOverlay != null)
+            if (entrance.type == EntranceType.Map)
             {
-                float elapsed = 0f;
-                float duration = 0.5f;
-                while (elapsed < duration)
+                if (DungeonEventManager.Instance) 
+                    DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
+                if (LevelManager.Instance) 
+                    LevelManager.Instance.LoadLevelFromJson(entrance.destinationID);
+                LoadMapData(entrance); 
+                yield return null; 
+
+                if (fadeOverlay != null)
                 {
-                    elapsed += Time.deltaTime;
-                    fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsed / duration);
-                    yield return null;
+                    float elapsed = 0f;
+                    float duration = 0.5f;
+                    while (elapsed < duration)
+                    {
+                        elapsed += Time.deltaTime;
+                        fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsed / duration);
+                        yield return null;
+                    }
+                    fadeOverlay.alpha = 0f;
+                    fadeOverlay.blocksRaycasts = false;
                 }
-                fadeOverlay.alpha = 0f;
-                fadeOverlay.blocksRaycasts = false;
+            }
+            else if (entrance.type == EntranceType.Shop)
+            {
+                if (GameStateManager.Instance != null)
+                {
+                    GameStateManager.Instance.ShowShop(entrance.destinationID);
+                }
+
+                // 상점이 열려있는 동안 코루틴 대기
+                yield return new WaitUntil(() => GameStateManager.Instance.CurrentState != GameState.Shop);
+
+                // 상점을 나설 때 180도 회전
+                int reverseDir = (_player.DirectionIdx + 2) % 4; 
+                
+                // 뒤집힌 방향을 기준으로 원래 위치의 오프셋을 다시 계산
+                Vector2 originalPos = _player.GetOffsetPosition(preEntranceLogicX, preEntranceLogicY, reverseDir);
+                _player.SetDirectPosition(originalPos.x, originalPos.y, reverseDir);
+
+                // 회전한 방향에 맞춰 나침반과 미니맵도 즉시 동기화
+                if (compassUI) compassUI.SetDirection(reverseDir);
+                if (miniMap) miniMap.SnapToGrid(preEntranceLogicX, preEntranceLogicY, reverseDir);
+                
+                UpdateMapDiscovery(preEntranceLogicX, preEntranceLogicY);
+
+                // 페이드인
+                if (fadeOverlay != null)
+                {
+                    float elapsedFade = 0f;
+                    float fadeDuration = 0.5f;
+                    
+                    while (elapsedFade < fadeDuration)
+                    {
+                        elapsedFade += Time.deltaTime;
+                        fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsedFade / fadeDuration);
+                        yield return null;
+                    }
+                    fadeOverlay.alpha = 0f;
+                    fadeOverlay.blocksRaycasts = false;
+                }
             }
 
-            _inputLocked = false; // 입력 잠금 해제
+            _inputLocked = false;
         }
 
         private Direction VectorToDirection(Vector2Int dirVec)
@@ -447,7 +478,7 @@ namespace Controller
         }
 
         // ================= Map & Game Logic =================
-        private void LoadMapData(WarpData entryWarp = null)
+        private void LoadMapData(EntranceData entryEntrance = null)
         {
             _currentMap = LevelManager.Instance.CurrentMapData;
             DungeonTheme theme = LevelManager.Instance.GetTheme(_currentMap.themeName);
@@ -459,12 +490,12 @@ namespace Controller
             encounterSystem.Initialize(theme);
 
             // Init Player Position
-            if (entryWarp != null)
+            if (entryEntrance != null)
             {
-                _currentMap.startDirection = entryWarp.targetDirection;
-                _currentMap.startX = entryWarp.targetX;
-                _currentMap.startY = entryWarp.targetY;
-                _player.SetDirectPosition(entryWarp.targetX, entryWarp.targetY, (int)entryWarp.targetDirection);
+                _currentMap.startDirection = entryEntrance.targetDirection;
+                _currentMap.startX = entryEntrance.targetX;
+                _currentMap.startY = entryEntrance.targetY;
+                _player.SetDirectPosition(entryEntrance.targetX, entryEntrance.targetY, (int)entryEntrance.targetDirection);
             }
             else
             {

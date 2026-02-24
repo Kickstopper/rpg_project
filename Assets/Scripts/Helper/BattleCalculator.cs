@@ -203,7 +203,7 @@ namespace Helper
             reward.dropItems = new List<string>();
 
             long totalMonsterExp = 0;
-            int calculatedGold = 0;
+            int calculatedMoney = 0;
 
             foreach (var entry in encounterLog)
             {
@@ -213,7 +213,7 @@ namespace Helper
                 if (Random.value >= 0.7f) // 30% 확률
                 {
                     int lv = entry.stats.level;
-                    calculatedGold += Random.Range(lv * 10, lv * 30);
+                    calculatedMoney += Random.Range(lv * 10, lv * 30);
                 }
 
                 // 드롭 아이템
@@ -232,7 +232,7 @@ namespace Helper
             
             int livingCount = players.Count(p => p.currentHp > 0);
             reward.expPerMember = (livingCount > 0) ? reward.totalExp / livingCount : 0;
-            reward.totalGold = calculatedGold;
+            reward.totalMoney = calculatedMoney;
 
             return reward;
         }

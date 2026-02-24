@@ -3,6 +3,7 @@ using UnityEngine;
 // 속성 타입을 열거형으로 정의 (ResistanceData 필드와 매칭용)
 public enum ElementType { Physical, Fire, Ice, Elec, Force, Psyche, None }
 public enum UseType { All, Exploration, Battle, Passive }
+public enum ItemCategory { Weapon, Armor, Etc }
 
 // 행동 범위
 public enum TargetScope 

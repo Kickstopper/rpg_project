@@ -308,7 +308,7 @@ public class BattleUIController : MonoBehaviour
         string itemTxt = reward.dropItems.Count > 0 ? $"\nDrops: {reward.dropItems.Count}" : "";
         
         instantResultText.text = $"<size=120%>YOU는 SHOCK!!</size>\n\n" +
-                                    $"EXP +{reward.totalExp}\nGOLD +{reward.totalGold}{itemTxt}\n" +
+                                    $"EXP +{reward.totalExp}\nGOLD +{reward.totalMoney}{itemTxt}\n" +
                                     $"적들은 이미 죽어 있다...";
         
         Tween tween = instantResultPanel.transform.DOScale(1.1f, instantWinDelay);

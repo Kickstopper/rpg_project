@@ -53,7 +53,7 @@ namespace Manager
             data.dungeonMapStates = MapManager.Instance.GetAllMapStates();
             
             // 인벤토리 & 골드 저장
-            data.gold = InventoryManager.Instance.GetGold();
+            data.money = InventoryManager.Instance.GetMoney();
             data.inventory = InventoryManager.Instance.GetSaveData(); 
 
             // 파티원 정보 저장
@@ -89,7 +89,7 @@ namespace Manager
             SaveData data = JsonUtility.FromJson<SaveData>(json);
 
             // 골드 및 인벤토리 복구
-            InventoryManager.Instance.SetGold(data.gold);
+            InventoryManager.Instance.SetMoney(data.money);
             InventoryManager.Instance.LoadFromSaveData(data.inventory);
 
             FlagManager.Instance.LoadFromSaveData(data.eventFlags);
