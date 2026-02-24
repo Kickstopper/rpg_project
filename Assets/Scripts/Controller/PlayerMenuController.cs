@@ -535,6 +535,7 @@ namespace Controller
             if(equipController != null)
             {
                 equipController.SetCharacter(charData);
+                equipController.onCloseCallback = CloseEquipUI; 
             }
 
             UpdatePopupMessage();

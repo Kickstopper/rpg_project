@@ -30,7 +30,6 @@ namespace UI.Shop
         private int currentHighlightIndex = 0;
         private int currentPurchaseQuantity = 0;
         
-        // 임시 데이터 참조용
         private ShopData currentShopData;
         private BaseItemData HighlightedItem => spawnedSlots[currentHighlightIndex].currentItem;
 
@@ -42,8 +41,6 @@ namespace UI.Shop
 
         void Update()
         {
-            if (spawnedSlots.Count == 0) return;
-
             HandleInput();
         }
 
@@ -52,7 +49,6 @@ namespace UI.Shop
         {
             buyUI.SetActive(true);
             currentShopData = ShopManager.Instance.GetShopData(shopID);
-            
             ClearContent();
             PopulateShop(currentShopData);
             
@@ -104,8 +100,12 @@ namespace UI.Shop
         {
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
             {
-                CloseShop();
+                CloseBuyMode();
+                return;
             }
+
+            if (spawnedSlots.Count == 0) return;
+
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
                 MoveHighlight(-1);
@@ -224,7 +224,7 @@ namespace UI.Shop
             spawnedSlots.Clear();
         }
 
-        public void CloseShop()
+        public void CloseBuyMode()
         {
             buyUI.SetActive(false);
         }

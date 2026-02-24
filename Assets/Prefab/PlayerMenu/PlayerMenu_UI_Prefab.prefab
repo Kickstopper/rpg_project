@@ -21667,7 +21667,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3ce97f091f46b94abbbb302cba64b34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Controller.EquipUIController
-  menuController: {fileID: 6372555989440531804}
   nameText: {fileID: 5339793686827103528}
   equipSlots:
   - button: {fileID: 8008322421487328116}

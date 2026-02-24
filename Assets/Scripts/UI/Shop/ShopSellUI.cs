@@ -112,6 +112,12 @@ namespace UI.Shop
 
         private void HandleInput()
         {
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                CloseSellMode();
+                return;
+            }
+
             // 탭 전환
             if (Input.GetKeyDown(KeyCode.Q)) MoveTab(-1);
             if (Input.GetKeyDown(KeyCode.E)) MoveTab(1);
@@ -159,10 +165,6 @@ namespace UI.Shop
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                CloseSellMode();
-            }
         }
 
         private void MoveTab(int direction)

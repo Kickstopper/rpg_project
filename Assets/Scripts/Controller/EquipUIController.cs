@@ -12,32 +12,31 @@ namespace Controller
 
     public class EquipUIController : MonoBehaviour
     {
-        [Header("Main Menu UI Controller")]
-        public PlayerMenuController menuController;
-        
         [Header("Name Texts")]
         public TextMeshProUGUI nameText;
         [Header("Slot Buttons")]
         public EquipSlotUI[] equipSlots; 
 
         [Header("Item List (Popup)")]
-        public GameObject itemListPanel;      
-        public Transform itemContent;         
+        public GameObject itemListPanel;  
+        public Transform itemContent; 
         public ScrollRect itemScrollRect;
-        public GameObject itemSlotPrefab;     
+        public GameObject itemSlotPrefab; 
 
         [Header("Info Windows")]
         public TextMeshProUGUI itemInfoText;  
         
         [Header("Stat Texts")]
-        public TextMeshProUGUI atkText;    
-        public TextMeshProUGUI hitText;    
-        public TextMeshProUGUI gunText;    
+        public TextMeshProUGUI atkText;
+        public TextMeshProUGUI hitText;
+        public TextMeshProUGUI gunText;
         public TextMeshProUGUI gunHitText; 
         public TextMeshProUGUI magPowText; 
         public TextMeshProUGUI magFxText;  
-        public TextMeshProUGUI defText;    
-        public TextMeshProUGUI evaText;    
+        public TextMeshProUGUI defText;
+        public TextMeshProUGUI evaText;
+        
+        public System.Action onCloseCallback;
 
         private RuntimeCharacterData currentCharacter;
         private int currentSlotIndex = 0;
@@ -52,8 +51,6 @@ namespace Controller
 
         private float inputCooldown = 0f;
         
-        
-
         public void SetCharacter(RuntimeCharacterData character)
         {
             if (PartyManager.Instance == null) return;
@@ -138,7 +135,11 @@ namespace Controller
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
             {
-                menuController.CloseEquipUI(); 
+                if (onCloseCallback != null)
+                {
+                    // 외부에서 덮어씌운 콜백이 있다면 그것을 실행
+                    onCloseCallback.Invoke();
+                }
             }
         }
 

@@ -12425,7 +12425,7 @@ GameObject:
   - component: {fileID: 7301902432266577444}
   - component: {fileID: 2784197990195716926}
   m_Layer: 0
-  m_Name: Gold_Text
+  m_Name: Money_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22226,7 +22226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4220b72f8bf99b478b1515da0f1b1af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Controller.CombatResultUI
-  goldText: {fileID: 2784197990195716926}
+  moneyText: {fileID: 2784197990195716926}
   totalExpText: {fileID: 3838628932678425379}
   itemContainer: {fileID: 6268848994727677}
   itemSlotPrefab: {fileID: 940030084927157362, guid: 3fcb7a7b1c2bbd34293be7de3dc5094a, type: 3}

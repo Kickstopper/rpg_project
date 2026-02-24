@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Manager;
+using TMPro;
+using Data;
 
 namespace UI.Shop
 {
@@ -9,15 +11,21 @@ namespace UI.Shop
         [Header("Sub Panels")]
         public ShopBuyUI buyUI;
         public ShopSellUI sellUI;
-        public GameObject equipUI; // 임시
+        public ShopEquipUI equipUI;
 
+        [Header("UI References")]
+        public TextMeshProUGUI titleText;
+        public TextMeshProUGUI possessionText;
+        public TextMeshProUGUI moneyText;
+        public TextMeshProUGUI totalPriceText;
+        
         [Header("Mode Buttons")]
         public Button[] modeButtons; // 0: BUY, 1: SELL, 2: EQUIP
-        public GameObject[] modeHighlights; // 선택된 버튼을 표시할 시각적 UI (배경, 화살표 등)
+        public GameObject[] modeHighlights; // 선택된 버튼의 하이라이트
 
         private int currentIndex = 0;
         private string currentShopID;
-
+        private bool wasSubPanelActive = false;
         void Start()
         {
             // 마우스 클릭 이벤트 연결
@@ -30,8 +38,23 @@ namespace UI.Shop
 
         void Update()
         {
-            //Buy, Sell, Equip UI 중 하나라도 켜져 있다면, 입력을 무시
-            if (IsAnySubPanelActive()) return;
+            if (string.IsNullOrEmpty(currentShopID)) return;
+
+            bool isCurrentlyActive = IsAnySubPanelActive();
+
+            // 하위 패널이 켜져 있다가 방금 막 꺼졌다면
+            if (wasSubPanelActive && !isCurrentlyActive)
+            {
+                UpdateTextUI();
+                // 현재 인덱스 버튼에 다시 포커스.
+                modeButtons[currentIndex].Select();
+            }
+
+            // 다음 프레임 비교를 위해 현재 상태를 저장
+            wasSubPanelActive = isCurrentlyActive;
+
+            // 하위 패널이 하나라도 켜져 있다면 상위 입력을 무시
+            if (isCurrentlyActive) return;
 
             HandleInput();
         }
@@ -40,13 +63,26 @@ namespace UI.Shop
         {
             currentShopID = shopID;
             
+            if (titleText != null) {
+                ShopData data = ShopManager.Instance.GetShopData(shopID);
+                titleText.text = data.displayName;
+            }
+
             // 모든 하위 패널 끄기
             if(buyUI != null) buyUI.gameObject.SetActive(false);
             if(sellUI != null) sellUI.gameObject.SetActive(false);
-            if(equipUI != null) equipUI.SetActive(false);
+            if(equipUI != null) equipUI.gameObject.SetActive(false);
 
-            // 초기 포커스는 BUY
-            ChangeHighlight(0);
+            UpdateTextUI();
+            
+            ChangeHighlight(0); // 초기 포커스는 BUY
+        }
+
+        private void UpdateTextUI()
+        {
+            if (moneyText != null) moneyText.text = $"${InventoryManager.Instance.GetMoney()}";
+            if (totalPriceText != null) totalPriceText.text = "-";
+            if (possessionText != null) possessionText.text = "-";
         }
 
         private void HandleInput()
@@ -127,8 +163,8 @@ namespace UI.Shop
                 case 2: // EQUIP
                     if (equipUI != null)
                     {
-                        equipUI.SetActive(true);
-                        // TODO: Equip 모드 초기화 로직
+                        equipUI.gameObject.SetActive(true);
+                        equipUI.OpenEquipMode();
                     }
                     break;
             }
@@ -136,6 +172,7 @@ namespace UI.Shop
 
         private void ExitShop()
         {
+            currentShopID = null;
             if (GameStateManager.Instance != null)
             {
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
@@ -146,7 +183,7 @@ namespace UI.Shop
         {
             bool isBuyActive = buyUI != null && buyUI.gameObject.activeInHierarchy;
             bool isSellActive = sellUI != null && sellUI.gameObject.activeInHierarchy;
-            bool isEquipActive = equipUI != null && equipUI.activeInHierarchy;
+            bool isEquipActive = equipUI != null && equipUI.gameObject.activeInHierarchy;
 
             return isBuyActive || isSellActive || isEquipActive;
         }
