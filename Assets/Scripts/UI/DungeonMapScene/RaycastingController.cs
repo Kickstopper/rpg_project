@@ -7,13 +7,11 @@ using Manager;
 using Data;
 using UI.DungeonMapScene;
 using UI;
-using UI.Shop;
 
 namespace Controller
 {
     public class RaycastingController : MonoBehaviour
     {
-        // ================= Components =================
         [Header("Settings")]
         public UI.DungeonMapScene.RenderSettings renderSettings;
         [Range(0.0f, 0.499f)] public float backwardOffset = 0.499f;
@@ -37,11 +35,11 @@ namespace Controller
         [Header("Encounter System")]
         public EncounterSystem encounterSystem;
 
-        // ================= Sub-Systems =================
+        // 서브 시스템
         private RaycastRenderEngine _renderer;
         private DungeonPlayer _player;
         
-        // ================= State =================
+        // 상태
         private TileAnimState[,] _tileAnimStates;
         private MapData _currentMap;
         private bool _canRender = true;
@@ -49,7 +47,6 @@ namespace Controller
         private float _lastWPressTime = -100f;
         private bool _isScanning = false;
         
-        // ================= Unity Lifecycle =================
         void Awake()
         {
             _renderer = new RaycastRenderEngine();
@@ -63,7 +60,6 @@ namespace Controller
         {
             _renderer.Initialize(renderSettings.screenWidth, renderSettings.screenHeight);
             
-            // Screen Material Setup
             Material mat;
             if (renderSettings.screenMaterial != null)
             {
@@ -78,7 +74,7 @@ namespace Controller
             screenImage.material = mat;
             screenImage.rectTransform.localScale = renderSettings.screenScale;
 
-            // Load Initial Map
+            // 맵 초기화
             LoadMapData();
             
             GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
@@ -139,13 +135,12 @@ namespace Controller
         {
             if (_player.IsGridMove)
             {
-                // Grid -> Free
                 _player.IsGridMove = false;
                 Debug.Log("Switched to Free Move");
             }
             else
             {
-                // Free -> Grid (스냅핑 필요)
+                // 그리드 상태로 스냅핑
                 _player.SnapToGrid();
                 _player.IsGridMove = true;
                 
@@ -170,20 +165,20 @@ namespace Controller
             if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
 
-            // 이동 (W/S)
+            // 이동
             if (Input.GetKey(KeyCode.W)) _player.MoveFree(moveSpeed);
             if (Input.GetKey(KeyCode.S)) _player.MoveFree(-moveSpeed);
 
             if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) 
             {
-                _player.RotateFree(rotSpeed); // 왼쪽 회전 (+값인가 -값인가는 DungeonPlayer.RotateFree 구현에 따름)
+                _player.RotateFree(rotSpeed); // 왼쪽 회전
             }
             if (Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) 
             {
                 _player.RotateFree(-rotSpeed); // 오른쪽 회전
             }
 
-            // Free Move 시 미니맵 갱신 (부드러운 이동 대신 즉시 갱신)
+            // Free Move 시 미니맵 갱신 (즉시 갱신)
             if (miniMap) miniMap.SetFreeDirection(_player.DirX, _player.DirY);
             autoMapRenderer.UpdatePlayerIconFree(_player.PosX, _player.PosY, _player.DirX, _player.DirY);
         }
@@ -193,7 +188,6 @@ namespace Controller
         {
             if (_inputLocked) return;
 
-            // Look (Pitch) - 시점 변경
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) _player.Pitch -= 300f * Time.deltaTime;
@@ -201,13 +195,11 @@ namespace Controller
             }
             else
             {
-                // Auto Center Look
                 if (Mathf.Abs(_player.Pitch) > 1f)
                     _player.Pitch = Mathf.Lerp(_player.Pitch, 0f, Time.deltaTime * 5f);
             }
             _player.Pitch = Mathf.Clamp(_player.Pitch, -150f, 150f);
 
-            // Action - 기타 기능
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
             if (Input.GetKeyDown(KeyCode.M))
             {
@@ -220,7 +212,6 @@ namespace Controller
                 Debug.Log($"Anaglyph Mode: {GameSettingManager.Instance.useAnaglyph}");
             }
 
-            // Running State Check (이동 중이어도 입력 받아야 함 -> 위치 이동)
             // W, S, 위, 아래 키 중 하나라도 눌리면 더블 탭 체크
             bool anyMoveKeyDown = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) || 
                                   Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow);
@@ -241,20 +232,19 @@ namespace Controller
                 _player.SetRunning(false);
             }
 
-            // Movement Execution (이동은 멈춰있을 때만 가능)
             if (!_player.IsMoving)
             {
                 if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
 
-                // 이동 입력 처리
+                // 이동 입력
                 if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) TryMove(1);
                 else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) TryMove(-1);
                 
-                // 좌우 수평 이동 (A/D)
+                // 좌우 수평 이동
                 else if (Input.GetKey(KeyCode.A)) TryStrafe(-1);
                 else if (Input.GetKey(KeyCode.D)) TryStrafe(1);
                 
-                // 회전 (Q/E)
+                // 회전
                 if (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.LeftArrow)) StartCoroutine(TurnRoutine(-1));
                 if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.RightArrow)) StartCoroutine(TurnRoutine(1));
             }
@@ -301,15 +291,14 @@ namespace Controller
 
             Direction inputDir = VectorToDirection(moveDir);
 
-            // 현재 위치(Source) 검사: "방 안쪽 벽에 있는 입구인가?"
+            // 방 안쪽 벽에 있는 입구인지 체크
             EntranceData currentEntrance = _currentMap.GetEntranceAt(currentX, currentY);
             if (currentEntrance != null && currentEntrance.isWallEntrance && currentEntrance.triggerDirection == inputDir)
             {
                 return currentEntrance;
             }
 
-            // 목표 위치(Target) 검사: "방 바깥쪽 벽(진입 시)에 있는 입구인가?"
-            // (맵 범위를 벗어나지 않았을 때만 검사)
+            // 진입 시 방 바깥쪽 벽에 있는 입구인지 체크 (맵 범위를 벗어나지 않았을 때만 체크함)
             if (targetX >= 0 && targetX < _currentMap.width && targetY >= 0 && targetY < _currentMap.height)
             {
                 EntranceData targetEntrance = _currentMap.GetEntranceAt(targetX, targetY);
@@ -463,16 +452,15 @@ namespace Controller
             // (a % n + n) % n 은 음수 나머지 처리를 위한 공식.
             int nextDir = ((currentDir + dirStep) % 4 + 4) % 4;
 
-            // UI에게 "Current에서 Next로 회전하라"고 지시
             if (compassUI) 
             {
                 compassUI.AnimateTurn(currentDir, nextDir, dirStep, turnDuration);
             }
 
-            // 실제 플레이어 데이터 회전 (기존 로직 유지)
+            // 실제 플레이어 데이터 회전
             yield return StartCoroutine(_player.RotateGridRoutine(dirStep, turnDuration, null));
             
-            // 보정 (혹시 모를 오차 방지)
+            // 오차 방지
             if (miniMap) miniMap.SetDirection(_player.DirectionIdx, 0.1f);
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
         }
@@ -485,22 +473,19 @@ namespace Controller
 
             if (backgroundImage != null) backgroundImage.texture = theme.background;
             
-            // Init Systems
-            _renderer.LoadAssets(theme.texture, 64, 64, null); // Dummy Sprite info
+            // 시스템 초기화
+            _renderer.LoadAssets(theme.texture, 64, 64, null); 
             encounterSystem.Initialize(theme);
 
-            // Init Player Position
+            // 플레이어 위치 초기화
             if (entryEntrance != null)
             {
                 _currentMap.startDirection = entryEntrance.targetDirection;
                 _currentMap.startX = entryEntrance.targetX;
                 _currentMap.startY = entryEntrance.targetY;
-                _player.SetDirectPosition(entryEntrance.targetX, entryEntrance.targetY, (int)entryEntrance.targetDirection);
             }
-            else
-            {
-                _player.SetMapData(_currentMap, _currentMap.startX, _currentMap.startY, _currentMap.startDirection);
-            }
+            
+            _player.SetMapData(_currentMap, _currentMap.startX, _currentMap.startY, _currentMap.startDirection);
             
             if (miniMap != null)
             {
@@ -518,7 +503,7 @@ namespace Controller
                 autoMapRenderer.DrawFullMap(_currentMap, LevelManager.Instance.CurrentMapState);
             }
             
-            // Init Wall Animations
+            // 벽 애니메이션 초기화
             InitializeWallAnims(theme);
             _renderer.SetMapData(_currentMap, theme, _tileAnimStates);
             
@@ -530,7 +515,7 @@ namespace Controller
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
             encounterSystem.OnStepTaken();
             
-            // Check Event (Dialogue)
+            // 이벤트가 있는지 체크
             string eventID = DungeonEventManager.Instance.CheckEvent(_player.LogicX, _player.LogicY);
             if (!string.IsNullOrEmpty(eventID))
             {
@@ -559,14 +544,12 @@ namespace Controller
             if (theme == null || theme.wallAnimations == null) return;
             _tileAnimStates = new TileAnimState[_currentMap.width, _currentMap.height];
 
-            // 딕셔너리로 변환하여 검색 속도 향상
             Dictionary<int, WallAnimConfig> animDict = new Dictionary<int, WallAnimConfig>();
             foreach (var cfg in theme.wallAnimations)
                 if (!animDict.ContainsKey(cfg.baseTexId)) animDict.Add(cfg.baseTexId, cfg);
 
             if (animDict.Count == 0) return;
 
-            // 전체 맵 순회
             for (int x = 0; x < _currentMap.width; x++)
             {
                 for (int y = 0; y < _currentMap.height; y++)
@@ -622,7 +605,7 @@ namespace Controller
             _isScanning = true;
             
             float radius = 0f;
-            // Expand
+            // 스캔 퍼짐
             while (radius < renderSettings.maxScanDistance)
             {
                 radius += Time.deltaTime * renderSettings.scanSpeed;
@@ -631,10 +614,9 @@ namespace Controller
             }
             radius = renderSettings.maxScanDistance;
             
-            // Wait
+            // 유지
             yield return new WaitForSeconds(renderSettings.scanWaitTime);
             
-            // Contract
             while (radius > 0f)
             {
                 radius -= Time.deltaTime * renderSettings.scanSpeed * renderSettings.returnSpeedMultiplier;
