@@ -7,13 +7,14 @@ public class MatrixController : MonoBehaviour
     public Transform canvasTransform; 
     
     [Header("Density Settings")]
-    public float columnSize = 20f; // 글자 하나의 너비 (폰트 크기와 비슷하게 설정)
+    public float columnSize = 32;
+    public int streamsPerColumn = 2; // 한 세로줄에 떨어질 문자열 뭉치의 개수
     
     [Header("Speed Settings")]
-    public float minSpeed = 200f; 
-    public float maxSpeed = 500f;
+    public float minSpeed = 50f;
+    public float maxSpeed = 150f;
 
-    private void Start()
+    void Start()
     {
         SpawnDenseStreams();
     }
@@ -26,28 +27,29 @@ public class MatrixController : MonoBehaviour
         float screenWidth = canvasRect.rect.width;
         float screenHeight = canvasRect.rect.height;
 
-        // 화면 왼쪽 끝부터 오른쪽 끝까지 글자 크기(columnSize) 간격으로 생성
-        // 예: 화면 1920픽셀, 글자크기 30 -> 약 64개 생성
+        // 화면의 가로 사이즈에 맞춰 문자 스트림 생성
         int streamCount = Mathf.CeilToInt(screenWidth / columnSize);
-        float startX = -(screenWidth / 2) + (columnSize / 2); // 왼쪽 끝 좌표 보정
+        float startX = -(screenWidth / 2) + (columnSize / 2); 
 
         for (int i = 0; i < streamCount; i++)
         {
-            GameObject obj = Instantiate(streamPrefab, canvasTransform);
-            RectTransform rect = obj.GetComponent<RectTransform>();
-
-            // X축: 정확히 간격에 맞춰 배치 (랜덤 제거하여 빈틈 방지)
             float posX = startX + (i * columnSize);
             
-            // Y축: 시작 높이를 화면 전체 랜덤한 위치로 한다.
-            //float posY = Random.Range(-screenHeight / 2, screenHeight);
-            float randomY = Random.Range(-screenHeight / 2, screenHeight * 1.5f);
+            // 한 열(X 좌표)에 streamsPerColumn 개수만큼 스트림을 추가 생성 (세로 밀도 증가)
+            for (int j = 0; j < streamsPerColumn; j++)
+            {
+                GameObject obj = Instantiate(streamPrefab, canvasTransform);
+                RectTransform rect = obj.GetComponent<RectTransform>();
 
-            rect.anchoredPosition = new Vector2(posX, randomY);
-            rect.sizeDelta = new Vector2(columnSize, rect.sizeDelta.y); // 너비 맞춤
+                // Y축: 겹치지 않게 더 넓은 범위(-screenHeight ~ screenHeight * 2)에서 랜덤 분산
+                float randomY = Random.Range(-screenHeight, screenHeight * 2f);
 
-            MatrixStream streamScript = obj.GetComponent<MatrixStream>();
-            streamScript.Setup(Random.Range(minSpeed, maxSpeed));
+                rect.anchoredPosition = new Vector2(posX, randomY);
+                rect.sizeDelta = new Vector2(columnSize, rect.sizeDelta.y);
+
+                MatrixStream streamScript = obj.GetComponent<MatrixStream>();
+                streamScript.Setup(Random.Range(minSpeed, maxSpeed));
+            }
         }
     }
 }

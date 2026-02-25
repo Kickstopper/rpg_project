@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Manager;
 using Data;
+using DG.Tweening;
+
 namespace Controller 
 {
     public static class GameScene
@@ -16,39 +18,51 @@ namespace Controller
 
     public class SceneController : MonoBehaviour
     {
-        
-        [SerializeField] private GameObject confirmWindow; // 확인 팝업 연결
+        [SerializeField] private GameObject confirmWindow; 
         
         [Header("UI Settings")]
         public GameObject UI_Canvas;
-        public Image targetImage; // 이미지가 표시될 UI Image 컴포넌트
+        public GameObject matrixGO;
+        public Image targetImage; 
         public SaveLoadUIController saveLoadUI;
         public List<Button> allMenuBtns;
-        public Button btnContinue; // 이어하기 버튼
-        public Button btnLoad;     // 불러오기 버튼 (슬롯 선택)
-        public Button btnNewGame;  // 새 게임
+        public Button btnContinue; 
+        public Button btnLoad;     
+        public Button btnNewGame;  
 
         private int currentBtnIndex = 0;
         
         [Header("Slide Settings")]
-        public List<Sprite> backgroundImages; // 배경 이미지 목록
-        public float fadeDuration = 1.5f; // 페이드 인/아웃 걸리는 시간
-        public float displayDuration = 3.0f; // 이미지가 완전히 보이는 시간
+        public List<Sprite> backgroundImages; 
+        public float fadeDuration = 1.5f; 
+        public float displayDuration = 3.0f; 
 
-        private bool isEnable = false;     // 팝업이 열려있는지 확인
+        private bool isEnable = false;     
         public bool IsEnable => isEnable;
+
+        private Coroutine slideshowCoroutine;
 
         void Start()
         {
             if (UI_Canvas) UI_Canvas.SetActive(false);
+            if (matrixGO) matrixGO.SetActive(false);
         }
-
 
         public void ShowAnimation()
         {
             if (targetImage != null && backgroundImages.Count > 0)
             {
-                StartCoroutine(SlideshowRoutine());
+                if (backgroundImages.Count > 1)
+                {
+                    slideshowCoroutine = StartCoroutine(SlideshowRoutine());
+                }
+                else
+                {
+                    Sequence seq = DOTween.Sequence();
+                    seq.Append(targetImage.DOFade(1f, fadeDuration).OnComplete(() => ShowDigitalRainEffect()));
+                    seq.AppendInterval(displayDuration); // 이미지 감상 시간 추가
+                    seq.Append(targetImage.DOFade(0.85f, fadeDuration).OnStart(EnableUI));
+                }
             }
             else
             {
@@ -60,112 +74,119 @@ namespace Controller
         {
             bool hasSuspend = SaveManager.Instance.HasSuspendData();
 
-            // 중단 데이터가 있으면 '이어하기' 표시
             if (!hasSuspend)
             {
                 btnContinue.gameObject.SetActive(false);
-                allMenuBtns.Remove(btnContinue);
+                if (allMenuBtns.Contains(btnContinue))
+                {
+                    allMenuBtns.Remove(btnContinue);
+                }
             }
         }
 
         void Update()
         {
+            // 스킵 처리
             if (!isEnable && Input.anyKeyDown)
             {
-                StopAllCoroutines();
-                targetImage.sprite = backgroundImages[backgroundImages.Count-1];
-                targetImage.color = Color.white;
-                targetImage.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
-                CheckSuspendSaveData();
-                UI_Canvas.SetActive(true);
-
-                isEnable = true;
+                SkipIntroAnimation();
                 return;
             }
-            else if (!isEnable || saveLoadUI.gameObject.activeSelf) return;
-            HandleMenuNavigation(ref currentBtnIndex);
+            
+            // UI가 켜져있고, 세이브로드 창이 없을 때만 키보드 네비게이션 작동
+            if (isEnable && !saveLoadUI.gameObject.activeSelf)
+            {
+                HandleMenuNavigation(ref currentBtnIndex);
+            }
+        }
+
+        private void SkipIntroAnimation()
+        {
+            if (slideshowCoroutine != null)
+            {
+                StopCoroutine(slideshowCoroutine);
+            }
+            
+            targetImage.DOKill();
+
+            // 스킵 시 최종 화면 상태 강제 세팅
+            targetImage.sprite = backgroundImages[backgroundImages.Count - 1];
+            targetImage.color = new Color(1, 1, 1, 0.85f);
+            targetImage.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
+            
+            ShowDigitalRainEffect();
+            EnableUI();
         }
 
         private IEnumerator SlideshowRoutine()
         {
-            int currentBtnIndex = 0;
-            Color color = targetImage.color;
+            int imageIndex = 0;
 
             while (true) // 무한 반복
             {
-                // 현재 순서의 이미지로 교체
-                targetImage.sprite = backgroundImages[currentBtnIndex];
+                targetImage.sprite = backgroundImages[imageIndex];
                 targetImage.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
 
-                // Fade In (투명 -> 불투명)
-                yield return StartCoroutine(FadeEffect(0f, 1f));
+                yield return targetImage.DOFade(1f, fadeDuration).WaitForCompletion();
 
-                // 대기 (이미지 감상 시간)
+                // 대기
                 yield return new WaitForSeconds(displayDuration);
 
-                // Fade Out (불투명 -> 투명)
-                yield return StartCoroutine(FadeEffect(1f, 0f));
-
-                // 다음 이미지 인덱스 계산 (리스트 끝에 도달하면 0번으로 돌아감)
-                currentBtnIndex = (currentBtnIndex + 1) % backgroundImages.Count;
-
+                // 첫 번째 이미지가 완전히 켜진 후 UI를 띄움
                 if (!isEnable)
                 {
-                    CheckSuspendSaveData();
-                    UI_Canvas.SetActive(true);
-                    isEnable = true;
+                    targetImage.DOFade(0.85f, fadeDuration);
+                    ShowDigitalRainEffect();
+                    EnableUI();
                 }
+
+                yield return targetImage.DOFade(0f, fadeDuration).WaitForCompletion();
+
+                imageIndex = (imageIndex + 1) % backgroundImages.Count;
             }
         }
 
-        // 페이드 효과를 처리하는 함수 (재사용 가능)
-        private IEnumerator FadeEffect(float startAlpha, float endAlpha)
+        private void EnableUI()
         {
-            float timer = 0f;
-            Color color = targetImage.color;
+            if (isEnable) return;
+            
+            CheckSuspendSaveData();
+            UI_Canvas.SetActive(true);
+            isEnable = true;
 
-            while (timer < fadeDuration)
-            {
-                timer += Time.deltaTime;
-                float progress = timer / fadeDuration;
-
-                // 부드러운 곡선(SmoothStep)으로 알파값 계산
-                float alpha = Mathf.SmoothStep(startAlpha, endAlpha, progress);
-
-                color.a = alpha;
-                targetImage.color = color;
-
-                yield return null;
-            }
-
-            // 오차 보정: 최종값으로 확실하게 설정
-            color.a = endAlpha;
-            targetImage.color = color;
+            // UI가 켜질 때 첫 번째 버튼을 선택
+            currentBtnIndex = 0;
+            UpdateSelection(currentBtnIndex);
         }
 
-        void HandleMenuNavigation(ref int currentBtnIndex)
+        private void ShowDigitalRainEffect()
+        {
+            if (matrixGO && !matrixGO.activeInHierarchy) matrixGO.SetActive(true);
+        }
+
+        void HandleMenuNavigation(ref int currentIndex)
         {
             if (allMenuBtns == null || allMenuBtns.Count == 0) return;
             bool changed = false;
 
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
-                currentBtnIndex = (currentBtnIndex - 1 + allMenuBtns.Count) % allMenuBtns.Count;
+                currentIndex = (currentIndex - 1 + allMenuBtns.Count) % allMenuBtns.Count;
                 changed = true;
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
-                currentBtnIndex = (currentBtnIndex + 1) % allMenuBtns.Count;
+                currentIndex = (currentIndex + 1) % allMenuBtns.Count;
                 changed = true;
             }
 
-            if (changed) UpdateSelection(currentBtnIndex);
+            if (changed) UpdateSelection(currentIndex);
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                if (allMenuBtns[currentBtnIndex].interactable)
+                if (allMenuBtns[currentIndex].interactable)
                 {
-                    allMenuBtns[currentBtnIndex].onClick.Invoke();
+                    allMenuBtns[currentIndex].onClick.Invoke();
                 }
             }
         }
@@ -179,30 +200,24 @@ namespace Controller
 
         public void OnClick_NewGame()
         {
-            // TODO: 캐릭터 생성 씬 또는 오프닝 씬으로 이동
             SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
         }
 
         public void OnClick_LoadGame()
         {
-            // 로드 창 활성화
-            //confirmWindow.SetActive(true);
             saveLoadUI.Open(false);
         }
 
-        // [이어하기] 버튼: 중단 데이터가 있으면 그것을 로드
         public void OnClick_Continue()
         {
             if (SaveManager.Instance.HasSuspendData())
             {
-                // -1번(중단 데이터) 로드 -> 로드 내부에서 파일 삭제됨
                 SaveManager.Instance.LoadGame(SaveManager.SUSPEND_SLOT_INDEX);
             }
         }
 
         public void OnClick_Quit()
         {
-            // 에디터와 빌드 버전 분기 처리
             #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
             #else
@@ -211,4 +226,3 @@ namespace Controller
         }
     }
 }
-

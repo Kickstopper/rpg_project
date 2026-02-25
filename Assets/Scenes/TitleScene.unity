@@ -1145,7 +1145,7 @@ GameObject:
   - component: {fileID: 511304156}
   - component: {fileID: 511304155}
   m_Layer: 0
-  m_Name: Layer_Far
+  m_Name: Layer_Near
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1190,7 +1190,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 8032953aca449884a92107a678759a83, type: 3}
+  m_Sprite: {fileID: -4987135763516232483, guid: bada6181cb6d6274287533a13f877c6a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1347,7 +1347,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 559943023}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1367,10 +1367,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   streamPrefab: {fileID: 9001027983298130375, guid: 2033d000fca4aec4db4f327c4b1ae0d5, type: 3}
-  canvasTransform: {fileID: 201973621}
-  columnSize: 20
-  minSpeed: 100
-  maxSpeed: 300
+  canvasTransform: {fileID: 1208232140}
+  columnSize: 25
+  streamsPerColumn: 2
+  minSpeed: 200
+  maxSpeed: 500
 --- !u!1 &568575780
 GameObject:
   m_ObjectHideFlags: 0
@@ -1725,7 +1726,7 @@ MonoBehaviour:
   menuCanvas: {fileID: 0}
   shopCanvas: {fileID: 0}
   currentBattleManager: {fileID: 0}
-  shopBuyUIController: {fileID: 0}
+  shopUIController: {fileID: 0}
   canHardSave: 0
 --- !u!1 &920790046
 GameObject:
@@ -1757,8 +1758,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 511304154}
   - {fileID: 1208232140}
+  - {fileID: 511304154}
   m_Father: {fileID: 201973621}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!225 &920790048
@@ -2092,6 +2093,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   confirmWindow: {fileID: 1243495747}
   UI_Canvas: {fileID: 2008646960}
+  matrixGO: {fileID: 559943023}
   targetImage: {fileID: 511304155}
   saveLoadUI: {fileID: 1115072391}
   allMenuBtns:
@@ -2103,7 +2105,7 @@ MonoBehaviour:
   btnLoad: {fileID: 1941007095}
   btnNewGame: {fileID: 493481233}
   backgroundImages:
-  - {fileID: 21300000, guid: c675cc619cec41449b0174251cd200e5, type: 3}
+  - {fileID: -4987135763516232483, guid: bada6181cb6d6274287533a13f877c6a, type: 3}
   fadeDuration: 3
   displayDuration: 5
 --- !u!1 &1034886870
@@ -2216,20 +2218,19 @@ GameObject:
   m_Component:
   - component: {fileID: 1208232140}
   m_Layer: 0
-  m_Name: Layer_Near
+  m_Name: Layer_Far
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1208232140
-Transform:
+--- !u!224 &1208232140
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1208232139}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -2237,6 +2238,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 920790047}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1280, y: 720}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1214734117
 GameObject:
   m_ObjectHideFlags: 0
@@ -3810,11 +3816,11 @@ MonoBehaviour:
   scrollRect: {fileID: 542866327}
   terminalCanvasGroup: {fileID: 1651225735}
   sceneController: {fileID: 1026948464}
-  typeSpeed: 0.01
-  lineDelay: 0.1
+  typeSpeed: 0.001
+  lineDelay: 0.01
   cursorChar: _
   cursorBlinkRate: 0.1
-  fadeDuration: 1.5
+  fadeDuration: 1
   skipFadeDuration: 0.3
   bootSequence:
   - text: 'Cirrus Logic 5429 VGA BIOS Version 1.02
@@ -3958,50 +3964,6 @@ MonoBehaviour:
 
 '
     preDelay: 2
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: 'SHIN.............
-
-      ..................
-
-      .................
-
-      ................
-
-      ...............
-
-      ..............
-
-      .............
-
-      ............
-
-      ...........
-
-      ..........
-
-      .........
-
-      ........
-
-      .......
-
-      ......
-
-      .....
-
-      ....
-
-      ...
-
-      ..
-
-      .
-
-      FCUK
-      YOU!'
-    preDelay: 3
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
