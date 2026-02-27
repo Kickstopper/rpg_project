@@ -10,16 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
-  m_Name: DummyTheme
+  m_Name: dummy
   m_EditorClassIdentifier: 
-  themeName: DummyTheme
+  themeName: dummy
   background: {fileID: 0}
   texture:
   - {fileID: 2800000, guid: 87cbe03c2d569d3449817b8787af0635, type: 3}
   - {fileID: 2800000, guid: 66a92645f20c0fe46bb1641e7c050252, type: 3}
   - {fileID: 2800000, guid: d07420b81bf4bd54ba4f1efeccb6ab2c, type: 3}
-  - {fileID: 2800000, guid: 188bf5825b90a5d409aee05f7a739e08, type: 3}
-  floorTexIdx: 3
+  - {fileID: 2800000, guid: 223ee10c3e3042541afc1df8aa1243ed, type: 3}
+  - {fileID: 2800000, guid: 3412a270ee74cb042b4bd9476b428672, type: 3}
+  floorTexIdx: 4
   ceilingTexIdx: 2
   wallAnimations:
   - name: anim

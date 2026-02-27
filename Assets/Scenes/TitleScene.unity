@@ -1675,8 +1675,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3033774bcf45dcd458b67bb977fbbfa6, type: 2}
   - {fileID: 11400000, guid: 484d98ce6299154429972dd7943e8054, type: 2}
   - {fileID: 11400000, guid: fcedda8f1ebfed94eb8db02addf7d512, type: 2}
-  ownedFeatures: 010000000300000004000000
-  installedFeatures: 010000000300000004000000
+  ownedFeatures: 0100000003000000040000000200000005000000
+  installedFeatures: 0100000003000000040000000200000005000000
 --- !u!1 &823262836
 GameObject:
   m_ObjectHideFlags: 0
@@ -3823,147 +3823,60 @@ MonoBehaviour:
   fadeDuration: 1
   skipFadeDuration: 0.3
   bootSequence:
-  - text: 'Cirrus Logic 5429 VGA BIOS Version 1.02
-
-      Copyright (c) 1993 Cirrus
-      Logic, Inc.'
+  - text: "AETHER BIOS v4.0 (c) 2026 Ultra-Silicon Corp.\r\n---------------------------------------------------------\r\nCPU:
+      128-Core Neural Processor - OK\r\nMEM: 2.0 PB Quantum Entangled RAM - CHECKING...
+      OK\r\nSTORAGE: Crystal-State Drive (CSD) - MAPPED\r\nNET: 10G-Satellite Mesh
+      Link - ESTABLISHED\r\n\r\nDETECTING NEURAL INTERFACE... \r\n[HANDSHAKE SUCCESSFUL]
+      - User: Guest_01\r\n---------------------------------------------------------\r\nRUNNING
+      'CONFIG.SYS' INTERPRETER...\r\nLOADING HYPERVISOR KERNEL..."
     preDelay: 0
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: 'Award Modular BIOS v4.51PG, An Energy Star Ally
+  - text: 'QUANTUM_CELL_ARRAY: INITIALIZING...
 
-      Copyright (C) 1984-95,
-      Award Software, Inc.
-
-      PENTIUM-S CPU at 133MHz'
-    preDelay: 0
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: 'Memory Test :'
+      MEMORY_CAPACITY: '
     preDelay: 2
     isMemoryCheck: 1
     memoryStart: 0
-    memoryEnd: 16384
-  - text: 'Award Plug and Play BIOS Extension v1.0A
-
-      Detecting HDD Primary
-      Master ... QUANTUM FIREBALL 1.2GB
-
-      Detecting HDD Primary Slave ... NONE
-
-      Detecting
-      HDD Secondary Master ... SONY CD-ROM CDU-31A'
+    memoryEnd: 1048576
+  - text: 'INTEGRITY_SCAN: NO PARITY ERRORS FOUND.'
     preDelay: 0
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: 'Press DEL to enter SETUP
+  - text: 'C:\> LOAD KERNEL.EXE /STABLE
 
-      08/15/95-i430FX-2A59CF54C-00
+      C:\> START ABRAXAS_SHELL.SYS --mode=minimalist
 
-'
+
+
+      [SYSTEM]
+      ''Abraxas'' is now online
+
+
+
+      C:\> '
     preDelay: 0
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: 'Starting MS-DOS...
-
-'
-    preDelay: 0
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: 'HIMEM is testing extended memory...done.
-
-'
+  - text: C:\> cd NEXT_WORLD
     preDelay: 1
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: 'C:\DOS\SMARTDRV.EXE /X
-
-      CD-ROM Device Driver ... Driver: MSCD001
-
-      Unit
-      0: SONY CDU-31A'
-    preDelay: 0
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: 'Sound Blaster 16 initialization complete.
-
-      Port 220, IRQ 5, DMA
-      1, High DMA 5
-
-      Copyright (c) Creative Technology Ltd., 1992-1994.'
-    preDelay: 0
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: 'Mouse Driver V8.20 installed.
-
-'
-    preDelay: 0
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: C:\>
+  - text: "C:\\NEXT_WORLD> run nextworld.exe --neuro-link --high-fidelity\r\n\r\n[INIT]
+      Allocating 512TB Virtual VRAM... DONE\r\n[ASSET] Fetching global textures from
+      Decentralized Cloud... 100%\r\n[COMPILING] Real-time Raytracing Shaders (AI-Optimized)...
+      OK\r\n[SYNC] Adjusting Neural Latency: 0.02ms\r\n\r\nReady to enter the simulation.\r\nPress
+      'Y' to synchronize your consciousness.\r\n "
     preDelay: 2
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: 'C:\>cd GAMES
-
-      C:\GAMES>cd MEGATEM'
-    preDelay: 1
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: C:\GAMES\MEGATEM>megami_nanpa32.exe
-    preDelay: 0
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: 'DOS/4GW Protected Mode Run-time Version 1.97
-
-      Copyright (c) Rational
-      Systems, Inc. 1990-1994'
-    preDelay: 2
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: 'Initializing Neural Link... OK
-
-      Loading Megami Summoning Program...
-
-'
-    preDelay: 0
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: 'Connecting to DDS Server...
-
-'
-    preDelay: 2
-    isMemoryCheck: 0
-    memoryStart: 0
-    memoryEnd: 0
-  - text: '''EL ELOHIM ELOHO ELOHIM SEBAOTH''
-
-      ''ELION EIECH ADIER EIECH ADONAI''
-
-      ''JAH
-      SADAI TETRAGRAMMATON SADAI''
-
-      ''AGIOS O THEOS ISCHIROS ATHANATOS''
-
-      ''AGLA
-      AMEN''
-
-'
-    preDelay: 2
+  - text: 'C:\> '
+    preDelay: 3
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0

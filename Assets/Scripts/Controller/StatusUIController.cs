@@ -46,7 +46,7 @@ namespace Controller
         public Slider agiSlider; public TextMeshProUGUI agiText;
         public Slider lucSlider; public TextMeshProUGUI lucText;
 
-        [Header("Combat Stats (Text Only)")]
+        [Header("Battle Stats (Text Only)")]
         public TextMeshProUGUI atkText;
         public TextMeshProUGUI atkHitText;
         public TextMeshProUGUI gunText;
@@ -203,7 +203,7 @@ namespace Controller
             UpdateStat(agiSlider, agiText, charData.stats.agi, maxStatVal);
             UpdateStat(lucSlider, lucText, charData.stats.luc, maxStatVal);
 
-            // Combat Stats
+            // Battle Stats
             atkText.text = charData.GetTotalAttack().ToString();
             atkHitText.text = charData.GetHitRate().ToString();
             gunText.text = charData.GetGunAttack().ToString();     // 총 공격력

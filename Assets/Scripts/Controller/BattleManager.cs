@@ -66,7 +66,7 @@ namespace Controller
         private Dictionary<int, (ActionType type, BaseRootData data, GameObject target)> lastPlayerActions = new();
        
         public BattleState state;
-        private List<CombatAction> actionQueue = new(); // 이번 턴의 모든 행동
+        private List<BattleAction> actionQueue = new(); // 이번 턴의 모든 행동
 
         // 입력 제어용 변수
         private ActionType currentSelectedAction;
@@ -239,7 +239,7 @@ namespace Controller
                 int speed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty;
                 currentActor.nextTurnSpeedPenalty = 0; 
 
-                CombatAction action = new CombatAction(currentActor.gameObject, null, actionType, speed);
+                BattleAction action = new BattleAction(currentActor.gameObject, null, actionType, speed);
                 actionQueue.Add(action);
 
                 NextPlayerInput();
@@ -369,7 +369,7 @@ namespace Controller
 
             // 결과 텍스트 구성
             List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
-            BattleReward reward = CombatCalculator.CalculateRewards(allPlayers, fieldController.encounterLog);
+            BattleReward reward = BattleCalculator.CalculateRewards(allPlayers, fieldController.encounterLog);
             foreach(var p in allPlayers)
             {
                 if (p != null && p.currentHp > 0) {
@@ -415,10 +415,10 @@ namespace Controller
                     }
 
                     // 데미지 계산
-                    CombatAction fakeAction = new CombatAction(player.gameObject, target.gameObject, ActionType.Attack, 0);
+                    BattleAction fakeAction = new BattleAction(player.gameObject, target.gameObject, ActionType.Attack, 0);
                     BattleEntity pEntity = player.GetComponent<BattleEntity>();
                     BattleEntity tEntity = target.GetComponent<BattleEntity>();
-                    int dmg = CombatCalculator.CalculateDamage(pEntity, tEntity, fakeAction, false, 1.0f);
+                    int dmg = BattleCalculator.CalculateDamage(pEntity, tEntity, fakeAction, false, 1.0f);
 
                     // 애니메이션 없이 HP 즉시 차감
                     target.currentHp = Mathf.Max(0, target.currentHp - dmg);
@@ -434,10 +434,10 @@ namespace Controller
                     var target = fieldController.activePlayers.FirstOrDefault(p => p.currentHp > 0);
                     if (target == null) break;
 
-                    CombatAction fakeAction = new CombatAction(monster.gameObject, target.gameObject, ActionType.Attack, 0);
+                    BattleAction fakeAction = new BattleAction(monster.gameObject, target.gameObject, ActionType.Attack, 0);
                     BattleEntity mEntity = monster.GetComponent<BattleEntity>();
                     BattleEntity ptEntity = target.GetComponent<BattleEntity>();
-                    int dmg = CombatCalculator.CalculateDamage(mEntity, ptEntity, fakeAction, false, 1.0f);
+                    int dmg = BattleCalculator.CalculateDamage(mEntity, ptEntity, fakeAction, false, 1.0f);
                     target.currentHp = Mathf.Max(0, target.currentHp - dmg);
                 }
             }
@@ -503,7 +503,7 @@ namespace Controller
             foreach (var p in livingPlayers)
             {
                 var pc = p as PlayerController;
-                if (pc.equippedGunId != "gun_000") return false;
+                if (pc.equippedGunId != "gun_001") return false;
                 if (pc.currentGun == null || pc.currentGunAmmo < pc.currentGun.maxHits) return false;
             }
 
@@ -532,8 +532,10 @@ namespace Controller
         {
             uiController.InitCommandButtons();
 
-            // Skill 조건
-            bool canSkill = actor.learnedSkillIds.Count > 0;
+            // Skill 조건. 배운 스킬이 있고, Silence 제약이 걸리지 않아야 함
+            bool hasSilence = actor.activeEffects.Exists(e => e.data.restrictionType == RestrictionType.Silence);
+            bool canSkill = actor.learnedSkillIds.Count > 0 && !hasSilence;
+
             // Item 조건
             bool canItem = (InventoryManager.Instance.GetAllItemIds().Count > 0);
 
@@ -921,7 +923,7 @@ namespace Controller
 
             int speed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty; 
 
-            CombatAction action = new CombatAction(
+            BattleAction action = new BattleAction(
                 currentActor.gameObject, 
                 currentActor.gameObject, 
                 ActionType.Reload,
@@ -944,7 +946,7 @@ namespace Controller
             currentActor.nextTurnSpeedPenalty = 0; // 페널티 초기화 (이번 턴 소모)
 
             // Next 액션 생성
-            CombatAction action = new CombatAction(
+            BattleAction action = new BattleAction(
                 currentActor.gameObject, 
                 currentActor.gameObject, 
                 ActionType.Next, 
@@ -1050,7 +1052,7 @@ namespace Controller
         void QueuePolymorphicAction(GameObject target)
         {
             PlayerController actor = fieldController.GetCurrentCharacter();
-            CombatAction action = new CombatAction(actor.gameObject, target, currentSelectedAction, actor.GetTotalAgi());
+            BattleAction action = new BattleAction(actor.gameObject, target, currentSelectedAction, actor.GetTotalAgi());
             action.itemData = currentSelectedItem; 
             if (currentSelectedItem is SkillData skill) action.skillData = skill;
 
@@ -1071,7 +1073,7 @@ namespace Controller
             int guardSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
             currentActor.nextTurnSpeedPenalty = 0; 
 
-            CombatAction action = new CombatAction(currentActor.gameObject, currentActor.gameObject, ActionType.Guard, guardSpeed);
+            BattleAction action = new BattleAction(currentActor.gameObject, currentActor.gameObject, ActionType.Guard, guardSpeed);
             actionQueue.Add(action);
             NextPlayerInput();
         }
@@ -1124,7 +1126,7 @@ namespace Controller
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             PlayerController leader = fieldController.GetCurrentCharacter();
 
-            CombatAction leaderAction = new CombatAction(leader.gameObject, leader.gameObject, ActionType.Last_Stand, 9999);
+            BattleAction leaderAction = new BattleAction(leader.gameObject, leader.gameObject, ActionType.Last_Stand, 9999);
             actionQueue.Add(leaderAction);
 
             isLastStandInputMode = true;
@@ -1148,7 +1150,7 @@ namespace Controller
             }
 
             // 행동 생성 (속도를 9999로 해서 무조건 최초 발동시킴)
-            CombatAction action = new CombatAction(leader.gameObject, null, ActionType.Rolling_Vulcan, 9999);
+            BattleAction action = new BattleAction(leader.gameObject, null, ActionType.Rolling_Vulcan, 9999);
             
             actionQueue.Add(action);
             NextPlayerInput();
@@ -1175,7 +1177,7 @@ namespace Controller
             {
                 // 마지막 행동 확인
                 int lastIndex = actionQueue.Count - 1;
-                CombatAction lastAction = actionQueue[lastIndex];
+                BattleAction lastAction = actionQueue[lastIndex];
                 PlayerController actor = lastAction.actor.GetComponent<PlayerController>();
 
                 // 행동 삭제
@@ -1229,12 +1231,32 @@ namespace Controller
             PlayerController currentPlayer = fieldController.GetCurrentCharacter();
             if (currentPlayer.currentHp <= 0) { NextPlayerInput(); return; }
 
+            // 제약 조건 체크
+            RestrictionType restriction = currentPlayer.CheckActionRestriction();
+
+            if (restriction == RestrictionType.SkipTurn)
+            {
+                uiController.ShowLog($"{currentPlayer.name}은(는) 움직일 수 없다!");
+                // 입력 없이 즉시 다음 턴으로 넘김
+                BattleAction skipAction = new BattleAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Next, 0);
+                actionQueue.Add(skipAction);
+                NextPlayerInput();
+                return;
+            }
+            else if (restriction == RestrictionType.Confusion || restriction == RestrictionType.Charm)
+            {
+                uiController.ShowLog($"{currentPlayer.name}은(는) 혼란에 빠졌다!");
+                // 플레이어 조작을 막고, 랜덤 타겟 자동 액션(Attack, Guard, Next)을 큐에 넣음.
+                ProcessRandomAction(currentPlayer);
+                return;
+            }
+
             // Union Attack / Rolling Vulcan 참가자 스킵 처리
             if (currentUnionParticipants.Contains(currentPlayer))
             {
                 Debug.Log($"Union Attack 또는 Rolling Vulcan 참가로 {currentPlayer.name}의 턴 스킵");
                 
-                /* CombatAction skipAction = new CombatAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Guard, 0);
+                /* BattleAction skipAction = new BattleAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Guard, 0);
                 actionQueue.Add(skipAction);
                 */
                 
@@ -1244,7 +1266,7 @@ namespace Controller
 
             if (isLastStandInputMode && currentPlayer.columnIndex < 3)
             {
-                CombatAction supportAction = new CombatAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Guard, currentPlayer.GetTotalAgi() + 2000);
+                BattleAction supportAction = new BattleAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Guard, currentPlayer.GetTotalAgi() + 2000);
                 actionQueue.Add(supportAction);
                 NextPlayerInput(); 
                 return; 
@@ -1289,6 +1311,33 @@ namespace Controller
                 EventSystem.current.SetSelectedGameObject(null);
                 UpdateSelection(list, index);
             }
+        }
+
+        void ProcessRandomAction(PlayerController actor)
+        {
+            List<ActionType> randAction = new(){ ActionType.Attack, ActionType.Guard, ActionType.Next };
+            ActionType actionType = randAction[Random.Range(0, randAction.Count)] ;
+            GameObject finalTarget = null;
+            if (actionType == ActionType.Attack)
+            {
+                List<BattleEntity> candidates = new List<BattleEntity>();
+                var livingMonsters = fieldController.GetLivingMonsters();
+                foreach (var m in livingMonsters)
+                {
+                    bool isFront = (m.transform.parent.parent == fieldController.enemyFrontRowContainer);
+                    if (!isFront) continue;
+                    candidates.Add(m);
+                }
+                
+                if (candidates.Count > 0)
+                    finalTarget = candidates[Random.Range(0, candidates.Count)].gameObject;
+            }
+            int speed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
+            actor.nextTurnSpeedPenalty = 0;
+            BattleAction action = new BattleAction(actor.gameObject, finalTarget, actionType, speed);
+            actionQueue.Add(action);
+
+            NextPlayerInput();
         }
 
         void ProcessAutoAction(PlayerController actor)
@@ -1351,7 +1400,7 @@ namespace Controller
             int speed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
             actor.nextTurnSpeedPenalty = 0;
 
-            CombatAction action = new CombatAction(actor.gameObject, finalTarget, actionType, speed);
+            BattleAction action = new BattleAction(actor.gameObject, finalTarget, actionType, speed);
             action.itemData = autoData; 
             if (autoData is SkillData skill) action.skillData = skill;
 
@@ -1420,7 +1469,7 @@ namespace Controller
                 int moveSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
                 currentActor.nextTurnSpeedPenalty = 0; 
 
-                CombatAction action = new CombatAction(currentActor.gameObject, targetSlot.gameObject, ActionType.Move, moveSpeed);
+                BattleAction action = new BattleAction(currentActor.gameObject, targetSlot.gameObject, ActionType.Move, moveSpeed);
                 actionQueue.Add(action);
 
                 isSelectingMoveTarget = false;
@@ -1490,7 +1539,7 @@ namespace Controller
 
             yield return wait10;
 
-            if (CombatCalculator.CalculateEscapeSuccess(fieldController.activePlayers, fieldController.activeMonsters, currentEscapeAttempts, guaranteedEscapeAttempts))
+            if (BattleCalculator.CalculateEscapeSuccess(fieldController.activePlayers, fieldController.activeMonsters, currentEscapeAttempts, guaranteedEscapeAttempts))
             {
                 fieldController.SetEnemyVisualsActive(false);
                 uiController.ShowMessage("휴~ 도망쳤다.");
@@ -1607,7 +1656,7 @@ namespace Controller
             int finalSpeed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
             actor.nextTurnSpeedPenalty = 0;
 
-            CombatAction action = new CombatAction(actor.gameObject, targetEntity.gameObject, currentSelectedAction, finalSpeed); 
+            BattleAction action = new BattleAction(actor.gameObject, targetEntity.gameObject, currentSelectedAction, finalSpeed); 
             
             if (currentSelectedAction == ActionType.Union_Attack)
             {
@@ -1656,11 +1705,13 @@ namespace Controller
             actionQueue.Clear(); 
 
             List<BattleEntity> livingPlayers = fieldController.GetLivingParty();
+            List<BattleEntity> livingMonsters = fieldController.GetLivingMonsters();
+            
             foreach (MonsterController monster in fieldController.activeMonsters)
             {
                 if (monster.currentHp <= 0) continue;
                 
-                CombatAction enemyAction = monster.ChooseAction(livingPlayers);
+                BattleAction enemyAction = monster.ChooseAction(livingPlayers, livingMonsters);
                 if (enemyAction != null)
                 {
                     enemyAction.speed = monster.GetTotalAgi() - monster.nextTurnSpeedPenalty;
@@ -1700,7 +1751,7 @@ namespace Controller
             }
         }
 
-        int CalculateActionDelay(CombatAction action)
+        int CalculateActionDelay(BattleAction action)
         {
             int baseDelay = 0;
             switch (action.type)
@@ -1724,7 +1775,7 @@ namespace Controller
             return false;
         }
 
-        IEnumerator PerformAction(CombatAction action)
+        IEnumerator PerformAction(BattleAction action)
         {
             switch (action.type)
             {
@@ -1751,7 +1802,7 @@ namespace Controller
             uiController.HideLog();
         }
 
-        IEnumerator HandleItemAction(CombatAction action)
+        IEnumerator HandleItemAction(BattleAction action)
         {
             BaseRootData item = action.itemData;
 
@@ -1806,7 +1857,7 @@ namespace Controller
             yield return wait05;
         }
 
-        IEnumerator HandleSkillAction(CombatAction action)
+        IEnumerator HandleSkillAction(BattleAction action)
         {
             // 스킬 타겟 자동 변경 로직
             if (action.target == null || !IsAlive(action.target))
@@ -1854,10 +1905,11 @@ namespace Controller
                     BattleEntity attackerEntity = action.actor.GetComponent<BattleEntity>();
                     BattleEntity targetEntity = targetObj.GetComponent<BattleEntity>();
 
-                    bool isCrit = CombatCalculator.CheckCritical(attackerEntity, targetEntity, action);
-                    int dmg = CombatCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCrit, 1.0f);
+                    bool isCrit = BattleCalculator.CheckCritical(attackerEntity, targetEntity, action);
+                    int dmg = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCrit, 1.0f);
                     
                     ApplyDamage(targetObj, dmg, isCrit);
+                    BattleCalculator.ProcessSkillStatusEffect(attackerEntity, targetEntity, skill);
                 }
                 else
                 {
@@ -1879,7 +1931,7 @@ namespace Controller
             yield return wait05;
         }
 
-        IEnumerator HandleGuardAction(CombatAction action)
+        IEnumerator HandleGuardAction(BattleAction action)
         {
             SetGuardState(action.actor, true);
             uiController.ShowLog($"{action.actor.name} IS GUARDING...");
@@ -1887,7 +1939,7 @@ namespace Controller
             uiController.HideLog();
         }
 
-        IEnumerator HandleUnionAttack(CombatAction action)
+        IEnumerator HandleUnionAttack(BattleAction action)
         {
             if (action.target == null || !IsAlive(action.target))
             {
@@ -1985,7 +2037,7 @@ namespace Controller
 
             BattleEntity leaderEntity = leader.GetComponent<BattleEntity>();
             BattleEntity targetEntity = target.GetComponent<BattleEntity>();
-            int dmg = CombatCalculator.CalculateDamage(leaderEntity, targetEntity, action, isCrit, dmgMultiplier);
+            int dmg = BattleCalculator.CalculateDamage(leaderEntity, targetEntity, action, isCrit, dmgMultiplier);
             dmg = Mathf.RoundToInt(dmg * (float)totalStr / leader.GetTotalStr()); 
             
             ApplyDamage(target, dmg, isCrit);
@@ -2021,7 +2073,7 @@ namespace Controller
         }
 
         // Last Stand 집결 애니메이션
-        IEnumerator HandleLastStandAction(CombatAction action)
+        IEnumerator HandleLastStandAction(BattleAction action)
         {
             isLastStandActive = true; 
             uiController.ShowLog("LAST STAND!!");
@@ -2048,7 +2100,7 @@ namespace Controller
         }
 
         // Rolling Vulcan 실행 코루틴
-        IEnumerator HandleRollingVulcan(CombatAction action)
+        IEnumerator HandleRollingVulcan(BattleAction action)
         {
             var leader = action.actor.GetComponent<PlayerController>();
             int index = leader.columnIndex;
@@ -2091,7 +2143,7 @@ namespace Controller
                         
                         PlayerController shooter = participants[i % participants.Count];
                         BattleEntity enemyEntity = enemy.gameObject.GetComponent<BattleEntity>();
-                        int dmg = CombatCalculator.CalculateGunDamage(shooter, enemyEntity, false);
+                        int dmg = BattleCalculator.CalculateGunDamage(shooter, enemyEntity, false);
                         
                         ApplyDamage(enemy.gameObject, dmg, false);
                         visualController.SpawnVFX(VfxID.Gun, enemy.transform.position);
@@ -2171,7 +2223,7 @@ namespace Controller
         }
 
         // 장전 코루틴
-        IEnumerator HandleReloadAction(CombatAction action)
+        IEnumerator HandleReloadAction(BattleAction action)
         {
             PlayerController actor = action.actor.GetComponent<PlayerController>();
             if (actor != null && actor.currentGun != null)
@@ -2190,7 +2242,7 @@ namespace Controller
             yield return wait05;
         }
 
-        IEnumerator HandleAttackAction(CombatAction action)
+        IEnumerator HandleAttackAction(BattleAction action)
         {
             // 타겟이 없거나 이미 죽은 상태라면?
             if (action.target == null || !IsAlive(action.target))
@@ -2246,7 +2298,7 @@ namespace Controller
             }
             else
             {
-                pc?.SetMessage(Random.Range(0f, 1f) < 0.5f ? "오라오라!" : "흐이짜!");
+                pc?.SetMessage(Random.Range(0f, 1f) < 0.5f ? "얍!" : "하이얍!");
             }
 
             string actStr = (action.type == ActionType.Shoot) ? "'S SHOOT!" : "'S SMASH!";
@@ -2334,7 +2386,7 @@ namespace Controller
                 if (pc.currentGunAmmo < 0) pc.currentGunAmmo = 0;
                 Debug.Log($"[Gun] 사격 종료. 남은 탄환: {pc.currentGunAmmo}");
             }
-
+            
             // 복귀
             if (isMonster)
                 yield return action.actor.transform.DOScale(originalScale, 0.15f).SetEase(Ease.OutQuad).WaitForCompletion();
@@ -2344,7 +2396,7 @@ namespace Controller
             yield return wait01;
         }
 
-        IEnumerator ProcessSingleHit(CombatAction action, GameObject target)
+        IEnumerator ProcessSingleHit(BattleAction action, GameObject target)
         {
             // 위치 보정 계산 호출
             BattleFieldController.BattlePosition atkPos = fieldController.GetUnitPosition(action.actor);
@@ -2358,26 +2410,26 @@ namespace Controller
             if (action.type == ActionType.Shoot || (pActor?.currentWeapon?.type == WeaponType.Gun)) 
                 wType = WeaponType.Gun;
             
-            CombatCalculator.GetPositionalModifiers(atkPos, defPos, wType, out float posDmgMult, out float posEvaBonus);
+            BattleCalculator.GetPositionalModifiers(atkPos, defPos, wType, out float posDmgMult, out float posEvaBonus);
 
-            if (CombatCalculator.CheckEvasion(attackerEntity, targetEntity, posEvaBonus))
+            if (BattleCalculator.CheckEvasion(attackerEntity, targetEntity, posEvaBonus))
             {
                 Debug.Log($"{target.name} 회피!");
+                yield return StartCoroutine(ProcessDodgeAnimation(target.transform));
                 if (targetEntity is PlayerController pc)
                 {
                     pc.SetMessage("어림없지!");
                     yield return wait05;
                     pc.SetMessage(string.Empty);
                 } 
-                yield return StartCoroutine(ProcessDodgeAnimation(target.transform));
                 yield break; 
             }
 
-            if (CombatCalculator.CheckReflection(targetEntity, action.type))
+            if (BattleCalculator.CheckReflection(targetEntity, action.type))
             {
                 uiController.ShowLog("REFLECT!");
                 visualController.SpawnVFX(VfxID.Reflect, target.transform.position);
-                int reflectDmg = CombatCalculator.CalculateDamage(attackerEntity, attackerEntity, action, false, 1.0f);
+                int reflectDmg = BattleCalculator.CalculateDamage(attackerEntity, attackerEntity, action, false, 1.0f);
                 ApplyDamage(action.actor, reflectDmg, false);
                 if (targetEntity is PlayerController pc)
                 {
@@ -2388,11 +2440,11 @@ namespace Controller
                 yield break;
             }
 
-            if (CombatCalculator.CheckAbsorption(targetEntity, action.type))
+            if (BattleCalculator.CheckAbsorption(targetEntity, action.type))
             {
                 uiController.ShowLog("ABSORB!");
                 visualController.SpawnVFX(VfxID.Absorb, target.transform.position);
-                int absorbAmount = CombatCalculator.CalculateDamage(attackerEntity, targetEntity, action, false, 1.0f);
+                int absorbAmount = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, false, 1.0f);
                 if (targetEntity is PlayerController pc)
                 {
                     pc.Recover(absorbAmount, 0);
@@ -2410,8 +2462,8 @@ namespace Controller
                 if (defenders.Count > 0)
                 {
                     
-                    bool isCrit = CombatCalculator.CheckCritical(attackerEntity, targetEntity, action);
-                    int originalDamage = CombatCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCrit, posDmgMult);
+                    bool isCrit = BattleCalculator.CheckCritical(attackerEntity, targetEntity, action);
+                    int originalDamage = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCrit, posDmgMult);
                     int splitDamage = Mathf.Max(1, originalDamage / defenders.Count);
                     uiController.ShowLog("DEFENSE!");
                     foreach (var defender in defenders)
@@ -2427,13 +2479,13 @@ namespace Controller
                 }
             }
 
-            bool isCritical = CombatCalculator.CheckCritical(attackerEntity, targetEntity, action);
+            bool isCritical = BattleCalculator.CheckCritical(attackerEntity, targetEntity, action);
             int damage = 0;
 
             if (action.type == ActionType.Shoot && pActor != null)
-                damage = CombatCalculator.CalculateGunDamage(pActor, targetEntity, isCritical);
+                damage = BattleCalculator.CalculateGunDamage(pActor, targetEntity, isCritical);
             else
-                damage = CombatCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCritical, posDmgMult);
+                damage = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCritical, posDmgMult);
 
             BattleEntity defenderEntity = target.GetComponent<BattleEntity>();
             if (defenderEntity != null && defenderEntity.isGuarding)
@@ -2465,7 +2517,7 @@ namespace Controller
                 if (vfxID != VfxID.None) visualController.SpawnVFX(vfxID, target.transform.position);
                 yield return wait01;
             }
-
+            
             ApplyDamage(target, damage, isCritical);
         }
 
@@ -2524,7 +2576,7 @@ namespace Controller
                 if (p == null || p.IsEmpty || p.currentHp <= 0) continue;
 
                 // Align 호환성 체크
-                if (!CombatCalculator.IsAlignCompatible(leader.align, p.align)) continue;
+                if (!BattleCalculator.IsAlignCompatible(leader.align, p.align)) continue;
 
                 // 행동 예약 상태 체크. 이미 행동 큐에 등록된 행동이 있는지 확인
                 bool isBusy = false;
@@ -2540,7 +2592,7 @@ namespace Controller
             return partners;
         }
 
-        void GetWeaponInfo(CombatAction action, out int min, out int max, out TargetScope scope)
+        void GetWeaponInfo(BattleAction action, out int min, out int max, out TargetScope scope)
         {
             min = 1; max = 1; scope = TargetScope.Front_Single_Enemy; 
             var pActor = action.actor.GetComponent<PlayerController>();
@@ -2552,7 +2604,7 @@ namespace Controller
         bool IsAlive(GameObject obj) { return obj != null && obj.activeSelf && (obj.GetComponent<IBattleTarget>()?.IsAlive ?? false); }
 
         // 아군 위치 이동 애니메이션
-        IEnumerator PerformMove(CombatAction action)
+        IEnumerator PerformMove(BattleAction action)
         {
             PlayerController actor = action.actor.GetComponent<PlayerController>();
             if (actor == null || actor.currentHp <= 0) yield break;
@@ -2587,7 +2639,7 @@ namespace Controller
                 SoundManager.Instance.PlayBGM(BgmID.Victory);
                 
                 List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
-                BattleReward reward = CombatCalculator.CalculateRewards(allPlayers, fieldController.encounterLog);
+                BattleReward reward = BattleCalculator.CalculateRewards(allPlayers, fieldController.encounterLog);
 
                 // 경험치 반영 전 상태 스냅샷 저장
                 Dictionary<PlayerController, (int oldLv, int oldExp, int oldMaxExp)> preBattleStates = new Dictionary<PlayerController, (int, int, int)>();
@@ -2597,7 +2649,7 @@ namespace Controller
                     if (pc != null && pc.currentHp > 0) 
                     {
                         int oldLevel = pc.sourceData.stats.level;
-                        int maxExp = CombatCalculator.GetMaxExpForLevel(oldLevel); // Spirit의 영향이 없는 원본 데이터의 Level을 사용함
+                        int maxExp = BattleCalculator.GetMaxExpForLevel(oldLevel); // Spirit의 영향이 없는 원본 데이터의 Level을 사용함
                         preBattleStates.Add(pc, (oldLevel, pc.sourceData.currentExp, maxExp));
                     }
                 }

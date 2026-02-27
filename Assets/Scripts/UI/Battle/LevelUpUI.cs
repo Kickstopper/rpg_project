@@ -118,10 +118,10 @@ namespace UI.Battle
             // UI 텍스트 갱신
             if (currentTarget.portraitImage != null) portraitImage.sprite = currentTarget.portraitImage.sprite;
             nameText.text = currentTarget.entityName;
-            levelText.text = $"LV {oldLevel} -> {currentTarget.sourceData.stats.level}";
+            levelText.text = $"LV {oldLevel} ▶ {currentTarget.sourceData.stats.level}";
             
-            int nextExp = CombatCalculator.GetMaxExpForLevel(currentTarget.sourceData.stats.level);
-            nextExpText.text = $"NEXT EXP {nextExp - currentTarget.sourceData.currentExp}";
+            int nextExp = BattleCalculator.GetMaxExpForLevel(currentTarget.sourceData.stats.level);
+            nextExpText.text = $"NEXT {nextExp - currentTarget.sourceData.currentExp}";
 
             PopulateSkillList();
             RefreshUI();

@@ -1,4 +1,5 @@
 EventID,Seq,Type,Speaker,Portrait,Text,Condition,Action / Param,NextID
-EVT_GUARD_MEET,1,TALK,Army,npc,Tomare! Tomarinasai!,None,None,2
-EVT_GUARD_MEET,1,TALK,Army,npc,Humu... Omaedattanoka.,None,None,
-EVT_GUARD_MEET,5,TALK,Army,npc,"Yoshi Tottemoyoi!",None,SET_FLAG:passed_guard,END
+EVT_GUARD_MEET,1,TALK,무장경찰,npc,멈춰. 멈춰라.,None,None,2
+EVT_GUARD_MEET,1,TALK,무장경찰,npc,흠... 당신입니까.,None,None,
+EVT_GUARD_MEET,1,TALK,무장경찰,npc,지금 이 앞은 위험합니다.,None,None,
+EVT_GUARD_MEET,5,TALK,무장경찰,npc,"가지 말라고는 하지 않겠지만 부디 조심하십시오.",None,SET_FLAG:passed_guard,END

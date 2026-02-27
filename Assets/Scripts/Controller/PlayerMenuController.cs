@@ -641,6 +641,7 @@ namespace Controller
                 case MenuState.Suspend:
                     // 중단 저장 및 타이틀 이동
                     SaveManager.Instance.SaveGame(SaveManager.SUSPEND_SLOT_INDEX);
+                    GameStateManager.Instance.ChangeState(GameState.None);
                     UnityEngine.SceneManagement.SceneManager.LoadScene(GameScene.TITLE_SCENE);
                     break;
 

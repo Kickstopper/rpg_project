@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfddf8673c460194d9cd0f6638dca743, type: 3}
+  m_Name: Poison
+  m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
+  id: status_poison
+  effectName: "\uC911\uB3C5"
+  durationType: 0
+  cureType: 0
+  maxTurns: 0
+  cureChancePerTurn: 0
+  atkMultiplier: 1
+  defMultiplier: 1
+  evaMultiplier: 1
+  accMultiplier: 1
+  canAct: 1
+  canUseMagic: 1
+  dotDamage: 0

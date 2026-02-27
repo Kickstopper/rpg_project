@@ -121,7 +121,6 @@ namespace Controller
             // 이름표 변경 (디버깅용)
             this.name = $"Empty_Slot_{colIndex}";
         }
-
         
         // RuntimeData를 받는 초기화 함수
         public void Initialize(RuntimeCharacterData runtimeData, BattleManager controller, bool hasAnimation = false)
@@ -400,7 +399,7 @@ namespace Controller
             
             while (true)
             {
-                int requiredExp = CombatCalculator.GetMaxExpForLevel(sourceData.stats.level);
+                int requiredExp = BattleCalculator.GetMaxExpForLevel(sourceData.stats.level);
 
                 if (sourceData.currentExp >= requiredExp)
                 {
@@ -488,12 +487,6 @@ namespace Controller
             gameObject.SetActive(true);
         }
 
-        public void ApplyStatusEffect(StatusEffect effect)
-        {
-            if (sourceData == null) return;
-            sourceData.statusEffect = effect;
-        }
-
         public void RefreshView()
         {
             UpdateUI(); 
@@ -551,5 +544,6 @@ namespace Controller
                 }
             }
         }
+
     }
 }

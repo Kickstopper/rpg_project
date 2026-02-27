@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
-  m_Name: cave_f1
+  m_Name: cave
   m_EditorClassIdentifier: 
-  themeName: cave_f1
+  themeName: cave
   background: {fileID: 2800000, guid: 5005efcc13ea09d48b4c0454fdd2abee, type: 3}
   texture:
   - {fileID: 2800000, guid: 71284589d32556142aa457c17366b265, type: 3}

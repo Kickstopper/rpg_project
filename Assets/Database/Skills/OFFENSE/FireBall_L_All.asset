@@ -25,4 +25,5 @@ MonoBehaviour:
   effectPrefab: {fileID: 0}
   useHpCost: 0
   costValue: 8
-  hitRate: 0
+  statusEffectData: {fileID: 11400000, guid: a0f2b441614a92d428780b07f1b57707, type: 2}
+  effectRate: 1

@@ -360,7 +360,7 @@ namespace Controller
 
             if (entrance.type == EntranceType.Map)
             {
-                if (DungeonEventManager.Instance) 
+                if (DungeonEventManager.Instance) {}
                     DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
                 if (LevelManager.Instance) 
                     LevelManager.Instance.LoadLevelFromJson(entrance.destinationID);
@@ -470,6 +470,8 @@ namespace Controller
         {
             _currentMap = LevelManager.Instance.CurrentMapData;
             DungeonTheme theme = LevelManager.Instance.GetTheme(_currentMap.themeName);
+            
+            SoundManager.Instance.PlayBGM(theme.bgmID);
 
             if (backgroundImage != null) backgroundImage.texture = theme.background;
             
@@ -484,8 +486,12 @@ namespace Controller
                 _currentMap.startX = entryEntrance.targetX;
                 _currentMap.startY = entryEntrance.targetY;
             }
+
+            if (DungeonEventManager.Instance)
+                DungeonEventManager.Instance.SetCurrentMapID(_currentMap.mapID);
             
             _player.SetMapData(_currentMap, _currentMap.startX, _currentMap.startY, _currentMap.startDirection);
+
             
             if (miniMap != null)
             {

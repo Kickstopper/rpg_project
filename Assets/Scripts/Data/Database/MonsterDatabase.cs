@@ -17,17 +17,18 @@ public class MonsterDatabase : ScriptableObject
         public string id;           // "M001_Slime"
         public string name;         // "슬라임"
         public string race;         // "요정"
+        public Data.AI.MonsterAIProfile aiProfile;
 
         [Header("Visual")]
         public Sprite[] image;     // 이미지
         public Sprite portrait;     // 초상화
         public GameObject prefab;   // 3D 모델 또는 전투용 프리팹
 
-        [Header("Combat Position")]
+        [Header("Battle Position")]
         public RowType preferredRow; // Front 또는 Back
         public ColumnType preferredCol; // 왼쪽, 오른쪽 또는 가운데
 
-        [Header("Combat Stats")]
+        [Header("Battle Stats")]
         public Align align;
         public StatData stats;             // 레벨, 힘, 마력, 체력 등
         public ResistanceData resistances; // 물리, 화염, 빙결 내성 등

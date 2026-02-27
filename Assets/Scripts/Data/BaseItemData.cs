@@ -37,16 +37,12 @@ public enum EffectType
     Reflect_Phys, Reflect_Magic,                                            // 물리 및 마법 공격 반사
     Absorb_Phys, Absorb_Magic,                                              // 물리 및 마법 공격 흡수 
     
-    
     // [Recover Magic]
     Recover_HP, Recover_MP,                 // HP 및 MP 상승 
     Revive_Empty, Revive_Fully,   // 부활만 시킴, HP와 MP가 최대 상태로 부활
 
     // [Special]
-    Special_Atk,
-
-    // [Atk Phys]
-    Phys_Atk, Gun_Atk
+    Special_Atk
 }
 
 namespace Data

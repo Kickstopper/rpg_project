@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UI.DungeonMapScene;
 using Data;
 using Manager;
+using Helper;
 
 namespace Controller
 {
@@ -236,24 +237,23 @@ namespace Controller
         }
 
         // AI 행동 결정 함수
-        public CombatAction ChooseAction(List<BattleEntity> players)
+        public BattleAction ChooseAction(List<BattleEntity> players, List<BattleEntity> monsters)
         {
-            // 예시 AI: HP가 30% 미만이면 50% 확률로 방어
-            float hpRatio = (float)currentHp / sourceData.stats.vit; // 혹은 maxHp
-            
-            if (hpRatio < 0.3f && Random.value < 0.5f)
+            // AI가 없다면 그냥 턴 스킵
+            if (sourceData.aiProfile == null)
             {
-                Debug.Log($"{sourceData.name}: 위기 감지! 방어 태세!");
-                
-                // 방어 행동 생성 (속도 보정 +2000)
-                int guardSpeed = sourceData.stats.agi + 2000;
-                return new CombatAction(this.gameObject, this.gameObject, UI.ActionType.Guard, guardSpeed);
+                Debug.LogWarning($"{this.name}에게 AI Profile이 없습니다!");
+                return new BattleAction(this.gameObject, this.gameObject, UI.ActionType.Next, 0);
             }
 
-            // 기본 공격 로직
-            BattleEntity target = players[Random.Range(0, players.Count)];
-            int speed = sourceData.stats.agi + Random.Range(0, 5);
-            return new CombatAction(this.gameObject, target.gameObject, UI.ActionType.Attack, speed);
+            BattleContext context = new BattleContext()
+            {
+                activePlayers = players,
+                activeMonsters = monsters
+            };
+
+            // AI에게 결정 위임
+            return sourceData.aiProfile.DecideAction(this, context);
         }
 
         // [BattleEntity 구현] 데미지 처리
@@ -292,11 +292,6 @@ namespace Controller
             int healAmount = Mathf.FloorToInt(maxHp * (percent / 100f));
             currentHp = healAmount;
             gameObject.SetActive(true);
-        }
-
-        public void ApplyStatusEffect(StatusEffect effect)
-        {
-            // 몬스터 상태이상 로직 구현
         }
 
         public void RefreshView()

@@ -10,7 +10,9 @@ namespace Data
         public int costValue;
 
         [Header("Effect Settings")]
-        public int hitRate;
+        public StatusEffectData statusEffectData;
+        [Range(0, 1f)]
+        public float effectRate;
 
         public int GetCategoryIndex()
         {

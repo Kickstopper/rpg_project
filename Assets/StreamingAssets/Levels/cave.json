@@ -2,7 +2,7 @@
     "width": 15,
     "height": 15,
     "mapID": "cave",
-    "themeName": "cave_f1",
+    "themeName": "cave",
     "startX": 14,
     "startY": 0,
     "startDirection": 0,
@@ -1781,7 +1781,7 @@
         {
             "x": 11,
             "y": 10,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
                 -1,

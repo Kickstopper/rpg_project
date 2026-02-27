@@ -25,4 +25,4 @@ MonoBehaviour:
   effectPrefab: {fileID: 0}
   useHpCost: 0
   costValue: 10
-  hitRate: 0
+  effectRate: 0

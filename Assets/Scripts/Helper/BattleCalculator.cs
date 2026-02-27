@@ -8,12 +8,12 @@ using UI.DungeonMapScene;
 
 namespace Helper
 {
-    public static class CombatCalculator
+    public static class BattleCalculator
     {
         // -------------------------------------------------------
         // [데미지 공식]
         // -------------------------------------------------------
-        public static int CalculateDamage(BattleEntity attacker, BattleEntity defender, CombatAction action, bool isCritical, float damageMultiplier)
+        public static int CalculateDamage(BattleEntity attacker, BattleEntity defender, BattleAction action, bool isCritical, float damageMultiplier)
         {
             if (attacker == null || defender == null) return 0;
 
@@ -83,7 +83,7 @@ namespace Helper
             return Random.value < totalChance;
         }
 
-        public static bool CheckCritical(BattleEntity attacker, BattleEntity defender, CombatAction action)
+        public static bool CheckCritical(BattleEntity attacker, BattleEntity defender, BattleAction action)
         {
             if (attacker == null || defender == null) return false;
 
@@ -248,6 +248,21 @@ namespace Helper
             // Lv 10 = 2,377
             // Lv 50 = 82,382 (플레이어 요구량의 약 15% 유지)
             return Mathf.FloorToInt(baseExp * Mathf.Pow(level, exponent));
+        }
+
+        public static void ProcessSkillStatusEffect(BattleEntity attacker, BattleEntity defender, SkillData skill)
+        {
+            if (skill.statusEffectData == null) return; // 상태이상이 없는 스킬
+
+            // 스킬의 기본 확률 (effectRate)
+            // TODO: 방어자의 상태이상 저항력도 포함시키자
+            float resistBonus = defender.GetTotalLuc() * 0.01f;
+            float finalChance = Mathf.Clamp(skill.effectRate - resistBonus, 0f, 1f);
+
+            if (Random.value < finalChance)
+            {
+                defender.ApplyStatusEffect(skill.statusEffectData);
+            }
         }
 
     }

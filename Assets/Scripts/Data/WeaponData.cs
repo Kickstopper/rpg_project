@@ -9,7 +9,7 @@ namespace Data
         [Header("Type")]
         public WeaponType type; // 근접(Melee)인지 총(Gun)인지 설정
 
-        [Header("Combat Stats")]
+        [Header("Battle Stats")]
         public int attackPower;       
         public int hitRateBonus;      
         

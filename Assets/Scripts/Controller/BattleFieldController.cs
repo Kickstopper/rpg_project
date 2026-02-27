@@ -1058,7 +1058,6 @@ public class BattleFieldController : MonoBehaviour
     {
         if (playerFrontRowContainer) playerFrontRowContainer.gameObject.SetActive(isActive);
         if (playerBackRowContainer) playerBackRowContainer.gameObject.SetActive(isActive);
-        
     }
 
     public void SetValidMonsterTargets()

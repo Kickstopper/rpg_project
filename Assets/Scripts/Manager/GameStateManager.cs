@@ -21,7 +21,7 @@ namespace Manager
 
         [Header("UI Groups")]
         public GameObject explorationCanvas; // 탐험용 UI
-        public GameObject combatCanvas;      // 전투용 UI (커맨드, 적 이미지 등)
+        public GameObject BattleCanvas;      // 전투용 UI (커맨드, 적 이미지 등)
         public GameObject menuCanvas;        // 메뉴 UI
         public GameObject shopCanvas;        // 상점 UI
 
@@ -50,10 +50,10 @@ namespace Manager
             }
         }
 
-        public void RegisterSceneUI(GameObject exploration, GameObject combat, GameObject menu, GameObject shop)
+        public void RegisterSceneUI(GameObject exploration, GameObject Battle, GameObject menu, GameObject shop)
         {
             this.explorationCanvas = exploration;
-            this.combatCanvas = combat;
+            this.BattleCanvas = Battle;
             this.menuCanvas = menu;
             this.shopCanvas = shop;
 
@@ -77,11 +77,13 @@ namespace Manager
         private void RefreshUIState()
         {
             // 아직 UI가 연결되지 않았다면 무시
-            if (explorationCanvas == null || combatCanvas == null || menuCanvas == null || shopCanvas == null) return;
-
+            if (explorationCanvas == null || BattleCanvas == null || menuCanvas == null || shopCanvas == null) return;
+            // 일단 음악 끄기
+            SoundManager.Instance.StopBGM();
+            
             // 모든 캔버스 일단 끄기 
             explorationCanvas.SetActive(false);
-            combatCanvas.SetActive(false);
+            BattleCanvas.SetActive(false);
             menuCanvas.SetActive(false);
             shopCanvas.SetActive(false);
             switch (CurrentState)
@@ -91,7 +93,7 @@ namespace Manager
                     break;
 
                 case GameState.Battle:
-                    combatCanvas.SetActive(true);
+                    BattleCanvas.SetActive(true);
                     break;
 
                 case GameState.PlayerMenu:
@@ -99,6 +101,10 @@ namespace Manager
                     break;
                 case GameState.Shop:
                     shopCanvas.SetActive(true);
+                    break;
+
+                case GameState.None:
+                default:
                     break;
             }
         }
@@ -108,7 +114,7 @@ namespace Manager
                                             BattleManager manager, ShopModeSelectUI shopController)
         {
             this.explorationCanvas = expl;
-            this.combatCanvas = cbt;
+            this.BattleCanvas = cbt;
             this.menuCanvas = menu;
             this.shopCanvas = shop;
             this.currentBattleManager = manager;

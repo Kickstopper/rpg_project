@@ -22,7 +22,7 @@ namespace Data.Database
             public Sprite portraitImage;
             public Sprite standingImage;
 
-            [Header("Combat Stats")]
+            [Header("Battle Stats")]
             public Align align;
             public StatData stats;
             public ResistanceData resistances;

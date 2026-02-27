@@ -151,10 +151,10 @@ namespace Controller
 
             for (int m = line.memoryStart; m <= line.memoryEnd; m += step)
             {
-                terminalText.text = sb.ToString() + m + "KB OK" + cursorChar;
+                terminalText.text = sb.ToString() + m + "GB OK" + cursorChar;
                 yield return null;
             }
-            sb.Append(line.memoryEnd + "KB OK");
+            sb.Append(line.memoryEnd + "GB (1.0 PB)");
             UpdateTerminalText();
         }
 

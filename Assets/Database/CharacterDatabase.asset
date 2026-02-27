@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entries:
   - id: chr_00
-    name: "\uBBF8\uC2A4\uD130-K"
+    name: "\uC8FC\uC778\uACF5"
     spiritId: spirit_000
     expTable: {fileID: 11400000, guid: 0a109a7319f60bb47bb30d455147ed4f, type: 2}
     exp: 0
@@ -23,7 +23,7 @@ MonoBehaviour:
     standingImage: {fileID: 0}
     align: 2
     stats:
-      level: 1
+      level: 2
       str: 3
       mag: 3
       intel: 3
@@ -53,7 +53,7 @@ MonoBehaviour:
     maxHp: 60
     maxMp: 60
   - id: chr_01
-    name: "\uC624\uC624\uAC00\uBBF8 \uBBF8\uCE58\uC624"
+    name: "\uC7A5\uC6D0\uC601"
     spiritId: spirit_001
     expTable: {fileID: 11400000, guid: 29b10d8d523d03547bd72504aa972be3, type: 2}
     exp: 0
@@ -89,7 +89,7 @@ MonoBehaviour:
     maxHp: 60
     maxMp: 60
   - id: chr_02
-    name: "\uC774\uB204\uC774 \uD558\uC774\uB124"
+    name: "\uCE74\uB9AC\uB098"
     spiritId: spirit_002
     expTable: {fileID: 11400000, guid: 280fb2ad8c3aaee4ebdaf4877cd2fc15, type: 2}
     exp: 0
@@ -114,13 +114,13 @@ MonoBehaviour:
       psyche: 0
     initialSkillIds: []
     initialWeaponId: sword_000
-    initialGunId: gun_000
+    initialGunId: gun_001
     initialAmmoId: ammo_000
     initialArmorIds: []
     maxHp: 60
     maxMp: 60
   - id: chr_03
-    name: "\uC2E0\uC8E0 \uC2DC\uC548"
+    name: "\uC124\uC724"
     spiritId: spirit_003
     expTable: {fileID: 11400000, guid: 1ea0c1c5d7db1654eb1169b3e2c94047, type: 2}
     exp: 0
@@ -145,13 +145,13 @@ MonoBehaviour:
       psyche: 0
     initialSkillIds: []
     initialWeaponId: sword_000
-    initialGunId: gun_000
+    initialGunId: gun_001
     initialAmmoId: ammo_000
     initialArmorIds: []
     maxHp: 60
     maxMp: 50
   - id: chr_04
-    name: "\uCE74\uBBF8\uBAA8\uB9AC \uCE74\uC774"
+    name: "\uC720\uB098"
     spiritId: spirit_004
     expTable: {fileID: 11400000, guid: 00d47d8b2275ee84d8a74dd7e91456eb, type: 2}
     exp: 0
@@ -176,13 +176,13 @@ MonoBehaviour:
       psyche: 0
     initialSkillIds: []
     initialWeaponId: sword_000
-    initialGunId: gun_000
+    initialGunId: gun_001
     initialAmmoId: ammo_000
     initialArmorIds: []
     maxHp: 60
     maxMp: 50
   - id: chr_05
-    name: "\uB370\uC6B0\uC5D0\uC2A4 "
+    name: "\uCE5C\uAD6C"
     spiritId: spirit_005
     expTable: {fileID: 11400000, guid: 99fb91fac017d1c4bb1210f0d98b1daa, type: 2}
     exp: 0
@@ -207,8 +207,39 @@ MonoBehaviour:
       psyche: 0
     initialSkillIds: []
     initialWeaponId: sword_000
-    initialGunId: gun_000
+    initialGunId: gun_001
     initialAmmoId: ammo_000
     initialArmorIds: []
     maxHp: 70
     maxMp: 70
+  - id: npc
+    name: "\uBB34\uC7A5\uACBD\uCC30"
+    spiritId: 
+    expTable: {fileID: 0}
+    exp: 0
+    isCommander: 0
+    portraitImage: {fileID: 0}
+    standingImage: {fileID: 2396085269434190896, guid: 723e994d56786b246b42ce9d4c1bc352, type: 3}
+    align: 0
+    stats:
+      level: 0
+      str: 0
+      mag: 0
+      intel: 0
+      vit: 0
+      agi: 0
+      luc: 0
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    initialSkillIds: []
+    initialWeaponId: 
+    initialGunId: 
+    initialAmmoId: 
+    initialArmorIds: []
+    maxHp: 0
+    maxMp: 0

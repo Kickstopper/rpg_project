@@ -2,7 +2,7 @@
     "width": 9,
     "height": 9,
     "mapID": "base",
-    "themeName": "basement",
+    "themeName": "base",
     "startX": 4,
     "startY": 0,
     "startDirection": 0,
@@ -901,31 +901,34 @@
     ],
     "entrances": [
         {
+            "type": 0,
             "sourceX": 2,
             "sourceY": 0,
             "isWallEntrance": true,
             "triggerDirection": 3,
-            "targetMapName": "cave_f1",
+            "destinationID": "cave",
             "targetX": 9,
             "targetY": 14,
             "targetDirection": 2
         },
         {
+            "type": 0,
             "sourceX": 6,
             "sourceY": 0,
             "isWallEntrance": true,
             "triggerDirection": 1,
-            "targetMapName": "cave_f1",
+            "destinationID": "cave",
             "targetX": 5,
             "targetY": 14,
             "targetDirection": 2
         },
         {
+            "type": 0,
             "sourceX": 4,
             "sourceY": 8,
             "isWallEntrance": true,
             "triggerDirection": 0,
-            "targetMapName": "dungeon_map",
+            "destinationID": "dummy",
             "targetX": 4,
             "targetY": 0,
             "targetDirection": 0

@@ -66,14 +66,14 @@ namespace Controller
                     expSlider.value = 0;
                     currentSimExp = 0;
                     
-                    currentSimMaxExp = CombatCalculator.GetMaxExpForLevel(currentSimLevel); 
+                    currentSimMaxExp = BattleCalculator.GetMaxExpForLevel(currentSimLevel); 
                     
                     yield return new WaitForSeconds(0.2f);
                 }
             }
 
             levelText.text = $"Lv.{pc.sourceData.stats.level}";
-            float finalRatio = (float)pc.sourceData.currentExp / CombatCalculator.GetMaxExpForLevel(pc.sourceData.stats.level);
+            float finalRatio = (float)pc.sourceData.currentExp / BattleCalculator.GetMaxExpForLevel(pc.sourceData.stats.level);
             expSlider.value = finalRatio;
         }
     }

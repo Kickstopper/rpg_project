@@ -3,7 +3,7 @@ using Data;
 namespace UI.DungeonMapScene
 {
     [System.Serializable]
-    public class CombatAction
+    public class BattleAction
     {
         public GameObject actor;    // 행동하는 사람 (아군 or 적)
         public GameObject target;   // 맞는 사람
@@ -20,7 +20,7 @@ namespace UI.DungeonMapScene
         public int speed; // 행동 속도 (AGI + 스킬 보정치 + 랜덤 변수)
 
         // 생성자 (편의용)
-        public CombatAction(GameObject _actor, GameObject _target, ActionType _type, int _speed)
+        public BattleAction(GameObject _actor, GameObject _target, ActionType _type, int _speed)
         {
             actor = _actor;
             target = _target;
