@@ -1,11 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UI.DungeonMapScene;
 using Data;
 using Manager;
 using Helper;
+using System.Linq;
 
 namespace Controller
 {
@@ -39,8 +39,8 @@ namespace Controller
         private const float BACK_OFFSET = 0.005f;
 
         // 상태 기억용 변수
-        private bool cachedIsFront = false;      // 내가 전열인지 후열인지 기억
-        private bool lastGlobalState = false;    // 최적화: 이전 프레임의 옵션 상태 기억
+        private bool cachedIsFront = false;      // 전열인지 후열인지 기억
+        private bool lastGlobalState = false;    // 이전 프레임의 옵션 상태 기억
 
         // 외부(BattleManager)에서 호출하는 함수
         public void SetAnaglyphDepth(bool isFront)
@@ -201,7 +201,7 @@ namespace Controller
             this.columnIndex = colIndex;
         }
 
-        // [BattleEntity 구현] 선택 강조
+        // 타겟 지정
         public override void SetSelectionState(bool isSelected)
         {
             if (preferredImage == null) return;
@@ -219,7 +219,7 @@ namespace Controller
             }
         }
 
-        // 노란색 <-> 원래색 반복해서 부드럽게 깜빡이는 연출
+        // 노란색 깜박임
         IEnumerator AnimateHighlight()
         {
             while (true)
@@ -237,26 +237,33 @@ namespace Controller
         }
 
         // AI 행동 결정 함수
-        public BattleAction ChooseAction(List<BattleEntity> players, List<BattleEntity> monsters)
+        public BattleAction ChooseAction(BattleContext context)
         {
-            // AI가 없다면 그냥 턴 스킵
-            if (sourceData.aiProfile == null)
+            // 상태이상에 대한 공통 처리
+            RestrictionType restriction = CheckActionRestriction();
+
+            if (restriction == RestrictionType.SkipTurn)
             {
-                Debug.LogWarning($"{this.name}에게 AI Profile이 없습니다!");
+                Debug.Log($"{this.name}은(는) 상태이상으로 움직일 수 없다!");
                 return new BattleAction(this.gameObject, this.gameObject, UI.ActionType.Next, 0);
             }
-
-            BattleContext context = new BattleContext()
+            else if (restriction == RestrictionType.Confusion || restriction == RestrictionType.Charm)
             {
-                activePlayers = players,
-                activeMonsters = monsters
-            };
+                Debug.Log($"{this.name}은(는) 혼란에 빠졌다!");
+                // 아군 적군 구분 없이 무작위 타겟을 골라 평타를 치는 액션 강제 반환
+                var allTargets = context.activePlayers.Concat(context.activeMonsters).Where(e => e.currentHp > 0).ToList();
+                var randomTarget = allTargets[Random.Range(0, allTargets.Count)];
+                return new BattleAction(this.gameObject, randomTarget.gameObject, UI.ActionType.Attack, this.GetTotalAgi());
+            }
 
-            // AI에게 결정 위임
-            return sourceData.aiProfile.DecideAction(this, context);
+            // 상태이상 통과 시, AI에 판단 위임
+            if (sourceData.aiProfile != null)
+                return sourceData.aiProfile.DecideAction(this, context);
+
+            return new BattleAction(this.gameObject, this.gameObject, UI.ActionType.Next, 0);
         }
 
-        // [BattleEntity 구현] 데미지 처리
+        // 데미지 처리
         public override IEnumerator OnDamageTaken(int damage)
         {
             currentHp -= damage;
@@ -288,7 +295,7 @@ namespace Controller
 
         public void ApplyRevive(int percent)
         {
-            // 몬스터 부활 로직 (필요하다면)
+            // 몬스터 부활 로직
             int healAmount = Mathf.FloorToInt(maxHp * (percent / 100f));
             currentHp = healAmount;
             gameObject.SetActive(true);
@@ -296,8 +303,6 @@ namespace Controller
 
         public void RefreshView()
         {
-            // 몬스터는 보통 UI바가 없거나, 피격 시에만 연출이 나오므로
-            // 필요한 경우 여기서 HP Bar 갱신 등을 호출
             UpdateUI();
         }
 

@@ -90,6 +90,10 @@ namespace Manager
             {
                 case GameState.Exploration:
                     explorationCanvas.SetActive(true);
+
+                    // 월드맵일 경우 카메라 보정
+                    CameraFollow cameraFollow = Camera.main.GetComponent<CameraFollow>();
+                    if (cameraFollow != null) cameraFollow.SnapToTarget();
                     break;
 
                 case GameState.Battle:
@@ -151,6 +155,5 @@ namespace Manager
                 Debug.LogWarning("Shop UI가 연결되지 않았습니다!");
             }
         }
-        
     }
 }

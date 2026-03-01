@@ -7,5 +7,11 @@ namespace Helper
     {
         public List<BattleEntity> activePlayers;
         public List<BattleEntity> activeMonsters;
+
+        public BattleContext(List<BattleEntity> activePlayers, List<BattleEntity> activeMonsters)
+        {
+            this.activePlayers = activePlayers;
+            this.activeMonsters = activeMonsters;
+        }
     }
 }

@@ -1,7 +1,7 @@
 using Manager;
 using UnityEngine;
 
-namespace Controller
+namespace UI.WorldMapScene
 {
     public class WorldMapMovementController : MonoBehaviour
     {
@@ -16,7 +16,7 @@ namespace Controller
 
         void FixedUpdate()
         {
-            if (GameStateManager.Instance.CurrentState != GameState.Exploration) return;
+            if (GameStateManager.Instance && GameStateManager.Instance.CurrentState != GameState.Exploration) return;
 
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");

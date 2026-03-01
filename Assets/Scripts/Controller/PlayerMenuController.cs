@@ -56,8 +56,12 @@ namespace Controller
         public bool IsPopupOpen => isPopupOpen;
         void Start()
         {
-            GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
-            OnGameStateChanged(GameStateManager.Instance.CurrentState);
+            if (GameStateManager.Instance)
+            {
+                GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
+                OnGameStateChanged(GameStateManager.Instance.CurrentState);
+            }
+            
             if (confirmPopup != null) confirmPopup.SetActive(false);
         }
 

@@ -18,6 +18,7 @@ public class MonsterDatabase : ScriptableObject
         public string name;         // "슬라임"
         public string race;         // "요정"
         public Data.AI.MonsterAIProfile aiProfile;
+        public List<SkillData> skills;
 
         [Header("Visual")]
         public Sprite[] image;     // 이미지

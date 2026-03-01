@@ -4,6 +4,7 @@ using TMPro;
 using DG.Tweening;
 using Data;
 using Manager;
+using System.Collections.Generic;
 
 namespace UI.DungeonMapScene
 {
@@ -27,13 +28,14 @@ namespace UI.DungeonMapScene
         private int _stepsUntilNextBattle;
         private int _initialSteps;
         private Tween _pulseTween;
-        private DungeonTheme _currentTheme;
+        private List<string> monsters;
 
-        public void Initialize(DungeonTheme theme)
+        public void Initialize(List<string> monsterCandidate)
         {
-            _currentTheme = theme;
+            monsters = monsterCandidate;
             ResetSteps();
-            SetVisible(AppManager.Instance.IsInstalled(AppFeature.MobSensor));
+            if (AppManager.Instance)
+                SetVisible(AppManager.Instance.IsInstalled(AppFeature.MobSensor));
         }
 
         private void SetVisible(bool visible)
@@ -62,7 +64,7 @@ namespace UI.DungeonMapScene
 
         private void UpdateUI()
         {
-            if(!AppManager.Instance.IsInstalled(AppFeature.MobSensor)) return;
+            if (AppManager.Instance && !AppManager.Instance.IsInstalled(AppFeature.MobSensor)) return;
             if (dangerSlider == null || fillImage == null) return;
 
             float ratio = 1.0f - ((float)_stepsUntilNextBattle / _initialSteps);
@@ -97,9 +99,9 @@ namespace UI.DungeonMapScene
         private void TriggerEncounter()
         {
             _pulseTween?.Kill();
-            if (_currentTheme != null && _currentTheme.monsterList != null)
+            if (GameStateManager.Instance && monsters != null && monsters.Count > 0)
             {
-                GameStateManager.Instance.StartEncounter(_currentTheme.monsterList);
+                GameStateManager.Instance.StartEncounter(monsters);
             }
             ResetSteps();
         }

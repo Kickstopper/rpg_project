@@ -477,7 +477,7 @@ namespace Controller
             
             // 시스템 초기화
             _renderer.LoadAssets(theme.texture, 64, 64, null); 
-            encounterSystem.Initialize(theme);
+            encounterSystem.Initialize(theme.monsterList);
 
             // 플레이어 위치 초기화
             if (entryEntrance != null)

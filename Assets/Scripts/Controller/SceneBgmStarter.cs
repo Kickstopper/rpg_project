@@ -12,7 +12,6 @@ namespace Controller
 
         void Start()
         {
-            // SoundManager가 존재하는지 안전하게 확인
             if (SoundManager.Instance != null)
             {
                 SoundManager.Instance.PlayBGM(bgmID, volume);

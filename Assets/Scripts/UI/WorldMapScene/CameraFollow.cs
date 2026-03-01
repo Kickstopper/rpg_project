@@ -5,14 +5,15 @@ public class CameraFollow : MonoBehaviour
     public Transform target;       
     public float smoothSpeed = 5f; 
     
-    private Vector3 offset; // 카메라와 플레이어 사이의 '거리 차이(벡터)'
+    [Header("카메라 고정 각도/거리")]
+    public Vector3 offset = new Vector3(0f, 10f, -7f); 
 
     void Start()
     {
         if (target != null)
         {
-            // 에디터에서 잡아둔 구도(거리 차이)를 계산해둠.
-            offset = transform.position - target.position;
+            // 전투 또는 메뉴에서 돌아오자마자 Lerp를 무시하고 플레이어의 현재 위치로 즉시 이동
+            SnapToTarget();
         }
     }
 
@@ -20,10 +21,13 @@ public class CameraFollow : MonoBehaviour
     {
         if (target == null) return;
 
-        // 플레이어 위치에 아까 계산해둔 오프셋을 더함.
         Vector3 targetPosition = target.position + offset;
-        
-        // 부드럽게 이동
         transform.position = Vector3.Lerp(transform.position, targetPosition, smoothSpeed * Time.deltaTime);
+    }
+
+    public void SnapToTarget()
+    {
+        if (target != null)
+            transform.position = target.position + offset;
     }
 }

@@ -1,13 +1,13 @@
 using UnityEngine;
-namespace Controller
+namespace UI.WorldMapScene
 {
-    [ExecuteInEditMode] // 에디터에서도 실시간으로 보이게 함
+    [ExecuteInEditMode]
     public class GlobalShaderController : MonoBehaviour
     {
         public GameObject visual;
         void Update()
         {
-            // "_PlayerPosition"이라는 이름으로 현재 내 위치를 전 세계(Shader)에 방송한다.
+            // _PlayerPosition이라는 이름으로 현재 플레이어의 위치를 알림
             Shader.SetGlobalVector("_PlayerPosition", new Vector3(transform.position.x, visual.transform.position.y, transform.position.z));
         }
     }
