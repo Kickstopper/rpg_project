@@ -463,6 +463,7 @@ Transform:
   - {fileID: 368130273}
   - {fileID: 744971245}
   - {fileID: 1498646862}
+  - {fileID: 2069006252}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &249169707
@@ -1722,7 +1723,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager.GameStateManager
   explorationCanvas: {fileID: 0}
-  combatCanvas: {fileID: 0}
+  BattleCanvas: {fileID: 0}
   menuCanvas: {fileID: 0}
   shopCanvas: {fileID: 0}
   currentBattleManager: {fileID: 0}
@@ -2580,7 +2581,7 @@ GameObject:
   - component: {fileID: 1553176717}
   - component: {fileID: 1553176718}
   m_Layer: 0
-  m_Name: LevelManager
+  m_Name: DungeonManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2613,9 +2614,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 284c71e02d90e4eb28935f6d04c5b4da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allThemes:
-  - {fileID: 11400000, guid: 61cd4570e47182647b174e1f3c15c4c3, type: 2}
+  allDungeons:
   - {fileID: 11400000, guid: c8b2d0b9da5a240459f5a54a14eeae32, type: 2}
+  - {fileID: 11400000, guid: 61cd4570e47182647b174e1f3c15c4c3, type: 2}
   - {fileID: 11400000, guid: 095e49405ca1fbc4b8eecbd799e6c2a7, type: 2}
 --- !u!1 &1612805584
 GameObject:
@@ -3880,6 +3881,52 @@ MonoBehaviour:
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
+--- !u!1 &2069006251
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2069006252}
+  - component: {fileID: 2069006253}
+  m_Layer: 0
+  m_Name: WorldManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2069006252
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069006251}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 222930936}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2069006253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069006251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c417f87c078c5d24692ad003fc5777a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Manager.WorldManager
+  allRegions:
+  - {fileID: 11400000, guid: 76870a910e58a904f9dbe5c7322f582e, type: 2}
 --- !u!1 &2093858314
 GameObject:
   m_ObjectHideFlags: 0

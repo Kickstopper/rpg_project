@@ -50,7 +50,7 @@ namespace Controller
         void Awake()
         {
             _renderer = new RaycastRenderEngine();
-            // illusion ID 리스트는 필요 시 Inspector나 LevelManager에서 가져옴
+            // illusion ID 리스트는 필요 시 Inspector나 DungeonManager에서 가져옴
             _player = new DungeonPlayer(this, fovScale, backwardOffset, new List<int>()); 
             
             _player.OnMoveStepTaken += OnPlayerStep;
@@ -63,7 +63,7 @@ namespace Controller
             Material mat;
             if (renderSettings.screenMaterial != null)
             {
-                mat = new Material(renderSettings.screenMaterial); // 원본 보존을 위해 복제 인스턴스 사용
+                mat = new Material(renderSettings.screenMaterial);
             }
             else
             {
@@ -362,8 +362,8 @@ namespace Controller
             {
                 if (DungeonEventManager.Instance) {}
                     DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
-                if (LevelManager.Instance) 
-                    LevelManager.Instance.LoadLevelFromJson(entrance.destinationID);
+                if (DungeonManager.Instance) 
+                    DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
                 LoadMapData(entrance); 
                 yield return null; 
 
@@ -468,8 +468,8 @@ namespace Controller
         // ================= Map & Game Logic =================
         private void LoadMapData(EntranceData entryEntrance = null)
         {
-            _currentMap = LevelManager.Instance.CurrentMapData;
-            DungeonTheme theme = LevelManager.Instance.GetTheme(_currentMap.themeName);
+            _currentMap = DungeonManager.Instance.CurrentDungeonData;
+            DungeonTheme theme = DungeonManager.Instance.GetDungeonTheme(_currentMap.themeName);
             
             SoundManager.Instance.PlayBGM(theme.bgmID);
 
@@ -506,7 +506,7 @@ namespace Controller
             if (autoMapContainer != null)
             {
                 autoMapContainer.SetActive(false);
-                autoMapRenderer.DrawFullMap(_currentMap, LevelManager.Instance.CurrentMapState);
+                autoMapRenderer.DrawFullMap(_currentMap, DungeonManager.Instance.CurrentDungeonState);
             }
             
             // 벽 애니메이션 초기화
@@ -539,10 +539,10 @@ namespace Controller
 
         private void UpdateMapDiscovery(int x, int y)
         {
-            LevelManager.Instance.CurrentMapState.MarkVisited(x, y);
+            DungeonManager.Instance.CurrentDungeonState.MarkVisited(x, y);
             autoMapRenderer.RevealCell(x, y);
             autoMapRenderer.UpdatePlayerIcon(x, y, (Direction)_player.DirectionIdx);
-            MapManager.Instance.UpdatePlayerPosition(x, y, (Direction)_player.DirectionIdx, _currentMap.mapID);
+            DungeonMapStateManager.Instance.UpdatePlayerPosition(x, y, (Direction)_player.DirectionIdx, _currentMap.mapID);
         }
 
         private void InitializeWallAnims(DungeonTheme theme)
@@ -646,7 +646,7 @@ namespace Controller
         private void OnGameStateChanged(GameState newState)
         {
             _canRender = (newState == GameState.Exploration);
-            if (_canRender) SoundManager.Instance.PlayBGM(LevelManager.Instance.GetTheme(_currentMap.themeName).bgmID);
+            if (_canRender) SoundManager.Instance.PlayBGM(DungeonManager.Instance.GetDungeonTheme(_currentMap.themeName).bgmID);
         }
     }
 }

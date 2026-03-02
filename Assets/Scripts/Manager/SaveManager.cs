@@ -45,12 +45,30 @@ namespace Manager
             data.sceneName = SceneManager.GetActiveScene().name;
 
             // 플레이어 위치 저장 (탐험 모드일 때의 플레이어 오브젝트 참조 필요)
-            data.dungeonId = MapManager.Instance.currentDungeonId;
-            data.playerPosX = MapManager.Instance.currentPx;
-            data.playerPosY = MapManager.Instance.currentPy;
-            data.playerDirection = MapManager.Instance.currentDirection;
+            data.dungeonId = DungeonMapStateManager.Instance.currentDungeonId;
+            data.playerPosX = DungeonMapStateManager.Instance.currentPx;
+            data.playerPosY = DungeonMapStateManager.Instance.currentPy;
+            data.playerDirection = DungeonMapStateManager.Instance.currentDirection;
             // 던전 탐색 상태 저장
-            data.dungeonMapStates = MapManager.Instance.GetAllMapStates();
+            data.dungeonMapStates = DungeonMapStateManager.Instance.GetAllMapStates();
+
+            if (data.sceneName == GameScene.WORLD_MAP_SCENE)
+            {
+                data.worldMapState = new WorldMapState();
+                
+                // 현재 지역 ID 저장
+                if (WorldManager.Instance.currentRegionTheme != null)
+                    data.worldMapState.regionId = WorldManager.Instance.currentRegionTheme.regionID;
+
+                // 플레이어 3D 위치 저장
+                Transform player = WorldManager.Instance.currentPlayerTransform;
+                if (player != null)
+                {
+                    data.worldMapState.x = player.position.x;
+                    data.worldMapState.y = player.position.y;
+                    data.worldMapState.z = player.position.z;
+                }
+            }
             
             // 인벤토리 & 골드 저장
             data.money = InventoryManager.Instance.GetMoney();
@@ -78,8 +96,7 @@ namespace Manager
         }
 
         
-        // 불러오기 (Load)
-        
+        // 불러오기
         public void LoadGame(int slotIndex)
         {
             string path = GetSavePath(slotIndex);
@@ -99,28 +116,39 @@ namespace Manager
             PartyManager.Instance.LoadFromSave(data.partyMembers);
             
             // 맵 매니저 설정
-            if (MapManager.Instance != null)
+            if (DungeonMapStateManager.Instance != null)
             {
                 if (data.dungeonMapStates != null && data.dungeonMapStates.Count > 0)
                 {
-                    MapManager.Instance.LoadMapStates(data.dungeonMapStates);
+                    DungeonMapStateManager.Instance.LoadMapStates(data.dungeonMapStates);
                 }
-                MapManager.Instance.UpdatePlayerPosition(data.playerPosX, data.playerPosY, data.playerDirection, data.dungeonId);
+                DungeonMapStateManager.Instance.UpdatePlayerPosition(data.playerPosX, data.playerPosY, data.playerDirection, data.dungeonId);
             }
 
             // 앱과 메모리 정보
             data.maxAppMemory = AppManager.Instance.maxMemory;
             data.ownedApps = new List<AppFeature>(AppManager.Instance.ownedFeatures);
             data.installedApps = new List<AppFeature>(AppManager.Instance.installedFeatures);
-
-            // 던전 탐색 상태 복구
-            // 씬 이동 및 위치 복구
-            if (data.sceneName == GameScene.DUNGEON_MAP_SCENE)
+            
+            if (data.sceneName == GameScene.WORLD_MAP_SCENE)
             {
-                LevelManager.Instance.LoadLevelFromJson(data.dungeonId);
-                LevelManager.Instance.UpdateStartPosition(data.playerPosX, data.playerPosY, data.playerDirection);
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                if (data.worldMapState != null)
+                {
+                    // 저장된 지역 테마 복원
+                    WorldManager.Instance.SetCurrentRegionTheme(data.worldMapState.regionId);
+                    
+                    // 불러오기를 통해 진입했음을 알리고 좌표를 전달
+                    WorldManager.Instance.isLoadGame = true;
+                    WorldManager.Instance.loadedPosition = new Vector3(data.worldMapState.x, data.worldMapState.y, data.worldMapState.z);
+                }
             }
+            else //if (data.sceneName == GameScene.DUNGEON_MAP_SCENE)
+            {
+                // 던전 탐색 상태 복구
+                DungeonManager.Instance.LoadDungeonFromJson(data.dungeonId);
+                DungeonManager.Instance.UpdateDungeonStartPosition(data.playerPosX, data.playerPosY, data.playerDirection);
+            }
+            
 
             // 휘발성 저장(중단 데이터)이라면 로드 후 즉시 삭제
             if (slotIndex == SUSPEND_SLOT_INDEX)
@@ -130,7 +158,7 @@ namespace Manager
             }
             
             SceneManager.LoadScene(data.sceneName);
-
+            GameStateManager.Instance.ChangeState(GameState.Exploration);
             Debug.Log("게임 불러오기 완료");
         }
 

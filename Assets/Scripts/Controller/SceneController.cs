@@ -200,6 +200,7 @@ namespace Controller
 
         public void OnClick_NewGame()
         {
+            WorldManager.Instance.SetCurrentRegionTheme("region_00");
             SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
         }
 

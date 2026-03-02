@@ -20,15 +20,20 @@ namespace Data
         // 기본 정보
         public string saveTime;
         public string sceneName;
-        public string dungeonId; // 현재 맵 ID
         
         // 플레이어 위치
         public int playerPosX;
         public int playerPosY;
 
         public Direction playerDirection;
+
+        // 3D 던전
+        public string dungeonId; // 현재 맵 ID
         public List<DungeonMapState> dungeonMapStates = new List<DungeonMapState>();
 
+        // 월드맵
+        public WorldMapState worldMapState;
+        
         // 자산 및 인벤토리
         public int money;
          // 아이템 ID 리스트

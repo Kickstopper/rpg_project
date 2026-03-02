@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65591b22da32d6844b847b1a118a9224, type: 3}
+  m_Name: DummyTheme
+  m_EditorClassIdentifier: Assembly-CSharp::Data.RegionTheme
+  regionID: region_00
+  regionName: "\uB3D9\uD0C4\uC2E0\uB3C4\uC2DC"
+  fieldBgmID: 26
+  battleBackground: {fileID: 0}
+  battleBgmID: 3
+  monsterList:
+  - 000
+  - 001
+  - 002
+  - 003
+  - 004
+  - 005
+  startPosition: {x: 27.5, y: 0, z: -5.5}

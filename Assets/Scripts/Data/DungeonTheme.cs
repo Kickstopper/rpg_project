@@ -16,7 +16,7 @@ namespace Data
     public class DungeonTheme : ScriptableObject
     {
         [Header("텍스처 설정")]
-        public string themeName; // 예: "지하 1층 - 하수구"
+        public string dungeonID;
         
         public Texture2D background; // 던전 아래에 깔릴 스카이박스
         public Texture2D[] texture;

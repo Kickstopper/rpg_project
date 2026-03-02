@@ -109,7 +109,7 @@ namespace UI.WorldMapScene
             }
 
             fadeImage.color = new Color(color.r, color.g, color.b, 1f);
-            LevelManager.Instance.LoadLevelFromJson(targetDungeonID);
+            DungeonManager.Instance.LoadDungeonFromJson(targetDungeonID);
             SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
         }
     }

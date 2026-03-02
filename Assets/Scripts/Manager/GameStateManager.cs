@@ -92,7 +92,7 @@ namespace Manager
                     explorationCanvas.SetActive(true);
 
                     // 월드맵일 경우 카메라 보정
-                    CameraFollow cameraFollow = Camera.main.GetComponent<CameraFollow>();
+                    WorldMapCameraFollow cameraFollow = FindFirstObjectByType<WorldMapCameraFollow>();
                     if (cameraFollow != null) cameraFollow.SnapToTarget();
                     break;
 

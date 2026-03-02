@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using System.Linq; // List 변환을 위해 필요
+using System.Linq;
 using Data;
 using UnityEngine;
 
 namespace Manager
 {
-    public class MapManager : MonoBehaviour
+    public class DungeonMapStateManager : MonoBehaviour
     {
-        public static MapManager Instance;
+        public static DungeonMapStateManager Instance;
 
         [Header("Current Session Data")]
         public string currentDungeonId; // 현재 맵 ID
@@ -15,7 +15,7 @@ namespace Manager
         public int currentPy { get; private set; }    
         public Direction currentDirection { get; private set; } 
 
-        // 모든 맵의 방문 상태를 관리하는 Dictionary (Key: MapID)
+        // 모든 맵의 방문 상태를 관리하는 Dictionary. MapID가 Key
         private Dictionary<string, DungeonMapState> _mapStates = new Dictionary<string, DungeonMapState>();
 
         void Awake()
@@ -46,7 +46,7 @@ namespace Manager
 
         /// <summary>
         /// 특정 맵 ID에 해당하는 상태가 있는지 확인하고 반환.
-        /// (LevelManager에서 맵 로드 시 호출하여 기존 방문 기록을 가져옴)
+        /// (DungeonManager에서 맵 로드 시 호출하여 기존 방문 기록을 가져옴)
         /// </summary>
         public DungeonMapState GetMapState(string mapID)
         {
@@ -61,7 +61,7 @@ namespace Manager
         /// 새로운 맵 상태를 등록하거나, 기존 상태를 갱신.
         /// (새 던전에 처음 진입하여 DungeonMapState를 새로 생성했을 때 호출)
         /// </summary>
-        public void RegisterMapState(DungeonMapState state)
+        public void RegisterDungeonMapState(DungeonMapState state)
         {
             if (state == null || string.IsNullOrEmpty(state.mapID)) return;
 
@@ -107,12 +107,8 @@ namespace Manager
                 }
             }
             
-            Debug.Log($"[MapManager] {_mapStates.Count}개의 맵 상태가 로드되었습니다.");
+            Debug.Log($"[DungeonMapStateManager] {_mapStates.Count}개의 맵 상태가 로드되었습니다.");
         }
-
-        
-        // 유틸리티
-        
 
         public void ResetPositionData()
         {
