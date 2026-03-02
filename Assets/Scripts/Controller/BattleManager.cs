@@ -1704,14 +1704,16 @@ namespace Controller
             state = BattleState.EnemyInput; 
             actionQueue.Clear(); 
 
-            List<BattleEntity> livingPlayers = fieldController.GetLivingParty();
-            List<BattleEntity> livingMonsters = fieldController.GetLivingMonsters();
+            var activePlayers = fieldController.activePlayers;
+            var activeMonsters = fieldController.activeMonsters;
+            BattleContext battleContext = new BattleContext(activePlayers, fieldController.activeMonsters);
             
-            foreach (MonsterController monster in fieldController.activeMonsters)
+            var livingMonsters = fieldController.GetLivingMonsters();
+            foreach (MonsterController monster in livingMonsters)
             {
                 if (monster.currentHp <= 0) continue;
                 
-                BattleAction enemyAction = monster.ChooseAction(livingPlayers, livingMonsters);
+                BattleAction enemyAction = monster.ChooseAction(battleContext);
                 if (enemyAction != null)
                 {
                     enemyAction.speed = monster.GetTotalAgi() - monster.nextTurnSpeedPenalty;
