@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2204781563935935785}
   - component: {fileID: 7420215860516149239}
   - component: {fileID: 6407314566388536907}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ResultItemSlotPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Controller.SimpleListItemController
   nameText: {fileID: 980361744341035279}
-  costText: {fileID: 445272908256512286}
+  valueText: {fileID: 0}
 --- !u!1 &5430962088907935339
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,7 +164,7 @@ GameObject:
   - component: {fileID: 5470758850541554024}
   - component: {fileID: 6754559679319604756}
   - component: {fileID: 445272908256512286}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Quantity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 1934757064770840198}
   - component: {fileID: 7560403689441086273}
   - component: {fileID: 980361744341035279}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}

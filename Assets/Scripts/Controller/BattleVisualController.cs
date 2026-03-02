@@ -34,7 +34,15 @@ public class BattleVisualController : MonoBehaviour
         if (vfx != null)
         {
             GameObject spawnedVfx = Instantiate(vfx, vfxContainer);
-            spawnedVfx.transform.position = new Vector3(position.x, position.y, -5f);
+            
+            // 슬롯의 완벽한 월드 좌표(회전, 깊이 포함)로 우선 일치시킴
+            spawnedVfx.transform.position = position;
+            
+            // 부모(vfxContainer 혹은 Canvas)가 기울어진 각도를 기준으로,
+            // Z축(카메라를 바라보는 방향)으로 살짝 당겨서 파티클이 UI 위에 오도록 만듦.
+            Vector3 localPos = spawnedVfx.transform.localPosition;
+            localPos.z -= 10f;
+            spawnedVfx.transform.localPosition = localPos;
         }
     }
 }

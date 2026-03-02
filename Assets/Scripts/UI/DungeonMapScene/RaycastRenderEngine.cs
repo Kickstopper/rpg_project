@@ -161,14 +161,18 @@ namespace UI.DungeonMapScene
         // ================= 세부 렌더링 로직 =================
         private void CastWalls(DungeonPlayer player, RenderSettings settings, int step, float px, float py)
         {
+            Color32 pulseColor = settings.pulseColor;
+            Color32 wireframeColor = settings.wireframeColor;
+            float pulseWidth = settings.pulseWidth;
+
             for (int x = 0; x < _screenWidth; x += step)
             {
                 float cameraX = 2 * x / (float)_screenWidth - 1;
                 float rayDirX = player.DirX + player.PlaneX * cameraX;
                 float rayDirY = player.DirY + player.PlaneY * cameraX;
 
-                int mapX = Mathf.FloorToInt(px);
-                int mapY = Mathf.FloorToInt(py);
+                int mapX = (int)px;
+                int mapY = (int)py;
 
                 float sideDistX, sideDistY;
                 float deltaDistX = (rayDirX == 0) ? 1e30f : Mathf.Abs(1 / rayDirX);
@@ -247,13 +251,12 @@ namespace UI.DungeonMapScene
                 float wallX;
                 if (side == 0) wallX = py + perpWallDist * rayDirY;
                 else wallX = px + perpWallDist * rayDirX;
-                wallX -= Mathf.Floor(wallX);
+                wallX -= (int)wallX;
 
                 int texX = (int)(wallX * _texWidth);
                 if ((side == 0 && rayDirX > 0) ^ hitBackFace) texX = _texWidth - texX - 1;
                 if ((side == 1 && rayDirY < 0) ^ hitBackFace) texX = _texWidth - texX - 1;
 
-                // 조명 계산
                 int lightScale;
                 if (settings.useGridLighting)
                 {
@@ -267,8 +270,16 @@ namespace UI.DungeonMapScene
                 if (side == 1) lightScale = (lightScale * 230) >> 8;
 
                 bool isWire = _isScanning && (perpWallDist < _currentScanRadius);
+                
+                // 수직선(Y루프)을 그리기 전에 공통으로 쓰이는 스캔 변수를 미리 계산
+                bool isPulse = false;
+                bool isVEdge = false;
+                if (isWire)
+                {
+                    isPulse = Mathf.Abs(perpWallDist - _currentScanRadius) < pulseWidth;
+                    isVEdge = (texX == 0 || texX == _texWidth - 1);
+                }
 
-                // 벽 그리기 루프
                 float stepVal = 1.0f * _texHeight / lineHeight;
                 
                 for (int y = drawStart; y < drawEnd; y++)
@@ -276,9 +287,8 @@ namespace UI.DungeonMapScene
                     Color32 col;
                     if (isWire)
                     {
-                        bool pulse = Mathf.Abs(perpWallDist - _currentScanRadius) < settings.pulseWidth;
-                        bool edge = (texX == 0 || texX == _texWidth - 1 || y == drawStart || y == drawEnd - 1);
-                        col = pulse ? settings.pulseColor : (edge ? settings.wireframeColor : Color.black);
+                        bool isHEdge = (y == drawStart || y == drawEnd - 1);
+                        col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
                     }
                     else
                     {
@@ -311,6 +321,11 @@ namespace UI.DungeonMapScene
             float horizon = _screenHeight / 2 - player.JumpOffset + player.Pitch;
             float hScale = 0.66f; 
 
+            // 캐싱
+            Color32 pulseColor = settings.pulseColor;
+            Color32 floorWireColor = settings.floorWireframeColor;
+            float pulseWidth = settings.pulseWidth;
+
             for (int y = 0; y < _screenHeight; y++)
             {
                 bool isFloor = y < horizon;
@@ -331,35 +346,55 @@ namespace UI.DungeonMapScene
                 float floorY = py + rowDist * rDY0;
 
                 int texIdx = isFloor ? _floorTexIdx : _ceilTexIdx;
+                
+                // 가로선(X루프)을 그리기 전에 해당 줄의 펄스 여부를 한 번만 계산
+                bool isRowScanned = _isScanning && (rowDist < _currentScanRadius);
+                bool isPulseRow = false;
+                if (isRowScanned)
+                {
+                    isPulseRow = Mathf.Abs(rowDist - _currentScanRadius) < pulseWidth;
+                }
+
+                // 조명 역시 가로줄은 rowDist가 동일하므로 밖에서 한 번만 계산
+                int lightScale = 255;
+                if (!isRowScanned)
+                {
+                    if (settings.useGridLighting)
+                        lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / rowDist, 0f, 1f) * 255);
+                    else
+                        lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / rowDist, 0f, 1f) * 255);
+                }
 
                 for (int x = 0; x < _screenWidth; x += step)
                 {
                     Color32 col;
-                    if (_isScanning && rowDist < _currentScanRadius)
+                    
+                    int cellX = (int)floorX;
+                    int cellY = (int)floorY;
+
+                    if (isRowScanned)
                     {
-                        int tx = (int)(_texWidth * (floorX - Mathf.Floor(floorX))) & (_texWidth - 1);
-                        int ty = (int)(_texHeight * (floorY - Mathf.Floor(floorY))) & (_texHeight - 1);
-                        bool pulse = Mathf.Abs(rowDist - _currentScanRadius) < settings.pulseWidth;
-                        bool edge = (tx == 0 || ty == 0);
-                        col = pulse ? settings.pulseColor : (edge ? settings.floorWireframeColor : Color.black);
+                        int tx = (int)(_texWidth * (floorX - cellX)) & (_texWidth - 1);
+                        int ty = (int)(_texHeight * (floorY - cellY)) & (_texHeight - 1);
+                        
+                        bool edge = (tx == 0 || tx == _texWidth - 1 || ty == 0 || ty == _texHeight - 1);
+                        col = isPulseRow ? pulseColor : (edge ? floorWireColor : Color.black);
                     }
                     else
                     {
-                        int cx = (int)(_texWidth * (floorX - Mathf.Floor(floorX))) & (_texWidth - 1);
-                        int cy = (int)(_texHeight * (floorY - Mathf.Floor(floorY))) & (_texHeight - 1);
+                        int cx = (int)(_texWidth * (floorX - cellX)) & (_texWidth - 1);
+                        int cy = (int)(_texHeight * (floorY - cellY)) & (_texHeight - 1);
                         col = GetPixelFast(texIdx, cx, cy);
-                        
-                        int lightScale = 255;
-                        if (settings.useGridLighting)
-                            lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / rowDist, 0f, 1f) * 255);
-                        else
-                            lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / rowDist, 0f, 1f) * 255);
                             
                         if (lightScale < 255) ApplyLight(ref col, lightScale);
                     }
 
+                    // Step 처리
+                    int baseIdx = y * _screenWidth;
                     for (int s = 0; s < step; s++)
-                        if (x + s < _screenWidth) _buffer[y * _screenWidth + (x + s)] = col;
+                    {
+                        if (x + s < _screenWidth) _buffer[baseIdx + x + s] = col;
+                    }
 
                     floorX += stepX;
                     floorY += stepY;

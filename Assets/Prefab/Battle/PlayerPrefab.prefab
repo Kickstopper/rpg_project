@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2109996044625336019}
   - component: {fileID: 6903912592117594015}
   - component: {fileID: 7730065506349364409}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 2948649554449318855}
   - component: {fileID: 7410088202760837200}
   - component: {fileID: 3632328003835161698}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Align
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,7 +238,7 @@ GameObject:
   - component: {fileID: 1358195210751673358}
   - component: {fileID: 7437495988212243990}
   - component: {fileID: 4896522997011202109}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: MessageText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -374,7 +374,7 @@ GameObject:
   - component: {fileID: 3950437025042674003}
   - component: {fileID: 4981279171287421524}
   - component: {fileID: 828068827275194019}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -449,7 +449,7 @@ GameObject:
   - component: {fileID: 7831869540627125776}
   - component: {fileID: 5493377860339539731}
   - component: {fileID: 7046307864764870932}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Spirit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -585,7 +585,7 @@ GameObject:
   - component: {fileID: 4544698828093742712}
   - component: {fileID: 7460743118171491618}
   - component: {fileID: 8695397865769900474}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TurnOrderText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -719,7 +719,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2791129304522122714}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -757,7 +757,7 @@ GameObject:
   - component: {fileID: 1645775956585750121}
   - component: {fileID: 1990771441493581556}
   - component: {fileID: 3928386209242673566}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HP_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -892,7 +892,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1773345737991372649}
   - component: {fileID: 3251042766647597053}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HP_Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -983,7 +983,7 @@ GameObject:
   - component: {fileID: 3655786321339362506}
   - component: {fileID: 7946820384444812868}
   - component: {fileID: 4412860075172480683}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Portrait
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1056,7 +1056,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1541845337649148627}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1093,7 +1093,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6168192919716885738}
   - component: {fileID: 5197518971176233568}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: MP_Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1184,7 +1184,7 @@ GameObject:
   - component: {fileID: 1897170710835671113}
   - component: {fileID: 498843020985792698}
   - component: {fileID: 1346961859579577419}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: MP_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1322,7 +1322,7 @@ GameObject:
   - component: {fileID: 7613608598207503269}
   - component: {fileID: 2258242611311976226}
   - component: {fileID: 1678176533427284992}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: MessagePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1431,7 +1431,7 @@ GameObject:
   - component: {fileID: 7386235388751826534}
   - component: {fileID: 3239132202619996078}
   - component: {fileID: 747998192384387287}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PlayerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1522,6 +1522,7 @@ MonoBehaviour:
   align: 0
   _currentHp: 0
   _currentMp: 0
+  activeEffects: []
   maxHp: 0
   maxMp: 0
   columnIndex: 0
@@ -1572,7 +1573,6 @@ MonoBehaviour:
     currentMp: 0
     maxMp: 0
     currentExp: 0
-    nextExp: 0
     row: 0
     column: 0
     equippedWeaponId: 
@@ -1590,6 +1590,13 @@ MonoBehaviour:
     vit: 0
     agi: 0
     luc: 0
+  resist:
+    phys: 0
+    fire: 0
+    ice: 0
+    elec: 0
+    force: 0
+    psyche: 0
   learnedSkillIds: []
   equippedWeaponId: 
   equippedGunId: 
@@ -1599,10 +1606,7 @@ MonoBehaviour:
   currentGun: {fileID: 0}
   currentAmmo: {fileID: 0}
   currentGunAmmo: 0
-  currentExp: 0
   currentStatusEffects: []
-  currentRow: 0
-  currentColumn: 0
   isCommander: 0
 --- !u!114 &3239132202619996078
 MonoBehaviour:
@@ -1645,7 +1649,7 @@ GameObject:
   - component: {fileID: 2681142165424591048}
   - component: {fileID: 5357439829485750836}
   - component: {fileID: 6420186902469803011}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1782,7 +1786,7 @@ GameObject:
   - component: {fileID: 6911423071020017543}
   - component: {fileID: 1117518515623818339}
   - component: {fileID: 4917786631556465085}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: SelectButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1901,7 +1905,7 @@ GameObject:
   - component: {fileID: 4597483499601251032}
   - component: {fileID: 2110709391501663818}
   - component: {fileID: 1366179664587526029}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Highlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1976,7 +1980,7 @@ GameObject:
   - component: {fileID: 7912994523354279528}
   - component: {fileID: 5847814519825884061}
   - component: {fileID: 8645414358669724148}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2052,7 +2056,7 @@ GameObject:
   - component: {fileID: 3580354964583558902}
   - component: {fileID: 7667477866722824894}
   - component: {fileID: 9175471630278243784}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}

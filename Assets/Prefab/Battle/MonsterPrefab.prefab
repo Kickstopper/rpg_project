@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7721651834789844838}
   - component: {fileID: 1617406961407531307}
   - component: {fileID: 7568836264752897540}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: MonsterPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,6 +95,7 @@ MonoBehaviour:
   align: 0
   _currentHp: 0
   _currentMp: 0
+  activeEffects: []
   maxHp: 0
   maxMp: 0
   columnIndex: 0
@@ -110,6 +111,8 @@ MonoBehaviour:
     id: 
     name: 
     race: 
+    aiProfile: {fileID: 0}
+    skills: []
     image: []
     portrait: {fileID: 0}
     prefab: {fileID: 0}
@@ -191,7 +194,7 @@ GameObject:
   - component: {fileID: 3616746848214278421}
   - component: {fileID: 4907191136894504494}
   - component: {fileID: 6314968359687016043}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TurnOrderText
   m_TagString: Untagged
   m_Icon: {fileID: 0}

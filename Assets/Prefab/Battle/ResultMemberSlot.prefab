@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2083112708546139932}
   - component: {fileID: 728754868683152365}
   - component: {fileID: 9116092541249809630}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Portrait
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 8502486795765713206}
   - component: {fileID: 6692210003131638419}
   - component: {fileID: 8478421665357964004}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -176,7 +176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3338055705948100476}
   - component: {fileID: 3992216948810318432}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ExpSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -266,7 +266,7 @@ GameObject:
   - component: {fileID: 6113728332114020002}
   - component: {fileID: 1598427945302553470}
   - component: {fileID: 4835767021013670355}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LevelUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -402,7 +402,7 @@ GameObject:
   - component: {fileID: 727783117425849744}
   - component: {fileID: 2016087690195525060}
   - component: {fileID: 6319330779005085751}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ExpText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -537,7 +537,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4866401298658800275}
   - component: {fileID: 5804940279378582191}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ResultMemberSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -596,7 +596,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3282573575404563223}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -634,7 +634,7 @@ GameObject:
   - component: {fileID: 3085727053052015483}
   - component: {fileID: 521084525091845876}
   - component: {fileID: 6691576242686791632}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LevelText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -770,7 +770,7 @@ GameObject:
   - component: {fileID: 3304782386720557939}
   - component: {fileID: 9079184224179828428}
   - component: {fileID: 975387843571299002}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -845,7 +845,7 @@ GameObject:
   - component: {fileID: 5356548659977977628}
   - component: {fileID: 7489775106429166891}
   - component: {fileID: 2428464628578110267}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: NameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}

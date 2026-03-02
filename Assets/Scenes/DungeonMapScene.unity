@@ -2360,6 +2360,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Battle_UI_Prefab
       objectReference: {fileID: 0}
+    - target: {fileID: 3687072972335226115, guid: e31f071411c2bf740a974e73476d9d62, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3687072972335226115, guid: e31f071411c2bf740a974e73476d9d62, type: 3}
+      propertyPath: m_MatchWidthOrHeight
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3687072972335226115, guid: e31f071411c2bf740a974e73476d9d62, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1280
+      objectReference: {fileID: 0}
+    - target: {fileID: 3687072972335226115, guid: e31f071411c2bf740a974e73476d9d62, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 720
+      objectReference: {fileID: 0}
     - target: {fileID: 7529033478687770845, guid: e31f071411c2bf740a974e73476d9d62, type: 3}
       propertyPath: m_Camera
       value: 
@@ -2988,7 +3004,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 3.6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
