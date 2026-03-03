@@ -284,8 +284,10 @@ namespace Controller
 
             yield return fieldController.ProcessEnemyRowShift();
             yield return fieldController.ProcessPlayerRowShift();
-
+            
             state = BattleState.PlayerInput;
+            yield return uiController.ShowPhaseIndicator(false);
+
             actionQueue.Clear(); 
             fieldController.currentPlayerIndex = -1; 
             isFightMode = false;
@@ -1745,7 +1747,19 @@ namespace Controller
                 yield return StartCoroutine(PerformAction(action));
             }
 
-            if (state == BattleState.Processing) { yield return wait05; ProcessEnemyTurn(); }
+            // 행동할 수 있는 적이 없는지 한 번 더 체크
+            if (CheckBattleEnd(out bool finalWin)) 
+            { 
+                StartCoroutine(EndBattleRoutine(finalWin)); 
+                yield break; 
+            }
+
+            if (state == BattleState.Processing) 
+            { 
+                yield return wait05;
+                yield return uiController.ShowPhaseIndicator(true);
+                ProcessEnemyTurn(); 
+            }
             else if (state == BattleState.EnemyInput)
             {
                 if (CheckBattleEnd(out bool win)) StartCoroutine(EndBattleRoutine(win));

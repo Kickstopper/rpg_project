@@ -14,7 +14,11 @@ public class BattleUIController : MonoBehaviour
 {
     [Header("Basic UI")]
     public GameObject raycastScreen;
-    public GameObject BattleUIContainer;
+    public GameObject battleUIContainer;
+    public GameObject phaseIndicator;
+    public TextMeshProUGUI phaseIndicatorText;
+    public SimpleGradient phaseIndicatorBg;
+
     public Slider qteTimingSlider; // 타이머 슬라이더. 인스펙터에서 할당
     public Button autoModeButton; // 오토 모드의 트리거
     public BattleResultUI resultUI;
@@ -250,17 +254,17 @@ public class BattleUIController : MonoBehaviour
         float duration = 0.3f;
 
         // 초기 위치 설정
-        BattleUIContainer.transform.localPosition = new Vector3(0, -screenPy, 0);
+        battleUIContainer.transform.localPosition = new Vector3(0, -screenPy, 0);
         raycastScreen.transform.localPosition = Vector3.zero;
 
         DOTween.Sequence()
             .Join(raycastScreen.transform.DOLocalMoveY(screenPy, duration).SetEase(Ease.OutBounce))
-            .Join(BattleUIContainer.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutBounce))
+            .Join(battleUIContainer.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutBounce))
             .OnComplete(() => 
             {
                 // 종료 후 위치 확정 (Floating point 오차 방지)
                 raycastScreen.transform.localPosition = new Vector3(0, screenPy, 0);
-                BattleUIContainer.transform.localPosition = Vector3.zero;
+                battleUIContainer.transform.localPosition = Vector3.zero;
                 onCompleteCallback?.Invoke();
             });
     }
@@ -275,7 +279,7 @@ public class BattleUIController : MonoBehaviour
         float battleUIPy = -216f;
         DOTween.Sequence()
         .Join(raycastScreen.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutSine))
-        .Join(BattleUIContainer.transform.DOLocalMoveY(battleUIPy, duration).SetEase(Ease.OutSine))
+        .Join(battleUIContainer.transform.DOLocalMoveY(battleUIPy, duration).SetEase(Ease.OutSine))
         .OnComplete(() => 
         {
             raycastScreen.transform.localPosition = Vector3.zero;
@@ -313,6 +317,45 @@ public class BattleUIController : MonoBehaviour
         
         Tween tween = instantResultPanel.transform.DOScale(1.1f, instantWinDelay);
         yield return tween.WaitForCompletion();
+    }
+
+    public IEnumerator ShowPhaseIndicator(bool isEnemyTurn)
+    {
+        // 1. 텍스트 설정 (캐싱된 변수 사용)
+        if (phaseIndicatorText != null)
+        {
+            phaseIndicatorText.text = isEnemyTurn ? "ENEMY PHASE" : "PLAYER PHASE";
+            //phaseIndicatorText.color = isEnemyTurn ? Color.softRed : Color.softBlue;
+        }
+        if (phaseIndicatorBg != null)
+        {
+            phaseIndicatorBg.colorRight = isEnemyTurn ? Color.darkRed : Color.darkBlue;
+        }
+
+        RectTransform rectT = phaseIndicator.transform as RectTransform;
+        
+        rectT.DOKill();
+
+        RectTransform parentRect = rectT.parent as RectTransform;
+        float offScreenX = (parentRect.rect.width / 2f) + (rectT.rect.width / 2f);
+
+        // 왼쪽 화면 밖으로 위치 초기화
+        rectT.anchoredPosition = new Vector2(-offScreenX, rectT.anchoredPosition.y);
+
+        var seq = DOTween.Sequence();
+        float moveDuration = 0.3f;
+
+        // 가운데로 날아오기
+        seq.Append(rectT.DOAnchorPosX(0, moveDuration).SetEase(Ease.OutCubic).OnStart(()=> {
+            phaseIndicator.SetActive(true);
+        }));
+
+        // 0.5초 대기 후 오른쪽 화면 밖으로 날아가기
+        seq.Append(rectT.DOAnchorPosX(offScreenX, moveDuration).SetDelay(0.5f).SetEase(Ease.InCubic).OnComplete(()=> {
+            phaseIndicator.SetActive(false);
+        }));
+
+        yield return seq.WaitForCompletion();
     }
 
     public void HideInstantWinPanel()
