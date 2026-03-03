@@ -36,7 +36,7 @@ namespace UI.Battle
 
         [Header("Skill UI")]
         public Transform skillContent;      
-        public GameObject skillSlotPrefab;   // [신규] 스킬 이름을 표시할 간단한 Text 프리팹
+        public GameObject skillSlotPrefab;
 
         [Header("Controls")]
         public Button confirmButton; 
@@ -78,7 +78,6 @@ namespace UI.Battle
 
         private void BindButtons()
         {
-            // 람다식 ref 캡처 문제를 피하기 위해 Enum 방식으로 변경
             strRow.upButton.onClick.RemoveAllListeners(); strRow.upButton.onClick.AddListener(() => ChangeStat(StatType.STR, 1));
             magRow.upButton.onClick.RemoveAllListeners(); magRow.upButton.onClick.AddListener(() => ChangeStat(StatType.MAG, 1));
             intRow.upButton.onClick.RemoveAllListeners(); intRow.upButton.onClick.AddListener(() => ChangeStat(StatType.INT, 1));
@@ -221,7 +220,6 @@ namespace UI.Battle
             UpdateStatRow(lucRow, baseStats.luc, allocatedStats.luc);
 
             if (pointsText) pointsText.text = $"POINTS: {availablePoints}";
-
             // 업데이트된 스탯에 맞춰 HP 및 MP도 재계산
             int previewMaxHp = (baseStats.vit + allocatedStats.vit) * 20;
             int previewMaxMp = (baseStats.mag + allocatedStats.mag) * 30;
@@ -230,6 +228,88 @@ namespace UI.Battle
             mpText.text = $"MP {previewMaxMp}/{previewMaxMp}";
 
             confirmButton.gameObject.SetActive(availablePoints == 0);
+
+            UpdateNavigation();
+        }
+
+        // 상태에 맞게 버튼 내비를 다시 설정
+        private void UpdateNavigation()
+        {
+            StatUIRow[] rows = new StatUIRow[] { strRow, magRow, intRow, vitRow, agiRow, lucRow };
+
+            List<Button> activeUpBtns = new List<Button>();
+            List<Button> activeDownBtns = new List<Button>();
+
+            // 현재 조작 가능한 버튼들만 수집
+            foreach (var row in rows)
+            {
+                if (row.upButton.interactable && row.upButton.gameObject.activeInHierarchy) 
+                    activeUpBtns.Add(row.upButton);
+                
+                if (row.downButton.interactable && row.downButton.gameObject.activeInHierarchy) 
+                    activeDownBtns.Add(row.downButton);
+            }
+
+            bool hasConfirm = confirmButton.gameObject.activeInHierarchy && confirmButton.interactable;
+
+            // 세로 방향 네비게이션 연결
+            LinkVerticalNavigation(activeUpBtns, hasConfirm ? confirmButton : null);
+            LinkVerticalNavigation(activeDownBtns, hasConfirm ? confirmButton : null);
+
+            // 가로 방향 네비게이션 연결
+            foreach (var row in rows)
+            {
+                Button downBtn = (row.downButton.interactable && row.downButton.gameObject.activeInHierarchy) ? row.downButton : null;
+                Button upBtn = (row.upButton.interactable && row.upButton.gameObject.activeInHierarchy) ? row.upButton : null;
+
+                if (downBtn != null)
+                {
+                    Navigation nav = downBtn.navigation;
+                    nav.selectOnRight = upBtn != null ? upBtn : downBtn;
+                    nav.selectOnLeft = upBtn != null ? upBtn : downBtn; // 가로도 순환
+                    downBtn.navigation = nav;
+                }
+
+                if (upBtn != null)
+                {
+                    Navigation nav = upBtn.navigation;
+                    nav.selectOnLeft = downBtn != null ? downBtn : upBtn;
+                    nav.selectOnRight = downBtn != null ? downBtn : upBtn; // 가로도 순환
+                    upBtn.navigation = nav;
+                }
+            }
+
+            // 확인 버튼 좌우 이동 방지
+            if (hasConfirm)
+            {
+                Navigation nav = confirmButton.navigation;
+                nav.selectOnLeft = confirmButton;
+                nav.selectOnRight = confirmButton;
+                confirmButton.navigation = nav;
+            }
+        }
+
+        // 활성화된 버튼들을 순환되게 함
+        private void LinkVerticalNavigation(List<Button> column, Button bottomButton)
+        {
+            List<Button> fullCol = new List<Button>(column);
+            if (bottomButton != null) fullCol.Add(bottomButton);
+
+            if (fullCol.Count == 0) return;
+
+            for (int i = 0; i < fullCol.Count; i++)
+            {
+                Navigation nav = fullCol[i].navigation;
+                nav.mode = Navigation.Mode.Explicit;
+
+                Button upTarget = fullCol[(i - 1 + fullCol.Count) % fullCol.Count];
+                Button downTarget = fullCol[(i + 1) % fullCol.Count];
+
+                nav.selectOnUp = upTarget;
+                nav.selectOnDown = downTarget;
+
+                fullCol[i].navigation = nav;
+            }
         }
 
         private void UpdateStatRow(StatUIRow row, int baseVal, int allocated)
@@ -243,7 +323,7 @@ namespace UI.Battle
                 row.slider.maxValue = maxStatValue;
                 row.slider.value = total; 
             }
-            // 상태에 따른 상호작용 활성화/비활성화
+            // 상태에 따른 상호작용 가부 결정
             row.upButton.interactable = (availablePoints > 0);
             row.downButton.interactable = (allocated > 0);
         }
