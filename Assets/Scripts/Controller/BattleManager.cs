@@ -15,6 +15,7 @@ using Manager;
 namespace Controller
 {
     public enum BattleState { Start, PlayerInput, EnemyInput, Processing, Won, Lost }
+    public enum EncounterType { Normal, Preemptive, Ambush }
     
     public class BattleManager : MonoBehaviour
     {
@@ -190,12 +191,93 @@ namespace Controller
             }
         }
 
+        // 파티와 적군의 평균 스탯을 비교하여 인카운터 타입을 결정
+        private EncounterType DetermineEncounterType()
+        {
+            // 살아있는 파티원과 몬스터 추출
+            var players = fieldController.GetLivingParty();
+            var monsters = fieldController.GetLivingMonsters();
+
+            if (players.Count == 0 || monsters.Count == 0) return EncounterType.Normal;
+
+            // 평균 민첩성, 운, 레벨 계산
+            float avgPlayerAgi = (float)players.Average(p => p.GetComponent<BattleEntity>().GetTotalAgi());
+            float avgPlayerLuc = (float)players.Average(p => p.GetComponent<BattleEntity>().GetTotalLuc());
+            float avgPlayerLv = (float)players.Average(p => p.GetComponent<BattleEntity>().level);
+
+            float avgMonsterAgi = (float)monsters.Average(m => m.GetComponent<BattleEntity>().GetTotalAgi());
+            float avgMonsterLv = (float)monsters.Average(m => m.GetComponent<BattleEntity>().level);
+
+            // 확률 계산 공식
+            // 기본 기습 확률 10%, 선제공격 확률 10%에서 출발
+            float ambushChance = 0.10f; 
+            float preemptiveChance = 0.10f;
+
+            // 적 레벨이 높으면 기습 확률 증가
+            float levelDiff = avgMonsterLv - avgPlayerLv;
+            ambushChance += (levelDiff * 0.02f); 
+            preemptiveChance -= (levelDiff * 0.02f);
+
+            // AGI 차이에 따른 보정
+            float agiDiff = avgPlayerAgi - avgMonsterAgi;
+            preemptiveChance += (agiDiff * 0.01f);
+            ambushChance -= (agiDiff * 0.01f);
+
+            // 운이 높을수록 기습당할 확률 감소, 선제공격 확률 증가
+            preemptiveChance += (avgPlayerLuc * 0.005f);
+            ambushChance -= (avgPlayerLuc * 0.005f);
+
+            // 확률 범위 제한 (최소 1%, 최대 35%)
+            ambushChance = Mathf.Clamp(ambushChance, 0.01f, 0.35f);
+            preemptiveChance = Mathf.Clamp(preemptiveChance, 0.01f, 0.35f);
+
+            float roll = Random.value;
+
+            if (roll < ambushChance) 
+            {
+                return EncounterType.Ambush;
+            }
+            else if (roll < ambushChance + preemptiveChance) 
+            {
+                return EncounterType.Preemptive;
+            }
+
+            return EncounterType.Normal;
+        }
+
         IEnumerator SetupBattle()
         {
             SoundManager.Instance.PlayBGM(BgmID.Encounter);
             
             yield return fieldController.Refresh();
-            PreparePlayerTurn();
+
+            // 인카운터 타입 결정
+            EncounterType encounterType = DetermineEncounterType();
+
+            switch (encounterType)
+            {
+                case EncounterType.Preemptive:
+                    uiController.ShowLog("PLAYER ADVANTAGE");
+                    SoundManager.Instance.PlaySFX(SfxID.Attack_Critical);
+                    yield return new WaitForSeconds(1f);
+                    uiController.HideLog();
+                    PreparePlayerTurn();
+                    break;
+
+                case EncounterType.Ambush:
+                    SoundManager.Instance.PlaySFX(SfxID.Attack_Critical);
+                    yield return uiController.ShowFlashEffect();
+                    uiController.ShowLog("ENEMY ADVANTAGE"); 
+                    yield return uiController.ShowPhaseIndicator(true);
+                    uiController.HideLog();
+                    ProcessEnemyTurn(); 
+                    break;
+
+                case EncounterType.Normal:
+                default:
+                    PreparePlayerTurn(); // 평소대로 아군 시작
+                    break;
+            }
         }
 
         private void PrepareWeaponAction(WeaponData weapon, ActionType actionType)
