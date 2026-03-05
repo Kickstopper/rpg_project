@@ -258,14 +258,14 @@ namespace Controller
             {
                 case EncounterType.Preemptive:
                     uiController.ShowLog("PLAYER ADVANTAGE");
-                    SoundManager.Instance.PlaySFX(SfxID.Attack_Critical);
+                    SoundManager.Instance.PlaySFX(SfxID.Attack_Critical); // 임시
                     yield return new WaitForSeconds(1f);
                     uiController.HideLog();
                     PreparePlayerTurn();
                     break;
 
                 case EncounterType.Ambush:
-                    SoundManager.Instance.PlaySFX(SfxID.Attack_Critical);
+                    SoundManager.Instance.PlaySFX(SfxID.Attack_Critical); // 임시
                     yield return uiController.ShowFlashEffect();
                     uiController.ShowLog("ENEMY ADVANTAGE"); 
                     yield return uiController.ShowPhaseIndicator(true);
