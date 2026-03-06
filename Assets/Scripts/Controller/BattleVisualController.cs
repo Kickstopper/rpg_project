@@ -14,7 +14,7 @@ public class BattleVisualController : MonoBehaviour
     public GameObject vfxReflectPrefab;    // 반사 발동 시
     public GameObject vfxAbsorbPrefab;     // 흡수 발동 시
     public Transform vfxContainer;
-    public void SpawnVFX(VfxID vfxID, Vector3 position)
+    public GameObject SpawnVFX(VfxID vfxID, Vector3 position)
     {
         GameObject vfx = null;
         switch(vfxID)
@@ -43,6 +43,8 @@ public class BattleVisualController : MonoBehaviour
             Vector3 localPos = spawnedVfx.transform.localPosition;
             localPos.z -= 10f;
             spawnedVfx.transform.localPosition = localPos;
+            return spawnedVfx;
         }
+        return null;
     }
 }

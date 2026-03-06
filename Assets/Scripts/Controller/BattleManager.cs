@@ -248,12 +248,27 @@ namespace Controller
         IEnumerator SetupBattle()
         {
             SoundManager.Instance.PlayBGM(BgmID.Encounter);
+
+            // ==========================================
+            // VFX 셰이더 웜업
+            Vector3 hiddenPosition = new Vector3(0, -1000f, 0);
             
+            GameObject warmupVfx1 = visualController.SpawnVFX(VfxID.Magic, hiddenPosition);
+            //GameObject warmupVfx2 = visualController.SpawnVFX(VfxID.Slash, hiddenPosition);
+            
+            // 셰이더 컴파일할 시간
+            yield return wait01; 
+            
+            // 웜업용 이펙트 즉시 삭제
+            if (warmupVfx1 != null) Destroy(warmupVfx1);
+            //if (warmupVfx2 != null) Destroy(warmupVfx2);
+            // ==========================================
+
             yield return fieldController.Refresh();
 
             // 인카운터 타입 결정
             EncounterType encounterType = DetermineEncounterType();
-
+            
             switch (encounterType)
             {
                 case EncounterType.Preemptive:
@@ -1996,10 +2011,34 @@ namespace Controller
                 {
                     // 공격
                     SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
-                    visualController.SpawnVFX(VfxID.Magic, targetObj.transform.position);
 
-                    // CalculateDamage를 통해 상성/방어력 계산 적용
-                    // 스킬 위력은 skill.effectValue가 CalculateDamage 내부에서 참조됨
+                    if (skill.effectType == EffectType.Magic_Atk)
+                    {
+                        // Z축을 카메라 쪽으로 당김.
+                        Vector3 startPos = actor.transform.position + new Vector3(0, 0, 1f);
+                        Vector3 targetPos = targetObj.transform.position + new Vector3(0, 0, 1f);
+
+                        GameObject vfx = visualController.SpawnVFX(VfxID.Magic, startPos);
+                        
+                        if (vfx != null)
+                        {
+                            float arcHeight = 1.0f; 
+                            yield return vfx.transform.DOJump(targetPos, arcHeight, 1, 0.5f)
+                                                      .SetEase(Ease.Linear)
+                                                      .WaitForCompletion();
+                        }
+                        else
+                        {
+                            yield return new WaitForSeconds(0.3f);
+                        }
+                    }
+                    else
+                    {
+                        // 타겟 위치에 즉시 생성 (Special_Atk 등)
+                        visualController.SpawnVFX(VfxID.Magic, targetObj.transform.position);
+                    }
+
+                    // 상성과 방어력 계산 적용
                     BattleEntity attackerEntity = action.actor.GetComponent<BattleEntity>();
                     BattleEntity targetEntity = targetObj.GetComponent<BattleEntity>();
 
