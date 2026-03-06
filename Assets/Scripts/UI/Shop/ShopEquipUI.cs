@@ -85,7 +85,7 @@ namespace UI.Shop
                 ConfirmSelection(currentCharIndex);
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 CloseShopEquip();
             }

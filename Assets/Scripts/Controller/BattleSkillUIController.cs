@@ -64,7 +64,7 @@ namespace Controller
                 }
 
                 // 닫기
-                if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
+                if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
                 {
                     Close();
                 }

@@ -133,7 +133,7 @@ namespace Controller
                 inputCooldown = 0.2f;
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 if (onCloseCallback != null)
                 {
@@ -352,7 +352,7 @@ namespace Controller
                 UpdateItemSelection();
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 CloseItemList();
             }

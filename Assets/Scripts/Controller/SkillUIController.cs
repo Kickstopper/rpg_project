@@ -110,7 +110,7 @@ namespace Controller
                 UpdateVisuals();
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 menuController.CloseSkillUI();
             }
@@ -133,7 +133,7 @@ namespace Controller
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) AttemptSelectSkill();
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 currentState = SkillUIState.SelectCaster;
@@ -229,7 +229,7 @@ namespace Controller
                 else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 currentState = SkillUIState.SelectSkill;

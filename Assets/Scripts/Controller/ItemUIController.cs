@@ -191,7 +191,7 @@ namespace Controller
                 SelectItem();
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 menuController.CloseItemUI(); 
             }
@@ -346,7 +346,7 @@ namespace Controller
             }
 
             // 취소
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 CancelTargetSelection();
             }

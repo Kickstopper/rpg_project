@@ -98,7 +98,7 @@ namespace UI.Shop
 
         private void HandleInput()
         {
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
             {
                 CloseBuyMode();
                 return;

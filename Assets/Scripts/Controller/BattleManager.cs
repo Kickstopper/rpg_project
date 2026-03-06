@@ -399,7 +399,7 @@ namespace Controller
             
             if (isAutoMode)
             {
-                if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift))
+                if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
                 {
                     if (!reserveAutoOff)
                     {
@@ -709,7 +709,7 @@ namespace Controller
         
         void HandleCommandInput()
         {
-            if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 
@@ -1548,7 +1548,7 @@ namespace Controller
                 fieldController.RefreshMoveHighlights(currentMoveSlotIndex); 
             }
 
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 CancelMoveSelection();
@@ -1658,7 +1658,7 @@ namespace Controller
         void HandleTargetSelectionInput()
         {
             // 취소 및 확정 입력 처리
-            bool isCancel = (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape));
+            bool isCancel = (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1));
             if (isCancel || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 if (fieldController.validTargets.Count > fieldController.currentTargetIndex)
@@ -1732,6 +1732,48 @@ namespace Controller
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                 fieldController.SetCurrentValidTargetIndex(nextEntity);
                 fieldController.UpdateValidTargetsHighlight();
+            }
+        }
+
+        // 마우스를 통한 타겟팅 처리
+        public void OnTargetHovered(BattleEntity hoveredEntity)
+        {
+            if (!isSelectingTarget) return;
+
+            // 마우스를 올린 대상이 validTargets에 포함되어 있는지 확인
+            if (fieldController.validTargets.Contains(hoveredEntity))
+            {
+                if (fieldController.GetCurrentValidTarget() == hoveredEntity) return;
+
+                // 하이라이트 이동
+                fieldController.SetCurrentValidTargetIndex(hoveredEntity);
+                fieldController.UpdateValidTargetsHighlight();
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            }
+        }
+
+        public void OnTargetClicked(BattleEntity clickedEntity)
+        {
+            if (!isSelectingTarget) return;
+
+            // 클릭한 대상이 유효한 타겟일 경우 확정
+            if (fieldController.validTargets.Contains(clickedEntity))
+            {
+                // 마우스가 너무 빨리 움직여 호버가 씹혔을 경우를 대비해 포커스 강제 갱신
+                fieldController.SetCurrentValidTargetIndex(clickedEntity);
+                fieldController.UpdateValidTargetsHighlight();
+
+                var validTarget = fieldController.GetCurrentValidTarget();
+                validTarget.SetSelectionState(false);
+                
+                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                
+                OnTargetSelected(validTarget); // 확정 처리
+            }
+            else
+            {
+                // 공격할 수 없는 아군이나 시체 등을 클릭했을 때의 피드백
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             }
         }
 
@@ -2471,7 +2513,7 @@ namespace Controller
                 {
                     timer += Time.deltaTime;
                     uiController.UpdateQTESliderValue(1.0f - (timer / qteDuration));
-                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
                     {
                         List<GameObject> currentTargets = fieldController.GetTargetsByScope(scope, action.actor, action.target);
                         if (currentTargets.Count == 0) break;

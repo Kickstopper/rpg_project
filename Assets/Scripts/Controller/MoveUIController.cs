@@ -114,7 +114,7 @@ namespace Controller
                 ExecuteSelection();
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 if (firstSelectedIndex != -1)
                 {

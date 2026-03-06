@@ -507,7 +507,7 @@ namespace UI.Battle
             }
 
             // 스킬 리스트가 포커스 되어 있는 상태에서 취소 처리
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
             {
                 if (currentSection == FocusSection.Skill && availablePoints == 0)
                 {

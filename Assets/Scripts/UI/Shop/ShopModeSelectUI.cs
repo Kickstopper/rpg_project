@@ -88,7 +88,7 @@ namespace UI.Shop
         private void HandleInput()
         {
             // 취소
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 ExitShop();
                 return;

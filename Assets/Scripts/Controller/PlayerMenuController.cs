@@ -172,7 +172,7 @@ namespace Controller
             }
 
             // 취소 키
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
             {
                 ResetInputTimer();
                 OnClickCancelButton();
@@ -249,7 +249,7 @@ namespace Controller
             }
             
             // 취소 키 (기존 로직 유지)
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
             {
                 SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
@@ -355,7 +355,7 @@ namespace Controller
             }
 
             // 취소 키: 메인 메뉴로 복귀
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 CancelCharacterSelection();
             }
