@@ -60,10 +60,10 @@ namespace Manager
                     target.ApplyHpChange(-data.effectValue);
                     success = true;
                     break;
-                
+
                 // TODO: 버프/디버프 로직 추가
             }
-            Debug.Log("1111111111111111111 TYPE: " + data.effectType + ", SUC? " +success);
+
             if (success)
             {
                 // 데이터 변경 후 UI 갱신 요청

@@ -8,6 +8,7 @@ namespace UI.WorldMapScene
         [Header("연결할 오브젝트")]
         public Transform playerTransform; // 씬에 배치된 플레이어
         public WorldMapCameraFollow cameraFollow;
+        private Data.BgmID bgmID;
 
         void Start()
         {
@@ -24,7 +25,8 @@ namespace UI.WorldMapScene
                 // 일반적인 진입(던전에서 나옴 등)인 경우, 테마의 기본 시작 좌표 사용
                 var theme = WorldManager.Instance.currentRegionTheme;
                 finalPos = theme.startPosition;
-                SoundManager.Instance.PlayBGM(theme.fieldBgmID);
+                bgmID = theme.fieldBgmID;
+                SoundManager.Instance.PlayBGM(bgmID);
             }
 
             // 플레이어 위치 이동
@@ -36,6 +38,16 @@ namespace UI.WorldMapScene
 
             // 카메라 복귀
             if (cameraFollow != null) cameraFollow.SnapToTarget();
+        }
+
+        void OnEnable()
+        {
+            SoundManager.Instance.PlayBGM(bgmID);
+        }
+
+        void OnDisable()
+        {
+            SoundManager.Instance.StopBGM();
         }
     }
 }

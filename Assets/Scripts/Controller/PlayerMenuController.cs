@@ -286,8 +286,55 @@ namespace Controller
                     if(pc.selectButton) pc.selectButton.interactable = false;
 
                     spawnedControllers[i] = pc;
+                    int slotIndex = i;
+                    AddMouseEvents(go, slotIndex);
                 }
             }
+        }
+
+        private void AddMouseEvents(GameObject go, int index)
+        {
+            EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
+            trigger.triggers.Clear();
+
+            EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enterEntry.callback.AddListener((data) => {
+                if (currentState == MenuState.SelectEquipChar || currentState == MenuState.SelectStatusChar)
+                {
+                    if (spawnedControllers[index] != null)
+                    {
+                        currentPartySelectIndex = index;
+                        SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                        foreach(var pc in spawnedControllers) pc.ResetHighlightColor();
+                        spawnedControllers[index].SetHighlightColor(charHighlightColor);
+                    }
+                } 
+            });
+            trigger.triggers.Add(enterEntry);
+
+            EventTrigger.Entry clickEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerClick };
+            clickEntry.callback.AddListener((data) => {
+                PointerEventData pointerData = data as PointerEventData;
+                if (pointerData != null && pointerData.button != PointerEventData.InputButton.Left) return;
+                
+                if (spawnedControllers[index] != null)
+                {
+                    var targetChar = spawnedControllers[index].sourceData;
+                    if (currentState == MenuState.SelectEquipChar)
+                    {
+                        OpenEquipUI(targetChar);
+                    }
+                    else if (currentState == MenuState.SelectStatusChar)
+                    {
+                        OpenStatusUI(targetChar);
+                    }
+                }
+                else
+                {
+                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+                }
+            });
+            trigger.triggers.Add(clickEntry);
         }
 
         private int GetIndexFromRowColumn(RowType row, ColumnType col)
@@ -299,7 +346,6 @@ namespace Controller
         // 캐릭터 선택 조작 (방향키)
         private void HandleCharacterSelection()
         {
-            // ... (방향키 이동 및 하이라이트 로직은 기존과 동일) ...
             bool moved = false;
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { if (currentPartySelectIndex % 3 > 0) { currentPartySelectIndex--; moved = true; } }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { if (currentPartySelectIndex % 3 < 2) { currentPartySelectIndex++; moved = true; } }
@@ -313,7 +359,6 @@ namespace Controller
                 ResetInputTimer();
             }
 
-            // [핵심 수정] 확인 키 입력 시 상태에 따른 분기
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 if (spawnedControllers[currentPartySelectIndex] != null)
@@ -335,7 +380,7 @@ namespace Controller
                 }
             }
 
-            // 취소 키: 메인 메뉴로 복귀
+            // 취소. 메인 메뉴로 복귀
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
             {
                 CancelCharacterSelection();

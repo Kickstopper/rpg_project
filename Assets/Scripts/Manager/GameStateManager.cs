@@ -78,8 +78,6 @@ namespace Manager
         {
             // 아직 UI가 연결되지 않았다면 무시
             if (explorationCanvas == null || BattleCanvas == null || menuCanvas == null || shopCanvas == null) return;
-            // 일단 음악 끄기
-            SoundManager.Instance.StopBGM();
             
             // 모든 캔버스 일단 끄기 
             explorationCanvas.SetActive(false);

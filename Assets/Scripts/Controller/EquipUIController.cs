@@ -6,6 +6,7 @@ using Manager;
 using Data;
 using System.Linq;
 using UI.Common;
+using UnityEngine.EventSystems;
 
 namespace Controller
 {
@@ -76,7 +77,7 @@ namespace Controller
             currentSlotIndex = 0;
             inputCooldown = 0f;
 
-            RefreshSlotButtons();
+            RefreshButtonText();
             UpdateStatDisplay();
             
             SelectSlot(0);
@@ -158,7 +159,7 @@ namespace Controller
             UpdateItemInfoText(itemId);
         }
 
-        private void RefreshSlotButtons()
+        private void RefreshButtonText()
         {
             for (int i = 0; i < equipSlots.Length; i++)
             {
@@ -167,6 +168,25 @@ namespace Controller
                 BaseRootData itemData = DatabaseManager.Instance.GetItem(itemId);
                 if (itemData != null) itemName = itemData.dataName;
                 equipSlots[i].UpdateText(itemName);
+                int slotIndex = i;
+                Button btn = equipSlots[i].button;
+                btn.onClick.RemoveAllListeners(); 
+                btn.onClick.AddListener(() =>
+                {
+                    OpenItemList(equipSlots[slotIndex].type);
+                    inputCooldown = 0.2f;
+                });
+
+                EventTrigger trigger = btn.gameObject.GetComponent<EventTrigger>() ?? btn.gameObject.AddComponent<EventTrigger>();
+                trigger.triggers.Clear();
+
+                EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+                enterEntry.callback.AddListener((data) =>
+                {
+                    currentSlotIndex = slotIndex;
+                    SelectSlot(slotIndex);
+                });
+                trigger.triggers.Add(enterEntry);
             }
         }
 
@@ -299,10 +319,24 @@ namespace Controller
             GameObject go = Instantiate(itemSlotPrefab, itemContent);
             var btn = go.GetComponent<Button>();
             var slotUI = go.GetComponent<SimpleListItemView>();
-
+            
             slotUI.SetData(text, count);
 
+            int itemIndex = displayedButtons.Count;
             btn.onClick.AddListener(() => OnItemClicked(itemId, slotType));
+            EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
+            trigger.triggers.Clear();
+
+            EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enterEntry.callback.AddListener((data) => {
+                if (currentItemIndex != itemIndex)
+                {
+                    currentItemIndex = itemIndex;
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    UpdateItemSelection(); // 포커스 변경 및 정보창 갱신
+                }
+            });
+            trigger.triggers.Add(enterEntry);
 
             displayedButtons.Add(btn);
             displayedItemIds.Add(itemId);
@@ -410,7 +444,7 @@ namespace Controller
             // 리스트 닫은 직후 쿨타임 설정 -> HandleSlotInput에서 다시 열리는 것 방지
             inputCooldown = 0.2f; 
             
-            RefreshSlotButtons();
+            RefreshButtonText();
             UpdateStatDisplay();
         }
 
