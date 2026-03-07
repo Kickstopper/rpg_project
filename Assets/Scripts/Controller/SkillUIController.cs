@@ -4,6 +4,9 @@ using UnityEngine.UI;
 using Manager;
 using Data;
 using TMPro;
+using UI.Common;
+using UnityEngine.EventSystems;
+using System;
 
 namespace Controller
 {
@@ -14,21 +17,23 @@ namespace Controller
         public PlayerMenuController menuController;
         
         [Header("Skill Info (Center)")]
+        public GameObject skillPanel;
         public SkillInfoController skillInfo;
+        public Transform skillContent;
+        public GameObject skillSlotPrefab;    
 
         [Header("Party List (Left)")]
-        public Transform[] partySlots;        
-        public GameObject partyPrefab;        
+        public Transform[] partySlots;
+        public GameObject partyPrefab;
         private PlayerController[] partyControllers = new PlayerController[6];
 
         [Header("Skill List (Right)")]
-        public Transform skillContent;        
-        public GameObject skillSlotPrefab;    
-        public TextMeshProUGUI mpText;        
+        public TextMeshProUGUI mpText;
+        public TextMeshProUGUI descriptionText;
 
         [Header("Highlight Colors")]
         public Color casterHighlightColor = new Color(0.5f, 0.5f, 1f, 1f); 
-        public Color targetHighlightColor = Color.yellow;                
+        public Color targetHighlightColor = Color.yellow;
         public Color disabledTextColor = Color.gray;
         public Color enabledTextColor = Color.white;
 
@@ -108,6 +113,7 @@ namespace Controller
                 currentState = SkillUIState.SelectSkill;
                 currentSkillIndex = 0;
                 UpdateVisuals();
+                menuController.ResetInputTimer(); // 상태가 넘어간 직후 이중 입력 방지
             }
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
@@ -151,10 +157,16 @@ namespace Controller
 
         private void UpdateSkillInfo()
         {
-            if (skillInfo == null) return;
+            if (skillInfo == null || currentSkillIds == null || currentSkillIndex >= currentSkillIds.Count) return;
             string skillId = currentSkillIds[currentSkillIndex];
             SkillData skillData = DatabaseManager.Instance.GetSkill(skillId);
             skillInfo.UpdateInfo(skillData);
+        }
+
+        private void OnClickListItem(int skillIndex)
+        {
+            currentSkillIndex = skillIndex;
+            AttemptSelectSkill();
         }
 
         private void AttemptSelectSkill()
@@ -166,22 +178,7 @@ namespace Controller
 
             if (selectedSkillData == null) return;
 
-            if (selectedSkillData.useType != UseType.All && selectedSkillData.useType != UseType.Exploration)
-            {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                return;
-            }
-
-            bool isMpCost = !selectedSkillData.useHpCost;
-            int cost = selectedSkillData.costValue;
-
-            if (isMpCost && currentCaster.currentMp < cost)
-            {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                // "MP 부족" 메시지 등을 띄울 수 있음
-                return;
-            }
-            else if (!isMpCost && currentCaster.currentHp <= cost)
+            if (!IsCostEnough() || selectedSkillData.useType != UseType.All && selectedSkillData.useType != UseType.Exploration)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 return;
@@ -200,6 +197,7 @@ namespace Controller
             currentState = SkillUIState.SelectTarget;
             InitializeTargetCursor();
             UpdateVisuals();
+            menuController.ResetInputTimer(); // 쿨타임 갱신
         }
 
         private void HandleTargetSelection()
@@ -225,8 +223,9 @@ namespace Controller
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                if (IsValidTarget(currentTargetIndex)) UseSkill();
+                if (IsCostEnough() && IsValidTarget(currentTargetIndex)) UseSkill();
                 else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                menuController.ResetInputTimer(); // 타겟 선택 완료 후 쿨타임 갱신
             }
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
@@ -237,9 +236,28 @@ namespace Controller
             }
         }
 
+        private bool IsCostEnough()
+        {
+            if (currentCaster == null || selectedSkillData == null) return false;
+
+            bool isMpCost = !selectedSkillData.useHpCost;
+            int cost = selectedSkillData.costValue;
+
+            if (isMpCost && currentCaster.currentMp < cost)
+            {
+                // "MP 부족" 메시지 등을 띄울 수 있음
+                return false;
+            }
+            else if (!isMpCost && currentCaster.currentHp < cost)
+            {
+                return false;
+            }
+            return true;
+        }
+
         private bool IsValidTarget(int index)
         {
-            if (partyControllers[index].IsEmpty) return false;
+            if (index < 0 || index >= partyControllers.Length ||partyControllers[index].IsEmpty || selectedSkillData == null) return false;
             PlayerController target = partyControllers[index];
             TargetScope scope = selectedSkillData.targetScope;
 
@@ -287,6 +305,7 @@ namespace Controller
                 }
             }
 
+        
             // 결과 처리
             if (success)
             {
@@ -294,30 +313,27 @@ namespace Controller
 
                 // 코스트 차감 (시전자)
                 if (selectedSkillData.useHpCost)
-                    currentCaster.Recover(-selectedSkillData.costValue, 0);
+                    currentCaster.currentHp -= selectedSkillData.costValue;
                 else
-                    currentCaster.Recover(0, -selectedSkillData.costValue);
+                    currentCaster.currentMp -= selectedSkillData.costValue;
 
                 currentCaster.sourceData.currentHp = currentCaster.currentHp;
                 currentCaster.sourceData.currentMp = currentCaster.currentMp;
 
-                // UI 갱신 (MP 소모 반영)
+                // UI 갱신
                 RefreshSkillList(currentCasterIndex); 
-                
-                // 상태: 스킬 선택 화면으로 돌아가기 (연속 사용을 위해)
-                // 만약 타겟 선택 상태를 유지하고 싶다면 currentState 변경 안함
-                currentState = SkillUIState.SelectSkill; 
+                // currentState = SkillUIState.SelectSkill; 
                 UpdateVisuals();
             }
             else
             {
-                // 실패 (모두 만피이거나 조건 불만족)
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             }
         }
 
         private void UpdateVisuals()
         {
+            if (skillPanel) skillPanel.SetActive(currentState != SkillUIState.SelectCaster);
             // 모든 하이라이트 초기화
             foreach (var pc in partyControllers) pc.ResetHighlightColor();
 
@@ -337,16 +353,25 @@ namespace Controller
                 buttons[currentSkillIndex].Select();
                 UpdateSkillInfo();
             }
+            else if (currentState == SkillUIState.SelectTarget)
+            {
+                // 타겟을 고르는 중에도 스킬 설명을 유지합니다!
+                EventSystem.current.SetSelectedGameObject(null);
+                UpdateSkillInfo(); 
+            }
             else
             {
                 if (skillInfo) skillInfo.ResetText();
-                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+                EventSystem.current.SetSelectedGameObject(null);
             }
 
-            // 타겟 하이라이트
-            if (currentState == SkillUIState.SelectTarget)
+            if (descriptionText)
             {
-                HighlightTargets();
+                string descText = string.Empty;
+                if (currentState == SkillUIState.SelectCaster) descText = "누가 스킬을 사용합니까?";
+                if (currentState == SkillUIState.SelectSkill) descText = "스킬을 선택해 주십시오.";
+                if (currentState == SkillUIState.SelectTarget) descText = "누구에게 스킬을 사용합니까?";
+                descriptionText.text = descText;
             }
         }
 
@@ -362,7 +387,7 @@ namespace Controller
             }
             else if (scope == TargetScope.Self)
             {
-                partyControllers[currentCasterIndex].SetHighlightColor(blinkColor);
+                partyControllers[currentTargetIndex].SetHighlightColor(blinkColor);
             }
             else // 단일 타겟
             {
@@ -400,10 +425,10 @@ namespace Controller
                 if (sData == null) continue;
 
                 GameObject go = Instantiate(skillSlotPrefab, skillContent);
-                var slot = go.GetComponent<SimpleListItemController>();
+                var slot = go.GetComponent<SimpleListItemView>();
                 
                 string costStr = sData.useHpCost ? $"{sData.costValue}HP" : $"{sData.costValue}MP";
-                if(slot) slot.SetData(sData.dataName + $" <size=70%>({costStr})</size>", 0);
+                if(slot) slot.SetData(sData.dataName, costStr);
 
                 bool isUsableType = (sData.useType == UseType.All || sData.useType == UseType.Exploration);
                 bool hasResource = sData.useHpCost ? (currentCaster.currentHp > sData.costValue) : (currentCaster.currentMp >= sData.costValue);
@@ -411,6 +436,35 @@ namespace Controller
 
                 var texts = go.GetComponentsInChildren<TextMeshProUGUI>();
                 foreach(var t in texts) t.color = isUsable ? enabledTextColor : disabledTextColor;
+
+                int itemIndex = i;
+                Button btn = go.GetComponent<Button>();
+                if (btn) btn.onClick.AddListener(() => OnClickListItem(itemIndex));
+
+                // 마우스를 올렸을 때 포커스 및 설명창 갱신
+                EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
+                trigger.triggers.Clear();
+
+                EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+                enterEntry.callback.AddListener((data) => {
+                    if (currentState == SkillUIState.SelectSkill && btn)
+                    {
+                        // 마우스가 올라간 스킬의 인덱스로 내부 변수 동기화
+                        if (currentSkillIndex != itemIndex)
+                        {
+                            currentSkillIndex = itemIndex;
+                            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                            btn.Select();
+                            UpdateSkillInfo();
+                        }
+                    }
+                    else
+                    {
+                        if (skillInfo) skillInfo.ResetText();
+                        EventSystem.current.SetSelectedGameObject(null);
+                    }
+                });
+                trigger.triggers.Add(enterEntry);
             }
         }
 
@@ -430,7 +484,76 @@ namespace Controller
 
                 if (member != null) partyControllers[i].Initialize(member, null, true);
                 else partyControllers[i].InitializeEmpty(i);
+
+                int slotIndex = i; 
+                AddMouseEvents(go, slotIndex);
             }
+        }
+
+        // 마우스 이벤트 동적 할당 및 처리
+        // 마우스 이벤트 동적 할당 및 처리
+        private void AddMouseEvents(GameObject go, int index)
+        {
+            EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
+            trigger.triggers.Clear();
+
+            EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enterEntry.callback.AddListener((data) => {
+                if (!partyControllers[index].IsEmpty)
+                {
+                    if (currentState == SkillUIState.SelectCaster)
+                    {
+                        if (currentCasterIndex != index)
+                        {
+                            currentCasterIndex = index;
+                            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                            UpdateVisuals(); 
+                        }
+                    }
+                    else if (currentState == SkillUIState.SelectTarget)
+                    {
+                        if (currentTargetIndex != index)
+                        {
+                            currentTargetIndex = index;
+                            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                            UpdateVisuals();
+                        }
+                    }
+                }
+            });
+            trigger.triggers.Add(enterEntry);
+
+            EventTrigger.Entry clickEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerClick };
+            clickEntry.callback.AddListener((data) => {
+                
+                // 우클릭은 무시
+                PointerEventData pointerData = data as PointerEventData;
+                if (pointerData != null && pointerData.button != PointerEventData.InputButton.Left) return;
+
+                if (currentState == SkillUIState.SelectCaster || currentState == SkillUIState.SelectSkill)
+                {
+                    currentCasterIndex = index; 
+
+                    if (partyControllers[currentCasterIndex].IsEmpty || partyControllers[currentCasterIndex].learnedSkillIds.Count == 0)
+                    {
+                        SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                        return;
+                    }
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                    currentState = SkillUIState.SelectSkill;
+                    currentSkillIndex = 0;
+                    
+                    currentCasterIndex = index;
+                    RefreshSkillList(index);
+                    UpdateVisuals();
+                }
+                else if (currentState == SkillUIState.SelectTarget)
+                {
+                    if (IsCostEnough() && IsValidTarget(index)) UseSkill();
+                    else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                }
+            });
+            trigger.triggers.Add(clickEntry);
         }
 
         private void InitializeTargetCursor()

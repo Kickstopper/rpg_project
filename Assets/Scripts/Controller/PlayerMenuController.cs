@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Data;
-using DG.Tweening;
 using Manager;
 using TMPro;
 using UI;
@@ -28,8 +27,6 @@ namespace Controller
         [Header("Background")]
         public SimpleGradient background;
 
-        private Tweener angleTween;
-
         [Header("Popup UI")]
         public GameObject confirmPopup; // 팝업 창 부모 오브젝트
         public TextMeshProUGUI popupMessage;  // 팝업 창에 표시될 메시지
@@ -50,7 +47,7 @@ namespace Controller
         public bool CanProcessInput => Time.time >= lastInputTime + inputDelay;
 
         // 입력 성공 시 쿨타임을 갱신
-        private void ResetInputTimer() => lastInputTime = Time.time;
+        public void ResetInputTimer() => lastInputTime = Time.time;
 
         private bool isPopupOpen = false;     // 팝업이 열려있는지 확인
         public bool IsPopupOpen => isPopupOpen;
@@ -75,7 +72,6 @@ namespace Controller
         {
             if (newState == GameState.PlayerMenu)
             {
-                //StartTween();
                 isMenuOpen = true;
                 currentState = MenuState.Main;
                 currentBtnIndex = 0;
@@ -87,22 +83,7 @@ namespace Controller
             }
             else
             {
-                //StopTween();
                 isMenuOpen = false;
-            }
-        }
-
-        void StartTween() 
-        {
-            angleTween = DOTween.To(() => background.angle, x => background.angle = x, 180f, 12f)
-                .From(-180f)
-                .SetEase(Ease.Linear)
-                .SetLoops(-1, LoopType.Restart);
-        }
-
-        void StopTween() {
-            if (angleTween != null && angleTween.IsActive()) {
-                angleTween.Kill();
             }
         }
 

@@ -1,9 +1,9 @@
 using UnityEngine;
 using TMPro;
 
-namespace Controller
+namespace UI.Common
 {
-    public class SimpleListItemController : MonoBehaviour
+    public class SimpleListItemView : MonoBehaviour
     {
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI valueText;
@@ -12,6 +12,12 @@ namespace Controller
         {
             nameText.text = name;
             valueText.text = $"{value}"; 
+        }
+
+        public void SetData(string name, string valueStr)
+        {
+            nameText.text = name;
+            valueText.text = valueStr; 
         }
     }
 }

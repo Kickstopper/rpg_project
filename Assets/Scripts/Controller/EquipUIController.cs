@@ -5,6 +5,7 @@ using TMPro;
 using Manager;
 using Data;
 using System.Linq;
+using UI.Common;
 
 namespace Controller
 {
@@ -297,7 +298,7 @@ namespace Controller
         {
             GameObject go = Instantiate(itemSlotPrefab, itemContent);
             var btn = go.GetComponent<Button>();
-            var slotUI = go.GetComponent<SimpleListItemController>();
+            var slotUI = go.GetComponent<SimpleListItemView>();
 
             slotUI.SetData(text, count);
 

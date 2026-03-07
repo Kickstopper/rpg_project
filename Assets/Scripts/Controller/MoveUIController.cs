@@ -4,6 +4,7 @@ using Manager;
 using Data;
 using DG.Tweening;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 namespace Controller
 {
@@ -80,13 +81,45 @@ namespace Controller
                 if (pc != null)
                 {
                     var member = currentSlotData[i];
-                    
                     if (member == null) pc.InitializeEmpty(i);
                     else pc.Initialize(member, null);
 
                     spawnedControllers[i] = pc;
+                    
+                    // 생성된 슬롯에 마우스 이벤트 동적 할당
+                    int slotIndex = i; // 클로저(Closure) 문제 방지를 위해 로컬 변수 복사
+                    AddMouseEvents(go, slotIndex);
                 }
             }
+        }
+
+        // 마우스 이벤트 동적 할당 및 처리
+        private void AddMouseEvents(GameObject go, int index)
+        {
+            EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
+            trigger.triggers.Clear();
+
+            // 마우스 엔터
+            EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enterEntry.callback.AddListener((data) => { 
+                if (isAnimating) return;
+                if (currentCursorIndex != index)
+                {
+                    currentCursorIndex = index;
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    UpdateVisualFeedback();
+                }
+            });
+            trigger.triggers.Add(enterEntry);
+
+            // 클릭
+            EventTrigger.Entry clickEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerClick };
+            clickEntry.callback.AddListener((data) => { 
+                if (isAnimating) return;
+                currentCursorIndex = index; // 클릭 시 커서를 확실히 이동시킨 후 선택 로직 실행
+                ExecuteSelection();
+            });
+            trigger.triggers.Add(clickEntry);
         }
 
         void Update()
@@ -204,6 +237,10 @@ namespace Controller
             PlayerController tempCtrl = spawnedControllers[idxA];
             spawnedControllers[idxA] = spawnedControllers[idxB];
             spawnedControllers[idxB] = tempCtrl;
+
+            // 위치가 바뀐 오브젝트들에게 새로운 자리 인덱스로 마우스 이벤트를 갱신
+            if (spawnedModels[idxA] != null) AddMouseEvents(spawnedModels[idxA], idxA);
+            if (spawnedModels[idxB] != null) AddMouseEvents(spawnedModels[idxB], idxB);
 
             isAnimating = false;
             UpdateVisualFeedback();

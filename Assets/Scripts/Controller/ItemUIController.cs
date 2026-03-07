@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using Manager;
 using Data;
 using TMPro;
+using UnityEngine.EventSystems;
+using UI.Common;
 
 namespace Controller
 {
@@ -13,12 +15,13 @@ namespace Controller
 
         [Header("Item Info (Center)")]
         public ItemInfoController itemInfo;
-
-        [Header("Item List (Left)")]
         public Transform itemContent;         
-        public GameObject itemSlotPrefab;     
+        public GameObject itemSlotPrefab;
+
+        [Header("Item Info (Right)")]
+        public TextMeshProUGUI descriptionText;     
         
-        [Header("Party List (Right)")]
+        [Header("Party List (Bottom)")]
         public Transform[] partySlots;        
         public GameObject partyPrefab;
         private PlayerController[] partyControllers = new PlayerController[6];
@@ -40,6 +43,7 @@ namespace Controller
         void OnEnable()
         {
             ResolvePositionConflicts();
+            ResetDescriptionText();
             ResetUI();
             RefreshItemList();
             RefreshPartyList();
@@ -91,6 +95,11 @@ namespace Controller
             return rowIndex + (int)col;
         }
 
+        private void ResetDescriptionText()
+        {
+            if (descriptionText) descriptionText.text = "사용할 아이템을 선택해 주세요.";
+        }
+
         public void RefreshItemList()
         {
             foreach (Transform child in itemContent) Destroy(child.gameObject);
@@ -110,7 +119,7 @@ namespace Controller
             for (int i = 0; i < inventoryItemIds.Count; i++)
             {
                 GameObject go = Instantiate(itemSlotPrefab, itemContent);
-                var slot = go.GetComponent<SimpleListItemController>();
+                var slot = go.GetComponent<SimpleListItemView>();
                 var itemData = DatabaseManager.Instance.GetConsumable(inventoryItemIds[i]);
 
                 if (slot != null && itemData != null)
@@ -120,6 +129,25 @@ namespace Controller
                     bool isUsable = (itemData.useType == UseType.All || itemData.useType == UseType.Exploration);
                     var texts = go.GetComponentsInChildren<TextMeshProUGUI>();
                     foreach(var t in texts) t.color = isUsable ? enabledTextColor : disabledTextColor;
+
+                    int itemIndex = i;
+                    slot.GetComponent<Button>().onClick.AddListener(() => OnClickListItem(itemIndex));
+
+                    // 마우스를 올렸을 때 포커스 및 설명창 갱신
+                    EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
+                    trigger.triggers.Clear();
+
+                    EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+                    enterEntry.callback.AddListener((data) => {
+                        // 타겟 선택 모드가 아닐 때만 아이템 포커스 이동
+                        if (!isSelectingTarget && currentItemIndex != itemIndex)
+                        {
+                            currentItemIndex = itemIndex;
+                            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                            UpdateItemSelection(); // 포커스 이동 및 중앙 itemInfo 갱신
+                        }
+                    });
+                    trigger.triggers.Add(enterEntry);
                 }
             }
 
@@ -146,7 +174,46 @@ namespace Controller
 
                 if (member != null) partyControllers[i].Initialize(member, null, true);
                 else partyControllers[i].InitializeEmpty(i);
+
+                int slotIndex = i; 
+                AddMouseEvents(go, slotIndex);
             }
+        }
+
+        // 마우스 이벤트 동적 할당 및 처리
+        private void AddMouseEvents(GameObject go, int index)
+        {
+            EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
+            trigger.triggers.Clear();
+
+            EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enterEntry.callback.AddListener((data) => { 
+                // 타겟 선택 모드이고, 단일 타겟 아이템일 경우만 마우스 호버 작동
+                TargetScope scope = selectedItemData?.targetScope ?? TargetScope.One_Ally;
+                bool canMove = (scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally || scope == TargetScope.Self);
+
+                if (isSelectingTarget && canMove && currentPartyIndex != index)
+                {
+                    currentPartyIndex = index;
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    UpdatePartyCursorVisuals();
+                }
+            });
+            trigger.triggers.Add(enterEntry);
+
+            EventTrigger.Entry clickEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerClick };
+            clickEntry.callback.AddListener((data) => {
+                // 우클릭은 무시
+                PointerEventData pointerData = data as PointerEventData;
+                if (pointerData != null && pointerData.button != PointerEventData.InputButton.Left) return;
+
+                if (isSelectingTarget)
+                {
+                    currentPartyIndex = index;
+                    UseItemOnTarget(); // 확인 로직 실행
+                }
+            });
+            trigger.triggers.Add(clickEntry);
         }
 
         void Update()
@@ -217,6 +284,12 @@ namespace Controller
             return DatabaseManager.Instance.GetConsumable(itemId);
         }
 
+        private void OnClickListItem(int itemIndex)
+        {
+            currentItemIndex = itemIndex;
+            SelectItem();
+        }
+
         private void SelectItem()
         {
             if (inventoryItemIds.Count == 0) return;
@@ -255,6 +328,8 @@ namespace Controller
             }
 
             isSelectingTarget = true;
+
+            if (descriptionText) descriptionText.text = "누구에게 아이템을 사용합니까?";
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             ApplyTargetHighlight();
         }
@@ -373,6 +448,7 @@ namespace Controller
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             // 아이템 리스트로 포커스 복귀
             UpdateItemSelection();
+            ResetDescriptionText();
         }
 
         private void UseItemOnTarget()

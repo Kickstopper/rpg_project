@@ -5,6 +5,7 @@ using TMPro;
 using Manager;
 using Data;
 using static Data.Database.CharacterDatabase;
+using UI.Common;
 
 namespace Controller
 {
@@ -296,7 +297,7 @@ namespace Controller
                 if (skillData == null) continue;
 
                 // SkillSlotUI 컴포넌트 가져오기
-                SimpleListItemController slotUI = item.GetComponent<SimpleListItemController>();
+                SimpleListItemView slotUI = item.GetComponent<SimpleListItemView>();
                 
                 if (slotUI != null)
                 {

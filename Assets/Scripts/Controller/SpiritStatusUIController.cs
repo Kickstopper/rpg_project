@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Manager;
 using Data;
-using static Data.Database.CharacterDatabase;
+using UI.Common;
 
 namespace Controller
 {
@@ -131,7 +130,7 @@ namespace Controller
             foreach (var skillData in skills)
             {
                 GameObject item = Instantiate(skillItemPrefab, skillContent);
-                SimpleListItemController slotUI = item.GetComponent<SimpleListItemController>();
+                SimpleListItemView slotUI = item.GetComponent<SimpleListItemView>();
                 
                 if (slotUI != null)
                 {
