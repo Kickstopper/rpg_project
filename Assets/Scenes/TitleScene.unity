@@ -3925,6 +3925,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c417f87c078c5d24692ad003fc5777a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager.WorldManager
+  isLoadGame: 0
+  loadedPosition: {x: 0, y: 0, z: 0}
+  currentPlayerTransform: {fileID: 0}
   allRegions:
   - {fileID: 11400000, guid: 76870a910e58a904f9dbe5c7322f582e, type: 2}
 --- !u!1 &2093858314

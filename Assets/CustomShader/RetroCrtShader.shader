@@ -4,6 +4,9 @@ Shader "UI/RetroCRTShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         
+        [Header(CRT Curvature)]
+        _Curvature ("Curvature Amount (0 is flat)", Range(0.0, 1.0)) = 0.15
+        
         [Header(Scanline Settings)]
         _ScanlineSize ("Scanline Count", Float) = 100.0
         _ScanlineIntensity ("Scanline Intensity", Range(0, 1)) = 0.5
@@ -21,8 +24,7 @@ Shader "UI/RetroCRTShader"
     {
         Tags { "RenderType"="Opaque" "Queue"="Transparent" }
         LOD 100
-        
-        // UI 요소와 잘 어우러지도록 블렌딩 설정
+    
         Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
@@ -48,6 +50,7 @@ Shader "UI/RetroCRTShader"
             sampler2D _MainTex;
             float4 _MainTex_ST;
             
+            float _Curvature;
             float _ScanlineSize;
             float _ScanlineIntensity;
             float _DotSize;
@@ -64,27 +67,45 @@ Shader "UI/RetroCRTShader"
                 return o;
             }
 
+            // 곡률 계산
+            float2 DistortUV(float2 uv, float curvature)
+            {
+                // 0~1의 UV를 -1~1 범위로 변환하여 중앙을 영점으로 맞춤
+                uv = uv * 2.0 - 1.0;
+                
+                // curvature를 곱하여 왜곡 적용
+                uv += uv * (uv.yx * uv.yx) * curvature;
+                
+                // 다시 0~1 범위로 복구
+                return uv * 0.5 + 0.5;
+            }
+
             fixed4 frag (v2f i) : SV_Target
             {
+                // UV에 곡률 적용
+                float2 curvedUV = DistortUV(i.uv, _Curvature);
+
+                // 곡률로 인해 0~1 범위를 벗어난 가장자리 픽셀을 투명(또는 검은색) 처리
+                if (curvedUV.x < 0.0 || curvedUV.x > 1.0 || curvedUV.y < 0.0 || curvedUV.y > 1.0)
+                {
+                    return fixed4(0, 0, 0, 0); 
+                }
+
                 // 기본 텍스처 색상 가져오기
-                fixed4 col = tex2D(_MainTex, i.uv);
-                
-                // 스캔라인 (가로 줄무늬)
-                // UV Y좌표에 사인파를 적용하여 밝고 어두운 줄무늬 생성
-                float scanline = sin(i.uv.y * _ScanlineSize * 3.14159 * 2.0);
-                // -1~1 범위를 0~1로 보정하고 강도 적용
+                fixed4 col = tex2D(_MainTex, curvedUV);
+
+                // 스캔라인
+                float scanline = sin(curvedUV.y * _ScanlineSize * 3.14159 * 2.0);
                 float scanLineEffect = lerp(1.0, 0.5 + 0.5 * scanline, _ScanlineIntensity);
-                
-                // 도트 매트릭스 (격자 무늬)
-                // UV X, Y 모두에 사인파 적용
-                float dotX = sin(i.uv.x * _DotSize * 3.14159 * 2.0);
-                float dotY = sin(i.uv.y * _DotSize * 3.14159 * 2.0);
+
+                // 도트 매트릭스
+                float dotX = sin(curvedUV.x * _DotSize * 3.14159 * 2.0);
+                float dotY = sin(curvedUV.y * _DotSize * 3.14159 * 2.0);
                 float dotPattern = dotX * dotY;
                 float dotEffect = lerp(1.0, 0.5 + 0.5 * dotPattern, _DotIntensity);
 
-                // 비네팅 (화면 가장자리 어둡게)
-                // 중앙(0.5, 0.5)에서의 거리 계산
-                float2 dist = i.uv - 0.5;
+                // 비네팅
+                float2 dist = curvedUV - 0.5;
                 float len = length(dist);
                 float vignette = smoothstep(_VignetteSize, _VignetteSize - _VignetteSmooth, len);
 
