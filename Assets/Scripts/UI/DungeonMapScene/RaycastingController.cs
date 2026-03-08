@@ -90,7 +90,7 @@ namespace Controller
         void Update()
         {
             if (!_canRender) return;
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
             {
                 GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
                 return;  

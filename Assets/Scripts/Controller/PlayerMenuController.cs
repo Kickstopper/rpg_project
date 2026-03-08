@@ -151,9 +151,9 @@ namespace Controller
                     OnClickCancelButton();
                 }
             }
-
+            
             // 취소 키
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
             {
                 ResetInputTimer();
                 OnClickCancelButton();
@@ -219,7 +219,7 @@ namespace Controller
                 return; 
             }
 
-            // 확인 키 (기존 로직 유지)
+            // 확인 키
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 if (allMenuBtns[currentBtnIndex].interactable)
@@ -229,10 +229,10 @@ namespace Controller
                 }
             }
             
-            // 취소 키 (기존 로직 유지)
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            // 취소 키
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
             {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
         }
@@ -331,7 +331,7 @@ namespace Controller
                 }
                 else
                 {
-                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 }
             });
             trigger.triggers.Add(clickEntry);
@@ -355,7 +355,7 @@ namespace Controller
             if (moved)
             {
                 UpdatePartyHighlight();
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                 ResetInputTimer();
             }
 
@@ -376,12 +376,12 @@ namespace Controller
                 }
                 else
                 {
-                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 }
             }
 
             // 취소. 메인 메뉴로 복귀
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
             {
                 CancelCharacterSelection();
             }
@@ -498,7 +498,7 @@ namespace Controller
             EventSystem.current.SetSelectedGameObject(null);
             
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
         }
 
         // 실제 StatusUI 열기
@@ -516,7 +516,7 @@ namespace Controller
 
             UpdatePopupMessage();
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
         }
 
         // 닫을 때 캐릭터 선택 화면으로 복귀
@@ -531,7 +531,7 @@ namespace Controller
             UpdatePartyHighlight();
             
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
         
         public void OnClick_Equip()
@@ -606,7 +606,7 @@ namespace Controller
             currentState = MenuState.Main;
             ResetInputTimer();
             UpdateSelection(currentBtnIndex);
-            SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cancel);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
 
         public void OnClick_System()
