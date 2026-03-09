@@ -99,7 +99,8 @@ namespace UI.DungeonMapScene
         private void TriggerEncounter()
         {
             _pulseTween?.Kill();
-            if (GameStateManager.Instance && monsters != null && monsters.Count > 0)
+            if (GameStateManager.Instance && GameStateManager.Instance.CurrentState != GameState.Battle &&
+                monsters != null && monsters.Count > 0)
             {
                 GameStateManager.Instance.StartEncounter(monsters);
             }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Data;
+using System.Linq;
 namespace Manager
 {
     public class AppManager : MonoBehaviour
@@ -17,23 +18,12 @@ namespace Manager
 
         [Header("Player State (Save This!)")]
         public List<AppFeature> ownedFeatures = new List<AppFeature>();
-        public List<AppFeature> installedFeatures = new List<AppFeature>();
+        public List<PlacedAppData> installedApps = new List<PlacedAppData>();
 
-        // 현재 메모리 사용량 계산
-        public int CurrentUsedMemory
-        {
-            get
-            {
-                int total = 0;
-                foreach (var feature in installedFeatures)
-                {
-                    if (_appLookup.ContainsKey(feature))
-                        total += _appLookup[feature].memoryCost;
-                }
-                return total;
-            }
-        }
-
+        public int gridWidth = 4;
+        public int gridHeight = 4;
+        private AppFeature[,] memoryBoard;
+        
         private void Awake()
         {
             if (Instance == null)
@@ -46,6 +36,8 @@ namespace Manager
                     if (!_appLookup.ContainsKey(app.feature))
                         _appLookup.Add(app.feature, app);
                 }
+
+                memoryBoard = new AppFeature[gridWidth, gridHeight];
             
                 DontDestroyOnLoad(gameObject);
             }
@@ -60,69 +52,87 @@ namespace Manager
         {
             maxMemory = data.maxAppMemory;
 
-            // 소유 목록 복구
             ownedFeatures.Clear();
-            if (data.ownedApps != null)
-            {
-                ownedFeatures.AddRange(data.ownedApps);
-            }
+            if (data.ownedApps != null) ownedFeatures.AddRange(data.ownedApps);
 
-            // 설치 목록 복구
-            installedFeatures.Clear();
-            if (data.installedApps != null)
+            installedApps.Clear();
+            memoryBoard = new AppFeature[gridWidth, gridHeight];
+
+            if (data.placedApps != null)
             {
-                foreach (var feature in data.installedApps)
+                foreach (var app in data.placedApps)
                 {
-                    // 세이브 파일에는 있지만, 삭제된 기능일 수도 있으니 유효성 검사
-                    if (_appLookup.ContainsKey(feature)) 
+                    if (_appLookup.ContainsKey(app.feature)) 
                     {
-                        installedFeatures.Add(feature);
+                        PlaceApp(app.feature, app.x, app.y); 
                     }
                 }
             }
-            
         }
 
-        // 설치
-        public bool TryInstall(AppFeature feature)
+        // 지정된 좌표에 앱을 설치할 수 있는지 검사
+        public bool CanPlaceApp(AppFeature feature, int startX, int startY)
         {
-            if (!_appLookup.ContainsKey(feature)) return false;
+            GameAppData data = GetAppData(feature);
             
-            if (installedFeatures.Contains(feature)) return true;
-
-            GameAppData data = _appLookup[feature];
-
-            // 메모리 체크
-            if (CurrentUsedMemory + data.memoryCost <= maxMemory)
+            foreach (Vector2Int blockOffset in data.shapeBlocks)
             {
-                installedFeatures.Add(feature);
-                Debug.Log($"Installed: {feature} (Mem: {CurrentUsedMemory}/{maxMemory})");
-                return true;
+                int checkX = startX + blockOffset.x;
+                int checkY = startY + blockOffset.y;
+
+                // 보드 경계 체크
+                if (checkX < 0 || checkX >= gridWidth || checkY < 0 || checkY >= gridHeight)
+                    return false;
+
+                // 해당 위치에 이미 설치된 앱이 있는지 체크
+                if (memoryBoard[checkX, checkY] != AppFeature.None)
+                    return false;
+            }
+            return true;
+        }
+
+        // 앱 설치
+        public void PlaceApp(AppFeature feature, int startX, int startY)
+        {
+            if (!CanPlaceApp(feature, startX, startY)) return;
+
+            GameAppData data = GetAppData(feature);
+            foreach (Vector2Int blockOffset in data.shapeBlocks)
+            {
+                memoryBoard[startX + blockOffset.x, startY + blockOffset.y] = feature;
             }
             
-            Debug.Log("Memory Full!");
-            return false;
+            installedApps.Add(new PlacedAppData { feature = feature, x = startX, y = startY });
         }
 
-        // 제거
         public void Uninstall(AppFeature feature)
         {
-            if (installedFeatures.Contains(feature))
+            var appToRemove = installedApps.FirstOrDefault(a => a.feature == feature);
+            if (appToRemove != null)
             {
-                installedFeatures.Remove(feature);
+                installedApps.Remove(appToRemove);
+                
+                // 보드에서 해당 앱의 모든 블록 지우기
+                GameAppData data = GetAppData(feature);
+                foreach (Vector2Int blockOffset in data.shapeBlocks)
+                {
+                    memoryBoard[appToRemove.x + blockOffset.x, appToRemove.y + blockOffset.y] = AppFeature.None;
+                }
             }
         }
-
         public bool IsInstalled(AppFeature feature)
         {
-            return installedFeatures.Contains(feature);
+            return installedApps.Any(app => app.feature == feature);
+        }
+
+        public List<PlacedAppData> GetPlacedApps()
+        {
+            return installedApps; 
         }
         
-        // UI나 다른 곳에서 정보가 필요할 때
         public GameAppData GetAppData(AppFeature feature)
         {
-            if (_appLookup.TryGetValue(feature, out GameAppData data))
-                return data;
+            if (_appLookup.TryGetValue(feature, out GameAppData data)) return data;
             return null;
         }
     }

@@ -15,6 +15,14 @@ namespace Data
         }
     }
     [Serializable]
+    public class PlacedAppData
+    {
+        public AppFeature feature;
+        public int x;
+        public int y;
+        public int rotation;
+    }
+    [Serializable]
     public class SaveData
     {
         // 기본 정보
@@ -45,9 +53,9 @@ namespace Data
         // 이벤트 플래그
         public List<string> eventFlags = new List<string>();
 
-        // 6. 가진 앱과 인스톨된 앱
+        // 가진 앱과 인스톨된 앱
         public List<AppFeature> ownedApps;
-        public List<AppFeature> installedApps;
+        public List<PlacedAppData> placedApps;
         public int maxAppMemory;
     }
 

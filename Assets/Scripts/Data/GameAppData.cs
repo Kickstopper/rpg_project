@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Data
@@ -10,20 +11,20 @@ namespace Data
         LocalRadar,       // Mini-map
         GyroCompass,      // 나침반
         GeoScanner,       // 지형 스캐너
-        KillSwitch        // 즉시 처형
+        KillSwitch,       // 즉시 처형
+        WeatherWidget,    // 날씨 위젯
     }
     
     [CreateAssetMenu(fileName = "NewGameApp", menuName = "Game System/Game App")]
     public class GameAppData : ScriptableObject
     {
-        [Header("Basic Info")]
         public string appName;
-        [TextArea] public string description;
         public Sprite icon;
-
-        [Header("System Settings")]
         public AppFeature feature;
-        [Range(1, 20)]
-        public int memoryCost; // 차지하는 메모리 블럭 수
+        
+        [Header("Puzzle Shape Settings")]
+        public List<Vector2Int> shapeBlocks = new List<Vector2Int> { new Vector2Int(0, 0) };
+        
+        public int memoryCost => shapeBlocks.Count; 
     }
 }

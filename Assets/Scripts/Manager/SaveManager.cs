@@ -44,7 +44,7 @@ namespace Manager
             data.saveTime = System.DateTime.Now.ToString();
             data.sceneName = SceneManager.GetActiveScene().name;
 
-            // 플레이어 위치 저장 (탐험 모드일 때의 플레이어 오브젝트 참조 필요)
+            // 플레이어 위치 저장
             data.dungeonId = DungeonMapStateManager.Instance.currentDungeonId;
             data.playerPosX = DungeonMapStateManager.Instance.currentPx;
             data.playerPosY = DungeonMapStateManager.Instance.currentPy;
@@ -80,13 +80,13 @@ namespace Manager
                 data.partyMembers.Add(i.ToSaveData());
             }
 
-            // 이벤트 플래그 저장 (FlagManager가 있다면 가져옴)
+            // 이벤트 플래그 저장
             data.eventFlags = FlagManager.Instance.GetSaveData();
 
             // 앱과 메모리 정보
             data.maxAppMemory = AppManager.Instance.maxMemory;
             data.ownedApps = new List<AppFeature>(AppManager.Instance.ownedFeatures);
-            data.installedApps = new List<AppFeature>(AppManager.Instance.installedFeatures);
+            data.placedApps = new List<PlacedAppData>(AppManager.Instance.GetPlacedApps());
 
             // 파일 쓰기
             string json = JsonUtility.ToJson(data, true);
@@ -126,9 +126,7 @@ namespace Manager
             }
 
             // 앱과 메모리 정보
-            data.maxAppMemory = AppManager.Instance.maxMemory;
-            data.ownedApps = new List<AppFeature>(AppManager.Instance.ownedFeatures);
-            data.installedApps = new List<AppFeature>(AppManager.Instance.installedFeatures);
+            AppManager.Instance.LoadGame(data);
             
             if (data.sceneName == GameScene.WORLD_MAP_SCENE)
             {
@@ -150,7 +148,7 @@ namespace Manager
             }
             
 
-            // 휘발성 저장(중단 데이터)이라면 로드 후 즉시 삭제
+            // 중단 데이터라면 로드 후 즉시 삭제
             if (slotIndex == SUSPEND_SLOT_INDEX)
             {
                 File.Delete(path);
@@ -162,7 +160,7 @@ namespace Manager
             Debug.Log("게임 불러오기 완료");
         }
 
-        // 해당 슬롯의 데이터 미리보기 (UI 표시용)
+        // 해당 슬롯의 데이터 미리보기
         public SaveData GetSaveDataHeader(int slotIndex)
         {
             string path = GetSavePath(slotIndex);

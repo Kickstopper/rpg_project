@@ -8,7 +8,7 @@ public enum GameState
     None,
     Exploration, // 월드맵 또는 Pseudo-3D 던전 탐험 모드
     Battle,      // 전투 모드
-    PlayerMenu,        // 메뉴/인벤토리
+    PlayerMenu,  // 메뉴/인벤토리
     Event,       // 이벤트
     Shop,        // 상점
 }

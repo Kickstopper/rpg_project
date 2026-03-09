@@ -41,8 +41,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BlurAmount: 0
     - _Brightness: 1.4
-    - _Curvature: 0.016
+    - _Curvature: 0
     - _DotIntensity: 0
     - _DotSize: 0
     - _EnableExternalAlpha: 0

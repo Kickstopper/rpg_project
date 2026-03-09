@@ -5,7 +5,8 @@ Shader "UI/RetroCRTShader"
         _MainTex ("Texture", 2D) = "white" {}
         
         [Header(CRT Curvature)]
-        _Curvature ("Curvature Amount (0 is flat)", Range(0.0, 1.0)) = 0.15
+        _Curvature ("Curvature Amount (0 is flat)", Range(0.0, 1.0)) = 0.2
+        _BlurAmount ("Curve Smoothing (Blur)", Range(0.0, 0.01)) = 0.0015
         
         [Header(Scanline Settings)]
         _ScanlineSize ("Scanline Count", Float) = 100.0
@@ -51,6 +52,7 @@ Shader "UI/RetroCRTShader"
             float4 _MainTex_ST;
             
             float _Curvature;
+            float _BlurAmount;
             float _ScanlineSize;
             float _ScanlineIntensity;
             float _DotSize;
@@ -85,14 +87,39 @@ Shader "UI/RetroCRTShader"
                 // UV에 곡률 적용
                 float2 curvedUV = DistortUV(i.uv, _Curvature);
 
-                // 곡률로 인해 0~1 범위를 벗어난 가장자리 픽셀을 투명(또는 검은색) 처리
+                // 2. 곡률로 인해 0~1 범위를 벗어난 가장자리 픽셀을 투명(또는 검은색) 처리
                 if (curvedUV.x < 0.0 || curvedUV.x > 1.0 || curvedUV.y < 0.0 || curvedUV.y > 1.0)
                 {
                     return fixed4(0, 0, 0, 0); 
                 }
 
-                // 기본 텍스처 색상 가져오기
-                fixed4 col = tex2D(_MainTex, curvedUV);
+                // 3. 텍스처 색상 가져오기 및 조건부 블러 처리
+                fixed4 col = fixed4(0, 0, 0, 0);
+
+                if (_Curvature > 0.001) 
+                {
+                    // 곡률이 활성화되었을 때: 십자(+) 형태로 5번 샘플링하여 뭉개주기
+                    fixed4 c1 = tex2D(_MainTex, curvedUV);
+                    fixed4 c2 = tex2D(_MainTex, curvedUV + float2(_BlurAmount, 0));
+                    fixed4 c3 = tex2D(_MainTex, curvedUV + float2(-_BlurAmount, 0));
+                    fixed4 c4 = tex2D(_MainTex, curvedUV + float2(0, _BlurAmount));
+                    fixed4 c5 = tex2D(_MainTex, curvedUV + float2(0, -_BlurAmount));
+
+                    // // 각각 CGA 팔레트로 스냅
+                    // c1.rgb = ApplyCGAPalette(c1.rgb);
+                    // c2.rgb = ApplyCGAPalette(c2.rgb);
+                    // c3.rgb = ApplyCGAPalette(c3.rgb);
+                    // c4.rgb = ApplyCGAPalette(c4.rgb);
+                    // c5.rgb = ApplyCGAPalette(c5.rgb);
+
+                    // 평균을 내어 부드럽게 합성
+                    col = (c1 + c2 + c3 + c4 + c5) / 5.0;
+                }
+                else 
+                {
+                    col = tex2D(_MainTex, curvedUV);
+                    //col.rgb = ApplyCGAPalette(col.rgb);
+                }
 
                 // 스캔라인
                 float scanline = sin(curvedUV.y * _ScanlineSize * 3.14159 * 2.0);

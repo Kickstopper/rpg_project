@@ -21,6 +21,7 @@ namespace Controller
         public RawImage screenImage;
         public RawImage backgroundImage;
         public CompassUI compassUI;
+        public WeatherUI weatherUI;
         public GridMap miniMap;
         public AutoMapRenderer autoMapRenderer;
         public DialogueUI dialogueUI;
@@ -493,12 +494,23 @@ namespace Controller
             _player.SetMapData(_currentMap, _currentMap.startX, _currentMap.startY, _currentMap.startDirection);
 
             
+            RefreshAppVisible();
+            
+            // 벽 애니메이션 초기화
+            InitializeWallAnims(theme);
+            _renderer.SetMapData(_currentMap, theme, _tileAnimStates);
+            
+            UpdateMapDiscovery(_player.LogicX, _player.LogicY);
+        }
+
+        private void RefreshAppVisible()
+        {
             if (miniMap != null)
             {
                 miniMap.Initialize(_currentMap);
                 miniMap.gameObject.SetActive(AppManager.Instance.IsInstalled(AppFeature.LocalRadar));
             }
-            if (compassUI)
+            if (compassUI != null)
             {
                 compassUI.SetDirection(_player.DirectionIdx);
                 compassUI.gameObject.SetActive(AppManager.Instance.IsInstalled(AppFeature.GyroCompass));   
@@ -508,12 +520,10 @@ namespace Controller
                 autoMapContainer.SetActive(false);
                 autoMapRenderer.DrawFullMap(_currentMap, DungeonManager.Instance.CurrentDungeonState);
             }
-            
-            // 벽 애니메이션 초기화
-            InitializeWallAnims(theme);
-            _renderer.SetMapData(_currentMap, theme, _tileAnimStates);
-            
-            UpdateMapDiscovery(_player.LogicX, _player.LogicY);
+            if (weatherUI != null)
+            {
+                weatherUI.gameObject.SetActive(AppManager.Instance.IsInstalled(AppFeature.WeatherWidget));
+            }
         }
 
         private void OnPlayerStep()
@@ -646,7 +656,10 @@ namespace Controller
         private void OnGameStateChanged(GameState newState)
         {
             _canRender = (newState == GameState.Exploration);
-            if (_canRender) SoundManager.Instance.PlayBGM(DungeonManager.Instance.GetDungeonTheme(_currentMap.themeName).bgmID);
+            if (!_canRender) return;
+            
+            SoundManager.Instance.PlayBGM(DungeonManager.Instance.GetDungeonTheme(_currentMap.themeName).bgmID);
+            RefreshAppVisible();
         }
     }
 }
