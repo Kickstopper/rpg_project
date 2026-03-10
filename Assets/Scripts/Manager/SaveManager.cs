@@ -10,7 +10,7 @@ namespace Manager
     {
         public static SaveManager Instance;
 
-        public const int SUSPEND_SLOT_INDEX = -1; // 중단 저장용 상수 ID
+        public const int SUSPEND_SLOT_INDEX = -1;
 
         void Awake()
         {

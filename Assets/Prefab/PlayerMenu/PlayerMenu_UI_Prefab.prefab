@@ -8532,8 +8532,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Controller.SkillUIController
   menuController: {fileID: 6372555989440531804}
-  skillInfo: {fileID: 83064893464034062}
   skillPanel: {fileID: 1701808033985092630}
+  skillInfo: {fileID: 83064893464034062}
   skillContent: {fileID: 2858135216975759869}
   skillSlotPrefab: {fileID: 940030084927157362, guid: 100b316df577df74fb6671fc9b94c6da, type: 3}
   partySlots:

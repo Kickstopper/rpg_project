@@ -23,6 +23,7 @@ namespace Data
         public AppFeature feature;
         
         [Header("Puzzle Shape Settings")]
+        [HideInInspector]
         public List<Vector2Int> shapeBlocks = new List<Vector2Int> { new Vector2Int(0, 0) };
         
         public int memoryCost => shapeBlocks.Count; 

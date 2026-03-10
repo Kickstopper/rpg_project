@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: Mob_Sensor
   m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
   appName: MOB SENSOR
-  description: "\uC801\uACFC \uC870\uC6B0\uD560 \uD655\uB960\uC744 \uBCF4\uC5EC\uC90D\uB2C8\uB2E4."
   icon: {fileID: 0}
-  featureType: 1
-  memoryCost: 4
+  feature: 1
+  shapeBlocks:
+  - {x: 0, y: 0}
+  - {x: 1, y: 0}
+  - {x: 0, y: -1}

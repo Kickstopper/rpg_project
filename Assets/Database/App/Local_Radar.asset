@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: Local_Radar
   m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
   appName: LOCAL RADAR
-  description: "\uC8FC\uBCC0\uC758 \uC9C0\uD615\uC744 \uBCF4\uC5EC\uC90D\uB2C8\uB2E4."
   icon: {fileID: 0}
-  featureType: 3
-  memoryCost: 4
+  feature: 3
+  shapeBlocks:
+  - {x: -1, y: 0}
+  - {x: 0, y: 0}
+  - {x: 1, y: 0}
+  - {x: 0, y: -1}
+  - {x: 0, y: -2}

@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Data;
 using System.Linq;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 namespace Manager
 {
     public class AppManager : MonoBehaviour
@@ -134,6 +137,93 @@ namespace Manager
         {
             if (_appLookup.TryGetValue(feature, out GameAppData data)) return data;
             return null;
+        }
+
+        // 인스펙터 우클릭 메뉴에 자동 배치 버튼 생성
+        [ContextMenu("빈 공간에 자동 배치 (Auto Arrange)")]
+        public void AutoArrangeDefaultApps()
+        {
+            AppFeature[,] tempBoard = new AppFeature[gridWidth, gridHeight];
+            Dictionary<AppFeature, GameAppData> tempLookup = new Dictionary<AppFeature, GameAppData>();
+            
+            foreach (var appData in appDatabase)
+            {
+                if (appData != null && !tempLookup.ContainsKey(appData.feature))
+                {
+                    tempLookup.Add(appData.feature, appData);
+                }
+            }
+
+            // 인스펙터의 installedApps를 순회하며 자리 찾기
+            for (int i = 0; i < installedApps.Count; i++)
+            {
+                PlacedAppData currentApp = installedApps[i];
+                
+                if (currentApp.feature == AppFeature.None) continue;
+                
+                if (!tempLookup.ContainsKey(currentApp.feature))
+                {
+                    Debug.LogWarning($"[AppManager] '{currentApp.feature}' 데이터를 appDatabase에서 찾을 수 없습니다.");
+                    continue;
+                }
+
+                GameAppData data = tempLookup[currentApp.feature];
+                bool isPlaced = false;
+
+                // 상단 왼쪽부터 우측 하단 방향으로 스캔
+                for (int y = 0; y < gridHeight; y++)
+                {
+                    for (int x = 0; x < gridWidth; x++)
+                    {
+                        if (CanPlaceAppInTempBoard(data, x, y, tempBoard))
+                        {
+                            // 위치 지정
+                            currentApp.x = x;
+                            currentApp.y = y;
+                            installedApps[i] = currentApp; // 변경된 좌표 적용
+
+                            // 다음 앱이 겹치지 않도록 임시 보드에 블록 채우기
+                            foreach (Vector2Int block in data.shapeBlocks)
+                            {
+                                tempBoard[x + block.x, y + block.y] = currentApp.feature;
+                            }
+                            
+                            isPlaced = true;
+                            break;
+                        }
+                    }
+                    if (isPlaced) break;
+                }
+
+                if (!isPlaced)
+                {
+                    Debug.LogError($"[AppManager] '{currentApp.feature}'를 배치할 공간이 부족합니다! (Grid 한도 초과)");
+                }
+            }
+
+            Debug.Log("[AppManager] 기본 앱 자동 배치 완료!");
+
+            // 씬을 저장할 때 함께 저장되도록 마킹
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
+#endif
+        }
+
+        // 임시 보드용 충돌 검사 함수
+        private bool CanPlaceAppInTempBoard(GameAppData data, int startX, int startY, AppFeature[,] tempBoard)
+        {
+            foreach (Vector2Int blockOffset in data.shapeBlocks)
+            {
+                int checkX = startX + blockOffset.x;
+                int checkY = startY + blockOffset.y;
+
+                if (checkX < 0 || checkX >= gridWidth || checkY < 0 || checkY >= gridHeight)
+                    return false;
+
+                if (tempBoard[checkX, checkY] != AppFeature.None)
+                    return false;
+            }
+            return true;
         }
     }
 }

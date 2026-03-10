@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Geo_Scanner
   m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
   appName: GEO SCANNER
-  description: "\uC9C0\uD615\uC744 \uC2A4\uCE94\uD558\uC5EC \uBCF4\uC774\uC9C0 \uC54A\uB294
-    \uAE38\uC744 \uCC3E\uC2B5\uB2C8\uB2E4."
   icon: {fileID: 0}
-  featureType: 5
-  memoryCost: 4
+  feature: 5
+  shapeBlocks:
+  - {x: 0, y: 1}
+  - {x: 1, y: 1}
+  - {x: 0, y: 0}
+  - {x: -1, y: -1}
+  - {x: 0, y: -1}
