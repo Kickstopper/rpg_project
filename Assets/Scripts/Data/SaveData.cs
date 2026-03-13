@@ -20,7 +20,7 @@ namespace Data
         public AppFeature feature;
         public int x;
         public int y;
-        public int rotation;
+        public int rotation; // rotation값 * 90도로 회전함
     }
     [Serializable]
     public class SaveData

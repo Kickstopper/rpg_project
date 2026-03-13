@@ -114,27 +114,29 @@ namespace Manager
                 {
                     if (_appLookup.ContainsKey(app.feature)) 
                     {
-                        PlaceApp(app.feature, app.x, app.y); 
+                        PlaceApp(app.feature, app.x, app.y, app.rotation); 
                     }
                 }
             }
         }
 
         // 지정된 좌표에 앱을 설치할 수 있는지 검사
-        public bool CanPlaceApp(AppFeature feature, int startX, int startY)
+        public bool CanPlaceApp(AppFeature feature, int startX, int startY, int rotation = 0)
         {
             GameAppData data = GetAppData(feature);
+            if (data == null) return false;
+
+            // 회전된 블럭 오프셋을 가져와서 검사
+            List<Vector2Int> blocksToCheck = data.GetRotatedBlocks(rotation);
             
-            foreach (Vector2Int blockOffset in data.shapeBlocks)
+            foreach (Vector2Int blockOffset in blocksToCheck)
             {
                 int checkX = startX + blockOffset.x;
                 int checkY = startY + blockOffset.y;
 
-                // 보드 경계 체크
                 if (checkX < 0 || checkX >= gridWidth || checkY < 0 || checkY >= gridHeight)
                     return false;
 
-                // 해당 위치에 이미 설치된 앱이 있는지 체크
                 if (memoryBoard[checkX, checkY] != AppFeature.None)
                     return false;
             }
@@ -142,17 +144,19 @@ namespace Manager
         }
 
         // 앱 설치
-        public void PlaceApp(AppFeature feature, int startX, int startY)
+        public void PlaceApp(AppFeature feature, int startX, int startY, int rotation = 0)
         {
-            if (!CanPlaceApp(feature, startX, startY)) return;
+            if (!CanPlaceApp(feature, startX, startY, rotation)) return;
 
             GameAppData data = GetAppData(feature);
-            foreach (Vector2Int blockOffset in data.shapeBlocks)
+            List<Vector2Int> blocksToPlace = data.GetRotatedBlocks(rotation);
+
+            foreach (Vector2Int blockOffset in blocksToPlace)
             {
                 memoryBoard[startX + blockOffset.x, startY + blockOffset.y] = feature;
             }
             
-            installedApps.Add(new PlacedAppData { feature = feature, x = startX, y = startY });
+            installedApps.Add(new PlacedAppData { feature = feature, x = startX, y = startY, rotation = rotation });
         }
 
         public void Uninstall(AppFeature feature)
@@ -162,9 +166,10 @@ namespace Manager
             {
                 installedApps.Remove(appToRemove);
                 
-                // 보드에서 해당 앱의 모든 블록 지우기
                 GameAppData data = GetAppData(feature);
-                foreach (Vector2Int blockOffset in data.shapeBlocks)
+                
+                // 설치 당시의 rotation 값을 가져와 회전된 블록 배열을 기준으로 보드를 비움
+                foreach (Vector2Int blockOffset in data.GetRotatedBlocks(appToRemove.rotation))
                 {
                     memoryBoard[appToRemove.x + blockOffset.x, appToRemove.y + blockOffset.y] = AppFeature.None;
                 }
@@ -276,27 +281,22 @@ namespace Manager
         // 현재 installedApps 리스트를 바탕으로 memoryBoard 배열을 강제로 재작성
         public void SyncMemoryBoardWithInstalledApps()
         {
-            // 보드 전체를 빈 공간으로
             for (int y = 0; y < gridHeight; y++)
-            {
                 for (int x = 0; x < gridWidth; x++)
-                {
                     memoryBoard[x, y] = AppFeature.None;
-                }
-            }
 
-            // 현재 설치된 앱 리스트를 순회하며 보드에 다시 채워 넣음
             foreach (var placedApp in installedApps)
             {
                 GameAppData data = GetAppData(placedApp.feature);
                 if (data == null) continue;
 
-                foreach (Vector2Int blockOffset in data.shapeBlocks)
+                List<Vector2Int> blocksToSync = data.GetRotatedBlocks(placedApp.rotation);
+
+                foreach (Vector2Int blockOffset in blocksToSync)
                 {
                     int targetX = placedApp.x + blockOffset.x;
                     int targetY = placedApp.y + blockOffset.y;
 
-                    // 경계 체크
                     if (targetX >= 0 && targetX < gridWidth && targetY >= 0 && targetY < gridHeight)
                     {
                         memoryBoard[targetX, targetY] = placedApp.feature;

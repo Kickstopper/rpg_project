@@ -36,6 +36,7 @@ namespace UI.PlayerMenu
         private int cursorX = 0;
         private int cursorY = 0;
         private GameAppData currentlyPlacingApp = null;
+        private int currentRotation = 0; // 0 ~ 3
 
         void Start()
         {
@@ -163,7 +164,7 @@ namespace UI.PlayerMenu
             EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
             trigger.triggers.Clear();
 
-            // Hover: 마우스가 올라가면 해당 아이템으로 포커스 이동
+            // 마우스가 올라가면 해당 아이템으로 포커스 이동
             EventTrigger.Entry enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
             enter.callback.AddListener((data) => {
                 if (currentState == MemoryUIState.AppList && !menuController.IsPopupOpen)
@@ -175,7 +176,7 @@ namespace UI.PlayerMenu
             });
             trigger.triggers.Add(enter);
 
-            // Click: 마우스 좌클릭 시 설치/해제 (스페이스바와 동일 역할)
+            // 마우스 좌클릭 시 설치/해제 (스페이스바와 동일)
             EventTrigger.Entry click = new EventTrigger.Entry { eventID = EventTriggerType.PointerClick };
             click.callback.AddListener((data) => {
                 PointerEventData pointerData = data as PointerEventData;
@@ -207,7 +208,7 @@ namespace UI.PlayerMenu
             EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
             trigger.triggers.Clear();
 
-            // Hover: 배치 모드일 때 마우스가 가리키는 곳으로 블록이 따라옴
+            // 배치 모드일 때 마우스가 가리키는 곳으로 블록이 따라옴
             EventTrigger.Entry enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
             enter.callback.AddListener((data) => {
                 if (currentState == MemoryUIState.BoardPlacement && !menuController.IsPopupOpen)
@@ -219,7 +220,7 @@ namespace UI.PlayerMenu
             });
             trigger.triggers.Add(enter);
 
-            // Click: 배치 모드일 때 클릭하면 해당 위치에 설치
+            // 배치 모드일 때 클릭하면 해당 위치에 설치
             EventTrigger.Entry click = new EventTrigger.Entry { eventID = EventTriggerType.PointerClick };
             click.callback.AddListener((data) => {
                 PointerEventData pointerData = data as PointerEventData;
@@ -228,17 +229,17 @@ namespace UI.PlayerMenu
                 if (currentState == MemoryUIState.BoardPlacement && !menuController.IsPopupOpen)
                 {
                     menuController.ResetInputTimer();
-                    if (AppManager.Instance.CanPlaceApp(currentlyPlacingApp.feature, cursorX, cursorY))
+                    if (AppManager.Instance.CanPlaceApp(currentlyPlacingApp.feature, cursorX, cursorY, currentRotation))
                     {
-                        AppManager.Instance.PlaceApp(currentlyPlacingApp.feature, cursorX, cursorY);
+                        AppManager.Instance.PlaceApp(currentlyPlacingApp.feature, cursorX, cursorY, currentRotation);
                         currentState = MemoryUIState.AppList; // 설치 후 목록으로 돌아감
                         RefreshAppList();
                         UpdateFocus();
-                        SoundManager.Instance.PlaySFX(SfxID.UI_Click); // 설치 성공음 (선택)
+                        SoundManager.Instance.PlaySFX(SfxID.UI_Click);
                     }
                     else
                     {
-                        SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); // 설치 실패 에러음
+                        SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                         // menuController.ShowAlertPopup("여기에 설치할 수 없습니다."); 
                     }
                 }
@@ -264,25 +265,31 @@ namespace UI.PlayerMenu
         // 입력 처리 (메모리 보드 포커스 상태)
         private void AttemptToPlaceApp(GameAppData appData)
         {
-            // 보드 전체를 스캔하여 빈 공간이 하나라도 있는지 확인
-            if (FindAutoPlaceCoordinate(appData, out Vector2Int startPos))
+            if (FindAutoPlaceCoordinate(appData, out Vector2Int startPos, out int foundRot))
             {
-                // 겹치는 자리에 놓고 Space를 누르면 아래 코드에서 설치를 시도
                 currentlyPlacingApp = appData;
                 cursorX = startPos.x;
                 cursorY = startPos.y;
+                currentRotation = foundRot; // 찾은 각도로 시작
                 currentState = MemoryUIState.BoardPlacement;
                 DrawBoard(); 
             }
             else
             {
-                // 여유 공간이 없으면 경고 팝업
                 menuController.ShowAlertPopup("설치할 공간이 없습니다.");
             }
         }
 
         private void HandleBoardPlacementInput()
         {
+            if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(2)) // 마우스 휠 클릭 등
+            {
+                menuController.ResetInputTimer();
+                currentRotation = (currentRotation + 1) % 4; // 90도 회전
+                DrawBoard(); // 프리뷰 갱신
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            }
+
             int prevX = cursorX;
             int prevY = cursorY;
 
@@ -301,12 +308,14 @@ namespace UI.PlayerMenu
                 DrawBoard(); // 커서 이동 시 보드 프리뷰 다시 그리기
             }
 
-            // 확인 키: 설치
+            // 설치
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                if (AppManager.Instance.CanPlaceApp(currentlyPlacingApp.feature, cursorX, cursorY))
+                // currentRotation 인자 추가
+                if (AppManager.Instance.CanPlaceApp(currentlyPlacingApp.feature, cursorX, cursorY, currentRotation))
                 {
-                    AppManager.Instance.PlaceApp(currentlyPlacingApp.feature, cursorX, cursorY);
+                    // [수정] currentRotation 인자 추가
+                    AppManager.Instance.PlaceApp(currentlyPlacingApp.feature, cursorX, cursorY, currentRotation);
                     currentState = MemoryUIState.AppList; // 설치 완료 후 리스트로 복귀
                     RefreshAppList();
                     UpdateFocus();
@@ -317,7 +326,7 @@ namespace UI.PlayerMenu
                 }
             }
             
-            // 취소. 취소 후 리스트로 복귀
+            // 취소 후 리스트로 복귀
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
             {
                 currentState = MemoryUIState.AppList;
@@ -346,20 +355,24 @@ namespace UI.PlayerMenu
                 GameAppData data = AppManager.Instance.GetAppData(placedApp.feature);
                 if (data == null) continue;
 
-                foreach (Vector2Int offset in data.shapeBlocks)
+                // 설치할 때 저장해둔 회전값을 적용하여 블록을 가져옴
+                foreach (Vector2Int offset in data.GetRotatedBlocks(placedApp.rotation))
                 {
                     int drawX = placedApp.x + offset.x;
                     int drawY = placedApp.y + offset.y;
-                    gridSlots[drawX, drawY].color = data.blockColor;
+                    
+                    if (drawX >= 0 && drawX < width && drawY >= 0 && drawY < height)
+                    {
+                        gridSlots[drawX, drawY].color = data.blockColor;
+                    }
                 }
             }
 
             // 현재 배치 진행 중인 앱 표시
             if (currentState == MemoryUIState.BoardPlacement && currentlyPlacingApp != null)
             {
-                bool canPlace = AppManager.Instance.CanPlaceApp(currentlyPlacingApp.feature, cursorX, cursorY);
-                
-                foreach (Vector2Int offset in currentlyPlacingApp.shapeBlocks)
+                bool canPlace = AppManager.Instance.CanPlaceApp(currentlyPlacingApp.feature, cursorX, cursorY, currentRotation);
+                foreach (Vector2Int offset in currentlyPlacingApp.GetRotatedBlocks(currentRotation))
                 {
                     int drawX = cursorX + offset.x;
                     int drawY = cursorY + offset.y;
@@ -377,23 +390,32 @@ namespace UI.PlayerMenu
             }
         }
 
-        // 좌상단부터 스캔하여 처음으로 설치 가능한 좌표를 찾는 함수
-        private bool FindAutoPlaceCoordinate(GameAppData appData, out Vector2Int pos)
+        // 4방향을 모두 탐색하며 최초로 들어맞는 공간과 각도를 찾음
+        private bool FindAutoPlaceCoordinate(GameAppData appData, out Vector2Int pos, out int foundRotation)
         {
             pos = Vector2Int.zero;
-            for (int y = 0; y < AppManager.Instance.gridHeight; y++)
+            foundRotation = 0;
+
+            // 회전 상태 0 -> 1 -> 2 -> 3 순으로 검사
+            for (int r = 0; r < 4; r++)
             {
-                for (int x = 0; x < AppManager.Instance.gridWidth; x++)
+                for (int y = 0; y < AppManager.Instance.gridHeight; y++)
                 {
-                    if (AppManager.Instance.CanPlaceApp(appData.feature, x, y))
+                    for (int x = 0; x < AppManager.Instance.gridWidth; x++)
                     {
-                        pos = new Vector2Int(x, y);
-                        return true;
+                        if (AppManager.Instance.CanPlaceApp(appData.feature, x, y, r))
+                        {
+                            pos = new Vector2Int(x, y);
+                            foundRotation = r;
+                            return true; // 맞는 각도와 자리를 찾으면 즉시 반환
+                        }
                     }
                 }
             }
             return false;
         }
+
+        
     }
     
 }
