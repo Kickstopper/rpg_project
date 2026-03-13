@@ -19,13 +19,14 @@ namespace Data
     public class GameAppData : ScriptableObject
     {
         public string appName;
+        public string description;
         public Sprite icon;
         public AppFeature feature;
         
         [Header("Puzzle Shape Settings")]
         [HideInInspector]
         public List<Vector2Int> shapeBlocks = new List<Vector2Int> { new Vector2Int(0, 0) };
-        
+        public Color blockColor = Color.white;
         public int memoryCost => shapeBlocks.Count; 
     }
 }

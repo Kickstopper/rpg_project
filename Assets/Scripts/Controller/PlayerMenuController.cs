@@ -22,6 +22,7 @@ namespace Controller
         public GameObject skillUI;
         public GameObject itemUI;
         public GameObject equipUI;
+        public GameObject memoryUI;
         public GameObject playerPrefab;
         
         [Header("Background")]
@@ -126,29 +127,28 @@ namespace Controller
                     ResetInputTimer();
                 }
             }
-
+            
             // 확인 키
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
+                ResetInputTimer();
                 // 알림 모드일 때는 확인 키를 누르면 무조건 닫기(No버튼 동작) 수행
                 if (isAlertMode)
                 {
-                    ResetInputTimer();
-                    OnClickCancelButton(); // 팝업 닫기
-                    return;
-                }
-
-                // 일반 모드일 때는 선택된 버튼에 따라 동작
-                GameObject currentSelected = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
-                if (currentSelected == popupYesBtn.gameObject)
-                {
-                    ResetInputTimer();
-                    OnClickConfirmButton();
-                }
-                else if (currentSelected == popupNoBtn.gameObject)
-                {
-                    ResetInputTimer();
                     OnClickCancelButton();
+                }
+                else
+                {
+                    // 일반 모드일 때는 선택된 버튼에 따라 동작
+                    GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
+                    if (currentSelected == popupYesBtn.gameObject)
+                    {
+                        OnClickConfirmButton();
+                    }
+                    else if (currentSelected == popupNoBtn.gameObject)
+                    {
+                        OnClickCancelButton();
+                    }
                 }
             }
             
@@ -448,10 +448,7 @@ namespace Controller
 
         public void OnClick_Memory()
         {
-            // currentState = MenuState.Memory;
-            // UpdatePopupMessage();
-            // ResetInputTimer();
-            Debug.Log("MEMORY 미구현");
+            OpenMemoryUI();
         }
 
         public void OnClick_Tactics()
@@ -531,6 +528,34 @@ namespace Controller
             UpdatePartyHighlight();
             
             ResetInputTimer();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+        }
+
+        // MemoryUI 열기
+        private void OpenMemoryUI()
+        {
+            currentState = MenuState.Memory;
+            memoryUI.SetActive(true);
+
+            // 버튼 포커스 해제 
+            EventSystem.current.SetSelectedGameObject(null);
+
+            UpdatePopupMessage();
+            ResetInputTimer();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+        }
+
+        // 닫을 때 캐릭터 선택 화면으로 복귀
+        public void CloseMemoryUI()
+        {
+            memoryUI.SetActive(false);
+            currentState = MenuState.Main;
+            
+            ResetInputTimer();
+            
+            // 메인 메뉴를 다시 조작할 수 있도록 원래 누르던 버튼으로 포커스 복구
+            UpdateSelection(currentBtnIndex); 
+            
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
         
@@ -644,6 +669,9 @@ namespace Controller
                 case MenuState.Equip:
                     popupMessage.SetText("선택한 아이템을 장비합니까?");
                 break;
+                case MenuState.Memory:
+                    popupMessage.SetText("설치할 공간이 부족합니다.");
+                break;
                 case MenuState.System:
                     popupMessage.SetText("설정을 저장합니까?");
                 break;
@@ -653,7 +681,7 @@ namespace Controller
                 case MenuState.Suspend:
                     popupMessage.SetText("중단 저장을 하고 타이틀 화면으로 이동합니까?");
                 break;
-
+                
                 case MenuState.Status:
                 default:
                 popupMessage.SetText(string.Empty);
@@ -676,11 +704,8 @@ namespace Controller
                     break;
 
                 case MenuState.Item:
-                    ClosePopup();
-                    break;
-                    
                 case MenuState.Skill:
-                    Debug.Log("스킬 사용 로직 실행");
+                case MenuState.Memory:
                     ClosePopup();
                     break;
 

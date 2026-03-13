@@ -23,8 +23,8 @@ namespace Manager
         public List<AppFeature> ownedFeatures = new List<AppFeature>();
         public List<PlacedAppData> installedApps = new List<PlacedAppData>();
 
-        public int gridWidth = 4;
-        public int gridHeight = 4;
+        public int gridWidth = 5;
+        public int gridHeight = 5;
         private AppFeature[,] memoryBoard;
         
         private void Awake()
@@ -41,14 +41,61 @@ namespace Manager
                 }
 
                 memoryBoard = new AppFeature[gridWidth, gridHeight];
-            
+
+                // 인스펙터의 기본 앱들을 검증하며 배치. 인스펙터에 지정된 리스트를 임시 복사하고 원본은 비움
+                List<PlacedAppData> defaultApps = new List<PlacedAppData>(installedApps);
+                installedApps.Clear();
+
+                foreach (var app in defaultApps)
+                {
+                    if (app.feature == AppFeature.None) continue;
+
+                    // 인스펙터에 지정된 좌표에 설치가 가능한지 확인
+                    if (CanPlaceApp(app.feature, app.x, app.y))
+                    {
+                        PlaceApp(app.feature, app.x, app.y);
+                    }
+                    else
+                    {
+                        // 겹친다면 자동으로 빈 공간을 찾음 (전부 x=0, y=0 인 경우)
+                        if (FindAutoPlaceCoordinate(app.feature, out Vector2Int newPos))
+                        {
+                            PlaceApp(app.feature, newPos.x, newPos.y);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[AppManager] {app.feature}를 설치할 메모리 공간이 부족하여 기본 배치에서 제외되었습니다.");
+                        }
+                    }
+                }
+
                 DontDestroyOnLoad(gameObject);
             }
             else
             {
                 Destroy(gameObject);
             }
-            
+        }
+
+        // 빈 공간을 찾아 좌표를 반환하는 함수
+        private bool FindAutoPlaceCoordinate(AppFeature feature, out Vector2Int pos)
+        {
+            pos = Vector2Int.zero;
+            GameAppData data = GetAppData(feature);
+            if (data == null) return false;
+
+            for (int y = 0; y < gridHeight; y++)
+            {
+                for (int x = 0; x < gridWidth; x++)
+                {
+                    if (CanPlaceApp(feature, x, y))
+                    {
+                        pos = new Vector2Int(x, y);
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public void LoadGame(SaveData data)
@@ -224,6 +271,38 @@ namespace Manager
                     return false;
             }
             return true;
+        }
+
+        // 현재 installedApps 리스트를 바탕으로 memoryBoard 배열을 강제로 재작성
+        public void SyncMemoryBoardWithInstalledApps()
+        {
+            // 보드 전체를 빈 공간으로
+            for (int y = 0; y < gridHeight; y++)
+            {
+                for (int x = 0; x < gridWidth; x++)
+                {
+                    memoryBoard[x, y] = AppFeature.None;
+                }
+            }
+
+            // 현재 설치된 앱 리스트를 순회하며 보드에 다시 채워 넣음
+            foreach (var placedApp in installedApps)
+            {
+                GameAppData data = GetAppData(placedApp.feature);
+                if (data == null) continue;
+
+                foreach (Vector2Int blockOffset in data.shapeBlocks)
+                {
+                    int targetX = placedApp.x + blockOffset.x;
+                    int targetY = placedApp.y + blockOffset.y;
+
+                    // 경계 체크
+                    if (targetX >= 0 && targetX < gridWidth && targetY >= 0 && targetY < gridHeight)
+                    {
+                        memoryBoard[targetX, targetY] = placedApp.feature;
+                    }
+                }
+            }
         }
     }
 }

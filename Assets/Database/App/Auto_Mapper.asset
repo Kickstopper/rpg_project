@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Auto_Mapper
   m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
   appName: AUTO-MAPPER
+  description: 
   icon: {fileID: 0}
   feature: 2
   shapeBlocks:
@@ -20,3 +21,4 @@ MonoBehaviour:
   - {x: 0, y: 0}
   - {x: 1, y: 0}
   - {x: 0, y: -1}
+  blockColor: {r: 1, g: 0, b: 0, a: 1}

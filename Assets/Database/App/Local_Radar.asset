@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Local_Radar
   m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
   appName: LOCAL RADAR
+  description: 
   icon: {fileID: 0}
   feature: 3
   shapeBlocks:
@@ -21,3 +22,4 @@ MonoBehaviour:
   - {x: 1, y: 0}
   - {x: 0, y: -1}
   - {x: 0, y: -2}
+  blockColor: {r: 0, g: 1, b: 1, a: 1}
