@@ -4,7 +4,7 @@ using TMPro;
 using Data;
 namespace UI.PlayerMenu
 {
-    public class AppItemUI : MonoBehaviour
+    public class ModuleItemUI : MonoBehaviour
     {
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI blockText;
@@ -14,13 +14,13 @@ namespace UI.PlayerMenu
         public Image blockColor;
         public CanvasGroup canvasGroup;
         
-        public void Setup(GameAppData data, bool isInstalled)
+        public void Setup(GameModuleData data, bool isMounted)
         {
-            nameText.text = data.appName;
-            blockText.text = $"{data.memoryCost}";
+            nameText.text = data.moduleName;
+            blockText.text = $"{data.blockCount}";
             blockColor.color = data.blockColor;
-            // 설치된 앱은 Grayout 투명도를 낮춤
-            canvasGroup.alpha = isInstalled ? 0.5f : 1.0f;
+            // 설치된 모듈은 Grayout 투명도를 낮춤
+            canvasGroup.alpha = isMounted ? 0.5f : 1.0f;
         }
 
         public void SetHighlight(bool isSelected)

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ddf923dd0365ba4b805542e4dc938b9, type: 3}
   m_Name: Mob_Sensor
   m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
-  appName: MOB SENSOR
-  description: 
+  moduleName: MOB SENSOR
+  description: "\uC801\uACFC\uC758 \uAC70\uB9AC\uB97C \uAC10\uC9C0\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
   feature: 1
+  blockColor: {r: 0.5, g: 0, b: 1, a: 1}
   shapeBlocks:
   - {x: 0, y: 0}
   - {x: 1, y: 0}
   - {x: 0, y: -1}
-  blockColor: {r: 0.5, g: 0, b: 1, a: 1}

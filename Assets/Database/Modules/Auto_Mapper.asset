@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ddf923dd0365ba4b805542e4dc938b9, type: 3}
   m_Name: Auto_Mapper
   m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
-  appName: AUTO-MAPPER
-  description: 
+  moduleName: AUTO MAP
+  description: "\uC790\uB3D9\uC73C\uB85C \uC9C0\uB3C4\uB97C \uADF8\uB824\uC90D\uB2C8\uB2E4."
   icon: {fileID: 0}
   feature: 2
+  blockColor: {r: 1, g: 0, b: 0, a: 1}
   shapeBlocks:
   - {x: 0, y: 1}
   - {x: 0, y: 0}
   - {x: 1, y: 0}
   - {x: 0, y: -1}
-  blockColor: {r: 1, g: 0, b: 0, a: 1}

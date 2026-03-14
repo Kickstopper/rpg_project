@@ -545,8 +545,8 @@ namespace Controller
         // 인스턴트 킬 조건 검사
         bool CheckInstantWinCondition()
         {
-            // 앱이 설치되지 않았으면 패스
-            if (!AppManager.Instance.IsInstalled(AppFeature.KillSwitch)) return false;
+            // 모듈이 설치되지 않았으면 패스
+            if (!ModuleManager.Instance.IsMounted(ModuleFeature.KillSwitch)) return false;
             // 아직 몬스터나 플레이어가 세팅되지 않았으면 패스
             int mCount = fieldController.GetLivingMonsters().Count;
             int pCount = fieldController.GetLivingParty().Count;

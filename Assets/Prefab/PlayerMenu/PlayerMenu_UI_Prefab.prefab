@@ -489,7 +489,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: MEMORY
+  m_text: MODULE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
   m_sharedMaterial: {fileID: -8397786257170836654, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
@@ -759,7 +759,7 @@ GameObject:
   - component: {fileID: 3775560944368438748}
   - component: {fileID: 768400381406581699}
   m_Layer: 5
-  m_Name: Apps_Panel
+  m_Name: Module_Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2011,7 +2011,7 @@ GameObject:
   - component: {fileID: 2286915520511320426}
   - component: {fileID: 8232253704097799650}
   m_Layer: 5
-  m_Name: MemoryManagerUIController
+  m_Name: ModuleManagerUIController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2049,9 +2049,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.PlayerMenu.MemoryManagerUI
   menuController: {fileID: 6372555989440531804}
-  appListContent: {fileID: 3452291926853127388}
-  appItemPrefab: {fileID: 940030084927157362, guid: 4b6b1d56faa55424aa3a7c6e40f92c83, type: 3}
-  memoryBoardGrid: {fileID: 7652620903434606204}
+  moduleListContent: {fileID: 3452291926853127388}
+  moduleItemPrefab: {fileID: 940030084927157362, guid: 4b6b1d56faa55424aa3a7c6e40f92c83, type: 3}
+  expansionBoardGrid: {fileID: 7652620903434606204}
   gridSlotPrefab: {fileID: 1279017491004383599, guid: d4267809110e6404689fce56f6f5336e, type: 3}
   descriptionText: {fileID: 542799688694215005}
   currentState: 0
@@ -4596,7 +4596,7 @@ GameObject:
   - component: {fileID: 1327260941550748395}
   - component: {fileID: 6786082289203647733}
   m_Layer: 5
-  m_Name: MemoryBtn
+  m_Name: ModuleBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5402,7 +5402,7 @@ GameObject:
   - component: {fileID: 6524604872004012652}
   - component: {fileID: 604617258471051221}
   m_Layer: 5
-  m_Name: MemoryUI
+  m_Name: ModuleUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21681,7 +21681,7 @@ GameObject:
   - component: {fileID: 1076784213706139421}
   - component: {fileID: 7848877815859609952}
   m_Layer: 5
-  m_Name: Memory_Board
+  m_Name: Expansion_Board
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

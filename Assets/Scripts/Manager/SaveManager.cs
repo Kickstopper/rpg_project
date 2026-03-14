@@ -83,10 +83,10 @@ namespace Manager
             // 이벤트 플래그 저장
             data.eventFlags = FlagManager.Instance.GetSaveData();
 
-            // 앱과 메모리 정보
-            data.maxAppMemory = AppManager.Instance.maxMemory;
-            data.ownedApps = new List<AppFeature>(AppManager.Instance.ownedFeatures);
-            data.placedApps = new List<PlacedAppData>(AppManager.Instance.GetPlacedApps());
+            // 모듈과 메모리 정보
+            data.maxBlockSize = ModuleManager.Instance.maxBlockSize;
+            data.ownedModules = new List<ModuleFeature>(ModuleManager.Instance.ownedModules);
+            data.mountedModules = new List<PlacedModuleData>(ModuleManager.Instance.GetMountedModules());
 
             // 파일 쓰기
             string json = JsonUtility.ToJson(data, true);
@@ -125,8 +125,8 @@ namespace Manager
                 DungeonMapStateManager.Instance.UpdatePlayerPosition(data.playerPosX, data.playerPosY, data.playerDirection, data.dungeonId);
             }
 
-            // 앱과 메모리 정보
-            AppManager.Instance.LoadGame(data);
+            // 모듈과 메모리 정보
+            ModuleManager.Instance.LoadGame(data);
             
             if (data.sceneName == GameScene.WORLD_MAP_SCENE)
             {

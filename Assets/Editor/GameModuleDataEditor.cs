@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEditor;
 using Data;
 
-[CustomEditor(typeof(GameAppData))]
-public class GameAppDataEditor : Editor
+[CustomEditor(typeof(GameModuleData))]
+public class GameModuleDataEditor : Editor
 {
     private const int GRID_SIZE = 5; // 5x5 그리드
     private const int CENTER = 2;    // 배열의 정중앙 인덱스 (0, 1, [2], 3, 4)
@@ -13,14 +13,14 @@ public class GameAppDataEditor : Editor
         // 기본 인스펙터 항목들 (이름, 아이콘 등)을 먼저 그림
         base.OnInspectorGUI();
 
-        GameAppData appData = (GameAppData)target;
+        GameModuleData moduleData = (GameModuleData)target;
 
         GUILayout.Space(20);
         GUILayout.Label("🧩 도형 편집기 (가운데가 기준점 0,0)", EditorStyles.boldLabel);
 
         // 현재 저장된 List<Vector2Int> 데이터를 5x5 bool 배열(그리드)로 변환
         bool[,] grid = new bool[GRID_SIZE, GRID_SIZE];
-        foreach (Vector2Int pos in appData.shapeBlocks)
+        foreach (Vector2Int pos in moduleData.shapeBlocks)
         {
             int visualX = pos.x + CENTER;
             int visualY = CENTER - pos.y; // 시각적 UI는 위에서 아래로 그려지므로 Y축 반전
@@ -72,10 +72,10 @@ public class GameAppDataEditor : Editor
         if (EditorGUI.EndChangeCheck())
         {
             // Ctrl+Z(실행 취소)를 위한 기록 남기기
-            Undo.RecordObject(appData, "Change App Shape");
+            Undo.RecordObject(moduleData, "Change Module Shape");
 
             // bool 배열을 다시 List<Vector2Int>로 변환하여 저장
-            appData.shapeBlocks.Clear();
+            moduleData.shapeBlocks.Clear();
             for (int y = 0; y < GRID_SIZE; y++)
             {
                 for (int x = 0; x < GRID_SIZE; x++)
@@ -83,22 +83,22 @@ public class GameAppDataEditor : Editor
                     if (grid[x, y])
                     {
                         // 시각적 좌표를 다시 수학적 좌표(중앙이 0,0)로 변환
-                        appData.shapeBlocks.Add(new Vector2Int(x - CENTER, CENTER - y));
+                        moduleData.shapeBlocks.Add(new Vector2Int(x - CENTER, CENTER - y));
                     }
                 }
             }
 
             // 디스크에 변경사항을 강제 저장하도록 플래그 세팅
-            EditorUtility.SetDirty(appData);
+            EditorUtility.SetDirty(moduleData);
         }
 
         GUILayout.Space(10);
         
         // 정보 표시
-        EditorGUILayout.HelpBox($"총 차지 메모리: {appData.memoryCost} 블록", MessageType.Info);
+        EditorGUILayout.HelpBox($"총 차지 메모리: {moduleData.blockCount} 블록", MessageType.Info);
         
         // 데이터가 1칸도 없을 경우 경고
-        if (appData.memoryCost == 0)
+        if (moduleData.blockCount == 0)
         {
             EditorGUILayout.HelpBox("도형은 최소 1개 이상의 블록(기준점 등)을 포함해야 합니다!", MessageType.Warning);
         }

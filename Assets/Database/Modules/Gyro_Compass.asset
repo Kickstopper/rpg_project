@@ -10,15 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ddf923dd0365ba4b805542e4dc938b9, type: 3}
-  m_Name: Weather_widget
-  m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppData
-  appName: WEATHER WIDGET
-  description: 
+  m_Name: Gyro_Compass
+  m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
+  moduleName: GYRO COMPASS
+  description: "\uBC14\uB77C\uBCF4\uACE0 \uC788\uB294 \uBC29\uD5A5\uC744 \uD45C\uC2DC\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
-  feature: 7
+  feature: 4
+  blockColor: {r: 0, g: 0, b: 1, a: 1}
   shapeBlocks:
+  - {x: 0, y: 1}
   - {x: 0, y: 0}
-  - {x: 1, y: 0}
-  - {x: 0, y: -1}
-  - {x: 1, y: -1}
-  blockColor: {r: 0, g: 0, b: 0.5, a: 1}

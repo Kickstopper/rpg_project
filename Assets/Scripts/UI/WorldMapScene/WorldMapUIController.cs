@@ -28,9 +28,9 @@ namespace UI.WorldMapScene
 
         void OnEnable()
         {
-            if (weatherWidget && AppManager.Instance.IsInstalled(Data.AppFeature.WeatherWidget))
+            if (weatherWidget && ModuleManager.Instance.IsMounted(Data.ModuleFeature.WeatherWidget))
                 weatherWidget.SetActive(true);
-            if (encounterSlider && AppManager.Instance.IsInstalled(Data.AppFeature.MobSensor))
+            if (encounterSlider && ModuleManager.Instance.IsMounted(Data.ModuleFeature.MobSensor))
                 encounterSlider.SetActive(false);
         }
 

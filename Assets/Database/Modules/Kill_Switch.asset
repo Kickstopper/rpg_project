@@ -10,13 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ddf923dd0365ba4b805542e4dc938b9, type: 3}
-  m_Name: Gyro_Compass
+  m_Name: Kill_Switch
   m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
-  appName: GYRO COMPASS
-  description: 
+  moduleName: KILL SWITCH
+  description: "\uB808\uBCA8\uC774 \uB0AE\uC740 \uC801\uB4E4\uC744 \uC21C\uC2DD\uAC04\uC5D0
+    \uC81C\uAC70\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
-  feature: 4
+  feature: 6
+  blockColor: {r: 1, g: 0, b: 1, a: 1}
   shapeBlocks:
+  - {x: 0, y: 2}
   - {x: 0, y: 1}
   - {x: 0, y: 0}
-  blockColor: {r: 0, g: 0, b: 1, a: 1}
+  - {x: 0, y: -1}
+  - {x: 0, y: -2}

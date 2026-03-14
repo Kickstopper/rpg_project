@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ddf923dd0365ba4b805542e4dc938b9, type: 3}
-  m_Name: Kill_Switch
+  m_Name: Geo_Scanner
   m_EditorClassIdentifier: Assembly-CSharp::Data.GameAppSO
-  appName: KILL SWITCH
-  description: 
+  moduleName: GEO SCANNER
+  description: "\uC9C0\uD615\uC744 \uC2A4\uCE94\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
-  feature: 6
+  feature: 5
+  blockColor: {r: 1, g: 1, b: 0, a: 1}
   shapeBlocks:
-  - {x: 0, y: 2}
   - {x: 0, y: 1}
+  - {x: 1, y: 1}
   - {x: 0, y: 0}
+  - {x: -1, y: -1}
   - {x: 0, y: -1}
-  - {x: 0, y: -2}
-  blockColor: {r: 1, g: 0, b: 1, a: 1}

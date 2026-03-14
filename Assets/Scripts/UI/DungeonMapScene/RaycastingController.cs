@@ -104,7 +104,7 @@ namespace Controller
             }
             if (Input.GetKeyDown(KeyCode.M))
             {
-                if (!AppManager.Instance.IsInstalled(AppFeature.AutoMapper)) return;
+                if (!ModuleManager.Instance.IsMounted(ModuleFeature.AutoMapper)) return;
                 autoMapContainer.SetActive(!autoMapContainer.activeSelf);
                 return;
             }
@@ -204,7 +204,7 @@ namespace Controller
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
             if (Input.GetKeyDown(KeyCode.M))
             {
-                if (!AppManager.Instance.IsInstalled(AppFeature.AutoMapper)) return;
+                if (!ModuleManager.Instance.IsMounted(ModuleFeature.AutoMapper)) return;
                 autoMapContainer.SetActive(!autoMapContainer.activeSelf);
             } 
             if (Input.GetKeyDown(KeyCode.P))
@@ -508,12 +508,12 @@ namespace Controller
             if (miniMap != null)
             {
                 miniMap.Initialize(_currentMap);
-                miniMap.gameObject.SetActive(AppManager.Instance.IsInstalled(AppFeature.LocalRadar));
+                miniMap.gameObject.SetActive(ModuleManager.Instance.IsMounted(ModuleFeature.LocalRadar));
             }
             if (compassUI != null)
             {
                 compassUI.SetDirection(_player.DirectionIdx);
-                compassUI.gameObject.SetActive(AppManager.Instance.IsInstalled(AppFeature.GyroCompass));   
+                compassUI.gameObject.SetActive(ModuleManager.Instance.IsMounted(ModuleFeature.GyroCompass));   
             }
             if (autoMapContainer != null)
             {
@@ -522,7 +522,7 @@ namespace Controller
             }
             if (weatherUI != null)
             {
-                weatherUI.gameObject.SetActive(AppManager.Instance.IsInstalled(AppFeature.WeatherWidget));
+                weatherUI.gameObject.SetActive(ModuleManager.Instance.IsMounted(ModuleFeature.WeatherWidget));
             }
         }
 

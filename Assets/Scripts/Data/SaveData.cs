@@ -15,9 +15,9 @@ namespace Data
         }
     }
     [Serializable]
-    public class PlacedAppData
+    public class PlacedModuleData
     {
-        public AppFeature feature;
+        public ModuleFeature feature;
         public int x;
         public int y;
         public int rotation; // rotation값 * 90도로 회전함
@@ -53,10 +53,10 @@ namespace Data
         // 이벤트 플래그
         public List<string> eventFlags = new List<string>();
 
-        // 가진 앱과 인스톨된 앱
-        public List<AppFeature> ownedApps;
-        public List<PlacedAppData> placedApps;
-        public int maxAppMemory;
+        // 가진 모듈과 인스톨된 모듈
+        public List<ModuleFeature> ownedModules;
+        public List<PlacedModuleData> mountedModules;
+        public int maxBlockSize;
     }
 
     [Serializable]

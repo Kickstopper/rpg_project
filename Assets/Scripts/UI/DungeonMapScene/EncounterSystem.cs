@@ -34,8 +34,8 @@ namespace UI.DungeonMapScene
         {
             monsters = monsterCandidate;
             ResetSteps();
-            if (AppManager.Instance)
-                SetVisible(AppManager.Instance.IsInstalled(AppFeature.MobSensor));
+            if (ModuleManager.Instance)
+                SetVisible(ModuleManager.Instance.IsMounted(ModuleFeature.MobSensor));
         }
 
         private void SetVisible(bool visible)
@@ -64,7 +64,7 @@ namespace UI.DungeonMapScene
 
         private void UpdateUI()
         {
-            if (AppManager.Instance && !AppManager.Instance.IsInstalled(AppFeature.MobSensor)) return;
+            if (ModuleManager.Instance && !ModuleManager.Instance.IsMounted(ModuleFeature.MobSensor)) return;
             if (dangerSlider == null || fillImage == null) return;
 
             float ratio = 1.0f - ((float)_stepsUntilNextBattle / _initialSteps);

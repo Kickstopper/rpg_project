@@ -1682,7 +1682,7 @@ GameObject:
   - component: {fileID: 744971245}
   - component: {fileID: 744971246}
   m_Layer: 0
-  m_Name: AppManager
+  m_Name: ModuleManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1715,8 +1715,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 061e66682c664544aba8392f55c40034, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager.AppManager
-  maxMemory: 10
-  appDatabase:
+  maxBlockSize: 10
+  moduleDatabase:
   - {fileID: 11400000, guid: 2ec96027e0150394c80bcf8ec05b50f6, type: 2}
   - {fileID: 11400000, guid: 875912a9819b6b245ae0e54bd9cfc61a, type: 2}
   - {fileID: 11400000, guid: cefca8a2e97f17e40ab0a7517d394dcd, type: 2}
@@ -1724,8 +1724,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 484d98ce6299154429972dd7943e8054, type: 2}
   - {fileID: 11400000, guid: fcedda8f1ebfed94eb8db02addf7d512, type: 2}
   - {fileID: 11400000, guid: 56f2cae6d85bce846a3f635b2013062f, type: 2}
-  ownedFeatures: 030000000400000001000000020000000500000007000000
-  installedApps:
+  ownedModules: 040000000300000001000000
+  mountedModules:
   - feature: 4
     x: 0
     y: 0
