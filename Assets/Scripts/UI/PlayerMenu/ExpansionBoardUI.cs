@@ -24,6 +24,14 @@ namespace UI.PlayerMenu
         public GameObject gridSlotPrefab;
         public TextMeshProUGUI descriptionText;
 
+        [Header("Preview Overlay Settings")]
+        public RectTransform previewContainer;
+        public float smoothSpeed = 40f;
+
+        private List<Image> previewImages = new List<Image>();
+        private float targetRotationAngle = 0f;
+        private float currentRotationAngle = 0f;
+
         [Header("State & Data")]
         public ExpansionBoardUIState currentState = ExpansionBoardUIState.ModuleList;
         
@@ -49,7 +57,16 @@ namespace UI.PlayerMenu
         void Update()
         {
             if (menuController.IsPopupOpen) return;
+
+            // 애니메이션은 입력 쿨타임과 무관하게 매 프레임 실행
+            if (currentState == ExpansionBoardUIState.BoardPlacement && currentlyPlacingModule != null)
+            {
+                UpdatePreviewAnimation();
+            }
+
+            // 입력을 감지하는 로직은 쿨타임이 지났을 때만 실행
             if (!menuController.CanProcessInput) return;
+
             switch (currentState)
             {
                 case ExpansionBoardUIState.ModuleList:
@@ -59,6 +76,20 @@ namespace UI.PlayerMenu
                     HandleBoardPlacementInput();
                     break;
             }
+        }
+
+        // 블럭의 부드러운 이동과 회전
+        private void UpdatePreviewAnimation()
+        {
+            if (previewContainer == null || !previewContainer.gameObject.activeSelf) return;
+
+            // 각도 보간
+            currentRotationAngle = Mathf.Lerp(currentRotationAngle, targetRotationAngle, Time.deltaTime * smoothSpeed);
+            previewContainer.localRotation = Quaternion.Euler(0, 0, currentRotationAngle);
+
+            // 위치 보간
+            Vector3 targetPos = gridSlots[cursorX, cursorY].transform.position;
+            previewContainer.position = Vector3.Lerp(previewContainer.position, targetPos, Time.deltaTime * smoothSpeed);
         }
 
         // 초기화 및 리스트 갱신
@@ -214,7 +245,7 @@ namespace UI.PlayerMenu
                 {
                     cursorX = x;
                     cursorY = y;
-                    DrawBoard();
+                    UpdatePreviewColor(); 
                 }
             });
             trigger.triggers.Add(enter);
@@ -231,6 +262,10 @@ namespace UI.PlayerMenu
                     if (ModuleManager.Instance.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation))
                     {
                         ModuleManager.Instance.MountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
+                        
+                        // 마우스로 마운트 성공 시 반투명 프리뷰 끔
+                        previewContainer.gameObject.SetActive(false); 
+
                         currentState = ExpansionBoardUIState.ModuleList; // 설치 후 목록으로 돌아감
                         RefreshModuleList();
                         UpdateFocus();
@@ -239,7 +274,6 @@ namespace UI.PlayerMenu
                     else
                     {
                         SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                        // menuController.ShowAlertPopup("여기에 설치할 수 없습니다."); 
                     }
                 }
             });
@@ -261,17 +295,26 @@ namespace UI.PlayerMenu
             }
         }
 
-        // 입력 처리 (메모리 보드 포커스 상태)
+        // 입력 처리 (확장보드 포커스 상태)
         private void AttemptToMountModule(GameModuleData moduleData)
         {
-            if (FindAutoPlaceCoordinate(moduleData, out Vector2Int startPos, out int foundRot))
+            if (FindAutoMountCoordinate(moduleData, out Vector2Int startPos, out int foundRot))
             {
                 currentlyPlacingModule = moduleData;
                 cursorX = startPos.x;
                 cursorY = startPos.y;
-                currentRotation = foundRot; // 찾은 각도로 시작
+                currentRotation = foundRot; 
+                
+                // 시작할 때 프리뷰 세팅 및 각도 즉시 스냅
+                SetupPreviewOverlay(moduleData);
+                
+                // 논리적 각도와 시각적 각도를 동기화
+                targetRotationAngle = currentRotation * 90f; 
+                
+                currentRotationAngle = targetRotationAngle; 
+                previewContainer.localRotation = Quaternion.Euler(0, 0, currentRotationAngle);
+                
                 currentState = ExpansionBoardUIState.BoardPlacement;
-                DrawBoard(); 
             }
             else
             {
@@ -281,80 +324,87 @@ namespace UI.PlayerMenu
 
         private void HandleBoardPlacementInput()
         {
-            if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(2)) // 마우스 휠 클릭 등
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            
+            // 회전 입력 (Q, E, 휠)
+            if (Input.GetKeyDown(KeyCode.Q) || scroll > 0f) 
             {
                 menuController.ResetInputTimer();
-                currentRotation = (currentRotation + 1) % 4; // 90도 회전
-                DrawBoard(); // 프리뷰 갱신
+                // 3에서 1로 변경: 시각적 +90도(반시계)와 수학적 변환 일치
+                currentRotation = (currentRotation + 1) % 4; 
+                targetRotationAngle += 90f; 
+                UpdatePreviewColor(); 
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            }
+            else if (Input.GetKeyDown(KeyCode.E) || scroll < 0f)
+            {
+                menuController.ResetInputTimer();
+                // 1에서 3으로 변경: 시각적 -90도(시계)와 수학적 변환 일치
+                currentRotation = (currentRotation + 3) % 4; 
+                targetRotationAngle -= 90f; 
+                UpdatePreviewColor();
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
             }
 
             int prevX = cursorX;
             int prevY = cursorY;
 
-            // 방향키로 커서 이동
+            // 이동 입력
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) cursorY--;
             if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) cursorY++;
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) cursorX--;
             if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) cursorX++;
 
-            // 커서가 보드를 벗어나지 않도록 제한
-            cursorX = Mathf.Clamp(cursorX, 0, ModuleManager.Instance.gridWidth - 1);
-            cursorY = Mathf.Clamp(cursorY, 0, ModuleManager.Instance.gridHeight - 1);
-
             if (prevX != cursorX || prevY != cursorY)
             {
-                DrawBoard(); // 커서 이동 시 보드 프리뷰 다시 그리기
+                menuController.ResetInputTimer(); // 키보드로 움직일 때도 쿨타임 적용
+                cursorX = Mathf.Clamp(cursorX, 0, ModuleManager.Instance.gridWidth - 1);
+                cursorY = Mathf.Clamp(cursorY, 0, ModuleManager.Instance.gridHeight - 1);
+                UpdatePreviewColor(); 
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
             }
 
             // 설치
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                // currentRotation 인자 추가
+                // 스페이스바 연타로 인한 꼬임 방지
+                menuController.ResetInputTimer(); 
+
                 if (ModuleManager.Instance.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation))
                 {
-                    // [수정] currentRotation 인자 추가
                     ModuleManager.Instance.MountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
-                    currentState = ExpansionBoardUIState.ModuleList; // 설치 완료 후 리스트로 복귀
-                    RefreshModuleList();
+                    previewContainer.gameObject.SetActive(false); 
+                    currentState = ExpansionBoardUIState.ModuleList; 
+                    RefreshModuleList(); 
                     UpdateFocus();
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Click);
                 }
-                else
-                {
-                    Debug.Log("여기에 설치할 수 없습니다!"); 
-                }
+                else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             }
             
-            // 취소 후 리스트로 복귀
+            // 취소
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
             {
+                previewContainer.gameObject.SetActive(false);
                 currentState = ExpansionBoardUIState.ModuleList;
-                DrawBoard(); // 프리뷰 제거
             }
         }
 
         // 보드 렌더링
         private void DrawBoard()
         {
-            // 보드를 모두 검은색으로 초기화
             int width = ModuleManager.Instance.gridWidth;
             int height = ModuleManager.Instance.gridHeight;
 
             for (int y = 0; y < height; y++)
-            {
                 for (int x = 0; x < width; x++)
-                {
                     gridSlots[x, y].color = Color.black; 
-                }
-            }
 
-            // 이미 설치된 모듈들의 블록의 색을 정의된 색으로 바꿈
             foreach (PlacedModuleData placedModule in ModuleManager.Instance.GetMountedModules())
             {
                 GameModuleData data = ModuleManager.Instance.GetModuleData(placedModule.feature);
                 if (data == null) continue;
 
-                // 설치할 때 저장해둔 회전값을 적용하여 블록을 가져옴
                 foreach (Vector2Int offset in data.GetRotatedBlocks(placedModule.rotation))
                 {
                     int drawX = placedModule.x + offset.x;
@@ -366,36 +416,15 @@ namespace UI.PlayerMenu
                     }
                 }
             }
-
-            // 현재 배치 진행 중인 모듈 표시
-            if (currentState == ExpansionBoardUIState.BoardPlacement && currentlyPlacingModule != null)
-            {
-                bool canPlace = ModuleManager.Instance.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
-                foreach (Vector2Int offset in currentlyPlacingModule.GetRotatedBlocks(currentRotation))
-                {
-                    int drawX = cursorX + offset.x;
-                    int drawY = cursorY + offset.y;
-
-                    if (drawX >= 0 && drawX < width && drawY >= 0 && drawY < height)
-                    {
-                        // 설치 가능하면 반투명한 원래 색상, 불가능하면 반투명한 빨간색
-                        Color previewColor = canPlace ? currentlyPlacingModule.blockColor : Color.red;
-                        previewColor.a = 0.5f; // 반투명
-                        
-                        // 기존 색상 위에 덧씌움
-                        gridSlots[drawX, drawY].color = previewColor; 
-                    }
-                }
-            }
         }
 
         // 4방향을 모두 탐색하며 최초로 들어맞는 공간과 각도를 찾음
-        private bool FindAutoPlaceCoordinate(GameModuleData moduleData, out Vector2Int pos, out int foundRotation)
+        private bool FindAutoMountCoordinate(GameModuleData moduleData, out Vector2Int pos, out int foundRotation)
         {
             pos = Vector2Int.zero;
             foundRotation = 0;
 
-            // 회전 상태 0 -> 1 -> 2 -> 3 순으로 검사
+            // 회전 상태 0 ~ 3 순으로 검사
             for (int r = 0; r < 4; r++)
             {
                 for (int y = 0; y < ModuleManager.Instance.gridHeight; y++)
@@ -414,7 +443,61 @@ namespace UI.PlayerMenu
             return false;
         }
 
-        
+        private void SetupPreviewOverlay(GameModuleData moduleData)
+        {
+            previewContainer.gameObject.SetActive(true);
+            
+            // UI의 맨 앞으로 가져오기 (검은색 보드판 뒤에 가려지는 현상 방지)
+            previewContainer.SetAsLastSibling(); 
+
+            foreach (var img in previewImages) Destroy(img.gameObject);
+            previewImages.Clear();
+
+            // GridLayoutGroup에서 CellSize와 Spacing을 가져옴
+            GridLayoutGroup gridLayout = expansionBoardGrid.GetComponent<GridLayoutGroup>();
+            Vector2 slotSize = gridLayout != null ? gridLayout.cellSize : new Vector2(100, 100);
+            
+            float stepX = slotSize.x;
+            float stepY = -slotSize.y;
+            if (gridLayout != null)
+            {
+                stepX += gridLayout.spacing.x;
+                stepY -= gridLayout.spacing.y;
+            }
+
+            // 회전하지 않은 상태의 블록들을 생성
+            foreach (Vector2Int offset in moduleData.shapeBlocks)
+            {
+                GameObject obj = Instantiate(gridSlotPrefab, previewContainer);
+                RectTransform rt = obj.GetComponent<RectTransform>();
+                
+                // 회전을 위해 앵커와 피벗을 중앙으로 맞춤
+                rt.anchorMin = new Vector2(0.5f, 0.5f);
+                rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+
+                // Grid 밖에서 생성되었으므로 크기를 강제로 지정해 줌
+                rt.sizeDelta = slotSize;
+
+                rt.localPosition = new Vector3(offset.x * stepX, offset.y * stepY, 0);
+                
+                Image img = obj.GetComponent<Image>();
+                img.raycastTarget = false;
+                previewImages.Add(img);
+            }
+            UpdatePreviewColor();
+        }
+
+        // 겹침 여부에 따라 프리뷰 색상 업데이트
+        private void UpdatePreviewColor()
+        {
+            if (currentlyPlacingModule == null) return;
+            bool canPlace = ModuleManager.Instance.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
+            
+            Color previewColor = canPlace ? currentlyPlacingModule.blockColor : Color.red;
+            previewColor.a = 0.6f;
+            
+            foreach (var img in previewImages) img.color = previewColor;
+        }
     }
-    
 }
