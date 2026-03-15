@@ -17,6 +17,7 @@ MonoBehaviour:
     name: "\uC548\uB4DC\uB85C\uBA54\uB2E4"
     race: "\uBC14\uC774\uB7EC\uC2A4"
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: da65ddecadf1a9e4b96b9b9e42691fe1, type: 3}
     - {fileID: 21300000, guid: 7a70624c6f6a381409980111234bcf68, type: 3}
@@ -40,11 +41,16 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - id: 001
     name: "\uC2A4\uD30C\uC774\uB354"
     race: "\uBC14\uC774\uB7EC\uC2A4"
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: 1e431d38b99c20a4bab56c3af9af2a2f, type: 3}
     - {fileID: 21300000, guid: 8d586a8d5b6afe04f98dbb95a33e7c13, type: 3}
@@ -68,11 +74,16 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - id: 002
     name: "\uBA54\uBE44\uC6B0\uC2A4"
     race: "\uBC14\uC774\uB7EC\uC2A4"
     aiProfile: {fileID: 11400000, guid: 3302da7c66331be48bb1baec32154be3, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: e7eaf790d24713f4daad4037b88db684, type: 3}
     - {fileID: 21300000, guid: f60ec9bbbc1feb54eb928163bde9065f, type: 3}
@@ -96,11 +107,16 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - id: 003
     name: "\uC5B4\uC0C8\uC2E0"
     race: "\uAC00\uC774\uC544\uAD50\uB3C4"
     aiProfile: {fileID: 11400000, guid: 3302da7c66331be48bb1baec32154be3, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: de04b6d72fc642c48a6937a2936eb03b, type: 3}
     - {fileID: 21300000, guid: c5dfb3e0846cbec4cbedc3cd6f3c7e17, type: 3}
@@ -124,11 +140,16 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - id: 004
     name: "\uCC98\uD615 \uB77C\uC774\uB354"
     race: "\uAC00\uC774\uC544\uAD50\uB3C4"
     aiProfile: {fileID: 11400000, guid: 3302da7c66331be48bb1baec32154be3, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: 72256cd481cfaaf48b6ce0cbbed1d653, type: 3}
     - {fileID: 21300000, guid: 450a466a623a28440a6b302409fe71cc, type: 3}
@@ -152,11 +173,16 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - id: 005
     name: "\uD2B9\uACF5\uB300"
     race: "\uAC00\uC774\uC544\uAD50\uB3C4"
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: fe499067f5e6b3140977c80eacfb5aa1, type: 3}
     - {fileID: 21300000, guid: eb8e0a1f6aebe8f4cb3535c9dcb907a7, type: 3}
@@ -180,11 +206,16 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - id: 006
     name: "\uD30C\uACC4\uC2B9"
     race: "\uAC00\uC774\uC544\uAD50\uB3C4"
     aiProfile: {fileID: 11400000, guid: 3302da7c66331be48bb1baec32154be3, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: 77c540ed0fb16304aa79da13e13ddb05, type: 3}
     - {fileID: 21300000, guid: 1bbc1cf0b8cfc084fbc087dca873adac, type: 3}
@@ -208,11 +239,16 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - id: 007
     name: "\uC554\uBC95\uC0AC"
     race: "\uAC00\uC774\uC544\uAD50\uB3C4"
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: 4e040646695889b49a6a67c40b101f6b, type: 3}
     - {fileID: 21300000, guid: fab0fc497e71ea848885ab351f342065, type: 3}
@@ -236,11 +272,16 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - id: 008
     name: "\uC624\uB2C8\uC870\uB85C\uC6B0"
     race: "\uAC00\uC774\uC544\uAD50\uB3C4"
     aiProfile: {fileID: 11400000, guid: 3302da7c66331be48bb1baec32154be3, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: 14b92f35807202c45a0c63a6dad5efd8, type: 3}
     - {fileID: 21300000, guid: 4957a7a357db4524bb3e457630c34e63, type: 3}
@@ -264,11 +305,16 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - id: 009
     name: "\uD0C0\uB85C\uC2A4"
     race: "\uBA38\uC2E0"
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
     image:
     - {fileID: 21300000, guid: ef9eb713eb57ddd4a98967a3d5776890, type: 3}
     - {fileID: 21300000, guid: 818a91978a387de489815ccf254c651f, type: 3}
@@ -292,4 +338,8 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    dropItemIds: []
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
