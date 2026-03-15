@@ -453,16 +453,15 @@ namespace Controller
             // (a % n + n) % n 은 음수 나머지 처리를 위한 공식.
             int nextDir = ((currentDir + dirStep) % 4 + 4) % 4;
 
-            if (compassUI) 
-            {
+            if (compassUI)
                 compassUI.AnimateTurn(currentDir, nextDir, dirStep, turnDuration);
-            }
+            
+            if (miniMap)
+                miniMap.SetDirection(nextDir, turnDuration);
 
-            // 실제 플레이어 데이터 회전
             yield return StartCoroutine(_player.RotateGridRoutine(dirStep, turnDuration, null));
             
-            // 오차 방지
-            if (miniMap) miniMap.SetDirection(_player.DirectionIdx, 0.1f);
+            // 맵 갱신
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
         }
 
