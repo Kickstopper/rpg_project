@@ -31,7 +31,7 @@ namespace UI.WorldMapScene
             if (weatherWidget && ModuleManager.Instance.IsMounted(Data.ModuleFeature.WeatherWidget))
                 weatherWidget.SetActive(true);
             if (encounterSlider && ModuleManager.Instance.IsMounted(Data.ModuleFeature.MobSensor))
-                encounterSlider.SetActive(false);
+                encounterSlider.SetActive(true);
         }
 
         void OnDisable()
