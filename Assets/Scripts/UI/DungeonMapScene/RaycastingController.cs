@@ -48,6 +48,9 @@ namespace Controller
         private float _lastWPressTime = -100f;
         private bool _isScanning = false;
         
+        [HideInInspector]
+        public bool isUIHoldingMovement = false; // 가상 컨트롤러에서 누르고 있는지 여부
+        
         void Awake()
         {
             _renderer = new RaycastRenderEngine();
@@ -230,7 +233,9 @@ namespace Controller
             if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S) && 
                 !Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow))
             {
-                _player.SetRunning(false);
+                // 가상 컨트롤러에서 누르고 있는 중이 아닐 때만 달리기 해제
+                if (!isUIHoldingMovement)
+                    _player.SetRunning(false);
             }
 
             if (!_player.IsMoving)
@@ -283,6 +288,58 @@ namespace Controller
                     SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                 }
             }
+        }
+
+        public void UI_SetRunning(bool isRunning)
+        {
+            if (_player != null)
+            {
+                _player.SetRunning(isRunning);
+            }
+        }
+
+        // UI Virtual Controller 용
+        public void UI_MoveForward()
+        {
+            if (_inputLocked || _player.IsMoving) return;
+            TryMove(1);
+        }
+
+        public void UI_MoveBackward()
+        {
+            if (_inputLocked || _player.IsMoving) return;
+            TryMove(-1);
+        }
+
+        public void UI_MoveLeft()
+        {
+            if (_inputLocked || _player.IsMoving) return;
+            TryStrafe(-1);
+        }
+
+        public void UI_MoveRight()
+        {
+            if (_inputLocked || _player.IsMoving) return;
+            TryStrafe(1);
+        }
+
+        public void UI_TurnLeft()
+        {
+            if (_inputLocked || _player.IsMoving) return;
+            StartCoroutine(TurnRoutine(-1));
+        }
+
+        public void UI_TurnRight()
+        {
+            if (_inputLocked || _player.IsMoving) return;
+            StartCoroutine(TurnRoutine(1));
+        }
+
+        public void UI_Action()
+        {
+            if (_inputLocked) return;
+            Debug.Log("ACTION 버튼 클릭됨 (기획 미정)");
+            // TODO: 추후 상호작용(문 열기, NPC 대화, 조사 등) 로직 연결
         }
 
         // 입구 데이터 확인 메서드
