@@ -1,3 +1,4 @@
+using Manager;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -19,7 +20,25 @@ namespace UI.WorldMapScene
             canvas = GetComponentInParent<Canvas>();
             uiCamera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
             
-            if (joystickBase != null) joystickBase.gameObject.SetActive(false);
+            if (joystickBase != null) 
+                joystickBase.gameObject.SetActive(false);
+                
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
+        }
+
+        void OnDestroy()
+        {
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+        }
+        
+        private void OnGameStateChanged(GameState state)
+        {
+            if (state != GameState.Exploration)
+            {
+                ResetJoystick();
+            }
         }
 
         public void OnPointerDown(PointerEventData eventData)
@@ -70,8 +89,19 @@ namespace UI.WorldMapScene
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            ResetJoystick();
+        }
+
+        private void ResetJoystick()
+        {
             InputVector = Vector2.zero;
-            if (joystickBase != null) joystickBase.gameObject.SetActive(false);
+            
+            // 손잡이 위치 중앙으로 초기화
+            if (joystickHandle != null)
+                joystickHandle.anchoredPosition = Vector2.zero;
+            
+            if (joystickBase != null)
+                joystickBase.gameObject.SetActive(false);
         }
     }
 }
