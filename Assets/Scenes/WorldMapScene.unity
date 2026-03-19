@@ -14699,7 +14699,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -16940,10 +16940,10 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1608120684}
   - {fileID: 1132573879}
   - {fileID: 570041247}
   - {fileID: 1308603853}
+  - {fileID: 1608120684}
   - {fileID: 334259870}
   - {fileID: 1014358289}
   m_Father: {fileID: 0}
