@@ -16,7 +16,7 @@ MonoBehaviour:
   description: "\uB0A0\uC528 \uC815\uBCF4\uB97C \uD45C\uC2DC\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
   feature: 7
-  blockColor: {r: 0, g: 0, b: 0.5, a: 1}
+  blockColor: {r: 0.57924527, g: 0.807, b: 1, a: 1}
   shapeBlocks:
   - {x: 0, y: 0}
   - {x: 1, y: 0}

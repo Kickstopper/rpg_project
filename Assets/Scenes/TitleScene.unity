@@ -1724,7 +1724,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 484d98ce6299154429972dd7943e8054, type: 2}
   - {fileID: 11400000, guid: fcedda8f1ebfed94eb8db02addf7d512, type: 2}
   - {fileID: 11400000, guid: 56f2cae6d85bce846a3f635b2013062f, type: 2}
-  ownedModules: 040000000300000001000000
+  ownedModules: 04000000030000000100000007000000
   mountedModules:
   - feature: 4
     x: 0
@@ -1737,6 +1737,10 @@ MonoBehaviour:
   - feature: 1
     x: 2
     y: 1
+    rotation: 0
+  - feature: 7
+    x: 3
+    y: 3
     rotation: 0
   gridWidth: 5
   gridHeight: 5

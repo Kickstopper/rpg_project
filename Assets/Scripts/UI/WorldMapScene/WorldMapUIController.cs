@@ -26,19 +26,28 @@ namespace UI.WorldMapScene
                 GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
         }
 
-        void OnEnable()
+        private void RefreshModules()
         {
-            if (weatherWidget && ModuleManager.Instance.IsMounted(Data.ModuleFeature.WeatherWidget))
-                weatherWidget.SetActive(true);
-            if (encounterSlider && ModuleManager.Instance.IsMounted(Data.ModuleFeature.MobSensor))
-                encounterSlider.SetActive(true);
+            if (weatherWidget)
+                weatherWidget.SetActive(ModuleManager.Instance.IsMounted(Data.ModuleFeature.WeatherWidget));
+            if (encounterSlider)
+                encounterSlider.SetActive(ModuleManager.Instance.IsMounted(Data.ModuleFeature.MobSensor));
         }
 
-        void OnDisable()
+        private void HideModules()
         {
             if (weatherWidget) weatherWidget.SetActive(false);
             if (encounterSlider) encounterSlider.SetActive(false);
         }
 
+        void OnEnable()
+        {
+            RefreshModules();
+        }
+
+        void OnDisable()
+        {
+            HideModules();
+        }
     }
 }
