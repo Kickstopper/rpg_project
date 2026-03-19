@@ -47,6 +47,7 @@ namespace Controller
         private bool _inputLocked = false;
         private float _lastWPressTime = -100f;
         private bool _isScanning = false;
+        private KeyCode _lastMoveKey = KeyCode.None; 
         
         [HideInInspector]
         public bool isUIHoldingMovement = false; // 가상 컨트롤러에서 누르고 있는지 여부
@@ -216,22 +217,42 @@ namespace Controller
                 Debug.Log($"Anaglyph Mode: {GameSettingManager.Instance.useAnaglyph}");
             }
 
-            // W, S, 위, 아래 키 중 하나라도 눌리면 더블 탭 체크
-            bool anyMoveKeyDown = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) || 
-                                  Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow);
+            // 상하좌우 키 중 하나라도 눌리면 더블 탭 체크
+            bool anyMoveKeyDown = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) ||
+                                  Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D) ||
+                                  Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) ||
+                                  Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow); 
             
-            if (anyMoveKeyDown)
+            // 이동 관련 키 배열 (W, S, A, D, 방향키 4개)
+            KeyCode[] moveKeys = { 
+                KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D, 
+                KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.LeftArrow, KeyCode.RightArrow 
+            };
+
+            foreach (KeyCode key in moveKeys)
             {
-                if (Time.time - _lastWPressTime < doubleTapThreshold)
+                if (Input.GetKeyDown(key))
                 {
-                    _player.SetRunning(true);
+                    // 같은 키를 두 번 눌렀는지, 시간 간격도 Threshold 이내인지 체크
+                    if (key == _lastMoveKey && (Time.time - _lastWPressTime < doubleTapThreshold))
+                    {
+                        _player.SetRunning(true);
+                    }
+                    else
+                    {
+                        _lastMoveKey = key;
+                    }
+                    
+                    _lastWPressTime = Time.time;
+                    break;
                 }
-                _lastWPressTime = Time.time;
             }
 
             // 키를 모두 떼면 달리기 해제
-            if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S) && 
-                !Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow))
+            if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S) &&
+                !Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && 
+                !Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) &&
+                !Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
             {
                 // 가상 컨트롤러에서 누르고 있는 중이 아닐 때만 달리기 해제
                 if (!isUIHoldingMovement)

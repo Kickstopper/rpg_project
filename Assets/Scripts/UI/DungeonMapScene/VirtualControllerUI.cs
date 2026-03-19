@@ -91,6 +91,8 @@ namespace UI.DungeonMapScene
 
         private void HideController()
         {
+            if (!controllerPanel.activeSelf) return;
+            
             controllerPanel.SetActive(false);
             
             _isHoldingForward = false;
