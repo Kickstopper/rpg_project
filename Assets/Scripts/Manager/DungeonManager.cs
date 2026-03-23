@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using Data;
+using System.Collections;
+using UnityEngine.Networking;
 
 namespace Manager
 {
@@ -78,6 +80,11 @@ namespace Manager
                 Debug.LogError($"[DungeonManager] JSON 파일을 찾을 수 없습니다: {path}");
             }
         }
+        
+        public void LoadDungeonFromJson(string fileName, System.Action onComplete)
+        {
+            StartCoroutine(LoadDungeonCoroutine(fileName, onComplete));
+        }
 
         // 레벨 적용 로직
         private void SetCurrentDungeonLevel(MapData data)
@@ -121,6 +128,61 @@ namespace Manager
             CurrentDungeonData.startX = px;
             CurrentDungeonData.startY = py;
             CurrentDungeonData.startDirection = dir;
+        }
+
+        private IEnumerator LoadDungeonCoroutine(string fileName, System.Action onComplete)
+        {
+            string path = Path.Combine(Application.streamingAssetsPath, "Levels", fileName + ".json");
+
+            if (loadedDungeons.ContainsKey(path))
+            {
+                SetCurrentDungeonLevel(loadedDungeons[path]);
+                onComplete?.Invoke();
+                yield break;
+            }
+
+            string json = "";
+
+            // 안드로이드 환경일 경우 UnityWebRequest 사용
+            if (path.Contains("://") || path.Contains(":///"))
+            {
+                using (UnityWebRequest www = UnityWebRequest.Get(path))
+                {
+                    yield return www.SendWebRequest();
+
+                    if (www.result == UnityWebRequest.Result.Success)
+                    {
+                        json = www.downloadHandler.text;
+                    }
+                    else
+                    {
+                        Debug.LogError($"[DungeonManager] JSON 파일 로드 에러: {www.error}");
+                    }
+                }
+            }
+            else // PC, 에디터 환경
+            {
+                if (File.Exists(path))
+                {
+                    json = File.ReadAllText(path);
+                }
+                else
+                {
+                    Debug.LogError($"[DungeonManager] JSON 파일을 찾을 수 없습니다: {path}");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(json))
+            {
+                MapData data = JsonUtility.FromJson<MapData>(json);
+                if (data != null)
+                {
+                    loadedDungeons[path] = data;
+                    SetCurrentDungeonLevel(data);
+                }
+            }
+
+            onComplete?.Invoke();
         }
     }
 }

@@ -46,6 +46,7 @@ namespace Controller
         {
             if (UI_Canvas) UI_Canvas.SetActive(false);
             if (matrixGO) matrixGO.SetActive(false);
+            
         }
 
         public void ShowAnimation()
@@ -58,6 +59,7 @@ namespace Controller
                 }
                 else
                 {
+                    targetImage.SetNativeSize();
                     Sequence seq = DOTween.Sequence();
                     seq.Append(targetImage.DOFade(1f, fadeDuration).OnComplete(() => ShowDigitalRainEffect()));
                     seq.AppendInterval(displayDuration); // 이미지 감상 시간 추가
@@ -112,7 +114,7 @@ namespace Controller
             // 스킵 시 최종 화면 상태 강제 세팅
             targetImage.sprite = backgroundImages[backgroundImages.Count - 1];
             targetImage.color = new Color(1, 1, 1, 0.85f);
-            targetImage.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
+            targetImage.SetNativeSize();
             
             ShowDigitalRainEffect();
             EnableUI();
@@ -125,8 +127,7 @@ namespace Controller
             while (true) // 무한 반복
             {
                 targetImage.sprite = backgroundImages[imageIndex];
-                targetImage.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
-
+                targetImage.SetNativeSize();
                 yield return targetImage.DOFade(1f, fadeDuration).WaitForCompletion();
 
                 // 대기
