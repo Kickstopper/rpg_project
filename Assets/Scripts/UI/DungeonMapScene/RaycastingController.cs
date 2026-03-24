@@ -45,6 +45,7 @@ namespace Controller
         private MapData _currentMap;
         private bool _canRender = true;
         private bool _inputLocked = false;
+        private float inputCooldown = 0f;
         private float _lastWPressTime = -100f;
         private bool _isScanning = false;
         private KeyCode _lastMoveKey = KeyCode.None; 
@@ -95,10 +96,18 @@ namespace Controller
         void Update()
         {
             if (!_canRender) return;
+
+            if (inputCooldown > 0)
+            {
+                inputCooldown -= Time.deltaTime;
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
             {
                 GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
-                return;  
+                inputCooldown = 0.2f;
+                return;
             }
             
             if (Input.GetKeyDown(KeyCode.O)) 
