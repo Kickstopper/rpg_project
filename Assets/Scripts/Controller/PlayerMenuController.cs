@@ -81,6 +81,7 @@ namespace Controller
                 RefreshPartyUI();
 
                 UpdateSelection(currentBtnIndex, false); 
+                ResetInputTimer();
             }
             else
             {
@@ -96,6 +97,14 @@ namespace Controller
             if (isPopupOpen) 
             {
                 HandlePopupNavigation();
+                return;
+            }
+
+            // 취소 키
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            {
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                GameStateManager.Instance.ChangeState(GameState.Exploration);
                 return;
             }
 
@@ -153,7 +162,7 @@ namespace Controller
             }
             
             // 취소 키
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
                 ResetInputTimer();
                 OnClickCancelButton();
@@ -227,13 +236,6 @@ namespace Controller
                     ResetInputTimer(); 
                     allMenuBtns[currentBtnIndex].onClick.Invoke();
                 }
-            }
-            
-            // 취소 키
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
-            {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
         }
 
@@ -381,7 +383,7 @@ namespace Controller
             }
 
             // 취소. 메인 메뉴로 복귀
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
                 CancelCharacterSelection();
             }

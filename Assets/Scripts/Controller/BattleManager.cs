@@ -399,7 +399,7 @@ namespace Controller
             
             if (isAutoMode)
             {
-                if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+                if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
                 {
                     if (!reserveAutoOff)
                     {
@@ -709,7 +709,7 @@ namespace Controller
         
         void HandleCommandInput()
         {
-            if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+            if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 
@@ -1548,7 +1548,7 @@ namespace Controller
                 fieldController.RefreshMoveHighlights(currentMoveSlotIndex); 
             }
 
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 CancelMoveSelection();
@@ -1658,7 +1658,7 @@ namespace Controller
         void HandleTargetSelectionInput()
         {
             // 취소 및 확정 입력 처리
-            bool isCancel = (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1));
+            bool isCancel = (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown());
             if (isCancel || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 if (fieldController.validTargets.Count > fieldController.currentTargetIndex)

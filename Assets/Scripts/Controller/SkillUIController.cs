@@ -116,7 +116,7 @@ namespace Controller
                 menuController.ResetInputTimer(); // 상태가 넘어간 직후 이중 입력 방지
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
                 menuController.CloseSkillUI();
             }
@@ -139,7 +139,7 @@ namespace Controller
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) AttemptSelectSkill();
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 currentState = SkillUIState.SelectCaster;
@@ -228,7 +228,7 @@ namespace Controller
                 menuController.ResetInputTimer(); // 타겟 선택 완료 후 쿨타임 갱신
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 currentState = SkillUIState.SelectSkill;

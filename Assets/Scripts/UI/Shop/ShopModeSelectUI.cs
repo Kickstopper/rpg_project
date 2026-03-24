@@ -38,6 +38,7 @@ namespace UI.Shop
 
         void Update()
         {
+            if (GameStateManager.Instance.CurrentState != GameState.Shop) return;
             if (string.IsNullOrEmpty(currentShopID)) return;
 
             bool isCurrentlyActive = IsAnySubPanelActive();
@@ -88,7 +89,7 @@ namespace UI.Shop
         private void HandleInput()
         {
             // 취소
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
             {
                 ExitShop();
                 return;

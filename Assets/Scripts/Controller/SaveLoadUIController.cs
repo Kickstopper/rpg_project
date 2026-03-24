@@ -125,7 +125,7 @@ namespace Controller
             }
 
             // 취소 (Esc / Shift / X)
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
             {
                 OnCancel();
             }

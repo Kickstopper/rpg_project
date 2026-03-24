@@ -8,6 +8,7 @@ using Data;
 using Helper;
 using System.Collections;
 using DG.Tweening;
+using Manager;
 
 namespace UI.Battle
 {
@@ -139,7 +140,7 @@ namespace UI.Battle
 
             PopulateSkillList();
 
-            // 1. 초기화 시 스탯 섹션으로 포커스
+            // 초기화 시 스탯 섹션으로 포커스
             SetSectionFocus(FocusSection.Stat);
             RefreshUI();
             
@@ -491,6 +492,8 @@ namespace UI.Battle
 
         private void Update()
         {
+            if (GameStateManager.Instance.CurrentState != GameState.Battle) return;
+            
             // 포커스 강제 유지 로직 (마우스 클릭 방어)
             if (EventSystem.current.currentSelectedGameObject != null)
             {
@@ -507,7 +510,7 @@ namespace UI.Battle
             }
 
             // 스킬 리스트가 포커스 되어 있는 상태에서 취소 처리
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
             {
                 if (currentSection == FocusSection.Skill && availablePoints == 0)
                 {

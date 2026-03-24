@@ -14,7 +14,7 @@ namespace UI.WorldMapScene
         {
             if (GameStateManager.Instance == null || GameStateManager.Instance.CurrentState != GameState.Exploration) return;
             
-            if (Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
                 ShowMenu(); 
             } 

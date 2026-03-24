@@ -24,7 +24,6 @@ namespace Controller
         public WeatherUI weatherUI;
         public GridMap miniMap;
         public AutoMapRenderer autoMapRenderer;
-        public DialogueUI dialogueUI;
         public GameObject autoMapContainer;
         public CanvasGroup fadeOverlay;
 
@@ -103,7 +102,7 @@ namespace Controller
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
                 GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
                 inputCooldown = 0.2f;
@@ -621,16 +620,8 @@ namespace Controller
             string eventID = DungeonEventManager.Instance.CheckEvent(_player.LogicX, _player.LogicY);
             if (!string.IsNullOrEmpty(eventID))
             {
-                _inputLocked = true;
-                dialogueUI.OnDialogueFinished -= OnDialogueEnd;
-                dialogueUI.OnDialogueFinished += OnDialogueEnd;
-                dialogueUI.StartDialogue(eventID);
+                GameStateManager.Instance.StartEventDialogue(eventID);
             }
-        }
-
-        private void OnDialogueEnd()
-        {
-            _inputLocked = false;
         }
 
         private void UpdateMapDiscovery(int x, int y)

@@ -49,6 +49,8 @@ namespace UI.DungeonMapScene
 
         void Update()
         {
+            if (GameStateManager.Instance.CurrentState != GameState.Exploration) return;
+            
             // 마우스 클릭 시 패널 나타남
             if (Input.GetMouseButtonDown(0))
             {
