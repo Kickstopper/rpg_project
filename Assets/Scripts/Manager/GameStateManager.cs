@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using Controller;
 using UI.Shop;
+using UI;
 public enum GameState
 {
     None,
@@ -20,6 +21,7 @@ namespace Manager
         public static GameStateManager Instance;
 
         [Header("UI Groups")]
+        public GameObject eventCanvas;       // 이벤트 UI
         public GameObject explorationCanvas; // 탐험용 UI
         public GameObject BattleCanvas;      // 전투용 UI (커맨드, 적 이미지 등)
         public GameObject menuCanvas;        // 메뉴 UI
@@ -27,6 +29,7 @@ namespace Manager
 
         public BattleManager currentBattleManager;
         public ShopModeSelectUI shopUIController;
+        public DialogueUI dialogueController;
 
         // 상태 변경 알림 이벤트
         public event Action<GameState> OnStateChanged;
@@ -50,16 +53,6 @@ namespace Manager
             }
         }
 
-        public void RegisterSceneUI(GameObject exploration, GameObject Battle, GameObject menu, GameObject shop)
-        {
-            this.explorationCanvas = exploration;
-            this.BattleCanvas = Battle;
-            this.menuCanvas = menu;
-            this.shopCanvas = shop;
-
-            RefreshUIState();
-        }
-
         public void ChangeState(GameState newState)
         {
             CurrentState = newState;
@@ -77,15 +70,20 @@ namespace Manager
         private void RefreshUIState()
         {
             // 아직 UI가 연결되지 않았다면 무시
-            if (explorationCanvas == null || BattleCanvas == null || menuCanvas == null || shopCanvas == null) return;
+            if (eventCanvas == null || explorationCanvas == null || BattleCanvas == null || menuCanvas == null || shopCanvas == null) return;
             
-            // 모든 캔버스 일단 끄기 
+            // 모든 캔버스 일단 끄기
+            eventCanvas.SetActive(false);
             explorationCanvas.SetActive(false);
             BattleCanvas.SetActive(false);
             menuCanvas.SetActive(false);
             shopCanvas.SetActive(false);
             switch (CurrentState)
             {
+                case GameState.Event:
+                    eventCanvas.SetActive(true);
+                    break;
+
                 case GameState.Exploration:
                     explorationCanvas.SetActive(true);
 
@@ -112,15 +110,17 @@ namespace Manager
         }
 
         // UI 등록 시 컨트롤러도 함께 등록받음
-        public void RegisterSceneComponents(GameObject expl, GameObject cbt, GameObject menu, GameObject shop, 
-                                            BattleManager manager, ShopModeSelectUI shopController)
+        public void RegisterSceneComponents(GameObject eventCanvas, GameObject explCanvas, GameObject battleCanvas, GameObject menuCanvas, GameObject shopCanvas, 
+                                            DialogueUI dialogUI, BattleManager battleManager, ShopModeSelectUI shopController)
         {
-            this.explorationCanvas = expl;
-            this.BattleCanvas = cbt;
-            this.menuCanvas = menu;
-            this.shopCanvas = shop;
-            this.currentBattleManager = manager;
+            this.eventCanvas = eventCanvas;
+            this.explorationCanvas = explCanvas;
+            this.BattleCanvas = battleCanvas;
+            this.menuCanvas = menuCanvas;
+            this.shopCanvas = shopCanvas;
+            this.currentBattleManager = battleManager;
             this.shopUIController = shopController;
+            this.dialogueController = dialogUI;
 
             RefreshUIState();
         }
@@ -139,6 +139,20 @@ namespace Manager
             {
                 Debug.LogError("BattleManager가 연결되지 않았습니다!");
             }
+        }
+
+        public void StartEventDialogue(string eventID)
+        {
+            if (dialogueController != null)
+            {
+                dialogueController.Initialize(eventID);
+                ChangeState(GameState.Event);
+            }
+            else
+            {
+                Debug.LogError("DialogController가 연결되지 않았습니다!");
+            }
+            
         }
 
         public void ShowShop(string shopID)

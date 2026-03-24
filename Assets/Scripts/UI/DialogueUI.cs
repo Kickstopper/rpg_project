@@ -19,8 +19,8 @@ namespace UI
 
         [Header("UI Components")]
         public GameObject uiPanel;
-        public Image portraitImageUI;   // 대화창 옆 얼굴 (Portrait)
-        public Image standingImageUI;   // 화면 중앙 전신 (Standing) - 새로 추가!
+        public Image portraitImageUI;
+        public Image standingImageUI;
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI contentText;
 
@@ -32,7 +32,6 @@ namespace UI
         private bool isTyping = false;
         private Coroutine typingCoroutine;
 
-        // 대화 종료 시 알려줄 이벤트 (C# Action)
         public event Action OnDialogueFinished;
 
         void Awake()
@@ -46,8 +45,7 @@ namespace UI
             uiPanel.SetActive(false); // 시작 시 숨김
         }
 
-        // 외부에서 호출: 대화 시작
-        public void StartDialogue(string eventID)
+        public void Initialize(string eventID)
         {
             currentEventLines = DialogueManager.Instance.GetEventData(eventID);
             
@@ -97,7 +95,6 @@ namespace UI
                     }
 
                     // 전신 이미지 적용 (Standing)
-                    // 만약 전신 이미지가 등록되어 있다면 표시, 없으면 숨김
                     if (entry.standingImage != null)
                     {
                         standingImageUI.sprite = entry.standingImage;
@@ -107,9 +104,6 @@ namespace UI
                     }
                     else
                     {
-                        // 전신 이미지는 없을 수도 있으므로(표정 변화만 있는 경우 등)
-                        // 기획에 따라 이전 이미지를 유지할지, 숨길지 결정해야 합니다.
-                        // 여기서는 '없으면 숨김'으로 처리했습니다.
                         standingImageUI.enabled = false; 
                     }
                 }
@@ -135,10 +129,10 @@ namespace UI
         {
             isTyping = true;
 
-            // TMP가 텍스트 정보를 갱신할 때까지 한 프레임 대기 (필수)
+            // TMP가 텍스트 정보를 갱신할 때까지 한 프레임 대기
             contentText.ForceMeshUpdate(); 
 
-            int totalVisibleCharacters = contentText.textInfo.characterCount; // 실제 글자 수 (태그 제외)
+            int totalVisibleCharacters = contentText.textInfo.characterCount; // 실제 글자 수
             int counter = 0;
 
             while (counter < totalVisibleCharacters)
@@ -167,28 +161,27 @@ namespace UI
         {
             if (!isDialogueActive) return;
 
-            // 입력 감지 (마우스 클릭, 스페이스바, Enter 등)
             if (Input.GetButtonDown("Submit") || Input.GetMouseButtonDown(0))
             {
                 if (isTyping)
                 {
-                    // 타이핑 중이라면 -> 즉시 완성 (Skip)
+                    // 타이핑 중이라면 즉시 완성
                     CompleteTypingImmediately();
                 }
                 else
                 {
-                    // 타이핑이 끝났다면 -> 다음 대사로
+                    // 타이핑이 끝났다면 다음 대사로
                     AdvanceLine();
                 }
             }
         }
 
-        // 타이핑 스킵: 즉시 모든 글자 표시
+        // 즉시 모든 글자 표시
         void CompleteTypingImmediately()
         {
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
             
-            contentText.maxVisibleCharacters = int.MaxValue; // 전부 표시
+            contentText.maxVisibleCharacters = int.MaxValue;
             isTyping = false;
         }
 
@@ -202,6 +195,7 @@ namespace UI
         {
             isDialogueActive = false;
             uiPanel.SetActive(false);
+            GameStateManager.Instance.ChangeState(GameState.Exploration);
             OnDialogueFinished?.Invoke();
         }
     }
