@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbd550e54fb7702488429f5a8bae4b22, type: 3}
-  m_Name: ReflectPhys
+  m_Name: Manassa_2
   m_EditorClassIdentifier: 
-  id: item_002
-  dataName: "\uAE08\uC751\uAD50"
-  description: "\uC544\uD0A8\uAD50"
+  id: item_000
+  dataName: "\uB9C8\uB0AB\uC0AC\uB514\uCF54"
+  description: "MP\uB97C \uD68C\uBCF5\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
-  effectType: 9
-  effectValue: 22
+  effectType: 14
+  effectValue: 100
   element: 6
-  targetScope: 7
-  useType: 2
+  targetScope: 8
+  useType: 0
   actionDelay: 0
   effectPrefab: {fileID: 0}
   price: 100

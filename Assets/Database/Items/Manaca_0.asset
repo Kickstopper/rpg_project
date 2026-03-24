@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbd550e54fb7702488429f5a8bae4b22, type: 3}
-  m_Name: Revive
+  m_Name: Manaca_0
   m_EditorClassIdentifier: 
-  id: item_003
-  dataName: "\uAE08\uB2E8"
-  description: "\uBD80\uD65C\uD558\uACE0 \uC2F6\uC73C\uBA74 \uAFC0\uAEBD\uD574"
+  id: item_000
+  dataName: "\uB9C8\uB098\uCE74"
+  description: "MP\uB97C \uD68C\uBCF5\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
-  effectType: 15
-  effectValue: 100
+  effectType: 14
+  effectValue: 25
   element: 6
   targetScope: 7
   useType: 0
