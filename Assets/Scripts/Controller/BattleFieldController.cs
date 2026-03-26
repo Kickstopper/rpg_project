@@ -229,10 +229,15 @@ public class BattleFieldController : MonoBehaviour
         }
     }
 
+    public MonsterDatabase.MonsterEntry GetMonsterEntry(string id)
+    {
+        return monsterDB.GetEntry(id);
+    }
+
     public void SpawnMonster(string id)
     {
         SoundManager.Instance.PlaySFX(SfxID.Encounter);
-        var entry = monsterDB.GetEntry(id);
+        var entry = GetMonsterEntry(id);
         if (entry == null) return;
         // 생성된 몬스터의 데이터를 로그에 기록 (보상 계산용)
         encounterLog.Add(entry);

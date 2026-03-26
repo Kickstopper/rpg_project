@@ -45,6 +45,8 @@ public class BattleUIController : MonoBehaviour
     public GameObject commandPanel;     // 커맨드 버튼들
     
     [Header("Log & Message")]
+    public GameObject statePanel;
+    public TextMeshProUGUI stateText;
     public GameObject logPanel;
     public TextMeshProUGUI logText;
     public GameObject messagePanel;
@@ -63,6 +65,7 @@ public class BattleUIController : MonoBehaviour
         fightCmdContainer.SetActive(false);
         commandPanel.SetActive(false);
         fightSubMenuContainer.SetActive(false);
+        HideStateMessage();
         HideLog();
         HideMessage();
     }
@@ -84,6 +87,25 @@ public class BattleUIController : MonoBehaviour
     public void HideQTESlider()
     {
         qteTimingSlider.gameObject.SetActive(false);
+    }
+
+    // 상태 메시지 표시
+    public void ShowStateMessage(string msg)
+    {
+        if (statePanel) 
+        {
+            statePanel.SetActive(true);
+            stateText.text = msg;
+        }
+    }
+
+    public void HideStateMessage()
+    {
+        if (statePanel) 
+        {
+            statePanel.SetActive(false);
+            stateText.text = string.Empty;
+        }
     }
 
     // 로그 표시

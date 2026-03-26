@@ -134,7 +134,7 @@ namespace Controller
             uiController.Initialize();
             fieldController.SetEnemyVisualsActive(false);
             
-            isAutoMode = false;         
+            isAutoMode = false;
             reserveAutoOff = false;     
             uiController.SetAutoButtonVisible(false);
 
@@ -158,11 +158,14 @@ namespace Controller
             int spawnCount = Random.Range(1, maxSpawnLimit + 1); 
 
             Debug.Log($"[Encounter] 몬스터 {spawnCount}마리가 출현합니다!");
-
+            Dictionary<string, int> monsterList = new();
             for (int i = 0; i < spawnCount; i++)
             {
                 int randomIndex = Random.Range(0, monsterIds.Count);
-                fieldController.SpawnMonster(monsterIds[randomIndex]);
+                string monsterId = monsterIds[randomIndex];
+                if (monsterList.ContainsKey(monsterId)) ++monsterList[monsterId];
+                else monsterList.Add(monsterId, 1);
+                fieldController.SpawnMonster(monsterId);
             }
             
             fieldController.SpawnParty();
@@ -186,7 +189,7 @@ namespace Controller
             {
                 fieldController.SetPlayerVisualsActive(true);
                 uiController.ShowBattleStartAnimation(()=> { 
-                    StartCoroutine(SetupBattle()); 
+                    StartCoroutine(SetupBattle(monsterList)); 
                 });
             }
         }
@@ -245,10 +248,10 @@ namespace Controller
             return EncounterType.Normal;
         }
 
-        IEnumerator SetupBattle()
+        IEnumerator SetupBattle(Dictionary<string, int> monsterList)
         {
             SoundManager.Instance.PlayBGM(BgmID.Encounter);
-
+            
             // ==========================================
             // VFX 셰이더 웜업
             Vector3 hiddenPosition = new Vector3(0, -1000f, 0);
@@ -266,25 +269,33 @@ namespace Controller
 
             yield return fieldController.Refresh();
 
+            foreach(var monster in monsterList)
+            {
+                var entry = fieldController.GetMonsterEntry(monster.Key);
+                if (entry == null) continue;
+                uiController.ShowStateMessage($"야생의 {entry.name} {monster.Value}체 출현!");
+                yield return wait05;
+            }
+            uiController.HideStateMessage();
             // 인카운터 타입 결정
             EncounterType encounterType = DetermineEncounterType();
             
             switch (encounterType)
             {
                 case EncounterType.Preemptive:
-                    uiController.ShowLog("PLAYER ADVANTAGE");
+                    uiController.ShowStateMessage("PLAYER ADVANTAGE");
                     SoundManager.Instance.PlaySFX(SfxID.Attack_Critical); // 임시
                     yield return new WaitForSeconds(1f);
-                    uiController.HideLog();
+                    uiController.HideStateMessage();
                     PreparePlayerTurn();
                     break;
 
                 case EncounterType.Ambush:
                     SoundManager.Instance.PlaySFX(SfxID.Attack_Critical); // 임시
                     yield return uiController.ShowFlashEffect();
-                    uiController.ShowLog("ENEMY ADVANTAGE"); 
+                    uiController.ShowStateMessage("ENEMY ADVANTAGE"); 
                     yield return uiController.ShowPhaseIndicator(true);
-                    uiController.HideLog();
+                    uiController.HideStateMessage();
                     ProcessEnemyTurn(); 
                     break;
 
@@ -366,8 +377,10 @@ namespace Controller
             {
                 isAutoMode = false;
                 reserveAutoOff = false;
+                
                 uiController.SetAutoButtonVisible(false);
                 Time.timeScale = 1.0f; 
+                uiController.HideStateMessage();
                 uiController.HideLog();
             }
 
@@ -964,6 +977,8 @@ namespace Controller
             uiController.SetBaseCmdVisible(false);
             uiController.SetFightCmdVisible(false);
             uiController.SetCmdPanelVisible(false);
+            
+            uiController.ShowStateMessage("파티는 죽을 각오로 싸우고 있다.");
             NextPlayerInput();
         }
 
@@ -2044,11 +2059,17 @@ namespace Controller
 
             uiController.ShowLog($"{action.actor.name}'S SKILL: {skill.dataName}");
 
+            bool isAttack = skill.effectType == EffectType.Special_Atk || skill.effectType == EffectType.Magic_Atk;
+
+            if (!isAutoMode)
+            {
+                string magType = isAttack ? "공격마법" : "보조마법";
+                uiController.ShowStateMessage($"{action.actor.name}의 {magType} {action.skillData.dataName} 발동!");
+            }
+
             foreach (var targetObj in targets)
             {
                 // 공격 계열 vs 보조 계열 분기
-                bool isAttack = skill.effectType == EffectType.Special_Atk || skill.effectType == EffectType.Magic_Atk;
-
                 if (isAttack)
                 {
                     // 공격
@@ -2106,8 +2127,9 @@ namespace Controller
                     }
                 }
             }
-
+            
             yield return wait05;
+            if (!isAutoMode) uiController.HideStateMessage();
         }
 
         IEnumerator HandleGuardAction(BattleAction action)
@@ -2479,11 +2501,18 @@ namespace Controller
             {
                 pc?.SetMessage(Random.Range(0f, 1f) < 0.5f ? "얍!" : "하이얍!");
             }
-
-            string actStr = (action.type == ActionType.Shoot) ? "'S SHOOT!" : "'S SMASH!";
+            
+            string actStr = isGunAction ? "'S SHOOT!" : "'S SMASH!";
             uiController.ShowLog($"{action.actor.name}{actStr}");
-            yield return wait10;
 
+            if (!isAutoMode)
+            {
+                string atkStr = isGunAction ? "의 총구가 불을 뿜었다!" : "(이)가 무기를 휘둘렀다!";
+                uiController.ShowStateMessage($"{action.actor.name}{atkStr}");
+            }
+            
+            yield return wait10;
+            
             pc?.SetMessage(string.Empty);
             
             // 등장 및 공격 모션 통합
@@ -2496,6 +2525,9 @@ namespace Controller
             else
                 yield return action.actor.transform.DOLocalMove(originalPos + new Vector3(0, 20f, 0), 0.15f).SetEase(Ease.OutQuad).WaitForCompletion();
 
+            if (!isAutoMode)
+                uiController.HideStateMessage();
+            
             // 타격 처리 (QTE or Auto)
             int currentHits = 0;
             int hitsPerformed = 0; // 실제로 수행한 타격 수 카운트
@@ -2812,7 +2844,7 @@ namespace Controller
         {
             state = isWin ? BattleState.Won : BattleState.Lost;
             uiController.SetCmdPanelVisible(false);
-
+            uiController.HideStateMessage();
             if (isWin)
             {
                 SoundManager.Instance.PlayBGM(BgmID.Victory);
