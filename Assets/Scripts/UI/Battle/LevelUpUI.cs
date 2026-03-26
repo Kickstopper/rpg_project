@@ -350,9 +350,11 @@ namespace UI.Battle
 
         private void UpdateStatRow(StatUIRow row, int baseVal, int allocated)
         {
+            int maxStatValue = 40;
             int total = baseVal + allocated;
+            if (total > maxStatValue) total = maxStatValue;
             row.valueText.text = total.ToString();
-            if (row.slider != null) row.slider.value = total; 
+            if (row.slider != null) row.slider.value = (float)total / maxStatValue; 
 
             row.upButton.interactable = (availablePoints > 0);
             row.downButton.interactable = (allocated > 0);
