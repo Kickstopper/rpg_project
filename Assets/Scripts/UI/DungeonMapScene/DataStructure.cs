@@ -1,5 +1,6 @@
 using UnityEngine;
 using Data;
+using System;
 
 namespace UI.DungeonMapScene
 {
@@ -23,6 +24,16 @@ namespace UI.DungeonMapScene
         public Vector2 screenScale = new Vector2(2.5f, 2.8125f);
         
         [Header("Visual Effects")]
+        public bool useOrganicEffect = false;
+        public float organicFreqX = 4f;   // 벽 수평 노이즈 빈도
+        public float organicSpeed = 0.3f;   // 꿈틀거림 속도
+        [Range(0, 1f)]public float organicBreath    = 0.35f;   // amplitude 자체가 숨쉬는 강도
+        [Range(-1f, 1f)] public float organicAmplitude = 0.2f;  // 최대 거리 왜곡 강도
+        [NonSerialized] public float organicTime; // Time.time
+
+        public bool useMeltEffect = false;
+        public float meltEdgeBump = 1f;
+
         public bool useWallDistortion = false;
         public float distortionFreq = 0.5f;
         public float distortionAmp = 2.0f;

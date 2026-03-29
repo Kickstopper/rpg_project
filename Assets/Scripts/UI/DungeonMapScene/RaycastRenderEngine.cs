@@ -97,6 +97,9 @@ namespace UI.DungeonMapScene
         // ================= 메인 렌더링 루프 =================
         public void RenderFrame(DungeonPlayer player, RenderSettings settings)
         {
+            // 유기체 애니메이션을 위한 주입
+            settings.organicTime = Time.time;
+
             Array.Clear(_buffer, 0, _buffer.Length);
             Array.Clear(_zBuffer, 0, _zBuffer.Length);
 
@@ -240,7 +243,32 @@ namespace UI.DungeonMapScene
                     perpWallDist *= (1.0f + distFactor * settings.cylinderStrength);
                 }
                 if (perpWallDist <= 0.001f) perpWallDist = 0.001f;
+                
+                float wallX;
+                if (side == 0) wallX = py + perpWallDist * rayDirY;
+                else wallX = px + perpWallDist * rayDirX;
+                wallX -= (int)wallX;
 
+                if (settings.useOrganicEffect)
+                {
+                    float t = settings.organicTime * settings.organicSpeed;
+
+                    // 각 지점이 독립적으로 꿈틀거리도록 공간 + 시간 노이즈
+                    float spatialSeed = wallX * settings.organicFreqX;
+                    float noise = Mathf.PerlinNoise(spatialSeed, t);          // 0~1
+                    noise = noise * 2f - 1f;                                  // -1~1
+
+                    // 느린 사인파 * 노이즈로 비규칙적 호흡
+                    float breathNoise = Mathf.PerlinNoise(spatialSeed * 0.3f, t * 0.4f);
+                    float liveAmplitude = settings.organicAmplitude
+                                        * Mathf.Lerp(1f - settings.organicBreath,
+                                                    1f,
+                                                    breathNoise);
+
+                    perpWallDist += noise * liveAmplitude;
+                    if (perpWallDist <= 0.001f) perpWallDist = 0.001f;
+                }
+                
                 // 화면 높이 계산
                 float hScale = 0.66f; 
                 int horizon = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
@@ -248,10 +276,14 @@ namespace UI.DungeonMapScene
                 int drawStart = Mathf.Max(0, -lineHeight / 2 + horizon);
                 int drawEnd = Mathf.Min(_screenHeight - 1, lineHeight / 2 + horizon);
 
-                float wallX;
-                if (side == 0) wallX = py + perpWallDist * rayDirY;
-                else wallX = px + perpWallDist * rayDirX;
-                wallX -= (int)wallX;
+                if (settings.useMeltEffect)
+                {
+                    float bumpSeed = wallX * 8.0f + x * 0.005f;
+                    int bump = (int)((Mathf.PerlinNoise(bumpSeed, 0.5f) * 2f - 1f) 
+                                    * settings.meltEdgeBump);
+                    drawStart = Mathf.Max(0, drawStart + bump);
+                    drawEnd   = Mathf.Min(_screenHeight - 1, drawEnd + bump);
+                }
 
                 int texX = (int)(wallX * _texWidth);
                 if ((side == 0 && rayDirX > 0) ^ hitBackFace) texX = _texWidth - texX - 1;
@@ -293,11 +325,14 @@ namespace UI.DungeonMapScene
                     else
                     {
                         int sTexX = texX;
-                        if (settings.useWallDistortion)
-                            sTexX = (int)(texX + Mathf.Sin((y + x) * settings.distortionFreq) * settings.distortionAmp) & (_texWidth - 1);
-
                         int d = y * 256 - _screenHeight * 128 + lineHeight * 128 - (int)player.Pitch * 256 + (int)player.JumpOffset * 256;
                         int texY = ((d * _texHeight) / lineHeight) / 256;
+
+                        if (settings.useWallDistortion) {
+                            sTexX = (int)(texX + Mathf.Sin((y + x) * settings.distortionFreq) * settings.distortionAmp) & (_texWidth - 1);
+                            float noiseY = Mathf.PerlinNoise(texX * 0.1f, y * settings.distortionFreq);
+                            texY = Mathf.Clamp((int)(texY + (noiseY * 2f - 1f) * settings.distortionAmp), 0, _texHeight - 1);
+                        }
                         
                         col = GetPixelFast(hitTexId, sTexX, texY);
                         if (lightScale < 255) ApplyLight(ref col, lightScale);
