@@ -792,9 +792,10 @@ namespace Controller
 
             // 서브 메뉴 리스트 구성
             List<Button> subButtons = new List<Button>();
-            float posY = -112f;
+            float posY = 0;
             if (menuType == ActionType.Menu_Gun)
             {
+                posY = -132f;
                 // 쏠 수 없으면 Shoot 버튼은 비활성화
                 bool canShoot = actor.CanShootGun() && actor.currentGunAmmo > 0;
                 AddSubButton(ActionType.Shoot, canShoot, subButtons); 
@@ -805,13 +806,13 @@ namespace Controller
             }
             else if (menuType == ActionType.Menu_Extra)
             {
-                posY -= 32f;
+                posY = -194f;
                 AddSubButton(ActionType.Move, true, subButtons);
                 AddSubButton(ActionType.Guard, true, subButtons);
             }
             else if (menuType == ActionType.Menu_Tactics)
             {
-                posY -= 64f;
+                posY = -254f;
                 bool canUnion = CheckUnionAttackCondition(actor);
                 bool canLastStand = CheckLastStandCondition(actor); 
                 bool canRollingVulcan = CheckRollingVulcanCondition(actor);

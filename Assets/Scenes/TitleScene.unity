@@ -1724,7 +1724,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 484d98ce6299154429972dd7943e8054, type: 2}
   - {fileID: 11400000, guid: fcedda8f1ebfed94eb8db02addf7d512, type: 2}
   - {fileID: 11400000, guid: 56f2cae6d85bce846a3f635b2013062f, type: 2}
-  ownedModules: 04000000030000000100000007000000
+  ownedModules: 04000000030000000100000002000000
   mountedModules:
   - feature: 4
     x: 0
@@ -1738,7 +1738,7 @@ MonoBehaviour:
     x: 2
     y: 1
     rotation: 0
-  - feature: 7
+  - feature: 2
     x: 3
     y: 3
     rotation: 0
@@ -1788,12 +1788,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd48513f7f0b70442a4300f0d6645277, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager.GameStateManager
+  eventCanvas: {fileID: 0}
   explorationCanvas: {fileID: 0}
   BattleCanvas: {fileID: 0}
   menuCanvas: {fileID: 0}
   shopCanvas: {fileID: 0}
   currentBattleManager: {fileID: 0}
   shopUIController: {fileID: 0}
+  dialogueController: {fileID: 0}
   canHardSave: 0
 --- !u!1 &920790046
 GameObject:

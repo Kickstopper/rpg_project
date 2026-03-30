@@ -260,12 +260,12 @@ public class BattleUIController : MonoBehaviour
     }
 
 
-    // 공식: (버튼 개수 * 30) + 10
+    // 공식: (버튼 개수 * 60) + 10
     private void ResizeContainer(RectTransform container, int count)
     {
         if (container != null)
         {
-            float newHeight = (count * 30f) + 10f;
+            float newHeight = (count * 60f) + 10f;
             container.sizeDelta = new Vector2(container.sizeDelta.x, newHeight);
         }
     }
