@@ -312,9 +312,20 @@ namespace Controller
                 }
                 else
                 {
-                    // 입구도 없다면 벽 충돌 처리
-                    StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
-                    SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
+                    CellData targetCell = _currentMap.GetCell(tx, ty);
+                    bool isVoidTile = (targetCell != null && targetCell.value == -1);
+
+                    if (!isVoidTile)
+                    {
+                        // 일반 벽일 경우에만 충돌 애니메이션과 사운드 재생
+                        StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
+                        SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
+                    }
+                    else
+                    {
+                        // 구멍(void) 앞에서는 아무런 피드백 없이 이동만 무시
+                        Debug.Log("Void tile ahead. Movement blocked silently.");
+                    }
                 }
             }
         }

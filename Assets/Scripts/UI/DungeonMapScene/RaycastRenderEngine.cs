@@ -98,7 +98,7 @@ namespace UI.DungeonMapScene
         public void RenderFrame(DungeonPlayer player, RenderSettings settings)
         {
             // 유기체 애니메이션을 위한 주입
-            settings.organicTime = Time.time;
+            settings.animTime = Time.time;
 
             Array.Clear(_buffer, 0, _buffer.Length);
             Array.Clear(_zBuffer, 0, _zBuffer.Length);
@@ -193,6 +193,11 @@ namespace UI.DungeonMapScene
                 else { stepY = 1; sideDistY = (mapY + 1.0f - py) * deltaDistY; }
 
                 // DDA 알고리즘
+                float voidEdgeDist = -1f;
+                int   voidEdgeSide = 0;
+                int   clipY = 0; // 앞쪽 바닥에 의해 가려지는 한계선(화면 Y좌표)
+                int horizon = 0;
+
                 while (hit == 0)
                 {
                     int prevX = mapX, prevY = mapY;
@@ -203,21 +208,63 @@ namespace UI.DungeonMapScene
                     {
                         hit = 1; hitBackFace = true;
                         hitTexId = GetBoundaryTex(prevX, prevY, side, stepX, stepY);
+                        CellData prevCell = _worldMap.GetCell(prevX, prevY);
+                        bool isPrevSolid = (prevCell != null && prevCell.value != -1);
+                        if (!isPrevSolid && voidEdgeDist < 0f)
+                        {
+                            voidEdgeDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
+                            voidEdgeSide = side;
+                        }
                     }
                     else
                     {
-                        CellData c = _worldMap.GetCell(mapX, mapY);
-                        if (c != null && c.HasWall())
+                        CellData prevCell = _worldMap.GetCell(prevX, prevY);
+                        CellData currCell = _worldMap.GetCell(mapX,  mapY);
+
+                        bool isPrevSolid = (prevCell != null && prevCell.value != -1);
+                        bool isCurrSolid = (currCell != null && currCell.value != -1);
+
+                        // Solid에서 Void로 (가까운 구멍 경계). 이 경계보다 아래쪽(작은 Y)은 앞쪽 바닥이므로 그리지 못하게 막음
+                        if (isPrevSolid && !isCurrSolid && voidEdgeDist < 0f)
                         {
-                            int fId = GetTextureIdOnSide(c, side, stepX, stepY, false);
+                            float nearDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
+                            
+                            // 가림선(clipY)에도 벽과 동일한 실린더 효과를 적용하여 어긋남 방지
+                            if (settings.useCylinderEffect)
+                            {
+                                float distFactor = cameraX * cameraX;
+                                nearDist *= (1.0f + distFactor * settings.cylinderStrength);
+                            }
+                            
+                            if (nearDist <= 0.001f) nearDist = 0.001f;
+                            int nearLineHeight = (int)((_screenHeight / nearDist) * 0.66f);
+                            horizon = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
+                            int currentClipY = horizon - nearLineHeight / 2;
+                            
+                            clipY = Mathf.Max(clipY, currentClipY); 
+                        }
+
+                        // Void에서 Solid로 (먼 구멍 경계 또는 측면). 실제로 화면에 보일 내벽 저장
+                        if (!isPrevSolid && isCurrSolid)
+                        {
+                            if (voidEdgeDist < 0f) // 첫 번째로 마주친 구멍 내벽만 저장
+                            {
+                                voidEdgeDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
+                                voidEdgeSide = side;
+                            }
+                        }
+
+                        // (기존 로직 유지) 벽 충돌 처리
+                        if (currCell != null && currCell.HasWall())
+                        {
+                            int fId = GetTextureIdOnSide(currCell, side, stepX, stepY, false);
                             if (fId != -1) { hit = 1; hitTexId = fId; hitBackFace = false; }
                         }
                         if (hit == 0)
                         {
-                            c = _worldMap.GetCell(prevX, prevY);
-                            if (c != null && c.HasWall())
+                            if (prevCell != null && prevCell.HasWall())
                             {
-                                int bId = GetTextureIdOnSide(c, side, stepX, stepY, true);
+                                int bId = GetTextureIdOnSide(prevCell, side, stepX, stepY, true);
                                 if (bId != -1) { hit = 1; hitTexId = bId; hitBackFace = true; }
                             }
                         }
@@ -247,11 +294,11 @@ namespace UI.DungeonMapScene
                 float wallX;
                 if (side == 0) wallX = py + perpWallDist * rayDirY;
                 else wallX = px + perpWallDist * rayDirX;
-                wallX -= (int)wallX;
+                wallX -= Mathf.Floor(wallX);
 
                 if (settings.useOrganicEffect)
                 {
-                    float t = settings.organicTime * settings.organicSpeed;
+                    float t = settings.animTime * settings.organicSpeed;
 
                     // 각 지점이 독립적으로 꿈틀거리도록 공간 + 시간 노이즈
                     float spatialSeed = wallX * settings.organicFreqX;
@@ -271,7 +318,7 @@ namespace UI.DungeonMapScene
                 
                 // 화면 높이 계산
                 float hScale = 0.66f; 
-                int horizon = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
+                horizon = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
                 int lineHeight = (int)((_screenHeight / perpWallDist) * hScale);
                 int drawStart = Mathf.Max(0, -lineHeight / 2 + horizon);
                 int drawEnd = Mathf.Min(_screenHeight - 1, lineHeight / 2 + horizon);
@@ -279,8 +326,8 @@ namespace UI.DungeonMapScene
                 if (settings.useMeltEffect)
                 {
                     float bumpSeed = wallX * 8.0f + x * 0.005f;
-                    int bump = (int)((Mathf.PerlinNoise(bumpSeed, 0.5f) * 2f - 1f) 
-                                    * settings.meltEdgeBump);
+                    float t = settings.animTime * settings.meltEdgeSpeed;
+                    int bump = (int)((Mathf.PerlinNoise(bumpSeed, t) * 2f - 1f) * settings.meltEdgeBump);
                     drawStart = Mathf.Max(0, drawStart + bump);
                     drawEnd   = Mathf.Min(_screenHeight - 1, drawEnd + bump);
                 }
@@ -348,6 +395,106 @@ namespace UI.DungeonMapScene
                         }
                     }
                 }
+
+                // void 내벽. horizon부터 그려서 본 벽 하단을 덮어씀
+                if (voidEdgeDist > 0f)
+                {
+                    if (settings.useCylinderEffect)
+                    {
+                        float distFactor = cameraX * cameraX;
+                        voidEdgeDist *= (1.0f + distFactor * settings.cylinderStrength);
+                    }
+
+                    DrawVoidWall(x, voidEdgeSide, stepX, stepY,
+                                px, py, rayDirX, rayDirY,
+                                voidEdgeDist, clipY, // <--- clipY 매개변수 추가
+                                player, settings, step,
+                                pulseColor, wireframeColor, pulseWidth);
+                }
+            }
+        }
+
+        private void DrawVoidWall(
+            int x, int side, int stepX, int stepY,
+            float px, float py, float rayDirX, float rayDirY,
+            float perpVoidDist, int clipY,
+            DungeonPlayer player, RenderSettings settings, int step,
+            Color32 pulseColor, Color32 wireframeColor, float pulseWidth)
+        {
+            if (perpVoidDist <= 0.001f) perpVoidDist = 0.001f;
+
+            float voidWallX = (side == 0)
+                ? (py + perpVoidDist * rayDirY)
+                : (px + perpVoidDist * rayDirX);
+            voidWallX -= Mathf.Floor(voidWallX);
+
+            int voidTexX = (int)(voidWallX * _texWidth);
+            if ((side == 0 && rayDirX > 0)) voidTexX = _texWidth - voidTexX - 1;
+            if ((side == 1 && rayDirY < 0)) voidTexX = _texWidth - voidTexX - 1;
+
+            float hScale     = 0.66f;
+            int horizon    = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
+            int lineHeight = (int)((_screenHeight / perpVoidDist) * hScale);
+            int voidHeight = (int)(lineHeight * settings.voidWallHeightScale);
+
+            int floorEdgeY = horizon - lineHeight / 2;
+
+            // 바닥선(floorEdgeY)에서 구멍 깊이(voidHeight)만큼 아래로 내려간 곳부터 바닥선까지 위로 그려줌
+            int rawDrawStart = floorEdgeY - voidHeight; // 원래 그려져야 할 바닥 좌표
+            int drawStart = Mathf.Max(0, rawDrawStart);
+            drawStart = Mathf.Max(drawStart, clipY);    // 앞쪽 바닥(clipY) 이하로는 그리지 않음
+            
+            int drawEnd = Mathf.Max(0, floorEdgeY);
+
+            if (drawStart >= drawEnd) return;
+
+            int lightScale = (int)(Mathf.Clamp(
+                settings.lightingIntensity / perpVoidDist, 0f, 1f) * 255);
+            if (side == 1) lightScale = (lightScale * 180) >> 8;
+
+            float stepVal = 1.0f * _texHeight / voidHeight;
+            
+            // 텍스처 시작점을 0(밑바닥)으로 잡고, 화면 밑(y < 0)으로 잘려나간 만큼 보정
+            float texPos = 0f;
+            if (drawStart > rawDrawStart)
+            {
+                texPos = (drawStart - rawDrawStart) * stepVal;
+            }
+
+            bool isWire  = _isScanning && (perpVoidDist < _currentScanRadius);
+            bool isPulse = isWire && Mathf.Abs(perpVoidDist - _currentScanRadius) < pulseWidth;
+            bool isVEdge = isWire && (voidTexX == 0 || voidTexX == _texWidth - 1);
+
+            for (int y = drawStart; y < drawEnd; y++) 
+            {
+                int voidTexY = (int)texPos & (_texHeight - 1);
+                texPos += stepVal;
+
+                Color32 col;
+                if (isWire)
+                {
+                    bool isHEdge = (y == drawStart || y == drawEnd - 1);
+                    col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
+                }
+                else
+                {
+                    col = GetPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
+                    
+                    // y가 drawStart(바닥)일 때 0.2, drawEnd(천장)일 때 1.0이 되는 계수 계산. 0.2는 최소 밝기
+                    float verticalFactor = Mathf.Clamp01((float)(y - drawStart) / (drawEnd - drawStart));
+                    float depthDimmer = Mathf.Lerp(0.2f, 1.0f, verticalFactor); 
+                    
+                    int finalLight = (int)(lightScale * depthDimmer);
+
+                    if (finalLight < 255) ApplyLight(ref col, finalLight);
+                }
+
+                int bIdx = y * _screenWidth + x;
+                for (int s = 0; s < step; s++)
+                {
+                    if (x + s < _screenWidth)
+                        _buffer[bIdx + s] = col;
+                }
             }
         }
 
@@ -392,22 +539,31 @@ namespace UI.DungeonMapScene
 
                 // 조명 역시 가로줄은 rowDist가 동일하므로 밖에서 한 번만 계산
                 int lightScale = 255;
-                if (!isRowScanned)
-                {
-                    if (settings.useGridLighting)
-                        lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / rowDist, 0f, 1f) * 255);
-                    else
-                        lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / rowDist, 0f, 1f) * 255);
-                }
+                if (!isRowScanned) 
+                    lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / rowDist, 0f, 1f) * 255);
 
                 for (int x = 0; x < _screenWidth; x += step)
                 {
-                    Color32 col;
-                    
                     int cellX = (int)floorX;
                     int cellY = (int)floorY;
 
-                    if (isRowScanned)
+                    CellData cell = _worldMap.GetCell(cellX, cellY);
+                    bool isVoid = isFloor && (cell != null && cell.value == -1);
+                    Color32 col;
+
+                    if (isVoid)
+                    {
+                        // 바닥을 검게
+                        float darkness = Mathf.Clamp01(1f - rowDist / settings.voidDepthScale);
+                        byte bright = (byte)(darkness * 60f); // 최대 밝기 60
+                        col = new Color32(bright, bright, bright, 255);
+                        // float tx = floorX - cellX; // 0~1, 셀 내 위치
+                        // float ty = floorY - cellY;
+                        // float edgeDist = Mathf.Min(tx, 1f - tx, ty, 1f - ty); // 가장 가까운 경계까지 거리
+                        // float shadow = Mathf.Clamp01(edgeDist * 6f);           // 경계에 가까울수록 0
+                        // ApplyLight(ref col, (int)(shadow * lightScale));
+                    }
+                    else if (isRowScanned)
                     {
                         int tx = (int)(_texWidth * (floorX - cellX)) & (_texWidth - 1);
                         int ty = (int)(_texHeight * (floorY - cellY)) & (_texHeight - 1);

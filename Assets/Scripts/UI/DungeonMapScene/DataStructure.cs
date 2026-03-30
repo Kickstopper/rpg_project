@@ -29,10 +29,12 @@ namespace UI.DungeonMapScene
         public float organicSpeed = 0.3f;   // 꿈틀거림 속도
         [Range(0, 1f)]public float organicBreath    = 0.35f;   // amplitude 자체가 숨쉬는 강도
         [Range(-1f, 1f)] public float organicAmplitude = 0.2f;  // 최대 거리 왜곡 강도
-        [NonSerialized] public float organicTime; // Time.time
-
+        
         public bool useMeltEffect = false;
         public float meltEdgeBump = 1f;
+        public float meltEdgeSpeed = 0.3f;   // 흘러내림 속도
+
+        [NonSerialized] public float animTime; // Time.time
 
         public bool useWallDistortion = false;
         public float distortionFreq = 0.5f;
@@ -54,6 +56,11 @@ namespace UI.DungeonMapScene
         public float pulseWidth = 0.5f;
         public float scanWaitTime = 2.0f;
         public float returnSpeedMultiplier = 1.5f;
+
+        [Header("Floor")]
+        public float voidDepthScale = 3.0f; // 클수록 구멍이 더 밝고 얕아 보임
+        public float voidWallHeightScale = 1f; // 구멍 벽 높이 비율 (낮을수록 깊어 보임)
+        public int voidWallTexIdx = 0; // 
     }
 
     // 스프라이트 정렬용 구조체

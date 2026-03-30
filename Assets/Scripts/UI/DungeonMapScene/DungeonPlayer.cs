@@ -297,6 +297,9 @@ namespace UI.DungeonMapScene
             // 목표 셀이 없거나 null이면 이동 불가 (안전장치)
             if (targetCell == null) return false;
 
+            // 목표 셀이 void(-1) 바닥인 경우 이동 불가
+            if (targetCell.value == -1) return false;
+
             // 목표 셀에 벽이 있다면 진입 방향의 면을 검사
             if (targetCell.HasWall() && targetEnterFace != -1)
             {
