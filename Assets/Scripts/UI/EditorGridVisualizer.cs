@@ -1,5 +1,6 @@
 using UnityEngine;
 using Data;
+using System.Collections.Generic;
 namespace UI
 {
     public class EditorGridVisualizer : MonoBehaviour
@@ -16,7 +17,7 @@ namespace UI
         };
 
         // 선택된 셀 좌표 (DungeonMapEditor에서 갱신)
-        public Vector2Int selectedCoord = new Vector2Int(-1, -1);
+        public List<Vector2Int> selectedCoords = new List<Vector2Int>();
 
         void OnDrawGizmos()
         {
@@ -27,22 +28,16 @@ namespace UI
                 CellData cell = mapData.cells[i];
                 Vector3 center = GetCellCenter(cell.x, cell.y);
 
-                
-                // 바닥 그리기 (항상 회색)
-                
-                
-                // (1) 바닥 면 채우기 (Solid)
+                // 바닥 면 채우기
                 Gizmos.color = Color.gray; 
-                // 높이(Y)를 0.1f로 주어 얇은 판처럼 그립니다.
-                Gizmos.DrawCube(center, new Vector3(cellSize, 0.1f, cellSize)); 
+                Gizmos.DrawCube(center, new Vector3(cellSize, 0.1f, cellSize)); // 바닥 면의 높이를 0.1f로
 
-                // (2) 바닥 테두리 그리기 (Grid Line)
-                // 회색 바닥끼리 겹치면 경계가 안 보이므로, 검은색 선으로 테두리를 그립니다.
+                // 테두리 그리기
                 Gizmos.color = Color.black;
                 Gizmos.DrawWireCube(center, new Vector3(cellSize, 0.1f, cellSize));
 
                 // 벽 그리기 로직 (isWall이 true일 때만 텍스처 검사)
-                // 각 방향별로 텍스처 ID가 유효하면(-1 아님) 그 면을 그림
+                // 각 방향별로 텍스처 ID가 -1이 아니면 그 면을 그림
                 
                 // North (Z+)
                 if (cell.wallTextureIDs[0] >= 0) 
@@ -61,11 +56,8 @@ namespace UI
                     DrawWallFace(center, Vector3.left, cell.wallTextureIDs[3]);
             }
 
-            // 선택된 셀 하이라이트 (깜빡임 효과)
-            if (selectedCoord.x >= 0 && selectedCoord.y >= 0)
-            {
-                HighlightSelectedCell();
-            }
+            // 선택된 셀 하이라이트
+            if (selectedCoords != null && selectedCoords.Count > 0) HighlightSelectedCells();
 
             // 플레이어 시작 위치 및 방향 그리기
             DrawPlayerStart(); 
@@ -202,17 +194,17 @@ namespace UI
             return new Vector3(x * cellSize + cellSize * 0.5f, 0, y * cellSize + cellSize * 0.5f);
         }
 
-        void HighlightSelectedCell()
+        void HighlightSelectedCells()
         {
-            Vector3 center = GetCellCenter(selectedCoord.x, selectedCoord.y);
-            Vector3 drawCenter = center + Vector3.up * (wallHeight * 0.5f);
-            
-            // 깜빡이는 노란색 박스
             float alpha = Mathf.PingPong(Time.realtimeSinceStartup * 3.0f, 0.5f) + 0.1f;
-            Gizmos.color = new Color(1f, 0.92f, 0.016f, alpha);
-            
-            // 선택 박스는 벽보다 살짝 크게 그려서 덮어씌움
-            Gizmos.DrawWireCube(drawCenter, new Vector3(cellSize * 1.05f, wallHeight * 1.05f, cellSize * 1.05f));
+
+            foreach (var coord in selectedCoords)
+            {
+                Vector3 center = GetCellCenter(coord.x, coord.y);
+                Vector3 drawCenter = center + Vector3.up * (wallHeight * 0.5f);
+                Gizmos.color = new Color(1f, 0.92f, 0.016f, alpha);
+                Gizmos.DrawWireCube(drawCenter, new Vector3(cellSize * 1.05f, wallHeight * 1.05f, cellSize * 1.05f));
+            }
         }
     }
 }
