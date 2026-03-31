@@ -4093,6 +4093,14 @@ MonoBehaviour:
     screenWidth: 512
     screenHeight: 256
     screenScale: {x: 12.8, y: 7.2}
+    useOrganicEffect: 0
+    organicFreqX: 4
+    organicSpeed: 0.3
+    organicBreath: 0.35
+    organicAmplitude: 0.2
+    useMeltEffect: 0
+    meltEdgeBump: 1
+    meltEdgeSpeed: 0.3
     useWallDistortion: 0
     distortionFreq: 0.5
     distortionAmp: 2
@@ -4115,6 +4123,9 @@ MonoBehaviour:
     pulseWidth: 0.5
     scanWaitTime: 2
     returnSpeedMultiplier: 1.5
+    voidDepthScale: 3
+    voidWallHeightScale: 1
+    voidWallTexIdx: 0
   backwardOffset: 0.499
   fovScale: 1
   screenImage: {fileID: 2114126939}

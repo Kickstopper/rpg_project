@@ -35,6 +35,11 @@ namespace Controller
         [Header("Encounter System")]
         public EncounterSystem encounterSystem;
 
+        // 시점 상태 관리
+        public enum LookState { None, Up, Down }
+        private LookState _currentLookState = LookState.None;
+        private bool _isLookTransitioning = false; // 시점이 부드럽게 변하는 애니메이션 중인지 여부
+
         // 서브 시스템
         private RaycastRenderEngine _renderer;
         private DungeonPlayer _player;
@@ -199,20 +204,64 @@ namespace Controller
         // ================= Input & Logic =================
         private void HandleInput()
         {
+            // 시점 전환 애니메이션 중이면 다른 입력 무시
+            if (_isLookTransitioning) return;
+
+            // 올려보기/내려보기 상태 유지 중일 때의 처리
+            if (_currentLookState != LookState.None)
+            {
+                if (Input.anyKeyDown)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                    {
+                        // 아래를 보고 있을 때만 구멍 체크 실행
+                        if (_currentLookState == LookState.Down)
+                        {
+                            Vector2Int fwd = _player.GetForwardVector();
+                            int tx = _player.LogicX + fwd.x;
+                            int ty = _player.LogicY + fwd.y;
+
+                            CellData targetCell = _currentMap.GetCell(tx, ty);
+                            
+                            // 앞 타일이 구멍(value == -1)인지 확인
+                            if (targetCell != null && targetCell.value == -1)
+                            {
+                                // 해당 좌표에 설정된 목적지 정보(EntranceData)가 있는지 확인
+                                EntranceData holeEntrance = _currentMap.GetEntranceAt(tx, ty);
+                                
+                                if (holeEntrance != null)
+                                {
+                                    StartCoroutine(JumpDownRoutine(holeEntrance, fwd));
+                                    return; // 아래 복귀 로직 실행 방지
+                                }
+                            }
+                        }
+                    }
+
+                    // 확인 키가 아니거나 구멍이 아니면 평소대로 복귀
+                    if (!_isLookTransitioning) 
+                        StartCoroutine(TransitionLookState(LookState.None));
+                }
+                return;
+            }
+
             if (_inputLocked) return;
-
-            if (Input.GetKey(KeyCode.LeftShift))
+            
+            // 올려보기 및 내려보기
+            if (Input.GetKey(KeyCode.LeftShift) && !_player.IsMoving)
             {
-                if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) _player.Pitch -= 300f * Time.deltaTime;
-                if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) _player.Pitch += 300f * Time.deltaTime;
+                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+                {
+                    StartCoroutine(TransitionLookState(LookState.Up));
+                    return;
+                }
+                if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+                {
+                    StartCoroutine(TransitionLookState(LookState.Down));
+                    return;
+                }
             }
-            else
-            {
-                if (Mathf.Abs(_player.Pitch) > 1f)
-                    _player.Pitch = Mathf.Lerp(_player.Pitch, 0f, Time.deltaTime * 5f);
-            }
-            _player.Pitch = Mathf.Clamp(_player.Pitch, -150f, 150f);
-
+            
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
             if (Input.GetKeyDown(KeyCode.M))
             {
@@ -285,7 +334,126 @@ namespace Controller
             }
         }
 
-        // 입구 체크 로직 추가
+        // 올려보기 내려보기 코루틴
+        private IEnumerator TransitionLookState(LookState targetState)
+        {
+            _isLookTransitioning = true;
+            
+            float startPitch = _player.Pitch;
+            float endPitch = 0f;
+            if (targetState == LookState.Up) endPitch = -100f;
+            else if (targetState == LookState.Down) endPitch = 100f;
+
+            float startOffset = _player.BackwardOffset;
+            float endOffset = (targetState == LookState.None) ? this.backwardOffset : 0f;
+
+            float duration = 0.3f;
+            float elapsed = 0f;
+
+            // 애니메이션
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                
+                t = t * t * (3f - 2f * t); // SmoothStep을 적용하여 시작과 끝을 더 부드럽게 감속
+
+                _player.Pitch = Mathf.Lerp(startPitch, endPitch, t);
+                _player.BackwardOffset = Mathf.Lerp(startOffset, endOffset, t);
+
+                // BackwardOffset이 변하므로 플레이어의 논리좌표 내의 물리적 위치를 재계산
+                Vector2 updatedPos = _player.GetOffsetPosition(_player.LogicX, _player.LogicY, _player.DirectionIdx);
+                _player.SetDirectPosition(updatedPos.x, updatedPos.y, _player.DirectionIdx);
+
+                yield return null;
+            }
+
+            // 최종 값 오차 보정
+            _player.Pitch = endPitch;
+            _player.BackwardOffset = endOffset;
+            
+            Vector2 finalPos = _player.GetOffsetPosition(_player.LogicX, _player.LogicY, _player.DirectionIdx);
+            _player.SetDirectPosition(finalPos.x, finalPos.y, _player.DirectionIdx);
+
+            _currentLookState = targetState;
+            _isLookTransitioning = false;
+        }
+
+        private IEnumerator JumpDownRoutine(EntranceData entrance, Vector2Int moveDir)
+        {
+            _isLookTransitioning = true;
+            _inputLocked = true;
+
+            // 낙하 애니메이션
+            float elapsed = 0f;
+            float duration = 0.8f;
+            
+            float startPosX = _player.PosX;
+            float startPosY = _player.PosY;
+            float startPitch = _player.Pitch;
+
+            // 구멍의 중앙 좌표
+            float targetPosX = _player.LogicX + moveDir.x + 0.5f;
+            float targetPosY = _player.LogicY + moveDir.y + 0.5f;
+            float targetPitch = 300f; // 바닥을 뚫고 지나가는 느낌을 주기 위해 Pitch를 크게 증가
+
+            if (fadeOverlay != null) fadeOverlay.blocksRaycasts = true;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                float easeIn = t * t; // 가속도 효과
+
+                // 구멍 안쪽으로 이동
+                _player.SetDirectPosition(
+                    Mathf.Lerp(startPosX, targetPosX, t),
+                    Mathf.Lerp(startPosY, targetPosY, t),
+                    _player.DirectionIdx
+                );
+
+                // 시점 낙하 연출
+                _player.Pitch = Mathf.Lerp(startPitch, targetPitch, easeIn);
+
+                // 마지막 0.3초 동안 페이드 아웃
+                if (fadeOverlay != null && t > 0.6f)
+                {
+                    fadeOverlay.alpha = (t - 0.6f) / 0.4f;
+                }
+
+                yield return null;
+            }
+
+            // 레벨 전환
+            DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
+            DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
+            
+            // 새로운 맵 로드
+            LoadMapData(entrance);
+            
+            yield return new WaitForSeconds(0.3f);
+
+            // 페이드 인 및 상태 초기화
+            if (fadeOverlay != null)
+            {
+                float fadeElapsed = 0f;
+                while (fadeElapsed < 0.5f)
+                {
+                    fadeElapsed += Time.deltaTime;
+                    fadeOverlay.alpha = 1f - (fadeElapsed / 0.5f);
+                    yield return null;
+                }
+                fadeOverlay.alpha = 0f;
+                fadeOverlay.blocksRaycasts = false;
+            }
+
+            _player.Pitch = 0f;
+            _player.BackwardOffset = this.backwardOffset; // 오프셋 복구
+            _currentLookState = LookState.None;
+            _inputLocked = false;
+            _isLookTransitioning = false;
+        }
+        
         private void PerformMove(Vector2Int moveVec)
         {
             int tx = _player.LogicX + moveVec.x;

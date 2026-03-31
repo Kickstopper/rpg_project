@@ -26,7 +26,7 @@ namespace UI.DungeonMapScene
         public float JumpOffset { get; private set; } = 0f;
         
         private readonly float _fovScale;
-        private readonly float _backwardOffset;
+        public float BackwardOffset { get; set; }
         
         private MonoBehaviour _runner; // 코루틴 실행용
         private MapData _currentMap;
@@ -38,7 +38,7 @@ namespace UI.DungeonMapScene
         {
             _runner = runner;
             _fovScale = fovScale;
-            _backwardOffset = backwardOffset;
+            BackwardOffset = backwardOffset;
             _illusionTextureIds = illusions;
         }
 
@@ -90,7 +90,7 @@ namespace UI.DungeonMapScene
         {
             Vector2 centerPos = new Vector2(gridX + 0.5f, gridY + 0.5f);
             (Vector2 dirVec, Vector2 _) = GetVectorsForDirection(dirIdx);
-            return centerPos - (dirVec * _backwardOffset);
+            return centerPos - (dirVec * BackwardOffset);
         }
 
         public void SetRunning(bool isRunning) => IsRunning = isRunning;
