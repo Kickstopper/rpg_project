@@ -736,7 +736,7 @@
         {
             "x": 3,
             "y": 7,
-            "value": 0,
+            "value": 1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -916,6 +916,17 @@
             "sourceX": 6,
             "sourceY": 6,
             "isWallEntrance": false,
+            "triggerDirection": 0,
+            "destinationID": "cave",
+            "targetX": 11,
+            "targetY": 9,
+            "targetDirection": 0
+        },
+        {
+            "type": 0,
+            "sourceX": 3,
+            "sourceY": 7,
+            "isWallEntrance": true,
             "triggerDirection": 0,
             "destinationID": "cave",
             "targetX": 11,

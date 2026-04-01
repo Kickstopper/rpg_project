@@ -193,9 +193,15 @@ namespace UI.DungeonMapScene
                 else { stepY = 1; sideDistY = (mapY + 1.0f - py) * deltaDistY; }
 
                 // DDA 알고리즘
+                // 바닥 구멍용
                 float voidEdgeDist = -1f;
                 int   voidEdgeSide = 0;
                 int   clipY = 0; // 앞쪽 바닥에 의해 가려지는 한계선(화면 Y좌표)
+                // 천장 구멍용
+                float ceilEdgeDist = -1f;
+                int   ceilEdgeSide = 0;
+                int   ceilClipY = _screenHeight; // 천장은 위로 갈수록 Y가 커지므로 화면 맨 위로 초기화
+                
                 int horizon = 0;
 
                 while (hit == 0)
@@ -214,6 +220,14 @@ namespace UI.DungeonMapScene
                         {
                             voidEdgeDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
                             voidEdgeSide = side;
+                        }
+
+                        // 천장 맵 경계 처리
+                        bool isPrevCeilSolid = (prevCell != null && prevCell.value != 1);
+                        if (!isPrevCeilSolid && ceilEdgeDist < 0f)
+                        {
+                            ceilEdgeDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
+                            ceilEdgeSide = side;
                         }
                     }
                     else
@@ -254,7 +268,36 @@ namespace UI.DungeonMapScene
                             }
                         }
 
-                        // (기존 로직 유지) 벽 충돌 처리
+                        // 천장 구멍 판정
+                        bool isPrevCeilSolid = (prevCell != null && prevCell.value != 1);
+                        bool isCurrCeilSolid = (currCell != null && currCell.value != 1);
+
+                        // 천장 Solid에서 Void로의 가림선(ceilClipY) 갱신
+                        if (isPrevCeilSolid && !isCurrCeilSolid && ceilEdgeDist < 0f)
+                        {
+                            float nearDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
+                            if (settings.useCylinderEffect) nearDist *= (1.0f + cameraX * cameraX * settings.cylinderStrength);
+                            if (nearDist <= 0.001f) nearDist = 0.001f;
+                            
+                            int nearLineHeight = (int)((_screenHeight / nearDist) * 0.66f);
+                            horizon = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
+                            
+                            // 천장의 경계는 화면 위쪽(horizon + height/2)
+                            int currentCeilClipY = horizon + nearLineHeight / 2;
+                            ceilClipY = Mathf.Min(ceilClipY, currentCeilClipY); // 더 낮게 내려온(가까운) 천장 선을 기준으로 자름
+                        }
+
+                        // 천장 Void에서 Solid로의 내벽 거리 저장
+                        if (!isPrevCeilSolid && isCurrCeilSolid)
+                        {
+                            if (ceilEdgeDist < 0f)
+                            {
+                                ceilEdgeDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
+                                ceilEdgeSide = side;
+                            }
+                        }
+
+                        // 벽 충돌 처리
                         if (currCell != null && currCell.HasWall())
                         {
                             int fId = GetTextureIdOnSide(currCell, side, stepX, stepY, false);
@@ -411,6 +454,22 @@ namespace UI.DungeonMapScene
                                 player, settings, step,
                                 pulseColor, wireframeColor, pulseWidth);
                 }
+
+                // 천장 void 내벽 그리기
+                if (ceilEdgeDist > 0f)
+                {
+                    if (settings.useCylinderEffect)
+                    {
+                        float distFactor = cameraX * cameraX;
+                        ceilEdgeDist *= (1.0f + distFactor * settings.cylinderStrength);
+                    }
+
+                    DrawCeilVoidWall(x, ceilEdgeSide, stepX, stepY,
+                                    px, py, rayDirX, rayDirY,
+                                    ceilEdgeDist, ceilClipY, 
+                                    player, settings, step,
+                                    pulseColor, wireframeColor, pulseWidth);
+                }
             }
         }
 
@@ -494,6 +553,87 @@ namespace UI.DungeonMapScene
                 {
                     if (x + s < _screenWidth)
                         _buffer[bIdx + s] = col;
+                }
+            }
+        }
+
+        private void DrawCeilVoidWall(
+            int x, int side, int stepX, int stepY,
+            float px, float py, float rayDirX, float rayDirY,
+            float perpVoidDist, int ceilClipY,
+            DungeonPlayer player, RenderSettings settings, int step,
+            Color32 pulseColor, Color32 wireframeColor, float pulseWidth)
+        {
+            if (perpVoidDist <= 0.001f) perpVoidDist = 0.001f;
+
+            float voidWallX = (side == 0) ? (py + perpVoidDist * rayDirY) : (px + perpVoidDist * rayDirX);
+            voidWallX -= Mathf.Floor(voidWallX);
+
+            int voidTexX = (int)(voidWallX * _texWidth);
+            if ((side == 0 && rayDirX > 0)) voidTexX = _texWidth - voidTexX - 1;
+            if ((side == 1 && rayDirY < 0)) voidTexX = _texWidth - voidTexX - 1;
+
+            float hScale = 0.66f;
+            int horizon = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
+            int lineHeight = (int)((_screenHeight / perpVoidDist) * hScale);
+            int voidHeight = (int)(lineHeight * settings.voidWallHeightScale);
+
+            // 천장의 모서리는 화면 위쪽에 위치 (Y값이 큼)
+            int ceilEdgeY = horizon + lineHeight / 2;
+
+            int rawDrawStart = ceilEdgeY; 
+            int rawDrawEnd = ceilEdgeY + voidHeight; // 구멍 안쪽(더 높은 곳)으로 올라감
+
+            int drawStart = Mathf.Max(0, rawDrawStart);
+            int drawEnd = Mathf.Min(_screenHeight, rawDrawEnd);
+            drawEnd = Mathf.Min(drawEnd, ceilClipY); // 앞쪽 천장에 가려지는 부분 자르기
+
+            if (drawStart >= drawEnd) return;
+
+            int lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / perpVoidDist, 0f, 1f) * 255);
+            if (side == 1) lightScale = (lightScale * 180) >> 8;
+
+            float stepVal = 1.0f * _texHeight / voidHeight;
+            float texPos = 0f;
+            
+            // 화면 밑으로 내려가서 잘린 경우 텍스처 보정
+            if (drawStart > rawDrawStart)
+            {
+                texPos = (drawStart - rawDrawStart) * stepVal;
+            }
+
+            bool isWire = _isScanning && (perpVoidDist < _currentScanRadius);
+            bool isPulse = isWire && Mathf.Abs(perpVoidDist - _currentScanRadius) < pulseWidth;
+            bool isVEdge = isWire && (voidTexX == 0 || voidTexX == _texWidth - 1);
+
+            for (int y = drawStart; y < drawEnd; y++) 
+            {
+                int voidTexY = (int)texPos & (_texHeight - 1);
+                texPos += stepVal;
+
+                Color32 col;
+                if (isWire)
+                {
+                    bool isHEdge = (y == drawStart || y == drawEnd - 1);
+                    col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
+                }
+                else
+                {
+                    // settings.voidWallTexIdx가 아닌 천장 구멍 전용 텍스처 인덱스가 있다면 수정 필요
+                    col = GetPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
+                    
+                    // 수직 그라데이션. 위로 올라갈수록(y가 커질수록) 어두워짐
+                    float verticalFactor = Mathf.Clamp01((float)(y - rawDrawStart) / voidHeight);
+                    float depthDimmer = Mathf.Lerp(1.0f, 0.2f, verticalFactor); // 입구(1.0), 깊은곳(0.2)
+                    
+                    int finalLight = (int)(lightScale * depthDimmer);
+                    if (finalLight < 255) ApplyLight(ref col, finalLight);
+                }
+
+                int bIdx = y * _screenWidth + x;
+                for (int s = 0; s < step; s++)
+                {
+                    if (x + s < _screenWidth) _buffer[bIdx + s] = col;
                 }
             }
         }

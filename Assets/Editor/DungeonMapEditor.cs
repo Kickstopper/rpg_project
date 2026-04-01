@@ -289,7 +289,8 @@ public class DungeonMapEditor : EditorWindow
                 // 다중 선택 포함 여부로 배경색 결정
                 bool isSelected = selectedCells.Contains(cell);
                 if (isSelected)        GUI.backgroundColor = Color.cyan;
-                else if (cell.value == -1) GUI.backgroundColor = Color.white;
+                else if (cell.value == -1) GUI.backgroundColor = Color.coral;
+                else if (cell.value == 1) GUI.backgroundColor = Color.brown;
                 else                       GUI.backgroundColor = Color.gray;
 
                 if (GUILayout.Button($"{x},{y}", GUILayout.Width(45), GUILayout.Height(45)))

@@ -214,8 +214,23 @@ namespace Controller
                 {
                     if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
                     {
-                        // 아래를 보고 있을 때만 구멍 체크 실행
-                        if (_currentLookState == LookState.Down)
+                       if (_currentLookState == LookState.Up)
+                        {
+                            CellData currentCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
+                            
+                            // 현재 칸의 천장이 void인지 확인
+                            if (currentCell != null && currentCell.value == 1)
+                            {
+                                EntranceData ceilingEntrance = _currentMap.GetEntranceAt(_player.LogicX, _player.LogicY);
+                                
+                                if (ceilingEntrance != null)
+                                {
+                                    StartCoroutine(JumpUpRoutine(ceilingEntrance));
+                                    return;
+                                }
+                            }
+                        }
+                        else if (_currentLookState == LookState.Down)
                         {
                             Vector2Int fwd = _player.GetForwardVector();
                             int tx = _player.LogicX + fwd.x;
@@ -223,22 +238,21 @@ namespace Controller
 
                             CellData targetCell = _currentMap.GetCell(tx, ty);
                             
-                            // 앞 타일이 구멍(value == -1)인지 확인
+                            // 앞 칸의 바닥이 void인지 확인
                             if (targetCell != null && targetCell.value == -1)
                             {
-                                // 해당 좌표에 설정된 목적지 정보(EntranceData)가 있는지 확인
                                 EntranceData holeEntrance = _currentMap.GetEntranceAt(tx, ty);
                                 
                                 if (holeEntrance != null)
                                 {
                                     StartCoroutine(JumpDownRoutine(holeEntrance, fwd));
-                                    return; // 아래 복귀 로직 실행 방지
+                                    return;
                                 }
                             }
                         }
                     }
 
-                    // 확인 키가 아니거나 구멍이 아니면 평소대로 복귀
+                    // 확인 키가 아니거나 구멍이 아니거나 EntranceData가 없으면 원래 상태로 복귀
                     if (!_isLookTransitioning) 
                         StartCoroutine(TransitionLookState(LookState.None));
                 }
@@ -345,7 +359,7 @@ namespace Controller
             else if (targetState == LookState.Down) endPitch = 100f;
 
             float startOffset = _player.BackwardOffset;
-            float endOffset = (targetState == LookState.None) ? this.backwardOffset : 0f;
+            float endOffset = (targetState == LookState.None || targetState == LookState.Up) ? this.backwardOffset : 0f;
 
             float duration = 0.3f;
             float elapsed = 0f;
@@ -376,6 +390,85 @@ namespace Controller
             _player.SetDirectPosition(finalPos.x, finalPos.y, _player.DirectionIdx);
 
             _currentLookState = targetState;
+            _isLookTransitioning = false;
+        }
+
+        private IEnumerator JumpUpRoutine(EntranceData entrance)
+        {
+            _isLookTransitioning = true;
+            _inputLocked = true;
+
+            float elapsed = 0f;
+            float duration = 0.8f;
+            
+            // 중앙 정렬을 위해 현재 위치 정보 저장
+            float startPosX = _player.PosX;
+            float startPosY = _player.PosY;
+            float startPitch = _player.Pitch;
+            
+            // 목표 위치는 현재 그리드의 정중앙
+            float centerPosX = _player.LogicX + 0.5f;
+            float centerPosY = _player.LogicY + 0.5f;
+            float targetPitch = -400f; // 천장을 뚫고 지나가는 느낌을 위해 Pitch를 크게 감소
+
+            if (fadeOverlay != null) fadeOverlay.blocksRaycasts = true;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                float easeIn = t * t;
+
+                // 그리드 중앙으로 위치 고정하며 수직 상승 연출
+                // JumpOffset을 직접 수정할 수 없으므로, 시각적 피드백을 위해 Pitch를 강하게 조절함.
+                _player.SetDirectPosition(
+                    Mathf.Lerp(startPosX, centerPosX, t),
+                    Mathf.Lerp(startPosY, centerPosY, t),
+                    _player.DirectionIdx
+                );
+
+                // 시점 상승 연출
+                _player.Pitch = Mathf.Lerp(startPitch, targetPitch, easeIn);
+
+                // 마지막 0.3초 동안 페이드 아웃
+                if (fadeOverlay != null && t > 0.6f)
+                {
+                    fadeOverlay.alpha = (t - 0.6f) / 0.4f;
+                }
+
+                yield return null;
+            }
+
+            // 레벨 전환 실행
+            DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
+            DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
+            
+            // 새로운 맵 로드
+            LoadMapData(entrance);
+            
+            yield return new WaitForSeconds(0.1f);
+
+            StartCoroutine(LandingImpactRoutine(10f));
+
+            _player.BackwardOffset = this.backwardOffset;
+            _currentLookState = LookState.None;
+
+            // 페이드 인 및 상태 초기화
+            if (fadeOverlay != null)
+            {
+                float fadeElapsed = 0f;
+                while (fadeElapsed < 0.5f)
+                {
+                    fadeElapsed += Time.deltaTime;
+                    fadeOverlay.alpha = 1f - (fadeElapsed / 0.5f);
+                    yield return null;
+                }
+                fadeOverlay.alpha = 0f;
+                fadeOverlay.blocksRaycasts = false;
+            }
+
+            // 상태 복구
+            _inputLocked = false;
             _isLookTransitioning = false;
         }
 
@@ -431,7 +524,14 @@ namespace Controller
             // 새로운 맵 로드
             LoadMapData(entrance);
             
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.1f);
+
+            // 착지 흔들림 코루틴
+            StartCoroutine(LandingImpactRoutine(150f));
+
+            // 흔들림이 시작되기 전, 상태와 오프셋을 미리 원상 복구
+            _player.BackwardOffset = this.backwardOffset; 
+            _currentLookState = LookState.None;
 
             // 페이드 인 및 상태 초기화
             if (fadeOverlay != null)
@@ -447,11 +547,26 @@ namespace Controller
                 fadeOverlay.blocksRaycasts = false;
             }
 
-            _player.Pitch = 0f;
-            _player.BackwardOffset = this.backwardOffset; // 오프셋 복구
-            _currentLookState = LookState.None;
             _inputLocked = false;
             _isLookTransitioning = false;
+        }
+
+        private IEnumerator LandingImpactRoutine(float magnitude, float duration = 0.6f)
+        {
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                float damp = 1f - t; // 시간이 지날수록 진동 폭이 줄어들도록
+                _player.Pitch = Mathf.Sin(t * Mathf.PI * 6f) * magnitude * damp; // 사인파로 상하 진동
+
+                yield return null;
+            }
+            
+            // 진동이 끝나면 시점을 정면(0)으로
+            _player.Pitch = 0f;
         }
         
         private void PerformMove(Vector2Int moveVec)
