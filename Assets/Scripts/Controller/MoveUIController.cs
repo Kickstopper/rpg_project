@@ -116,6 +116,11 @@ namespace Controller
             EventTrigger.Entry clickEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerClick };
             clickEntry.callback.AddListener((data) => { 
                 if (isAnimating) return;
+                
+                // 우클릭은 무시
+                PointerEventData pointerData = data as PointerEventData;
+                if (pointerData != null && pointerData.button != PointerEventData.InputButton.Left) return;
+
                 currentCursorIndex = index; // 클릭 시 커서를 확실히 이동시킨 후 선택 로직 실행
                 ExecuteSelection();
             });

@@ -49,7 +49,11 @@ namespace Controller
 
         public Vector3 cursorOffset = new Vector3(0, 50, 0); // 몬스터 머리 위 오프셋
 
-        
+        // 현재 실행 중인 액션 추적용
+        private BattleAction currentProcessingAction; 
+        private Coroutine runningActionCoroutine; // 실행 중인 코루틴을 담아둘 변수
+        private bool isInterrupted = false;
+
         //이동 모드 관련 변수
         private bool isSelectingMoveTarget = false;
         private int currentMoveSlotIndex = 0; // 0~2: 전열, 3~5: 후열
@@ -410,6 +414,21 @@ namespace Controller
         {
             if (!isBattleState) return;
             
+            // 난입 입력 감지
+            if ((state == BattleState.Processing || state == BattleState.EnemyInput) && currentProcessingAction != null && !isInterrupted)
+            {
+                bool isEnemyActing = currentProcessingAction.actor.GetComponent<MonsterController>() != null;
+
+                // 부동소수점 오차 방지를 위해 0.99f로 검사
+                if (isEnemyActing && uiController.GetPartyGaugeValue() >= 0.99f)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                    {
+                        StartCoroutine(TriggerInterrupt(true)); // 아군이 적을 끊음
+                    }
+                }
+            }
+
             if (isAutoMode)
             {
                 if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
@@ -452,6 +471,45 @@ namespace Controller
                     MaintainSelection();
                 }
             }
+        }
+
+        // 난입 실행 코루틴
+        IEnumerator TriggerInterrupt(bool isPlayerInterrupting)
+        {
+            isInterrupted = true; 
+
+            // 진행 중이던 액션 코루틴과 애니메이션을 즉시 폭파
+            if (runningActionCoroutine != null)
+            {
+                StopCoroutine(runningActionCoroutine);
+                runningActionCoroutine = null;
+            }
+
+            if (currentProcessingAction != null && currentProcessingAction.actor != null)
+            {
+                currentProcessingAction.actor.transform.DOKill();
+                 // 원래 위치와 크기 복구
+                currentProcessingAction.actor.transform.localPosition = Vector3.zero;
+                currentProcessingAction.actor.transform.localScale = Vector3.one;
+            }
+
+            //SoundManager.Instance.PlaySFX(SfxID.Action_Break); // 턴 파괴 효과음
+
+            if (isPlayerInterrupting) uiController.ResetPartyGauge();
+            else uiController.ResetEnemyGauge();
+
+            yield return uiController.ShowFlashEffect();
+            uiController.ShowLog(isPlayerInterrupting ? "PARTY INTERRUPT!!" : "ENEMY INTERRUPT!!");
+            
+            yield return wait10;
+
+            // ActionQueue 완전히 비우기
+            actionQueue.Clear();
+            currentProcessingAction = null;
+
+            // 턴 강제 전환
+            if (isPlayerInterrupting) PreparePlayerTurn();
+            else ProcessEnemyTurn();
         }
 
         void MaintainSelection()
@@ -1886,21 +1944,44 @@ namespace Controller
 
         IEnumerator ExecuteActions()
         {
-            foreach (var action in actionQueue)
+            isInterrupted = false;
+            
+            while (actionQueue.Count > 0)
             {
+                if (isInterrupted) yield break; // 난입 시 루프 즉시 종료
+
+                currentProcessingAction = actionQueue[0];
+                actionQueue.RemoveAt(0);
+
                 if (CheckBattleEnd(out bool isWin)) { StartCoroutine(EndBattleRoutine(isWin)); yield break; }
 
                 bool isActorDead = false;
-                if (action.actor == null || !action.actor.activeSelf) isActorDead = true;
-                else if (action.actor.TryGetComponent(out IBattleTarget ib) && !ib.IsAlive) isActorDead = true;
+                if (currentProcessingAction.actor == null || !currentProcessingAction.actor.activeSelf) isActorDead = true;
+                else if (currentProcessingAction.actor.TryGetComponent(out IBattleTarget ib) && !ib.IsAlive) isActorDead = true;
                 if (isActorDead) continue; 
 
-                int delay = CalculateActionDelay(action);
-                BattleEntity actorEntity = action.actor.GetComponent<BattleEntity>();
+                // 적의 자동 난입 체크
+                bool isPlayerActing = currentProcessingAction.actor.GetComponent<PlayerController>() != null;
+
+                // 적 게이지가 꽉 찼고, 현재 큐에서 꺼낸 행동이 아군의 행동이라면 적이 즉시 난입
+                if (isPlayerActing && uiController.GetEnemyGaugeValue() >= 0.99f)
+                {
+                    StartCoroutine(TriggerInterrupt(false)); 
+                    yield break; // 현재 루프 즉시 폭파
+                }
+
+                int delay = CalculateActionDelay(currentProcessingAction);
+                BattleEntity actorEntity = currentProcessingAction.actor.GetComponent<BattleEntity>();
                 if (actorEntity != null) actorEntity.nextTurnSpeedPenalty += delay; 
 
-                yield return StartCoroutine(PerformAction(action));
+                // 실행되는 액션 코루틴을 추적 변수에 담는다
+                runningActionCoroutine = StartCoroutine(PerformAction(currentProcessingAction));
+                yield return runningActionCoroutine;
+
+                if (isInterrupted) yield break;
             }
+
+            currentProcessingAction = null;
 
             // 행동할 수 있는 적이 없는지 한 번 더 체크
             if (CheckBattleEnd(out bool finalWin)) 
@@ -2579,6 +2660,8 @@ namespace Controller
             
             for (int i = 0; i < autoHitCount; i++)
             {
+                if (isInterrupted) yield break; 
+
                 List<GameObject> currentTargets = fieldController.GetTargetsByScope(scope, action.actor, action.target);
                 if (currentTargets.Count == 0) break; 
                 foreach (var target in currentTargets)
@@ -2610,6 +2693,8 @@ namespace Controller
 
         IEnumerator ProcessSingleHit(BattleAction action, GameObject target)
         {
+            bool isPlayerActor = action.actor.GetComponent<PlayerController>() != null;
+
             // 위치 보정 계산 호출
             BattleFieldController.BattlePosition atkPos = fieldController.GetUnitPosition(action.actor);
             BattleFieldController.BattlePosition defPos = fieldController.GetUnitPosition(target);
@@ -2626,6 +2711,9 @@ namespace Controller
 
             if (BattleCalculator.CheckEvasion(attackerEntity, targetEntity, posEvaBonus))
             {
+                // 회피 시 방어자 측 게이지 0.2 상승
+                AddGauge(!isPlayerActor, 0.2f);
+
                 Debug.Log($"{target.name} 회피!");
                 yield return StartCoroutine(ProcessDodgeAnimation(target.transform));
                 if (targetEntity is PlayerController pc)
@@ -2639,6 +2727,9 @@ namespace Controller
 
             if (BattleCalculator.CheckReflection(targetEntity, action.type))
             {
+                // 반사 시 방어자 측 게이지 0.2 상승
+                AddGauge(!isPlayerActor, 0.2f);
+
                 uiController.ShowLog("REFLECT!");
                 visualController.SpawnVFX(VfxID.Reflect, target.transform.position);
                 int reflectDmg = BattleCalculator.CalculateDamage(attackerEntity, attackerEntity, action, false, 1.0f);
@@ -2654,6 +2745,9 @@ namespace Controller
 
             if (BattleCalculator.CheckAbsorption(targetEntity, action.type))
             {
+                // 흡수 시 방어자 측 게이지 0.2 상승
+                AddGauge(!isPlayerActor, 0.2f);
+
                 uiController.ShowLog("ABSORB!");
                 visualController.SpawnVFX(VfxID.Absorb, target.transform.position);
                 int absorbAmount = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, false, 1.0f);
@@ -2692,12 +2786,18 @@ namespace Controller
             }
 
             bool isCritical = BattleCalculator.CheckCritical(attackerEntity, targetEntity, action);
+            
             int damage = 0;
-
             if (action.type == ActionType.Shoot && pActor != null)
                 damage = BattleCalculator.CalculateGunDamage(pActor, targetEntity, isCritical);
             else
                 damage = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCritical, posDmgMult);
+            
+            // 정상 타격 시 게이지 상승 계산
+            float resistValue = BattleCalculator.GetResistanceValue(action.skillData, targetEntity.GetResistances()); 
+            float hitGaugeInc = 0.1f + (1.0f - resistValue) * 0.1f;
+            if (isCritical) hitGaugeInc *= 2f; // 크리티컬 시, 게이지 상승 2배
+            AddGauge(isPlayerActor, hitGaugeInc);
 
             BattleEntity defenderEntity = target.GetComponent<BattleEntity>();
             if (defenderEntity != null && defenderEntity.isGuarding)
@@ -2731,6 +2831,12 @@ namespace Controller
             }
             
             ApplyDamage(target, damage, isCritical);
+        }
+
+        void AddGauge(bool isParty, float amount)
+        {
+            if (isParty) uiController.AddPartyGauge(amount);
+            else uiController.AddEnemyGauge(amount);
         }
 
         void ApplyDamage(GameObject target, int damage, bool isCritical)

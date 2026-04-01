@@ -19,6 +19,8 @@ public class BattleUIController : MonoBehaviour
     public TextMeshProUGUI phaseIndicatorText;
     public SimpleGradient phaseIndicatorBg;
 
+    public Slider enemyBreakSlider;
+    public Slider partyBreakSlider;
     public Slider qteTimingSlider; // 타이머 슬라이더. 인스펙터에서 할당
     public Button autoModeButton; // 오토 모드의 트리거
     public BattleResultUI resultUI;
@@ -57,7 +59,10 @@ public class BattleUIController : MonoBehaviour
     public bool IsItemUIVisible => battleItemUI != null && battleItemUI.gameObject.activeSelf;
     public bool IsSkillUIVisible => battleSkillUI != null && battleSkillUI.gameObject.activeSelf;
     public bool IsCmdPanelVisible => commandPanel != null && commandPanel.activeSelf;
-    // 초기화: 전투 시작 시 UI 숨김 처리 등
+
+    private float targetPartyGauge = 0f;
+    private float targetEnemyGauge = 0f;
+    
     public void Initialize()
     {
         if (raycastScreen == null) raycastScreen = GameStateManager.Instance.explorationCanvas;
@@ -68,6 +73,8 @@ public class BattleUIController : MonoBehaviour
         HideStateMessage();
         HideLog();
         HideMessage();
+        ResetPartyGauge();
+        ResetEnemyGauge();
     }
 
     public void ShowQTESlider()
@@ -268,6 +275,48 @@ public class BattleUIController : MonoBehaviour
             float newHeight = (count * 60f) + 10f;
             container.sizeDelta = new Vector2(container.sizeDelta.x, newHeight);
         }
+    }
+
+    public void AddPartyGauge(float amount)
+    {
+        // 슬라이더의 현재 값이 아닌, 내부 목표값에 수치를 누적
+        targetPartyGauge = Mathf.Clamp01(targetPartyGauge + amount);
+        
+        // 애니메이션 적용
+        partyBreakSlider.DOKill();
+        partyBreakSlider.DOValue(targetPartyGauge, 0.3f).SetEase(Ease.OutCubic);
+    }
+    
+    public float GetPartyGaugeValue()
+    {
+        return targetPartyGauge;
+    }
+
+    public void ResetPartyGauge()
+    {
+        targetPartyGauge = 0f;
+        partyBreakSlider.DOKill();
+        partyBreakSlider.value = 0f;
+    }
+
+    public void AddEnemyGauge(float amount)
+    {
+        targetEnemyGauge = Mathf.Clamp01(targetEnemyGauge + amount);
+        
+        enemyBreakSlider.DOKill();
+        enemyBreakSlider.DOValue(targetEnemyGauge, 0.3f).SetEase(Ease.OutCubic);
+    }
+
+    public float GetEnemyGaugeValue()
+    {
+        return targetEnemyGauge;
+    }
+
+    public void ResetEnemyGauge()
+    {
+        targetEnemyGauge = 0f;
+        enemyBreakSlider.DOKill();
+        enemyBreakSlider.value = 0f;
     }
 
     public void ShowBattleStartAnimation(Action onCompleteCallback)
