@@ -35,8 +35,10 @@ namespace Controller
         public Button popupNoBtn;             // '아니오' 버튼
 
         [Header("Input Settings")]
-        [SerializeField] private float inputDelay = 0.15f; // 입력 간 지연 시간
-        private float lastInputTime; // 마지막으로 입력이 처리된 시간
+        [Header("Input Settings")]
+        [SerializeField] private float inputDelay = 0.15f; 
+        private float lastInputTime; 
+        private int lastInputFrame; // 마지막으로 입력이 처리된 프레임
 
         [Header("Party Visuals")]
         public Transform[] partySlots; // 6개의 슬롯 (0~5)
@@ -44,11 +46,14 @@ namespace Controller
         private int currentPartySelectIndex = 0;
         public Color charHighlightColor = Color.yellow; // 선택 시 하이라이트 색상
 
-        // 입력을 처리할 수 있는 상태인지 확인하는 프로퍼티
-        public bool CanProcessInput => Time.time >= lastInputTime + inputDelay;
+        // 입력을 처리할 수 있는 상태인지 확인하는 프로퍼티. 시간 조건과 프레임 조건을 모두 만족해야 입력 가능
+        public bool CanProcessInput => (Time.unscaledTime >= lastInputTime + inputDelay) && (Time.frameCount > lastInputFrame);
 
-        // 입력 성공 시 쿨타임을 갱신
-        public void ResetInputTimer() => lastInputTime = Time.time;
+        public void ResetInputTimer() 
+        {
+            lastInputTime = Time.unscaledTime;
+            lastInputFrame = Time.frameCount;
+        }
 
         private bool isPopupOpen = false;     // 팝업이 열려있는지 확인
         public bool IsPopupOpen => isPopupOpen;
@@ -92,6 +97,8 @@ namespace Controller
         void Update()
         {
             if (!isMenuOpen) return;
+            
+            // 서브 UI가 닫히면서 타이머가 리셋되었다면, 여기서 바로 차단됨
             if (!CanProcessInput) return; 
 
             if (isPopupOpen) 
@@ -100,20 +107,16 @@ namespace Controller
                 return;
             }
 
-            // 취소 키
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
-            {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
-                return;
-            }
+            // 서브 메뉴가 눈에 보이는 상태라면 무조건 리턴 (서브 메뉴 안에서의 입력은 각각의 UI Controller가 처리함)
+            if (IsAnySubMenuOpen()) return;
 
+            // 장비, 스테이터스 캐릭터 선택 상태
             if (currentState == MenuState.SelectEquipChar || currentState == MenuState.SelectStatusChar)
             {
                 HandleCharacterSelection();
                 return;
             }
-
+            
             HandleMenuNavigation(ref currentBtnIndex);
         }
 
@@ -236,6 +239,14 @@ namespace Controller
                     ResetInputTimer(); 
                     allMenuBtns[currentBtnIndex].onClick.Invoke();
                 }
+            }
+
+            // 취소 키
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            {
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ResetInputTimer();
+                GameStateManager.Instance.ChangeState(GameState.Exploration);
             }
         }
 
@@ -498,6 +509,18 @@ namespace Controller
             
             ResetInputTimer();
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+        }
+
+        private bool IsAnySubMenuOpen()
+        {
+            // 열려있는 서브 UI가 단 하나라도 있다면 true 반환
+            if (statusUI != null && statusUI.activeInHierarchy) return true;
+            if (moveUI != null && moveUI.activeInHierarchy) return true;
+            if (skillUI != null && skillUI.activeInHierarchy) return true;
+            if (itemUI != null && itemUI.activeInHierarchy) return true;
+            if (equipUI != null && equipUI.activeInHierarchy) return true;
+            if (memoryUI != null && memoryUI.activeInHierarchy) return true;
+            return false;
         }
 
         // 실제 StatusUI 열기
