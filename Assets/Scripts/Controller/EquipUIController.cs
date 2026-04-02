@@ -218,54 +218,45 @@ namespace Controller
 
         private void UpdateStatDisplay()
         {
-             // 기본 스탯
             int str = currentCharacter.stats.str;
             int vit = currentCharacter.stats.vit;
             int mag = currentCharacter.stats.mag;
             int agi = currentCharacter.stats.agi;
             int luc = currentCharacter.stats.luc;
+            int intel = currentCharacter.stats.intel;
+            int lv = currentCharacter.stats.level;
 
             WeaponData weapon = DatabaseManager.Instance.GetWeapon(currentCharacter.equippedWeaponId);
             WeaponData gun = DatabaseManager.Instance.GetWeapon(currentCharacter.equippedGunId);
             AmmoData ammo = DatabaseManager.Instance.GetAmmo(currentCharacter.equippedAmmoId);
-            List<ArmorData> armors = new List<ArmorData>();
+            
+            int armorDef = 0;
+            int armorEva = 0;
             foreach(var id in currentCharacter.equippedArmorIds)
             {
                 var a = DatabaseManager.Instance.GetArmor(id);
-                if(a) armors.Add(a);
+                if(a) { armorDef += a.defense; armorEva += a.evasionMod; }
             }
 
-            int atk = str + currentCharacter.stats.level; 
-            if (weapon != null) atk += weapon.attackPower;
+            // 기획서 공식 적용
+            int atk = str + (weapon != null ? weapon.attackPower : 0) + (lv / 4);
+            int hit = agi + (weapon != null ? weapon.hitRateBonus : 0) + (luc / 2) + lv;
             
-            int hit = 100 + (agi * 2); 
-            if (weapon != null) hit += weapon.hitRateBonus;
-
             int gunAtk = 0;
             int gunHit = 0;
-            if (gun != null)
+            if (gun != null && ammo != null)
             {
-                gunAtk = gun.attackPower;
-                if (gun.scalingStatName == "AGI") gunAtk += agi;
-                else gunAtk += luc;
-
-                if (ammo != null) gunAtk += ammo.damageBonus;
-
-                gunHit = 100 + (agi * 2) + gun.hitRateBonus;
-                if (ammo != null) gunHit += ammo.hitRateBonus;
+                gunAtk = gun.attackPower + ammo.damageBonus + (lv / 4);
+                gunHit = gun.hitRateBonus + ammo.hitRateBonus + agi + (luc / 2) + lv;
             }
 
-            int def = vit + (currentCharacter.stats.level / 2);
-            int eva = agi;
-            foreach(var armor in armors)
-            {
-                def += armor.defense;
-                eva += armor.evasionMod;
-            }
+            int def = armorDef + vit + agi;
+            int eva = armorEva + agi + (intel / 4) + (luc / 4) + lv;
 
-            int magPow = mag + (currentCharacter.stats.level); 
-            int magFx = mag; 
+            int magPow = (mag * 2) + (intel / 2); // MATK
+            int magFx = ((mag + vit + agi) / 4) + intel + (armorDef / 4); // MDEF
 
+            // UI 텍스트 반영
             atkText.text = atk.ToString();
             hitText.text = hit.ToString();
             gunText.text = gunAtk.ToString();

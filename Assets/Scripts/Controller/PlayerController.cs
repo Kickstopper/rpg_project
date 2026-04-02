@@ -68,6 +68,10 @@ namespace Controller
         public override int GetTotalMag() => currentStats.mag;
         public override int GetTotalLuc() => currentStats.luc;
         public override int GetTotalVit() => currentStats.vit;
+        public override int GetTotalInt() => currentStats.intel;
+
+        public int TotalArmorEvasion => totalArmorEvasion;
+        private int totalArmorEvasion;
 
         // IBattleTarget 구현
         public bool IsAlive => currentHp > 0;
@@ -223,9 +227,8 @@ namespace Controller
 
         private void InitializeStats()
         {
-            // currentStats를 기반으로 파생 스탯(MaxHP, MaxMP) 재계산
-            this.maxHp = this.currentStats.vit * 20;
-            this.maxMp = this.currentStats.mag * 30;
+            this.maxHp = ((GetTotalStr() + GetTotalVit()) * (level + 1)) / 4 + 14;
+            this.maxMp = ((GetTotalMag() + GetTotalInt()) * (level + 4)) / 8 + 4;
         }
         
         // 회복 함수
@@ -293,20 +296,11 @@ namespace Controller
             }
         }
         
-        // 총 공격력 계산
+        // GATK = 총 공격력 + 총알 공격력 + (LV/4)
         public int GetGunAttack()
         {
             if (currentGun == null || currentAmmo == null) return 0;
-
-            int gunAtk = currentGun.attackPower;
-            int ammoAtk = currentAmmo.damageBonus;
-            int statBonus = 0;
-
-            // 총은 LUC이나 AGI 영향을 받음
-            if (currentGun.scalingStatName == "AGI") statBonus = GetTotalAgi();
-            else if (currentGun.scalingStatName == "LUC") statBonus = GetTotalLuc();
-            
-            return gunAtk + ammoAtk + statBonus;
+            return currentGun.attackPower + currentAmmo.damageBonus + (level / 4);
         }
         
         // 발사 가능 여부 확인
@@ -351,40 +345,63 @@ namespace Controller
         public void RefreshArmorStats()
         {
             currentArmors.Clear();
+            totalArmorEvasion = 0;
             foreach (var id in equippedArmorIds)
             {
                 if (string.IsNullOrEmpty(id)) continue;
                 
                 // DatabaseManager를 사용하여 실제 데이터 로드
                 ArmorData armor = DatabaseManager.Instance.GetArmor(id);
-                if (armor != null) currentArmors.Add(armor);
+                if (armor != null)
+                {
+                    totalArmorEvasion += armor.evasionMod;
+                    currentArmors.Add(armor);  
+                } 
             }
         }
 
-        
-        // 장비 스탯 반영
-        
         public override int GetAttack()
         {
-            int statAtk = currentStats.str;
-            int levelBonus = level;
+            // ATK = STR + 무기 공격력 + (LV/4)
             int weaponBonus = (currentWeapon != null) ? currentWeapon.attackPower : 0;
-            return statAtk + levelBonus + weaponBonus;
+            return GetTotalStr() + weaponBonus + (level / 4);
         }
 
         public override int GetDefense()
         {
-            int statDef = currentStats.vit;
-            int levelBonus = Mathf.FloorToInt(level * 0.5f);
+            // DEF = 장비방어력 + VIT + AGI
             int armorBonus = 0;
             foreach (var armor in currentArmors) armorBonus += armor.defense;
-            return statDef + levelBonus + armorBonus;
+            return armorBonus + GetTotalVit() + GetTotalAgi();
         }
 
+        // 마법 공격력 (MATK = (MAG*2) + (INT/2))
         public override int GetMagicAttack()
         {
-            //차후 구체화
-            return GetTotalMag();
+            return (GetTotalMag() * 2) + (GetTotalInt() / 2);
+        }
+
+        // 마법 방어력 (MDEF = (MAG+VIT+AGI)/4 + INT + 장비방어력/4)
+        public override int GetMagicDefense()
+        {
+            int armorBonus = 0;
+            foreach (var armor in currentArmors) armorBonus += armor.defense;
+            
+            int baseMdef = (GetTotalMag() + GetTotalVit() + GetTotalAgi()) / 4;
+            return baseMdef + GetTotalInt() + (armorBonus / 4);
+        }
+
+        public override int GetHitRate()
+        {
+            int weaponHit = currentWeapon != null ? currentWeapon.hitRateBonus : 0;
+            return GetTotalAgi() + weaponHit + (GetTotalLuc() / 2) + level;
+        }
+
+        public override int GetEvasion()
+        {
+            int armorEva = 0;
+            foreach (var armor in currentArmors) armorEva += armor.evasionMod;
+            return armorEva + GetTotalAgi() + (GetTotalInt() / 4) + (GetTotalLuc() / 4) + level;
         }
 
         public override ResistanceData GetResistances()
@@ -432,7 +449,6 @@ namespace Controller
             Debug.Log($"[Level Up Logic] {entityName} Updated -> Lv.{level}, Exp: {sourceData.currentExp}");
         }
 
-        // [BattleEntity 구현] 데미지 처리
         public override IEnumerator OnDamageTaken(int damage)
         {
             currentHp = Mathf.Max(0, currentHp - damage);
@@ -440,19 +456,18 @@ namespace Controller
 
             Debug.Log($"<color=red>{entityName}에게 {damage} 데미지!</color>");
 
-            // 플레이어 전용 피격 연출 (얼굴 붉어짐)
             if (portraitImage && portraitImage.sprite)
             {
                 portraitImage.color = Color.red;
                 yield return new WaitForSeconds(0.1f);
-                portraitImage.color = Color.white;
+                // 사망 시 초상화를 어둡게, 살아있으면 원래 색으로
+                portraitImage.color = currentHp <= 0 ? Color.gray : Color.white; 
             }
 
             if (currentHp <= 0)
             {
                 Debug.Log($"{entityName} 쓰러짐...");
-                // Player는 비활성화 대신 사망 상태(Dead State) 처리 필요
-                InitializeEmpty(columnIndex);
+                SetMessage("DEAD");
             }
         }
         

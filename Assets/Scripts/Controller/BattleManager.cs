@@ -542,8 +542,16 @@ namespace Controller
             BattleReward reward = BattleCalculator.CalculateRewards(allPlayers, fieldController.encounterLog);
             foreach(var p in allPlayers)
             {
-                if (p != null && p.currentHp > 0) {
-                    p.ApplyExperience(reward.expPerMember); 
+                if (p != null) 
+                {
+                    if (p.currentHp > 0) p.ApplyExperience(reward.expPerMember); 
+                    
+                    // 전투 종료 시 HP/MP 원본 저장
+                    if (p.sourceData != null)
+                    {
+                        p.sourceData.currentHp = p.currentHp;
+                        p.sourceData.currentMp = p.currentMp;
+                    }
                 }
             }
             InventoryManager.Instance.AddMoney(reward.totalMoney);
@@ -2709,7 +2717,7 @@ namespace Controller
             
             BattleCalculator.GetPositionalModifiers(atkPos, defPos, wType, out float posDmgMult, out float posEvaBonus);
 
-            if (BattleCalculator.CheckEvasion(attackerEntity, targetEntity, posEvaBonus))
+            if (BattleCalculator.CheckEvasion(attackerEntity, targetEntity, action, posEvaBonus))
             {
                 // 회피 시 방어자 측 게이지 0.2 상승
                 AddGauge(!isPlayerActor, 0.2f);
@@ -2975,8 +2983,17 @@ namespace Controller
                 // 실제 데이터 반영 (PartyManager 데이터 수정)
                 foreach(var p in allPlayers)
                 {
-                    if (p != null && p.currentHp > 0) {
-                        p.ApplyExperience(reward.expPerMember); 
+                    if (p != null) 
+                    {
+                        // 살아있는 파티원만 경험치 획득
+                        if (p.currentHp > 0) p.ApplyExperience(reward.expPerMember); 
+
+                        // 생사 여부에 상관없이 최종 HP/MP를 원본 데이터에 저장
+                        if (p.sourceData != null)
+                        {
+                            p.sourceData.currentHp = p.currentHp;
+                            p.sourceData.currentMp = p.currentMp;
+                        }
                     }
                 }
                 

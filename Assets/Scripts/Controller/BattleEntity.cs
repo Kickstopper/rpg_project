@@ -216,9 +216,16 @@ namespace Controller
         public abstract int GetTotalMag();
         public abstract int GetTotalLuc();
         public abstract int GetTotalVit();
+        public abstract int GetTotalInt();
         public abstract int GetAttack();
-        public abstract int GetMagicAttack();
         public abstract int GetDefense();
+        
+        public abstract int GetHitRate();
+        public abstract int GetEvasion();
+
+        public abstract int GetMagicAttack();
+        public abstract int GetMagicDefense();
+        
         public abstract ResistanceData GetResistances();
         public abstract void SetSelectionState(bool isSelected);
     }

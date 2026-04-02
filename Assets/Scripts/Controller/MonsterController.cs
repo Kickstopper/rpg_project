@@ -104,22 +104,16 @@ namespace Controller
         }
 
         // [BattleEntity 구현] 스탯 반환
-        public override int GetTotalStr() => sourceData.stats.str + level; 
-        public override int GetTotalAgi() => sourceData.stats.agi + level;
-        public override int GetTotalMag() => sourceData.stats.mag + level;
-        public override int GetTotalLuc() => sourceData.stats.luc + level;
-        public override int GetTotalVit() => sourceData.stats.vit + level;
+        public override int GetTotalStr() => sourceData.stats.str; 
+        public override int GetTotalAgi() => sourceData.stats.agi;
+        public override int GetTotalMag() => sourceData.stats.mag;
+        public override int GetTotalLuc() => sourceData.stats.luc;
+        public override int GetTotalVit() => sourceData.stats.vit;
+        public override int GetTotalInt() => sourceData.stats.intel;
 
         public override int GetAttack()
         {
-            // 차후 구체화
-            return GetTotalStr();
-        }
-
-        public override int GetMagicAttack()
-        {
-            // 차후 구체화
-            return GetTotalMag();
+            return (level + GetTotalStr()) * 2;
         }
 
         public override int GetDefense()
@@ -128,6 +122,25 @@ namespace Controller
             int levelBonus = Mathf.FloorToInt(sourceData.stats.level * 0.5f);
 
             return statDef + levelBonus;
+        }
+        public override int GetMagicAttack()
+        {
+            return (GetTotalInt() / 2) + (GetTotalMag() / 2);
+        }
+
+        public override int GetMagicDefense()
+        {
+            return GetTotalInt() + (GetTotalMag() / 4) + (GetTotalVit() / 2) + (level / 2);
+        }
+
+        public override int GetHitRate()
+        {
+            return ((GetTotalStr() + GetTotalLuc()) / 4) + GetTotalAgi() + (level / 2) + level;
+        }
+
+        public override int GetEvasion()
+        {
+            return GetTotalAgi() + (GetTotalInt() / 4) + (GetTotalLuc() / 4) + level + (level / 2);
         }
 
         public override ResistanceData GetResistances()
