@@ -6,15 +6,20 @@ using TMPro;
 using System;
 using Manager;
 using Data.Database;
+using UnityEngine.EventSystems;
 
 namespace UI
 {
     public class DialogueUI : MonoBehaviour
     {
+        [Header("Choice Components")]
+        public GameObject choiceContainer;       // 선택지들이 들어갈 컨테이너
+        public GameObject choiceButtonPrefab;    // 선택지 프리팹
+
         [Header("Settings")]
-        public CharacterDatabase portraitDB; // inspector에서 설정
-        public float typingSpeed = 0.05f; // 글자당 시간 (작을수록 빠름)
-        public AudioClip typingSound;     // 타이핑 효과음
+        public CharacterDatabase portraitDB;     // inspector에서 설정
+        public float typingSpeed = 0.05f;        // 글자당 시간 (작을수록 빠름)
+        public AudioClip typingSound;            // 타이핑 효과음
         private AudioSource audioSource;
 
         [Header("UI Components")]
@@ -31,6 +36,7 @@ namespace UI
         // 타이핑 상태 관리 변수
         private bool isTyping = false;
         private Coroutine typingCoroutine;
+        private bool isWaitingForChoice = false;
 
         public event Action OnDialogueFinished;
 
@@ -42,7 +48,7 @@ namespace UI
 
         void Start()
         {
-            uiPanel.SetActive(false); // 시작 시 숨김
+            uiPanel.SetActive(false);
         }
 
         public void Initialize(string eventID)
@@ -67,22 +73,28 @@ namespace UI
             }
 
             var lineData = currentEventLines[currentLineIndex];
+
+            string type = lineData.ContainsKey("Type") ? lineData["Type"].ToUpper() : "TALK";
+
+            // BRANCH 라인은 패스 (CHOICE가 알아서 처리함)
+            if (type == "BRANCH")
+            {
+                AdvanceLine();
+                return;
+            }
             
             // 텍스트 및 이름 설정
             nameText.text = lineData.ContainsKey("Speaker") ? lineData["Speaker"] : "";
             contentText.text = lineData.ContainsKey("Text") ? lineData["Text"] : "";
 
-            // 초상화 로드 변경 (Resources.Load 삭제)
             string portraitID = lineData.ContainsKey("Portrait") ? lineData["Portrait"] : "";
         
             if (!string.IsNullOrEmpty(portraitID))
             {
-                // 데이터베이스에서 Entry 전체를 가져옴
                 var entry = portraitDB.GetEntry(portraitID);
                 
                 if (entry != null)
                 {
-                    // 얼굴 이미지 적용
                     if (entry.portraitImage != null)
                     {
                         portraitImageUI.sprite = entry.portraitImage;
@@ -94,7 +106,6 @@ namespace UI
                         portraitImageUI.enabled = false;
                     }
 
-                    // 전신 이미지 적용 (Standing)
                     if (entry.standingImage != null)
                     {
                         standingImageUI.sprite = entry.standingImage;
@@ -116,50 +127,48 @@ namespace UI
 
             // 텍스트 설정 및 타이핑 효과 시작
             string fullText = lineData.ContainsKey("Text") ? lineData["Text"] : "";
-            contentText.text = fullText; // 텍스트를 미리 다 넣어둠 (안 보일 뿐)
+            contentText.text = fullText;
             contentText.maxVisibleCharacters = 0; // 글자 표시 개수를 0으로 초기화
 
             // 기존 타이핑이 있다면 중지하고 새로 시작
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-            typingCoroutine = StartCoroutine(TypeText());
+            typingCoroutine = StartCoroutine(TypeText(type));
         }
 
-        // 타이핑 효과 코루틴
-        IEnumerator TypeText()
+        // 타이핑 효과 코루틴. Type을 매개변수로 받아서, 타이핑이 끝나면 어떻게 할지 결정
+        IEnumerator TypeText(string lineType)
         {
             isTyping = true;
-
-            // TMP가 텍스트 정보를 갱신할 때까지 한 프레임 대기
             contentText.ForceMeshUpdate(); 
 
-            int totalVisibleCharacters = contentText.textInfo.characterCount; // 실제 글자 수
+            int totalChars = contentText.textInfo.characterCount;
             int counter = 0;
 
-            while (counter < totalVisibleCharacters)
+            while (counter < totalChars)
             {
-                int visibleCount = counter % (totalVisibleCharacters + 1);
-                contentText.maxVisibleCharacters = visibleCount + 1;
-
-                // 소리 재생 (너무 빠르면 귀 아프므로 매 글자마다 재생하되 피치 조절)
+                contentText.maxVisibleCharacters = counter + 1;
                 if (typingSound != null)
                 {
-                    // 약간의 피치 변화를 주어 기계적인 느낌을 줄임
                     audioSource.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
                     audioSource.PlayOneShot(typingSound);
                 }
-
                 counter++;
                 yield return new WaitForSeconds(typingSpeed);
             }
 
-            // 완료 처리
-            contentText.maxVisibleCharacters = totalVisibleCharacters;
+            contentText.maxVisibleCharacters = totalChars;
             isTyping = false;
+
+            // 타이핑이 끝난 후, 현재 타입이 CHOICE라면 선택지를 띄움
+            if (lineType == "CHOICE")
+                GenerateChoices();
         }
 
         void Update()
         {
             if (!isDialogueActive) return;
+
+            if (isWaitingForChoice) return;
 
             if (Input.GetButtonDown("Submit") || Input.GetMouseButtonDown(0))
             {
@@ -180,9 +189,109 @@ namespace UI
         void CompleteTypingImmediately()
         {
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-            
             contentText.maxVisibleCharacters = int.MaxValue;
             isTyping = false;
+
+            // 스킵했을 때도 CHOICE라면 선택지를 띄워야 함
+            var lineData = currentEventLines[currentLineIndex];
+            string type = lineData.ContainsKey("Type") ? lineData["Type"].ToUpper() : "TALK";
+            
+            if (type == "CHOICE") GenerateChoices();
+        }
+
+        // 선택지 로직
+        void GenerateChoices()
+        {
+            isWaitingForChoice = true;
+            choiceContainer.SetActive(true);
+
+            // 기존 버튼들 모두 제거
+            foreach (Transform child in choiceContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            // 현재 줄 다음부터 BRANCH가 나올 때마다 ChoiceButtonPrefab (선택지) 생성
+            int lookAheadIndex = currentLineIndex + 1;
+            GameObject firstButton = null;
+
+            while (lookAheadIndex < currentEventLines.Count)
+            {
+                var branchData = currentEventLines[lookAheadIndex];
+                string branchType = branchData.ContainsKey("Type") ? branchData["Type"].ToUpper() : "";
+
+                if (branchType == "BRANCH")
+                {
+                    // 버튼 생성 로직
+                    GameObject btnObj = Instantiate(choiceButtonPrefab, choiceContainer.transform);
+                    btnObj.GetComponentInChildren<TextMeshProUGUI>().text = branchData["Text"];
+
+                    string nextTargetID = branchData.ContainsKey("NextID") ? branchData["NextID"] : "END";
+                    
+                    // 버튼 클릭 이벤트 연결
+                    Button btn = btnObj.GetComponent<Button>();
+                    btn.onClick.AddListener(() => OnChoiceSelected(nextTargetID));
+
+                    if (firstButton == null) firstButton = btnObj;
+                }
+                else
+                {
+                    // BRANCH가 끝나고 다른 타입(TALK 등)이 나오면 탐색 종료
+                    break;
+                }
+                lookAheadIndex++;
+            }
+
+            // 키보드/패드 조작을 위해 첫 번째 버튼에 포커스 주기
+            if (firstButton != null)
+            {
+                EventSystem.current.SetSelectedGameObject(null); // 기존 포커스 해제
+                EventSystem.current.SetSelectedGameObject(firstButton); // 새 포커스 지정
+            }
+        }
+
+        // 버튼을 클릭했을 때 호출됨
+        void OnChoiceSelected(string nextTargetID)
+        {
+            // 선택지 UI 정리
+            isWaitingForChoice = false;
+            choiceContainer.SetActive(false);
+            EventSystem.current.SetSelectedGameObject(null); // 포커스 해제
+
+            // 점프 혹은 대화 종료
+            if (nextTargetID.ToUpper() == "END" || string.IsNullOrEmpty(nextTargetID))
+            {
+                EndDialogue();
+            }
+            else
+            {
+                // 대상 Seq 번호를 찾아 이동
+                int targetIndex = FindIndexBySeq(nextTargetID);
+                
+                if (targetIndex != -1)
+                {
+                    currentLineIndex = targetIndex;
+                    ShowCurrentLine();
+                }
+                else
+                {
+                    Debug.LogWarning($"NextID '{nextTargetID}'를 찾을 수 없습니다.");
+                    EndDialogue();
+                }
+            }
+        }
+
+        // Seq 값으로 줄 번호(Index)를 찾아주는 유틸리티 함수
+        int FindIndexBySeq(string seqValue)
+        {
+            for (int i = 0; i < currentEventLines.Count; i++)
+            {
+                if (currentEventLines[i].ContainsKey("Seq") && currentEventLines[i]["Seq"] == seqValue)
+                {
+                    return i;
+                }
+            }
+            return -1; // 못 찾음
         }
 
         void AdvanceLine()
@@ -195,6 +304,7 @@ namespace UI
         {
             isDialogueActive = false;
             uiPanel.SetActive(false);
+            choiceContainer.SetActive(false);
             GameStateManager.Instance.ChangeState(GameState.Exploration);
             OnDialogueFinished?.Invoke();
         }

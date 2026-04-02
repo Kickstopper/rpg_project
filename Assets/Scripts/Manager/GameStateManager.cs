@@ -145,14 +145,13 @@ namespace Manager
         {
             if (dialogueController != null)
             {
-                dialogueController.Initialize(eventID);
                 ChangeState(GameState.Event);
+                dialogueController.Initialize(eventID);
             }
             else
             {
                 Debug.LogError("DialogController가 연결되지 않았습니다!");
             }
-            
         }
 
         public void ShowShop(string shopID)
