@@ -14,6 +14,7 @@ namespace UI
         Union_Attack, Last_Stand, Rolling_Vulcan, 
         Penetration, Power_Charge, Anima, 
         Burner, Freezer, Stunner, Pulser,
+        Talk,
     }
     public class CommandButton : MonoBehaviour
     {

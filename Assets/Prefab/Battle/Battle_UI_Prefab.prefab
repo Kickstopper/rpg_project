@@ -19081,6 +19081,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Controller.BattleManager
   uiController: {fileID: 1616790773360827174}
+  dialogueUI: {fileID: 0}
   fieldController: {fileID: 8174008803012594333}
   visualController: {fileID: 2026097407857020551}
   levelUpUI: {fileID: 8901032274154488167}

@@ -23,7 +23,7 @@ namespace UI
         private AudioSource audioSource;
 
         [Header("UI Components")]
-        public GameObject uiPanel;
+        public GameObject uiCanvas;
         public Image portraitImageUI;
         public Image standingImageUI;
         public TextMeshProUGUI nameText;
@@ -39,6 +39,7 @@ namespace UI
         private bool isWaitingForChoice = false;
 
         public event Action OnDialogueFinished;
+        public event Action<string> OnChoiceMade;
 
         void Awake()
         {
@@ -48,20 +49,47 @@ namespace UI
 
         void Start()
         {
-            uiPanel.SetActive(false);
+            uiCanvas.SetActive(false);
         }
 
-        public void Initialize(string eventID)
+        public void Initialize(string eventID, Action onComplete = null)
         {
             currentEventLines = DialogueManager.Instance.GetEventData(eventID);
+            if (currentEventLines == null || currentEventLines.Count == 0) return;
             
+            OnDialogueFinished = onComplete; 
+            
+            StartDialogueFlow();
+        }
+
+        // CSV를 거치지 않고, 전투 시스템이 실시간으로 조립한 대화 스크립트로 초기화
+        public void InitializeDynamic(List<Dictionary<string, string>> dynamicLines, Action onComplete = null, Action<string> onChoice = null)
+        {
+            currentEventLines = dynamicLines;
             if (currentEventLines == null || currentEventLines.Count == 0) return;
 
+            OnDialogueFinished = onComplete;
+            OnChoiceMade = onChoice; // [신규 추가]
+            
+            StartDialogueFlow();
+        }
+
+        private void StartDialogueFlow()
+        {
             currentLineIndex = 0;
             isDialogueActive = true;
-            uiPanel.SetActive(true);
-
+            uiCanvas.SetActive(true);
             ShowCurrentLine();
+        }
+
+        void EndDialogue()
+        {
+            isDialogueActive = false;
+            uiCanvas.SetActive(false);
+            choiceContainer.SetActive(false);
+            
+            // BattleManager가 알아서 다음 턴을 이어감
+            OnDialogueFinished?.Invoke();
         }
 
         void ShowCurrentLine()
@@ -258,6 +286,14 @@ namespace UI
             choiceContainer.SetActive(false);
             EventSystem.current.SetSelectedGameObject(null); // 포커스 해제
 
+            // 교섭용 콜백이 연결되어 있다면, 값을 쏴주고 즉시 종료
+            if (OnChoiceMade != null)
+            {
+                OnChoiceMade.Invoke(nextTargetID);
+                EndDialogue();
+                return;
+            }
+
             // 점프 혹은 대화 종료
             if (nextTargetID.ToUpper() == "END" || string.IsNullOrEmpty(nextTargetID))
             {
@@ -300,13 +336,5 @@ namespace UI
             ShowCurrentLine();
         }
 
-        void EndDialogue()
-        {
-            isDialogueActive = false;
-            uiPanel.SetActive(false);
-            choiceContainer.SetActive(false);
-            GameStateManager.Instance.ChangeState(GameState.Exploration);
-            OnDialogueFinished?.Invoke();
-        }
     }
 }

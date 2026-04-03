@@ -22,6 +22,7 @@ namespace Controller
         [Header("UI References")]
         // 인스펙터에서 할당
         public BattleUIController uiController;
+        public DialogueUI dialogueUI;
         public BattleFieldController fieldController;
         public BattleVisualController visualController; 
         public UI.Battle.LevelUpUI levelUpUI;
@@ -91,6 +92,12 @@ namespace Controller
         // 유니온 어택 참가자 목록 (턴 스킵 및 애니메이션용)
         private List<PlayerController> currentUnionParticipants = new List<PlayerController>();
         private bool isUnionAttackUsedThisTurn = false;
+
+        EnvironmentState currentEnv = new EnvironmentState 
+        { 
+            moonPhase = MoonPhase.Full, 
+            weather = Weather.Clear 
+        };
         
         // 자주 쓰는 딜레이 캐싱
         private WaitForSeconds wait01 = new WaitForSeconds(0.1f);
@@ -1031,7 +1038,12 @@ namespace Controller
             StartCoroutine(ProcessRunAttempt());
         }
         
-        public void OnBaseCommand_Talk() { Debug.Log("대화하기 (미구현)"); }
+        public void OnBaseCommand_Talk()
+        {
+            // 대화할 수 있는 적 타겟팅 시작
+            currentSelectedAction = ActionType.Talk;
+            StartTargetSelection(TargetScope.Single_Enemy, ActionType.Talk, "WHO TO TALK?");
+        }
 
         public void OnBaseCommand_Auto()
         {
@@ -1175,9 +1187,7 @@ namespace Controller
             uiController.SetFightCmdInteractable(true);
             StartCoroutine(SelectButton(attackButton)); 
         }
-
         
-
         public void OnPopupItemSelected(BaseRootData item)
         {
             currentSelectedItem = item;
@@ -1199,7 +1209,8 @@ namespace Controller
             }
         }
 
-        void StartItemTargetSelection(TargetScope scope)
+        // 범용 타겟팅 시작 함수
+        private void StartTargetSelection(TargetScope scope, ActionType actionType, string logMessage)
         {
             fieldController.SetValidTargetsByTargetScope(scope);
             if (fieldController.validTargets.Count == 0)
@@ -1210,18 +1221,26 @@ namespace Controller
             }
             
             isSelectingTarget = true;
-
-            // 현재 선택된 데이터 타입에 따라 분기
-            if (currentSelectedItem is SkillData) 
-                currentSelectedAction = ActionType.Skill;
-            else 
-                currentSelectedAction = ActionType.Item;
+            currentSelectedAction = actionType;
             
             fieldController.currentTargetIndex = 0; 
             fieldController.UpdateValidTargetsHighlight();
             inputCooldown = 0.2f;
 
+            // 메뉴 끄기
             uiController.SetFightCmdInteractable(false);
+            uiController.SetBaseCmdInteractable(false); 
+            
+            // 선택된 UI 버튼의 포커스를 날려서 확인 키의 중복 입력 차단
+            EventSystem.current.SetSelectedGameObject(null); 
+
+            uiController.ShowLog(logMessage);
+        }
+
+        void StartItemTargetSelection(TargetScope scope)
+        {
+            ActionType type = (currentSelectedItem is SkillData) ? ActionType.Skill : ActionType.Item;
+            StartTargetSelection(scope, type, "SELECT TARGET");
         }
 
         IEnumerator HideLogAfterDelay(float delay)
@@ -1682,18 +1701,30 @@ namespace Controller
         void CancelTargetSelection()
         {
             isSelectingTarget = false;
-            currentFightBtnIndex = 0;
-            uiController.SetCmdPanelVisible(true);
-            uiController.SetBaseCmdVisible(false);
-            uiController.SetFightCmdVisible(true);
             uiController.SetTargetCursorVisible(false);
-            uiController.SetFightCmdInteractable(true);
             uiController.ShowLog("WAITING...");
-
             fieldController.HighlightToCurrentCharacter();
-            
             inputCooldown = 0.2f; 
-            StartCoroutine(SelectButton(attackButton));
+            
+            // 커맨드 윈도우의 상태에 따라 원래 있던 메뉴로 복귀시킴
+            if (isFightMode)
+            {
+                currentFightBtnIndex = 0;
+                uiController.SetCmdPanelVisible(true);
+                uiController.SetBaseCmdVisible(false);
+                uiController.SetFightCmdVisible(true);
+                uiController.SetFightCmdInteractable(true);
+                StartCoroutine(SelectButton(attackButton));
+            }
+            else
+            {
+                currentBaseBtnIndex = 0;
+                uiController.SetCmdPanelVisible(true);
+                uiController.SetBaseCmdVisible(true);
+                uiController.SetFightCmdVisible(false);
+                uiController.SetBaseCmdInteractable(true);
+                StartCoroutine(SelectButton(baseFirstButton));
+            }
         }
 
         void UpdateMoveCursor()
@@ -1863,6 +1894,17 @@ namespace Controller
         {
             if (!isSelectingTarget) return;
 
+            if (currentSelectedAction == ActionType.Talk)
+            {
+                isSelectingTarget = false;
+                uiController.SetTargetCursorVisible(false);
+                targetEntity.SetSelectionState(false);
+
+                MonsterController targetMonster = targetEntity.GetComponent<MonsterController>();
+                StartNegotiation(targetMonster);
+                return;
+            }
+
             if (currentSelectedAction == ActionType.Union_Attack)
             {
                 fieldController.StopBlinkEffects();
@@ -1905,6 +1947,76 @@ namespace Controller
             targetEntity.SetSelectionState(false);
             uiController.SetFightCmdInteractable(true);
             NextPlayerInput();
+        }
+
+        public void StartNegotiation(MonsterController targetMonster)
+        {
+            targetMonster.CurrentAnger = 0; targetMonster.CurrentJoy = 0; targetMonster.CurrentInterest = 0;
+
+            List<Dictionary<string, string>> negotiationScript = GetNegotiationScript(targetMonster);
+            uiController.SetCmdPanelVisible(false);
+            
+            dialogueUI.InitializeDynamic(
+                negotiationScript, 
+                () => OnNegotiationEnded(targetMonster),
+                (choiceToneString) => {
+                    if (System.Enum.TryParse(choiceToneString, out ChoiceTone tone))
+                    {
+                        OnUserSelectedChoice(tone, targetMonster);
+                    }
+                }
+            );
+        }
+        
+        // 교섭 선택지의 결과 반영
+        public void OnUserSelectedChoice(ChoiceTone selectedTone, MonsterController target)
+        {
+            MoodDelta delta = NegotiationCalculator.CalculateMoodChange(selectedTone, target, currentEnv);
+
+            target.CurrentAnger += delta.addedAnger;
+            target.CurrentJoy += delta.addedJoy;
+            target.CurrentInterest += delta.addedInterest;
+            
+            // 결과 판정
+            if (target.CurrentAnger >= 100) { /* 교섭 결렬 및 적 턴 시작 */ }
+            else if (target.CurrentJoy >= 100) { /* 아이템 획득 및 적 퇴각 */ }
+            else if (target.CurrentInterest >= 100) { /* 대화 종료. 아무 변화 없음 */ }
+        }
+
+        private List<Dictionary<string, string>> GetNegotiationScript(MonsterController monster)
+        {
+            var lines = new List<Dictionary<string, string>>();
+            
+            // 1. 몬스터의 인사말
+            var line1 = new Dictionary<string, string>();
+            line1["Speaker"] = monster.entityName;
+            line1["Text"] = "인간...! 나에게 말을 걸다니 배짱이 좋군. 돈을 주면 살려주마.";
+            line1["Type"] = "CHOICE"; // 선택지 띄우기 트리거
+            lines.Add(line1);
+
+            // 2. 유저의 선택지 생성 (NextID에 ChoiceTone을 임시로 담아서 전달)
+            var branch1 = new Dictionary<string, string>();
+            branch1["Type"] = "BRANCH";
+            branch1["Text"] = "알겠다. (우호적)";
+            branch1["NextID"] = ChoiceTone.Friendly.ToString(); 
+            lines.Add(branch1);
+
+            var branch2 = new Dictionary<string, string>();
+            branch2["Type"] = "BRANCH";
+            branch2["Text"] = "웃기지 마라! (공격적)";
+            branch2["NextID"] = ChoiceTone.Aggressive.ToString();
+            lines.Add(branch2);
+
+            return lines;
+        }
+
+        // 대화가 종료되었을 때 선택지 결과(Tone)를 판정
+        private void OnNegotiationEnded(MonsterController targetMonster)
+        {
+            // TODO: DialogueUI에서 버튼 클릭 시 어떤 버튼을 눌렀는지 정보를 넘겨주는 이벤트 처리가 필요
+            
+            uiController.ShowLog("교섭이 종료되었다...");
+            ProcessTurn();
         }
 
         void ProcessTurn()

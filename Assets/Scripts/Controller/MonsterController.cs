@@ -14,8 +14,8 @@ namespace Controller
         private BattleManager manager;
         public MonsterDatabase.MonsterEntry sourceData;
         [Header("VFX")]
-        public Material baseAnaglyphMaterial; // 여기에 'Mat_Anaglyph'를 연결.
-
+        public Material baseAnaglyphMaterial;
+        
         // Monster 전용 필드
         private Color backRowColor = new Color(0.6f, 0.6f, 0.6f, 1f); 
         private Color frontRowColor = Color.white;
@@ -33,6 +33,10 @@ namespace Controller
         public int MaxHp => maxHp;
         public int CurrentMp => currentMp;
         public int MaxMp => maxMp;
+
+        public int CurrentAnger { get; set; } = 0;
+        public int CurrentJoy { get; set; } = 0;
+        public int CurrentInterest { get; set; } = 0;
 
         private Material instanceMaterial;
         private const float FRONT_OFFSET = 0.01f;

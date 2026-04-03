@@ -1878,6 +1878,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -25
       objectReference: {fileID: 0}
+    - target: {fileID: 6760945191955151476, guid: e31f071411c2bf740a974e73476d9d62, type: 3}
+      propertyPath: dialogueUI
+      value: 
+      objectReference: {fileID: 1046656592}
     - target: {fileID: 7022779427819685875, guid: e31f071411c2bf740a974e73476d9d62, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -15634,6 +15638,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 514247600}
+    - target: {fileID: 1263032844844120448, guid: 87e890a5e645756408afa24ef87b8670, type: 3}
+      propertyPath: m_PlaneDistance
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3845470703872386321, guid: 87e890a5e645756408afa24ef87b8670, type: 3}
       propertyPath: m_Name
       value: Event_UI_Prefab
@@ -33866,8 +33874,8 @@ SceneRoots:
   - {fileID: 523811328}
   - {fileID: 1162789354}
   - {fileID: 1889353587}
-  - {fileID: 1046656590}
   - {fileID: 549703111}
   - {fileID: 188862324}
+  - {fileID: 1046656590}
   - {fileID: 1333669211}
   - {fileID: 1739339670}

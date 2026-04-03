@@ -53,7 +53,7 @@ MonoBehaviour:
   portraitDB: {fileID: 11400000, guid: 89d0e2e30bc8d6c40985b195be7ff30d, type: 2}
   typingSpeed: 0.05
   typingSound: {fileID: 8300000, guid: 1e32dfd682842a84e878385091e385de, type: 3}
-  uiPanel: {fileID: 8012576290160900662}
+  uiCanvas: {fileID: 2439952145935944111}
   portraitImageUI: {fileID: 8107967876598392529}
   standingImageUI: {fileID: 1628889355570212421}
   nameText: {fileID: 6035737695114507682}
@@ -260,7 +260,7 @@ Canvas:
   m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
-  m_PixelPerfect: 0
+  m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
@@ -269,7 +269,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!114 &3901630161524289040
 MonoBehaviour:

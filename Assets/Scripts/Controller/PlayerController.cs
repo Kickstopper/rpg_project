@@ -423,26 +423,10 @@ namespace Controller
                     // 레벨 업!
                     sourceData.currentExp -= requiredExp;
                     sourceData.stats.level++;
-                    
-                    // // 스탯 상승 (임시)
-                    // sourceData.stats.str++;
-                    // sourceData.stats.vit++;
-                    // sourceData.stats.mag++;
-                    // sourceData.stats.agi++;
-                    // sourceData.stats.luc++;
-                    // sourceData.stats.intel++;
-
-                    // // HP/MP 완전 회복 및 Max 수치 재계산
-                    // InitializeStats(); 
-                    
-                    // sourceData.currentHp = sourceData.maxHp;
-                    // sourceData.currentMp = sourceData.maxMp;
-                    // sourceData.maxHp = this.maxHp;
-                    // sourceData.maxMp = this.maxMp;
                 }
                 else
                 {
-                    break; // 레벨업 조건 불충족 시 종료
+                    break;
                 }
             }
 
