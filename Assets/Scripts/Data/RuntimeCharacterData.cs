@@ -25,7 +25,8 @@ namespace Data
         public bool isParty;
 
         public string name;
-
+        public Race race;         // 인간
+        public Gender gender;
         public Align align;
 
         public StatusEffect statusEffect;

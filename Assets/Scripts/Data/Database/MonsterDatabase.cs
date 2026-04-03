@@ -16,9 +16,18 @@ public class MonsterDatabase : ScriptableObject
         [Header("Basic Info")]
         public string id;           // "M001_Slime"
         public string name;         // "슬라임"
-        public string race;         // "요정"
+        public Race race;         // "요정"
+        public Align align;
+        public Gender gender;
         public Data.AI.MonsterAIProfile aiProfile;
         public List<SkillData> skills;
+        
+        [Header("Negotiation")]
+        public Personality personality;
+        public TimeOfDay timeOfDay; // Morning, Day, Evening, Night
+        public Weather weather; // Clear, Rain, Storm
+        public MoonPhase moonPhase; // New, Half, Full
+        public ChoiceTone choiceTone; // Friendly, Aggressive, Logical, Bribe, Flirt
 
         [Header("Visual")]
         public Sprite[] image;     // 이미지
@@ -30,7 +39,6 @@ public class MonsterDatabase : ScriptableObject
         public ColumnType preferredCol; // 왼쪽, 오른쪽 또는 가운데
 
         [Header("Battle Stats")]
-        public Align align;
         public StatData stats;             // 레벨, 힘, 마력, 체력 등
         public ResistanceData resistances; // 물리, 화염, 빙결 내성 등
 
