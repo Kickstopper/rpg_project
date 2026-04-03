@@ -179,7 +179,7 @@ public class BattleUIController : MonoBehaviour
         ResizeContainer(fightSubMenuContainer.GetComponent<RectTransform>(), subButtons.Count);
 
         // 서브 메뉴의 높이를 메인 메뉴의 카테고리 버튼과 일치시킴
-        fightSubMenuContainer.transform.parent.transform.localPosition = new Vector3(0, posY, 0);
+        fightSubMenuContainer.transform.parent.transform.localPosition = new Vector3(-180f, posY, 0);
     }
 
     public void SetCmdPanelVisible(bool isVisible)

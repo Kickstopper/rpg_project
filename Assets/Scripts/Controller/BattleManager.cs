@@ -69,8 +69,8 @@ namespace Controller
         private bool reserveAutoOff = false;
         
         // 각 캐릭터가 마지막으로 수행한 행동 타입 저장
-        private Dictionary<int, (ActionType type, BaseRootData data, GameObject target)> lastPlayerActions = new();
-       
+        private static Dictionary<int, (ActionType type, BaseRootData data, int targetIndex)> lastPlayerActions = new();
+
         public BattleState state;
         private List<BattleAction> actionQueue = new(); // 이번 턴의 모든 행동
 
@@ -165,10 +165,9 @@ namespace Controller
 
             if (monsterIds == null || monsterIds.Count == 0) return;
             
-            int maxSpawnLimit = Mathf.Min(monsterIds.Count, 6);
-            int spawnCount = Random.Range(1, maxSpawnLimit + 1); 
+            // 가중치 적용 (낮은 수일수록 등장 확률 높음)
+            int spawnCount = BattleCalculator.DetermineSpawnCount();
 
-            Debug.Log($"[Encounter] 몬스터 {spawnCount}마리가 출현합니다!");
             Dictionary<string, int> monsterList = new();
             for (int i = 0; i < spawnCount; i++)
             {
@@ -454,6 +453,9 @@ namespace Controller
             {
                 if (isAutoMode) return;
                 Time.timeScale = 1.0f;
+
+                // 대화창이 열려있다면 모든 입력 무시
+                if (dialogueUI != null && dialogueUI.IsDialogueActive) return;
 
                 if (uiController.IsItemUIVisible) return; 
                 if (uiController.IsSkillUIVisible) return;
@@ -1026,6 +1028,10 @@ namespace Controller
             isFightMode = true;
             uiController.SetBaseCmdVisible(false);
             uiController.SetFightCmdVisible(true);
+
+            // Fight 메뉴에 진입 시 무조건 인터랙션 활성화
+            uiController.SetFightCmdInteractable(true);
+
             inputCooldown = 0.2f;
             currentFightBtnIndex = 0;
             StartCoroutine(SelectButtonDelayed(uiController.activeFightButtons, currentFightBtnIndex));
@@ -1257,10 +1263,13 @@ namespace Controller
             if (currentSelectedItem is SkillData skill) action.skillData = skill;
 
             // 즉시 실행되는 행동(All_Allies, Self 등)도 Auto 모드를 위해 저장
+            int tIndex = -1;
+            if (target != null && target.TryGetComponent(out PlayerController pc)) tIndex = pc.columnIndex;
+
             if (lastPlayerActions.ContainsKey(fieldController.currentPlayerIndex))
-                lastPlayerActions[fieldController.currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, target);
+                lastPlayerActions[fieldController.currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, tIndex);
             else
-                lastPlayerActions.Add(fieldController.currentPlayerIndex, (currentSelectedAction, currentSelectedItem, target));
+                lastPlayerActions.Add(fieldController.currentPlayerIndex, (currentSelectedAction, currentSelectedItem, tIndex));
 
             actionQueue.Add(action);
             NextPlayerInput();
@@ -1361,6 +1370,10 @@ namespace Controller
             isFightMode = false; 
             uiController.SetFightCmdVisible(false);
             uiController.SetBaseCmdVisible(true);
+
+            // Base 메뉴 진입 시, 무조건 인터랙션 활성화
+            uiController.SetBaseCmdInteractable(true);
+
             currentBaseBtnIndex = 0; 
             UpdateSelection(uiController.baseButtons, currentBaseBtnIndex);
         }
@@ -1498,6 +1511,8 @@ namespace Controller
             {
                 uiController.SetBaseCmdVisible(true);
                 uiController.SetFightCmdVisible(false);
+                uiController.SetBaseCmdInteractable(true);
+
                 currentBaseBtnIndex = 0;
                 StartCoroutine(SelectButtonDelayed(uiController.baseButtons, currentBaseBtnIndex));
             }
@@ -1544,7 +1559,7 @@ namespace Controller
         {
             ActionType actionType = ActionType.Attack;
             BaseRootData autoData = null;
-            GameObject autoTarget = null; // 저장된 타겟
+            int autoTargetIndex = -1;
 
             // 저장된 행동 불러오기
             if (lastPlayerActions.ContainsKey(fieldController.currentPlayerIndex))
@@ -1552,7 +1567,7 @@ namespace Controller
                 var info = lastPlayerActions[fieldController.currentPlayerIndex];
                 actionType = info.type;
                 autoData = info.data; 
-                autoTarget = info.target; // 타겟 복원
+                autoTargetIndex = info.targetIndex;
             }
 
             // 스코프 확인
@@ -1575,7 +1590,17 @@ namespace Controller
             if (isAllyScope)
             {
                 // 아군 대상인 경우 무조건 저장된 타겟 사용
-                finalTarget = autoTarget;
+                if (autoTargetIndex != -1)
+                {
+                    PlayerController restoredTarget = fieldController.allSlotControllers[autoTargetIndex];
+                    if (restoredTarget != null && !restoredTarget.IsEmpty)
+                    {
+                        finalTarget = restoredTarget.gameObject;
+                    }
+                }
+
+                // 동료가 죽었거나 파티가 바뀌었다면 본인을 타겟으로 설정
+                if (finalTarget == null) finalTarget = actor.gameObject;
             }
             else
             {
@@ -1756,6 +1781,8 @@ namespace Controller
                 fieldController.SetEnemyVisualsActive(false);
                 uiController.ShowMessage("휴~ 도망쳤다.");
                 yield return wait10;
+
+                fieldController.ClearMonsterField(); // 전장 몬스터 지우기
                 uiController.ShowBattleEndAnimation(()=>{ GameStateManager.Instance.ChangeState(GameState.Exploration); });
             }
             else
@@ -1913,10 +1940,13 @@ namespace Controller
             PlayerController actor = fieldController.GetCurrentCharacter();
 
             // 타겟 정보까지 함께 저장
+            int tIndex = -1;
+            if (targetEntity is PlayerController targetPc) tIndex = targetPc.columnIndex;
+
             if (lastPlayerActions.ContainsKey(fieldController.currentPlayerIndex))
-                lastPlayerActions[fieldController.currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, targetEntity.gameObject);
+                lastPlayerActions[fieldController.currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, tIndex);
             else
-                lastPlayerActions.Add(fieldController.currentPlayerIndex, (currentSelectedAction, currentSelectedItem, targetEntity.gameObject));
+                lastPlayerActions.Add(fieldController.currentPlayerIndex, (currentSelectedAction, currentSelectedItem, tIndex));
             
             int finalSpeed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
             actor.nextTurnSpeedPenalty = 0;
@@ -1987,14 +2017,12 @@ namespace Controller
         {
             var lines = new List<Dictionary<string, string>>();
             
-            // 1. 몬스터의 인사말
             var line1 = new Dictionary<string, string>();
             line1["Speaker"] = monster.entityName;
             line1["Text"] = "인간...! 나에게 말을 걸다니 배짱이 좋군. 돈을 주면 살려주마.";
             line1["Type"] = "CHOICE"; // 선택지 띄우기 트리거
             lines.Add(line1);
 
-            // 2. 유저의 선택지 생성 (NextID에 ChoiceTone을 임시로 담아서 전달)
             var branch1 = new Dictionary<string, string>();
             branch1["Type"] = "BRANCH";
             branch1["Text"] = "알겠다. (우호적)";
@@ -2166,6 +2194,8 @@ namespace Controller
 
                 case ActionType.Next:
                     uiController.ShowLog($"{action.actor.name} IS WATCHING FOR OPPORTUNITY...");
+                    bool isParty = action.actor.GetComponent<PlayerController>() != null;
+                    AddGauge(isParty, 0.1f);
                     // 별도의 애니메이션 없이 대기
                     yield return wait05; 
                     break;
@@ -2831,8 +2861,8 @@ namespace Controller
 
             if (BattleCalculator.CheckEvasion(attackerEntity, targetEntity, action, posEvaBonus))
             {
-                // 회피 시 방어자 측 게이지 0.2 상승
-                AddGauge(!isPlayerActor, 0.2f);
+                // 회피 시 방어자 측 게이지 0.1 상승
+                AddGauge(!isPlayerActor, 0.1f);
 
                 Debug.Log($"{target.name} 회피!");
                 yield return StartCoroutine(ProcessDodgeAnimation(target.transform));
@@ -2847,8 +2877,8 @@ namespace Controller
 
             if (BattleCalculator.CheckReflection(targetEntity, action.type))
             {
-                // 반사 시 방어자 측 게이지 0.2 상승
-                AddGauge(!isPlayerActor, 0.2f);
+                // 반사 시 방어자 측 게이지 0.1 상승
+                AddGauge(!isPlayerActor, 0.1f);
 
                 uiController.ShowLog("REFLECT!");
                 visualController.SpawnVFX(VfxID.Reflect, target.transform.position);
@@ -2865,8 +2895,8 @@ namespace Controller
 
             if (BattleCalculator.CheckAbsorption(targetEntity, action.type))
             {
-                // 흡수 시 방어자 측 게이지 0.2 상승
-                AddGauge(!isPlayerActor, 0.2f);
+                // 흡수 시 방어자 측 게이지 0.1 상승
+                AddGauge(!isPlayerActor, 0.1f);
 
                 uiController.ShowLog("ABSORB!");
                 visualController.SpawnVFX(VfxID.Absorb, target.transform.position);
@@ -2915,7 +2945,8 @@ namespace Controller
             
             // 정상 타격 시 게이지 상승 계산
             float resistValue = BattleCalculator.GetResistanceValue(action.skillData, targetEntity.GetResistances()); 
-            float hitGaugeInc = 0.1f + (1.0f - resistValue) * 0.1f;
+            float hitGaugeInc = 0.05f + (1.0f - resistValue) * 0.05f;
+            if (action.type == ActionType.Shoot) hitGaugeInc /= 3f;
             if (isCritical) hitGaugeInc *= 2f; // 크리티컬 시, 게이지 상승 2배
             AddGauge(isPlayerActor, hitGaugeInc);
 
@@ -3156,6 +3187,7 @@ namespace Controller
             }
 
             // 전투 종료
+            fieldController.ClearMonsterField(); // 전장의 몬스터들을 싹 지워버림
             uiController.ShowBattleEndAnimation(()=>{GameStateManager.Instance.ChangeState(GameState.Exploration);});
         }
         

@@ -122,7 +122,25 @@ namespace Helper
             float totalChance = Mathf.Clamp(baseCritChance + (atkLuc - defLuc) * 0.005f, 0f, 0.5f);
             return Random.value < totalChance;
         }
+        
+        // =======================================================
+        // 스폰되는 몬스터의 수 결정
+        // =======================================================
+        public static int DetermineSpawnCount()
+        {
+            int spawnCount = 1;
+            float roll = Random.value;
 
+            // 기획된 가중치 확률 적용
+            if (roll < 0.30f)      spawnCount = 1; // 30%
+            else if (roll < 0.60f) spawnCount = 2; // 30%
+            else if (roll < 0.80f) spawnCount = 3; // 20%
+            else if (roll < 0.90f) spawnCount = 4; // 10%
+            else if (roll < 0.97f) spawnCount = 5; // 7%
+            else                   spawnCount = 6; // 3%
+
+            return spawnCount;
+        }
 
         // =======================================================
         // [경험치, 재화, 드랍 아이템 보상]

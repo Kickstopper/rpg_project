@@ -32,14 +32,18 @@ namespace UI
         private List<Dictionary<string, string>> currentEventLines;
         private int currentLineIndex = 0;
         private bool isDialogueActive = false;
+        public bool IsDialogueActive => isDialogueActive;
 
         // 타이핑 상태 관리 변수
         private bool isTyping = false;
         private Coroutine typingCoroutine;
         private bool isWaitingForChoice = false;
 
+        private float inputCooldown = 0f;
+
         public event Action OnDialogueFinished;
         public event Action<string> OnChoiceMade;
+
 
         void Awake()
         {
@@ -76,6 +80,7 @@ namespace UI
 
         private void StartDialogueFlow()
         {
+            inputCooldown = 0.2f;
             currentLineIndex = 0;
             isDialogueActive = true;
             uiCanvas.SetActive(true);
@@ -196,6 +201,12 @@ namespace UI
         {
             if (!isDialogueActive) return;
 
+            if (inputCooldown > 0)
+            {
+                inputCooldown -= Time.deltaTime;
+                return;
+            }
+            
             if (isWaitingForChoice) return;
 
             if (Input.GetButtonDown("Submit") || Input.GetMouseButtonDown(0))
