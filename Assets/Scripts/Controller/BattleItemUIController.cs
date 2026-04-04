@@ -88,6 +88,7 @@ namespace Controller
         {
             gameObject.SetActive(false);
             battleManager.OnPopupMenuClosed();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
 
         void SwitchTab(int categoryIndex)
@@ -99,6 +100,8 @@ namespace Controller
 
             // 리스트 새로고침
             RefreshList();
+
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
         }
 
         // 현재 선택된 탭을 시각적으로 강조
@@ -129,7 +132,7 @@ namespace Controller
             List<string> allItemIds = InventoryManager.Instance.GetAllItemIds();
             foreach (string id in allItemIds)
             {
-                ConsumableItemData data = DatabaseManager.Instance.GetConsumable(id); // [구현 필요]
+                ConsumableItemData data = DatabaseManager.Instance.GetConsumable(id);
                 if (data == null) continue;
 
                 if (data.GetCategoryIndex() == currentTab)
@@ -146,7 +149,7 @@ namespace Controller
         {
             GameObject slotObj = Instantiate(itemSlotPrefab, contentTransform);
             
-            // 이름/개수 표시 (예시)
+            // 이름/개수 표시
             var texts = slotObj.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
             if(texts.Length > 0) texts[0].text = data.dataName;
             int count = InventoryManager.Instance.GetItemCount(data.id);
@@ -164,6 +167,7 @@ namespace Controller
             gameObject.SetActive(false);
             battleManager.OnPopupMenuClosed(); 
             battleManager.OnPopupItemSelected(itemData);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
         }
 
         IEnumerator SelectFirstItem()

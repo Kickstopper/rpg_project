@@ -1187,7 +1187,6 @@ namespace Controller
 
         public void OnPopupMenuClosed()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             currentFightBtnIndex = 0;
             uiController.SetFightCmdInteractable(true);
             StartCoroutine(SelectButton(attackButton)); 
@@ -1980,6 +1979,8 @@ namespace Controller
 
         public void StartNegotiation(MonsterController targetMonster)
         {
+            SoundManager.Instance.PlayBGM(BgmID.Encounter);
+            
             targetMonster.CurrentAnger = 0; targetMonster.CurrentJoy = 0; targetMonster.CurrentInterest = 0;
 
             List<Dictionary<string, string>> negotiationScript = GetNegotiationScript(targetMonster);

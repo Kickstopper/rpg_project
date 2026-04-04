@@ -76,7 +76,7 @@ namespace Controller
             currentTab += direction;
             if (currentTab > 3) currentTab = 0;
             else if (currentTab < 0) currentTab = 3;
-
+            
             SwitchTab(currentTab);
         }
 
@@ -97,6 +97,7 @@ namespace Controller
             currentActor = null; // 초기화
             gameObject.SetActive(false);
             battleManager.OnPopupMenuClosed();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
 
         void SwitchTab(int categoryIndex)
@@ -105,6 +106,7 @@ namespace Controller
             currentTab = categoryIndex;
             UpdateTabVisuals();
             RefreshList();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
         }
 
         void UpdateTabVisuals()
@@ -190,9 +192,7 @@ namespace Controller
                 }
                 else
                 {
-                    // 조건 불만족 시 거부 반응 (효과음 등)
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); // 띵~ 소리
-                    // 필요하다면 로그 출력: "MP가 부족합니다" 등
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 }
             });
             
@@ -204,6 +204,7 @@ namespace Controller
             gameObject.SetActive(false);
             battleManager.OnPopupMenuClosed(); 
             battleManager.OnPopupItemSelected(itemData);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
         }
 
         IEnumerator SelectFirstItem()

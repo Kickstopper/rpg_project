@@ -179,8 +179,9 @@ namespace Controller
             float moveSpeed = Time.deltaTime * 3.0f; // 속도 조절
             float rotSpeed = Time.deltaTime * 2.0f;
 
-            // 점프 / 스캔
-            if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
+            // 점프
+            //if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
+            // 스캔
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
 
             // 이동
@@ -332,7 +333,7 @@ namespace Controller
 
             if (!_player.IsMoving)
             {
-                if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
+                //if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
 
                 // 이동 입력
                 if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) TryMove(1);
