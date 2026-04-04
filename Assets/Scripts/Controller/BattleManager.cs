@@ -1019,7 +1019,6 @@ namespace Controller
         {
             if (list == null || list.Count == 0 || index < 0 || index >= list.Count) return;
             list[index].Select();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
         }
 
         // [UI Buttons]
