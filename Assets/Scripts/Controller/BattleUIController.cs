@@ -19,6 +19,7 @@ public class BattleUIController : MonoBehaviour
     public TextMeshProUGUI phaseIndicatorText;
     public SimpleGradient phaseIndicatorBg;
 
+    public GameObject breakSliderContainer;
     public Slider enemyBreakSlider;
     public Slider partyBreakSlider;
     public Slider qteTimingSlider; // 타이머 슬라이더. 인스펙터에서 할당
@@ -317,6 +318,11 @@ public class BattleUIController : MonoBehaviour
         targetEnemyGauge = 0f;
         enemyBreakSlider.DOKill();
         enemyBreakSlider.value = 0f;
+    }
+
+    public void SetBreakSliderVisible(bool visible)
+    {
+        breakSliderContainer.SetActive(visible);
     }
 
     public void ShowBattleStartAnimation(Action onCompleteCallback)

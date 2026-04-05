@@ -39,6 +39,9 @@ namespace UI
         private Coroutine typingCoroutine;
         private bool isWaitingForChoice = false;
 
+        private List<Button> activeChoiceButtons = new List<Button>();
+        private int currentChoiceIndex = 0;
+
         private float inputCooldown = 0f;
 
         public event Action OnDialogueFinished;
@@ -73,7 +76,7 @@ namespace UI
             if (currentEventLines == null || currentEventLines.Count == 0) return;
 
             OnDialogueFinished = onComplete;
-            OnChoiceMade = onChoice; // [신규 추가]
+            OnChoiceMade = onChoice;
             
             StartDialogueFlow();
         }
@@ -207,7 +210,11 @@ namespace UI
                 return;
             }
             
-            if (isWaitingForChoice) return;
+            if (isWaitingForChoice)
+            {
+                HandleChoiceNavigation();
+                return;
+            }
 
             if (Input.GetButtonDown("Submit") || Input.GetMouseButtonDown(0))
             {
@@ -220,6 +227,48 @@ namespace UI
                 {
                     // 타이핑이 끝났다면 다음 대사로
                     AdvanceLine();
+                }
+            }
+        }
+
+        // 수동 네비게이션 및 포커스 유지 로직
+        void HandleChoiceNavigation()
+        {
+            if (activeChoiceButtons == null || activeChoiceButtons.Count == 0) return;
+
+            bool changed = false;
+
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            {
+                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+                currentChoiceIndex = (currentChoiceIndex - 1 + activeChoiceButtons.Count) % activeChoiceButtons.Count;
+                changed = true;
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+                currentChoiceIndex = (currentChoiceIndex + 1) % activeChoiceButtons.Count;
+                changed = true;
+            }
+
+            // 포커스 유실 감지 (마우스로 화면 빈 공간을 클릭했을 경우)
+            GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
+            bool isFocusLost = currentSelected == null || !activeChoiceButtons.Exists(b => b.gameObject == currentSelected);
+
+            // 인덱스가 변했거나 포커스를 잃었다면 즉시 복구
+            if (changed || isFocusLost)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+                EventSystem.current.SetSelectedGameObject(activeChoiceButtons[currentChoiceIndex].gameObject);
+            }
+
+            // 결정
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            {
+                if (activeChoiceButtons[currentChoiceIndex].interactable)
+                {
+                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+                    activeChoiceButtons[currentChoiceIndex].onClick.Invoke();
                 }
             }
         }
@@ -244,15 +293,17 @@ namespace UI
             isWaitingForChoice = true;
             choiceContainer.SetActive(true);
 
-            // 기존 버튼들 모두 제거
+            // 리스트와 인덱스 초기화
+            activeChoiceButtons.Clear();
+            currentChoiceIndex = 0;
+
+            // 기존 버튼 모두 제거
             foreach (Transform child in choiceContainer.transform)
             {
                 Destroy(child.gameObject);
             }
 
-            // 현재 줄 다음부터 BRANCH가 나올 때마다 ChoiceButtonPrefab (선택지) 생성
             int lookAheadIndex = currentLineIndex + 1;
-            GameObject firstButton = null;
 
             while (lookAheadIndex < currentEventLines.Count)
             {
@@ -261,31 +312,28 @@ namespace UI
 
                 if (branchType == "BRANCH")
                 {
-                    // 버튼 생성 로직
                     GameObject btnObj = Instantiate(choiceButtonPrefab, choiceContainer.transform);
                     btnObj.GetComponentInChildren<TextMeshProUGUI>().text = branchData["Text"];
 
                     string nextTargetID = branchData.ContainsKey("NextID") ? branchData["NextID"] : "END";
                     
-                    // 버튼 클릭 이벤트 연결
                     Button btn = btnObj.GetComponent<Button>();
                     btn.onClick.AddListener(() => OnChoiceSelected(nextTargetID));
 
-                    if (firstButton == null) firstButton = btnObj;
+                    activeChoiceButtons.Add(btn);
                 }
                 else
                 {
-                    // BRANCH가 끝나고 다른 타입(TALK 등)이 나오면 탐색 종료
                     break;
                 }
                 lookAheadIndex++;
             }
 
-            // 키보드/패드 조작을 위해 첫 번째 버튼에 포커스 주기
-            if (firstButton != null)
+            // 첫 번째 버튼에 포커스
+            if (activeChoiceButtons.Count > 0)
             {
-                EventSystem.current.SetSelectedGameObject(null); // 기존 포커스 해제
-                EventSystem.current.SetSelectedGameObject(firstButton); // 새 포커스 지정
+                EventSystem.current.SetSelectedGameObject(null); 
+                EventSystem.current.SetSelectedGameObject(activeChoiceButtons[0].gameObject);
             }
         }
 
@@ -341,10 +389,49 @@ namespace UI
             return -1; // 못 찾음
         }
 
+        // 유저가 타이핑이 끝난 후 클릭했을 때 실행되는 함수
         void AdvanceLine()
         {
+            var currentData = currentEventLines[currentLineIndex];
+            string nextTargetID = currentData.ContainsKey("NextID") ? currentData["NextID"] : "";
+
+            // 현재 줄의 NextID가 "END"라면 즉시 대화 종료
+            if (nextTargetID.ToUpper() == "END")
+            {
+                EndDialogue();
+                return;
+            }
+
+            // 특정 Seq로 점프해야 하는 경우 (일반 대화 중 컷씬 스킵 등)
+            if (!string.IsNullOrEmpty(nextTargetID) && nextTargetID.ToUpper() != "END")
+            {
+                int targetIndex = FindIndexBySeq(nextTargetID);
+                if (targetIndex != -1)
+                {
+                    currentLineIndex = targetIndex;
+                    ShowCurrentLine();
+                    return;
+                }
+                else
+                {
+                    Debug.LogWarning($"NextID '{nextTargetID}'를 찾을 수 없습니다.");
+                    EndDialogue();
+                    return;
+                }
+            }
+
+            // 아무 지시가 없으면 바로 다음 줄로 이동
             currentLineIndex++;
-            ShowCurrentLine();
+
+            // 더 이상 읽을 줄이 남아있지 않다면 종료
+            if (currentLineIndex < currentEventLines.Count)
+            {
+                ShowCurrentLine();
+            }
+            else
+            {
+                EndDialogue(); 
+            }
         }
 
     }
