@@ -1095,4 +1095,17 @@ public class BattleFieldController : MonoBehaviour
         currentTargetIndex = validTargets.IndexOf(target);
     }
 
+    public void SetEnemyVisible(bool visible)
+    {
+        enemyFrontRowContainer.gameObject.SetActive(visible);
+        enemyBackRowContainer.gameObject.SetActive(visible);
+        
+    }
+
+    public void SetPartyVisible(bool visible)
+    {
+        playerFrontRowContainer.gameObject.SetActive(visible);
+        playerBackRowContainer.gameObject.SetActive(visible);
+    }
+
 }

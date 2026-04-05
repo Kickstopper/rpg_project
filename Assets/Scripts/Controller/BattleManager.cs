@@ -1981,10 +1981,15 @@ namespace Controller
         {
             SoundManager.Instance.PlayBGM(BgmID.Encounter);
             
+            // 불필요한 UI 비활성화
+            uiController.HideLog();
+            uiController.SetBreakSliderVisible(false);
+            uiController.SetCmdPanelVisible(false);
+            fieldController.SetPartyVisible(false);
+
             targetMonster.CurrentAnger = 0; targetMonster.CurrentJoy = 0; targetMonster.CurrentInterest = 0;
 
             List<Dictionary<string, string>> negotiationScript = GetNegotiationScript(targetMonster);
-            uiController.SetCmdPanelVisible(false);
             
             dialogueUI.InitializeDynamic(
                 negotiationScript, 
@@ -2043,7 +2048,11 @@ namespace Controller
         {
             // TODO: DialogueUI에서 버튼 클릭 시 어떤 버튼을 눌렀는지 정보를 넘겨주는 이벤트 처리가 필요
             
-            uiController.ShowLog("교섭이 종료되었다...");
+            // Fight UI 켜기
+            uiController.SetCmdPanelVisible(true);
+            fieldController.SetPartyVisible(true);
+            uiController.SetBreakSliderVisible(true);
+            
             ProcessTurn();
         }
 

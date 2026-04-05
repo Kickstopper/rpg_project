@@ -22108,6 +22108,7 @@ MonoBehaviour:
   phaseIndicator: {fileID: 6995468018352850659}
   phaseIndicatorText: {fileID: 6968874013641484861}
   phaseIndicatorBg: {fileID: 4176885643479921146}
+  breakSliderContainer: {fileID: 514976957773467343}
   enemyBreakSlider: {fileID: 147735940098087211}
   partyBreakSlider: {fileID: 5753892399466282918}
   qteTimingSlider: {fileID: 4019049488780649018}
