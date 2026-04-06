@@ -951,12 +951,17 @@ namespace Controller
         // 서브 메뉴 버튼 추가
         void AddSubButton(ActionType type, bool isActive, List<Button> list)
         {
-            CommandButton cmdBtn = uiController.allFightButtons.Find(b => b.type == type);
+            CommandButton cmdBtn = GetCommandButton(type);
             if (cmdBtn != null)
             {
                 cmdBtn.gameObject.SetActive(isActive);
                 if (isActive) list.Add(cmdBtn.button);
             }
+        }
+
+        private CommandButton GetCommandButton(ActionType type)
+        {
+            return uiController.allFightButtons.Find(b => b.type == type);
         }
 
         // 서브 메뉴 닫기 (메인 메뉴로 복귀)
@@ -1682,25 +1687,31 @@ namespace Controller
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Click);
-                int myCurrentIndex = fieldController.GetCurrentChracterIndex();
-
-                if (currentMoveSlotIndex == myCurrentIndex) { CancelMoveSelection(); return; }
-
-                Transform targetSlot = fieldController.GetPlayerSlotByIndex(currentMoveSlotIndex);
-
-                BattleEntity currentActor = fieldController.GetCurrentCharacter();
-                int moveSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
-                currentActor.nextTurnSpeedPenalty = 0; 
-
-                BattleAction action = new BattleAction(currentActor.gameObject, targetSlot.gameObject, ActionType.Move, moveSpeed);
-                actionQueue.Add(action);
-
-                isSelectingMoveTarget = false;
-                
-                uiController.SetTargetCursorVisible(false);
-                fieldController.ResetPlayerSlotHighlights();
-                NextPlayerInput();
+                ConfirmMoveSelection();
             }
+        }
+
+        void ConfirmMoveSelection()
+        {
+            
+            int myCurrentIndex = fieldController.GetCurrentChracterIndex();
+
+            if (currentMoveSlotIndex == myCurrentIndex) { CancelMoveSelection(); return; }
+
+            Transform targetSlot = fieldController.GetPlayerSlotByIndex(currentMoveSlotIndex);
+
+            BattleEntity currentActor = fieldController.GetCurrentCharacter();
+            int moveSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
+            currentActor.nextTurnSpeedPenalty = 0; 
+
+            BattleAction action = new BattleAction(currentActor.gameObject, targetSlot.gameObject, ActionType.Move, moveSpeed);
+            actionQueue.Add(action);
+
+            isSelectingMoveTarget = false;
+            
+            uiController.SetTargetCursorVisible(false);
+            fieldController.ResetPlayerSlotHighlights();
+            NextPlayerInput();
         }
 
         void CancelMoveSelection()
@@ -1718,7 +1729,7 @@ namespace Controller
 
             uiController.SetTargetCursorVisible(false);
             inputCooldown = 0.2f;
-            StartCoroutine(SelectButton(attackButton)); 
+            StartCoroutine(SelectButton(GetCommandButton(ActionType.Move).gameObject)); 
         }
 
         void CancelTargetSelection()
@@ -1876,42 +1887,56 @@ namespace Controller
         // 마우스를 통한 타겟팅 처리
         public void OnTargetHovered(BattleEntity hoveredEntity)
         {
-            if (!isSelectingTarget) return;
-
-            // 마우스를 올린 대상이 validTargets에 포함되어 있는지 확인
-            if (fieldController.validTargets.Contains(hoveredEntity))
+            if (isSelectingTarget)
             {
-                if (fieldController.GetCurrentValidTarget() == hoveredEntity) return;
+                // 마우스를 올린 대상이 validTargets에 포함되어 있는지 확인
+                if (fieldController.validTargets.Contains(hoveredEntity))
+                {
+                    if (fieldController.GetCurrentValidTarget() == hoveredEntity) return;
 
-                // 하이라이트 이동
-                fieldController.SetCurrentValidTargetIndex(hoveredEntity);
-                fieldController.UpdateValidTargetsHighlight();
+                    // 하이라이트 이동
+                    fieldController.SetCurrentValidTargetIndex(hoveredEntity);
+                    fieldController.UpdateValidTargetsHighlight();
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                }
+            }
+            else if (isSelectingMoveTarget)
+            {
+                currentMoveSlotIndex = fieldController.GetPlayerSlotIndex(hoveredEntity.transform.parent);
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                UpdateMoveCursor();
+                fieldController.RefreshMoveHighlights(currentMoveSlotIndex); 
             }
         }
 
         public void OnTargetClicked(BattleEntity clickedEntity)
         {
-            if (!isSelectingTarget) return;
-
-            // 클릭한 대상이 유효한 타겟일 경우 확정
-            if (fieldController.validTargets.Contains(clickedEntity))
+            if (isSelectingTarget)
             {
-                // 마우스가 너무 빨리 움직여 호버가 씹혔을 경우를 대비해 포커스 강제 갱신
-                fieldController.SetCurrentValidTargetIndex(clickedEntity);
-                fieldController.UpdateValidTargetsHighlight();
+                // 클릭한 대상이 유효한 타겟일 경우 확정
+                if (fieldController.validTargets.Contains(clickedEntity))
+                {
+                    // 마우스가 너무 빨리 움직여 호버가 씹혔을 경우를 대비해 포커스 강제 갱신
+                    fieldController.SetCurrentValidTargetIndex(clickedEntity);
+                    fieldController.UpdateValidTargetsHighlight();
 
-                var validTarget = fieldController.GetCurrentValidTarget();
-                validTarget.SetSelectionState(false);
-                
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
-                
-                OnTargetSelected(validTarget); // 확정 처리
+                    var validTarget = fieldController.GetCurrentValidTarget();
+                    validTarget.SetSelectionState(false);
+                    
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                    
+                    OnTargetSelected(validTarget); // 확정 처리
+                }
+                else
+                {
+                    // 공격할 수 없는 아군이나 시체 등을 클릭했을 때의 피드백
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                }
             }
-            else
+            else if (isSelectingMoveTarget)
             {
-                // 공격할 수 없는 아군이나 시체 등을 클릭했을 때의 피드백
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                ConfirmMoveSelection();
             }
         }
 
