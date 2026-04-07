@@ -28,6 +28,8 @@ namespace Data
 
         [Header("환경 설정")]
         public Color fogColor = Color.black; // 심도 표현을 위한 안개의 색
+        public float lightingIntensity = 3.5f;
+        public bool useGridLighting = true;
         public BgmID bgmID;                  // 이 레벨에서 재생될 BGM
         public List<string> monsterList;     // 출현하는 몬스터의 ID 목록
     }

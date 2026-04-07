@@ -46,6 +46,7 @@ namespace UI.DungeonMapScene
         [Header("Lighting")]
         public float lightingIntensity = 3.5f;
         public bool useGridLighting = true;
+        public Color fogColor = Color.black;
 
         [Header("Scanner Effect")]
         public Color32 wireframeColor = Color.green;

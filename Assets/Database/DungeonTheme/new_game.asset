@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
+  m_Name: new_game
+  m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
+  dungeonID: new_game
+  background: {fileID: 0}
+  texture:
+  - {fileID: 2800000, guid: ae7a978fe58e9ec4e98bdb2d5596652f, type: 3}
+  - {fileID: 2800000, guid: bfc7b9fe4315ce549aad8294a0ba873e, type: 3}
+  floorTexIdx: 1
+  ceilingTexIdx: 1
+  wallAnimations: []
+  fogColor: {r: 0.14117648, g: 0.4117647, b: 0.38039216, a: 1}
+  lightingIntensity: 0.3
+  useGridLighting: 0
+  bgmID: 0
+  monsterList: []

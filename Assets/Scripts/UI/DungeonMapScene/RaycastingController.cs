@@ -854,6 +854,10 @@ namespace Controller
             
             SoundManager.Instance.PlayBGM(theme.bgmID);
 
+            renderSettings.useGridLighting = theme.useGridLighting;
+            renderSettings.lightingIntensity = theme.lightingIntensity;
+            renderSettings.fogColor = theme.fogColor;
+            
             if (backgroundImage != null) backgroundImage.texture = theme.background;
             
             // 시스템 초기화

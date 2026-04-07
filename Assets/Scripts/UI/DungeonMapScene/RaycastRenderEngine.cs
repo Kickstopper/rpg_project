@@ -425,7 +425,7 @@ namespace UI.DungeonMapScene
                         }
                         
                         col = GetPixelFast(hitTexId, sTexX, texY);
-                        if (lightScale < 255) ApplyLight(ref col, lightScale);
+                        if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
                     }
 
                     int bIdx = y * _screenWidth + x;
@@ -544,8 +544,7 @@ namespace UI.DungeonMapScene
                     float depthDimmer = Mathf.Lerp(0.2f, 1.0f, verticalFactor); 
                     
                     int finalLight = (int)(lightScale * depthDimmer);
-
-                    if (finalLight < 255) ApplyLight(ref col, finalLight);
+                    if (finalLight < 255) ApplyLight(ref col, finalLight, settings.fogColor);
                 }
 
                 int bIdx = y * _screenWidth + x;
@@ -624,10 +623,10 @@ namespace UI.DungeonMapScene
                     
                     // 수직 그라데이션. 위로 올라갈수록(y가 커질수록) 어두워짐
                     float verticalFactor = Mathf.Clamp01((float)(y - rawDrawStart) / voidHeight);
-                    float depthDimmer = Mathf.Lerp(1.0f, 0.2f, verticalFactor); // 입구(1.0), 깊은곳(0.2)
+                    float depthDimmer = Mathf.Lerp(1.0f, 0.2f, verticalFactor); 
                     
                     int finalLight = (int)(lightScale * depthDimmer);
-                    if (finalLight < 255) ApplyLight(ref col, finalLight);
+                    if (finalLight < 255) ApplyLight(ref col, finalLight, settings.fogColor);
                 }
 
                 int bIdx = y * _screenWidth + x;
@@ -697,11 +696,9 @@ namespace UI.DungeonMapScene
                         float darkness = Mathf.Clamp01(1f - rowDist / settings.voidDepthScale);
                         byte bright = (byte)(darkness * 60f); // 최대 밝기 60
                         col = new Color32(bright, bright, bright, 255);
-                        // float tx = floorX - cellX; // 0~1, 셀 내 위치
-                        // float ty = floorY - cellY;
-                        // float edgeDist = Mathf.Min(tx, 1f - tx, ty, 1f - ty); // 가장 가까운 경계까지 거리
-                        // float shadow = Mathf.Clamp01(edgeDist * 6f);           // 경계에 가까울수록 0
-                        // ApplyLight(ref col, (int)(shadow * lightScale));
+                        
+                        // 빈 구멍도 멀어질수록 안개 색으로 덮이게 함
+                        if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
                     }
                     else if (isRowScanned)
                     {
@@ -717,7 +714,7 @@ namespace UI.DungeonMapScene
                         int cy = (int)(_texHeight * (floorY - cellY)) & (_texHeight - 1);
                         col = GetPixelFast(texIdx, cx, cy);
                             
-                        if (lightScale < 255) ApplyLight(ref col, lightScale);
+                        if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
                     }
 
                     // Step 처리
@@ -820,7 +817,7 @@ namespace UI.DungeonMapScene
                             
                             if (col.a > 0) // 투명색이 아니면 그리기
                             {
-                                if (lightScale < 255) ApplyLight(ref col, lightScale);
+                                if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
 
                                 int bIdx = y * _screenWidth + stripe;
                                 
@@ -839,11 +836,13 @@ namespace UI.DungeonMapScene
             }
         }
 
-        private void ApplyLight(ref Color32 c, int scale)
+        private void ApplyLight(ref Color32 c, int scale, Color32 fog)
         {
-            c.r = (byte)((c.r * scale) >> 8);
-            c.g = (byte)((c.g * scale) >> 8);
-            c.b = (byte)((c.b * scale) >> 8);
+            int invScale = 255 - scale; // 안개 농도 (거리가 멀어 빛이 줄어들수록 안개가 짙어짐)
+            
+            c.r = (byte)(((c.r * scale) + (fog.r * invScale)) >> 8);
+            c.g = (byte)(((c.g * scale) + (fog.g * invScale)) >> 8);
+            c.b = (byte)(((c.b * scale) + (fog.b * invScale)) >> 8);
         }
 
         private int GetTextureIdOnSide(CellData cell, int side, int stepX, int stepY, bool back)
