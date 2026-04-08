@@ -23,14 +23,16 @@ MonoBehaviour:
   floorTexIdx: 3
   ceilingTexIdx: -1
   spriteTextures:
-  - {fileID: -2631205595881985455, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
   - {fileID: -137211449224041512, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
   - {fileID: -5478674400631355457, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  - {fileID: -2631205595881985455, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
   - {fileID: -8592587084538253407, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
   - {fileID: 7556728160588841100, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
   - {fileID: -4759437863653782067, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
   - {fileID: 7903781024494958643, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
   - {fileID: -6788500882895127655, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  maxSpawnCount: 3
+  spawnDelay: 5
   wallAnimations: []
   fogColor: {r: 0.5396226, g: 0.5396226, b: 0.5396226, a: 1}
   lightingIntensity: 3.5
