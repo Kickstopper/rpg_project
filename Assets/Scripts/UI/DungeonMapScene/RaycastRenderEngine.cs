@@ -5,15 +5,25 @@ using Manager;
 
 namespace UI.DungeonMapScene
 {
+    public struct SpriteInfo
+    {
+        public float x;
+        public float y;
+        public int texIdx;
+    }
+
     public class RaycastRenderEngine
     {
         private Color32[] _buffer;
         private Color32[] _leftEyeBuffer;
         private float[] _zBuffer;
-        private Color32[] _flatTexturePixels; // 최적화된 텍스처 메모리
-        
+        private Color32[] _flatWallPixels;   // 벽 캐시
+        private Color32[] _flatSpritePixels; // 스프라이트 캐시
+
         private MapData _worldMap;
-        private Texture2D[] _textures;
+        private Texture2D[] _wallTextures;
+        private Sprite[] _sprites;
+        
         private SpriteInfo[] _sprtData;
         
         // Sprite Sorting
@@ -42,12 +52,13 @@ namespace UI.DungeonMapScene
             ScreenTexture.filterMode = FilterMode.Point;
         }
 
-        public void LoadAssets(Texture2D[] textures, int texW, int texH, SpriteInfo[] sprites)
+        public void LoadAssets(Texture2D[] wallTextures, Sprite[] sprites, int texW, int texH, SpriteInfo[] spriteData)
         {
-            _textures = textures;
+            _wallTextures = wallTextures;
+            _sprites = sprites;
             _texWidth = texW;
             _texHeight = texH;
-            _sprtData = sprites;
+            _sprtData = spriteData;
             
             if (_sprtData != null)
             {
@@ -55,6 +66,63 @@ namespace UI.DungeonMapScene
             }
 
             PrecomputeTextures();
+        }
+
+        private void PrecomputeTextures()
+        {
+            int pxPerTex = _texWidth * _texHeight;
+
+            // 벽 텍스처 캐싱
+            if (_wallTextures != null && _wallTextures.Length > 0)
+            {
+                _flatWallPixels = new Color32[_wallTextures.Length * pxPerTex];
+                for (int i = 0; i < _wallTextures.Length; i++)
+                {
+                    Color[] src = _wallTextures[i].GetPixels();
+                    int offset = i * pxPerTex;
+                    for (int p = 0; p < src.Length; p++)
+                        _flatWallPixels[offset + p] = (Color32)src[p];
+                }
+            }
+
+            // 스프라이트 텍스처 캐싱
+            if (_sprites != null && _sprites.Length > 0)
+            {
+                _flatSpritePixels = new Color32[_sprites.Length * pxPerTex];
+                for (int i = 0; i < _sprites.Length; i++)
+                {
+                    Sprite spr = _sprites[i];
+                    if (spr == null) continue;
+
+                    // 스프라이트 시트에서 해당 스프라이트가 잘린 영역만큼 픽셀을 가져옴
+                    Color[] src = spr.texture.GetPixels(
+                        (int)spr.rect.x, 
+                        (int)spr.rect.y, 
+                        (int)spr.rect.width, 
+                        (int)spr.rect.height
+                    );
+
+                    int offset = i * pxPerTex;
+                    for (int p = 0; p < src.Length; p++)
+                    {
+                        _flatSpritePixels[offset + p] = (Color32)src[p];
+                    }
+                }
+            }
+        }
+
+        public void UpdateSprites(SpriteInfo[] sprites)
+        {
+            _sprtData = sprites;
+            
+            // 기존 정렬 배열의 크기가 부족하면 새로 할당
+            if (_sprtData != null)
+            {
+                if (_spriteSortList == null || _spriteSortList.Length < _sprtData.Length)
+                {
+                    _spriteSortList = new SpriteSortInfo[_sprtData.Length];
+                }
+            }
         }
 
         public void SetMapData(MapData map, DungeonTheme theme, TileAnimState[,] animStates)
@@ -71,27 +139,25 @@ namespace UI.DungeonMapScene
             _currentScanRadius = radius;
         }
 
-        private void PrecomputeTextures()
+        private Color32 GetWallPixelFast(int texIdx, int x, int y)
         {
-            if (_textures == null || _textures.Length == 0) return;
-            int pxPerTex = _texWidth * _texHeight;
-            _flatTexturePixels = new Color32[_textures.Length * pxPerTex];
-
-            for (int i = 0; i < _textures.Length; i++)
-            {
-                Color[] src = _textures[i].GetPixels();
-                int offset = i * pxPerTex;
-                for (int p = 0; p < src.Length; p++)
-                    _flatTexturePixels[offset + p] = (Color32)src[p];
-            }
-        }
-
-        private Color32 GetPixelFast(int texIdx, int x, int y)
-        {
-            if (texIdx < 0 || texIdx >= _textures.Length) return new Color32(255, 0, 255, 255);
+            if (_wallTextures == null || texIdx < 0 || texIdx >= _wallTextures.Length) 
+                return new Color32(255, 0, 255, 255); // 마젠타 에러 색상
+            
             x &= (_texWidth - 1);
             y &= (_texHeight - 1);
-            return _flatTexturePixels[(texIdx * _texWidth * _texHeight) + (y * _texWidth) + x];
+            return _flatWallPixels[(texIdx * _texWidth * _texHeight) + (y * _texWidth) + x];
+        }
+
+        // 스프라이트 전용 픽셀 읽기 함수
+        private Color32 GetSpritePixelFast(int texIdx, int x, int y)
+        {
+            if (_sprites == null || texIdx < 0 || texIdx >= _sprites.Length) 
+                return new Color32(0, 0, 0, 0); // 투명 반환
+            
+            x &= (_texWidth - 1);
+            y &= (_texHeight - 1);
+            return _flatSpritePixels[(texIdx * _texWidth * _texHeight) + (y * _texWidth) + x];
         }
 
         // ================= 메인 렌더링 루프 =================
@@ -424,7 +490,7 @@ namespace UI.DungeonMapScene
                             texY = Mathf.Clamp((int)(texY + (noiseY * 2f - 1f) * settings.distortionAmp), 0, _texHeight - 1);
                         }
                         
-                        col = GetPixelFast(hitTexId, sTexX, texY);
+                        col = GetWallPixelFast(hitTexId, sTexX, texY);
                         if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
                     }
 
@@ -450,7 +516,7 @@ namespace UI.DungeonMapScene
 
                     DrawVoidWall(x, voidEdgeSide, stepX, stepY,
                                 px, py, rayDirX, rayDirY,
-                                voidEdgeDist, clipY, // <--- clipY 매개변수 추가
+                                voidEdgeDist, clipY,
                                 player, settings, step,
                                 pulseColor, wireframeColor, pulseWidth);
                 }
@@ -505,6 +571,9 @@ namespace UI.DungeonMapScene
             
             int drawEnd = Mathf.Max(0, floorEdgeY);
 
+            // 시점이 크게 꺾였을 때 화면 높이를 뚫고 나가지 않도록 최대치 제한
+            drawEnd = Mathf.Min(drawEnd, _screenHeight);
+
             if (drawStart >= drawEnd) return;
 
             int lightScale = (int)(Mathf.Clamp(
@@ -537,7 +606,7 @@ namespace UI.DungeonMapScene
                 }
                 else
                 {
-                    col = GetPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
+                    col = GetWallPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
                     
                     // y가 drawStart(바닥)일 때 0.2, drawEnd(천장)일 때 1.0이 되는 계수 계산. 0.2는 최소 밝기
                     float verticalFactor = Mathf.Clamp01((float)(y - drawStart) / (drawEnd - drawStart));
@@ -619,7 +688,7 @@ namespace UI.DungeonMapScene
                 else
                 {
                     // settings.voidWallTexIdx가 아닌 천장 구멍 전용 텍스처 인덱스가 있다면 수정 필요
-                    col = GetPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
+                    col = GetWallPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
                     
                     // 수직 그라데이션. 위로 올라갈수록(y가 커질수록) 어두워짐
                     float verticalFactor = Mathf.Clamp01((float)(y - rawDrawStart) / voidHeight);
@@ -712,7 +781,7 @@ namespace UI.DungeonMapScene
                     {
                         int cx = (int)(_texWidth * (floorX - cellX)) & (_texWidth - 1);
                         int cy = (int)(_texHeight * (floorY - cellY)) & (_texHeight - 1);
-                        col = GetPixelFast(texIdx, cx, cy);
+                        col = GetWallPixelFast(texIdx, cx, cy);
                             
                         if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
                     }
@@ -735,15 +804,22 @@ namespace UI.DungeonMapScene
         {
             if (_sprtData == null || _sprtData.Length == 0) return;
 
-            // 거리 계산 및 정렬
+            // 살아있는 몬스터 심볼 스프라이트 거리 계산 및 정렬 인덱스 갱신
             for (int i = 0; i < _sprtData.Length; i++)
             {
                 _spriteSortList[i].index = i;
-                // 멀리 있는 것부터 그려야 하므로 거리 역순 계산을 위해 (또는 Sort에서 내림차순)
-                // 유클리드 거리 제곱 사용
+                // 멀리 있는 것부터 그려야 하므로 거리 역순 계산을 위해 유클리드 거리 제곱 사용
                 _spriteSortList[i].distance = ((px - _sprtData[i].x) * (px - _sprtData[i].x) + 
                                                (py - _sprtData[i].y) * (py - _sprtData[i].y));
             }
+
+            // 사용하지 않는 가비지 배열 공간 초기화
+            for (int i = _sprtData.Length; i < _spriteSortList.Length; i++)
+            {
+                _spriteSortList[i].index = 0;      // 더미 인덱스
+                _spriteSortList[i].distance = -1f; // 내림차순 정렬 시 맨 뒤로 밀려나도록 음수 처리
+            }
+
             // 거리 기준 내림차순 정렬 (먼 것 -> 가까운 것)
             Array.Sort(_spriteSortList, (a, b) => b.distance.CompareTo(a.distance));
 
@@ -795,9 +871,9 @@ namespace UI.DungeonMapScene
                 if (drawEndX >= _screenWidth) drawEndX = _screenWidth;
 
                 // 텍스처 데이터 가져오기
-                Texture2D tex = _textures[_sprtData[idx].texIdx];
-                int texW = tex.width;
-                int texH = tex.height;
+                Sprite spr = _sprites[_sprtData[idx].texIdx];
+                int texW = (int)spr.rect.width; 
+                int texH = (int)spr.rect.height;
 
                 // 스트라이프(세로줄) 그리기
                 for (int stripe = drawStartX; stripe < drawEndX; stripe += step)
@@ -813,7 +889,7 @@ namespace UI.DungeonMapScene
                             int d = (y - vOffset) * 256 - _screenHeight * 128 + spriteHeight * 128;
                             int texY = ((d * texH) / spriteHeight) / 256;
 
-                            Color32 col = GetPixelFast(_sprtData[idx].texIdx, texX, texY);
+                            Color32 col = GetSpritePixelFast(_sprtData[idx].texIdx, texX, texY);
                             
                             if (col.a > 0) // 투명색이 아니면 그리기
                             {

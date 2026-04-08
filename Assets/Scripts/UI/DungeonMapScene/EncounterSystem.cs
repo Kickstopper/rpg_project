@@ -28,6 +28,8 @@ namespace UI.DungeonMapScene
         private int _stepsUntilNextBattle;
         private int _initialSteps;
         private Tween _pulseTween;
+
+        public List<string> MonsterCandidate => monsters;
         private List<string> monsters;
 
         public void Initialize(List<string> monsterCandidate)

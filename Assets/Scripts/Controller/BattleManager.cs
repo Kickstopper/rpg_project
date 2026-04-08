@@ -15,7 +15,7 @@ using Manager;
 namespace Controller
 {
     public enum BattleState { Start, PlayerInput, EnemyInput, Processing, Won, Lost }
-    public enum EncounterType { Normal, Preemptive, Ambush }
+    public enum EncounterType { Normal, Preemptive, Ambush, Random }
     
     public class BattleManager : MonoBehaviour
     {
@@ -92,7 +92,7 @@ namespace Controller
         // 유니온 어택 참가자 목록 (턴 스킵 및 애니메이션용)
         private List<PlayerController> currentUnionParticipants = new List<PlayerController>();
         private bool isUnionAttackUsedThisTurn = false;
-
+        private EncounterType currentEncounterType = EncounterType.Random;
         EnvironmentState currentEnv = new EnvironmentState 
         { 
             moonPhase = MoonPhase.Full, 
@@ -139,8 +139,10 @@ namespace Controller
             }
         }
 
-        public void Initialize(List<string> monsterIds)
+        public void Initialize(List<string> monsterIds, EncounterType encType = EncounterType.Random)
         {
+            currentEncounterType = encType;
+
             // 전투 진입 시 UI를 일단 모두 숨김
             uiController.Initialize();
             fieldController.SetEnemyVisualsActive(false);
@@ -287,8 +289,17 @@ namespace Controller
                 yield return wait05;
             }
             uiController.HideStateMessage();
+
+            // 스탯 기반 확률 대신 전달받은 방향 기반 인카운터 적용
+            EncounterType encounterType;
+            if (currentEncounterType == EncounterType.Random)
+            {
+                encounterType = DetermineEncounterType();
+            }
+            else encounterType = currentEncounterType;
+            
             // 인카운터 타입 결정
-            EncounterType encounterType = DetermineEncounterType();
+            // 
             
             switch (encounterType)
             {
