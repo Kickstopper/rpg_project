@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
   m_Name: base
   m_EditorClassIdentifier: 
-  themeName: base
+  dungeonID: base
   background: {fileID: 0}
   texture:
   - {fileID: 2800000, guid: 4603e34b45171b24ea3050ff20670123, type: 3}
@@ -23,9 +23,21 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 6e633d473ea81d04a9b6aa09c6579b8e, type: 3}
   floorTexIdx: 5
   ceilingTexIdx: 4
+  spriteTextures:
+  - {fileID: -2631205595881985455, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  - {fileID: -137211449224041512, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  - {fileID: -5478674400631355457, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  - {fileID: -8592587084538253407, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  - {fileID: 7556728160588841100, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  - {fileID: -4759437863653782067, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  - {fileID: 7903781024494958643, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  - {fileID: -6788500882895127655, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
   wallAnimations: []
   fogColor: {r: 0, g: 0, b: 0, a: 1}
+  lightingIntensity: 3.5
+  useGridLighting: 1
   bgmID: 9
+  moduleEnable: 1
   monsterList:
   - 006
   - 007
