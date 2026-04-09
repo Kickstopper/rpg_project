@@ -194,6 +194,7 @@ namespace Controller
             UpdateEnemyAI();
             UpdateEnemySprites();
             UpdateEnemySpawner();
+            UpdateEncounterSensor(); // 위험도 센서 실시간 갱신
 
             _renderer.RenderFrame(_player, renderSettings);
             UpdateBackgroundUV();
@@ -713,6 +714,11 @@ namespace Controller
             // 적에게 부딪히는 연출 (벽 충돌과 같음)
             SoundManager.Instance.PlaySFX(SfxID.Bump_Wall); 
             yield return StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
+
+            if (_currentLookState != LookState.None)
+            {
+                yield return StartCoroutine(TransitionLookState(LookState.None));
+            }
             
             // 부딪히면 해당 적 심볼 삭제
             enemy.isAlive = false;
@@ -1068,7 +1074,7 @@ namespace Controller
             
             // 시스템 초기화
             _renderer.LoadAssets(theme.texture, theme.spriteTextures, 64, 64, null);
-            encounterSystem.Initialize(theme.monsterList);
+            encounterSystem.Initialize(theme.monsterList, EncounterMode.Symbol);
 
             // 플레이어 위치 초기화
             if (entryEntrance != null)
@@ -1117,10 +1123,43 @@ namespace Controller
                 autoMapContainer.SetActive(false);
                 autoMapRenderer.DrawFullMap(_currentMap, DungeonManager.Instance.CurrentDungeonState);
             }
+            if (encounterSystem != null)
+            {
+                encounterSystem.SetVisible(ModuleManager.Instance.IsMounted(ModuleFeature.MobSensor));
+            }
             if (weatherUI != null)
             {
                 weatherUI.gameObject.SetActive(ModuleManager.Instance.IsMounted(ModuleFeature.WeatherWidget));
             }
+        }
+
+        // 플레이어 주변의 몬스터 거리를 감지하여 위험도 UI에 반영
+        private void UpdateEncounterSensor()
+        {
+            if (_activeEnemies.Count == 0)
+            {
+                encounterSystem.UpdateSymbolDanger(0f);
+                return;
+            }
+
+            float minDistance = float.MaxValue;
+            foreach (var enemy in _activeEnemies)
+            {
+                if (!enemy.isAlive) continue;
+                float dist = Vector2.Distance(new Vector2(enemy.x, enemy.y), new Vector2(_player.LogicX, _player.LogicY));
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                }
+            }
+
+            // 센서 최대 감지 거리 (8칸 안에 몬스터가 들어오면 반응 시작)
+            float maxSensorRange = 8.0f; 
+            
+            // 거리가 0에 가까울수록 ratio는 1에 가까워짐
+            float ratio = 1.0f - (minDistance / maxSensorRange);
+            
+            encounterSystem.UpdateSymbolDanger(ratio);
         }
 
         private void OnPlayerStep()
@@ -1458,19 +1497,42 @@ namespace Controller
             int tx = ex + dir.x;
             int ty = ey + dir.y;
 
-            // 플레이어 자리는 기습을 위해 진입 가능으로 판단
-            if (tx == _player.LogicX && ty == _player.LogicY) return true;
-
-            // 맵 밖 방지
+            // 맵 범위 체크
             if (tx < 0 || tx >= _currentMap.width || ty < 0 || ty >= _currentMap.height) return false;
 
-            // 벽과 구멍 방지 (몬스터는 기본적으로 일루전 월을 통과하지 않음)
+            // 방향에 따른 벽면 충돌 체크
+            int targetEnterFace = -1;
+            int currentExitFace = -1;
+
+            if (dir.x > 0)      { targetEnterFace = 0; currentExitFace = 2; } // 동쪽 이동
+            else if (dir.x < 0) { targetEnterFace = 2; currentExitFace = 0; } // 서쪽 이동
+            else if (dir.y > 0) { targetEnterFace = 3; currentExitFace = 1; } // 북쪽 이동
+            else if (dir.y < 0) { targetEnterFace = 1; currentExitFace = 3; } // 남쪽 이동
+
+            // 현재 칸에서 해당 방향으로 나갈 수 있는지 내벽 검사
+            CellData currentCell = _currentMap.GetCell(ex, ey);
+            if (currentCell != null && currentCell.HasWall() && currentExitFace != -1)
+            {
+                int texID = currentCell.wallTextureIDs[currentExitFace];
+                if (texID != -1) return false;
+            }
+
+            // 목표 칸이 void인지 먼저 검사
             CellData targetCell = _currentMap.GetCell(tx, ty);
             if (targetCell == null || targetCell.value == -1) return false;
-            if (targetCell.HasWall()) return false; 
 
-            // 다른 몬스터와 겹치기 방지
-            foreach(var other in _activeEnemies)
+            // 목표 칸으로 해당 방향을 통해 들어갈 수 있는지 외벽 검사
+            if (targetCell.HasWall() && targetEnterFace != -1)
+            {
+                int texID = targetCell.wallTextureIDs[targetEnterFace];
+                if (texID != -1) return false;
+            }
+
+            // 플레이어 위치일 경우, 겹치기 체크를 무시하고 돌진
+            if (tx == _player.LogicX && ty == _player.LogicY) return true;
+
+            // 다른 살아있는 몬스터와 겹치기 방지
+            foreach (var other in _activeEnemies)
             {
                 if (other.isAlive && Mathf.FloorToInt(other.targetX) == tx && Mathf.FloorToInt(other.targetY) == ty)
                     return false;
@@ -1505,8 +1567,11 @@ namespace Controller
 
         private void UpdateEnemyAI()
         {
-            // 플레이어가 대화 중이거나 이동 중일 때는 적들도 움직이지 않고 대기
-            if (_inputLocked || _player.IsMoving) return;
+            // 플레이어가 대화 중이거나 이동 중이거나 시스템 메시지 패널이 켜있을 때는 적들이 움직이지 않고 대기
+            if (_inputLocked || _player.IsMoving || (systemMessagePanel != null && systemMessagePanel.activeSelf)) 
+            {
+                return;
+            }
 
             float dt = Time.deltaTime;
 

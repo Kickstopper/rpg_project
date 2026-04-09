@@ -8,10 +8,14 @@ using System.Collections.Generic;
 
 namespace UI.DungeonMapScene
 {
+    public enum EncounterMode { Random, Symbol }
+
     [System.Serializable]
     public class EncounterSystem
     {
+        
         [Header("Settings")]
+        public EncounterMode currentMode = EncounterMode.Random;
         public int minSteps = 15;
         public int maxSteps = 30;
 
@@ -27,20 +31,31 @@ namespace UI.DungeonMapScene
 
         private int _stepsUntilNextBattle;
         private int _initialSteps;
+        
         private Tween _pulseTween;
 
+        private int _lastDangerLevel = -1;
         public List<string> MonsterCandidate => monsters;
         private List<string> monsters;
 
-        public void Initialize(List<string> monsterCandidate)
+        public void Initialize(List<string> monsterCandidate, EncounterMode mode = EncounterMode.Random)
         {
             monsters = monsterCandidate;
-            ResetSteps();
-            if (ModuleManager.Instance)
-                SetVisible(ModuleManager.Instance.IsMounted(ModuleFeature.MobSensor));
+            currentMode = mode;
+
+            if (currentMode == EncounterMode.Random)
+            {
+                ResetSteps();
+            }
+            else
+            {
+                // 심볼 모드일 때는 초기 위험도 0
+                _lastDangerLevel = -1; 
+                UpdateDangerUI(0f);
+            }
         }
 
-        private void SetVisible(bool visible)
+        public void SetVisible(bool visible)
         {
             dangerSlider.gameObject.SetActive(visible);
             dangerText.gameObject.SetActive(visible);
@@ -64,13 +79,28 @@ namespace UI.DungeonMapScene
             }
         }
 
+        // 심볼 인카운터용 위험도 직접 주입 메서드
+        public void UpdateSymbolDanger(float ratio)
+        {
+            if (currentMode != EncounterMode.Symbol) return;
+            UpdateDangerUI(Mathf.Clamp01(ratio));
+        }
+
         private void UpdateUI()
+        {
+            float ratio = 1.0f - ((float)_stepsUntilNextBattle / _initialSteps);
+            UpdateDangerUI(Mathf.Clamp01(ratio));
+        }
+
+        private void UpdateDangerUI(float ratio)
         {
             if (ModuleManager.Instance && !ModuleManager.Instance.IsMounted(ModuleFeature.MobSensor)) return;
             if (dangerSlider == null || fillImage == null) return;
 
-            float ratio = 1.0f - ((float)_stepsUntilNextBattle / _initialSteps);
-            ratio = Mathf.Clamp01(ratio);
+            // 위험도를 5% 단위(0~20)로 나누어 단계가 변했을 때만 트윈과 색상을 갱신
+            int currentDangerLevel = Mathf.FloorToInt(ratio * 20f); 
+            if (_lastDangerLevel == currentDangerLevel) return;
+            _lastDangerLevel = currentDangerLevel;
 
             if (dangerText != null) dangerText.text = $"DANGER: {ratio * 100f:F0}%";
 

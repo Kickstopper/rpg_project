@@ -4371,11 +4371,12 @@ MonoBehaviour:
   autoMapContainer: {fileID: 581309548}
   fadeOverlay: {fileID: 1028032715}
   systemMessagePanel: {fileID: 1310747630}
-  systemMessageText: {fileID: 431799682}
+  systemMessageText: {fileID: 431799684}
   doubleTapThreshold: 0.3
   moveDuration: 0.2
   turnDuration: 0.2
   encounterSystem:
+    currentMode: 0
     minSteps: 15
     maxSteps: 30
     dangerSlider: {fileID: 77270347}
