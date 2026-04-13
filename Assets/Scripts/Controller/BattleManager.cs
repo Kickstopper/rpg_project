@@ -834,7 +834,7 @@ namespace Controller
             }
             
             // 서브 메뉴 닫기. 취소 키와 동일
-            if (isSubMenuActive && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)))
+            if (isSubMenuActive && (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                 CloseSubMenu();
@@ -846,7 +846,7 @@ namespace Controller
                 HandleMenuNavigation(uiController.currentMenuButtons, ref currentFightBtnIndex);
                 
                 // 서브 메뉴 진입. 확인 키와 동일
-                if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
                 {
                     Button currentBtn = uiController.currentMenuButtons[currentFightBtnIndex];
                     CommandButton cmdBtn = currentBtn.GetComponent<CommandButton>();
