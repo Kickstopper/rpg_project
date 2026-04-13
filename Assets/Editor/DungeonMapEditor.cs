@@ -13,6 +13,12 @@ public class DungeonMapEditor : EditorWindow
     CellData selectedCell;                          // 단일 선택
     List<CellData> selectedCells = new List<CellData>(); // 다중 선택 목록
 
+    bool _isDragging = false;   // 드래그 확정 상태
+    bool _dragPending = false;  // MouseDown 이후 이동 확인 대기
+    Vector2 _dragStartPos;      // 드래그 시작 마우스 위치
+    CellData _dragStartCell;    // 드래그 시작 셀
+    const float DragThreshold = 5f; // 드래그 인정 거리 (px)
+
     // 맵 크기 입력을 위한 변수
     int inputWidth = 10;
     int inputHeight = 10;
@@ -160,25 +166,31 @@ public class DungeonMapEditor : EditorWindow
 
     void OnGUI()
     {
-        // 상단 툴바 (크기 설정 및 파일 저장/로드)
-        DrawToolbar();
+        Event e = Event.current;
 
+        // Ctrl+S 단축키
+        if (e.type == EventType.KeyDown && e.keyCode == KeyCode.S && (e.control || e.command))
+        { SaveMap(); e.Use(); }
+
+        // 마우스 버튼을 놓으면 드래그 종료
+        if (e.type == EventType.MouseUp)
+        {
+            _isDragging = false;
+            _dragPending = false;
+        }
+
+        // 드래그 중에는 지속적으로 Repaint. Repaint마다 마우스 위치 재검사
+        if (_isDragging) Repaint();
+
+        DrawToolbar();
         if (mapData == null) return;
 
         EditorGUILayout.BeginHorizontal();
-        
-        // 좌측: 그리드 맵 뷰
         DrawGridView();
-
-        // 우측: 선택된 셀 속성 편집
         DrawInspectorView();
-
         EditorGUILayout.EndHorizontal();
 
-        if (GUI.changed)
-        {
-            UpdateVisualizer();
-        }
+        if (GUI.changed) UpdateVisualizer();
     }
 
     void UpdateVisualizer()
@@ -278,6 +290,9 @@ public class DungeonMapEditor : EditorWindow
     {
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(position.width * 0.7f));
 
+        Event e = Event.current;
+        bool isCtrl = e.control || e.command;
+
         for (int y = mapData.height - 1; y >= 0; y--)
         {
             EditorGUILayout.BeginHorizontal();
@@ -285,56 +300,92 @@ public class DungeonMapEditor : EditorWindow
             {
                 int index = y * mapData.width + x;
                 CellData cell = mapData.cells[index];
-
-                // 다중 선택 포함 여부로 배경색 결정
                 bool isSelected = selectedCells.Contains(cell);
-                if (isSelected)        GUI.backgroundColor = Color.cyan;
-                else if (cell.value == -1) GUI.backgroundColor = Color.coral;
-                else if (cell.value == 1) GUI.backgroundColor = Color.brown;
-                else                       GUI.backgroundColor = Color.gray;
 
-                if (GUILayout.Button($"{x},{y}", GUILayout.Width(45), GUILayout.Height(45)))
+                GUI.backgroundColor = isSelected         ? Color.cyan
+                                    : cell.value == -1  ? Color.white
+                                    : cell.value == 1   ? Color.brown
+                                                        : Color.gray;
+
+                // GUILayout.Button 대신 Rect를 먼저 예약
+                Rect rect = GUILayoutUtility.GetRect(
+                    new GUIContent($"{x},{y}"),
+                    GUI.skin.button,
+                    GUILayout.Width(45), GUILayout.Height(45));
+
+                bool mouseOverCell = rect.Contains(e.mousePosition);
+
+                // 드래그 대기 시작 (Ctrl + MouseDown)
+                if (isCtrl && e.type == EventType.MouseDown && mouseOverCell)
                 {
-                    bool isCtrl = Event.current.control || Event.current.command; // Mac: Cmd키
+                    _dragPending  = true;
+                    _dragStartPos  = e.mousePosition;
+                    _dragStartCell = cell;
+                }
 
+                // 드래그 대기 중 마우스가 충분히 이동하면 드래그 확정
+                if (_dragPending && e.type == EventType.MouseDrag)
+                {
+                    if (Vector2.Distance(e.mousePosition, _dragStartPos) > DragThreshold)
+                    {
+                        _isDragging   = true;
+                        _dragPending  = false;
+
+                        // 드래그 시작 셀을 선택 목록에 추가
+                        if (!selectedCells.Contains(_dragStartCell))
+                        {
+                            selectedCells.Add(_dragStartCell);
+                            selectedCell = _dragStartCell;
+                        }
+                        UpdateVisualizerSelection(selectedCells);
+                        Repaint();
+                    }
+                }
+
+                // 드래그 확정 상태에서 마우스가 올라온 셀을 선택 목록에 추가
+                if (_isDragging && mouseOverCell &&
+                    (e.type == EventType.MouseDrag || e.type == EventType.Repaint))
+                {
+                    if (!selectedCells.Contains(cell))
+                    {
+                        selectedCells.Add(cell);
+                        selectedCell = cell;
+                        UpdateVisualizerSelection(selectedCells);
+                    }
+                }
+
+                // 드래그 중이 아닐 때만 버튼 클릭 처리
+                if (GUI.Button(rect, $"{x},{y}") && !_isDragging)
+                {
                     if (isCtrl)
                     {
-                        // Ctrl: 토글 방식으로 추가/제거
-                        if (selectedCells.Contains(cell))
-                            selectedCells.Remove(cell);
-                        else
-                            selectedCells.Add(cell);
-
-                        // 마지막 선택된 셀을 Inspector 기준으로 사용
+                        // 토글
+                        if (selectedCells.Contains(cell)) selectedCells.Remove(cell);
+                        else selectedCells.Add(cell);
                         selectedCell = selectedCells.Count > 0
-                            ? selectedCells[selectedCells.Count - 1]
-                            : null;
+                            ? selectedCells[selectedCells.Count - 1] : null;
                     }
                     else
                     {
-                        // 일반 클릭: 단일 선택으로 초기화
                         selectedCells.Clear();
                         selectedCells.Add(cell);
                         selectedCell = cell;
                     }
-
                     UpdateVisualizerSelection(selectedCells);
                     GUI.FocusControl(null);
                 }
 
-                // 벽 시각화 (기존 코드 그대로)
-                Rect rect = GUILayoutUtility.GetLastRect();
-                float wallThickness = 4f;
-                Color wallColor = new Color(1f, 0.3f, 0.3f);
-
+                // 벽 시각화
+                float wt = 4f; // 벽 두께
+                Color wc = new Color(1f, 0.3f, 0.3f); // 벽 컬러
                 if (cell.wallTextureIDs[0] != -1)
-                    EditorGUI.DrawRect(new Rect(rect.x, rect.y, wallThickness, rect.height), wallColor);
+                    EditorGUI.DrawRect(new Rect(rect.x, rect.y, wt, rect.height), wc);
                 if (cell.wallTextureIDs[1] != -1)
-                    EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, wallThickness), wallColor);
+                    EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, wt), wc);
                 if (cell.wallTextureIDs[2] != -1)
-                    EditorGUI.DrawRect(new Rect(rect.xMax - wallThickness, rect.y, wallThickness, rect.height), wallColor);
+                    EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y, wt, rect.height), wc);
                 if (cell.wallTextureIDs[3] != -1)
-                    EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - wallThickness, rect.width, wallThickness), wallColor);
+                    EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - wt, rect.width, wt), wc);
             }
             EditorGUILayout.EndHorizontal();
         }
