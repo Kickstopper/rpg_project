@@ -55,7 +55,7 @@ namespace Controller
         // 상태
         private TileAnimState[,] _tileAnimStates;
         private MapData _currentMap;
-
+        private DungeonTheme theme;
         public class MapEnemy
         {
             public float x, y;
@@ -166,7 +166,7 @@ namespace Controller
             }
             if (Input.GetKeyDown(KeyCode.M))
             {
-                if (!ModuleManager.Instance.IsMounted(ModuleFeature.AutoMapper)) return;
+                if (!theme.moduleEnable || !ModuleManager.Instance.IsMounted(ModuleFeature.AutoMapper)) return;
                 autoMapContainer.SetActive(!autoMapContainer.activeSelf);
                 return;
             }
@@ -190,11 +190,14 @@ namespace Controller
 
             UpdateWallAnimations();
             
-            // 몬스터 심볼의 이동과 스폰
-            UpdateEnemyAI();
-            UpdateEnemySprites();
-            UpdateEnemySpawner();
-            UpdateEncounterSensor(); // 위험도 센서 실시간 갱신
+            if (_maxSpawnCount > 0)
+            {
+                // 몬스터 심볼의 이동과 스폰
+                UpdateEnemyAI();
+                UpdateEnemySprites();
+                UpdateEnemySpawner();
+                UpdateEncounterSensor(); // 위험도 센서 실시간 갱신
+            }
 
             _renderer.RenderFrame(_player, renderSettings);
             UpdateBackgroundUV();
@@ -1062,7 +1065,7 @@ namespace Controller
         private void LoadMapData(EntranceData entryEntrance = null)
         {
             _currentMap = DungeonManager.Instance.CurrentDungeonData;
-            DungeonTheme theme = DungeonManager.Instance.GetDungeonTheme(_currentMap.themeName);
+            theme = DungeonManager.Instance.GetDungeonTheme(_currentMap.themeName);
             
             SoundManager.Instance.PlayBGM(theme.bgmID);
 
@@ -1102,21 +1105,22 @@ namespace Controller
             _spawnDelay = theme.spawnDelay;
             _currentSpawnTimer = 0f;
             _activeEnemies.Clear();
-
-            SpawnSymbolEnemies(theme.maxSpawnCount);
+            if (_maxSpawnCount > 0) 
+                SpawnSymbolEnemies(_maxSpawnCount);
         }
 
         private void RefreshAppVisible()
         {
+            
             if (miniMap != null)
             {
                 miniMap.Initialize(_currentMap);
-                miniMap.gameObject.SetActive(ModuleManager.Instance.IsMounted(ModuleFeature.LocalRadar));
+                miniMap.gameObject.SetActive(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.LocalRadar));
             }
             if (compassUI != null)
             {
                 compassUI.SetDirection(_player.DirectionIdx);
-                compassUI.gameObject.SetActive(ModuleManager.Instance.IsMounted(ModuleFeature.GyroCompass));   
+                compassUI.gameObject.SetActive(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.GyroCompass));   
             }
             if (autoMapContainer != null)
             {
@@ -1125,11 +1129,11 @@ namespace Controller
             }
             if (encounterSystem != null)
             {
-                encounterSystem.SetVisible(ModuleManager.Instance.IsMounted(ModuleFeature.MobSensor));
+                encounterSystem.SetVisible(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.MobSensor));
             }
             if (weatherUI != null)
             {
-                weatherUI.gameObject.SetActive(ModuleManager.Instance.IsMounted(ModuleFeature.WeatherWidget));
+                weatherUI.gameObject.SetActive(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.WeatherWidget));
             }
         }
 
