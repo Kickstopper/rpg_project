@@ -10579,5 +10579,28 @@
             ]
         }
     ],
-    "entrances": []
+    "entrances": [
+        {
+            "type": 0,
+            "sourceX": 14,
+            "sourceY": 23,
+            "isWallEntrance": false,
+            "triggerDirection": 1,
+            "destinationID": "Police_Station",
+            "targetX": 8,
+            "targetY": 0,
+            "targetDirection": 1
+        },
+        {
+            "type": 0,
+            "sourceX": 16,
+            "sourceY": 23,
+            "isWallEntrance": false,
+            "triggerDirection": 3,
+            "destinationID": "Police_Station",
+            "targetX": 8,
+            "targetY": 0,
+            "targetDirection": 3
+        }
+    ]
 }

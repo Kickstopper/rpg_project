@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
-  m_Name: dummy
+  m_Name: Police_Station
   m_EditorClassIdentifier: 
-  dungeonID: dummy
+  dungeonID: Police_Station
+  useWakeUpEffect: 0
   background: {fileID: 0}
   texture:
   - {fileID: 2800000, guid: 87cbe03c2d569d3449817b8787af0635, type: 3}

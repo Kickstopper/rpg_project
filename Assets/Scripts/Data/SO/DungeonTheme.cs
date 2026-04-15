@@ -18,6 +18,9 @@ namespace Data
         [Header("텍스처 설정")]
         public string dungeonID;
         
+        [Header("Entry Effect")]
+        public bool useWakeUpEffect = false;
+        
         public Texture2D background; // 던전 아래에 깔릴 스카이박스
         public Texture2D[] texture;
         

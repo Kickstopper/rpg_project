@@ -234,6 +234,8 @@ namespace Controller
         // 회복 함수
         public void Recover(int hpAmount, int mpAmount)
         {
+            if (!IsAlive) return;
+            
             if (hpAmount > 0)
             {
                 currentHp = Mathf.Min(currentHp + hpAmount, maxHp);
@@ -250,8 +252,8 @@ namespace Controller
         // 부활 함수
         public void Revive(int percent)
         {
-            if (currentHp > 0) return; // 이미 살아있음
-
+            if (IsAlive) return;
+            
             int healAmount = Mathf.FloorToInt(maxHp * (percent / 100f));
             currentHp = healAmount;
             

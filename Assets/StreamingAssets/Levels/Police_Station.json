@@ -1,11 +1,11 @@
 {
     "width": 9,
     "height": 9,
-    "mapID": "dummy",
-    "themeName": "dummy",
-    "startX": 1,
-    "startY": 8,
-    "startDirection": 2,
+    "mapID": "Police_Station",
+    "themeName": "Police_Station",
+    "startX": 8,
+    "startY": 0,
+    "startDirection": 0,
     "cells": [
         {
             "x": 0,
@@ -670,7 +670,7 @@
         {
             "x": 6,
             "y": 6,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -736,7 +736,7 @@
         {
             "x": 3,
             "y": 7,
-            "value": 1,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -910,28 +910,6 @@
             "targetX": 4,
             "targetY": 8,
             "targetDirection": 2
-        },
-        {
-            "type": 0,
-            "sourceX": 6,
-            "sourceY": 6,
-            "isWallEntrance": false,
-            "triggerDirection": 0,
-            "destinationID": "cave",
-            "targetX": 11,
-            "targetY": 9,
-            "targetDirection": 0
-        },
-        {
-            "type": 0,
-            "sourceX": 3,
-            "sourceY": 7,
-            "isWallEntrance": true,
-            "triggerDirection": 0,
-            "destinationID": "cave",
-            "targetX": 11,
-            "targetY": 9,
-            "targetDirection": 0
         }
     ]
 }

@@ -203,7 +203,7 @@ namespace Controller
         {
             // WorldManager.Instance.SetCurrentRegionTheme("region_00");
             // SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
-            DungeonManager.Instance.LoadDungeonFromJson(DungeonID.Dream.ToString(), () => 
+            DungeonManager.Instance.LoadDungeonFromJson("Dream", () => 
             {
                 SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
             });

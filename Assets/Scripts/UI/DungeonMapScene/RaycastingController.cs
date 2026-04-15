@@ -8,6 +8,7 @@ using Data;
 using UI.DungeonMapScene;
 using UI;
 using TMPro;
+using DG.Tweening;
 
 namespace Controller
 {
@@ -129,11 +130,70 @@ namespace Controller
             screenImage.material = mat;
             screenImage.rectTransform.localScale = renderSettings.screenScale;
 
+            // 씬이 시작되자마자 화면을 검게 가림
+            if (fadeOverlay != null)
+            {
+                fadeOverlay.alpha = 1f;
+                fadeOverlay.blocksRaycasts = true;
+            }
+
             // 맵 초기화
             LoadMapData();
             
             GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
             GameStateManager.Instance.ChangeState(GameState.Exploration);
+
+            if (theme != null && theme.useWakeUpEffect)
+                StartCoroutine(WakeUpFadeInRoutine());
+            else
+                StartCoroutine(InitialFadeInRoutine());
+        }
+
+        // 씬 진입 시 최초 페이드 인
+        private IEnumerator InitialFadeInRoutine()
+        {
+            if (fadeOverlay == null) yield break;
+
+            _inputLocked = true;
+            yield return new WaitForSeconds(0.1f);
+
+            yield return fadeOverlay.DOFade(0f, 1f).WaitForCompletion();
+
+            fadeOverlay.blocksRaycasts = false;
+            _inputLocked = false;
+        }
+
+        // 잠에서 깨어나는 눈 깜빡임 연출
+        private IEnumerator WakeUpFadeInRoutine()
+        {
+            if (fadeOverlay == null) yield break;
+
+            _inputLocked = true;
+            fadeOverlay.alpha = 1f;
+            fadeOverlay.blocksRaycasts = true;
+
+            yield return new WaitForSeconds(1f);
+
+            Sequence seq = DOTween.Sequence();
+            
+            // 첫 번째 깜빡임
+            seq.Append(fadeOverlay.DOFade(0.4f, 2f).SetEase(Ease.InOutSine));
+            seq.Append(fadeOverlay.DOFade(1f, 0.1f).SetEase(Ease.InOutSine));
+            seq.AppendInterval(0.2f);
+            
+            // 두 번째 깜빡임
+            seq.Append(fadeOverlay.DOFade(0.1f, 0.2f).SetEase(Ease.InOutSine));
+            seq.Append(fadeOverlay.DOFade(1f, 0.1f).SetEase(Ease.InOutSine));
+            seq.AppendInterval(0.3f);
+            
+            // 완전히 눈을 뜸
+            seq.Append(fadeOverlay.DOFade(0f, 1f).SetEase(Ease.InOutSine));
+
+            // 시퀀스가 모두 끝날 때까지 대기
+            yield return seq.WaitForCompletion();
+
+            fadeOverlay.blocksRaycasts = false;
+            _inputLocked = false;
         }
 
         void OnDestroy()
@@ -409,59 +469,33 @@ namespace Controller
         {
             _isLookTransitioning = true;
             
-            if (targetState == LookState.None)
-            {
-                HideSystemMessage(); // 정면을 보면 메시지 숨김
-            }
+            if (targetState == LookState.None) HideSystemMessage();
             else if (targetState == LookState.Up)
             {
-                // 천장에 입구가 있는지 확인
                 EntranceData entrance = _currentMap.GetEntranceAt(_player.LogicX, _player.LogicY);
                 if (entrance != null) ShowSystemMessage("올라갈 수 있을 것 같다. 올라가시겠습니까?");
             }
             else if (targetState == LookState.Down)
             {
-                // 바로 앞 바닥에 입구가 있는지 확인
                 Vector2Int fwd = _player.GetForwardVector();
                 EntranceData entrance = _currentMap.GetEntranceAt(_player.LogicX + fwd.x, _player.LogicY + fwd.y);
                 if (entrance != null) ShowSystemMessage("바닥이 보인다. 뛰어내리시겠습니까?");
             }
 
-            float startPitch = _player.Pitch;
-            float endPitch = 0f;
-            if (targetState == LookState.Up) endPitch = -100f;
-            else if (targetState == LookState.Down) endPitch = 100f;
-
-            float startOffset = _player.BackwardOffset;
+            float endPitch = (targetState == LookState.Up) ? -100f : (targetState == LookState.Down) ? 100f : 0f;
             float endOffset = (targetState == LookState.None || targetState == LookState.Up) ? this.backwardOffset : 0f;
 
-            float duration = 0.3f;
-            float elapsed = 0f;
-
-            // 애니메이션
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / duration);
-                
-                t = t * t * (3f - 2f * t); // SmoothStep을 적용하여 시작과 끝을 더 부드럽게 감속
-
-                _player.Pitch = Mathf.Lerp(startPitch, endPitch, t);
-                _player.BackwardOffset = Mathf.Lerp(startOffset, endOffset, t);
-
-                // BackwardOffset이 변하므로 플레이어의 논리좌표 내의 물리적 위치를 재계산
-                Vector2 updatedPos = _player.GetOffsetPosition(_player.LogicX, _player.LogicY, _player.DirectionIdx);
-                _player.SetDirectPosition(updatedPos.x, updatedPos.y, _player.DirectionIdx);
-
-                yield return null;
-            }
-
-            // 최종 값 오차 보정
-            _player.Pitch = endPitch;
-            _player.BackwardOffset = endOffset;
+            Sequence seq = DOTween.Sequence();
             
-            Vector2 finalPos = _player.GetOffsetPosition(_player.LogicX, _player.LogicY, _player.DirectionIdx);
-            _player.SetDirectPosition(finalPos.x, finalPos.y, _player.DirectionIdx);
+            seq.Join(DOTween.To(() => _player.Pitch, x => _player.Pitch = x, endPitch, 0.3f).SetEase(Ease.InOutQuad));
+            seq.Join(DOTween.To(() => _player.BackwardOffset, x => _player.BackwardOffset = x, endOffset, 0.3f)
+                .SetEase(Ease.InOutQuad)
+                .OnUpdate(() => {
+                    Vector2 updatedPos = _player.GetOffsetPosition(_player.LogicX, _player.LogicY, _player.DirectionIdx);
+                    _player.SetDirectPosition(updatedPos.x, updatedPos.y, _player.DirectionIdx);
+                }));
+
+            yield return seq.WaitForCompletion();
 
             _currentLookState = targetState;
             _isLookTransitioning = false;
@@ -1091,7 +1125,6 @@ namespace Controller
                 DungeonEventManager.Instance.SetCurrentMapID(_currentMap.mapID);
             
             _player.SetMapData(_currentMap, _currentMap.startX, _currentMap.startY, _currentMap.startDirection);
-
             
             RefreshAppVisible();
             
@@ -1109,9 +1142,9 @@ namespace Controller
                 SpawnSymbolEnemies(_maxSpawnCount);
         }
 
+        // 모듈 UI의 표시 여부 결정
         private void RefreshAppVisible()
         {
-            
             if (miniMap != null)
             {
                 miniMap.Initialize(_currentMap);
@@ -1255,24 +1288,29 @@ namespace Controller
             _isScanning = true;
             
             float radius = 0f;
+            _renderer.SetScanState(true, 0f);
+
+            // 속도 기반으로 도달 시간 계산
+            float expandTime = renderSettings.maxScanDistance / renderSettings.scanSpeed;
+            float returnTime = renderSettings.maxScanDistance / (renderSettings.scanSpeed * renderSettings.returnSpeedMultiplier);
+
+            Sequence seq = DOTween.Sequence();
+            
             // 스캔 퍼짐
-            while (radius < renderSettings.maxScanDistance)
-            {
-                radius += Time.deltaTime * renderSettings.scanSpeed;
-                _renderer.SetScanState(true, radius);
-                yield return null;
-            }
-            radius = renderSettings.maxScanDistance;
+            seq.Append(DOTween.To(() => radius, x => { 
+                radius = x; 
+                _renderer.SetScanState(true, radius); 
+            }, renderSettings.maxScanDistance, expandTime).SetEase(Ease.Linear));
             
-            // 유지
-            yield return new WaitForSeconds(renderSettings.scanWaitTime);
+            seq.AppendInterval(renderSettings.scanWaitTime);
             
-            while (radius > 0f)
-            {
-                radius -= Time.deltaTime * renderSettings.scanSpeed * renderSettings.returnSpeedMultiplier;
-                _renderer.SetScanState(true, radius);
-                yield return null;
-            }
+            // 돌아옴
+            seq.Append(DOTween.To(() => radius, x => { 
+                radius = x; 
+                _renderer.SetScanState(true, radius); 
+            }, 0f, returnTime).SetEase(Ease.Linear));
+
+            yield return seq.WaitForCompletion();
 
             _isScanning = false;
             _renderer.SetScanState(false, 0f);
