@@ -201,8 +201,12 @@ namespace Controller
 
         public void OnClick_NewGame()
         {
-            WorldManager.Instance.SetCurrentRegionTheme("region_00");
-            SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
+            // WorldManager.Instance.SetCurrentRegionTheme("region_00");
+            // SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
+            DungeonManager.Instance.LoadDungeonFromJson(DungeonID.Dream.ToString(), () => 
+            {
+                SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
+            });
         }
 
         public void OnClick_LoadGame()
