@@ -4,9 +4,13 @@ using System.IO;
 using Data;
 using UI;
 using System.Collections.Generic;
+using System;
 public class DungeonMapEditor : EditorWindow
 {
     string currentFilePath = null; // 현재 로드된 파일 경로 (null이면 미로드 상태)
+
+    string[] availableMapIDs = new string[] { "Dream", "Police_Station", "Downtown" }; 
+    bool isInvalidIDLoaded = false;
 
     MapData mapData;
     Vector2 scrollPos;
@@ -86,9 +90,19 @@ public class DungeonMapEditor : EditorWindow
     {
         EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-        // Map ID 입력
         GUILayout.Label("ID:", GUILayout.Width(20));
-        inputID = EditorGUILayout.TextField(inputID, GUILayout.Width(80));
+
+        // 현재 inputID가 배열의 몇 번째 인덱스인지 확인
+        int selectedIndex = Array.IndexOf(availableMapIDs, inputID);
+
+        // Popup에 -1이 들어가면 자동으로 빈 칸을 표시함
+        int newIndex = EditorGUILayout.Popup(selectedIndex, availableMapIDs, GUILayout.Width(100));
+
+        if (newIndex >= 0 && newIndex != selectedIndex)
+        {
+            inputID = availableMapIDs[newIndex];
+            isInvalidIDLoaded = false;
+        }
 
         // 시작 위치 및 방향 입력
         GUILayout.Space(10);
@@ -155,12 +169,13 @@ public class DungeonMapEditor : EditorWindow
                 $"File: {currentFilePath}",
                 MessageType.Info);
         }
-        else
+        
+        // 잘못된 ID가 로드되었을 때 경고
+        if (isInvalidIDLoaded)
         {
             EditorGUILayout.HelpBox(
-                $"Current Map: ID [{mapData.mapID}] / Theme [{mapData.themeName}]\n" +
-                "File: (unsaved — use Export to save)",
-                MessageType.Info);
+                "로드된 파일의 Map ID가 유효한 목록에 없어 삭제되었습니다. 반드시 올바른 Map ID를 다시 선택한 후 저장하세요.", 
+                MessageType.Warning);
         }
     }
 
@@ -213,6 +228,19 @@ public class DungeonMapEditor : EditorWindow
             string json = File.ReadAllText(path);
             mapData = JsonUtility.FromJson<MapData>(json);
             currentFilePath = path;
+
+            // 로드된 ID가 availableMapIDs 배열에 있는지 확인
+            if (System.Array.IndexOf(availableMapIDs, mapData.mapID) == -1)
+            {
+                Debug.LogWarning($"[DungeonEditor] 로드된 맵 ID '{mapData.mapID}'는 유효한 목록에 없습니다. 빈 칸으로 초기화됩니다.");
+                inputID = ""; // 배열에 없으면 빈 칸으로 덮어씀
+                isInvalidIDLoaded = true;
+            }
+            else
+            {
+                inputID = mapData.mapID; // 배열에 있으면 정상 동기화
+                isInvalidIDLoaded = false;
+            }
 
             // UI 값 동기화
             inputWidth = mapData.width;
@@ -274,14 +302,19 @@ public class DungeonMapEditor : EditorWindow
         ApplyUIToData();
 
         string json = JsonUtility.ToJson(mapData, true);
-        string path = EditorUtility.SaveFilePanel("Save Map", "", "dungeon_map", "json");
+
+        // 파일명으로 사용할 변수 설정 (ID가 없으면 기본값 사용)
+        string defaultFileName = string.IsNullOrEmpty(inputID) ? "dungeon_map" : inputID;
+
+        // SaveFilePanel의 세 번째 인자에 변수 전달
+        string path = EditorUtility.SaveFilePanel("Save Map", "", defaultFileName, "json");
+
         if (path.Length != 0)
         {
             File.WriteAllText(path, json);
             currentFilePath = path;
-            Debug.Log("Map Saved to: " + path);
+            Debug.Log($"Map Exported: {path}");
             
-            // 시각화 갱신
             UpdateVisualizer(); 
         }
     }

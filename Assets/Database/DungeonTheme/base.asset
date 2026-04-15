@@ -41,8 +41,4 @@ MonoBehaviour:
   bgmID: 9
   moduleEnable: 1
   monsterList:
-  - 006
-  - 007
-  - 008
-  - 009
-  - 010
+  - 000
