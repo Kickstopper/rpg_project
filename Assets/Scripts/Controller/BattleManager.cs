@@ -280,14 +280,16 @@ namespace Controller
             // ==========================================
 
             yield return fieldController.Refresh();
+            
+            int monsterCount = monsterList.Sum(m => m.Value);
 
-            foreach(var monster in monsterList)
-            {
-                var entry = fieldController.GetMonsterEntry(monster.Key);
-                if (entry == null) continue;
-                uiController.ShowStateMessage($"야생의 {entry.name} {monster.Value}체 출현!");
-                yield return wait05;
-            }
+            string monsterName = monsterList.Count > 1 
+                ? "적들이" 
+                : fieldController.GetMonsterEntry(monsterList.First().Key)?.name.AttachParticle("이/가");
+
+            uiController.ShowStateMessage($"{monsterName} {monsterCount}체 출현!");
+            yield return wait10;
+            
             uiController.HideStateMessage();
 
             // 스탯 기반 확률 대신 전달받은 방향 기반 인카운터 적용
@@ -1078,7 +1080,7 @@ namespace Controller
             uiController.SetFightCmdVisible(false);
             uiController.SetCmdPanelVisible(false);
             
-            uiController.ShowStateMessage("파티는 죽을 각오로 싸우고 있다.");
+            uiController.ShowStateMessage("파티는 싸움에 몰두하고 있다");
             NextPlayerInput();
         }
 
@@ -2784,8 +2786,8 @@ namespace Controller
 
             if (!isAutoMode)
             {
-                string atkStr = isGunAction ? "의 총구가 불을 뿜었다!" : "(이)가 무기를 휘둘렀다!";
-                uiController.ShowStateMessage($"{action.actor.name}{atkStr}");
+                string atkStr = isGunAction ? "의 총구가 불을 뿜었다!" : "의 공격!";
+                uiController.ShowStateMessage($"{action.actor.name} {atkStr}");
             }
             
             yield return wait10;
