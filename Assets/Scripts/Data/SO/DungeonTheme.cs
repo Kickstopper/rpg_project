@@ -12,14 +12,18 @@ namespace Data
         public float maxInterval;   
     }
 
+    public enum EncounterMode { Random, Symbol }
+
     [CreateAssetMenu(fileName = "NewTheme", menuName = "Dungeon/DungeonTheme")]
     public class DungeonTheme : ScriptableObject
     {
-        [Header("텍스처 설정")]
         public string dungeonID;
         
         [Header("Entry Effect")]
         public bool useWakeUpEffect = false;
+
+        [Header("Battle Encounter Mode")]
+        public EncounterMode encounterMode = EncounterMode.Symbol;
         
         public Texture2D background; // 던전 아래에 깔릴 스카이박스
         public Texture2D[] texture;
@@ -34,7 +38,7 @@ namespace Data
         [Header("Animations")]
         public List<WallAnimConfig> wallAnimations; // 테마별 애니메이션 설정
 
-        [Header("환경 설정")]
+        [Header("Environment Options")]
         public Color fogColor = Color.black; // 심도 표현을 위한 안개의 색
         public float lightingIntensity = 3.5f;
         public bool useGridLighting = true;

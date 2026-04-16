@@ -8,8 +8,6 @@ using System.Collections.Generic;
 
 namespace UI.DungeonMapScene
 {
-    public enum EncounterMode { Random, Symbol }
-
     [System.Serializable]
     public class EncounterSystem
     {

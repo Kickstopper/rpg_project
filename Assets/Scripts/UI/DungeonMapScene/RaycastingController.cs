@@ -161,6 +161,8 @@ namespace Controller
 
             fadeOverlay.blocksRaycasts = false;
             _inputLocked = false;
+
+            CheckCurrentTileEvent();
         }
 
         // 잠에서 깨어나는 눈 깜빡임 연출
@@ -194,6 +196,8 @@ namespace Controller
 
             fadeOverlay.blocksRaycasts = false;
             _inputLocked = false;
+
+            CheckCurrentTileEvent();
         }
 
         void OnDestroy()
@@ -212,18 +216,13 @@ namespace Controller
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (theme.moduleEnable && (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown()))
             {
                 GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
                 inputCooldown = 0.2f;
                 return;
             }
             
-            if (Input.GetKeyDown(KeyCode.O)) 
-            {
-                ToggleMovementMode();
-                return;
-            }
             if (Input.GetKeyDown(KeyCode.M))
             {
                 if (!theme.moduleEnable || !ModuleManager.Instance.IsMounted(ModuleFeature.AutoMapper)) return;
@@ -231,12 +230,17 @@ namespace Controller
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.P)) 
-            {
-                GameSettingManager.Instance.useAnaglyph = !GameSettingManager.Instance.useAnaglyph;
-                Debug.Log($"Anaglyph: {GameSettingManager.Instance.useAnaglyph}");
-                return;
-            }
+            // if (Input.GetKeyDown(KeyCode.O)) 
+            // {
+            //     ToggleMovementMode();
+            //     return;
+            // }
+            // if (Input.GetKeyDown(KeyCode.P)) 
+            // {
+            //     GameSettingManager.Instance.useAnaglyph = !GameSettingManager.Instance.useAnaglyph;
+            //     Debug.Log($"Anaglyph: {GameSettingManager.Instance.useAnaglyph}");
+            //     return;
+            // }
 
             // 입력 처리 분기
             if (_player.IsGridMove)
@@ -250,7 +254,8 @@ namespace Controller
 
             UpdateWallAnimations();
             
-            if (_maxSpawnCount > 0)
+            // 심볼 몬스터 로직은 랜덤 인카운터 모드가 아닐 때만 실행
+            if (_maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random)
             {
                 // 몬스터 심볼의 이동과 스폰
                 UpdateEnemyAI();
@@ -1111,7 +1116,8 @@ namespace Controller
             
             // 시스템 초기화
             _renderer.LoadAssets(theme.texture, theme.spriteTextures, 64, 64, null);
-            encounterSystem.Initialize(theme.monsterList, EncounterMode.Symbol);
+            // 테마에 설정된 인카운터 모드로 초기화
+            encounterSystem.Initialize(theme.monsterList, theme.encounterMode);
 
             // 플레이어 위치 초기화
             if (entryEntrance != null)
@@ -1138,8 +1144,12 @@ namespace Controller
             _spawnDelay = theme.spawnDelay;
             _currentSpawnTimer = 0f;
             _activeEnemies.Clear();
-            if (_maxSpawnCount > 0) 
+
+            // 심볼 인카운터 모드일 때만 몬스터 스폰
+            if (_maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random) 
+            {
                 SpawnSymbolEnemies(_maxSpawnCount);
+            }
         }
 
         // 모듈 UI의 표시 여부 결정
@@ -1203,10 +1213,21 @@ namespace Controller
         {
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
             
-            // 랜덤 인카운터 계산
-            //encounterSystem.OnStepTaken();
+            // 테마 설정에 따라 랜덤 인카운터가 활성화된 경우에만 걸음 수 연산
+            if (theme != null && theme.encounterMode == EncounterMode.Random)
+            {
+                encounterSystem.OnStepTaken();
+            }
             
             // 이벤트가 있는지 체크
+            CheckCurrentTileEvent();
+        }
+
+        // 현재 서 있는 칸의 이벤트를 확인하고 발동
+        private void CheckCurrentTileEvent()
+        {
+            if (DungeonEventManager.Instance == null) return;
+
             string eventID = DungeonEventManager.Instance.CheckEvent(_player.LogicX, _player.LogicY);
             if (!string.IsNullOrEmpty(eventID))
             {
