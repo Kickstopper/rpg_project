@@ -51,3 +51,41 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
+  - id: 001
+    name: "\uADF8\uB9B0\uACE0\uBE14\uB9B0"
+    race: 2
+    align: 6
+    gender: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    image:
+    - {fileID: -563267033, guid: 2d65abb127b88b6438d496e152fa45df, type: 3}
+    portrait: {fileID: 0}
+    prefab: {fileID: 0}
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
