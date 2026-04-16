@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbd550e54fb7702488429f5a8bae4b22, type: 3}
   m_Name: Animan
   m_EditorClassIdentifier: 
-  id: item_003
+  id: item_000
   dataName: "\uC544\uB2C8\uB9CC"
   description: "\uC804\uD22C \uBD88\uB2A5 \uC0C1\uD0DC\uB97C \uD574\uC81C\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
   effectType: 15
-  effectValue: 100
+  effectValue: 1
   element: 6
-  targetScope: 7
+  targetScope: 9
   useType: 0
   actionDelay: 0
   effectPrefab: {fileID: 0}

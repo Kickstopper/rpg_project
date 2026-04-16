@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbd550e54fb7702488429f5a8bae4b22, type: 3}
   m_Name: Reflohy_1
   m_EditorClassIdentifier: 
-  id: item_002
+  id: item_018
   dataName: "\uB808\uD50C\uB85C\uD798"
   description: "\uBB3C\uB9AC \uACF5\uACA9\uC744 \uBC18\uC0AC\uD569\uB2C8\uB2E4."
   icon: {fileID: 0}
