@@ -39,7 +39,7 @@ namespace Controller
         private ConsumableItemData selectedItemData;
 
         private bool wasPopupOpen = false;
-
+        private float localCooldown = 0f;
         void OnEnable()
         {
             ResolvePositionConflicts();
@@ -219,6 +219,11 @@ namespace Controller
         void Update()
         {
             if (!menuController.CanProcessInput) return;
+            if (localCooldown > 0f)
+            {
+                localCooldown -= Time.unscaledDeltaTime;
+                return; 
+            }
 
             if (menuController.IsPopupOpen) 
             {
@@ -240,6 +245,11 @@ namespace Controller
 
         private void HandleItemNavigation()
         {
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            {
+                menuController.CloseItemUI(); 
+            }
+
             if (inventoryItemIds.Count == 0) return;
 
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
@@ -256,11 +266,6 @@ namespace Controller
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 SelectItem();
-            }
-
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
-            {
-                menuController.CloseItemUI(); 
             }
         }
 
@@ -292,6 +297,8 @@ namespace Controller
 
         private void SelectItem()
         {
+            if (isSelectingTarget || localCooldown > 0f) return;
+
             if (inventoryItemIds.Count == 0) return;
             if (currentItemIndex >= inventoryItemIds.Count) currentItemIndex = inventoryItemIds.Count - 1;
 
@@ -328,10 +335,35 @@ namespace Controller
             }
 
             isSelectingTarget = true;
+            localCooldown = 0.2f;
 
             if (descriptionText) descriptionText.text = "누구에게 아이템을 사용합니까?";
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             ApplyTargetHighlight();
+        }
+
+        // 타겟 유효성 검사 함수
+        private bool IsValidTarget(int index)
+        {
+            if (index < 0 || index >= partyControllers.Length) return false;
+            
+            PlayerController target = partyControllers[index];
+            if (target.IsEmpty) return false;
+
+            // 실제 EffectType을 기준으로 생존 여부 판단
+            bool isReviveItem = (selectedItemData.effectType == EffectType.Revive_Empty || 
+                                 selectedItemData.effectType == EffectType.Revive_Fully);
+
+            if (isReviveItem)
+            {
+                // 부활 아이템은 대상의 HP가 0 이하여야만 유효한 타겟으로 인정
+                return target.currentHp <= 0;
+            }
+            else
+            {
+                // 일반 아이템은 대상의 HP가 0보다 커야만 유효한 타겟으로 인정
+                return target.currentHp > 0;
+            }
         }
 
         private void ApplyTargetHighlight()
@@ -340,6 +372,10 @@ namespace Controller
             foreach (var pc in partyControllers) pc.ResetHighlightColor();
 
             TargetScope scope = selectedItemData.targetScope;
+            
+            // 부활 효과를 가진 아이템인지 판별
+            bool isReviveItem = (selectedItemData.effectType == EffectType.Revive_Empty || 
+                                 selectedItemData.effectType == EffectType.Revive_Fully);
 
             // 전체 대상은 모두 하이라이트
             if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies)
@@ -357,17 +393,17 @@ namespace Controller
             }
 
             // 단일 대상 (초기 커서 위치 계산)
-            if (scope == TargetScope.One_Ally)
+            if (isReviveItem || scope == TargetScope.Dead_Ally)
+            {
+                // 부활 아이템인 경우 무조건 죽은 첫 번째 아군에게 포커스
+                int deadIdx = GetFirstDeadMemberIndex();
+                currentPartyIndex = (deadIdx != -1) ? deadIdx : 0;
+            }
+            else if (scope == TargetScope.One_Ally)
             {
                 // 살아있는 첫 번째 아군
                 int validIdx = GetFirstValidMemberIndex();
                 currentPartyIndex = (validIdx != -1) ? validIdx : 0;
-            }
-            else if (scope == TargetScope.Dead_Ally)
-            {
-                // 죽은 첫 번째 아군
-                int deadIdx = GetFirstDeadMemberIndex();
-                currentPartyIndex = (deadIdx != -1) ? deadIdx : 0;
             }
             else // Self 등
             {
@@ -417,11 +453,21 @@ namespace Controller
             // 확인
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                UseItemOnTarget();
+                localCooldown = 0.2f;
+                // 전체 대상 아이템이거나, 단일 대상일 때 타겟이 유효한 경우에만 실행
+                if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies || IsValidTarget(currentPartyIndex))
+                {
+                    UseItemOnTarget();
+                }
+                else
+                {
+                    // 조건에 맞지 않을 경우 에러음
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                }
             }
 
-            // 취소
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            // 취소 키
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
             {
                 CancelTargetSelection();
             }
@@ -444,6 +490,8 @@ namespace Controller
         private void CancelTargetSelection()
         {
             isSelectingTarget = false;
+            localCooldown = 0.2f;
+
             foreach (var pc in partyControllers) pc.ResetHighlightColor(); 
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             // 아이템 리스트로 포커스 복귀

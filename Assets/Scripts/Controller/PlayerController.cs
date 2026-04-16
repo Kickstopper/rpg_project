@@ -27,6 +27,7 @@ namespace Controller
         public TextMeshProUGUI nameText;         // 이름 텍스트
         public TextMeshProUGUI alignText;        // 성향
         public TextMeshProUGUI spiritText;       // 빙의한 신의 이름
+        public GameObject dim;
 
         public Button selectButton;
         
@@ -469,23 +470,24 @@ namespace Controller
 
         public void ApplyHpChange(int amount)
         {
+            if (!IsAlive) return;
             currentHp = Mathf.Clamp(currentHp + amount, 0, maxHp);
         }
 
         public void ApplyMpChange(int amount)
         {
+            if (!IsAlive) return;
             currentMp = Mathf.Clamp(currentMp + amount, 0, maxMp);
         }
 
         public void ApplyRevive(int percent)
         {
+            if (IsAlive) return;
+
             int healAmount = Mathf.FloorToInt(maxHp * (percent / 100f));
             if (healAmount < 1) healAmount = 1;
             
             currentHp = healAmount;
-            
-            // 부활 시 게임오브젝트 활성화 등 상태 복구
-            gameObject.SetActive(true);
         }
 
         public void RefreshView()
@@ -497,6 +499,7 @@ namespace Controller
         {
             if (IsEmpty)
             {
+                if (dim) dim.SetActive(false);
                 if (messagePanel) messagePanel.SetActive(false);
                 if (messageText) messageText.SetText(string.Empty);
                 // 비활성화 시 진행 중인 트윈(애니메이션)이 있다면 즉시 중단
@@ -517,6 +520,7 @@ namespace Controller
             }
             else
             {
+                if (dim) dim.SetActive(!IsAlive);
                 if (messagePanel) messagePanel.SetActive(true);
                 if (messageText) messageText.SetText(string.Empty);
                 if (alignText) alignText.text = AlignmentSystem.GetAlignString(align);

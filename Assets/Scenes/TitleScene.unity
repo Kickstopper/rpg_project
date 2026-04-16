@@ -2911,9 +2911,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingItems:
-  - {fileID: 11400000, guid: 330701932e9dbd0448ca37746a7cb001, type: 2}
-  - {fileID: 11400000, guid: 3b422622809c5ef4c95092658d5096c6, type: 2}
-  - {fileID: 11400000, guid: a23f7ea7c299a5945b397900589d048a, type: 2}
   - {fileID: 11400000, guid: cf8d97a6cbc9c01429b49ddd34f634c2, type: 2}
 --- !u!1 &1651225731
 GameObject:
