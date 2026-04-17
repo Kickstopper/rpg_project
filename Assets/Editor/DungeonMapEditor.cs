@@ -334,17 +334,21 @@ public class DungeonMapEditor : EditorWindow
                 int index = y * mapData.width + x;
                 CellData cell = mapData.cells[index];
                 bool isSelected = selectedCells.Contains(cell);
+                bool hasEntrance = mapData.entrances != null && 
+                                   mapData.entrances.Exists(e => e.sourceX == cell.x && e.sourceY == cell.y);
 
                 GUI.backgroundColor = isSelected         ? Color.cyan
-                                    : cell.value == -1  ? Color.white
-                                    : cell.value == 1   ? Color.brown
-                                                        : Color.gray;
+                                    : hasEntrance        ? Color.red     // 입구가 있으면 빨간색
+                                    : cell.value == -1   ? Color.white
+                                    : cell.value == 1    ? Color.brown
+                                                         : Color.gray;
 
                 // GUILayout.Button 대신 Rect를 먼저 예약
+                float cellSize = 38f;
                 Rect rect = GUILayoutUtility.GetRect(
                     new GUIContent($"{x},{y}"),
                     GUI.skin.button,
-                    GUILayout.Width(45), GUILayout.Height(45));
+                    GUILayout.Width(cellSize), GUILayout.Height(cellSize));
 
                 bool mouseOverCell = rect.Contains(e.mousePosition);
 
@@ -409,7 +413,7 @@ public class DungeonMapEditor : EditorWindow
                 }
 
                 // 벽 시각화
-                float wt = 4f; // 벽 두께
+                float wt = 3f; // 벽 두께
                 Color wc = new Color(1f, 0.3f, 0.3f); // 벽 컬러
                 if (cell.wallTextureIDs[0] != -1)
                     EditorGUI.DrawRect(new Rect(rect.x, rect.y, wt, rect.height), wc);
