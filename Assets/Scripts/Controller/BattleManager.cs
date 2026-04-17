@@ -2308,15 +2308,31 @@ namespace Controller
 
         IEnumerator HandleSkillAction(BattleAction action)
         {
-            // 스킬 타겟 자동 변경 로직
-            if (action.target == null || !IsAlive(action.target))
-            {
-                action.target = fieldController.FindNearestLivingTarget(action.actor);
-                if (action.target == null) yield break; 
-            }
-
             SkillData skill = action.itemData as SkillData; 
             PlayerController actor = action.actor.GetComponent<PlayerController>();
+
+            bool isReviveSkill = skill != null && 
+                                 (skill.effectType == EffectType.Revive_Empty || 
+                                  skill.effectType == EffectType.Revive_Fully);
+
+            // 스킬 타겟 자동 변경 로직. 부활 스킬이 아닐 때만 살아있는 타겟으로 자동 변경
+            if (!isReviveSkill)
+            {
+                if (action.target == null || !IsAlive(action.target))
+                {
+                    action.target = fieldController.FindNearestLivingTarget(action.actor);
+                    if (action.target == null) yield break; // 살아있는 타겟이 없으면 취소
+                }
+            }
+            else
+            {
+                // 부활 스킬인데 대상이 이미 살아있거나 없다면 취소
+                if (action.target == null || IsAlive(action.target))
+                {
+                    yield return wait05;
+                    yield break;
+                }
+            }
 
             // 비용 지불 로직
             if (actor != null && skill != null)

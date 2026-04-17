@@ -471,12 +471,14 @@ namespace Controller
         public void ApplyHpChange(int amount)
         {
             if (!IsAlive) return;
+            if (sourceData != null) sourceData.currentHp = Mathf.Clamp(sourceData.currentHp + amount, 0, sourceData.maxHp);
             currentHp = Mathf.Clamp(currentHp + amount, 0, maxHp);
         }
 
         public void ApplyMpChange(int amount)
         {
             if (!IsAlive) return;
+            if (sourceData != null) sourceData.currentMp = Mathf.Clamp(sourceData.currentMp + amount, 0, sourceData.maxMp);
             currentMp = Mathf.Clamp(currentMp + amount, 0, maxMp);
         }
 
@@ -487,7 +489,13 @@ namespace Controller
             int healAmount = Mathf.FloorToInt(maxHp * (percent / 100f));
             if (healAmount < 1) healAmount = 1;
             
+            if (sourceData != null) sourceData.currentHp = healAmount;
             currentHp = healAmount;
+        }
+
+        public void ApplyStatusEffect(StatusEffect effect)
+        {
+            if (sourceData != null) sourceData.statusEffect = effect;
         }
 
         public void RefreshView()

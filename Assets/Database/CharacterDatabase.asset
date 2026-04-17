@@ -39,8 +39,7 @@ MonoBehaviour:
       psyche: 0
     initialSkillIds:
     - skl_000
-    - skl_001
-    - skl_002
+    - skl_318
     initialWeaponId: sword_001
     initialGunId: gun_001
     initialAmmoId: ammo_001
@@ -76,7 +75,8 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    initialSkillIds: []
+    initialSkillIds:
+    - skl_318
     initialWeaponId: sword_001
     initialGunId: gun_001
     initialAmmoId: ammo_001
@@ -112,7 +112,8 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    initialSkillIds: []
+    initialSkillIds:
+    - skl_318
     initialWeaponId: sword_000
     initialGunId: gun_001
     initialAmmoId: ammo_000
@@ -143,7 +144,8 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    initialSkillIds: []
+    initialSkillIds:
+    - skl_318
     initialWeaponId: sword_000
     initialGunId: gun_001
     initialAmmoId: ammo_000
@@ -174,7 +176,8 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    initialSkillIds: []
+    initialSkillIds:
+    - skl_318
     initialWeaponId: sword_000
     initialGunId: gun_001
     initialAmmoId: ammo_000
@@ -205,7 +208,8 @@ MonoBehaviour:
       elec: 0
       force: 0
       psyche: 0
-    initialSkillIds: []
+    initialSkillIds:
+    - skl_318
     initialWeaponId: sword_000
     initialGunId: gun_001
     initialAmmoId: ammo_000

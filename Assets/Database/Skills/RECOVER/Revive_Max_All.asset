@@ -18,7 +18,7 @@ MonoBehaviour:
     \uBD80\uD65C\uC2DC\uD0B5\uB2C8\uB2E4"
   icon: {fileID: 0}
   effectType: 16
-  effectValue: 0
+  effectValue: 999
   element: 6
   targetScope: 10
   useType: 0
@@ -26,4 +26,5 @@ MonoBehaviour:
   effectPrefab: {fileID: 0}
   useHpCost: 0
   costValue: 30
-  hitRate: 0
+  statusEffectData: {fileID: 0}
+  effectRate: 0

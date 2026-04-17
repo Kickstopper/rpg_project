@@ -62,6 +62,38 @@ namespace Manager
                     break;
 
                 // TODO: 버프/디버프 로직 추가
+                case EffectType.Buff_Phys_Atk:
+                case EffectType.Buff_Magic_Atk:
+                    //target.ApplyBuffChange();
+                    break;
+
+                case EffectType.Buff_Phys_Def:
+                case EffectType.Buff_Mag_Def:
+                    break;
+                
+                case EffectType.Debuff_Phys_Atk:
+                case EffectType.Debuff_Magic_Atk:
+                    break;
+
+                case EffectType.Debuff_Phys_Def:
+                case EffectType.Debuff_Magic_Def:
+                    break;
+
+                case EffectType.Reflect_Phys:
+                case EffectType.Reflect_Magic:
+                    break;
+
+                case EffectType.Absorb_Phys:
+                case EffectType.Absorb_Magic:
+                    break;
+
+                // TODO: 상태이상 치료
+                case EffectType.Recover_Bad_Status:
+                case EffectType.Recover_Curse:
+                case EffectType.Recover_Paralyze:
+                case EffectType.Recover_Poison:
+                    break;
+
             }
 
             if (success)

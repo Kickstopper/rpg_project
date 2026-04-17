@@ -47,7 +47,7 @@ MonoBehaviour:
   - id: 4
     clip: {fileID: 8300000, guid: 7a76f3c92e3427042ae8e672fc4e26d3, type: 3}
   - id: 7
-    clip: {fileID: 8300000, guid: 42355888ac76c8e409d5ea99a92c39d0, type: 3}
+    clip: {fileID: 8300000, guid: 242d653ef983d0c44854e24ec6722193, type: 3}
   - id: 8
     clip: {fileID: 8300000, guid: f67d037d5d0b6cd40983267496587e98, type: 3}
   - id: 9
