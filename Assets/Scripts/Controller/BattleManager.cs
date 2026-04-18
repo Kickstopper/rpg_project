@@ -516,7 +516,7 @@ namespace Controller
             }
 
             //SoundManager.Instance.PlaySFX(SfxID.Action_Break); // 턴 파괴 효과음
-
+            uiController.HideStateMessage();
             if (isPlayerInterrupting) uiController.ResetPartyGauge();
             else uiController.ResetEnemyGauge();
 
@@ -1205,6 +1205,7 @@ namespace Controller
 
         public void OnPopupMenuClosed()
         {
+            inputCooldown = 0.2f;
             currentFightBtnIndex = 0;
             uiController.SetFightCmdInteractable(true);
             StartCoroutine(SelectButton(attackButton)); 
@@ -1217,9 +1218,29 @@ namespace Controller
             else if (item is ConsumableItemData) currentSelectedAction = ActionType.Item;
 
             TargetScope scope = item.targetScope;
+
+            // 타겟팅 모드 진입 전, 유효한 대상이 있는지 먼저 확인
+            fieldController.SetValidTargetsByTargetScope(scope);
+            
+            if (fieldController.validTargets.Count == 0)
+            {
+                if (item.effectType == EffectType.Revive_Empty || item.effectType == EffectType.Revive_Fully)
+                {
+                    uiController.ShowLog("전투 불능인 동료가 없습니다.");
+                }
+                else if (item.effectType == EffectType.Recover_Bad_Status || item.effectType == EffectType.Recover_Curse ||
+                item.effectType == EffectType.Recover_Paralyze || item.effectType == EffectType.Recover_Poison  )
+                {
+                    uiController.ShowLog("상태 이상인 동료가 없습니다.");
+                }
+                OnPopupMenuClosed();
+                return;
+            }
+
             if (scope == TargetScope.Single_Enemy || scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally || scope == TargetScope.Front_Single_Enemy)
             {
-                // 대상을 직접 찍어야 하는 경우만 StartItemTargetSelection 호출
+                // 이미 위에서 SetValidTargetsByTargetScope를 수행했으므로, 
+                // StartItemTargetSelection 내부의 중복 호출을 피하기 위해 로직을 조정할 수도 있습니다.
                 StartItemTargetSelection(scope); 
             }
             else
@@ -2254,15 +2275,35 @@ namespace Controller
         IEnumerator HandleItemAction(BattleAction action)
         {
             BaseRootData item = action.itemData;
-
             // 아이템 소모 로직
             if (item is ConsumableItemData consumable)
             {
                 if (!InventoryManager.Instance.UseItem(consumable.id))
                 {
-                    uiController.ShowLog($"NOT ENOUGH {item.dataName}");
+                    uiController.ShowLog($"{item.name} 부족! 일반 공격으로 대체합니다.");
                     yield return wait10;
-                    yield break; 
+
+                    // 행동 기억을 일반 공격으로 업데이트. 현재 행동 중인 캐릭터의 인덱스를 찾아 딕셔너리를 갱신
+                    PlayerController actorPc = action.actor.GetComponent<PlayerController>();
+                    int actorIndex = fieldController.allSlotControllers.IndexOf(actorPc);
+
+                    if (actorIndex != -1)
+                    {
+                        // ActionType은 Attack으로, 데이터는 null로, 타겟은 초기화(-1)하여 저장
+                        lastPlayerActions[actorIndex] = (ActionType.Attack, null, -1);
+                    }
+
+                    if (action.target == null || action.target.GetComponent<PlayerController>() != null)
+                    {
+                        var livingEnemies = fieldController.activeMonsters.Where(m => m.currentHp > 0).ToList();
+                        if (livingEnemies.Count > 0)
+                            action.target = livingEnemies[Random.Range(0, livingEnemies.Count)].gameObject;
+                        else yield break;
+                    }
+
+                    action.type = ActionType.Attack;
+                    yield return HandleAttackAction(action);
+                    yield break;
                 }
             }
             
@@ -3166,8 +3207,11 @@ namespace Controller
             state = isWin ? BattleState.Won : BattleState.Lost;
             uiController.SetCmdPanelVisible(false);
             uiController.HideStateMessage();
+
             if (isWin)
             {
+                fieldController.SyncPositionsToPartyManager();
+
                 SoundManager.Instance.PlayBGM(BgmID.Victory);
                 
                 List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
