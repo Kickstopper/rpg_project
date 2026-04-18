@@ -17,6 +17,7 @@ namespace Data.Database
             public int exp;
 
             public bool isCommander;
+            public bool isRegular;
             
             [Header("Visual")]
             public Sprite portraitImage;

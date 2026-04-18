@@ -18,7 +18,8 @@ MonoBehaviour:
     spiritId: spirit_000
     expTable: {fileID: 11400000, guid: 0a109a7319f60bb47bb30d455147ed4f, type: 2}
     exp: 0
-    isCommander: 0
+    isCommander: 1
+    isRegular: 1
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     align: 2
@@ -56,7 +57,8 @@ MonoBehaviour:
     spiritId: spirit_001
     expTable: {fileID: 11400000, guid: 29b10d8d523d03547bd72504aa972be3, type: 2}
     exp: 0
-    isCommander: 1
+    isCommander: 0
+    isRegular: 1
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     align: 5
@@ -94,6 +96,7 @@ MonoBehaviour:
     expTable: {fileID: 11400000, guid: 280fb2ad8c3aaee4ebdaf4877cd2fc15, type: 2}
     exp: 0
     isCommander: 0
+    isRegular: 1
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     align: 8
@@ -126,6 +129,7 @@ MonoBehaviour:
     expTable: {fileID: 11400000, guid: 1ea0c1c5d7db1654eb1169b3e2c94047, type: 2}
     exp: 0
     isCommander: 0
+    isRegular: 1
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     align: 4
@@ -158,6 +162,7 @@ MonoBehaviour:
     expTable: {fileID: 11400000, guid: 00d47d8b2275ee84d8a74dd7e91456eb, type: 2}
     exp: 0
     isCommander: 0
+    isRegular: 0
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     align: 9
@@ -190,6 +195,7 @@ MonoBehaviour:
     expTable: {fileID: 11400000, guid: 99fb91fac017d1c4bb1210f0d98b1daa, type: 2}
     exp: 0
     isCommander: 0
+    isRegular: 1
     portraitImage: {fileID: 0}
     standingImage: {fileID: 0}
     align: 4
@@ -222,6 +228,7 @@ MonoBehaviour:
     expTable: {fileID: 0}
     exp: 0
     isCommander: 0
+    isRegular: 0
     portraitImage: {fileID: 0}
     standingImage: {fileID: 2396085269434190896, guid: 723e994d56786b246b42ce9d4c1bc352, type: 3}
     align: 0

@@ -140,7 +140,7 @@ public class BattleFieldController : MonoBehaviour
         for (int i = 0; i < partyCount; i++)
         {
             var member = PartyManager.Instance.GetMember(i);
-            if (member == null || member.currentHp <= 0) continue;
+            if (member == null || (!member.isRegular && member.currentHp <= 0)) continue;
 
             // 데이터상의 위치를 인덱스로 변환
             // 전열(0,1,2), 후열(3,4,5)
@@ -1083,6 +1083,27 @@ public class BattleFieldController : MonoBehaviour
             validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp > 0));
         else if (scope == TargetScope.Dead_Ally)
             validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp <= 0));
+    }
+
+    public void SyncPositionsToPartyManager()
+    {
+        if (PartyManager.Instance == null) return;
+
+        for (int i = 0; i < allSlotControllers.Count; i++)
+        {
+            PlayerController pc = allSlotControllers[i];
+            
+            if (pc != null && !pc.IsEmpty)
+            {
+                // 인덱스 0~2는 전열, 3~5는 후열
+                RowType newRow = (i < 3) ? RowType.Front : RowType.Back;
+                ColumnType newCol = (ColumnType)(i % 3);
+
+                // 실제 데이터의 위치 정보 업데이트
+                pc.sourceData.row = newRow;
+                pc.sourceData.column = newCol;
+            }
+        }
     }
 
     public void SetValidTargets(List<BattleEntity> targets)

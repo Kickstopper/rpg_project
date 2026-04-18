@@ -39,7 +39,7 @@ namespace Data
             data.name = "---";
             data.isCommander = partyId == PartyID.CHARACTER_00;
             data.align = Align.True_Neutral;
-            data.isParty = false;
+            data.isRegular = true;
             data.row = RowType.Front;
             data.resistances = new ResistanceData();
             data.stats = new StatData(){ level = 1, str = 3, vit = 3, mag = 3, agi = 3, intel = 3, luc = 3};

@@ -22,7 +22,7 @@ namespace Data
     {
         // 원본 데이터 참조 (이름, 기본 스탯 등)
         public string characterId;
-        public bool isParty;
+        public bool isRegular;
 
         public string name;
         public Race race;         // 인간
@@ -96,6 +96,7 @@ namespace Data
             stats = entry.stats;
             resistances = entry.resistances;
             isCommander = entry.isCommander;
+            isRegular = entry.isRegular;
 
             currentHp = maxHp = entry.maxHp;
             currentMp = maxMp = entry.maxMp;
