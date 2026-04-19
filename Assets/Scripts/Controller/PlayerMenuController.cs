@@ -286,22 +286,19 @@ namespace Controller
                 foreach (Transform child in partySlots[i]) Destroy(child.gameObject);
                 spawnedControllers[i] = null;
 
-                if (slotAssignments[i] != null)
-                {
-                    GameObject go = Instantiate(playerPrefab, partySlots[i]);
-                    go.transform.localPosition = Vector3.zero;
-                    
-                    PlayerController pc = go.GetComponent<PlayerController>();
-                    // 메뉴 화면용 초기화 (BattleManager는 null)
-                    pc.Initialize(slotAssignments[i], null);
-                    
-                    // 파티 슬롯의 캐릭터 버튼은 클릭되지 않도록 설정 (직접 조작하므로)
-                    if(pc.selectButton) pc.selectButton.interactable = false;
+                GameObject go = Instantiate(playerPrefab, partySlots[i]);
+                go.transform.localPosition = Vector3.zero;
+                
+                PlayerController pc = go.GetComponent<PlayerController>();
+                // 메뉴 화면용 초기화 (BattleManager는 null)
+                pc.Initialize(slotAssignments[i], null);
+                
+                // 파티 슬롯의 캐릭터 버튼은 클릭되지 않도록 설정 (직접 조작하므로)
+                if(pc.selectButton) pc.selectButton.interactable = false;
 
-                    spawnedControllers[i] = pc;
-                    int slotIndex = i;
-                    AddMouseEvents(go, slotIndex);
-                }
+                spawnedControllers[i] = pc;
+                int slotIndex = i;
+                AddMouseEvents(go, slotIndex);
             }
         }
 

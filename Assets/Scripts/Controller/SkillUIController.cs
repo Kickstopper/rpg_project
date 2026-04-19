@@ -90,6 +90,7 @@ namespace Controller
         private void HandleCasterSelection()
         {
             bool moved = false;
+            // 💡 직관적인 1칸 이동 로직 유지
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { if (currentCasterIndex % 3 > 0) { currentCasterIndex--; moved = true; } }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { if (currentCasterIndex % 3 < 2) { currentCasterIndex++; moved = true; } }
             else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) { if (currentCasterIndex >= 3) { currentCasterIndex -= 3; moved = true; } }
@@ -98,27 +99,71 @@ namespace Controller
             if (moved)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
-                RefreshSkillList(currentCasterIndex); 
+                RefreshSkillList(currentCasterIndex); // 빈 슬롯이면 내부에서 currentSkillIds.Clear() 되므로 안전함
                 UpdateVisuals();
             }
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                if (partyControllers[currentCasterIndex].IsEmpty || currentSkillIds.Count == 0)
+                // 💡 빈 슬롯이거나, HP가 없거나, 스킬이 없을 때는 에러음 출력 및 선택 불가
+                if (partyControllers[currentCasterIndex].IsEmpty || partyControllers[currentCasterIndex].currentHp <= 0 || currentSkillIds.Count == 0)
                 {
                     SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                     return;
                 }
+                
                 SoundManager.Instance.PlaySFX(SfxID.UI_Click);
                 currentState = SkillUIState.SelectSkill;
                 currentSkillIndex = 0;
                 UpdateVisuals();
-                menuController.ResetInputTimer(); // 상태가 넘어간 직후 이중 입력 방지
+                menuController.ResetInputTimer();
             }
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
                 menuController.CloseSkillUI();
+            }
+        }
+
+        private void HandleTargetSelection()
+        {
+            TargetScope scope = selectedSkillData.targetScope;
+            bool canMove = (scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally);
+
+            if (canMove)
+            {
+                bool moved = false;
+                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { if (currentTargetIndex % 3 > 0) { currentTargetIndex--; moved = true; } }
+                else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { if (currentTargetIndex % 3 < 2) { currentTargetIndex++; moved = true; } }
+                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) { if (currentTargetIndex >= 3) { currentTargetIndex -= 3; moved = true; } }
+                else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) { if (currentTargetIndex < 3) { currentTargetIndex += 3; moved = true; } }
+
+                if (moved)
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    UpdateVisuals();
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            {
+                // 타겟팅 가능한지 체크
+                if (IsCostEnough() && IsValidTarget(currentTargetIndex)) 
+                {
+                    UseSkill();
+                }
+                else 
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                }
+                menuController.ResetInputTimer();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            {
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                currentState = SkillUIState.SelectSkill;
+                UpdateVisuals();
             }
         }
 
@@ -198,42 +243,6 @@ namespace Controller
             InitializeTargetCursor();
             UpdateVisuals();
             menuController.ResetInputTimer(); // 쿨타임 갱신
-        }
-
-        private void HandleTargetSelection()
-        {
-            // 타겟 선택 로직
-            TargetScope scope = selectedSkillData.targetScope;
-            bool canMove = (scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally);
-
-            if (canMove)
-            {
-                bool moved = false;
-                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { if (currentTargetIndex % 3 > 0) { currentTargetIndex--; moved = true; } }
-                else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { if (currentTargetIndex % 3 < 2) { currentTargetIndex++; moved = true; } }
-                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) { if (currentTargetIndex >= 3) { currentTargetIndex -= 3; moved = true; } }
-                else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) { if (currentTargetIndex < 3) { currentTargetIndex += 3; moved = true; } }
-
-                if (moved)
-                {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
-                    UpdateVisuals();
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-            {
-                if (IsCostEnough() && IsValidTarget(currentTargetIndex)) UseSkill();
-                else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                menuController.ResetInputTimer(); // 타겟 선택 완료 후 쿨타임 갱신
-            }
-
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
-            {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                currentState = SkillUIState.SelectSkill;
-                UpdateVisuals();
-            }
         }
 
         private bool IsCostEnough()
@@ -334,19 +343,17 @@ namespace Controller
         private void UpdateVisuals()
         {
             if (skillPanel) skillPanel.SetActive(currentState != SkillUIState.SelectCaster);
+            
             // 모든 하이라이트 초기화
             foreach (var pc in partyControllers) pc.ResetHighlightColor();
 
             // 시전자 하이라이트
             if (currentState == SkillUIState.SelectCaster || currentState == SkillUIState.SelectSkill || currentState == SkillUIState.SelectTarget)
             {
-                if (!partyControllers[currentCasterIndex].IsEmpty)
-                {
-                    partyControllers[currentCasterIndex].SetHighlightColor(casterHighlightColor);
-                }
+                partyControllers[currentCasterIndex].SetHighlightColor(casterHighlightColor);
             }
 
-            // 스킬 리스트 버튼 Focus
+            // 스킬 리스트 버튼 포커스
             var buttons = skillContent.GetComponentsInChildren<Button>();
             if (currentState == SkillUIState.SelectSkill && buttons.Length > currentSkillIndex)
             {
@@ -355,7 +362,6 @@ namespace Controller
             }
             else if (currentState == SkillUIState.SelectTarget)
             {
-                // 타겟을 고르는 중에도 스킬 설명을 유지합니다!
                 EventSystem.current.SetSelectedGameObject(null);
                 UpdateSkillInfo(); 
             }
@@ -382,15 +388,13 @@ namespace Controller
 
             if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies)
             {
+                // 전체 대상일 경우 빈 슬롯은 깜빡일 필요 없음
                 foreach (var pc in partyControllers) 
                     if (!pc.IsEmpty) pc.SetHighlightColor(blinkColor);
             }
-            else if (scope == TargetScope.Self)
+            else // 단일 타겟 (Self 포함)
             {
-                partyControllers[currentTargetIndex].SetHighlightColor(blinkColor);
-            }
-            else // 단일 타겟
-            {
+                // 타겟 선택 중일 때도 빈 슬롯에 커서가 있으면 깜빡이도록 설정
                 partyControllers[currentTargetIndex].SetHighlightColor(blinkColor);
             }
         }
@@ -490,7 +494,6 @@ namespace Controller
             }
         }
 
-        // 마우스 이벤트 동적 할당 및 처리
         // 마우스 이벤트 동적 할당 및 처리
         private void AddMouseEvents(GameObject go, int index)
         {
@@ -605,6 +608,56 @@ namespace Controller
                     }
                 }
             }
+        }
+
+        // 방향키 이동 시 다음 유효한 슬롯을 찾는 헬퍼 메서드
+        private int GetNextValidIndex(int currentIndex, int dx, int dy, Func<int, bool> isValid)
+        {
+            int x = currentIndex % 3; // 0, 1, 2 (열)
+            int y = currentIndex / 3; // 0, 1 (행 - 전열/후열)
+
+            if (dx != 0) // 좌/우 이동
+            {
+                while (true)
+                {
+                    x += dx;
+                    if (x < 0 || x > 2) break; // 범위를 벗어나면 중단
+                    
+                    int idx = y * 3 + x;
+                    if (isValid(idx)) return idx; // 유효한 대상을 찾으면 반환
+                }
+            }
+            else if (dy != 0) // 상/하 이동
+            {
+                y += dy;
+                if (y >= 0 && y <= 1) // 앞/뒷열 범위 체크
+                {
+                    // 1. 수직 방향에 바로 대상이 있는지 우선 확인
+                    int directIdx = y * 3 + x;
+                    if (isValid(directIdx)) return directIdx;
+
+                    // 2. 바로 위/아래가 비어있다면, 이동한 줄(Row)에서 가장 가까운 유효 캐릭터 탐색
+                    int closestIdx = -1;
+                    int minDistance = 99;
+                    
+                    for (int i = 0; i < 3; i++)
+                    {
+                        int checkIdx = y * 3 + i;
+                        if (isValid(checkIdx))
+                        {
+                            int dist = Mathf.Abs(i - x);
+                            if (dist < minDistance)
+                            {
+                                minDistance = dist;
+                                closestIdx = checkIdx;
+                            }
+                        }
+                    }
+                    if (closestIdx != -1) return closestIdx;
+                }
+            }
+
+            return currentIndex; // 유효한 대상을 찾지 못하면 제자리 유지
         }
 
         private int GetFirstValidMemberIndex() => System.Array.FindIndex(partyControllers, p => !p.IsEmpty && p.currentHp > 0);
