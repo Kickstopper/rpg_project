@@ -111,7 +111,8 @@ namespace Data
             equippedAmmoId = entry.initialAmmoId;
             equippedArmorIds = new List<string>(entry.initialArmorIds);
             
-            learnedSkills = new List<string>(entry.initialSkillIds);
+            var skillIds = entry.initialSkills.ConvertAll(s => s.id);
+            learnedSkills = new List<string>(skillIds);
         }
 
         public CharacterSaveData ToSaveData()

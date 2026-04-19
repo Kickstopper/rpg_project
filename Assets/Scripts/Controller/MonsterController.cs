@@ -117,24 +117,26 @@ namespace Controller
 
         public override int GetAttack()
         {
-            return (level + GetTotalStr()) * 2;
+            float baseAtk = (level + GetTotalStr()) * 2;
+            return Mathf.RoundToInt(baseAtk * GetBuffMultiplier(buffPhysAtk));
         }
 
         public override int GetDefense()
         {
-            int statDef = sourceData.stats.vit;
-            int levelBonus = Mathf.FloorToInt(sourceData.stats.level * 0.5f);
-
-            return statDef + levelBonus;
+            float baseDef = sourceData.stats.vit + Mathf.FloorToInt(sourceData.stats.level * 0.5f);
+            return Mathf.RoundToInt(baseDef * GetBuffMultiplier(buffPhysDef));
         }
+        
         public override int GetMagicAttack()
         {
-            return (GetTotalInt() / 2) + (GetTotalMag() / 2);
+            float baseMagAtk = (GetTotalInt() / 2) + (GetTotalMag() / 2);
+            return Mathf.RoundToInt(baseMagAtk * GetBuffMultiplier(buffMagAtk));
         }
 
         public override int GetMagicDefense()
         {
-            return GetTotalInt() + (GetTotalMag() / 4) + (GetTotalVit() / 2) + (level / 2);
+            float baseMagDef = GetTotalInt() + (GetTotalMag() / 4) + (GetTotalVit() / 2) + (level / 2);
+            return Mathf.RoundToInt(baseMagDef * GetBuffMultiplier(buffMagDef));
         }
 
         public override int GetHitRate()

@@ -82,15 +82,35 @@ namespace Controller
         protected float normalShakeDuration = 0.2f;
         protected float critShakeMagnitude = 15f;
         protected float critShakeDuration = 0.5f;
-        
 
         // 공통 코루틴 참조
         protected Coroutine highlightCoroutine;
         protected Color originalColor; 
 
-        
-        // 공통 로직 (그대로 상속받아 사용)
-        
+        [Header("Buff/Debuff Stacks (-4 ~ +4)")]
+        public int buffPhysAtk = 0;
+        public int buffMagAtk = 0;
+        public int buffPhysDef = 0;
+        public int buffMagDef = 0;
+
+        // 버프 스택 증감 함수 (4중첩 제한)
+        public bool ChangeBuffStack(ref int currentStack, int amount)
+        {
+            int before = currentStack;
+            // -4(최대 디버프)에서 4(최대 버프) 사이로 값 고정
+            currentStack = Mathf.Clamp(currentStack + amount, -4, 4);
+            
+            // 이미 풀 스택이라 변화가 없다면 false 반환 (UI 갱신 생략용)
+            return currentStack != before; 
+        }
+
+        // 스택을 실제 스탯 배율로 변환 (기획에 맞춰 1스택당 25% 증감으로 설정)
+        public float GetBuffMultiplier(int stack)
+        {
+            // 예: 4스택 = 2.0배, -4스택 = 0.25배 (최소 0.25배 보장)
+            return Mathf.Max(0.25f, 1.0f + (stack * 0.25f));
+        }
+
         public void ResetStatus()
         {
             isGuarding = false;
@@ -186,6 +206,12 @@ namespace Controller
         {
             // durationType이 BattleOnly인 것만 리스트에서 제거
             activeEffects.RemoveAll(e => e.data.durationType == EffectDurationType.BattleOnly);
+
+            // 전투가 끝나면 버프/디버프 스택 초기화
+            buffPhysAtk = 0;
+            buffMagAtk = 0;
+            buffPhysDef = 0;
+            buffMagDef = 0;
         }
 
         // 턴 시작 시 또는 행동 실행 직전에 호출하여 제약이 발동했는지 확인합니다.

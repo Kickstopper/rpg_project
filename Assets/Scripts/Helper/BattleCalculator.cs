@@ -241,8 +241,6 @@ namespace Helper
             return Mathf.FloorToInt((level * level * 10f) + 15f); 
         }
 
-        public static bool CheckReflection(BattleEntity target, ActionType type) { return false; }
-        public static bool CheckAbsorption(BattleEntity target, ActionType type) { return false; }
         public static float GetResistanceValue(BaseRootData data, ResistanceData resist) { return 0f; }
         public static bool IsAlignCompatible(Align a, Align b) { return a == b || a == Align.True_Neutral || b == Align.True_Neutral; }
         public static void GetPositionalModifiers(BattleFieldController.BattlePosition atkPos, BattleFieldController.BattlePosition defPos, WeaponType wType, out float damageMultiplier, out float evasionBonus) { damageMultiplier=1f; evasionBonus=0f; }

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Manager;
 using Data;
+using UI.Common;
 namespace Controller
 {
     public class BattleItemUIController : MonoBehaviour
@@ -154,9 +155,10 @@ namespace Controller
             GameObject slotObj = Instantiate(itemSlotPrefab, contentTransform);
             
             // 이름/개수 표시
-            var texts = slotObj.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
             int count = InventoryManager.Instance.GetItemCount(data.id);
-            if(texts.Length > 1) texts[1].text = $"x{count}";
+            
+            var itemView = slotObj.GetComponent<SimpleListItemView>();
+            if (itemView != null) itemView.SetData(data.dataName, count);
 
             // 버튼 클릭 이벤트
             Button btn = slotObj.GetComponent<Button>();

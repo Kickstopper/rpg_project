@@ -367,7 +367,15 @@ namespace Controller
         {
             // ATK = STR + 무기 공격력 + (LV/4)
             int weaponBonus = (currentWeapon != null) ? currentWeapon.attackPower : 0;
-            return GetTotalStr() + weaponBonus + (level / 4);
+            float baseAtk = GetTotalStr() + weaponBonus + (level / 4);
+            return Mathf.RoundToInt(baseAtk * GetBuffMultiplier(buffPhysAtk));
+        }
+
+        public override int GetMagicAttack()
+        {
+            // 마법 공격력 (MATK = (MAG*2) + (INT/2))
+            float baseMagAtk = (GetTotalMag() * 2f) + (GetTotalInt() / 2f);
+            return Mathf.RoundToInt(baseMagAtk * GetBuffMultiplier(buffMagAtk));
         }
 
         public override int GetDefense()
@@ -375,36 +383,33 @@ namespace Controller
             // DEF = 장비방어력 + VIT + AGI
             int armorBonus = 0;
             foreach (var armor in currentArmors) armorBonus += armor.defense;
-            return armorBonus + GetTotalVit() + GetTotalAgi();
+            float baseDef = armorBonus + GetTotalVit() + GetTotalAgi();
+            return Mathf.RoundToInt(baseDef * GetBuffMultiplier(buffPhysDef));
         }
 
-        // 마법 공격력 (MATK = (MAG*2) + (INT/2))
-        public override int GetMagicAttack()
-        {
-            return (GetTotalMag() * 2) + (GetTotalInt() / 2);
-        }
-
-        // 마법 방어력 (MDEF = (MAG+VIT+AGI)/4 + INT + 장비방어력/4)
         public override int GetMagicDefense()
         {
+            // 마법 방어력 (MDEF = (MAG+VIT+AGI)/4 + INT + 장비방어력/4)
             int armorBonus = 0;
             foreach (var armor in currentArmors) armorBonus += armor.defense;
             
-            int baseMdef = (GetTotalMag() + GetTotalVit() + GetTotalAgi()) / 4;
-            return baseMdef + GetTotalInt() + (armorBonus / 4);
+            float baseMagDef = (GetTotalMag() + GetTotalVit() + GetTotalAgi()) / 4f + GetTotalInt() + armorBonus / 4f;
+            return Mathf.RoundToInt(baseMagDef * GetBuffMultiplier(buffMagDef));
         }
 
         public override int GetHitRate()
         {
             int weaponHit = currentWeapon != null ? currentWeapon.hitRateBonus : 0;
-            return GetTotalAgi() + weaponHit + (GetTotalLuc() / 2) + level;
+            float baseHitRate = GetTotalAgi() + weaponHit + (GetTotalLuc() / 2f) + level;
+            return Mathf.RoundToInt(baseHitRate);
         }
 
         public override int GetEvasion()
         {
             int armorEva = 0;
             foreach (var armor in currentArmors) armorEva += armor.evasionMod;
-            return armorEva + GetTotalAgi() + (GetTotalInt() / 4) + (GetTotalLuc() / 4) + level;
+            float baseEvation = armorEva + GetTotalAgi() + (GetTotalInt() / 4) + (GetTotalLuc() / 4) + level;
+            return Mathf.RoundToInt(baseEvation);
         }
 
         public override ResistanceData GetResistances()

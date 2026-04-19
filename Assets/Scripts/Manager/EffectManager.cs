@@ -1,5 +1,6 @@
 using UnityEngine;
 using Data;
+using Controller;
 
 namespace Manager
 {
@@ -26,6 +27,7 @@ namespace Manager
             if (target == null || data == null) return false;
 
             bool success = false;
+            BattleEntity entity = target as BattleEntity;
 
             switch (data.effectType)
             {
@@ -61,39 +63,61 @@ namespace Manager
                     success = true;
                     break;
 
-                // TODO: 버프/디버프 로직 추가
+                // --- 반사 및 흡수 --- 
+                case EffectType.Reflect_Phys:
+                    if (entity != null) { entity.isPhysicalReflect = true; success = true; }
+                    break;
+                case EffectType.Reflect_Magic:
+                    if (entity != null) { entity.isMagicReflect = true; success = true; }
+                    break;
+                case EffectType.Absorb_Phys:
+                    if (entity != null) { entity.isPhysicalAbsorb = true; success = true; }
+                    break;
+                case EffectType.Absorb_Magic:
+                    if (entity != null) { entity.isMagicAbsorb = true; success = true; }
+                    break;
+
+                // --- 버프 및 디버프 --- 
                 case EffectType.Buff_Phys_Atk:
+                    if (entity != null) success = entity.ChangeBuffStack(ref entity.buffPhysAtk, 1);
+                    break;
+                case EffectType.Debuff_Phys_Atk:
+                    if (entity != null) success = entity.ChangeBuffStack(ref entity.buffPhysAtk, -1);
+                    break;
+
                 case EffectType.Buff_Magic_Atk:
-                    //target.ApplyBuffChange();
+                    if (entity != null) success = entity.ChangeBuffStack(ref entity.buffMagAtk, 1);
+                    break;
+                case EffectType.Debuff_Magic_Atk:
+                    if (entity != null) success = entity.ChangeBuffStack(ref entity.buffMagAtk, -1);
                     break;
 
                 case EffectType.Buff_Phys_Def:
-                case EffectType.Buff_Mag_Def:
+                    if (entity != null) success = entity.ChangeBuffStack(ref entity.buffPhysDef, 1);
                     break;
-                
-                case EffectType.Debuff_Phys_Atk:
-                case EffectType.Debuff_Magic_Atk:
-                    break;
-
                 case EffectType.Debuff_Phys_Def:
-                case EffectType.Debuff_Magic_Def:
+                    if (entity != null) success = entity.ChangeBuffStack(ref entity.buffPhysDef, -1);
                     break;
 
-                case EffectType.Reflect_Phys:
-                case EffectType.Reflect_Magic:
+                case EffectType.Buff_Mag_Def:
+                    if (entity != null) success = entity.ChangeBuffStack(ref entity.buffMagDef, 1);
+                    break;
+                case EffectType.Debuff_Magic_Def: // BaseItemData.cs의 Enum 철자에 맞춤
+                    if (entity != null) success = entity.ChangeBuffStack(ref entity.buffMagDef, -1);
                     break;
 
-                case EffectType.Absorb_Phys:
-                case EffectType.Absorb_Magic:
-                    break;
-
-                // TODO: 상태이상 치료
+                // --- 상태이상 --- 
                 case EffectType.Recover_Bad_Status:
+                case EffectType.Recover_Poison:
                 case EffectType.Recover_Curse:
                 case EffectType.Recover_Paralyze:
-                case EffectType.Recover_Poison:
+                    if (entity != null && entity.activeEffects.Count > 0)
+                    {
+                        // TODO: EffectType에 맞춰 특정 상태이상만 지우도록 세분화
+                        entity.activeEffects.Clear(); 
+                        success = true;
+                    }
                     break;
-
             }
 
             if (success)

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Manager;
 using Data;
+using UI.Common;
 
 namespace Controller
 {
@@ -147,16 +148,6 @@ namespace Controller
 
         void CreateSkillSlot(SkillData data)
         {
-            GameObject slotObj = Instantiate(skillSlotPrefab, contentTransform);
-            Button btn = slotObj.GetComponent<Button>();
-            
-            var texts = slotObj.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
-            if(texts.Length > 0) texts[0].text = data.dataName;
-            
-            string consumeText = data.useHpCost ? "HP" : "MP";
-            string cost = data.costValue.ToString();
-            if(texts.Length > 1) texts[1].text = $"{consumeText} {cost}";
-
             bool canUse = true;
             if (currentActor != null)
             {
@@ -170,19 +161,32 @@ namespace Controller
                 }
             }
 
-
-            // 버튼 상태 및 클릭 이벤트 처리. 버튼 자체는 항상 활성화 (그래야 포커스가 이동됨)
-            btn.interactable = true;
-            Color textColor = canUse ? Color.white : Color.gray;
-            foreach (var txt in texts) txt.color = textColor;
-
-            btn.onClick.AddListener(() => 
+            GameObject slotObj = Instantiate(skillSlotPrefab, contentTransform);
+            var itemView = slotObj.GetComponent<SimpleListItemView>();
+            if (itemView != null)
             {
-                if (canUse)
-                    OnItemClicked(data);
-                else
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-            });
+                string consumeText = data.useHpCost ? "HP" : "MP";
+                string cost = data.costValue.ToString();
+                itemView.SetData(data.dataName,  $"{consumeText} {cost}");
+
+                Color textColor = canUse ? Color.white : Color.gray;
+                itemView.SetNameTextColor(textColor);
+                itemView.SetValueTextColor(textColor);
+            }
+
+            Button btn = slotObj.GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.interactable = true;
+                btn.onClick.AddListener(() => {
+                    if (canUse)
+                        OnItemClicked(data);
+                    else
+                        SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                });
+                
+            }
+            
             EventTrigger trigger = slotObj.GetComponent<EventTrigger>();
             if (trigger == null) trigger = slotObj.AddComponent<EventTrigger>();
 

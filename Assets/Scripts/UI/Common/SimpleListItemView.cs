@@ -19,5 +19,15 @@ namespace UI.Common
             nameText.text = name;
             valueText.text = valueStr; 
         }
+
+        public void SetNameTextColor(Color c)
+        {
+            nameText.color = c;
+        }
+
+        public void SetValueTextColor(Color c)
+        {
+            valueText.color = c;
+        }
     }
 }

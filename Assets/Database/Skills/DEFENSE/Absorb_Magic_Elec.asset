@@ -24,5 +24,6 @@ MonoBehaviour:
   actionDelay: 0
   effectPrefab: {fileID: 0}
   useHpCost: 0
-  costValue: 12
-  hitRate: 0
+  costValue: 1
+  statusEffectData: {fileID: 0}
+  effectRate: 0

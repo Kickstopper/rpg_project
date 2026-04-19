@@ -31,9 +31,9 @@ namespace Data.Database
             // ----------------------------------------------------------
             // 초기 세팅 및 아이템/스킬 참조 ID
             // ----------------------------------------------------------
-            [Header("Initial Loadout (IDs)")]
+            [Header("Initial Loadout")]
             // 이 캐릭터가 처음 생성될 때 가지고 있을 스킬 ID 목록
-            public List<string> initialSkillIds = new List<string>();
+            public List<SkillData> initialSkills = new();
 
             // 초기 장비 ID (없으면 비워둠)
             public string initialWeaponId;

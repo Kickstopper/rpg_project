@@ -2979,41 +2979,78 @@ namespace Controller
                 yield break; 
             }
 
-            if (BattleCalculator.CheckReflection(targetEntity, action.type))
+            // 공격 속성 판별
+            bool isMagicAttack = false;
+            bool isPhysicalAttack = false;
+
+            // 평타, 사격, 유니온 어택, 롤링 발칸 등은 물리 공격으로 간주
+            if (action.type == ActionType.Attack || action.type == ActionType.Shoot || 
+                action.type == ActionType.Union_Attack || action.type == ActionType.Rolling_Vulcan)
             {
-                // 반사 시 방어자 측 게이지 0.1 상승
+                isPhysicalAttack = true;
+            }
+            // 스킬이나 아이템은 내부 데이터를 확인하여 마법인지 판별
+            else if (action.type == ActionType.Skill || action.type == ActionType.Item)
+            {
+                if (action.itemData != null && action.itemData.effectType == EffectType.Magic_Atk)
+                {
+                    isMagicAttack = true;
+                }
+                else 
+                {
+                    // Special_Atk 등은 물리로 취급
+                    isPhysicalAttack = true; 
+                }
+            }
+
+            // 반사 로직
+            bool isReflected = (isPhysicalAttack && targetEntity.isPhysicalReflect) || 
+                               (isMagicAttack && targetEntity.isMagicReflect);
+            if (isReflected)
+            {
+                // 반사 시 방어자 측 게이지 상승
                 AddGauge(!isPlayerActor, 0.1f);
 
                 uiController.ShowLog("REFLECT!");
                 visualController.SpawnVFX(VfxID.Reflect, target.transform.position);
+                
+                // 공격자 본인에게 돌아갈 데미지 계산 및 적용
                 int reflectDmg = BattleCalculator.CalculateDamage(attackerEntity, attackerEntity, action, false, 1.0f);
                 ApplyDamage(action.actor, reflectDmg, false);
+                
                 if (targetEntity is PlayerController pc)
                 {
                     pc.SetMessage("반사다!");
                     yield return wait05;
                     pc.SetMessage(string.Empty);
                 } 
-                yield break;
+                yield break; // 데미지를 무효화하고 즉시 루프 종료
             }
 
-            if (BattleCalculator.CheckAbsorption(targetEntity, action.type))
+            // 흡수 로직
+            bool isAbsorbed = (isPhysicalAttack && targetEntity.isPhysicalAbsorb) || 
+                              (isMagicAttack && targetEntity.isMagicAbsorb);
+            if (isAbsorbed)
             {
-                // 흡수 시 방어자 측 게이지 0.1 상승
+                // 흡수 시 방어자 측 게이지 상승
                 AddGauge(!isPlayerActor, 0.1f);
 
                 uiController.ShowLog("ABSORB!");
                 visualController.SpawnVFX(VfxID.Absorb, target.transform.position);
+                
+                // 타겟이 회복할 데미지량 계산
                 int absorbAmount = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, false, 1.0f);
+                
+                targetEntity.currentHp += absorbAmount;
+
                 if (targetEntity is PlayerController pc)
                 {
-                    pc.Recover(absorbAmount, 0);
+                    // 기존의 pc.Recover 함수 대신 통일된 프로퍼티 조작 사용
                     pc.SetMessage("흡수해주마!");
                     yield return wait05;
                     pc.SetMessage(string.Empty);
                 } 
-                else if (targetEntity is MonsterController mc) mc.currentHp = Mathf.Min(mc.currentHp + absorbAmount, mc.maxHp);
-                yield break; 
+                yield break; // 데미지를 무효화하고 즉시 루프 종료
             }
 
             if (isLastStandActive && target.GetComponent<PlayerController>() != null)
@@ -3208,13 +3245,16 @@ namespace Controller
             uiController.SetCmdPanelVisible(false);
             uiController.HideStateMessage();
 
+            // 파티원들의 버프/상태이상을 모두 제거
+            List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
+            foreach (var p in allPlayers) if (p != null) p.ClearBattleOnlyEffects();
+
             if (isWin)
             {
                 fieldController.SyncPositionsToPartyManager();
 
                 SoundManager.Instance.PlayBGM(BgmID.Victory);
                 
-                List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
                 BattleReward reward = BattleCalculator.CalculateRewards(allPlayers, fieldController.encounterLog);
 
                 // 경험치 반영 전 상태 스냅샷 저장
