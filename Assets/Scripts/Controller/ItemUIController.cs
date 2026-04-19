@@ -131,7 +131,14 @@ namespace Controller
                     foreach(var t in texts) t.color = isUsable ? enabledTextColor : disabledTextColor;
 
                     int itemIndex = i;
-                    slot.GetComponent<Button>().onClick.AddListener(() => OnClickListItem(itemIndex));
+                    Button btn = go.GetComponent<Button>();
+                    if (btn)
+                    {
+                        btn.onClick.AddListener(() => OnClickListItem(itemIndex));
+                        // Unity의 기본 방향키 네비게이션 비활성화
+                        Navigation nav = new Navigation { mode = Navigation.Mode.None };
+                        btn.navigation = nav;
+                    } 
 
                     // 마우스를 올렸을 때 포커스 및 설명창 갱신
                     EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();

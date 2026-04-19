@@ -105,7 +105,7 @@ namespace Controller
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                // 💡 빈 슬롯이거나, HP가 없거나, 스킬이 없을 때는 에러음 출력 및 선택 불가
+                // 빈 슬롯이거나, HP가 없거나, 스킬이 없을 때는 에러음 출력 및 선택 불가
                 if (partyControllers[currentCasterIndex].IsEmpty || partyControllers[currentCasterIndex].currentHp <= 0 || currentSkillIds.Count == 0)
                 {
                     SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
@@ -431,20 +431,28 @@ namespace Controller
                 GameObject go = Instantiate(skillSlotPrefab, skillContent);
                 var slot = go.GetComponent<SimpleListItemView>();
                 
-                string costStr = sData.useHpCost ? $"{sData.costValue}HP" : $"{sData.costValue}MP";
-                if(slot) slot.SetData(sData.dataName, costStr);
-
-                bool isUsableType = (sData.useType == UseType.All || sData.useType == UseType.Exploration);
-                bool hasResource = sData.useHpCost ? (currentCaster.currentHp > sData.costValue) : (currentCaster.currentMp >= sData.costValue);
-                bool isUsable = isUsableType && hasResource;
-
-                var texts = go.GetComponentsInChildren<TextMeshProUGUI>();
-                foreach(var t in texts) t.color = isUsable ? enabledTextColor : disabledTextColor;
+                if (slot)
+                {
+                    string costStr = sData.useHpCost ? $"{sData.costValue}HP" : $"{sData.costValue}MP";
+                    slot.SetData(sData.dataName, costStr);
+                    bool isUsableType = (sData.useType == UseType.All || sData.useType == UseType.Exploration);
+                    bool hasResource = sData.useHpCost ? (currentCaster.currentHp > sData.costValue) : (currentCaster.currentMp >= sData.costValue);
+                    bool isUsable = isUsableType && hasResource;
+                    Color color = isUsable ? enabledTextColor : disabledTextColor;
+                    slot.SetNameTextColor(color);
+                    slot.SetValueTextColor(color);
+                } 
 
                 int itemIndex = i;
                 Button btn = go.GetComponent<Button>();
-                if (btn) btn.onClick.AddListener(() => OnClickListItem(itemIndex));
-
+                if (btn)
+                {
+                    btn.onClick.AddListener(() => OnClickListItem(itemIndex));
+                    // Unity의 기본 방향키 네비게이션 비활성화
+                    Navigation nav = new Navigation { mode = Navigation.Mode.None };
+                    btn.navigation = nav;
+                }
+                
                 // 마우스를 올렸을 때 포커스 및 설명창 갱신
                 EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
                 trigger.triggers.Clear();
