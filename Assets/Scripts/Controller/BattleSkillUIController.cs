@@ -13,6 +13,7 @@ namespace Controller
         [Header("UI References")]
         public Transform contentTransform; 
         public GameObject skillSlotPrefab;
+        public SkillInfoController skillInfoView;
 
         public BattleManager battleManager;
         
@@ -96,6 +97,7 @@ namespace Controller
             currentSkillIds = null;
             currentActor = null; // 초기화
             gameObject.SetActive(false);
+            if (skillInfoView != null) skillInfoView.ResetText();
             battleManager.OnPopupMenuClosed();
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
@@ -139,7 +141,7 @@ namespace Controller
                     CreateSkillSlot(data);
                 }
             }
-            
+            skillInfoView?.gameObject.SetActive(currentSlots.Count > 0);
             StartCoroutine(SelectFirstItem());
         }
 
@@ -155,9 +157,6 @@ namespace Controller
             string cost = data.costValue.ToString();
             if(texts.Length > 1) texts[1].text = $"{consumeText} {cost}";
 
-            // ---------------------------------------------------------
-            // 사용 가능 여부 판별 (로직은 그대로 유지)
-            // ---------------------------------------------------------
             bool canUse = true;
             if (currentActor != null)
             {
@@ -171,32 +170,38 @@ namespace Controller
                 }
             }
 
-            // ---------------------------------------------------------
-            // 버튼 상태 및 클릭 이벤트 처리
-            // ---------------------------------------------------------
-            
-            // 버튼 자체는 항상 활성화 (그래야 포커스가 이동됨)
-            btn.interactable = true; 
 
-            // 시각적 구분: 사용 불가면 글자색을 회색으로, 가능하면 흰색으로
+            // 버튼 상태 및 클릭 이벤트 처리. 버튼 자체는 항상 활성화 (그래야 포커스가 이동됨)
+            btn.interactable = true;
             Color textColor = canUse ? Color.white : Color.gray;
             foreach (var txt in texts) txt.color = textColor;
 
-            // 클릭 리스너 내부에서 분기 처리
             btn.onClick.AddListener(() => 
             {
                 if (canUse)
-                {
-                    // 조건 만족 시 정상 실행
                     OnItemClicked(data);
-                }
                 else
-                {
                     SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-                }
             });
+            EventTrigger trigger = slotObj.GetComponent<EventTrigger>();
+            if (trigger == null) trigger = slotObj.AddComponent<EventTrigger>();
+
+            // hover
+            EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enterEntry.callback.AddListener((eventData) => OnItemSelect(data));
+            trigger.triggers.Add(enterEntry);
+            // select
+            EventTrigger.Entry selectEntry = new EventTrigger.Entry { eventID = EventTriggerType.Select };
+            selectEntry.callback.AddListener((eventData) => OnItemSelect(data));
+            trigger.triggers.Add(selectEntry);
             
             currentSlots.Add(slotObj);
+        }
+
+        void OnItemSelect(SkillData skillData)
+        {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            if (skillInfoView != null) skillInfoView.UpdateInfo(skillData);
         }
 
         void OnItemClicked(BaseRootData itemData)
@@ -212,14 +217,9 @@ namespace Controller
             yield return null; 
             
             // 사용 가능한 첫 번째 슬롯을 찾을지, 그냥 첫 번째를 잡을지 결정
-            // 여기서는 단순히 첫 번째 슬롯을 잡지만, interactable이 false면 포커스는 가되 클릭은 안됨
-            
             if (currentSlots.Count > 0)
             {
                 EventSystem.current.SetSelectedGameObject(null);
-                
-                // 첫 번째 슬롯이 비활성화 상태여도 포커스는 갈 수 있어야 키보드로 다른 스킬을 고를 수 있음. 
-                // 만약 '사용 가능한 첫 번째'를 원한다면 반복문으로 interactable == true인 것을 찾아야 함.
                 EventSystem.current.SetSelectedGameObject(currentSlots[0]);
             }
             else

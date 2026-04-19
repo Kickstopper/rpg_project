@@ -168,7 +168,7 @@ namespace UI.Battle
 
             foreach (string skillId in currentTarget.learnedSkillIds)
             {
-                var skillData = Manager.DatabaseManager.Instance.GetSkill(skillId);
+                var skillData = DatabaseManager.Instance.GetSkill(skillId);
                 if (skillData != null && skillSlotPrefab != null)
                 {
                     GameObject go = Instantiate(skillSlotPrefab, skillContent);
@@ -264,14 +264,14 @@ namespace UI.Battle
                 AddAllocatedStat(type, 1);
                 availablePoints -= 1;
                 isChanged = true;
-                Manager.SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
             }
             else if (amount < 0 && currentAllocated > 0)
             {
                 AddAllocatedStat(type, -1);
                 availablePoints += 1;
                 isChanged = true;
-                Manager.SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
 
                 // 스킬 리스트에서 마우스로 스탯 취소 버튼을 클릭했을 때 다시 스탯 섹션으로 강제 이동
                 if (currentSection == FocusSection.Skill)
@@ -454,7 +454,6 @@ namespace UI.Battle
             }
         }
 
-        // 상태에 맞춰 똑똑하게 포커스를 이동해주는 함수
         private IEnumerator SelectFirstAvailableButton()
         {
             yield return null;
@@ -516,7 +515,7 @@ namespace UI.Battle
             {
                 if (currentSection == FocusSection.Skill && availablePoints == 0)
                 {
-                    Manager.SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                     SetSectionFocus(FocusSection.Stat);
                     StartCoroutine(SelectFirstAvailableButton());
                     return;
@@ -588,7 +587,7 @@ namespace UI.Battle
 
         private void OnConfirmClicked()
         {
-            Manager.SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
 
             currentTarget.sourceData.stats.str += allocatedStats.str;
             currentTarget.sourceData.stats.mag += allocatedStats.mag;

@@ -12,6 +12,7 @@ namespace Controller
         [Header("UI References")]
         public Transform contentTransform; 
         public GameObject itemSlotPrefab;
+        public ItemInfoController itemInfoView;
 
         public BattleManager battleManager;
         
@@ -87,6 +88,7 @@ namespace Controller
         public void Close()
         {
             gameObject.SetActive(false);
+            if (itemInfoView != null) itemInfoView.ResetText();
             battleManager.OnPopupMenuClosed();
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
@@ -140,6 +142,8 @@ namespace Controller
                     CreateItemSlot(data);
                 }
             }
+
+            itemInfoView?.gameObject.SetActive(currentSlots.Count > 0);
             
             // 리스트 갱신 후 첫 번째 아이템 선택 (포커스 이동)
             StartCoroutine(SelectFirstItem());
@@ -151,14 +155,34 @@ namespace Controller
             
             // 이름/개수 표시
             var texts = slotObj.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
-            if(texts.Length > 0) texts[0].text = data.dataName;
             int count = InventoryManager.Instance.GetItemCount(data.id);
             if(texts.Length > 1) texts[1].text = $"x{count}";
 
-            // 버튼 이벤트
-            slotObj.GetComponent<Button>().onClick.AddListener(() => OnItemClicked(data));
+            // 버튼 클릭 이벤트
+            Button btn = slotObj.GetComponent<Button>();
+            btn.onClick.AddListener(() => OnItemClicked(data));
             
+            // 마우스 호버 및 키보드 포커스 이벤트 연결
+            EventTrigger trigger = slotObj.GetComponent<EventTrigger>();
+            if (trigger == null) trigger = slotObj.AddComponent<EventTrigger>();
+
+            // Hover
+            EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enterEntry.callback.AddListener((eventData) => OnItemSelect(data));
+            trigger.triggers.Add(enterEntry);
+
+            // Select
+            EventTrigger.Entry selectEntry = new EventTrigger.Entry { eventID = EventTriggerType.Select };
+            selectEntry.callback.AddListener((eventData) => OnItemSelect(data));
+            trigger.triggers.Add(selectEntry);
+
             currentSlots.Add(slotObj);
+        }
+
+        void OnItemSelect(ConsumableItemData itemData)
+        {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            if (itemInfoView != null) itemInfoView.UpdateInfo(itemData);
         }
 
         void OnItemClicked(ConsumableItemData itemData)

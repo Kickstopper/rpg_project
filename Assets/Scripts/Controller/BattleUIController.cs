@@ -43,8 +43,8 @@ public class BattleUIController : MonoBehaviour
     public GameObject fightSubMenuContainer; // 서브 메뉴 패널 오브젝트 (Inspector 할당)
     public List<Button> baseButtons; 
     public List<CommandButton> allFightButtons;
-    public BattleSkillUIController battleSkillUI; // 인스펙터에서 할당
-    public BattleItemUIController battleItemUI; // 인스펙터에서 할당
+    public BattleSkillUIController battleSkillUI;
+    public BattleItemUIController battleItemUI;
     public GameObject commandPanel;     // 커맨드 버튼들
     
     [Header("Log & Message")]
