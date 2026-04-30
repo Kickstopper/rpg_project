@@ -36,6 +36,8 @@ namespace UI.DungeonMapScene
 
         [NonSerialized] public float animTime; // Time.time
 
+        public bool useDustEffect = false; // 먼지 효과 온오프
+
         public bool useWallDistortion = false;
         public float distortionFreq = 0.5f;
         public float distortionAmp = 2.0f;

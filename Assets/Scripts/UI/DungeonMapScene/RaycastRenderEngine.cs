@@ -38,6 +38,14 @@ namespace UI.DungeonMapScene
         private bool _isScanning;
         private float _currentScanRadius;
 
+        // 먼지 파티클 구조체와 배열
+        private struct DustParticle
+        {
+            public float x, y, z;
+            public float speed, phase;
+        }
+        private DustParticle[] _dustArray;
+
         public Texture2D ScreenTexture { get; private set; }
 
         public void Initialize(int width, int height)
@@ -50,6 +58,20 @@ namespace UI.DungeonMapScene
             
             ScreenTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
             ScreenTexture.filterMode = FilterMode.Point;
+
+            // 먼지 입자 생성
+            _dustArray = new DustParticle[300]; 
+            for (int i = 0; i < _dustArray.Length; i++)
+            {
+                _dustArray[i] = new DustParticle
+                {
+                    x = UnityEngine.Random.Range(0f, 10f),
+                    y = UnityEngine.Random.Range(0f, 10f),
+                    z = UnityEngine.Random.Range(0f, 2f),
+                    speed = UnityEngine.Random.Range(0.02f, 0.08f), // 떨어지는 속도
+                    phase = UnityEngine.Random.Range(0f, Mathf.PI * 2f) // 좌우로 흔들리는 난수
+                };
+            }
         }
 
         public void LoadAssets(Texture2D[] wallTextures, Sprite[] sprites, int texW, int texH, SpriteInfo[] spriteData)
@@ -225,6 +247,9 @@ namespace UI.DungeonMapScene
             CastWalls(player, settings, step, rPosX, rPosY);
             if (_sprtData != null && _sprtData.Length > 0)
                 CastSprites(player, settings, step, rPosX, rPosY);
+
+            if (settings.useDustEffect)
+                CastDust(player, settings, step);
         }
 
         // ================= 세부 렌더링 로직 =================
@@ -795,6 +820,100 @@ namespace UI.DungeonMapScene
 
                     floorX += stepX;
                     floorY += stepY;
+                }
+            }
+        }
+
+        // 공중에 떠다니는 먼지 파티클을 렌더링
+        private void CastDust(DungeonPlayer player, RenderSettings settings, int step)
+        {
+            if (_dustArray == null) return;
+
+            // 카메라 변환 매트릭스 계산
+            float invDet = 1.0f / (player.PlaneX * player.DirY - player.DirX * player.PlaneY);
+            float horizon = _screenHeight / 2 - player.JumpOffset + player.Pitch;
+
+            // 먼지 색상
+            Color32 baseDustColor = new Color32(220, 210, 180, 255);
+            float t = settings.animTime;
+
+            for (int i = 0; i < _dustArray.Length; i++)
+            {
+                var p = _dustArray[i];
+
+                // 애니메이션 시간에 기반한 상태 없는 이동 계산
+                // 위에서 아래로 떨어짐 (0 ~ 2 범위를 순환)
+                float currentZ = (p.z - t * p.speed) % 2.0f;
+                if (currentZ < 0) currentZ += 2.0f;
+                currentZ -= 0.5f; // 실제 높이: 바닥(-0.5) ~ 천장(1.5)
+
+                // 좌우로 흔들림
+                float currentX = p.x + Mathf.Sin(t + p.phase) * 0.15f;
+                float currentY = p.y + Mathf.Cos(t + p.phase * 0.8f) * 0.15f;
+
+                // 플레이어와의 상대 좌표 계산
+                float dx = currentX - player.PosX;
+                float dy = currentY - player.PosY;
+
+                // 플레이어를 감싸는 10x10 큐브 안에서 무한 반복되도록 공간 래핑
+                dx = (dx % 10f + 10f) % 10f - 5f;
+                dy = (dy % 10f + 10f) % 10f - 5f;
+
+                // 3D에서 2D로 카메라 평면 투영
+                float transformX = invDet * (player.DirY * dx - player.DirX * dy);
+                float transformY = invDet * (-player.PlaneY * dx + player.PlaneX * dy);
+
+                // 카메라 앞쪽에 있는지 확인 (너무 가까운 것은 그리지 않음)
+                if (transformY > 0.1f)
+                {
+                    // 화면 X 좌표 계산
+                    int screenX = (int)((_screenWidth / 2.0f) * (1.0f + transformX / transformY));
+                    
+                    // 화면 Y 좌표 (높이) 계산. 0.5가 눈높이 기준
+                    float eyeDiff = currentZ - 0.5f; 
+                    int screenY = (int)(horizon - (eyeDiff * _screenHeight / transformY));
+
+                    // 화면을 벗어나지 않는지, 그리고 벽 뒤에 가려졌는지(_zBuffer) 확인
+                    if (screenX >= 0 && screenX < _screenWidth && screenY >= 0 && screenY < _screenHeight)
+                    {
+                        if (transformY < _zBuffer[screenX])
+                        {
+                            int bIdx = screenY * _screenWidth + screenX;
+                            
+                            // 조명 및 안개 페이드 적용
+                            Color32 finalColor = baseDustColor;
+                            int lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / transformY, 0f, 1f) * 255);
+                            ApplyLight(ref finalColor, lightScale, settings.fogColor);
+
+                            // 화면에 점 찍기. 거리가 1.5칸 이내로 가까우면 3픽셀, 그보다 멀면 2픽셀
+                            int particleSize = (transformY < 1.5f) ? 3 : 2; 
+                            
+                            // particleSize 크기의 네모로 먼지 그리기
+                            for (int pY = 0; pY < particleSize; pY++)
+                            {
+                                int drawY = screenY + pY;
+                                
+                                // Y좌표가 화면 아래로 뚫고 나가면 무시
+                                if (drawY >= _screenHeight) continue; 
+
+                                int rowIdx = drawY * _screenWidth;
+
+                                for (int pX = 0; pX < particleSize * step; pX++)
+                                {
+                                    int drawX = screenX + pX;
+                                    
+                                    // X좌표가 화면 오른쪽으로 뚫고 나가면 무시
+                                    if (drawX >= _screenWidth) continue; 
+
+                                    // 각 픽셀마다 벽 뒤에 가려지는지 검사
+                                    if (transformY < _zBuffer[drawX])
+                                    {
+                                        _buffer[rowIdx + drawX] = finalColor;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
