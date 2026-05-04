@@ -45,5 +45,38 @@ namespace Data
         public BgmID bgmID;                  // 이 레벨에서 재생될 BGM
         public bool moduleEnable = true;     // 모듈을 사용할 수 있는지 여부
         public List<string> monsterList;     // 출현하는 몬스터의 ID 목록
+
+        [Header("Dust Effect")]
+        public bool useDustEffect = false;
+        public int dustParticleCount = 300;     
+        public float dustSwayAmplitude = 0.01f; 
+        public bool dustMovesUp = false; 
+        public bool useDustTwinkle = true; 
+        public float dustTwinkleSpeed = 10.0f; // 반짝이는 속도 (높을수록 빠르게 깜빡임)
+        public Color32 dustColor = new Color32(220, 210, 180, 255);
+
+        [Header("OrganicEffect")]
+        public bool useOrganicEffect = false;
+        public float organicFreqX = 4f;   // 벽 수평 노이즈 빈도
+        public float organicSpeed = 0.3f;   // 꿈틀거림 속도
+        [Range(0, 1f)]public float organicBreath    = 0.35f;   // amplitude 자체가 숨쉬는 강도
+        [Range(-1f, 1f)] public float organicAmplitude = 0.2f;  // 최대 거리 왜곡 강도
+        
+        [Header("MeltEffect")]
+        public bool useMeltEffect = false;
+        public float meltEdgeBump = 1f;
+        public float meltEdgeSpeed = 0.3f;   // 흘러내림 속도
+
+        [Header("WallDistortionEffect")]
+        public bool useWallDistortion = false;
+        public float distortionFreq = 0.5f;
+        public float distortionAmp = 2.0f;
+
+        [Header("CylinderEffect")]
+        public bool useCylinderEffect = false;
+        [Range(-10f, 10f)] public float cylinderStrength = 3.0f;
+
+        [Header("Anaglyph")]
+        [Range(0.03f, 0.07f)] public float stereoSeparation = 0.05f;
     }
 }

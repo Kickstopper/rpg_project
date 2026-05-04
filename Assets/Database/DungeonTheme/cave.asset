@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: cave
   m_EditorClassIdentifier: 
   dungeonID: cave
+  useWakeUpEffect: 0
+  encounterMode: 1
   background: {fileID: 2800000, guid: 5005efcc13ea09d48b4c0454fdd2abee, type: 3}
   texture:
   - {fileID: 2800000, guid: 71284589d32556142aa457c17366b265, type: 3}
@@ -41,3 +43,24 @@ MonoBehaviour:
   moduleEnable: 1
   monsterList:
   - 000
+  useDustEffect: 0
+  dustParticleCount: 300
+  dustSwayAmplitude: 0.15
+  dustMovesUp: 0
+  dustColor:
+    serializedVersion: 2
+    rgba: 4290040540
+  useOrganicEffect: 0
+  organicFreqX: 4
+  organicSpeed: 0.3
+  organicBreath: 0.35
+  organicAmplitude: 0.2
+  useMeltEffect: 0
+  meltEdgeBump: 1
+  meltEdgeSpeed: 0.3
+  useWallDistortion: 0
+  distortionFreq: 0.5
+  distortionAmp: 2
+  useCylinderEffect: 0
+  cylinderStrength: 3
+  stereoSeparation: 0.05

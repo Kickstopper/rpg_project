@@ -1111,7 +1111,37 @@ namespace Controller
             renderSettings.useGridLighting = theme.useGridLighting;
             renderSettings.lightingIntensity = theme.lightingIntensity;
             renderSettings.fogColor = theme.fogColor;
-            
+
+            // 생물체 효과
+            renderSettings.useOrganicEffect = theme.useOrganicEffect;
+            renderSettings.organicFreqX = theme.organicFreqX;
+            renderSettings.organicSpeed = theme.organicSpeed;
+            renderSettings.organicBreath = theme.organicBreath;
+            renderSettings.organicAmplitude = theme.organicAmplitude;
+
+            // 실린더 효과
+            renderSettings.useCylinderEffect = theme.useCylinderEffect;
+            renderSettings.cylinderStrength = theme.cylinderStrength;
+
+            // 멜트 효과
+            renderSettings.useMeltEffect = theme.useMeltEffect;
+            renderSettings.meltEdgeBump = theme.meltEdgeBump;
+            renderSettings.meltEdgeSpeed = theme.meltEdgeSpeed;
+
+            // 벽 왜곡 효과
+            renderSettings.useWallDistortion = theme.useWallDistortion;
+            renderSettings.distortionAmp = theme.distortionAmp;
+            renderSettings.distortionFreq = theme.distortionFreq;
+
+            // 먼지 효과
+            renderSettings.useDustEffect = theme.useDustEffect;
+            renderSettings.dustParticleCount = theme.dustParticleCount;
+            renderSettings.dustSwayAmplitude = theme.dustSwayAmplitude;
+            renderSettings.dustMovesUp = theme.dustMovesUp;
+            renderSettings.useDustTwinkle = theme.useDustTwinkle;
+            renderSettings.dustTwinkleSpeed = theme.dustTwinkleSpeed;
+            renderSettings.dustColor = theme.dustColor;
+
             if (backgroundImage != null) backgroundImage.texture = theme.background;
             
             // 시스템 초기화

@@ -31,3 +31,24 @@ MonoBehaviour:
   bgmID: 7
   moduleEnable: 0
   monsterList: []
+  useDustEffect: 1
+  dustParticleCount: 300
+  dustSwayAmplitude: 0.01
+  dustMovesUp: 0
+  dustColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  useOrganicEffect: 0
+  organicFreqX: 4
+  organicSpeed: 0.3
+  organicBreath: 0.35
+  organicAmplitude: 0.2
+  useMeltEffect: 0
+  meltEdgeBump: 1
+  meltEdgeSpeed: 0.3
+  useWallDistortion: 0
+  distortionFreq: 0.5
+  distortionAmp: 2
+  useCylinderEffect: 0
+  cylinderStrength: 3
+  stereoSeparation: 0.05
