@@ -423,6 +423,19 @@ public class DungeonMapEditor : EditorWindow
                     EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y, wt, rect.height), wc);
                 if (cell.wallTextureIDs[3] != -1)
                     EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - wt, rect.width, wt), wc);
+                
+                // 고정 오브젝트 시각화 (노란색 네모)
+                if (cell.objectID != -1)
+                {
+                    Rect objRect = new Rect(rect.x + rect.width * 0.25f, rect.y + rect.height * 0.25f, rect.width * 0.5f, rect.height * 0.5f);
+                    EditorGUI.DrawRect(objRect, Color.yellow);
+                    
+                    // ID 텍스트 표시
+                    GUIStyle style = new GUIStyle(EditorStyles.miniLabel);
+                    style.alignment = TextAnchor.MiddleCenter;
+                    style.normal.textColor = Color.black;
+                    GUI.Label(objRect, cell.objectID.ToString(), style);
+                }
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -480,6 +493,17 @@ public class DungeonMapEditor : EditorWindow
             GUILayout.Space(10);
             GUILayout.Label("Batch Value", EditorStyles.miniBoldLabel);
             DrawBatchValueField();
+
+            GUILayout.Space(10);
+            GUILayout.Label("Batch Static Object", EditorStyles.miniBoldLabel);
+            DrawBatchObjectField();
+
+            GUILayout.Space(5);
+            if (GUILayout.Button("Remove Objects (-1)", EditorStyles.miniButton))
+            {
+                foreach (var c in selectedCells) c.objectID = -1;
+                GUI.changed = true; GUI.FocusControl(null);
+            }
 
             GUILayout.Space(5);
             EditorGUILayout.BeginHorizontal();
@@ -544,14 +568,21 @@ public class DungeonMapEditor : EditorWindow
                 }
                 
                 EditorGUILayout.EndHorizontal();
-                
 
                 GUILayout.Space(10);
                 selectedCell.value = EditorGUILayout.IntField("Value", selectedCell.value);
 
+                // 고정 오브젝트 설정
+                GUILayout.Space(15);
+                GUILayout.Label("Static Object Settings", EditorStyles.boldLabel);
+                selectedCell.objectID = EditorGUILayout.IntField("Object ID", selectedCell.objectID);
+                if (selectedCell.objectID != -1)
+                {
+                    EditorGUILayout.HelpBox($"Object ID {selectedCell.objectID}가 배치되었습니다.", MessageType.Info);
+                }
+
                 GUILayout.Space(20);
-                
-                
+
                 // 입구 포털 설정 UI
                 
                 GUILayout.Label("Door / Entrance / Portal Settings", EditorStyles.boldLabel);
@@ -670,6 +701,25 @@ public class DungeonMapEditor : EditorWindow
         if (EditorGUI.EndChangeCheck())
         {
             foreach (var c in selectedCells) c.value = newVal;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
+    }
+
+    // 오브젝트 다중 선택 일괄 적용 헬퍼
+    void DrawBatchObjectField()
+    {
+        int firstVal = selectedCells[0].objectID;
+        bool isMixed = false;
+        foreach (var c in selectedCells)
+            if (c.objectID != firstVal) { isMixed = true; break; }
+
+        EditorGUI.showMixedValue = isMixed;
+        EditorGUI.BeginChangeCheck();
+        int newVal = EditorGUILayout.IntField("Object ID", isMixed ? -1 : firstVal);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.objectID = newVal;
             GUI.changed = true;
         }
         EditorGUI.showMixedValue = false;

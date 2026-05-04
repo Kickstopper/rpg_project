@@ -14,6 +14,14 @@ namespace Data
 
     public enum EncounterMode { Random, Symbol }
 
+    [System.Serializable]
+    public struct ObjectSpriteData
+    {
+        public int objectID;           // _staticObjects의 ID와 매핑
+        public Texture2D texture;      // 기본 텍스처
+        public bool isObstacle;        // 통과 가능 여부 (Raycasting 충돌용)
+    }
+
     [CreateAssetMenu(fileName = "NewTheme", menuName = "Dungeon/DungeonTheme")]
     public class DungeonTheme : ScriptableObject
     {
@@ -31,7 +39,9 @@ namespace Data
         public int floorTexIdx = 1;   // 바닥 텍스처 인덱스
         public int ceilingTexIdx = 2; // 천장 텍스처 인덱스
         
-        public Sprite[] spriteTextures;
+        public Sprite[] enemySprites;
+        public ObjectSpriteData[] objectSprites;
+
         public int maxSpawnCount = 3;
         public int spawnDelay = 5;
 

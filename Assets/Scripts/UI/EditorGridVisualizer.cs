@@ -54,8 +54,23 @@ namespace UI
                 // West (X-)
                 if (cell.wallTextureIDs[3] >= 0) 
                     DrawWallFace(center, Vector3.left, cell.wallTextureIDs[3]);
-            }
 
+                // 고정 오브젝트 그리기
+                if (cell.objectID != -1)
+                {
+                    // 오브젝트를 노란색 구체로 표시
+                    Gizmos.color = Color.yellow;
+                    
+                    // wallHeight의 절반으로 바닥에서 살짝 띄움
+                    Vector3 objCenter = center + Vector3.up * (wallHeight * 0.4f);
+                    float objSize = cellSize * 0.4f;
+
+                    Gizmos.DrawSphere(objCenter, objSize * 0.5f);
+                    
+                    Gizmos.color = Color.black;
+                    Gizmos.DrawWireCube(objCenter, new Vector3(objSize, objSize, objSize));
+                }
+            }
             // 선택된 셀 하이라이트
             if (selectedCoords != null && selectedCoords.Count > 0) HighlightSelectedCells();
 

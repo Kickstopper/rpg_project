@@ -43,6 +43,9 @@ namespace Data
         public int x, y;
         public int value = -1;
         public int[] wallTextureIDs = new int[4] { -1, -1, -1, -1 }; // left, up, right, down
+
+        public int objectID = -1;
+        
         public bool HasWall()
         {
             foreach(var i in wallTextureIDs)
