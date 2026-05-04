@@ -21,7 +21,11 @@ MonoBehaviour:
   - {fileID: 2800000, guid: bfc7b9fe4315ce549aad8294a0ba873e, type: 3}
   floorTexIdx: 1
   ceilingTexIdx: 1
-  spriteTextures: []
+  enemySprites: []
+  objectSprites:
+  - objectID: 0
+    texture: {fileID: 2800000, guid: 8639788b7cbf65345930f2b945bb24fa, type: 3}
+    isObstacle: 1
   maxSpawnCount: 0
   spawnDelay: 0
   wallAnimations: []
@@ -35,6 +39,8 @@ MonoBehaviour:
   dustParticleCount: 300
   dustSwayAmplitude: 0.01
   dustMovesUp: 0
+  useDustTwinkle: 1
+  dustTwinkleSpeed: 10
   dustColor:
     serializedVersion: 2
     rgba: 4294967295

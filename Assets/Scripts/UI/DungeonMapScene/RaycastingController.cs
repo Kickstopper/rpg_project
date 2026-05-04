@@ -88,6 +88,7 @@ namespace Controller
             
             public string objectId;     // 상호작용 이벤트 처리를 위한 ID
         }
+        
         private List<MapEnemy> _activeEnemies = new List<MapEnemy>(); // 심볼 인카운터 에너미 리스트
         private List<MapObject> _staticObjects = new List<MapObject>(); // 고정 오브젝트 리스트
 
@@ -1145,7 +1146,7 @@ namespace Controller
             if (backgroundImage != null) backgroundImage.texture = theme.background;
             
             // 시스템 초기화
-            _renderer.LoadAssets(theme.texture, theme.spriteTextures, 64, 64, null);
+            _renderer.LoadAssets(theme, 64, 64, null);
             // 테마에 설정된 인카운터 모드로 초기화
             encounterSystem.Initialize(theme.monsterList, theme.encounterMode);
 
@@ -1175,10 +1176,17 @@ namespace Controller
             _currentSpawnTimer = 0f;
             _activeEnemies.Clear();
 
+            SpawnStaticObjects(theme);
+            
             // 심볼 인카운터 모드일 때만 몬스터 스폰
             if (_maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random) 
             {
                 SpawnSymbolEnemies(_maxSpawnCount);
+            }
+            else
+            {
+                // 몬스터가 없어도 고정 오브젝트를 렌더러로 보내야 하므로
+                UpdateSpriteData();
             }
         }
 
@@ -1374,6 +1382,51 @@ namespace Controller
             Rect uv = backgroundImage.uvRect;
             uv.x = -angle / 360f;
             backgroundImage.uvRect = uv;
+        }
+
+        // 맵 데이터에 배치된 고정 오브젝트들을 씬에 스폰
+        private void SpawnStaticObjects(DungeonTheme theme)
+        {
+            _staticObjects.Clear();
+
+            // 테마에서 오브젝트의 충돌 여부(isObstacle)를 찾기 위한 딕셔너리
+            Dictionary<int, bool> objectSolidMap = new Dictionary<int, bool>();
+            if (theme.objectSprites != null)
+            {
+                foreach (var objData in theme.objectSprites)
+                {
+                    objectSolidMap[objData.objectID] = objData.isObstacle;
+                }
+            }
+
+            for (int x = 0; x < _currentMap.width; x++)
+            {
+                for (int y = 0; y < _currentMap.height; y++)
+                {
+                    CellData cell = _currentMap.GetCell(x, y);
+                    
+                    // objectID가 -1이 아니라면 오브젝트가 존재
+                    if (cell != null && cell.objectID != -1)
+                    {
+                        // 테마 데이터에서 해당 오브젝트가 통과 불가능한지 확인
+                        bool isSolid = true; // 기본값
+                        if (objectSolidMap.TryGetValue(cell.objectID, out bool solidInfo))
+                        {
+                            isSolid = solidInfo;
+                        }
+
+                        // 맵 오브젝트 리스트에 추가 (좌표는 타일의 정중앙)
+                        _staticObjects.Add(new MapObject {
+                            x = x + 0.5f,
+                            y = y + 0.5f,
+                            texIdx = cell.objectID,
+                            isSolid = isSolid,
+                            isActive = true,
+                            objectId = $"Obj_{cell.objectID}_{x}_{y}" // 상호작용 식별을 위한 고유 ID
+                        });
+                    }
+                }
+            }
         }
 
         // 맵의 빈 공간에 적 심볼 생성
@@ -1702,7 +1755,6 @@ namespace Controller
         {
             List<SpriteInfo> spriteList = new List<SpriteInfo>();
 
-            // 에너미 데이터 추가
             foreach (var enemy in _activeEnemies)
             {
                 if (enemy.isAlive)
@@ -1710,12 +1762,12 @@ namespace Controller
                     spriteList.Add(new SpriteInfo { 
                         x = enemy.x, 
                         y = enemy.y, 
-                        texIdx = enemy.currentTexIdx 
+                        texIdx = enemy.currentTexIdx,
+                        isEnemy = true
                     });
                 }
             }
 
-            // 고정 오브젝트 데이터 추가
             foreach (var obj in _staticObjects)
             {
                 if (obj.isActive)
@@ -1723,7 +1775,8 @@ namespace Controller
                     spriteList.Add(new SpriteInfo { 
                         x = obj.x, 
                         y = obj.y, 
-                        texIdx = obj.texIdx 
+                        texIdx = obj.texIdx, // DungeonTheme의 ObjectSpriteData.objectID와 일치
+                        isEnemy = false
                     });
                 }
             }

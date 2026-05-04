@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Data;
 using Manager;
+using System.Collections.Generic;
 
 namespace UI.DungeonMapScene
 {
@@ -10,6 +11,7 @@ namespace UI.DungeonMapScene
         public float x;
         public float y;
         public int texIdx;
+        public bool isEnemy;
     }
 
     public class RaycastRenderEngine
@@ -19,10 +21,13 @@ namespace UI.DungeonMapScene
         private float[] _zBuffer;
         private Color32[] _flatWallPixels;   // 벽 캐시
         private Color32[] _flatSpritePixels; // 스프라이트 캐시
+        private Dictionary<int, Color32[]> _flatObjectPixels;  // 오브젝트 고속 렌더링용 픽셀 캐시
+        private Dictionary<int, Vector2Int> _objectDimensions; // 오브젝트 텍스처 사이즈 캐시
 
         private MapData _worldMap;
         private Texture2D[] _wallTextures;
-        private Sprite[] _sprites;
+        private Sprite[] _enemySprite;
+        private Dictionary<int, Texture2D> _objectSpriteDict;
         
         private SpriteInfo[] _sprtData;
         
@@ -61,20 +66,52 @@ namespace UI.DungeonMapScene
 
         }
 
-        public void LoadAssets(Texture2D[] wallTextures, Sprite[] sprites, int texW, int texH, SpriteInfo[] spriteData)
+        public void LoadAssets(DungeonTheme theme, int texW, int texH, SpriteInfo[] spriteData)
         {
-            _wallTextures = wallTextures;
-            _sprites = sprites;
+            _wallTextures = theme.texture;
+            _enemySprite = theme.enemySprites;
+
+            _objectSpriteDict = new Dictionary<int, Texture2D>();
+            _flatObjectPixels = new Dictionary<int, Color32[]>();
+            _objectDimensions = new Dictionary<int, Vector2Int>();
+
+            if (theme.objectSprites != null)
+            {
+                foreach (var obj in theme.objectSprites)
+                {
+                    if (obj.texture != null)
+                    {
+                        _objectSpriteDict[obj.objectID] = obj.texture;
+                        
+                        // GetPixels32()로 Color32 1차원 배열을 즉시 캐싱하여 렌더링 속도 향상
+                        _flatObjectPixels[obj.objectID] = obj.texture.GetPixels32();
+                        _objectDimensions[obj.objectID] = new Vector2Int(obj.texture.width, obj.texture.height);
+                    }
+                }
+            }
+            
             _texWidth = texW;
             _texHeight = texH;
             _sprtData = spriteData;
             
-            if (_sprtData != null)
-            {
-                _spriteSortList = new SpriteSortInfo[_sprtData.Length];
-            }
+            if (_sprtData != null) _spriteSortList = new SpriteSortInfo[_sprtData.Length];
 
             PrecomputeTextures();
+        }
+
+        // 오브젝트 전용 고속 픽셀 읽기 함수
+        private Color32 GetObjectSpritePixelFast(int objId, int x, int y)
+        {
+            if (_flatObjectPixels != null && _flatObjectPixels.TryGetValue(objId, out Color32[] pixels))
+            {
+                Vector2Int dim = _objectDimensions[objId];
+                // 텍스처 크기를 벗어나지 않도록
+                x = Mathf.Clamp(x, 0, dim.x - 1);
+                y = Mathf.Clamp(y, 0, dim.y - 1);
+                
+                return pixels[y * dim.x + x];
+            }
+            return new Color32(0, 0, 0, 0);
         }
 
         private void PrecomputeTextures()
@@ -95,12 +132,12 @@ namespace UI.DungeonMapScene
             }
 
             // 스프라이트 텍스처 캐싱
-            if (_sprites != null && _sprites.Length > 0)
+            if (_enemySprite != null && _enemySprite.Length > 0)
             {
-                _flatSpritePixels = new Color32[_sprites.Length * pxPerTex];
-                for (int i = 0; i < _sprites.Length; i++)
+                _flatSpritePixels = new Color32[_enemySprite.Length * pxPerTex];
+                for (int i = 0; i < _enemySprite.Length; i++)
                 {
-                    Sprite spr = _sprites[i];
+                    Sprite spr = _enemySprite[i];
                     if (spr == null) continue;
 
                     // 스프라이트 시트에서 해당 스프라이트가 잘린 영역만큼 픽셀을 가져옴
@@ -159,9 +196,9 @@ namespace UI.DungeonMapScene
         }
 
         // 스프라이트 전용 픽셀 읽기 함수
-        private Color32 GetSpritePixelFast(int texIdx, int x, int y)
+        private Color32 GetEnemySpritePixelFast(int texIdx, int x, int y)
         {
-            if (_sprites == null || texIdx < 0 || texIdx >= _sprites.Length) 
+            if (_enemySprite == null || texIdx < 0 || texIdx >= _enemySprite.Length) 
                 return new Color32(0, 0, 0, 0); // 투명 반환
             
             x &= (_texWidth - 1);
@@ -986,17 +1023,40 @@ namespace UI.DungeonMapScene
                 if (drawEndX >= _screenWidth) drawEndX = _screenWidth;
 
                 // 텍스처 데이터 가져오기
-                Sprite spr = _sprites[_sprtData[idx].texIdx];
-                int texW = (int)spr.rect.width; 
-                int texH = (int)spr.rect.height;
+                int idOrIdx = _sprtData[idx].texIdx;
+                bool isEnemy = _sprtData[idx].isEnemy;
+
+                int texW = _texWidth; 
+                int texH = _texHeight;
+
+                if (isEnemy)
+                {
+                    // 에너미 스프라이트 배열 참조
+                    if (_enemySprite != null && idOrIdx >= 0 && idOrIdx < _enemySprite.Length)
+                    {
+                        Sprite spr = _enemySprite[idOrIdx];
+                        if (spr != null)
+                        {
+                            texW = (int)spr.rect.width; 
+                            texH = (int)spr.rect.height;
+                        }
+                    }
+                }
+                else
+                {
+                    // 고정 오브젝트 캐시 참조
+                    if (_objectDimensions != null && _objectDimensions.TryGetValue(idOrIdx, out Vector2Int dim))
+                    {
+                        texW = dim.x;
+                        texH = dim.y;
+                    }
+                }
 
                 // 스트라이프(세로줄) 그리기
                 for (int stripe = drawStartX; stripe < drawEndX; stripe += step)
                 {
                     int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texW / spriteWidth) / 256;
                     
-                    // ZBuffer 검사 (벽보다 앞에 있는지)
-                    // stripe가 화면 범위를 벗어나지 않는지 확인
                     if (stripe >= 0 && stripe < _screenWidth && transformY < _zBuffer[stripe])
                     {
                         for (int y = drawStartY; y < drawEndY; y++)
@@ -1004,7 +1064,10 @@ namespace UI.DungeonMapScene
                             int d = (y - vOffset) * 256 - _screenHeight * 128 + spriteHeight * 128;
                             int texY = ((d * texH) / spriteHeight) / 256;
 
-                            Color32 col = GetSpritePixelFast(_sprtData[idx].texIdx, texX, texY);
+                            Color32 col;
+                            
+                            if (isEnemy) col = GetEnemySpritePixelFast(idOrIdx, texX, texY);
+                            else         col = GetObjectSpritePixelFast(idOrIdx, texX, texY);
                             
                             if (col.a > 0) // 투명색이 아니면 그리기
                             {
