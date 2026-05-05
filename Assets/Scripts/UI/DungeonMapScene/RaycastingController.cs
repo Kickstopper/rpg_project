@@ -384,18 +384,25 @@ namespace Controller
             if (_inputLocked) return;
             
             // 올려보기 및 내려보기
-            if (Input.GetKey(KeyCode.LeftShift) && !_player.IsMoving)
+            // if (Input.GetKey(KeyCode.LeftShift) && !_player.IsMoving)
+            // {
+            //     if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+            //     {
+            //         StartCoroutine(TransitionLookState(LookState.Up));
+            //         return;
+            //     }
+            //     if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+            //     {
+            //         StartCoroutine(TransitionLookState(LookState.Down));
+            //         return;
+            //     }
+            // }
+
+            // 상호작용 (올려보기, 내려보기, 보물상자 열기 등)
+            if (!_player.IsMoving && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)))
             {
-                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
-                {
-                    StartCoroutine(TransitionLookState(LookState.Up));
-                    return;
-                }
-                if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-                {
-                    StartCoroutine(TransitionLookState(LookState.Down));
-                    return;
-                }
+                UI_Action();
+                return;
             }
             
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
@@ -454,8 +461,6 @@ namespace Controller
 
             if (!_player.IsMoving)
             {
-                //if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
-
                 // 이동 입력
                 if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) TryMove(1);
                 else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) TryMove(-1);
@@ -892,19 +897,50 @@ namespace Controller
             int frontX = _player.LogicX + forward.x;
             int frontY = _player.LogicY + forward.y;
 
-            // 앞 칸에 고정 오브젝트(보물상자 등)가 있는지 확인
-            MapObject targetObj = _staticObjects.Find(o => Mathf.FloorToInt(o.x) == frontX && Mathf.FloorToInt(o.y) == frontY && o.isActive);
+            // 현재 서있는 칸에 고정 오브젝트가 있는지 확인
+            MapObject targetObj = _staticObjects.Find(o => 
+                Mathf.FloorToInt(o.x) == _player.LogicX && 
+                Mathf.FloorToInt(o.y) == _player.LogicY && 
+                o.isActive);
+            
+            // 만약 현재의 칸에 없다면 앞 칸을 확인
+            // if (targetObj == null)
+            // {
+            //     targetObj = _staticObjects.Find(o => 
+            //         Mathf.FloorToInt(o.x) == frontX && 
+            //         Mathf.FloorToInt(o.y) == frontY && 
+            //         o.isActive);
+            // }
             
             if (targetObj != null)
             {
-                Debug.Log($"오브젝트 상호작용 발생: {targetObj.objectId}");
-                
-                // TODO
-                // 이벤트 매니저를 통해 대화창이나 보상 획득 UI 띄우기
-                // targetObj.texIdx를 열린 상자 텍스처로 변경
-                // targetObj.isSolid = false 로 변경하여 지나갈 수 있게 만들기
-                // UpdateSpriteData() 호출하여 화면 갱신
-                
+                // 닫힌 보물상자 (Object ID: 0) 상호작용
+                if (targetObj.texIdx == 0)
+                {
+                    // 상태 및 텍스처 변경 (열린 상자의 ID인 1로 변경)
+                    targetObj.texIdx = 1;
+                    
+                    // 열린 상자는 충돌하지 않음
+                    // targetObj.isSolid = false;
+
+                    // 변경된 텍스처를 렌더러에 즉시 반영
+                    UpdateSpriteData();
+
+                    // SoundManager.Instance.PlaySFX(SfxID.Open_Chest);
+                    ShowSystemMessage("낡은 보물상자를 열었다.");
+
+                    // TODO: 획득한 아이템이 있을 경우, 인벤토리에 저장한다
+                    // InventoryManager.Instance.AddMoney(100);
+                }
+                else if (targetObj.texIdx == 1)
+                {
+                    ShowSystemMessage("안은 텅 비어있다...");
+                }
+                else
+                {
+                    ShowSystemMessage("아무 반응이 없다.");
+                }
+
                 return;
             }
 

@@ -19,7 +19,7 @@ namespace Data
     {
         public int objectID;           // _staticObjects의 ID와 매핑
         public Texture2D texture;      // 기본 텍스처
-        public bool isObstacle;        // 통과 가능 여부 (Raycasting 충돌용)
+        public bool isObstacle;        // 통과 가능 여부
     }
 
     [CreateAssetMenu(fileName = "NewTheme", menuName = "Dungeon/DungeonTheme")]
