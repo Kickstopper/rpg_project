@@ -55,20 +55,22 @@ namespace UI
                 if (cell.wallTextureIDs[3] >= 0) 
                     DrawWallFace(center, Vector3.left, cell.wallTextureIDs[3]);
 
-                // 고정 오브젝트 그리기
-                if (cell.objectID != -1)
-                {
-                    // 오브젝트를 노란색 구체로 표시
-                    Gizmos.color = Color.yellow;
-                    
-                    // wallHeight의 절반으로 바닥에서 살짝 띄움
-                    Vector3 objCenter = center + Vector3.up * (wallHeight * 0.4f);
-                    float objSize = cellSize * 0.4f;
+                // 중앙 고정 오브젝트
+                if (cell.centerObjectID != -1)
+                    DrawObjectMarker(center + Vector3.up * (wallHeight * 0.4f), "C:" + cell.centerObjectID);
 
-                    Gizmos.DrawSphere(objCenter, objSize * 0.5f);
-                    
-                    Gizmos.color = Color.black;
-                    Gizmos.DrawWireCube(objCenter, new Vector3(objSize, objSize, objSize));
+                // 벽면 고정 오브젝트 (각 면의 중앙 끝부분으로 오프셋 계산)
+                Vector3[] faceDirs = { Vector3.forward, Vector3.right, Vector3.back, Vector3.left };
+                for (int f = 0; f < 4; f++)
+                {
+                    if (cell.faceObjectIDs[f] != -1)
+                    {
+                        // 벽면에 붙이기 위해 cellSize의 절반만큼 해당 방향으로 이동
+                        Vector3 facePos = center + (faceDirs[f] * (cellSize * 0.45f)); 
+                        facePos.y += wallHeight * 0.5f; // 눈높이
+                        
+                        DrawObjectMarker(facePos, "F:" + cell.faceObjectIDs[f]);
+                    }
                 }
             }
             // 선택된 셀 하이라이트
@@ -79,6 +81,16 @@ namespace UI
 
             // 입구 그리기
             DrawEntrances();
+        }
+
+        // 마커 그리기 헬퍼 함수
+        void DrawObjectMarker(Vector3 pos, string label)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(pos, 0.15f);
+#if UNITY_EDITOR
+            UnityEditor.Handles.Label(pos + Vector3.up * 0.3f, label);
+#endif
         }
 
         // 입구 시각화 함수

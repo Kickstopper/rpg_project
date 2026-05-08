@@ -63,6 +63,8 @@ public class DungeonMapEditor : EditorWindow
         mapData.startDirection = startDir;
 
         mapData.cells = new CellData[w * h];
+        mapData.entrances = new List<EntranceData>();
+        
         for (int i = 0; i < mapData.cells.Length; i++)
         {
             mapData.cells[i] = new CellData { x = i % w, y = i / w };
@@ -193,9 +195,6 @@ public class DungeonMapEditor : EditorWindow
             _isDragging = false;
             _dragPending = false;
         }
-
-        // 드래그 중에는 지속적으로 Repaint. Repaint마다 마우스 위치 재검사
-        if (_isDragging) Repaint();
 
         DrawToolbar();
         if (mapData == null) return;
@@ -415,27 +414,48 @@ public class DungeonMapEditor : EditorWindow
                 // 벽 시각화
                 float wt = 3f; // 벽 두께
                 Color wc = new Color(1f, 0.3f, 0.3f); // 벽 컬러
-                if (cell.wallTextureIDs[0] != -1)
-                    EditorGUI.DrawRect(new Rect(rect.x, rect.y, wt, rect.height), wc);
-                if (cell.wallTextureIDs[1] != -1)
-                    EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, wt), wc);
-                if (cell.wallTextureIDs[2] != -1)
-                    EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y, wt, rect.height), wc);
-                if (cell.wallTextureIDs[3] != -1)
-                    EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - wt, rect.width, wt), wc);
                 
-                // 고정 오브젝트 시각화 (노란색 네모)
-                if (cell.objectID != -1)
+                // 북쪽 벽 (Top) - Index 0
+                if (cell.wallTextureIDs[0] != -1)
+                    EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, wt), wc);
+                // 동쪽 벽 (Right) - Index 1
+                if (cell.wallTextureIDs[1] != -1)
+                    EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y, wt, rect.height), wc);
+                // 남쪽 벽 (Bottom) - Index 2
+                if (cell.wallTextureIDs[2] != -1)
+                    EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - wt, rect.width, wt), wc);
+                // 서쪽 벽 (Left) - Index 3
+                if (cell.wallTextureIDs[3] != -1)
+                    EditorGUI.DrawRect(new Rect(rect.x, rect.y, wt, rect.height), wc);
+                
+                // 중앙 고정 오브젝트 시각화
+                if (cell.centerObjectID != -1)
                 {
-                    Rect objRect = new Rect(rect.x + rect.width * 0.25f, rect.y + rect.height * 0.25f, rect.width * 0.5f, rect.height * 0.5f);
-                    EditorGUI.DrawRect(objRect, Color.yellow);
+                    Rect centerObjRect = new Rect(rect.x + rect.width * 0.35f, rect.y + rect.height * 0.35f, rect.width * 0.3f, rect.height * 0.3f);
+                    EditorGUI.DrawRect(centerObjRect, Color.yellow);
                     
-                    // ID 텍스트 표시
                     GUIStyle style = new GUIStyle(EditorStyles.miniLabel);
                     style.alignment = TextAnchor.MiddleCenter;
                     style.normal.textColor = Color.black;
-                    GUI.Label(objRect, cell.objectID.ToString(), style);
+                    GUI.Label(centerObjRect, cell.centerObjectID.ToString(), style);
                 }
+
+                // 벽면 오브젝트 시각화
+                float dotSize = 6f;
+                Color dotColor = new Color(1f, 0.9f, 0f); // 진노랑
+
+                // 북쪽 (Top) - Index 0
+                if (cell.faceObjectIDs[0] != -1) 
+                    EditorGUI.DrawRect(new Rect(rect.center.x - dotSize/2, rect.y + 2, dotSize, dotSize), dotColor);
+                // 동쪽 (Right) - Index 1
+                if (cell.faceObjectIDs[1] != -1) 
+                    EditorGUI.DrawRect(new Rect(rect.xMax - dotSize - 2, rect.center.y - dotSize/2, dotSize, dotSize), dotColor);
+                // 남쪽 (Bottom) - Index 2
+                if (cell.faceObjectIDs[2] != -1) 
+                    EditorGUI.DrawRect(new Rect(rect.center.x - dotSize/2, rect.yMax - dotSize - 2, dotSize, dotSize), dotColor);
+                // 서쪽 (Left) - Index 3
+                if (cell.faceObjectIDs[3] != -1) 
+                    EditorGUI.DrawRect(new Rect(rect.x + 2, rect.center.y - dotSize/2, dotSize, dotSize), dotColor);
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -468,11 +488,11 @@ public class DungeonMapEditor : EditorWindow
             GUILayout.Space(8);
             GUILayout.Label("Batch Wall Textures", EditorStyles.miniBoldLabel);
 
-            // 방향별 일괄 설정 — "mixed" 상태 표시
-            DrawBatchWallField("← Tex", 0);
-            DrawBatchWallField("↑ Tex", 1);
-            DrawBatchWallField("→ Tex", 2);
-            DrawBatchWallField("↓ Tex", 3);
+            // 방향별 일괄 설정.
+            DrawBatchWallField("↑ Tex (N)", 0);
+            DrawBatchWallField("→ Tex (E)", 1);
+            DrawBatchWallField("↓ Tex (S)", 2);
+            DrawBatchWallField("← Tex (W)", 3);
 
             GUILayout.Space(5);
             EditorGUILayout.BeginHorizontal();
@@ -495,13 +515,26 @@ public class DungeonMapEditor : EditorWindow
             DrawBatchValueField();
 
             GUILayout.Space(10);
-            GUILayout.Label("Batch Static Object", EditorStyles.miniBoldLabel);
-            DrawBatchObjectField();
+            GUILayout.Label("Batch Static Objects", EditorStyles.miniBoldLabel);
+            DrawBatchCenterObjectField();
+            
+            GUILayout.Space(5);
+            GUILayout.Label("Batch Face Objects", EditorStyles.miniBoldLabel);
+            
+            // 4면 고정 오브젝트
+            DrawBatchFaceObjectField("↑ Face Obj (N)", 0);
+            DrawBatchFaceObjectField("→ Face Obj (E)", 1);
+            DrawBatchFaceObjectField("↓ Face Obj (S)", 2);
+            DrawBatchFaceObjectField("← Face Obj (W)", 3);
 
             GUILayout.Space(5);
-            if (GUILayout.Button("Remove Objects (-1)", EditorStyles.miniButton))
+            if (GUILayout.Button("Remove All Objects (-1)", EditorStyles.miniButton))
             {
-                foreach (var c in selectedCells) c.objectID = -1;
+                foreach (var c in selectedCells)
+                {
+                    c.centerObjectID = -1;
+                    for (int i = 0; i < 4; i++) c.faceObjectIDs[i] = -1;
+                }
                 GUI.changed = true; GUI.FocusControl(null);
             }
 
@@ -532,14 +565,12 @@ public class DungeonMapEditor : EditorWindow
                 GUILayout.Label("Wall Textures (ID)", EditorStyles.miniBoldLabel);
                 
                 // 4방향 텍스처 ID 입력 (기존 코드)
-                selectedCell.wallTextureIDs[0] = EditorGUILayout.IntField("← Tex", selectedCell.wallTextureIDs[0]);
-                selectedCell.wallTextureIDs[1] = EditorGUILayout.IntField("↑ Tex", selectedCell.wallTextureIDs[1]);
-                selectedCell.wallTextureIDs[2] = EditorGUILayout.IntField("→ Tex", selectedCell.wallTextureIDs[2]);
-                selectedCell.wallTextureIDs[3] = EditorGUILayout.IntField("↓ Tex", selectedCell.wallTextureIDs[3]);
+                selectedCell.wallTextureIDs[0] = EditorGUILayout.IntField("↑ Tex (N)", selectedCell.wallTextureIDs[0]);
+                selectedCell.wallTextureIDs[1] = EditorGUILayout.IntField("→ Tex (E)", selectedCell.wallTextureIDs[1]);
+                selectedCell.wallTextureIDs[2] = EditorGUILayout.IntField("↓ Tex (S)", selectedCell.wallTextureIDs[2]);
+                selectedCell.wallTextureIDs[3] = EditorGUILayout.IntField("← Tex (W)", selectedCell.wallTextureIDs[3]);
 
-                
                 // 텍스처 일괄 설정 버튼 (Quick Actions)
-                
                 GUILayout.Space(5);
                 EditorGUILayout.BeginHorizontal();
                 
@@ -575,16 +606,22 @@ public class DungeonMapEditor : EditorWindow
                 // 고정 오브젝트 설정
                 GUILayout.Space(15);
                 GUILayout.Label("Static Object Settings", EditorStyles.boldLabel);
-                selectedCell.objectID = EditorGUILayout.IntField("Object ID", selectedCell.objectID);
-                if (selectedCell.objectID != -1)
-                {
-                    EditorGUILayout.HelpBox($"Object ID {selectedCell.objectID}가 배치되었습니다.", MessageType.Info);
-                }
+
+                // 중앙 오브젝트
+                selectedCell.centerObjectID = EditorGUILayout.IntField("Center Obj ID", selectedCell.centerObjectID);
+                
+                GUILayout.Space(5);
+                GUILayout.Label("Face Objects (Wall Decor)", EditorStyles.miniBoldLabel);
+
+                // 4방향 면 오브젝트 입력 필드
+                selectedCell.faceObjectIDs[0] = EditorGUILayout.IntField("↑ Face Obj (N)", selectedCell.faceObjectIDs[0]);
+                selectedCell.faceObjectIDs[1] = EditorGUILayout.IntField("→ Face Obj (E)", selectedCell.faceObjectIDs[1]);
+                selectedCell.faceObjectIDs[2] = EditorGUILayout.IntField("↓ Face Obj (S)", selectedCell.faceObjectIDs[2]);
+                selectedCell.faceObjectIDs[3] = EditorGUILayout.IntField("← Face Obj (W)", selectedCell.faceObjectIDs[3]);
 
                 GUILayout.Space(20);
 
                 // 입구 포털 설정 UI
-                
                 GUILayout.Label("Door / Entrance / Portal Settings", EditorStyles.boldLabel);
 
                 // 현재 셀(x, y)에 존재하는 입구 데이터를 찾음
@@ -667,6 +704,44 @@ public class DungeonMapEditor : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
+    // 중앙 고정 오브젝트 일괄 적용 헬퍼
+    void DrawBatchCenterObjectField()
+    {
+        int firstVal = selectedCells[0].centerObjectID;
+        bool isMixed = false;
+        foreach (var c in selectedCells)
+            if (c.centerObjectID != firstVal) { isMixed = true; break; }
+
+        EditorGUI.showMixedValue = isMixed;
+        EditorGUI.BeginChangeCheck();
+        int newVal = EditorGUILayout.IntField("Center Obj ID", isMixed ? -1 : firstVal);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.centerObjectID = newVal;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
+    }
+
+    // 벽면 고정 오브젝트 4방향 일괄 적용 헬퍼
+    void DrawBatchFaceObjectField(string label, int faceIdx)
+    {
+        int firstVal = selectedCells[0].faceObjectIDs[faceIdx];
+        bool isMixed = false;
+        foreach (var c in selectedCells)
+            if (c.faceObjectIDs[faceIdx] != firstVal) { isMixed = true; break; }
+
+        EditorGUI.showMixedValue = isMixed;
+        EditorGUI.BeginChangeCheck();
+        int newVal = EditorGUILayout.IntField(label, isMixed ? -1 : firstVal);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.faceObjectIDs[faceIdx] = newVal;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
+    }
+
     // 방향별 "mixed" 상태를 표시하고 일괄 적용하는 헬퍼
     void DrawBatchWallField(string label, int dirIdx)
     {
@@ -701,25 +776,6 @@ public class DungeonMapEditor : EditorWindow
         if (EditorGUI.EndChangeCheck())
         {
             foreach (var c in selectedCells) c.value = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
-    }
-
-    // 오브젝트 다중 선택 일괄 적용 헬퍼
-    void DrawBatchObjectField()
-    {
-        int firstVal = selectedCells[0].objectID;
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.objectID != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        int newVal = EditorGUILayout.IntField("Object ID", isMixed ? -1 : firstVal);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.objectID = newVal;
             GUI.changed = true;
         }
         EditorGUI.showMixedValue = false;

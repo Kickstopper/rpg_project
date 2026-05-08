@@ -707,10 +707,11 @@ namespace Controller
             }
 
             // 통과할 수 없는 고정 오브젝트 충돌 (예: 잠긴 상자, 기둥)
-            MapObject blockingObj = _staticObjects.Find(o => Mathf.FloorToInt(o.x) == tx && Mathf.FloorToInt(o.y) == ty && o.isActive);
-            if (blockingObj != null && blockingObj.isSolid)
+            MapObject blockingObj = _staticObjects.Find(o => Mathf.FloorToInt(o.x) == tx && Mathf.FloorToInt(o.y) == ty && o.isActive && o.isSolid);
+            
+            if (blockingObj != null)
             {
-                // 부딪히는 사운드와 애니메이션만 재생하고 이동은 막음
+                // 부딪히는 사운드와 애니메이션 재생 후 이동 막음
                 StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
                 SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                 return; 
@@ -1440,29 +1441,29 @@ namespace Controller
                 for (int y = 0; y < _currentMap.height; y++)
                 {
                     CellData cell = _currentMap.GetCell(x, y);
-                    
-                    // objectID가 -1이 아니라면 오브젝트가 존재
-                    if (cell != null && cell.objectID != -1)
-                    {
-                        // 테마 데이터에서 해당 오브젝트가 통과 불가능한지 확인
-                        bool isSolid = true; // 기본값
-                        if (objectSolidMap.TryGetValue(cell.objectID, out bool solidInfo))
-                        {
-                            isSolid = solidInfo;
-                        }
+                    if (cell == null) continue;
 
-                        // 맵 오브젝트 리스트에 추가 (좌표는 타일의 정중앙)
-                        _staticObjects.Add(new MapObject {
-                            x = x + 0.5f,
-                            y = y + 0.5f,
-                            texIdx = cell.objectID,
-                            isSolid = isSolid,
-                            isActive = true,
-                            objectId = $"Obj_{cell.objectID}_{x}_{y}" // 상호작용 식별을 위한 고유 ID
-                        });
-                    }
+                    // 중앙 오브젝트 스폰
+                    if (cell.centerObjectID != -1)
+                        AddStaticObject(x + 0.5f, y + 0.5f, cell.centerObjectID, objectSolidMap);
+
+                    // 벽면 오브젝트 스폰 (벽 쪽으로 오프셋을 줌)
+                    float offset = 0.49f;
+                    if (cell.faceObjectIDs[0] != -1) AddStaticObject(x + 0.5f, y + 0.5f + offset, cell.faceObjectIDs[0], objectSolidMap); // North
+                    if (cell.faceObjectIDs[1] != -1) AddStaticObject(x + 0.5f + offset, y + 0.5f, cell.faceObjectIDs[1], objectSolidMap); // East
+                    if (cell.faceObjectIDs[2] != -1) AddStaticObject(x + 0.5f, y + 0.5f - offset, cell.faceObjectIDs[2], objectSolidMap); // South
+                    if (cell.faceObjectIDs[3] != -1) AddStaticObject(x + 0.5f - offset, y + 0.5f, cell.faceObjectIDs[3], objectSolidMap); // West
                 }
             }
+        }
+
+        private void AddStaticObject(float x, float y, int id, Dictionary<int, bool> solidMap)
+        {
+            bool isSolid = solidMap.ContainsKey(id) ? solidMap[id] : false;
+            _staticObjects.Add(new MapObject {
+                x = x, y = y, texIdx = id, isSolid = isSolid, isActive = true,
+                objectId = $"Obj_{id}_{x}_{y}"
+            });
         }
 
         // 맵의 빈 공간에 적 심볼 생성
@@ -1686,10 +1687,10 @@ namespace Controller
             int targetEnterFace = -1;
             int currentExitFace = -1;
 
-            if (dir.x > 0)      { targetEnterFace = 0; currentExitFace = 2; } // 동쪽 이동
-            else if (dir.x < 0) { targetEnterFace = 2; currentExitFace = 0; } // 서쪽 이동
-            else if (dir.y > 0) { targetEnterFace = 3; currentExitFace = 1; } // 북쪽 이동
-            else if (dir.y < 0) { targetEnterFace = 1; currentExitFace = 3; } // 남쪽 이동
+            if (dir.x > 0)      { targetEnterFace = 3; currentExitFace = 1; } // East 이동 (내동쪽(1)으로 나가서 상대서쪽(3)으로 진입)
+            else if (dir.x < 0) { targetEnterFace = 1; currentExitFace = 3; } // West 이동
+            else if (dir.y > 0) { targetEnterFace = 2; currentExitFace = 0; } // North 이동
+            else if (dir.y < 0) { targetEnterFace = 0; currentExitFace = 2; } // South 이동
 
             // 현재 칸에서 해당 방향으로 나갈 수 있는지 내벽 검사
             CellData currentCell = _currentMap.GetCell(ex, ey);

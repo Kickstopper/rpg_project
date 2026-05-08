@@ -60,7 +60,8 @@ namespace Manager
             partyData.Clear();
             string[] starterIds = { 
                 PartyID.CHARACTER_00, 
-                // PartyID.CHARACTER_01, PartyID.CHARACTER_02,
+                PartyID.CHARACTER_01, 
+                // PartyID.CHARACTER_02,
                 // PartyID.CHARACTER_03, PartyID.CHARACTER_04, PartyID.CHARACTER_05 
             };
             

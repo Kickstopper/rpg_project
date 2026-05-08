@@ -1103,13 +1103,15 @@ namespace UI.DungeonMapScene
         {
             if (!back)
             {
-                if (side == 0) return (stepX > 0) ? cell.wallTextureIDs[0] : cell.wallTextureIDs[2];
-                else return (stepY > 0) ? cell.wallTextureIDs[3] : cell.wallTextureIDs[1];
+                // side == 0: X축 벽(세로선), side == 1: Y축 벽(가로선)
+                if (side == 0) return (stepX > 0) ? cell.wallTextureIDs[3] : cell.wallTextureIDs[1]; // East이동시 West면(3), West이동시 East면(1)
+                else           return (stepY > 0) ? cell.wallTextureIDs[2] : cell.wallTextureIDs[0]; // North이동시 South면(2), South이동시 North면(0)
             }
             else
             {
-                if (side == 0) return (stepX > 0) ? cell.wallTextureIDs[2] : cell.wallTextureIDs[0];
-                else return (stepY > 0) ? cell.wallTextureIDs[1] : cell.wallTextureIDs[3];
+                // 뒷면(내벽) 처리
+                if (side == 0) return (stepX > 0) ? cell.wallTextureIDs[1] : cell.wallTextureIDs[3];
+                else           return (stepY > 0) ? cell.wallTextureIDs[0] : cell.wallTextureIDs[2];
             }
         }
 

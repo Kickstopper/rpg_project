@@ -217,7 +217,6 @@ namespace UI.DungeonMapScene
             onRender?.Invoke();
         }
 
-        // 원본 코드의 로직(Exit Check + Enter Check)과 인덱스 매핑을 복원
         public bool IsWalkable(float targetX, float targetY, float deltaX, float deltaY)
         {
             // 현재 위치 및 목표 위치 그리드 계산
@@ -247,28 +246,28 @@ namespace UI.DungeonMapScene
 
             if (Mathf.Abs(deltaX) > 0.0001f) // X축 이동
             {
-                if (deltaX > 0) // East
+                if (deltaX > 0) // East 이동
                 {
-                    targetEnterFace = 0; // Target의 West면(0) 검사
-                    currentExitFace = 2; // Current의 East면(2) 검사
+                    targetEnterFace = 3; // Target의 West면(3) 검사
+                    currentExitFace = 1; // Current의 East면(1) 검사
                 }
-                else // West
+                else // West 이동
                 {
-                    targetEnterFace = 2; // Target의 East면(2) 검사
-                    currentExitFace = 0; // Current의 West면(0) 검사
+                    targetEnterFace = 1; // Target의 East면(1) 검사
+                    currentExitFace = 3; // Current의 West면(3) 검사
                 }
             }
             else if (Mathf.Abs(deltaY) > 0.0001f) // Y축 이동
             {
-                if (deltaY > 0) // North
+                if (deltaY > 0) // North 이동
                 {
-                    targetEnterFace = 3; // Target의 South면(3) 검사
-                    currentExitFace = 1; // Current의 North면(1) 검사
+                    targetEnterFace = 2; // Target의 South면(2) 검사
+                    currentExitFace = 0; // Current의 North면(0) 검사
                 }
-                else // South
+                else // South 이동
                 {
-                    targetEnterFace = 1; // Target의 North면(1) 검사
-                    currentExitFace = 3; // Current의 South면(3) 검사
+                    targetEnterFace = 0; // Target의 North면(0) 검사
+                    currentExitFace = 2; // Current의 South면(2) 검사
                 }
             }
 

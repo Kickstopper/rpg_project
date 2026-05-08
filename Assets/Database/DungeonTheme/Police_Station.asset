@@ -51,7 +51,6 @@ MonoBehaviour:
   bgmID: 8
   moduleEnable: 1
   monsterList:
-  - 000
   - 001
   useDustEffect: 0
   dustParticleCount: 300

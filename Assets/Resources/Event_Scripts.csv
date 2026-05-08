@@ -1,4 +1,11 @@
 EventID,Seq,Type,Speaker,Portrait,Text,Condition,Action / Param,NextID
+DREAM_1,1,TALK,,,안개가 자욱해 앞이 잘 보이지 않는다,None,None,2
+DREAM_1,2,TALK,,,......,None,None,3
+DREAM_1,3,TALK,,,앞으로 나아가지 않으면 안 될 것 같다,None,None,END
+
+DREAM_2,1,TALK,,,바닥에 구멍이 있다,None,None,2
+DREAM_2,2,TALK,,,Shift + ↓를 눌러 내려다볼까?,None,None,END
+
 EVT_GUARD_MEET,1,TALK,무장경찰,npc,거기 서라! 통행증은 있나?,None,None,2
 EVT_GUARD_MEET,2,CHOICE,System,npc,(행동을 선택하세요),None,None,"3, 4"
 EVT_GUARD_MEET,3,BRANCH,플레이어,npc,[공격한다],None,BATTLE:guard_mob,END

@@ -26,10 +26,11 @@ namespace Controller
             if (data != null && data.wallTextureIDs != null && data.wallTextureIDs.Length > 3)
             {
                 int[] wallIds = data.wallTextureIDs;
-                leftWall.color = GetWallColor(wallIds[0]);
-                upWall.color = GetWallColor(wallIds[1]);
-                rightWall.color = GetWallColor(wallIds[2]);
-                downWall.color = GetWallColor(wallIds[3]);
+                
+                upWall.color = GetWallColor(wallIds[0]);
+                rightWall.color = GetWallColor(wallIds[1]);
+                downWall.color = GetWallColor(wallIds[2]);
+                leftWall.color = GetWallColor(wallIds[3]);
 
                 floor.color = GetFloorColor(data.value);
             }
