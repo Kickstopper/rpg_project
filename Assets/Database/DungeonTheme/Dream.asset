@@ -17,8 +17,8 @@ MonoBehaviour:
   encounterMode: 1
   background: {fileID: 0}
   texture:
-  - {fileID: 2800000, guid: ae7a978fe58e9ec4e98bdb2d5596652f, type: 3}
-  - {fileID: 2800000, guid: bfc7b9fe4315ce549aad8294a0ba873e, type: 3}
+  - {fileID: 2800000, guid: eaa37948b936cdd4f947e6987a2e78c6, type: 3}
+  - {fileID: 2800000, guid: dc179bea276f2534eaeec81487282600, type: 3}
   floorTexIdx: 1
   ceilingTexIdx: 1
   enemySprites: []
@@ -32,7 +32,7 @@ MonoBehaviour:
   maxSpawnCount: 0
   spawnDelay: 0
   wallAnimations: []
-  fogColor: {r: 0.14117648, g: 0.4117647, b: 0.38039216, a: 1}
+  fogColor: {r: 0, g: 0.65882355, b: 0.38431373, a: 1}
   lightingIntensity: 0.3
   useGridLighting: 0
   bgmID: 7
@@ -46,7 +46,7 @@ MonoBehaviour:
   dustTwinkleSpeed: 10
   dustColor:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4284022672
   useOrganicEffect: 0
   organicFreqX: 4
   organicSpeed: 0.3
