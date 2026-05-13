@@ -22,17 +22,18 @@ public class MonsterDatabase : ScriptableObject
         public Data.AI.MonsterAIProfile aiProfile;
         public List<SkillData> skills;
         
+        [Header("Visual")]
+        public Sprite[] image;     // 이미지
+        public float animInterval = 0.5f; // 애니메이션 프레임 간격
+        public Sprite portrait;     // 초상화
+        public GameObject prefab;   // 3D 모델 또는 전투용 프리팹
+        
         [Header("Negotiation")]
         public Personality personality;
         public TimeOfDay timeOfDay; // Morning, Day, Evening, Night
         public Weather weather; // Clear, Rain, Storm
         public MoonPhase moonPhase; // New, Half, Full
         public ChoiceTone choiceTone; // Friendly, Aggressive, Logical, Bribe, Flirt
-
-        [Header("Visual")]
-        public Sprite[] image;     // 이미지
-        public Sprite portrait;     // 초상화
-        public GameObject prefab;   // 3D 모델 또는 전투용 프리팹
 
         [Header("Battle Position")]
         public RowType preferredRow; // Front 또는 Back

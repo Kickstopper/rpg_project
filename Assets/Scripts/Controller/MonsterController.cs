@@ -24,6 +24,11 @@ namespace Controller
         public RowType currentRow;
         public ColumnType currentColumn;
 
+        // 애니메이션용 코루틴
+        private Coroutine animationCoroutine;
+        private Sprite[] animFrames;
+        private float animSpeed;
+
         // [IBattleTarget 구현]
         public bool IsAlive => currentHp > 0;
         public bool IsMaxHp => currentHp >= maxHp;
@@ -159,8 +164,7 @@ namespace Controller
             this.manager = manager;
             
             sourceData = data;
-            entityName = $"{data.name}_{data.id}"; // 부모 필드 사용
-
+            entityName = data.name;
             level = data.stats.level;
             
             // HP/MP 설정
@@ -170,11 +174,18 @@ namespace Controller
             currentMp = maxMp;
 
             // 이미지 설정
-            if (preferredImage != null && data.image != null)
+            if (preferredImage != null && data.image != null && data.image.Length > 0) 
             {
                 preferredImage.sprite = data.image[0];
                 preferredImage.SetNativeSize();
-                originalColor = preferredImage.color; // 부모 필드 사용
+                originalColor = preferredImage.color;
+                preferredImage.rectTransform.pivot = new Vector2(0.5f, 0f);
+                
+                if (data.image.Length > 1 && data.animInterval > 0f) 
+                {
+                    animFrames = data.image;
+                    animSpeed = data.animInterval;
+                }
             }
             
             gameObject.name = entityName;
@@ -184,6 +195,41 @@ namespace Controller
             {
                 selectButton.onClick.RemoveAllListeners();
                 selectButton.onClick.AddListener(OnClicked);
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (animFrames != null && animFrames.Length > 1 && animSpeed > 0f) 
+            {
+                if (animationCoroutine != null) StopCoroutine(animationCoroutine);
+                animationCoroutine = StartCoroutine(AnimateSprite(animFrames, animSpeed));
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (animationCoroutine != null) StopCoroutine(animationCoroutine);
+        }
+
+        // 몬스터 대기 모션 애니메이션
+        private IEnumerator AnimateSprite(Sprite[] frames, float interval)
+        {
+            int currentFrame = 0;
+            WaitForSeconds waitTime = new WaitForSeconds(interval); // 캐싱
+
+            while (true)
+            {
+                // 설정된 시간만큼 대기
+                yield return waitTime;
+
+                currentFrame = (currentFrame + 1) % frames.Length;
+                
+                if (preferredImage != null)
+                {
+                    preferredImage.sprite = frames[currentFrame];
+                    // preferredImage.SetNativeSize(); 
+                }
             }
         }
 
