@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5d70a450204a3f4eb511088e2bcc8ad, type: 3}
+  m_Name: 001_CivilianHuntingRifle
+  m_EditorClassIdentifier: 
+  id: gun_001
+  dataName: "\uC0AC\uB0E5\uCD1D"
+  description: "\uBA67\uB3FC\uC9C0\uB97C \uC7A1\uAE30 \uC704\uD574 \uC124\uACC4\uB41C
+    \uCD1D"
+  icon: {fileID: 0}
+  effectPrefab: {fileID: 0}
+  effectType: 0
+  effectValue: 0
+  element: 6
+  targetScope: 1
+  useType: 2
+  actionDelay: 0
+  price: 4500
+  isSellable: 1
+  type: 1
+  attackRange: 1
+  attackPower: 40
+  hitRateBonus: 1
+  minHits: 1
+  maxHits: 1

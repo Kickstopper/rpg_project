@@ -10,26 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5d70a450204a3f4eb511088e2bcc8ad, type: 3}
-  m_Name: DefaultGun
+  m_Name: 000_CompactHandgun
   m_EditorClassIdentifier: 
   id: gun_000
-  dataName: "\uB9AC\uBCFC\uBC84"
-  description: "\uAC00\uC7A5 \uBCF4\uD1B5\uC758 \uCD1D"
+  dataName: "\uCEF4\uD329\uD2B8 \uD578\uB4DC\uAC74"
+  description: "\uC77C\uBC18\uC801\uC778 \uAD8C\uCD1D"
   icon: {fileID: 0}
-  effectType: 19
+  effectPrefab: {fileID: 0}
+  effectType: 0
   effectValue: 0
-  element: 0
+  element: 6
   targetScope: 1
   useType: 2
   actionDelay: 0
-  effectPrefab: {fileID: 0}
-  price: 0
+  price: 2500
   isSellable: 1
   type: 1
-  attackPower: 1
+  attackRange: 0
+  attackPower: 15
   hitRateBonus: 1
-  scalingStatName: 
-  damageElement: 0
-  attackRange: 1
   minHits: 1
-  maxHits: 6
+  maxHits: 1

@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 84edbd8d2af6f4942ae8c84ce29e41b8, type: 3}
-  m_Name: NormalAmmo
+  m_Name: 006_FMJ
   m_EditorClassIdentifier: 
   id: ammo_000
-  dataName: "\uD1B5\uC0C1\uD0C4"
-  description: "\uAC00\uC7A5 \uBCF4\uD1B5\uC758 \uD0C4"
+  dataName: "\uD480\uBA54\uD0C8\uC790\uCF13"
+  description: ".357\uC758 \uBC29\uD0C4\uBCF5\uC744 \uB6AB\uB294 \uB9E4\uADF8\uB118\uD0C4"
   icon: {fileID: 0}
-  effectType: 19
+  effectPrefab: {fileID: 0}
+  effectType: 0
   effectValue: 0
-  element: 0
+  element: 6
   targetScope: 0
   useType: 2
   actionDelay: 0
-  effectPrefab: {fileID: 0}
-  price: 100
+  price: 1000
   isSellable: 1
-  damageBonus: 7
-  hitRateBonus: 7
+  damageBonus: 20
+  hitRateBonus: 0
   statusEffectChance: 0

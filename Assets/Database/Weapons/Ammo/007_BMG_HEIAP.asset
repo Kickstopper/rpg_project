@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84edbd8d2af6f4942ae8c84ce29e41b8, type: 3}
+  m_Name: 007_BMG_HEIAP
+  m_EditorClassIdentifier: 
+  id: ammo_007
+  dataName: "BMG \uCCA0\uAC11\uC720\uD0C4"
+  description: ".50\uC758 \uC704\uB825\uC774 \uB9E4\uC6B0 \uAC15\uD55C \uD0C4\uD658 "
+  icon: {fileID: 0}
+  effectPrefab: {fileID: 0}
+  effectType: 0
+  effectValue: 0
+  element: 6
+  targetScope: 0
+  useType: 2
+  statusEffect: 0
+  statusEffectChance: 0
+  actionDelay: 0
+  price: 5000
+  isSellable: 1
+  damageBonus: 60
+  hitRateBonus: 0
