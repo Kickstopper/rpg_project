@@ -2844,7 +2844,7 @@ namespace Controller
             if (!isAutoMode)
             {
                 string atkStr = isGunAction ? "의 총구가 불을 뿜었다!" : "의 공격!";
-                uiController.ShowStateMessage($"{action.actor.name} {atkStr}");
+                uiController.ShowStateMessage($"{action.actor.name}{atkStr}");
             }
             
             yield return wait10;

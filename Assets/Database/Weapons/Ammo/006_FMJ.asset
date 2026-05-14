@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84edbd8d2af6f4942ae8c84ce29e41b8, type: 3}
   m_Name: 006_FMJ
   m_EditorClassIdentifier: 
-  id: ammo_000
+  id: ammo_006
   dataName: "\uD480\uBA54\uD0C8\uC790\uCF13"
   description: ".357\uC758 \uBC29\uD0C4\uBCF5\uC744 \uB6AB\uB294 \uB9E4\uADF8\uB118\uD0C4"
   icon: {fileID: 0}
@@ -22,9 +22,10 @@ MonoBehaviour:
   element: 6
   targetScope: 0
   useType: 2
+  statusEffect: 0
+  statusEffectChance: 0
   actionDelay: 0
   price: 1000
   isSellable: 1
   damageBonus: 20
   hitRateBonus: 0
-  statusEffectChance: 0
