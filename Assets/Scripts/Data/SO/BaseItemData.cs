@@ -28,6 +28,7 @@ public enum TargetScope
 
 public enum EffectType 
 { 
+    None,
     // [Atk Magic]
     Magic_Atk,
 
@@ -58,18 +59,24 @@ namespace Data
         public string id;              // 고유 ID (예: "S_FIREBALL", "W_SWORD_01")
         public string dataName;        // 게임 내 표시 이름
         [TextArea] public string description; // 설명
+        
+        [Header("Visual")]
         public Sprite icon;            // 아이콘
+        public GameObject effectPrefab; // 사용 시 이펙트 (옵션)
+
+        [Header("Skill")]
         public EffectType effectType;
         public int effectValue; // 회복량 또는 데미지
         public ElementType element;
         public TargetScope targetScope;
-
         public UseType useType;
 
-        public int actionDelay = 0; // 사용했을 때의 딜레이 (행동 속도 지연)
+        
+        [Header("Additional Effect")]
+        public StatusEffect statusEffect = StatusEffect.None;
+        public float statusEffectChance = 0f; 
 
-        [Header("Visual")]
-        public GameObject effectPrefab; // 사용 시 이펙트 (옵션)
+        public int actionDelay = 0; // 사용했을 때의 딜레이 (행동 속도 지연)
     }
 
     // ---------------------------------------------------------

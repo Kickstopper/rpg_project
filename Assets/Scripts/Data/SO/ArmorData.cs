@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace Data
 {
+    public enum ArmorSlot { Helmet, Body, Gloves, Boots, Accessory }
+    
     [CreateAssetMenu(fileName = "New Armor", menuName = "RPG/Item/Armor")]
     public class ArmorData : BaseItemData
     {
-        public enum ArmorSlot { Helmet, Body, Gloves, Boots, Accessory }
+        [Header("Defense Only")]
         public ArmorSlot slot;
-
-        [Header("Defense")]
         public int defense;
         public int evasionMod; // 회피율 보정
 
@@ -20,5 +20,7 @@ namespace Data
         // 0이면 변경 없음. 덮어쓰기 로직 혹은 합연산 로직 필요.
         // 여기서는 간단히 '착용 시 적용할 내성 계수'로 가정
         public ResistanceData resistanceMod; 
+
+        
     }
 }

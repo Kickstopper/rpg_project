@@ -7,10 +7,5 @@ namespace Data
         [Header("Ammo Stats")]
         public int damageBonus; // 총기 공격력에 추가될 데미지
         public int hitRateBonus;
-
-        [Header("Effect")]
-        // 상태이상을 유발한다면 여기에 추가 (예: 마비탄)
-        public float statusEffectChance = 0f; 
     }
-    
 }

@@ -175,7 +175,7 @@ namespace Controller
             nextExpText.text = charData.GetRequiredExpForNextLevel().ToString(); 
             alignText.text = charData.align.ToString().ToUpper().Replace("_", " ");
 
-            if (charData.statusEffect != StatusEffect.Good)
+            if (charData.statusEffect != StatusEffect.None)
             {
                 statusFxText.text = charData.statusEffect.ToString().ToUpper();
             }

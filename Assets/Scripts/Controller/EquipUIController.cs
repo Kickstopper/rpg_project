@@ -197,16 +197,16 @@ namespace Controller
                 case EquipSlotType.Melee: return currentCharacter.equippedWeaponId;
                 case EquipSlotType.Gun: return currentCharacter.equippedGunId;
                 case EquipSlotType.Ammo: return currentCharacter.equippedAmmoId;
-                case EquipSlotType.Head: return GetArmorIdBySlot(ArmorData.ArmorSlot.Helmet);
-                case EquipSlotType.Body: return GetArmorIdBySlot(ArmorData.ArmorSlot.Body);
-                case EquipSlotType.Hands: return GetArmorIdBySlot(ArmorData.ArmorSlot.Gloves);
-                case EquipSlotType.Feet: return GetArmorIdBySlot(ArmorData.ArmorSlot.Boots);
-                case EquipSlotType.Acc: return GetArmorIdBySlot(ArmorData.ArmorSlot.Accessory);
+                case EquipSlotType.Head: return GetArmorIdBySlot(ArmorSlot.Helmet);
+                case EquipSlotType.Body: return GetArmorIdBySlot(ArmorSlot.Body);
+                case EquipSlotType.Hands: return GetArmorIdBySlot(ArmorSlot.Gloves);
+                case EquipSlotType.Feet: return GetArmorIdBySlot(ArmorSlot.Boots);
+                case EquipSlotType.Acc: return GetArmorIdBySlot(ArmorSlot.Accessory);
                 default: return "";
             }
         }
 
-        private string GetArmorIdBySlot(ArmorData.ArmorSlot slotType)
+        private string GetArmorIdBySlot(ArmorSlot slotType)
         {
             foreach (string id in currentCharacter.equippedArmorIds)
             {
@@ -350,11 +350,11 @@ namespace Controller
             ArmorData ar = DatabaseManager.Instance.GetArmor(itemId);
             if (ar != null)
             {
-                if (slotType == EquipSlotType.Head && ar.slot == ArmorData.ArmorSlot.Helmet) return true;
-                if (slotType == EquipSlotType.Body && ar.slot == ArmorData.ArmorSlot.Body) return true;
-                if (slotType == EquipSlotType.Hands && ar.slot == ArmorData.ArmorSlot.Gloves) return true;
-                if (slotType == EquipSlotType.Feet && ar.slot == ArmorData.ArmorSlot.Boots) return true;
-                if (slotType == EquipSlotType.Acc && ar.slot == ArmorData.ArmorSlot.Accessory) return true;
+                if (slotType == EquipSlotType.Head && ar.slot == ArmorSlot.Helmet) return true;
+                if (slotType == EquipSlotType.Body && ar.slot == ArmorSlot.Body) return true;
+                if (slotType == EquipSlotType.Hands && ar.slot == ArmorSlot.Gloves) return true;
+                if (slotType == EquipSlotType.Feet && ar.slot == ArmorSlot.Boots) return true;
+                if (slotType == EquipSlotType.Acc && ar.slot == ArmorSlot.Accessory) return true;
                 return false;
             }
             return false;
