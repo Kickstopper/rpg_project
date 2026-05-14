@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5d70a450204a3f4eb511088e2bcc8ad, type: 3}
+  m_Name: 002_KunckleDuster
+  m_EditorClassIdentifier: Assembly-CSharp::Data.WeaponData
+  id: sword_002
+  dataName: "\uB108\uD074\uB354\uC2A4\uD130"
+  description: "\uD734\uB300\uAC00 \uAC04\uD3B8\uD558\uACE0 \uBA85\uC911\uB960\uC774
+    \uB9E4\uC6B0 \uB192\uC74C"
+  icon: {fileID: 0}
+  effectPrefab: {fileID: 0}
+  effectType: 0
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 0
+  actionDelay: 0
+  price: 250
+  isSellable: 1
+  type: 0
+  attackRange: 0
+  attackPower: 12
+  hitRateBonus: 0
+  minHits: 1
+  maxHits: 1

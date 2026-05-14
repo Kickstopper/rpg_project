@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5d70a450204a3f4eb511088e2bcc8ad, type: 3}
+  m_Name: 011_RiotShield
+  m_EditorClassIdentifier: Assembly-CSharp::Data.WeaponData
+  id: sword_011
+  dataName: "\uC9C4\uC555\uC6A9 \uBC29\uD328"
+  description: "\uCD94\uAC00 \uD6A8\uACFC: \uBC29\uC5B4\uB825 \uC0C1\uC2B9"
+  icon: {fileID: 0}
+  effectPrefab: {fileID: 0}
+  effectType: 0
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 0
+  actionDelay: 0
+  price: 8000
+  isSellable: 1
+  type: 0
+  attackRange: 4
+  attackPower: 22
+  hitRateBonus: 0
+  minHits: 1
+  maxHits: 1

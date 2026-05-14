@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5d70a450204a3f4eb511088e2bcc8ad, type: 3}
+  m_Name: 012_Chainsaw
+  m_EditorClassIdentifier: Assembly-CSharp::Data.WeaponData
+  id: sword_012
+  dataName: "\uC804\uAE30\uD1B1"
+  description: "\uC6B4\uC5D0 \uB530\uB77C \uD3ED\uBC1C\uC801\uC778 \uB51C\uB9C1\uC744
+    \uBFDC\uC5B4\uB0B4\uB294 \uAE30\uACC4"
+  icon: {fileID: 0}
+  effectPrefab: {fileID: 0}
+  effectType: 0
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 0
+  actionDelay: 0
+  price: 12000
+  isSellable: 1
+  type: 0
+  attackRange: 2
+  attackPower: 85
+  hitRateBonus: 0
+  minHits: 1
+  maxHits: 3
