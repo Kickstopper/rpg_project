@@ -7,15 +7,16 @@ using Manager;
 using Data;
 using DG.Tweening;
 
+public static class GameScene
+{
+    public const string TITLE_SCENE = "TitleScene";
+    public const string INTRO_SCENE = "IntroScene";
+    public const string WORLD_MAP_SCENE = "WorldMapScene";
+    public const string DUNGEON_MAP_SCENE = "DungeonMapScene";
+}
+
 namespace Controller 
 {
-    public static class GameScene
-    {
-        public const string TITLE_SCENE = "TitleScene";
-        public const string WORLD_MAP_SCENE = "WorldMapScene";
-        public const string DUNGEON_MAP_SCENE = "DungeonMapScene";
-    }
-
     public class SceneController : MonoBehaviour
     {
         [SerializeField] private GameObject confirmWindow; 
@@ -201,12 +202,7 @@ namespace Controller
 
         public void OnClick_NewGame()
         {
-            // WorldManager.Instance.SetCurrentRegionTheme("region_00");
-            // SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
-            DungeonManager.Instance.LoadDungeonFromJson("Dream", () => 
-            {
-                SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
-            });
+            SceneManager.LoadScene(GameScene.INTRO_SCENE);
         }
 
         public void OnClick_LoadGame()
