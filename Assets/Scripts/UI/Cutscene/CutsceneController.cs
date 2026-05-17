@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Manager;
+using Data;
 
 namespace UI.IntroScene
 {
@@ -25,6 +26,9 @@ namespace UI.IntroScene
         [Header("UI References")]
         public Image cutsceneImage;
         public TextMeshProUGUI cutsceneText;
+
+        [Header("BGM")]
+        public BgmID bgmId;
         
         [Header("Fade Settings")]
         public Image fadeOverlay;
@@ -47,6 +51,10 @@ namespace UI.IntroScene
 
         private void Start()
         {
+            if (SoundManager.Instance != null && bgmId != BgmID.None)
+            {
+                SoundManager.Instance.PlayBGM(bgmId, 1, false);
+            }
             if (fadeOverlay != null)
             {
                 fadeOverlay.color = new Color(fadeInColor.r, fadeInColor.g, fadeInColor.b, fadeInDuration > 0f ? 1f : 0f);
@@ -151,7 +159,7 @@ namespace UI.IntroScene
         private IEnumerator FadeOut()
         {
             if (fadeOverlay == null) yield break;
-
+            SoundManager.Instance.StopBGM(true, fadeOutDuration);
             float timer = 0f;
             Color startColor = new Color(fadeOutColor.r, fadeOutColor.g, fadeOutColor.b, 0);
             Color endColor = new Color(fadeOutColor.r, fadeOutColor.g, fadeOutColor.b, 1);

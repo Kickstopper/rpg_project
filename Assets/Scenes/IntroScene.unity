@@ -579,7 +579,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 120}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &391111877
@@ -684,6 +684,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneController
   cutsceneImage: {fileID: 391111877}
   cutsceneText: {fileID: 834021688}
+  bgmId: 27
   fadeOverlay: {fileID: 63047163}
   fadeInColor: {r: 0, g: 0, b: 0, a: 1}
   fadeOutColor: {r: 1, g: 1, b: 1, a: 1}
@@ -691,35 +692,34 @@ MonoBehaviour:
   fadeOutDuration: 1.5
   cutsceneList:
   - image: {fileID: 21300000, guid: 592e90f87260607468de0206f87dadd6, type: 3}
-    text: "NEXT WORLD\uB294 \uC778\uB958\uC758 \uBBF8\uB798\uB97C \uBC14\uAFC0 \uBB3C\uC9C8
-      E-Particle\uC744 \uBC1C\uACAC\uD588\uB2E4.\n\uD558\uC9C0\uB9CC \uADF8\uAC83\uC740
-      \uC774 \uC138\uACC4\uC758 \uBB3C\uC9C8\uC774 \uC544\uB2C8\uC5C8\uB2E4."
+    text: "\uAC70\uB300 \uAE30\uC5C5 NEXT WORLD\uB294 \uC0C8\uB85C\uC6B4 \uBB3C\uC9C8\uC744
+      \uBC1C\uACAC\uD588\uB2E4."
     lineDelay: 0.1
-    delayAfter: 1
-  - image: {fileID: 21300000, guid: 298ca0094547958459fd12c1044849d1, type: 3}
-    text: "\uC785\uC790\uC758 \uD750\uB984\uC744 \uC5ED\uCD94\uC801\uD558\uB358 \uC2E4\uD5D8\uC740
-      \uACB0\uAD6D \"\uAC8C\uC774\uD2B8\"\uB97C \uC5F4\uC5B4\uBC84\uB838\uB2E4.\n\uADF8\uB9AC\uACE0
-      \uBB34\uC5B8\uAC00\uAC00 \uB118\uC5B4\uC654\uB2E4."
+    delayAfter: 6
+  - image: {fileID: 21300000, guid: 33aca312661749049b942ec6192b8d83, type: 3}
+    text: "\uB9C9\uB300\uD55C \uC5D0\uB108\uC9C0 \uC0DD\uC131, \uACF5\uAC04 \uC65C\uACE1.\n\uC9C0\uAE08\uAE4C\uC9C0
+      \uC54C\uACE0 \uC788\uC5C8\uB358 \uBB3C\uB9AC \uBC95\uCE59\uC740 \uD2C0\uB838\uB2E4."
     lineDelay: 0.1
-    delayAfter: 1
-  - image: {fileID: 21300000, guid: 298ca0094547958459fd12c1044849d1, type: 3}
-    text: "\uC5F0\uAD6C\uC18C\uB294 \uBD09\uC1C4\uB418\uC5C8\uB2E4.\n\uC0AC\uB78C\uB4E4\uC740
-      \uBCC0\uD558\uAE30 \uC2DC\uC791\uD588\uACE0, \uD604\uC2E4\uC740 \uB4A4\uD2C0\uB824\uAC14\uB2E4.\n\uC5F0\uAD6C\uC18C\uB294
-      \uC810\uC810 \"\uB2E4\uB978 \uC138\uACC4\"\uB85C \uBCC0\uD574\uAC14\uB2E4."
+    delayAfter: 6
+  - image: {fileID: 21300000, guid: e600d22a285129348acc10112e29c26d, type: 3}
+    text: "\uC5F0\uAD6C\uC9C4\uC758 \uB178\uB825\uC5D0 \uC758\uD574 \uC774 \uBB3C\uC9C8\uC774
+      \uB2E4\uB978 \uC138\uACC4\uC5D0\uC11C \uD758\uB7EC\uB4E4\uC5B4\uC654\uC74C\uC744
+      \uC54C\uAC8C\uB418\uC5C8\uB2E4.\n\uC5F0\uAD6C\uC9C4\uC740 \uC774 \uBB3C\uC9C8\uC744
+      \uC774\uACC4\uC785\uC790 E-Particles\uB77C\uACE0 \uBA85\uBA85\uD588\uB2E4."
     lineDelay: 0.1
-    delayAfter: 1
-  - image: {fileID: 21300000, guid: 298ca0094547958459fd12c1044849d1, type: 3}
-    text: "\u201C\uC625\uC0C1\uC73C\uB85C \uC640!\u201D\n\uADF8\uB140\uC758 \uBAA9\uC18C\uB9AC\uB97C
-      \uB9C8\uC9C0\uB9C9\uC73C\uB85C \uD1B5\uC2E0\uC740 \uB04A\uACBC\uB2E4."
+    delayAfter: 6
+  - image: {fileID: 21300000, guid: 5db50c05165facd4ba680a0bf4dee4d2, type: 3}
+    text: "\uC2E4\uD5D8 \uC911 \uBC1C\uC0DD\uD55C \uACF5\uAC04 \uACF5\uBA85 \uD604\uC0C1\uACFC
+      \uCC28\uC6D0 \uADE0\uC5F4\uB85C \uC5F0\uAD6C\uC18C \uB0B4\uBD80\uAC00 \uD3ED\uBC1C\uD588\uB2E4."
     lineDelay: 0.1
-    delayAfter: 1
-  - image: {fileID: 21300000, guid: 298ca0094547958459fd12c1044849d1, type: 3}
-    text: "\uADF8 \uC9C1\uD6C4\u2014\n\uC5F0\uAD6C\uC18C \uC911\uC2EC\uBD80\uC5D0\uC11C
-      \uAC70\uB300\uD55C \uD3ED\uBC1C\uC774 \uBC1C\uC0DD\uD588\uB2E4."
+    delayAfter: 6
+  - image: {fileID: 0}
+    text: "NEXT WORLD\uC758 \uBCF4\uC548\uC694\uC6D0\uC778 \uB2F9\uC2E0\uC740 \uAE34\uAE09\uD788
+      \uC0AC\uAC74 \uD604\uC7A5\uC73C\uB85C \uD5A5\uD588\uB2E4."
     lineDelay: 0.1
-    delayAfter: 1
+    delayAfter: 8
   nextSceneName: DungeonMapScene
-  nextSceneParam: Dream
+  nextSceneParam: Outpost
 --- !u!4 &679237706
 Transform:
   m_ObjectHideFlags: 0
