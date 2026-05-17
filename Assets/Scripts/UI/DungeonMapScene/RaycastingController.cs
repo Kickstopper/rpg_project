@@ -28,6 +28,8 @@ namespace Controller
         public AutoMapRenderer autoMapRenderer;
         public GameObject autoMapContainer;
         public CanvasGroup fadeOverlay;
+        public GameObject roomNamePanel;
+        public TextMeshProUGUI roomNameText;
         public GameObject systemMessagePanel;
         public TextMeshProUGUI systemMessageText;
 
@@ -814,6 +816,17 @@ namespace Controller
             if (systemMessagePanel != null) systemMessagePanel.SetActive(false);
         }
 
+        private void ShowRoomName(string message)
+        {
+            if (roomNamePanel != null) roomNamePanel.SetActive(true);
+            if (roomNameText != null) roomNameText.text = message;
+        }
+
+        private void HideRoomName()
+        {
+            if (roomNamePanel != null) roomNamePanel.SetActive(false);
+        }
+
         public void UI_SetRunning(bool isRunning)
         {
             if (_player != null)
@@ -1004,6 +1017,37 @@ namespace Controller
             return null;
         }
 
+        // 현재 바라보는 방향에 상점 입구가 있는지 확인하고 UI를 갱신
+        private void CheckFrontForShop()
+        {
+            if (_player == null || _currentMap == null) return;
+
+            // 탐험 상태가 아닐 때는 무조건 숨김
+            if (GameStateManager.Instance != null && GameStateManager.Instance.CurrentState != GameState.Exploration)
+            {
+                HideRoomName();
+                return;
+            }
+
+            Vector2Int forwardVec = _player.GetForwardVector();
+            int frontX = _player.LogicX + forwardVec.x;
+            int frontY = _player.LogicY + forwardVec.y;
+
+            // 정면에 입구가 있는지 확인
+            EntranceData frontEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, frontX, frontY, forwardVec);
+
+            // 상점 입구가 맞다면 텍스트 표시, 아니면 숨김
+            if (frontEntrance != null && frontEntrance.type == EntranceType.Shop)
+            {
+                var shopData = ShopManager.Instance.GetShopData(frontEntrance.destinationID);
+                if (shopData != null) ShowRoomName(shopData.displayName);
+            }
+            else
+            {
+                HideRoomName();
+            }
+        }
+
         // 레벨 전환 및 상점 진입 코루틴
         private IEnumerator TransitionToOtherPlace(EntranceData entrance, Vector2Int moveDir)
         {
@@ -1155,6 +1199,9 @@ namespace Controller
             
             // 맵 갱신
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
+
+            // 회전 후 정면에 상점이 있는지 확인
+            CheckFrontForShop();
         }
 
         // ================= Map & Game Logic =================
@@ -1315,6 +1362,8 @@ namespace Controller
             
             // 이벤트가 있는지 체크
             CheckCurrentTileEvent();
+            // 상점이 있는지 확인
+            CheckFrontForShop();
         }
 
         // 현재 서 있는 칸의 이벤트를 확인하고 발동
@@ -1844,10 +1893,19 @@ namespace Controller
         private void OnGameStateChanged(GameState newState)
         {
             _canRender = (newState == GameState.Exploration);
-            if (!_canRender) return;
+            if (!_canRender)
+            {
+                // 탐험 상태가 아니면 텍스트를 숨김
+                HideSystemMessage();
+                HideRoomName();
+                return;
+            }
             
             SoundManager.Instance.PlayBGM(DungeonManager.Instance.GetDungeonTheme(_currentMap.themeName).bgmID);
             RefreshAppVisible();
+
+            // 탐험 상태로 돌아왔을 때 정면 체크 
+            CheckFrontForShop();
         }
     }
 }

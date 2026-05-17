@@ -24,6 +24,8 @@ namespace UI.Shop
         public Button[] modeButtons; // 0: BUY, 1: SELL, 2: EQUIP
         public GameObject[] modeHighlights; // 선택된 버튼의 하이라이트
 
+        private BgmID prevBgmID;
+        
         private int currentIndex = 0;
         private string currentShopID;
         private bool wasSubPanelActive = false;
@@ -60,8 +62,6 @@ namespace UI.Shop
 
             HandleInput();
         }
-
-        private BgmID prevBgmID;
 
         public void OpenShop(string shopID)
         {

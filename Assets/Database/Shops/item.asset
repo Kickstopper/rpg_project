@@ -15,7 +15,7 @@ MonoBehaviour:
   shopID: item
   bgmID: 30
   BackgroundImage: {fileID: 1729840402284382006, guid: 70217d3118aedad4480191e67cd27a80, type: 3}
-  displayName: "\uC18C\uBAA8\uD488 \uC0C1\uC810"
+  displayName: ITEM
   itemsForSale:
   - {fileID: 11400000, guid: 330701932e9dbd0448ca37746a7cb001, type: 2}
   - {fileID: 11400000, guid: 3b422622809c5ef4c95092658d5096c6, type: 2}

@@ -15,7 +15,7 @@ MonoBehaviour:
   shopID: armor
   bgmID: 29
   BackgroundImage: {fileID: -1128947775675819744, guid: 695477817a75e4c4b8bfd87b46f74151, type: 3}
-  displayName: "\uBC29\uC5B4\uAD6C \uC0C1\uC810"
+  displayName: ARMOR
   itemsForSale:
   - {fileID: 11400000, guid: 2c03c21b8b6bb6c4cbc1d977617b126c, type: 2}
   - {fileID: 11400000, guid: ba0a286e34dce5c44b9f6ef3f54896d1, type: 2}

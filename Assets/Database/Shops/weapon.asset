@@ -15,7 +15,7 @@ MonoBehaviour:
   shopID: weapon
   bgmID: 28
   BackgroundImage: {fileID: -4029819251187114856, guid: e7407659e8799484c811cf85374ec7d7, type: 3}
-  displayName: "\uBB34\uAE30 \uC0C1\uC810"
+  displayName: WEAPON
   itemsForSale:
   - {fileID: 11400000, guid: 12adfbd2512b2394ebd7bea48fbeb872, type: 2}
   - {fileID: 11400000, guid: d95e26f2cbc95e84e96cb869b0972668, type: 2}
