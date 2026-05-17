@@ -24,6 +24,9 @@ namespace Manager
         // 페이드 아웃 코루틴을 제어하기 위한 변수
         private Coroutine bgmFadeCoroutine;
 
+        private BgmID currentBgmId;
+        public BgmID CurrentBgmID => currentBgmId;
+
         private void Awake()
         {
             if (Instance == null)
@@ -126,13 +129,17 @@ namespace Manager
 
         #region BGM Methods
 
-        public void PlayBGM(BgmID bgmId, float volume = 1.0f)
+        public void PlayBGM(BgmID bgmId, float volume = 1.0f, bool loop = true)
         {
             AudioClip clip = AudioLibrary.GetBgmClip(bgmId);
-            if (clip != null) PlayBGM(clip, volume); 
+            if (clip != null)
+            {
+                currentBgmId = bgmId;
+                PlayBGM(clip, volume, loop);
+            } 
         }
         
-        public void PlayBGM(AudioClip clip, float volume = 1.0f)
+        public void PlayBGM(AudioClip clip, float volume = 1.0f, bool loop = true)
         {
             if (bgmSource == null) return;
             
@@ -147,7 +154,7 @@ namespace Manager
             if (bgmSource.clip == clip && bgmSource.isPlaying) return;
 
             bgmSource.clip = clip;
-            bgmSource.loop = true;
+            bgmSource.loop = loop;
             bgmSource.volume = volume;
             bgmSource.Play();
         }
@@ -159,8 +166,10 @@ namespace Manager
         /// <param name="fadeDuration">페이드 아웃 시간(초)</param>
         public void StopBGM(bool useFade = true, float fadeDuration = 1.0f)
         {
+            currentBgmId = BgmID.None;
+            
             if (bgmSource == null || !bgmSource.isPlaying) return;
-
+            
             // 이미 페이드 아웃 중이라면 중복 실행 방지
             if (bgmFadeCoroutine != null) StopCoroutine(bgmFadeCoroutine);
 

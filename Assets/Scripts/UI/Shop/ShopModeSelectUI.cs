@@ -14,6 +14,7 @@ namespace UI.Shop
         public ShopEquipUI equipUI;
 
         [Header("UI References")]
+        public Image background;
         public TextMeshProUGUI titleText;
         public TextMeshProUGUI possessionText;
         public TextMeshProUGUI moneyText;
@@ -60,14 +61,30 @@ namespace UI.Shop
             HandleInput();
         }
 
+        private BgmID prevBgmID;
+
         public void OpenShop(string shopID)
         {
             currentShopID = shopID;
-            
-            if (titleText != null) {
-                ShopData data = ShopManager.Instance.GetShopData(shopID);
-                titleText.text = data.displayName;
+            ShopData data = ShopManager.Instance.GetShopData(shopID);
+            if (data != null)
+            {
+                if (titleText != null)
+                    titleText.text = data.displayName;
+
+                if (background != null)
+                {
+                    Sprite img = data.BackgroundImage;
+                    background.sprite = img;
+                    background.color = img != null ? Color.white : Color.clear; 
+                }
+                if (data.bgmID != BgmID.None)
+                {
+                    prevBgmID = SoundManager.Instance.CurrentBgmID;
+                    SoundManager.Instance.PlayBGM(data.bgmID);
+                }
             }
+            
 
             // 모든 하위 패널 끄기
             if(buyUI != null) buyUI.gameObject.SetActive(false);
@@ -173,7 +190,18 @@ namespace UI.Shop
 
         private void ExitShop()
         {
+            if (SoundManager.Instance != null)
+            {
+                if (prevBgmID != BgmID.None)
+                    SoundManager.Instance.PlayBGM(prevBgmID);
+                else
+                    SoundManager.Instance.StopBGM();
+                
+            }
+
+            prevBgmID = BgmID.None;
             currentShopID = null;
+
             if (GameStateManager.Instance != null)
             {
                 GameStateManager.Instance.ChangeState(GameState.Exploration);

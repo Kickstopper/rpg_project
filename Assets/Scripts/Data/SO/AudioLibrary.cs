@@ -54,6 +54,13 @@ namespace Data
         Dungeon_17,
         Dungeon_18,
         WorldMap,
+        Intro,
+        WeaponShop,
+        ArmorShop,
+        ItemShop,
+        HealShop,
+        Laboatory,
+        Terminal
     }
 
     [CreateAssetMenu(fileName = "AudioLibrary", menuName = "Audio/AudioLibrary")]

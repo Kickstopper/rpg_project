@@ -7,6 +7,8 @@ namespace Data
     {
         [Header("기본 정보")]
         public string shopID;
+        public BgmID bgmID;
+        public Sprite BackgroundImage;
         public string displayName;
         public List<BaseItemData> itemsForSale;
     }

@@ -3225,7 +3225,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7747288089118911418
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3238,11 +3238,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 298638077285101063}
+  m_Father: {fileID: 7748157164710882827}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 150, y: 0}
+  m_AnchoredPosition: {x: 150, y: 65}
   m_SizeDelta: {x: 300, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8252225417941380057
@@ -4733,6 +4733,7 @@ RectTransform:
   - {fileID: 8847930889100419580}
   - {fileID: 378849557632652950}
   - {fileID: 298638077285101063}
+  - {fileID: 7747288089118911418}
   - {fileID: 5410696249917427121}
   - {fileID: 802761638862769788}
   - {fileID: 6875140371047799853}
@@ -7494,14 +7495,13 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7747288089118911418}
+  m_Children: []
   m_Father: {fileID: 7748157164710882827}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 65}
-  m_SizeDelta: {x: 1280, y: 350}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7111177505514984143
 CanvasRenderer:
@@ -7524,7 +7524,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5320754, g: 0.5320754, b: 0.5320754, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -14445,6 +14445,7 @@ MonoBehaviour:
   buyUI: {fileID: 3023393544994289930}
   sellUI: {fileID: 6148171760641134016}
   equipUI: {fileID: 5465954988499364355}
+  background: {fileID: 2104005309707494361}
   titleText: {fileID: 6523067480422386736}
   possessionText: {fileID: 4433477763293605809}
   moneyText: {fileID: 772640820556971747}

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2aff1049b94926438cd35a23e285b5a, type: 3}
+  m_Name: heal
+  m_EditorClassIdentifier: Assembly-CSharp::Data.ShopData
+  shopID: heal
+  bgmID: 31
+  BackgroundImage: {fileID: 1729840402284382006, guid: 70217d3118aedad4480191e67cd27a80, type: 3}
+  displayName: "\uD790 \uC2A4\uD31F"
+  itemsForSale:
+  - {fileID: 11400000, guid: 330701932e9dbd0448ca37746a7cb001, type: 2}
+  - {fileID: 11400000, guid: 3b422622809c5ef4c95092658d5096c6, type: 2}
+  - {fileID: 11400000, guid: a23f7ea7c299a5945b397900589d048a, type: 2}
+  - {fileID: 11400000, guid: cf8d97a6cbc9c01429b49ddd34f634c2, type: 2}
