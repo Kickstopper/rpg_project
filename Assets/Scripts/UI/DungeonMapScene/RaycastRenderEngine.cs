@@ -875,7 +875,7 @@ namespace UI.DungeonMapScene
             float invDet = 1.0f / (player.PlaneX * player.DirY - player.DirX * player.PlaneY);
             float horizon = _screenHeight / 2 - player.JumpOffset + player.Pitch;
 
-            Color32 baseDustColor = new Color32(220, 210, 180, 255);
+            Color32 baseDustColor = settings.dustColor;
             float t = settings.animTime;
             float verticalDir = settings.dustMovesUp ? -1f : 1f;
 

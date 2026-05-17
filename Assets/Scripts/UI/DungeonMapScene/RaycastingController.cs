@@ -738,19 +738,38 @@ namespace Controller
                 }
                 else
                 {
+                    CellData currentCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
                     CellData targetCell = _currentMap.GetCell(tx, ty);
-                    bool isVoidTile = (targetCell != null && targetCell.value == -1);
 
-                    if (!isVoidTile)
+                    int targetEnterFace = -1;
+                    int currentExitFace = -1;
+
+                    if (moveVec.x > 0)      { targetEnterFace = 3; currentExitFace = 1; } // 동쪽 이동
+                    else if (moveVec.x < 0) { targetEnterFace = 1; currentExitFace = 3; } // 서쪽 이동
+                    else if (moveVec.y > 0) { targetEnterFace = 2; currentExitFace = 0; } // 북쪽 이동
+                    else if (moveVec.y < 0) { targetEnterFace = 0; currentExitFace = 2; } // 남쪽 이동
+
+                    bool isBlockedByWall = false;
+
+                    // 현재 칸에서 나가는 내벽이 존재하는가?
+                    if (currentCell != null && currentExitFace != -1 && currentCell.HasWall() && currentCell.wallTextureIDs[currentExitFace] != -1)
+                        isBlockedByWall = true;
+                    // 진입하려는 칸의 외벽이 존재하는가?
+                    else if (targetCell != null && targetEnterFace != -1 && targetCell.HasWall() && targetCell.wallTextureIDs[targetEnterFace] != -1)
+                        isBlockedByWall = true;
+                    // 맵 경계선 바깥인가?
+                    else if (targetCell == null)
+                        isBlockedByWall = true;
+
+                    // 실제로 텍스처가 발라진 벽이거나 맵 경계일 때만 충돌 효과 발생
+                    if (isBlockedByWall)
                     {
-                        // 일반 벽일 경우에만 충돌 애니메이션과 사운드 재생
                         StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
                         SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                     }
                     else
                     {
-                        // 구멍(void) 앞에서는 아무런 피드백 없이 이동만 무시
-                        Debug.Log("Void tile ahead. Movement blocked silently.");
+                        // Void에 막힌 경우 무시
                     }
                 }
             }
