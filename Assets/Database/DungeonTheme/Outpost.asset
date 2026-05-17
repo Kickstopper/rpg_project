@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dungeonID: Base
   useWakeUpEffect: 0
-  encounterMode: 0
+  encounterMode: 1
   background: {fileID: 0}
   texture:
   - {fileID: 2800000, guid: b95212534e552a54a86c2c1746b0d32f, type: 3}
@@ -25,23 +25,48 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 62f50738d34f71e43b7c445b8e3fe4e0, type: 3}
   floorTexIdx: 4
   ceilingTexIdx: 5
-  enemySprites: []
+  enemySprites:
+  - {fileID: 1220384822, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
+  - {fileID: -1679923512, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
+  - {fileID: -1679923512, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
+  - {fileID: 1220384822, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
+  - {fileID: 106993151, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
+  - {fileID: 268489575, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
+  - {fileID: 1048007731, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
+  - {fileID: -786878360, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
   objectSprites: []
-  maxSpawnCount: 1
+  maxSpawnCount: 4
   spawnDelay: 10
   wallAnimations: []
   fogColor: {r: 0, g: 0, b: 0, a: 1}
   lightingIntensity: 3.5
-  useGridLighting: 0
+  useGridLighting: 1
   bgmID: 7
   moduleEnable: 1
-  monsterList: []
+  monsterList:
+  - 000
+  - 001
+  - 002
+  - 003
+  - 004
+  - 005
+  - 006
+  - 007
+  - 008
+  - 009
+  - 010
+  - 011
+  - 012
+  - 013
+  - 014
+  - 015
+  - 016
   useDustEffect: 1
   dustParticleCount: 100
   dustSwayAmplitude: 0.01
-  dustMovesUp: 1
+  dustMovesUp: 0
   useDustTwinkle: 1
-  dustTwinkleSpeed: 20
+  dustTwinkleSpeed: 10
   dustColor:
     serializedVersion: 2
     rgba: 4294901886
