@@ -2640,6 +2640,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: cf619bd0549a0c14e8faa4e25bda8b1a, type: 2}
   - {fileID: 11400000, guid: 0c64d724a5932604599af63022b8ef45, type: 2}
   - {fileID: 11400000, guid: 24efb401775c0cd46bdbd4a5c3c23c8d, type: 2}
+  - {fileID: 11400000, guid: b2b7dfb6ea2208849a68fe77518be867, type: 2}
+  - {fileID: 11400000, guid: 8e0eabb4bb8c43a4e8e097f26b40e393, type: 2}
+  - {fileID: 11400000, guid: 2c5f341167f380d4681f9fdf06776050, type: 2}
 --- !u!1 &1551108254
 GameObject:
   m_ObjectHideFlags: 0
@@ -2729,8 +2732,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allDungeons:
-  - {fileID: 11400000, guid: 88d4cd0ef2b60a04eaf1e025e8ebd18e, type: 2}
   - {fileID: 11400000, guid: c8b2d0b9da5a240459f5a54a14eeae32, type: 2}
+  - {fileID: 11400000, guid: 88d4cd0ef2b60a04eaf1e025e8ebd18e, type: 2}
   - {fileID: 11400000, guid: 61cd4570e47182647b174e1f3c15c4c3, type: 2}
   - {fileID: 11400000, guid: 095e49405ca1fbc4b8eecbd799e6c2a7, type: 2}
 --- !u!1 &1612805584
