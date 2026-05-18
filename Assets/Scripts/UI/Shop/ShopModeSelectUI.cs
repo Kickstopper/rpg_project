@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using Manager;
 using TMPro;
 using Data;
+using DG.Tweening;
 
 namespace UI.Shop
 {
@@ -19,6 +20,7 @@ namespace UI.Shop
         public TextMeshProUGUI possessionText;
         public TextMeshProUGUI moneyText;
         public TextMeshProUGUI totalPriceText;
+        public Image fadeOverlay;
         
         [Header("Mode Buttons")]
         public Button[] modeButtons; // 0: BUY, 1: SELL, 2: EQUIP
@@ -66,6 +68,7 @@ namespace UI.Shop
         public void OpenShop(string shopID)
         {
             currentShopID = shopID;
+
             ShopData data = ShopManager.Instance.GetShopData(shopID);
             if (data != null)
             {
@@ -84,7 +87,6 @@ namespace UI.Shop
                     SoundManager.Instance.PlayBGM(data.bgmID);
                 }
             }
-            
 
             // 모든 하위 패널 끄기
             if(buyUI != null) buyUI.gameObject.SetActive(false);
@@ -94,6 +96,13 @@ namespace UI.Shop
             UpdateTextUI();
             
             ChangeHighlight(0); // 초기 포커스는 BUY
+
+            if (fadeOverlay != null)
+            {
+                fadeOverlay.gameObject.SetActive(true);
+                fadeOverlay.color = Color.black;
+                fadeOverlay.DOFade(0, 1f).OnComplete(()=> fadeOverlay.gameObject.SetActive(false));
+            }
         }
 
         private void UpdateTextUI()
