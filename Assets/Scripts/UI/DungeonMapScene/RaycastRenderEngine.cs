@@ -1069,7 +1069,7 @@ namespace UI.DungeonMapScene
                             if (isEnemy) col = GetEnemySpritePixelFast(idOrIdx, texX, texY);
                             else         col = GetObjectSpritePixelFast(idOrIdx, texX, texY);
                             
-                            if (col.a > 0) // 투명색이 아니면 그리기
+                            if (col.a == 255) 
                             {
                                 if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
 
