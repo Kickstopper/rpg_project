@@ -26,14 +26,14 @@ MonoBehaviour:
   floorTexIdx: 4
   ceilingTexIdx: 5
   enemySprites:
-  - {fileID: 1220384822, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
-  - {fileID: -1679923512, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
-  - {fileID: -1679923512, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
-  - {fileID: 1220384822, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
-  - {fileID: 106993151, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
-  - {fileID: 268489575, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
-  - {fileID: 1048007731, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
-  - {fileID: -786878360, guid: 5bbcb3b52de218a47bfea33e2ed5a509, type: 3}
+  - {fileID: 21300000, guid: b29ac828bb8d5204791056d1574c2550, type: 3}
+  - {fileID: 21300000, guid: 0e0c687bfb6fdc84d875547b14420a07, type: 3}
+  - {fileID: 21300000, guid: db6227537a8ea43499c4deada0449d3e, type: 3}
+  - {fileID: 21300000, guid: 7458706a6be8c5542aaaa5e1c1d34f3d, type: 3}
+  - {fileID: 21300000, guid: b29ac828bb8d5204791056d1574c2550, type: 3}
+  - {fileID: 21300000, guid: 0e0c687bfb6fdc84d875547b14420a07, type: 3}
+  - {fileID: 21300000, guid: b29ac828bb8d5204791056d1574c2550, type: 3}
+  - {fileID: 21300000, guid: 0e0c687bfb6fdc84d875547b14420a07, type: 3}
   objectSprites: []
   maxSpawnCount: 4
   spawnDelay: 10
