@@ -131,7 +131,16 @@ namespace UI.Battle
             baseStats = currentTarget.sourceData.stats; 
             allocatedStats = new StatData(); 
 
-            if (currentTarget.portraitImage != null) portraitImage.sprite = currentTarget.portraitImage.sprite;
+            if (portraitImage != null && currentTarget.sourceData != null)
+            {
+                var dbEntry = PartyManager.Instance.charDB.GetEntry(currentTarget.sourceData.characterId);
+                if (dbEntry != null && dbEntry.portraitImage != null)
+                {
+                    portraitImage.sprite = dbEntry.portraitImage;
+                    portraitImage.color = Color.white;
+                }
+                else portraitImage.color = Color.clear;
+            }
             nameText.text = currentTarget.entityName;
             levelText.text = $"LV {oldLevel} -> {currentTarget.sourceData.stats.level}";
             

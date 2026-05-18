@@ -21,6 +21,7 @@ namespace Data.Database
             
             [Header("Visual")]
             public Sprite portraitImage;
+            public Sprite battlePortraitImg;
             public Sprite standingImage;
 
             [Header("Battle Stats")]

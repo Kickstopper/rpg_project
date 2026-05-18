@@ -503,7 +503,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SPIRIT
+  m_text: ...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
   m_sharedMaterial: {fileID: -8397786257170836654, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
@@ -1079,10 +1079,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 8212734689680213695}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 161, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7946820384444812868
 CanvasRenderer:
@@ -1527,11 +1527,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4597483499601251032}
+  - {fileID: 3655786321339362506}
   - {fileID: 1826705599877998822}
   - {fileID: 2681142165424591048}
   - {fileID: 2948649554449318855}
   - {fileID: 7831869540627125776}
-  - {fileID: 3655786321339362506}
   - {fileID: 4544698828093742712}
   - {fileID: 1773345737991372649}
   - {fileID: 6168192919716885738}
@@ -1610,6 +1610,10 @@ MonoBehaviour:
   isMagicReflect: 0
   isPhysicalAbsorb: 0
   isMagicAbsorb: 0
+  buffPhysAtk: 0
+  buffMagAtk: 0
+  buffPhysDef: 0
+  buffMagDef: 0
   expTable: {fileID: 11400000, guid: 0a109a7319f60bb47bb30d455147ed4f, type: 2}
   bgImage: {fileID: 3565750124405715318}
   portraitImage: {fileID: 4412860075172480683}
@@ -1625,7 +1629,7 @@ MonoBehaviour:
   selectButton: {fileID: 0}
   sourceData:
     characterId: 
-    isParty: 0
+    isRegular: 0
     name: 
     race: 0
     gender: 0
