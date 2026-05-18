@@ -2537,7 +2537,6 @@ namespace Controller
                     Debug.Log($"[Union] {p.name}의 Next 속도 보너스 상쇄 (+50 적용)");
                 }
             }
-            
 
             uiController.ShowLog("UNION ATTACK!");
             SoundManager.Instance.PlaySFX(SfxID.Attack_Sword);
@@ -2545,7 +2544,7 @@ namespace Controller
             // 애니메이션: 타겟 앞으로 모이기
             GameObject target = action.target;
             Vector3 targetBasePos = target.transform.position;
-            Vector3 rallyPoint = targetBasePos + new Vector3(0, -0.9f, 0); 
+            Vector3 rallyPoint = targetBasePos + new Vector3(0, 0.9f, 0); 
 
             Dictionary<PlayerController, Vector3> originPositions = new Dictionary<PlayerController, Vector3>();
             Sequence moveSeq = DOTween.Sequence();

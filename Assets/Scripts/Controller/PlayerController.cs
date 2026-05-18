@@ -26,14 +26,14 @@ namespace Controller
         public TextMeshProUGUI messageText;
         public TextMeshProUGUI nameText;         // 이름 텍스트
         public TextMeshProUGUI alignText;        // 성향
-        public TextMeshProUGUI spiritText;       // 빙의한 신의 이름
+        public TextMeshProUGUI resonanceText;       // 빙의한 신의 이름
         public GameObject dim;
 
         public Button selectButton;
         
         [Header("Runtime Data")]
         public RuntimeCharacterData sourceData; // 캐릭터의 고유 데이터
-        public SpiritData spiritData;
+        public ResonanceData resonanceData;
         public StatData currentStats; // 캐릭터 단독 또는 캐릭터와 스피릿의 융합 스탯
         public ResistanceData resist; // 캐릭터 단독 또는 캐릭터와 스피릿의 융합 내성
 
@@ -118,7 +118,7 @@ namespace Controller
             currentAmmo = null;
             currentGunAmmo = 0;
 
-            spiritData = null;
+            resonanceData = null;
             
             // 그래픽 숨기기 (스프라이트, UI 등)
             UpdateUI();
@@ -144,19 +144,19 @@ namespace Controller
             this.entityName = runtimeData.name;
             this.gameObject.name = entityName;
 
-            this.spiritData = DatabaseManager.Instance.GetSpirit(runtimeData.spiritId);
+            this.resonanceData = DatabaseManager.Instance.GetResonance(runtimeData.resonanceId);
 
             // 데이터 융합
-            if (this.spiritData != null)
+            if (this.resonanceData != null)
             {
                 // 스탯 평균화
-                this.currentStats = CalculateAverageStats(runtimeData.stats, spiritData.stats);
+                this.currentStats = CalculateAverageStats(runtimeData.stats, resonanceData.stats);
                 
                 // 성향 평균화
-                this.align = AlignmentSystem.GetAverageAlign(runtimeData.align, spiritData.align);
+                this.align = AlignmentSystem.GetAverageAlign(runtimeData.align, resonanceData.align);
 
                 // 스킬 합치기
-                this.learnedSkillIds = runtimeData.learnedSkills.Union(spiritData.skills.Select(s => s.id)).ToList();
+                this.learnedSkillIds = runtimeData.learnedSkills.Union(resonanceData.skills.Select(s => s.id)).ToList();
 
                 // 내성 합치기
                 this.resist = runtimeData.resistances;
@@ -213,16 +213,16 @@ namespace Controller
 
         
         // 스피릿과 캐릭터의 스탯을 하나로
-        private StatData CalculateAverageStats(StatData charStats, StatData spiritStats)
+        private StatData CalculateAverageStats(StatData charStats, StatData resonanceStats)
         {
             StatData result = new StatData();
-            result.level = Mathf.CeilToInt((charStats.level + spiritStats.level) / 2f);
-            result.str = charStats.str + spiritStats.str;
-            result.mag = charStats.mag + spiritStats.mag;
-            result.intel = charStats.intel + spiritStats.intel;
-            result.vit = charStats.vit + spiritStats.vit;
-            result.agi = charStats.agi + spiritStats.agi;
-            result.luc = charStats.luc + spiritStats.luc;
+            result.level = Mathf.CeilToInt((charStats.level + resonanceStats.level) / 2f);
+            result.str = charStats.str + resonanceStats.str;
+            result.mag = charStats.mag + resonanceStats.mag;
+            result.intel = charStats.intel + resonanceStats.intel;
+            result.vit = charStats.vit + resonanceStats.vit;
+            result.agi = charStats.agi + resonanceStats.agi;
+            result.luc = charStats.luc + resonanceStats.luc;
 
             return result;
         }
@@ -529,7 +529,7 @@ namespace Controller
                     nameText.alignment = TextAlignmentOptions.Center;
                 }
                 if (alignText) alignText.text = string.Empty;
-                if (spiritText) spiritText.text = string.Empty;
+                if (resonanceText) resonanceText.text = string.Empty;
                 if (portraitImage) portraitImage.gameObject.SetActive(false);
             }
             else
@@ -538,7 +538,7 @@ namespace Controller
                 if (messagePanel) messagePanel.SetActive(true);
                 if (messageText) messageText.SetText(string.Empty);
                 if (alignText) alignText.text = AlignmentSystem.GetAlignString(align);
-                if (spiritText && spiritData) spiritText.text = spiritData.entityName;
+                if (resonanceText && resonanceData) resonanceText.text = resonanceData.entityName;
 
                 if (hpSlider)
                 {

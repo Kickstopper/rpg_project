@@ -2767,7 +2767,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4486274242651986361}
   m_Layer: 5
-  m_Name: Spirit
+  m_Name: Resonance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7816,7 +7816,7 @@ GameObject:
   - component: {fileID: 4875891093686302185}
   - component: {fileID: 5429829400958281493}
   m_Layer: 5
-  m_Name: SpiritStatusUI
+  m_Name: ResonanceStatusUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8605,7 +8605,7 @@ GameObject:
   - component: {fileID: 4130106516962418400}
   - component: {fileID: 4208858728872639059}
   m_Layer: 5
-  m_Name: SpiritBtn
+  m_Name: ResonanceBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11252,7 +11252,7 @@ GameObject:
   - component: {fileID: 7071684940384367234}
   - component: {fileID: 4129129028838700273}
   m_Layer: 5
-  m_Name: Spirit_Value
+  m_Name: Resonance_Value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19312,8 +19312,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 105, y: 0}
+  m_SizeDelta: {x: -210, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8571256514573390530
 CanvasRenderer:
@@ -20610,7 +20610,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SPIRIT VIEW
+  m_text: RESONANCE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
   m_sharedMaterial: {fileID: -8397786257170836654, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
@@ -20730,8 +20730,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Controller.StatusUIController
   menuController: {fileID: 6372555989440531804}
-  spiritStatusUI: {fileID: 1585794175825012446}
-  spiritUIController: {fileID: 2270245509925146839}
+  resonanceStatusUI: {fileID: 1585794175825012446}
+  resonanceUIController: {fileID: 2270245509925146839}
   nameText: {fileID: 569761228495279163}
   portraitImage: {fileID: 6520894775591693226}
   statusFxText: {fileID: 6184438089604036667}
@@ -20745,7 +20745,7 @@ MonoBehaviour:
   expText: {fileID: 3619769776164485702}
   nextExpText: {fileID: 3907004482542077186}
   alignText: {fileID: 7019412021913538321}
-  spiritText: {fileID: 4129129028838700273}
+  resonanceText: {fileID: 6316774081580833666}
   hpSlider: {fileID: 1773495482860831869}
   hpText: {fileID: 1532295464551333766}
   mpSlider: {fileID: 692620176659827601}
@@ -23864,7 +23864,7 @@ GameObject:
   - component: {fileID: 2152934806211938063}
   - component: {fileID: 6674331912288037003}
   m_Layer: 5
-  m_Name: Spirit_Value
+  m_Name: Resonance_Value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25395,6 +25395,82 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &5015358836289148263
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7747408840877479954}
+  - component: {fileID: 479035694277314419}
+  - component: {fileID: 4717189895499917955}
+  m_Layer: 5
+  m_Name: PortraitPanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7747408840877479954
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015358836289148263}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2115652744914784474}
+  m_Father: {fileID: 3258951698623536042}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 135, y: 180}
+  m_SizeDelta: {x: 200, y: 300}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &479035694277314419
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015358836289148263}
+  m_CullTransparentMesh: 1
+--- !u!114 &4717189895499917955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015358836289148263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 2100000, guid: c353a16545e5f964794ba996f7d41590, type: 2}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 0
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 02109635d1342c6419e12a01ed2bff41, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &5055261247379035814
 GameObject:
   m_ObjectHideFlags: 0
@@ -25679,7 +25755,7 @@ GameObject:
   - component: {fileID: 4761207295146144901}
   - component: {fileID: 6316774081580833666}
   m_Layer: 5
-  m_Name: SpiritName
+  m_Name: ResonantName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25732,7 +25808,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SPIRIT_NAME
+  m_text: RESONANT_NAME
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
   m_sharedMaterial: {fileID: -8397786257170836654, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
@@ -27974,7 +28050,7 @@ GameObject:
   - component: {fileID: 6599482969619416558}
   - component: {fileID: 2270245509925146839}
   m_Layer: 5
-  m_Name: SpiritStatusController
+  m_Name: ResonanceStatusController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29197,7 +29273,6 @@ GameObject:
   - component: {fileID: 3258951698623536042}
   - component: {fileID: 8735252868217478266}
   - component: {fileID: 3777731095167549062}
-  - component: {fileID: 5131599963784609066}
   m_Layer: 5
   m_Name: StatusUI
   m_TagString: Untagged
@@ -29217,7 +29292,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2115652744914784474}
+  - {fileID: 7747408840877479954}
   - {fileID: 7902677105741319761}
   - {fileID: 2400598462476114440}
   - {fileID: 703524278703699936}
@@ -29256,15 +29331,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
+  m_Sprite: {fileID: 21300000, guid: 1c7e58a605754df43967f3642e6d53f3, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -29272,21 +29347,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5131599963784609066
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5832497569709580542}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 641636adc6943794582897dbbbd8a10f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UI.SimpleGradient
-  colorLeft: {r: 0, g: 0, b: 0, a: 1}
-  colorRight: {r: 0, g: 0.02745098, b: 0.7058824, a: 1}
-  m_Angle: -90
 --- !u!1 &5846144394277514368
 GameObject:
   m_ObjectHideFlags: 0
@@ -30395,7 +30455,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SPIRIT
+  m_text: RESONA
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
   m_sharedMaterial: {fileID: -8397786257170836654, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
@@ -31228,12 +31288,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2614862818964238837}
-  m_Father: {fileID: 3258951698623536042}
+  m_Father: {fileID: 7747408840877479954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 135, y: -224}
-  m_SizeDelta: {x: 190, y: 220}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6689140800815238802
 CanvasRenderer:
@@ -31257,9 +31317,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -36632,7 +36692,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3606934830909974852}
   m_Layer: 5
-  m_Name: Spirit
+  m_Name: Resonance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -40063,7 +40123,7 @@ GameObject:
   - component: {fileID: 769083733946530729}
   - component: {fileID: 1915586720791402955}
   m_Layer: 5
-  m_Name: SpiritViewBtn
+  m_Name: ResonanceViewBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41582,7 +41642,7 @@ GameObject:
   - component: {fileID: 4011443443660254304}
   - component: {fileID: 5658249174685652673}
   m_Layer: 5
-  m_Name: Spirit_Text
+  m_Name: Resonance_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41635,7 +41695,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SPIRIT
+  m_text: RESONANCE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
   m_sharedMaterial: {fileID: -8397786257170836654, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
@@ -43584,7 +43644,7 @@ GameObject:
   - component: {fileID: 3350123368760587046}
   - component: {fileID: 1277753500189763547}
   m_Layer: 5
-  m_Name: Spirit_Text
+  m_Name: Resonance_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43637,7 +43697,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SPIRIT
+  m_text: RESONANCE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
   m_sharedMaterial: {fileID: -8397786257170836654, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}

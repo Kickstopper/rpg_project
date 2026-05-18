@@ -13,7 +13,7 @@ namespace Manager
         public ArmorDatabase armorDB;
         public SkillDatabase skillDB;
         public ConsumableDatabase cosumableDB;
-        public SpiritDatabase spiritDB;
+        public ResonanceDatabase spiritDB;
 
         void Awake()
         {
@@ -59,6 +59,6 @@ namespace Manager
         public ArmorData GetArmor(string id) => armorDB.GetItem(id);
         public SkillData GetSkill(string id) => skillDB.GetItem(id);
         public ConsumableItemData GetConsumable(string id) => cosumableDB.GetItem(id);
-        public SpiritData GetSpirit(string id) => spiritDB.GetData(id);
+        public ResonanceData GetResonance(string id) => spiritDB.GetData(id);
     }
 }

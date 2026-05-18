@@ -31,7 +31,7 @@ namespace Data
 
         public StatusEffect statusEffect;
 
-        public string spiritId;
+        public string resonanceId;
 
         public StatData stats;
         public ResistanceData resistances;
@@ -69,7 +69,7 @@ namespace Data
             if (System.Enum.TryParse(save.row, out RowType parsedRow)) row = parsedRow;
             if (System.Enum.TryParse(save.column, out ColumnType parsedCol)) column = parsedCol;
 
-            spiritId = save.spiritId;
+            resonanceId = save.resonanceId;
 
             stats = save.stats;
             resistances = save.resistances;
@@ -92,7 +92,7 @@ namespace Data
             characterId = entry.id;
             name = entry.name;
             align = entry.align;
-            spiritId = entry.spiritId;
+            resonanceId = entry.resonanceId;
             stats = entry.stats;
             resistances = entry.resistances;
             isCommander = entry.isCommander;
@@ -121,7 +121,7 @@ namespace Data
 
             data.characterId = this.characterId;
             data.name = this.name;
-            data.spiritId = this.spiritId;
+            data.resonanceId = this.resonanceId;
             data.align = this.align.ToString();
             
             data.weaponId = this.equippedWeaponId;

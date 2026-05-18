@@ -7,8 +7,8 @@ using UnityEditor;
 
 namespace Data
 {
-    [CreateAssetMenu(fileName = "Spirit", menuName = "RPG/Spirit")]
-    public class SpiritData : ScriptableObject
+    [CreateAssetMenu(fileName = "Resonance", menuName = "RPG/Resonance")]
+    public class ResonanceData : ScriptableObject
     {
         public Sprite portraitImage;
         public string id;
@@ -32,14 +32,14 @@ namespace Data
 
             // [자동 ID 생성 로직]
 #if UNITY_EDITOR
-            string[] guids = AssetDatabase.FindAssets("t:SpiritData");
+            string[] guids = AssetDatabase.FindAssets("t:ResonanceData");
             
             int nextCount = guids.Length; 
 
             // ID 포맷팅. 숫자를 3자리로 맞춤
-            id = $"spirit_{nextCount:D3}";
+            id = $"resonance_{nextCount:D3}";
             
-            entityName = $"Spirit {nextCount}";
+            entityName = $"Resonance {nextCount}";
 #endif
         }
     }

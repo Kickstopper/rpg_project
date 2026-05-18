@@ -73,7 +73,7 @@ namespace Data
 
         public string align;
 
-        public string spiritId;
+        public string resonanceId;
 
         public string row;
         public string column;

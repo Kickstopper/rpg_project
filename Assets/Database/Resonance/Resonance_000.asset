@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0347f80ab29208248bdd1838e8310914, type: 3}
-  m_Name: Spirit_005
+  m_Name: Resonance_000
   m_EditorClassIdentifier: Assembly-CSharp::Data.SpiritData
   portraitImage: {fileID: 0}
-  id: spirit_005
-  entityName: "\uB9C8\uB77C"
-  align: 9
+  id: resonance_000
+  entityName: "\uC544\uB9C8\uD14C\uB77C\uC2A4"
+  align: 2
   stats:
     level: 1
     str: 3
@@ -32,4 +32,8 @@ MonoBehaviour:
     force: 0
     psyche: 0
   skills:
-  - {fileID: 11400000, guid: becb6811a251c3e4795ae36031685cc4, type: 2}
+  - {fileID: 11400000, guid: cdecffb0e5e703a43ae88e56283a50c8, type: 2}
+  - {fileID: 11400000, guid: 82eaa2f43f0a9714ebafe8cc542cccba, type: 2}
+  - {fileID: 11400000, guid: 94d7658448eedfe41b6db430006104f0, type: 2}
+  - {fileID: 11400000, guid: e4ae321848eab4d43b059e66f20932a0, type: 2}
+  - {fileID: 11400000, guid: 500609528e33f2948be5383f1aeae371, type: 2}

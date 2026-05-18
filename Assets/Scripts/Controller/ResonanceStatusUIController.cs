@@ -7,7 +7,7 @@ using UI.Common;
 
 namespace Controller
 {
-    public class SpiritStatusUIController : MonoBehaviour
+    public class ResonanceStatusUIController : MonoBehaviour
     {
         public StatusUIController charStatusController;
 
@@ -54,7 +54,7 @@ namespace Controller
         {
             if (charStatusController != null)
             {
-                charStatusController.CloseSpiritStatusUI();
+                charStatusController.CloseResonanceStatusUI();
             }
         }
 
@@ -63,7 +63,7 @@ namespace Controller
             Close();
         }
 
-        public void Initialze(SpiritData data)
+        public void Initialze(ResonanceData data)
         {
             UpdatePortraitImage(data);
 
@@ -92,7 +92,7 @@ namespace Controller
             UpdateSkillList(data.skills);
         }
 
-        private void UpdatePortraitImage(SpiritData data)
+        private void UpdatePortraitImage(ResonanceData data)
         {
             if (data == null || data.portraitImage == null) return;
 

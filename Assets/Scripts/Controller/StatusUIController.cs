@@ -12,8 +12,8 @@ namespace Controller
     public class StatusUIController : MonoBehaviour
     {
         public PlayerMenuController menuController;
-        public GameObject spiritStatusUI;
-        public SpiritStatusUIController spiritUIController;
+        public GameObject resonanceStatusUI;
+        public ResonanceStatusUIController resonanceUIController;
 
         [Header("Header Info")]
         public TextMeshProUGUI nameText;
@@ -30,7 +30,7 @@ namespace Controller
         public TextMeshProUGUI expText;
         public TextMeshProUGUI nextExpText;
         public TextMeshProUGUI alignText;
-        public TextMeshProUGUI spiritText;
+        public TextMeshProUGUI resonanceText;
 
         [Header("Vitals (Slider + Text)")]
         public Slider hpSlider;
@@ -64,7 +64,7 @@ namespace Controller
         private List<RuntimeCharacterData> partyMembers;
         private int currentIndex = 0;
 
-        private bool hasSpirit;
+        private bool hasresonance;
 
         void OnEnable()
         {
@@ -79,7 +79,7 @@ namespace Controller
 
         void Update()
         {
-            if (spiritStatusUI.activeSelf) return;
+            if (resonanceStatusUI.activeSelf) return;
             HandleInput();
         }
 
@@ -110,7 +110,7 @@ namespace Controller
                 ChangeCharacter(1);
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) ShowSpiritStatusUI();
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) ShowresonanceStatusUI();
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
@@ -135,29 +135,29 @@ namespace Controller
             RefreshUI();
         }
 
-        private void ShowSpiritStatusUI()
+        private void ShowresonanceStatusUI()
         {
-            if (spiritStatusUI)
+            if (resonanceStatusUI)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Click);
-                spiritStatusUI.SetActive(true);
+                resonanceStatusUI.SetActive(true);
             }
             else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             
         }
 
-        public void CloseSpiritStatusUI()
+        public void CloseResonanceStatusUI()
         {
-            if (spiritStatusUI)
+            if (resonanceStatusUI)
             {
-                spiritStatusUI.SetActive(false);
+                resonanceStatusUI.SetActive(false);
             }
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
 
-        public void OnClick_SpiritViewButton()
+        public void OnClick_ResonanceViewButton()
         {
-            ShowSpiritStatusUI();
+            ShowresonanceStatusUI();
         }
 
         private void RefreshUI()
@@ -214,18 +214,18 @@ namespace Controller
             magPowText.text = charData.GetMagicPower().ToString(); // 마법 위력
             magFxText.text = charData.GetMagicEffect().ToString(); // 마법 효과(명중률 등)
 
-            // Spirit 및 Skills (ScrollView 갱신)
+            // resonance 및 Skills (ScrollView 갱신)
             List<string> skills = new(charData.learnedSkills);
-            if (!string.IsNullOrEmpty(charData.spiritId))
+            if (!string.IsNullOrEmpty(charData.resonanceId))
             {
-                SpiritData spirit = DatabaseManager.Instance.GetSpirit(charData.spiritId);
-                if (spirit != null)
+                ResonanceData resonance = DatabaseManager.Instance.GetResonance(charData.resonanceId);
+                if (resonance != null)
                 {
-                    hasSpirit = true;
-                    spiritUIController.Initialze(spirit);
-                    spiritText.text = spirit.entityName;
-                    // List<SkillData> spiritSkills = spirit.skills;
-                    // foreach(var skill in spiritSkills)
+                    hasresonance = true;
+                    resonanceUIController.Initialze(resonance);
+                    resonanceText.text = resonance.entityName;
+                    // List<SkillData> resonanceSkills = resonance.skills;
+                    // foreach(var skill in resonanceSkills)
                     // {
                     //     if (!skills.Contains(skill.id))
                     //     {
@@ -233,9 +233,9 @@ namespace Controller
                     //     }
                     // }
                 }
-                else hasSpirit = false;
+                else hasresonance = false;
             }
-            else hasSpirit = false;
+            else hasresonance = false;
             UpdateSkillList(skills);
         }
 

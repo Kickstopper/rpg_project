@@ -11,7 +11,7 @@ namespace Data.Database
             public string id;
             public string name;
 
-            public string spiritId;
+            public string resonanceId;
             
             public ExpTable expTable;
             public int exp;

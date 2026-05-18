@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 708931218f786bc4382253260b58e5da, type: 3}
-  m_Name: SpiritDatabase
+  m_Name: ResonanceDatabase
   m_EditorClassIdentifier: Assembly-CSharp::Data.Database.SpiritDatabase
   db:
   - {fileID: 11400000, guid: f3692344d0c57754eba4af9ad188d841, type: 2}
