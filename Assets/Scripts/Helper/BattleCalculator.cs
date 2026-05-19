@@ -241,6 +241,16 @@ namespace Helper
             return Mathf.FloorToInt((level * level * 10f) + 15f); 
         }
 
+        public static int GetMaxHP(int level, int str, int vit)
+        {
+            return ((str + vit) * (level + 1)) / 4 + 14;
+        }
+
+        public static int GetMaxMP(int level, int mag, int intel)
+        {
+            return  ((mag + intel) * (level + 4)) / 8 + 4;
+        }
+
         public static float GetResistanceValue(BaseRootData data, ResistanceData resist) { return 0f; }
         public static bool IsAlignCompatible(Align a, Align b) { return a == b || a == Align.True_Neutral || b == Align.True_Neutral; }
         public static void GetPositionalModifiers(BattleFieldController.BattlePosition atkPos, BattleFieldController.BattlePosition defPos, WeaponType wType, out float damageMultiplier, out float evasionBonus) { damageMultiplier=1f; evasionBonus=0f; }

@@ -229,8 +229,8 @@ namespace Controller
 
         private void InitializeStats()
         {
-            this.maxHp = ((GetTotalStr() + GetTotalVit()) * (level + 1)) / 4 + 14;
-            this.maxMp = ((GetTotalMag() + GetTotalInt()) * (level + 4)) / 8 + 4;
+            this.maxHp = BattleCalculator.GetMaxHP(level, GetTotalStr(), GetTotalVit());
+            this.maxMp = BattleCalculator.GetMaxMP(level, GetTotalMag(), GetTotalInt());
         }
         
         // 회복 함수
