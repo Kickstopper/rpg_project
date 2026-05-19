@@ -30,10 +30,6 @@ namespace UI.CharacterCreationScene
 
         private CreationStep currentStep = CreationStep.PlayerName;
         
-        // 저장될 캐릭터 데이터
-        private StatData playerStats;
-        private StatData partnerStats;
-
         private void Start()
         {
             UpdateStep(CreationStep.PlayerName);
@@ -65,17 +61,18 @@ namespace UI.CharacterCreationScene
                 case CreationStep.PlayerStats:
                     nameInputPanel.SetActive(false);
                     levelUpUI.LeveUpUI.SetActive(true);
+
+                    SetCharacterStats(PartyID.CHARACTER_00, CreateBaseStat(5)); // 주인공 기본 스탯 저장
                     // 스탯 보너스 포인트 15
                     levelUpUI.ShowForCreation(PartyID.CHARACTER_00, 15, OnPlayerStatsConfirmed);
                     break;
 
                 case CreationStep.PartnerStats:
-                    SetCharacterStats(PartyID.CHARACTER_00, playerStats); // 플레이어 스탯 저장
+                    SetCharacterStats(PartyID.CHARACTER_01, CreateBaseStat(5)); // 히로인 기본 스탯 저장
                     levelUpUI.ShowForCreation(PartyID.CHARACTER_01, 15, OnPartnerStatsConfirmed);
                     break;
 
                 case CreationStep.Done:
-                    SetCharacterStats(PartyID.CHARACTER_01, partnerStats); // 히로인 스탯 저장
                     TransitionToNextScene();
                     break;
             }
@@ -139,13 +136,13 @@ namespace UI.CharacterCreationScene
 
         private void OnPlayerStatsConfirmed(StatData finalStats)
         {
-            playerStats = finalStats;
+            SetCharacterStats(PartyID.CHARACTER_00, finalStats); // 플레이어 최종 스탯 저장
             UpdateStep(CreationStep.PartnerStats);
         }
 
         private void OnPartnerStatsConfirmed(StatData finalStats)
         {
-            partnerStats = finalStats;
+            SetCharacterStats(PartyID.CHARACTER_01, finalStats); // 히로인 최종 스탯 저장
             UpdateStep(CreationStep.Done);
         }
 
@@ -153,6 +150,7 @@ namespace UI.CharacterCreationScene
         {
             return new StatData
             {
+                level = 1,
                 str = baseValue, mag = baseValue, intel = baseValue,
                 vit = baseValue, agi = baseValue, luc = baseValue
             };

@@ -42,9 +42,9 @@ namespace Data
             data.isRegular = true;
             data.row = RowType.Front;
             data.resistances = new ResistanceData();
-            data.stats = new StatData(){ level = 1, str = 3, vit = 3, mag = 3, agi = 3, intel = 3, luc = 3};
-            data.currentHp = data.maxHp = data.stats.vit * 10; 
-            data.currentMp = data.maxMp = data.stats.mag * 5;
+            data.stats = new StatData(){ level = 1, str = 5, vit = 5, mag = 5, agi = 5, intel = 5, luc = 5};
+            data.currentHp = data.maxHp = 0; 
+            data.currentMp = data.maxMp = 0;
             return data;
         }
 

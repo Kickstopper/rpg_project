@@ -41,16 +41,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BlurAmount: 0
+    - _BlurAmount: 0.0011
     - _Brightness: 1.4
-    - _Curvature: 0
+    - _Curvature: 0.008
     - _DotIntensity: 0
     - _DotSize: 0
     - _EnableExternalAlpha: 0
     - _ScanlineIntensity: 0.3
     - _ScanlineSize: 128
     - _VignetteSize: 0.9
-    - _VignetteSmooth: 0.5
+    - _VignetteSmooth: 0.6
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}

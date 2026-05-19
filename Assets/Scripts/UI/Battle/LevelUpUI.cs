@@ -90,22 +90,23 @@ namespace UI.Battle
             isCreationMode = true;
             LeveUpUI.SetActive(true);
             
-            var dbEntry = PartyManager.Instance.charDB.GetEntry(characterID);
+            var characterData = PartyManager.Instance.GetCharacterByID(characterID);
 
             this.onCreationFinished = onFinished;
             this.availablePoints = bonusPoints;
             
             // 데이터 복사 및 초기화
-            this.baseStats = dbEntry.stats;
+            this.baseStats = characterData.stats;
             this.allocatedStats = new StatData(); 
 
             // UI 텍스트 초기화
-            nameText.text = dbEntry.name;
-            levelText.text = $"LV{dbEntry.stats.level}";
+            nameText.text = characterData.name;
+            levelText.text = $"LV{characterData.stats.level}";
             nextExpText.text = "";
             if (portraitImage != null)
             {
-                if (dbEntry.portraitImage != null)
+                var dbEntry = PartyManager.Instance.charDB.GetEntry(characterID);
+                if (dbEntry != null && dbEntry.portraitImage != null)
                 {
                     portraitImage.sprite = dbEntry.portraitImage;
                     portraitImage.color = Color.white;
@@ -113,7 +114,7 @@ namespace UI.Battle
                 else portraitImage.color = Color.clear;
             }
             
-            int nextExp = BattleCalculator.GetMaxExpForLevel(dbEntry.stats.level);
+            int nextExp = BattleCalculator.GetMaxExpForLevel(baseStats.level);
             nextExpText.text = $"NEXT EXP {nextExp}";
 
             // 스킬 리스트 비우기
@@ -395,8 +396,12 @@ namespace UI.Battle
 
             if (pointsText) pointsText.text = $"POINTS: {availablePoints}";
 
-            int previewMaxHp = (baseStats.vit + allocatedStats.vit) * 20;
-            int previewMaxMp = (baseStats.mag + allocatedStats.mag) * 30;
+            int previewMaxHp = BattleCalculator.GetMaxHP(baseStats.level, 
+                                                         baseStats.str + allocatedStats.str,
+                                                         baseStats.vit + allocatedStats.vit);
+            int previewMaxMp = BattleCalculator.GetMaxMP(baseStats.level,
+                                                         baseStats.mag + allocatedStats.mag,
+                                                         baseStats.intel + allocatedStats.intel);
 
             hpText.text = $"HP {previewMaxHp}/{previewMaxHp}";
             mpText.text = $"MP {previewMaxMp}/{previewMaxMp}";
@@ -652,6 +657,7 @@ namespace UI.Battle
                 // 생성 모드일 경우 델리게이트로 최종 할당된 스탯만 전달 후 UI 종료
                 StatData finalStats = new StatData
                 {
+                    level = baseStats.level,
                     str = baseStats.str + allocatedStats.str,
                     mag = baseStats.mag + allocatedStats.mag,
                     intel = baseStats.intel + allocatedStats.intel,

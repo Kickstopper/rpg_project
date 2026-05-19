@@ -15,7 +15,7 @@ MonoBehaviour:
   entries:
   - id: chr_00
     name: "\uC8FC\uC778\uACF5"
-    spiritId: 
+    resonanceId: 
     expTable: {fileID: 11400000, guid: 0a109a7319f60bb47bb30d455147ed4f, type: 2}
     exp: 0
     isCommander: 1
@@ -23,15 +23,15 @@ MonoBehaviour:
     portraitImage: {fileID: 21300000, guid: e939083112817ed4b99752bde680182c, type: 3}
     battlePortraitImg: {fileID: 21300000, guid: 10f457f2662bead40babb49ee64f4a74, type: 3}
     standingImage: {fileID: 0}
-    align: 2
+    align: 5
     stats:
-      level: 2
-      str: 3
-      mag: 3
-      intel: 3
-      vit: 3
-      agi: 3
-      luc: 3
+      level: 1
+      str: 5
+      mag: 5
+      intel: 5
+      vit: 5
+      agi: 5
+      luc: 5
     resistances:
       phys: 1
       fire: 0
@@ -49,11 +49,11 @@ MonoBehaviour:
     - hands_000
     - legs_000
     - acc_000
-    maxHp: 60
-    maxMp: 60
+    maxHp: 0
+    maxMp: 0
   - id: chr_01
     name: "\uD30C\uD2B8\uB108"
-    spiritId: 
+    resonanceId: 
     expTable: {fileID: 11400000, guid: 29b10d8d523d03547bd72504aa972be3, type: 2}
     exp: 0
     isCommander: 0
@@ -61,18 +61,18 @@ MonoBehaviour:
     portraitImage: {fileID: 21300000, guid: 37ce1438b0d0ea14ca964d69140c81e0, type: 3}
     battlePortraitImg: {fileID: 21300000, guid: 70e4b58033885144da08ffa653855d03, type: 3}
     standingImage: {fileID: 0}
-    align: 5
+    align: 1
     stats:
       level: 1
-      str: 4
-      mag: 4
-      intel: 4
-      vit: 3
+      str: 5
+      mag: 5
+      intel: 5
+      vit: 5
       agi: 5
-      luc: 4
+      luc: 5
     resistances:
       phys: 0
-      fire: 1
+      fire: 0
       ice: 0
       elec: 0
       force: 0
@@ -88,346 +88,5 @@ MonoBehaviour:
     - body_000
     - hands_000
     - acc_000
-    maxHp: 60
-    maxMp: 60
-  - id: chr_02
-    name: CHR02
-    spiritId: spirit_002
-    expTable: {fileID: 11400000, guid: 280fb2ad8c3aaee4ebdaf4877cd2fc15, type: 2}
-    exp: 0
-    isCommander: 0
-    isRegular: 1
-    portraitImage: {fileID: 0}
-    battlePortraitImg: {fileID: 0}
-    standingImage: {fileID: 0}
-    align: 8
-    stats:
-      level: 2
-      str: 4
-      mag: 4
-      intel: 4
-      vit: 3
-      agi: 5
-      luc: 4
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    initialSkills:
-    - {fileID: 11400000, guid: 247563a9a36c3dc4b9b20037d98f23f6, type: 2}
-    - {fileID: 11400000, guid: 747515d4a6a623e4099e586b7de647aa, type: 2}
-    - {fileID: 11400000, guid: e3acdf1810a4d824b92848cbb85256ae, type: 2}
-    - {fileID: 11400000, guid: 40ecc95d2b0c1b04cbc5cb957e58290d, type: 2}
-    - {fileID: 11400000, guid: f14a6b457982ea24799ad45f9d2efe6f, type: 2}
-    - {fileID: 11400000, guid: b3f84d38eeb68d043b020ea1c3dfc179, type: 2}
-    - {fileID: 11400000, guid: e5c470a526ccf8e45877974365dfd7ec, type: 2}
-    - {fileID: 11400000, guid: 715c2ea70ac0383469f21c676b214c61, type: 2}
-    - {fileID: 11400000, guid: 68622656e07521b4d99c6f3f610af226, type: 2}
-    - {fileID: 11400000, guid: 73578491e47e347459095e52e086e037, type: 2}
-    - {fileID: 11400000, guid: 82eaa2f43f0a9714ebafe8cc542cccba, type: 2}
-    - {fileID: 11400000, guid: d0dc12980e308a34787012b1b7a1c1bc, type: 2}
-    - {fileID: 11400000, guid: 7f915a4078dcbc946a3eabdba6302cd5, type: 2}
-    - {fileID: 11400000, guid: e0209319ed327bf4280d9d8e8658fcc0, type: 2}
-    - {fileID: 11400000, guid: 8689075a897d3d6449ed7536b0ab4c5f, type: 2}
-    - {fileID: 11400000, guid: b8e14e6505331494db0641cd0d2055b7, type: 2}
-    - {fileID: 11400000, guid: a9720c7f4f3ad8b49af23eefce3d94d5, type: 2}
-    - {fileID: 11400000, guid: 22381ed94e8c62e4bbaa979f44d49ad5, type: 2}
-    - {fileID: 11400000, guid: b716eefc5c35ad94eb92f1976cdde9b3, type: 2}
-    - {fileID: 11400000, guid: a4d8611ac40d7e843951e403c81f1acf, type: 2}
-    - {fileID: 11400000, guid: 94c5e174ffb0aae40b8feeb8175043e8, type: 2}
-    - {fileID: 11400000, guid: 780e48a823455c54e9876a582a3aea31, type: 2}
-    - {fileID: 11400000, guid: cdecffb0e5e703a43ae88e56283a50c8, type: 2}
-    - {fileID: 11400000, guid: 7278d34207da5694b82b0fce778b3880, type: 2}
-    - {fileID: 11400000, guid: bd81c0030ab2b6a409b5ad50d4764a75, type: 2}
-    - {fileID: 11400000, guid: 2b90e663b8cdee54981d3779286d2773, type: 2}
-    - {fileID: 11400000, guid: becb6811a251c3e4795ae36031685cc4, type: 2}
-    - {fileID: 11400000, guid: 9c14c0bb52975b34895e50d7cac2f7a4, type: 2}
-    - {fileID: 11400000, guid: 27c3b3c85a73ccf439381f4c00845801, type: 2}
-    - {fileID: 11400000, guid: 7b8ce25cbcda7ba4e96c21f333739f40, type: 2}
-    - {fileID: 11400000, guid: 862a96975acc81e4fa327954455489bf, type: 2}
-    - {fileID: 11400000, guid: 41a61f79c4f62cd4cb950af4357a6eb2, type: 2}
-    - {fileID: 11400000, guid: 12a367f4a6dfad440bb094f2eb624fdc, type: 2}
-    - {fileID: 11400000, guid: 9d4c7098b1dfc5740a9de6f52cbe5375, type: 2}
-    - {fileID: 11400000, guid: f140acc68db22604b93d78e27c72f96f, type: 2}
-    - {fileID: 11400000, guid: 529c2cbec4797fb419849b291fe0ca80, type: 2}
-    - {fileID: 11400000, guid: 75db5fc5ef50d5d4881479a26dbb3805, type: 2}
-    - {fileID: 11400000, guid: c464b675d624a104c90cee0753c07d3b, type: 2}
-    - {fileID: 11400000, guid: 94d7658448eedfe41b6db430006104f0, type: 2}
-    - {fileID: 11400000, guid: 67edafd7a7f81e74384e6e2d38693202, type: 2}
-    - {fileID: 11400000, guid: c428297cf66cf7a459c04ef81af79eb2, type: 2}
-    - {fileID: 11400000, guid: f9648c6d3d1b3f94eab0de2b62403196, type: 2}
-    - {fileID: 11400000, guid: 0af1ad9ffc120c1439e749a336996ede, type: 2}
-    - {fileID: 11400000, guid: 5fc275aeccadcb9468860815f000b724, type: 2}
-    initialWeaponId: sword_000
-    initialGunId: gun_001
-    initialAmmoId: ammo_000
-    initialArmorIds: []
-    maxHp: 60
-    maxMp: 60
-  - id: chr_03
-    name: CHR03
-    spiritId: spirit_003
-    expTable: {fileID: 11400000, guid: 1ea0c1c5d7db1654eb1169b3e2c94047, type: 2}
-    exp: 0
-    isCommander: 0
-    isRegular: 1
-    portraitImage: {fileID: 0}
-    battlePortraitImg: {fileID: 0}
-    standingImage: {fileID: 0}
-    align: 4
-    stats:
-      level: 1
-      str: 2
-      mag: 5
-      intel: 3
-      vit: 6
-      agi: 2
-      luc: 4
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    initialSkills:
-    - {fileID: 11400000, guid: 247563a9a36c3dc4b9b20037d98f23f6, type: 2}
-    - {fileID: 11400000, guid: 747515d4a6a623e4099e586b7de647aa, type: 2}
-    - {fileID: 11400000, guid: e3acdf1810a4d824b92848cbb85256ae, type: 2}
-    - {fileID: 11400000, guid: 40ecc95d2b0c1b04cbc5cb957e58290d, type: 2}
-    - {fileID: 11400000, guid: f14a6b457982ea24799ad45f9d2efe6f, type: 2}
-    - {fileID: 11400000, guid: b3f84d38eeb68d043b020ea1c3dfc179, type: 2}
-    - {fileID: 11400000, guid: e5c470a526ccf8e45877974365dfd7ec, type: 2}
-    - {fileID: 11400000, guid: 715c2ea70ac0383469f21c676b214c61, type: 2}
-    - {fileID: 11400000, guid: 68622656e07521b4d99c6f3f610af226, type: 2}
-    - {fileID: 11400000, guid: 73578491e47e347459095e52e086e037, type: 2}
-    - {fileID: 11400000, guid: 82eaa2f43f0a9714ebafe8cc542cccba, type: 2}
-    - {fileID: 11400000, guid: d0dc12980e308a34787012b1b7a1c1bc, type: 2}
-    - {fileID: 11400000, guid: 7f915a4078dcbc946a3eabdba6302cd5, type: 2}
-    - {fileID: 11400000, guid: e0209319ed327bf4280d9d8e8658fcc0, type: 2}
-    - {fileID: 11400000, guid: 8689075a897d3d6449ed7536b0ab4c5f, type: 2}
-    - {fileID: 11400000, guid: b8e14e6505331494db0641cd0d2055b7, type: 2}
-    - {fileID: 11400000, guid: a9720c7f4f3ad8b49af23eefce3d94d5, type: 2}
-    - {fileID: 11400000, guid: 22381ed94e8c62e4bbaa979f44d49ad5, type: 2}
-    - {fileID: 11400000, guid: b716eefc5c35ad94eb92f1976cdde9b3, type: 2}
-    - {fileID: 11400000, guid: a4d8611ac40d7e843951e403c81f1acf, type: 2}
-    - {fileID: 11400000, guid: 94c5e174ffb0aae40b8feeb8175043e8, type: 2}
-    - {fileID: 11400000, guid: 780e48a823455c54e9876a582a3aea31, type: 2}
-    - {fileID: 11400000, guid: cdecffb0e5e703a43ae88e56283a50c8, type: 2}
-    - {fileID: 11400000, guid: 7278d34207da5694b82b0fce778b3880, type: 2}
-    - {fileID: 11400000, guid: bd81c0030ab2b6a409b5ad50d4764a75, type: 2}
-    - {fileID: 11400000, guid: 2b90e663b8cdee54981d3779286d2773, type: 2}
-    - {fileID: 11400000, guid: becb6811a251c3e4795ae36031685cc4, type: 2}
-    - {fileID: 11400000, guid: 9c14c0bb52975b34895e50d7cac2f7a4, type: 2}
-    - {fileID: 11400000, guid: 27c3b3c85a73ccf439381f4c00845801, type: 2}
-    - {fileID: 11400000, guid: 7b8ce25cbcda7ba4e96c21f333739f40, type: 2}
-    - {fileID: 11400000, guid: 862a96975acc81e4fa327954455489bf, type: 2}
-    - {fileID: 11400000, guid: 41a61f79c4f62cd4cb950af4357a6eb2, type: 2}
-    - {fileID: 11400000, guid: 12a367f4a6dfad440bb094f2eb624fdc, type: 2}
-    - {fileID: 11400000, guid: 9d4c7098b1dfc5740a9de6f52cbe5375, type: 2}
-    - {fileID: 11400000, guid: f140acc68db22604b93d78e27c72f96f, type: 2}
-    - {fileID: 11400000, guid: 529c2cbec4797fb419849b291fe0ca80, type: 2}
-    - {fileID: 11400000, guid: 75db5fc5ef50d5d4881479a26dbb3805, type: 2}
-    - {fileID: 11400000, guid: c464b675d624a104c90cee0753c07d3b, type: 2}
-    - {fileID: 11400000, guid: 94d7658448eedfe41b6db430006104f0, type: 2}
-    - {fileID: 11400000, guid: 67edafd7a7f81e74384e6e2d38693202, type: 2}
-    - {fileID: 11400000, guid: c428297cf66cf7a459c04ef81af79eb2, type: 2}
-    - {fileID: 11400000, guid: f9648c6d3d1b3f94eab0de2b62403196, type: 2}
-    - {fileID: 11400000, guid: 0af1ad9ffc120c1439e749a336996ede, type: 2}
-    - {fileID: 11400000, guid: 5fc275aeccadcb9468860815f000b724, type: 2}
-    initialWeaponId: sword_000
-    initialGunId: gun_001
-    initialAmmoId: ammo_000
-    initialArmorIds: []
-    maxHp: 60
-    maxMp: 50
-  - id: chr_04
-    name: CHR04
-    spiritId: spirit_004
-    expTable: {fileID: 11400000, guid: 00d47d8b2275ee84d8a74dd7e91456eb, type: 2}
-    exp: 0
-    isCommander: 0
-    isRegular: 0
-    portraitImage: {fileID: 0}
-    battlePortraitImg: {fileID: 0}
-    standingImage: {fileID: 0}
-    align: 9
-    stats:
-      level: 2
-      str: 6
-      mag: 2
-      intel: 2
-      vit: 5
-      agi: 6
-      luc: 3
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    initialSkills:
-    - {fileID: 11400000, guid: 247563a9a36c3dc4b9b20037d98f23f6, type: 2}
-    - {fileID: 11400000, guid: 747515d4a6a623e4099e586b7de647aa, type: 2}
-    - {fileID: 11400000, guid: e3acdf1810a4d824b92848cbb85256ae, type: 2}
-    - {fileID: 11400000, guid: 40ecc95d2b0c1b04cbc5cb957e58290d, type: 2}
-    - {fileID: 11400000, guid: f14a6b457982ea24799ad45f9d2efe6f, type: 2}
-    - {fileID: 11400000, guid: b3f84d38eeb68d043b020ea1c3dfc179, type: 2}
-    - {fileID: 11400000, guid: e5c470a526ccf8e45877974365dfd7ec, type: 2}
-    - {fileID: 11400000, guid: 715c2ea70ac0383469f21c676b214c61, type: 2}
-    - {fileID: 11400000, guid: 68622656e07521b4d99c6f3f610af226, type: 2}
-    - {fileID: 11400000, guid: 73578491e47e347459095e52e086e037, type: 2}
-    - {fileID: 11400000, guid: 82eaa2f43f0a9714ebafe8cc542cccba, type: 2}
-    - {fileID: 11400000, guid: d0dc12980e308a34787012b1b7a1c1bc, type: 2}
-    - {fileID: 11400000, guid: 7f915a4078dcbc946a3eabdba6302cd5, type: 2}
-    - {fileID: 11400000, guid: e0209319ed327bf4280d9d8e8658fcc0, type: 2}
-    - {fileID: 11400000, guid: 8689075a897d3d6449ed7536b0ab4c5f, type: 2}
-    - {fileID: 11400000, guid: b8e14e6505331494db0641cd0d2055b7, type: 2}
-    - {fileID: 11400000, guid: a9720c7f4f3ad8b49af23eefce3d94d5, type: 2}
-    - {fileID: 11400000, guid: 22381ed94e8c62e4bbaa979f44d49ad5, type: 2}
-    - {fileID: 11400000, guid: b716eefc5c35ad94eb92f1976cdde9b3, type: 2}
-    - {fileID: 11400000, guid: a4d8611ac40d7e843951e403c81f1acf, type: 2}
-    - {fileID: 11400000, guid: 94c5e174ffb0aae40b8feeb8175043e8, type: 2}
-    - {fileID: 11400000, guid: 780e48a823455c54e9876a582a3aea31, type: 2}
-    - {fileID: 11400000, guid: cdecffb0e5e703a43ae88e56283a50c8, type: 2}
-    - {fileID: 11400000, guid: 7278d34207da5694b82b0fce778b3880, type: 2}
-    - {fileID: 11400000, guid: bd81c0030ab2b6a409b5ad50d4764a75, type: 2}
-    - {fileID: 11400000, guid: 2b90e663b8cdee54981d3779286d2773, type: 2}
-    - {fileID: 11400000, guid: becb6811a251c3e4795ae36031685cc4, type: 2}
-    - {fileID: 11400000, guid: 9c14c0bb52975b34895e50d7cac2f7a4, type: 2}
-    - {fileID: 11400000, guid: 27c3b3c85a73ccf439381f4c00845801, type: 2}
-    - {fileID: 11400000, guid: 7b8ce25cbcda7ba4e96c21f333739f40, type: 2}
-    - {fileID: 11400000, guid: 862a96975acc81e4fa327954455489bf, type: 2}
-    - {fileID: 11400000, guid: 41a61f79c4f62cd4cb950af4357a6eb2, type: 2}
-    - {fileID: 11400000, guid: 12a367f4a6dfad440bb094f2eb624fdc, type: 2}
-    - {fileID: 11400000, guid: 9d4c7098b1dfc5740a9de6f52cbe5375, type: 2}
-    - {fileID: 11400000, guid: f140acc68db22604b93d78e27c72f96f, type: 2}
-    - {fileID: 11400000, guid: 529c2cbec4797fb419849b291fe0ca80, type: 2}
-    - {fileID: 11400000, guid: 75db5fc5ef50d5d4881479a26dbb3805, type: 2}
-    - {fileID: 11400000, guid: c464b675d624a104c90cee0753c07d3b, type: 2}
-    - {fileID: 11400000, guid: 94d7658448eedfe41b6db430006104f0, type: 2}
-    - {fileID: 11400000, guid: 67edafd7a7f81e74384e6e2d38693202, type: 2}
-    - {fileID: 11400000, guid: c428297cf66cf7a459c04ef81af79eb2, type: 2}
-    - {fileID: 11400000, guid: f9648c6d3d1b3f94eab0de2b62403196, type: 2}
-    - {fileID: 11400000, guid: 0af1ad9ffc120c1439e749a336996ede, type: 2}
-    - {fileID: 11400000, guid: 5fc275aeccadcb9468860815f000b724, type: 2}
-    initialWeaponId: sword_000
-    initialGunId: gun_001
-    initialAmmoId: ammo_000
-    initialArmorIds: []
-    maxHp: 60
-    maxMp: 50
-  - id: chr_05
-    name: CHR05
-    spiritId: spirit_005
-    expTable: {fileID: 11400000, guid: 99fb91fac017d1c4bb1210f0d98b1daa, type: 2}
-    exp: 0
-    isCommander: 0
-    isRegular: 1
-    portraitImage: {fileID: 0}
-    battlePortraitImg: {fileID: 0}
-    standingImage: {fileID: 0}
-    align: 4
-    stats:
-      level: 3
-      str: 7
-      mag: 2
-      intel: 2
-      vit: 6
-      agi: 1
-      luc: 3
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    initialSkills:
-    - {fileID: 11400000, guid: 247563a9a36c3dc4b9b20037d98f23f6, type: 2}
-    - {fileID: 11400000, guid: 747515d4a6a623e4099e586b7de647aa, type: 2}
-    - {fileID: 11400000, guid: e3acdf1810a4d824b92848cbb85256ae, type: 2}
-    - {fileID: 11400000, guid: 40ecc95d2b0c1b04cbc5cb957e58290d, type: 2}
-    - {fileID: 11400000, guid: f14a6b457982ea24799ad45f9d2efe6f, type: 2}
-    - {fileID: 11400000, guid: b3f84d38eeb68d043b020ea1c3dfc179, type: 2}
-    - {fileID: 11400000, guid: e5c470a526ccf8e45877974365dfd7ec, type: 2}
-    - {fileID: 11400000, guid: 715c2ea70ac0383469f21c676b214c61, type: 2}
-    - {fileID: 11400000, guid: 68622656e07521b4d99c6f3f610af226, type: 2}
-    - {fileID: 11400000, guid: 73578491e47e347459095e52e086e037, type: 2}
-    - {fileID: 11400000, guid: 82eaa2f43f0a9714ebafe8cc542cccba, type: 2}
-    - {fileID: 11400000, guid: d0dc12980e308a34787012b1b7a1c1bc, type: 2}
-    - {fileID: 11400000, guid: 7f915a4078dcbc946a3eabdba6302cd5, type: 2}
-    - {fileID: 11400000, guid: e0209319ed327bf4280d9d8e8658fcc0, type: 2}
-    - {fileID: 11400000, guid: 8689075a897d3d6449ed7536b0ab4c5f, type: 2}
-    - {fileID: 11400000, guid: b8e14e6505331494db0641cd0d2055b7, type: 2}
-    - {fileID: 11400000, guid: a9720c7f4f3ad8b49af23eefce3d94d5, type: 2}
-    - {fileID: 11400000, guid: 22381ed94e8c62e4bbaa979f44d49ad5, type: 2}
-    - {fileID: 11400000, guid: b716eefc5c35ad94eb92f1976cdde9b3, type: 2}
-    - {fileID: 11400000, guid: a4d8611ac40d7e843951e403c81f1acf, type: 2}
-    - {fileID: 11400000, guid: 94c5e174ffb0aae40b8feeb8175043e8, type: 2}
-    - {fileID: 11400000, guid: 780e48a823455c54e9876a582a3aea31, type: 2}
-    - {fileID: 11400000, guid: cdecffb0e5e703a43ae88e56283a50c8, type: 2}
-    - {fileID: 11400000, guid: 7278d34207da5694b82b0fce778b3880, type: 2}
-    - {fileID: 11400000, guid: bd81c0030ab2b6a409b5ad50d4764a75, type: 2}
-    - {fileID: 11400000, guid: 2b90e663b8cdee54981d3779286d2773, type: 2}
-    - {fileID: 11400000, guid: becb6811a251c3e4795ae36031685cc4, type: 2}
-    - {fileID: 11400000, guid: 9c14c0bb52975b34895e50d7cac2f7a4, type: 2}
-    - {fileID: 11400000, guid: 27c3b3c85a73ccf439381f4c00845801, type: 2}
-    - {fileID: 11400000, guid: 7b8ce25cbcda7ba4e96c21f333739f40, type: 2}
-    - {fileID: 11400000, guid: 862a96975acc81e4fa327954455489bf, type: 2}
-    - {fileID: 11400000, guid: 41a61f79c4f62cd4cb950af4357a6eb2, type: 2}
-    - {fileID: 11400000, guid: 12a367f4a6dfad440bb094f2eb624fdc, type: 2}
-    - {fileID: 11400000, guid: 9d4c7098b1dfc5740a9de6f52cbe5375, type: 2}
-    - {fileID: 11400000, guid: f140acc68db22604b93d78e27c72f96f, type: 2}
-    - {fileID: 11400000, guid: 529c2cbec4797fb419849b291fe0ca80, type: 2}
-    - {fileID: 11400000, guid: 75db5fc5ef50d5d4881479a26dbb3805, type: 2}
-    - {fileID: 11400000, guid: c464b675d624a104c90cee0753c07d3b, type: 2}
-    - {fileID: 11400000, guid: 94d7658448eedfe41b6db430006104f0, type: 2}
-    - {fileID: 11400000, guid: 67edafd7a7f81e74384e6e2d38693202, type: 2}
-    - {fileID: 11400000, guid: c428297cf66cf7a459c04ef81af79eb2, type: 2}
-    - {fileID: 11400000, guid: f9648c6d3d1b3f94eab0de2b62403196, type: 2}
-    - {fileID: 11400000, guid: 0af1ad9ffc120c1439e749a336996ede, type: 2}
-    - {fileID: 11400000, guid: 5fc275aeccadcb9468860815f000b724, type: 2}
-    initialWeaponId: sword_000
-    initialGunId: gun_001
-    initialAmmoId: ammo_000
-    initialArmorIds: []
-    maxHp: 70
-    maxMp: 70
-  - id: npc
-    name: "\uBB34\uC7A5\uACBD\uCC30"
-    spiritId: 
-    expTable: {fileID: 0}
-    exp: 0
-    isCommander: 0
-    isRegular: 0
-    portraitImage: {fileID: 0}
-    battlePortraitImg: {fileID: 0}
-    standingImage: {fileID: 2396085269434190896, guid: 723e994d56786b246b42ce9d4c1bc352, type: 3}
-    align: 0
-    stats:
-      level: 0
-      str: 0
-      mag: 0
-      intel: 0
-      vit: 0
-      agi: 0
-      luc: 0
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    initialSkills: []
-    initialWeaponId: 
-    initialGunId: 
-    initialAmmoId: 
-    initialArmorIds: []
     maxHp: 0
     maxMp: 0
