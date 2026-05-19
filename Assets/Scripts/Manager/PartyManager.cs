@@ -125,5 +125,11 @@ namespace Manager
             
             return partyData.Find(ch => ch.row == r && ch.column == c);
         }
+
+        // id로 캐릭터를 찾는 헬퍼 함수
+        public RuntimeCharacterData GetCharacterByID(string characterId)
+        {
+            return partyData.Find(ch => ch.characterId == characterId);
+        }
     }
 }

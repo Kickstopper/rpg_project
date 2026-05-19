@@ -14,6 +14,10 @@ namespace UI.Battle
 {
     public class LevelUpUI : MonoBehaviour
     {
+        [Header("Creation Mode")]
+        public bool isCreationMode = false;
+        private System.Action<StatData> onCreationFinished;
+
         [Header("Settings")]
         public int pointsPerLevel = 3; 
 
@@ -77,6 +81,50 @@ namespace UI.Battle
             public Slider slider;
             public Button upButton;
             public Button downButton;
+        }
+
+
+        // 캐릭터 생성용
+        public void ShowForCreation(string characterID, int bonusPoints, System.Action<StatData> onFinished)
+        {
+            isCreationMode = true;
+            LeveUpUI.SetActive(true);
+            
+            var dbEntry = PartyManager.Instance.charDB.GetEntry(characterID);
+
+            this.onCreationFinished = onFinished;
+            this.availablePoints = bonusPoints;
+            
+            // 데이터 복사 및 초기화
+            this.baseStats = dbEntry.stats;
+            this.allocatedStats = new StatData(); 
+
+            // UI 텍스트 초기화
+            nameText.text = dbEntry.name;
+            levelText.text = $"LV{dbEntry.stats.level}";
+            nextExpText.text = "";
+            if (portraitImage != null)
+            {
+                if (dbEntry.portraitImage != null)
+                {
+                    portraitImage.sprite = dbEntry.portraitImage;
+                    portraitImage.color = Color.white;
+                }
+                else portraitImage.color = Color.clear;
+            }
+            
+            int nextExp = BattleCalculator.GetMaxExpForLevel(dbEntry.stats.level);
+            nextExpText.text = $"NEXT EXP {nextExp}";
+
+            // 스킬 리스트 비우기
+            foreach (Transform child in skillContent) Destroy(child.gameObject);
+            ClearDescription();
+
+            BindButtons();
+            SetSectionFocus(FocusSection.Stat);
+            RefreshUI();
+            
+            StartCoroutine(SelectFirstAvailableButton());
         }
 
         public void Show(List<PlayerController> leveledUpPlayers, Dictionary<PlayerController, int> oldLevels, System.Action onFinished)
@@ -502,7 +550,8 @@ namespace UI.Battle
 
         private void Update()
         {
-            if (GameStateManager.Instance.CurrentState != GameState.Battle) return;
+            // 생성 모드가 아닐 때만 전투 상태 체크
+            if (!isCreationMode && GameStateManager.Instance.CurrentState != GameState.Battle) return;
             
             // 포커스 강제 유지 로직 (마우스 클릭 방어)
             if (EventSystem.current.currentSelectedGameObject != null)
@@ -597,6 +646,25 @@ namespace UI.Battle
         private void OnConfirmClicked()
         {
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+
+            if (isCreationMode)
+            {
+                // 생성 모드일 경우 델리게이트로 최종 할당된 스탯만 전달 후 UI 종료
+                StatData finalStats = new StatData
+                {
+                    str = baseStats.str + allocatedStats.str,
+                    mag = baseStats.mag + allocatedStats.mag,
+                    intel = baseStats.intel + allocatedStats.intel,
+                    vit = baseStats.vit + allocatedStats.vit,
+                    agi = baseStats.agi + allocatedStats.agi,
+                    luc = baseStats.luc + allocatedStats.luc
+                };
+                
+                LeveUpUI.SetActive(false);
+                isCreationMode = false;
+                onCreationFinished?.Invoke(finalStats);
+                return;
+            }
 
             currentTarget.sourceData.stats.str += allocatedStats.str;
             currentTarget.sourceData.stats.mag += allocatedStats.mag;
