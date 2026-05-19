@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Helper;
 using UnityEngine;
 
 namespace Data
@@ -98,8 +99,9 @@ namespace Data
             isCommander = entry.isCommander;
             isRegular = entry.isRegular;
 
-            currentHp = maxHp = entry.maxHp;
-            currentMp = maxMp = entry.maxMp;
+            currentHp = maxHp = BattleCalculator.GetMaxHP(stats.level, stats.str, stats.vit);
+            currentMp = maxMp = BattleCalculator.GetMaxMP(stats.level, stats.mag, stats.intel);
+
             currentExp = 0;
             expTable = entry.expTable;
 

@@ -41,10 +41,6 @@ namespace Data.Database
             public string initialGunId;
             public string initialAmmoId;
             public List<string> initialArmorIds = new List<string>(); // 투구, 갑옷 등 여러 개일 수 있으므로 리스트
-
-            public int maxHp; 
-            public int maxMp;
-            
         }
 
         [Header("캐릭터 이미지 등록")]
