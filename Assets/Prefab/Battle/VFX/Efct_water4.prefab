@@ -1,0 +1,155 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2210249593246853867
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7455165204648841251}
+  - component: {fileID: 2940020399484473439}
+  - component: {fileID: 5907517404362654901}
+  - component: {fileID: 4822102411084150749}
+  m_Layer: 5
+  m_Name: Efct_water4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7455165204648841251
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2210249593246853867}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &2940020399484473439
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2210249593246853867}
+  m_CullTransparentMesh: 1
+--- !u!114 &5907517404362654901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2210249593246853867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4822102411084150749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2210249593246853867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 708128a446799b242ac624eef2707eb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Battle.BattleVFXAnimator
+  images:
+  - {fileID: 6614767472398217480, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 67690273, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: -648194086, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 1654733643, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: -1524381842, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 1425687783, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: -110646190, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 1237062270, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: -1872138309, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 1623480391, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 94579578, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 708885827, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: -1906914186, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: -1413361681, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: -38391359, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 306542603, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 286409214, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 1258225660, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: 616813191, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  - {fileID: -783069667, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+  defaultDuration: 0.1
+  generateFramesNow: 0
+  frames:
+  - frameSprite: {fileID: 6614767472398217480, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 67690273, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: -648194086, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 1654733643, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: -1524381842, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 1425687783, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: -110646190, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 1237062270, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: -1872138309, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 1623480391, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 94579578, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 708885827, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: -1906914186, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: -1413361681, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: -38391359, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 306542603, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 286409214, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 1258225660, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: 616813191, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  - frameSprite: {fileID: -783069667, guid: 67d0b9d7c6a84a24ca57e1953c8f0621, type: 3}
+    duration: 0.1
+  useNativeSize: 1
