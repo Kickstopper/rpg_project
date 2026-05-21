@@ -6,8 +6,7 @@ namespace Data
     public struct WallAnimConfig
     {
         public string name;         
-        public int baseTexId;       // 기본 텍스처 ID
-        public int altTexId;        // 바뀔 텍스처 ID
+        public int[] frameTexIDs;
         public float minInterval;   
         public float maxInterval;   
     }

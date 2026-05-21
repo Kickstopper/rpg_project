@@ -157,6 +157,14 @@ namespace UI.DungeonMapScene
             }
         }
 
+        // 애니메이션으로 인해 바닥이나 천장 텍스처가 변경될 때 호출
+        public void UpdateFloorCeilingTex(int floorTexIdx, int ceilTexIdx)
+        {
+            Debug.Log($"{floorTexIdx},{ceilTexIdx}");
+            _floorTexIdx = floorTexIdx;
+            _ceilTexIdx = ceilTexIdx;
+        }
+
         public void UpdateSprites(SpriteInfo[] sprites)
         {
             _sprtData = sprites;
@@ -435,8 +443,15 @@ namespace UI.DungeonMapScene
                 if (mapX >= 0 && mapX < _tileAnimStates.GetLength(0) && mapY >= 0 && mapY < _tileAnimStates.GetLength(1))
                 {
                     var st = _tileAnimStates[mapX, mapY];
-                    if (st != null && st.isAnimating && st.showAlt && hitTexId == st.config.baseTexId)
-                        hitTexId = st.config.altTexId;
+                    
+                    // 기준 텍스처(배열의 0번째)를 맞춘 벽이라면, 현재 재생 중인 프레임의 텍스처로 바꿔 그림
+                    if (st != null && st.isAnimating && st.config.frameTexIDs != null && st.config.frameTexIDs.Length > 0)
+                    {
+                        if (hitTexId == st.config.frameTexIDs[0])
+                        {
+                            hitTexId = st.config.frameTexIDs[st.currentFrame];
+                        }
+                    }
                 }
 
                 if (side == 0) perpWallDist = (sideDistX - deltaDistX);

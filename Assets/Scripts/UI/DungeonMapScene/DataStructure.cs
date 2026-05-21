@@ -7,8 +7,8 @@ namespace UI.DungeonMapScene
     // 타일 애니메이션 상태
     public class TileAnimState
     {
-        public bool isAnimating;    // 애니메이션 대상인가?
-        public bool showAlt;        // 현재 B 텍스처를 보여줄 차례인가?
+        public bool isAnimating;
+        public int currentFrame; // 현재 재생 중인 텍스처의 배열 인덱스
         public float timer;         // 다음 변경까지 남은 시간
         public WallAnimConfig config; // 참조할 설정
     }

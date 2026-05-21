@@ -59,6 +59,13 @@ namespace Controller
         private TileAnimState[,] _tileAnimStates;
         private MapData _currentMap;
         private DungeonTheme theme;
+
+        // 바닥/천장 애니메이션 전용 상태 변수
+        private TileAnimState _floorAnimState;
+        private TileAnimState _ceilAnimState;
+        private int _currentFloorTexIdx;
+        private int _currentCeilTexIdx;
+
         public class MapEnemy
         {
             public float x, y;
@@ -1389,11 +1396,37 @@ namespace Controller
         private void InitializeWallAnims(DungeonTheme theme)
         {
             if (theme == null || theme.wallAnimations == null) return;
+
+            // 바닥/천장 초기화
+            _floorAnimState = null;
+            _ceilAnimState = null;
+            _currentFloorTexIdx = theme.floorTexIdx;
+            _currentCeilTexIdx = theme.ceilingTexIdx;
+
             _tileAnimStates = new TileAnimState[_currentMap.width, _currentMap.height];
 
             Dictionary<int, WallAnimConfig> animDict = new Dictionary<int, WallAnimConfig>();
             foreach (var cfg in theme.wallAnimations)
-                if (!animDict.ContainsKey(cfg.baseTexId)) animDict.Add(cfg.baseTexId, cfg);
+            {
+                // 배열에 텍스처가 없으면 건너뜀
+                if (cfg.frameTexIDs == null || cfg.frameTexIDs.Length == 0) continue;
+
+                // 기준 텍스처는 항상 0번 인덱스로 사용
+                int baseTex = cfg.frameTexIDs[0];
+
+                if (!animDict.ContainsKey(baseTex)) animDict.Add(baseTex, cfg);
+
+                // 바닥/천장 초기화 로직도 baseTex로 비교
+                if (baseTex == theme.floorTexIdx)
+                {
+                    _floorAnimState = new TileAnimState { isAnimating = true, config = cfg, currentFrame = 0, timer = UnityEngine.Random.Range(cfg.minInterval, cfg.maxInterval) };
+                }
+                if (baseTex == theme.ceilingTexIdx)
+                {
+                    _ceilAnimState = new TileAnimState { isAnimating = true, config = cfg, currentFrame = 0, timer = UnityEngine.Random.Range(cfg.minInterval, cfg.maxInterval) };
+                }
+            }
+                
 
             if (animDict.Count == 0) return;
 
@@ -1412,7 +1445,6 @@ namespace Controller
                                 {
                                     isAnimating = true,
                                     config = animDict[texID],
-                                    showAlt = false,
                                     timer = UnityEngine.Random.Range(animDict[texID].minInterval, animDict[texID].maxInterval)
                                 };
                                 break;
@@ -1425,8 +1457,43 @@ namespace Controller
 
         private void UpdateWallAnimations()
         {
-            if (_tileAnimStates == null) return;
             float dt = Time.deltaTime;
+            bool globalTexChanged = false;
+
+            // 전역 바닥 애니메이션 업데이트
+            if (_floorAnimState != null && _floorAnimState.isAnimating)
+            {
+                _floorAnimState.timer -= dt;
+                if (_floorAnimState.timer <= 0)
+                {
+                    // 프레임 1 증가, 배열 길이를 넘어가면 0으로 순환
+                    _floorAnimState.currentFrame = (_floorAnimState.currentFrame + 1) % _floorAnimState.config.frameTexIDs.Length;
+                    _floorAnimState.timer = UnityEngine.Random.Range(_floorAnimState.config.minInterval, _floorAnimState.config.maxInterval);
+                    _currentFloorTexIdx = _floorAnimState.config.frameTexIDs[_floorAnimState.currentFrame];
+                    globalTexChanged = true;
+                }
+            }
+
+            // 전역 천장 애니메이션 업데이트
+            if (_ceilAnimState != null && _ceilAnimState.isAnimating)
+            {
+                _ceilAnimState.timer -= dt;
+                if (_ceilAnimState.timer <= 0)
+                {
+                    _ceilAnimState.currentFrame = (_ceilAnimState.currentFrame + 1) % _ceilAnimState.config.frameTexIDs.Length;
+                    _ceilAnimState.timer = UnityEngine.Random.Range(_ceilAnimState.config.minInterval, _ceilAnimState.config.maxInterval);
+                    _currentCeilTexIdx = _ceilAnimState.config.frameTexIDs[_ceilAnimState.currentFrame];
+                    globalTexChanged = true;
+                }
+            }
+
+            // 텍스처 스왑이 일어났다면 렌더러에 즉시 반영
+            if (globalTexChanged)
+            {
+                _renderer.UpdateFloorCeilingTex(_currentFloorTexIdx, _currentCeilTexIdx);
+            }
+
+            if (_tileAnimStates == null) return;
 
             for (int x = 0; x < _tileAnimStates.GetLength(0); x++)
             {
@@ -1438,7 +1505,8 @@ namespace Controller
                         st.timer -= dt;
                         if (st.timer <= 0)
                         {
-                            st.showAlt = !st.showAlt;
+                            // 프레임 순환
+                            st.currentFrame = (st.currentFrame + 1) % st.config.frameTexIDs.Length;
                             st.timer = UnityEngine.Random.Range(st.config.minInterval, st.config.maxInterval);
                         }
                     }
