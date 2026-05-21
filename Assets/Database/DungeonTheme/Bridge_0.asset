@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
+  m_Name: Bridge_0
+  m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
+  dungeonID: Bridge_0
+  useWakeUpEffect: 0
+  encounterMode: 1
+  background: {fileID: 0}
+  texture:
+  - {fileID: 2800000, guid: fc4417a817c674946a0cbd140b366707, type: 3}
+  - {fileID: 2800000, guid: 2ddb541c6f6b2d247bf39315fe305aa7, type: 3}
+  - {fileID: 2800000, guid: a7a439ae38c83814596d6e76d86b6eaf, type: 3}
+  - {fileID: 2800000, guid: 888d1537263e65e4094e456b01250178, type: 3}
+  - {fileID: 2800000, guid: 0ed88cd3b18e7c4428ef9e0a4d609743, type: 3}
+  - {fileID: 2800000, guid: dbe248a95b8ee7942b6a35d795b9acd0, type: 3}
+  - {fileID: 2800000, guid: da6abc5bf3802d244a34b3725a773895, type: 3}
+  - {fileID: 2800000, guid: 3f81d2c296e490042b935a24d3cf1424, type: 3}
+  floorTexIdx: 3
+  ceilingTexIdx: 4
+  enemySprites: []
+  objectSprites: []
+  maxSpawnCount: 0
+  spawnDelay: 5
+  wallAnimations:
+  - name: anim
+    frameTexIDs: 040000000500000006000000070000000600000005000000
+    minInterval: 0.2
+    maxInterval: 0.2
+  fogColor: {r: 0.9860432, g: 1, b: 0, a: 1}
+  lightingIntensity: 0.55
+  useGridLighting: 0
+  bgmID: 0
+  moduleEnable: 1
+  monsterList: []
+  useDustEffect: 1
+  dustParticleCount: 300
+  dustSwayAmplitude: 0.01
+  dustMovesUp: 0
+  useDustTwinkle: 1
+  dustTwinkleSpeed: 15
+  dustColor:
+    serializedVersion: 2
+    rgba: 4292411567
+  useOrganicEffect: 0
+  organicFreqX: 4
+  organicSpeed: 0.3
+  organicBreath: 0.35
+  organicAmplitude: 0.2
+  useMeltEffect: 0
+  meltEdgeBump: 1
+  meltEdgeSpeed: 0.3
+  useWallDistortion: 0
+  distortionFreq: 0.5
+  distortionAmp: 2
+  useCylinderEffect: 0
+  cylinderStrength: 3
+  stereoSeparation: 0.05

@@ -1,0 +1,510 @@
+{
+    "width": 3,
+    "height": 9,
+    "mapID": "Bridge_0",
+    "themeName": "Bridge_0",
+    "startX": 3,
+    "startY": 9,
+    "startDirection": 0,
+    "cells": [
+        {
+            "x": 0,
+            "y": 0,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 0,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                2,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 0,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 1,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 1,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                1,
+                -1,
+                1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 1,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 2,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 2,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 2,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 3,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 3,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                1,
+                -1,
+                1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 3,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 4,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 4,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 5,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 5,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                1,
+                -1,
+                1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 5,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 6,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 6,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 6,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 7,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 7,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                1,
+                -1,
+                1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 7,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 8,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 8,
+            "value": 0,
+            "wallTextureIDs": [
+                2,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 8,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        }
+    ],
+    "entrances": [
+        {
+            "type": 0,
+            "sourceX": 1,
+            "sourceY": 0,
+            "isWallEntrance": true,
+            "triggerDirection": 2,
+            "destinationID": "Outpost",
+            "targetX": 5,
+            "targetY": 10,
+            "targetDirection": 2
+        }
+    ]
+}

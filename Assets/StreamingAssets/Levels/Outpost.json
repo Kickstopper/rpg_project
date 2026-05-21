@@ -2082,7 +2082,7 @@
             "y": 10,
             "value": 0,
             "wallTextureIDs": [
-                4,
+                3,
                 -1,
                 -1,
                 -1
@@ -2251,6 +2251,17 @@
             "destinationID": "special",
             "targetX": 1,
             "targetY": 1,
+            "targetDirection": 0
+        },
+        {
+            "type": 0,
+            "sourceX": 5,
+            "sourceY": 10,
+            "isWallEntrance": true,
+            "triggerDirection": 0,
+            "destinationID": "Bridge_0",
+            "targetX": 1,
+            "targetY": 0,
             "targetDirection": 0
         }
     ]
