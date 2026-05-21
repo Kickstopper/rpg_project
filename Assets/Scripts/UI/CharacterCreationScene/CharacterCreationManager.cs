@@ -35,6 +35,17 @@ namespace UI.CharacterCreationScene
             UpdateStep(CreationStep.PlayerName);
         }
 
+        private void Update()
+        {
+            if (currentStep == CreationStep.PlayerName || currentStep == CreationStep.PartnerName)
+            {
+                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                {
+                    OnNameConfirmClicked();
+                }
+            }
+        }
+
         private void UpdateStep(CreationStep nextStep)
         {
             currentStep = nextStep;
@@ -47,6 +58,7 @@ namespace UI.CharacterCreationScene
 
                     nameInputPanel.SetActive(true);
                     virtualKeyboard.ClearInput();
+                    virtualKeyboard.FocusFirstKey();
                     SetDefaultCharacterInfo(PartyID.CHARACTER_00);
                     break;
 
@@ -55,6 +67,7 @@ namespace UI.CharacterCreationScene
 
                     nameInputPanel.SetActive(true);
                     virtualKeyboard.ClearInput();
+                    virtualKeyboard.FocusFirstKey();
                     SetDefaultCharacterInfo(PartyID.CHARACTER_01);
                     break;
 
