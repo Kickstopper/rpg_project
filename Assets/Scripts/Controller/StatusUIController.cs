@@ -64,7 +64,7 @@ namespace Controller
         private List<RuntimeCharacterData> partyMembers;
         private int currentIndex = 0;
 
-        private bool hasresonance;
+        private bool hasResonance;
 
         void OnEnable()
         {
@@ -137,7 +137,7 @@ namespace Controller
 
         private void ShowresonanceStatusUI()
         {
-            if (resonanceStatusUI)
+            if (hasResonance && resonanceStatusUI)
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Click);
                 resonanceStatusUI.SetActive(true);
@@ -221,7 +221,7 @@ namespace Controller
                 ResonanceData resonance = DatabaseManager.Instance.GetResonance(charData.resonanceId);
                 if (resonance != null)
                 {
-                    hasresonance = true;
+                    hasResonance = true;
                     resonanceUIController.Initialze(resonance);
                     resonanceText.text = resonance.entityName;
                     // List<SkillData> resonanceSkills = resonance.skills;
@@ -233,9 +233,9 @@ namespace Controller
                     //     }
                     // }
                 }
-                else hasresonance = false;
+                else hasResonance = false;
             }
-            else hasresonance = false;
+            else hasResonance = false;
             UpdateSkillList(skills);
         }
 
