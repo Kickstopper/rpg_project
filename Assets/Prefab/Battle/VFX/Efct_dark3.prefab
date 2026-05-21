@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -104,37 +104,37 @@ MonoBehaviour:
   - {fileID: -380328267511605941, guid: a1ef579e738334b49a5961ace088204f, type: 3}
   - {fileID: -3590125027355500239, guid: a1ef579e738334b49a5961ace088204f, type: 3}
   - {fileID: 8095012930050790512, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: -7612027727473259337, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -6325861069841768432, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -956639361987782519, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1151516121549522643, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 3423355479166772329, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1066383399158985068, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -8691788866117825681, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 8205873562644341932, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -2131571518174766337, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -3158807244104078124, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -398100718209573118, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 3431491969946651203, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -380328267511605941, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -3590125027355500239, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 8095012930050790512, guid: a1ef579e738334b49a5961ace088204f, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

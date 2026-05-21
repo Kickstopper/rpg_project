@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -90,9 +90,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UI.Battle.BattleVFXAnimator
   images:
   - {fileID: 446964152365233695, guid: 9ff6c9e30ab2ed541b0270a03831e773, type: 3}
-  defaultDuration: 0.5
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: 446964152365233695, guid: 9ff6c9e30ab2ed541b0270a03831e773, type: 3}
-    duration: 0.5
+    duration: 0.08
   useNativeSize: 1

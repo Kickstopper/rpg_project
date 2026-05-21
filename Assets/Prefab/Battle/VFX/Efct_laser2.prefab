@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -99,27 +99,27 @@ MonoBehaviour:
   - {fileID: 4209969399081381447, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
   - {fileID: -7686916983637622620, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
   - {fileID: 1889348648, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: -8902573400495706285, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -2022001159772491539, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 5822398290862508568, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 8251476403159122195, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 3768734034173857209, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -8400362660948235033, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1095456916124414876, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 4209969399081381447, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -7686916983637622620, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1889348648, guid: 137eb7ea2e6bbde48b260e4fc9db0b8f, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

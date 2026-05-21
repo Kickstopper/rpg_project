@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -99,27 +99,27 @@ MonoBehaviour:
   - {fileID: 1676879815381271607, guid: 7798623967761dc4795601e021e93ed3, type: 3}
   - {fileID: -2644168475189592041, guid: 7798623967761dc4795601e021e93ed3, type: 3}
   - {fileID: -7931182879720802636, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: 4687160566120244354, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -5814690478563868864, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -7859562931810517307, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -571820314048381327, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -6038510621215617712, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -6742269328273949236, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 5236097602481965674, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1676879815381271607, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -2644168475189592041, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -7931182879720802636, guid: 7798623967761dc4795601e021e93ed3, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

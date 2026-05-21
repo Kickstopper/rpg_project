@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -109,47 +109,47 @@ MonoBehaviour:
   - {fileID: 3387717362347543141, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
   - {fileID: -1433602522260588607, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
   - {fileID: -1405611664428386540, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: -2496352503699108902, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 8387683212427797648, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -7428773274001564151, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 5527739138591240825, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -993254149133358048, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -3490745092817701664, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -4770480563540895078, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -7801108018242069921, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -110090433804671284, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 6355382697176515027, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 4436626102509197668, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 262921209726691738, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1644409926937851200, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 3908143130260922120, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 8641030112643488744, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 5064607088489089583, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 2599984651891000899, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 3387717362347543141, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1433602522260588607, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1405611664428386540, guid: 36a70ac28b6c9c34494bc18c2690ea13, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

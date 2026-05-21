@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -104,7 +104,37 @@ MonoBehaviour:
   - {fileID: 6141224720977263196, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
   - {fileID: 986126357478920957, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
   - {fileID: -7837659257359579564, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
-  frames: []
+  frames:
+  - frameSprite: {fileID: 1093177687102202057, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: 6703577855291567198, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: -5443508421562878875, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: 5534226298458775338, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: -8344135224620461804, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: 4309020645546446477, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: 4079279294817847015, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: 634615233018355504, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: -6010701775669895545, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: 7332919441760914546, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: -2569890466106662417, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: 4626688011757876623, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: 6141224720977263196, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: 986126357478920957, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
+  - frameSprite: {fileID: -7837659257359579564, guid: 7ae71e4a71be11e4ca6779686650d3bd, type: 3}
+    duration: 0.08
   useNativeSize: 1

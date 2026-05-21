@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -114,57 +114,57 @@ MonoBehaviour:
   - {fileID: -198913114, guid: a6bb024ff497713458697e37c3258dad, type: 3}
   - {fileID: 27182155, guid: a6bb024ff497713458697e37c3258dad, type: 3}
   - {fileID: -1168075133, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: -531687755511998023, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 127221965732583465, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -7315722196254549613, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1452097961255730732, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -6840702550863678433, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 6968404339709893170, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1308418879457848557, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -5900287536581611823, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1573711320112414944, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 114919407329596620, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 882700600919298568, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 5136212296848770951, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 2467513316544503805, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1961902143058816835, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -5916909520130976629, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -5612739023913522179, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 8354704489704649162, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -292385186975973028, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 6296742437541933280, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 5291917966328003086, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 5096278619780125227, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 889213585, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -198913114, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 27182155, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1168075133, guid: a6bb024ff497713458697e37c3258dad, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

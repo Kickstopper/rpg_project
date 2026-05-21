@@ -264,21 +264,6 @@ namespace Controller
         {
             SoundManager.Instance.PlayBGM(BgmID.Encounter);
             
-            // ==========================================
-            // VFX 셰이더 웜업
-            Vector3 hiddenPosition = new Vector3(0, -1000f, 0);
-            
-            GameObject warmupVfx1 = visualController.SpawnVFX(VfxID.Magic, hiddenPosition);
-            //GameObject warmupVfx2 = visualController.SpawnVFX(VfxID.Slash, hiddenPosition);
-            
-            // 셰이더 컴파일할 시간
-            yield return wait01; 
-            
-            // 웜업용 이펙트 즉시 삭제
-            if (warmupVfx1 != null) Destroy(warmupVfx1);
-            //if (warmupVfx2 != null) Destroy(warmupVfx2);
-            // ==========================================
-
             yield return fieldController.Refresh();
             
             int monsterCount = monsterList.Sum(m => m.Value);
@@ -2411,31 +2396,7 @@ namespace Controller
                     // 공격
                     SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
 
-                    if (skill.effectType == EffectType.Magic_Atk)
-                    {
-                        // Z축을 카메라 쪽으로 당김.
-                        Vector3 startPos = actor.transform.position + new Vector3(0, 0, 1f);
-                        Vector3 targetPos = targetObj.transform.position + new Vector3(0, 0, 1f);
-
-                        GameObject vfx = visualController.SpawnVFX(VfxID.Magic, startPos);
-                        
-                        if (vfx != null)
-                        {
-                            float arcHeight = 1.0f; 
-                            yield return vfx.transform.DOJump(targetPos, arcHeight, 1, 0.5f)
-                                                      .SetEase(Ease.Linear)
-                                                      .WaitForCompletion();
-                        }
-                        else
-                        {
-                            yield return new WaitForSeconds(0.3f);
-                        }
-                    }
-                    else
-                    {
-                        // 타겟 위치에 즉시 생성 (Special_Atk 등)
-                        visualController.SpawnVFX(VfxID.Magic, targetObj.transform.position);
-                    }
+                    visualController.SpawnVFX(VfxID.Magic, GetCenterPosition(targetObj));
 
                     // 상성과 방어력 계산 적용
                     BattleEntity attackerEntity = action.actor.GetComponent<BattleEntity>();
@@ -2458,7 +2419,7 @@ namespace Controller
                         if (success)
                         {
                             SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
-                            visualController.SpawnVFX(VfxID.Magic, targetObj.transform.position);
+                            visualController.SpawnVFX(VfxID.Magic, GetCenterPosition(targetObj));
                         }
                     }
                 }
@@ -2558,7 +2519,7 @@ namespace Controller
             yield return moveSeq.WaitForCompletion();
 
             // 타격 및 데미지 계산
-            visualController.SpawnVFX(VfxID.Slash, target.transform.position); 
+            visualController.SpawnVFX(VfxID.Slash, GetCenterPosition(target));
             SoundManager.Instance.PlaySFX(SfxID.Attack_Sword);
 
             float critChance = 0.3f + (partners.Count * 0.1f);
@@ -2626,7 +2587,7 @@ namespace Controller
 
                 seq.Join(pc.transform.DOLocalMove(targetPos, 0.3f).SetEase(Ease.OutBack));
                 
-                visualController.SpawnVFX(VfxID.Guard, pc.transform.position); 
+                visualController.SpawnVFX(VfxID.Guard, GetCenterPosition(pc.gameObject));
                 pc.isGuarding = true; 
             }
             yield return seq.WaitForCompletion();
@@ -2682,7 +2643,7 @@ namespace Controller
                         int dmg = BattleCalculator.CalculateGunDamage(shooter, enemyEntity, false);
                         
                         ApplyDamage(enemy.gameObject, dmg, false);
-                        visualController.SpawnVFX(VfxID.Gun, enemy.transform.position);
+                        visualController.SpawnVFX(VfxID.Gun, GetCenterPosition(enemy.gameObject));
                     }
                 }
                 
@@ -3011,7 +2972,7 @@ namespace Controller
                 AddGauge(!isPlayerActor, 0.1f);
 
                 uiController.ShowLog("REFLECT!");
-                visualController.SpawnVFX(VfxID.Reflect, target.transform.position);
+                visualController.SpawnVFX(VfxID.Reflect, GetCenterPosition(target));
                 
                 // 공격자 본인에게 돌아갈 데미지 계산 및 적용
                 int reflectDmg = BattleCalculator.CalculateDamage(attackerEntity, attackerEntity, action, false, 1.0f);
@@ -3035,7 +2996,7 @@ namespace Controller
                 AddGauge(!isPlayerActor, 0.1f);
 
                 uiController.ShowLog("ABSORB!");
-                visualController.SpawnVFX(VfxID.Absorb, target.transform.position);
+                visualController.SpawnVFX(VfxID.Absorb, GetCenterPosition(target));
                 
                 // 타겟이 회복할 데미지량 계산
                 int absorbAmount = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, false, 1.0f);
@@ -3066,7 +3027,7 @@ namespace Controller
                     {
                         defender.SetMessage("막아!");
                         ApplyDamage(defender.gameObject, splitDamage, false);
-                        visualController.SpawnVFX(VfxID.Guard, defender.transform.position);
+                        visualController.SpawnVFX(VfxID.Guard, GetCenterPosition(defender.gameObject));
                     }
                     yield return wait01;
                     
@@ -3098,7 +3059,7 @@ namespace Controller
                     defender = pc; 
                     pc.SetMessage("윽!");
                 }
-                visualController.SpawnVFX(VfxID.Guard, target.transform.position);
+                visualController.SpawnVFX(VfxID.Guard, GetCenterPosition(target));
                 yield return wait01;
                 
                 if (defender) defender.SetMessage(string.Empty);
@@ -3117,7 +3078,7 @@ namespace Controller
                 }
 
                 if (sfxId != SfxID.None) SoundManager.Instance.PlaySFX(sfxId);
-                if (vfxID != VfxID.None) visualController.SpawnVFX(vfxID, target.transform.position);
+                if (vfxID != VfxID.None) visualController.SpawnVFX(vfxID, GetCenterPosition(target));
                 yield return wait01;
             }
             
@@ -3335,6 +3296,17 @@ namespace Controller
             // 전투 종료
             fieldController.ClearMonsterField(); // 전장의 몬스터들을 싹 지워버림
             uiController.ShowBattleEndAnimation(()=>{GameStateManager.Instance.ChangeState(GameState.Exploration);});
+        }
+
+        // 피봇 설정과 무관하게 RectTransform의 시각적 중앙 월드 좌표를 반환하는 함수
+        private Vector3 GetCenterPosition(GameObject target)
+        {
+            RectTransform rt = target.GetComponent<RectTransform>();
+            if (rt != null)
+                return rt.TransformPoint(rt.rect.center);
+            
+            // RectTransform이 없는 예외적인 경우
+            return target.transform.position;
         }
         
     }

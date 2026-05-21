@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -99,27 +99,27 @@ MonoBehaviour:
   - {fileID: 1749418213, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
   - {fileID: 1818308488, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
   - {fileID: 1695672142, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: 681071799447341495, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 4487532577609932381, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 2272001917959763892, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 5227281965415428547, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -7438309389003594596, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -8830055913147423920, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1534733970, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1749418213, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1818308488, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1695672142, guid: 584ed96e93d04f649abff6dc808a30a8, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

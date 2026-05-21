@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -92,13 +92,13 @@ MonoBehaviour:
   - {fileID: 5357241829845827063, guid: fb33110790dd31f438682b85badf7980, type: 3}
   - {fileID: -9159663366425904886, guid: fb33110790dd31f438682b85badf7980, type: 3}
   - {fileID: 8604911815385986741, guid: fb33110790dd31f438682b85badf7980, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: 5357241829845827063, guid: fb33110790dd31f438682b85badf7980, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -9159663366425904886, guid: fb33110790dd31f438682b85badf7980, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 8604911815385986741, guid: fb33110790dd31f438682b85badf7980, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

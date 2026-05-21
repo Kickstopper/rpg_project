@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -99,27 +99,27 @@ MonoBehaviour:
   - {fileID: -4478359052254164306, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
   - {fileID: 1946958126989119633, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
   - {fileID: 1884298381427781722, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: -7288778627117066249, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1899516790877511266, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -841450502081975732, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -4976920026865506762, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -2559958114217007463, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 3918660012944566550, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 5791010486908723188, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -4478359052254164306, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1946958126989119633, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1884298381427781722, guid: 2d5289f5b3f5f2747ac211761298aa12, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -99,27 +99,27 @@ MonoBehaviour:
   - {fileID: -1695786424, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
   - {fileID: -571185570, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
   - {fileID: 979572408, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: -3909555651057788044, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -3231498021360879254, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -2628142293398134643, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -5869504260974052998, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 8472771807289393344, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1472488351869603822, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 1750053329, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1695786424, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -571185570, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 979572408, guid: cbf0a039a3cadfa44b981b100605bd14, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

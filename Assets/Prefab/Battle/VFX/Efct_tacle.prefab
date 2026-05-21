@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -99,27 +99,27 @@ MonoBehaviour:
   - {fileID: 7763140949492305398, guid: 9884b7351678313428e63f91ecc06226, type: 3}
   - {fileID: 7683529146821717826, guid: 9884b7351678313428e63f91ecc06226, type: 3}
   - {fileID: -3740128256255558926, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: -2590383284556846536, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 213366450764234809, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -3010374042039231447, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -7254248283969596363, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -9167477976434258066, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -2367150355863762900, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 6092441403204604876, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 7763140949492305398, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 7683529146821717826, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -3740128256255558926, guid: 9884b7351678313428e63f91ecc06226, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1

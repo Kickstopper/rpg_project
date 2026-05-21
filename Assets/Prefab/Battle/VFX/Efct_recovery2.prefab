@@ -28,8 +28,8 @@ RectTransform:
   m_GameObject: {fileID: 2210249593246853867}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -99,27 +99,27 @@ MonoBehaviour:
   - {fileID: -2619067793582839321, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
   - {fileID: -2141901776, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
   - {fileID: -1853547341, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-  defaultDuration: 0.1
+  defaultDuration: 0.08
   generateFramesNow: 0
   frames:
   - frameSprite: {fileID: -6375011016467771811, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -7220984325582052348, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: 6908755920198576913, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -5334621521099055003, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -5601325545967780396, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1149178533403766118, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -899105782276495266, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -2619067793582839321, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -2141901776, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   - frameSprite: {fileID: -1853547341, guid: f7bc178691282ff4c85409f49d7a2236, type: 3}
-    duration: 0.1
+    duration: 0.08
   useNativeSize: 1
