@@ -18793,7 +18793,7 @@ PrefabInstance:
       objectReference: {fileID: 87195423}
     - target: {fileID: 1008498175082326751, guid: 0ee4b56faf9f8314b970dbbb0996e9f3, type: 3}
       propertyPath: locationName
-      value: "\uBC18\uB3C4\uCCB4 \uACF5\uC7A5"
+      value: "\uC5F0\uAD6C\uC18C \uB85C\uBE44"
       objectReference: {fileID: 0}
     - target: {fileID: 1008498175082326751, guid: 0ee4b56faf9f8314b970dbbb0996e9f3, type: 3}
       propertyPath: messagePanel
@@ -18801,7 +18801,7 @@ PrefabInstance:
       objectReference: {fileID: 334259869}
     - target: {fileID: 1008498175082326751, guid: 0ee4b56faf9f8314b970dbbb0996e9f3, type: 3}
       propertyPath: targetDungeonID
-      value: dummy
+      value: Outpost
       objectReference: {fileID: 0}
     - target: {fileID: 5706274382006714108, guid: 0ee4b56faf9f8314b970dbbb0996e9f3, type: 3}
       propertyPath: m_LocalScale.z
@@ -30837,6 +30837,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.WorldMapScene.WorldMapEncounterController
   encounterSystem:
+    currentMode: 0
     minSteps: 15
     maxSteps: 30
     dangerSlider: {fileID: 1132573882}

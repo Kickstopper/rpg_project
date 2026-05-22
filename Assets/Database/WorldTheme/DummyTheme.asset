@@ -13,15 +13,9 @@ MonoBehaviour:
   m_Name: DummyTheme
   m_EditorClassIdentifier: Assembly-CSharp::Data.RegionTheme
   regionID: region_00
-  regionName: "\uB3D9\uD0C4\uC2E0\uB3C4\uC2DC"
+  regionName: "\uC5F0\uAD6C\uC18C \uC815\uBB38 \uADFC\uCC98"
   fieldBgmID: 26
   battleBackground: {fileID: 0}
   battleBgmID: 3
-  monsterList:
-  - 000
-  - 001
-  - 002
-  - 003
-  - 004
-  - 005
-  startPosition: {x: 27.5, y: 0, z: -5.5}
+  monsterList: []
+  startPosition: {x: 16.05, y: 0, z: 35.75}

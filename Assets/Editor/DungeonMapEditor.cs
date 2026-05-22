@@ -648,6 +648,8 @@ public class DungeonMapEditor : EditorWindow
                     GUILayout.Space(5);
                     GUILayout.Label("Target Destination", EditorStyles.miniBoldLabel);
                     
+                    existingEntrance.isWorldMap = EditorGUILayout.Toggle("Is World Map", existingEntrance.isWorldMap);
+                    
                     existingEntrance.destinationID = EditorGUILayout.TextField("Destination ID", existingEntrance.destinationID);
                     
                     EditorGUILayout.BeginHorizontal();
@@ -680,6 +682,7 @@ public class DungeonMapEditor : EditorWindow
                             sourceY = selectedCell.y,
                             isWallEntrance = true,
                             triggerDirection = Direction.North,
+                            isWorldMap = false,
                             destinationID = "NewDestination",
                             targetX = 1,
                             targetY = 1,

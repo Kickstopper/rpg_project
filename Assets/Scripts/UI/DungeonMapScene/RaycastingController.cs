@@ -9,6 +9,7 @@ using UI.DungeonMapScene;
 using UI;
 using TMPro;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 namespace Controller
 {
@@ -1223,9 +1224,22 @@ namespace Controller
             {
                 if (DungeonEventManager.Instance) {}
                     DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
-                if (DungeonManager.Instance) 
+                
+                if (entrance.isWorldMap)
+                {
+                    WorldManager.Instance.SetCurrentRegionTheme(entrance.destinationID);
+                    WorldManager.Instance.isLoadGame = true;
+                    
+                    var data = WorldManager.Instance.currentRegionTheme;
+                    WorldManager.Instance.loadedPosition = data.startPosition;
+                    SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
+                    GameStateManager.Instance.ChangeState(GameState.Exploration);
+                }
+                else if (DungeonManager.Instance)
+                {
                     DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
-                LoadMapData(entrance); 
+                    LoadMapData(entrance); 
+                } 
                 yield return null; 
 
                 if (fadeOverlay != null)

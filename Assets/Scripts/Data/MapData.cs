@@ -72,9 +72,12 @@ namespace Data
         // 입구 발동을 위한 진입 방향 (플레이어가 어느 방향으로 움직이다 벽을 쳤는가?)
         public Direction triggerDirection;
 
-        public string destinationID; // 도착 장소 ID (맵이면 맵 ID, 상점이면 상점 ID)
+        public bool isWorldMap;
+        public string destinationID; // 도착 장소 ID (맵이면 맵 ID, 상점이면 상점 ID, 월드맵이면 regionId)
+        
         public int targetX;          // 이동 후 스폰될 X
         public int targetY;          // 이동 후 스폰될 Y
-        public Direction targetDirection; // 이동 후 바라볼 방향
+        
+        public Direction targetDirection; // 이동 후 바라볼 방향 (DungeonMapScene만 사용)
     }
 }
