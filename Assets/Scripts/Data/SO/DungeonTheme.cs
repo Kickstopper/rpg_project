@@ -11,6 +11,14 @@ namespace Data
         public float maxInterval;   
     }
 
+    [System.Serializable]
+    public class DoorAnimConfig
+    {
+        public int closedTexId;         // 닫혀있을 때의 기본 문 텍스처 ID
+        public int[] openFrameTexIds;   // 문이 열릴 때 순서대로 교체될 텍스처 ID 배열
+        public float animSpeed = 0.1f;  // 한 프레임당 걸리는 시간
+    }
+
     public enum EncounterMode { Random, Symbol }
 
     [System.Serializable]
@@ -37,6 +45,9 @@ namespace Data
         
         public int floorTexIdx = 1;   // 바닥 텍스처 인덱스
         public int ceilingTexIdx = 2; // 천장 텍스처 인덱스
+
+        [Header("Door Settings")]
+        public List<DoorAnimConfig> doorAnimations; // 맵에 존재하는 문들의 세팅 리스트
         
         public Sprite[] enemySprites;
         public ObjectSpriteData[] objectSprites;

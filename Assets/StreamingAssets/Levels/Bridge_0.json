@@ -505,6 +505,17 @@
             "targetX": 5,
             "targetY": 10,
             "targetDirection": 2
+        },
+        {
+            "type": 0,
+            "sourceX": 1,
+            "sourceY": 8,
+            "isWallEntrance": true,
+            "triggerDirection": 0,
+            "destinationID": "Underground_0",
+            "targetX": 6,
+            "targetY": 2,
+            "targetDirection": 2
         }
     ]
 }

@@ -10,47 +10,44 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
-  m_Name: Bridge_0
+  m_Name: Underground_0
   m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
-  dungeonID: Bridge_0
+  dungeonID: Underground_0
   useWakeUpEffect: 0
   encounterMode: 1
   background: {fileID: 0}
   texture:
-  - {fileID: 2800000, guid: fc4417a817c674946a0cbd140b366707, type: 3}
-  - {fileID: 2800000, guid: 2ddb541c6f6b2d247bf39315fe305aa7, type: 3}
-  - {fileID: 2800000, guid: a7a439ae38c83814596d6e76d86b6eaf, type: 3}
-  - {fileID: 2800000, guid: 888d1537263e65e4094e456b01250178, type: 3}
-  - {fileID: 2800000, guid: 0ed88cd3b18e7c4428ef9e0a4d609743, type: 3}
-  - {fileID: 2800000, guid: dbe248a95b8ee7942b6a35d795b9acd0, type: 3}
-  - {fileID: 2800000, guid: da6abc5bf3802d244a34b3725a773895, type: 3}
-  - {fileID: 2800000, guid: 3f81d2c296e490042b935a24d3cf1424, type: 3}
-  - {fileID: 2800000, guid: bcf619ad6fe4e6840952615fed34c99d, type: 3}
-  - {fileID: 2800000, guid: 39bcae986eefa2645be033b3670c3c04, type: 3}
-  - {fileID: 2800000, guid: fb2a73b6bcf9b3442920cc4624402063, type: 3}
+  - {fileID: 2800000, guid: dc179bea276f2534eaeec81487282600, type: 3}
+  - {fileID: 2800000, guid: be6bd49f5d1ffbe49a708847c9c6385e, type: 3}
+  - {fileID: 2800000, guid: eaa37948b936cdd4f947e6987a2e78c6, type: 3}
+  - {fileID: 2800000, guid: 94aab34d88e1dd844bff34c6dab73fb4, type: 3}
+  - {fileID: 2800000, guid: 6a7687c68ecd89f45b1c7baf9b0d2c3c, type: 3}
+  - {fileID: 2800000, guid: 9b71210b5337d61428d46076d0708d43, type: 3}
+  - {fileID: 2800000, guid: ff5b2d4bd9c9b094abdd00b097ec5283, type: 3}
+  - {fileID: 2800000, guid: 35f1b02016a90264f8fb09d8092cb677, type: 3}
+  - {fileID: 2800000, guid: a5bf58618e8e7ec478814275e2b7b829, type: 3}
+  - {fileID: 2800000, guid: e59edfa2d641fb149ba65a3f42e51d16, type: 3}
+  - {fileID: 2800000, guid: d65075aeea6fff84eaf35ec32389bb0c, type: 3}
+  - {fileID: 2800000, guid: b70fa08e0791aad4091302d3b9968630, type: 3}
   - {fileID: 2800000, guid: 0a8359ec91578d24c957c9d74626529a, type: 3}
-  floorTexIdx: 3
-  ceilingTexIdx: 4
+  floorTexIdx: 5
+  ceilingTexIdx: 1
   doorAnimations:
-  - closedTexId: 2
-    openFrameTexIds: 08000000090000000a0000000b000000
+  - closedTexId: 8
+    openFrameTexIds: 090000000a0000000b0000000c000000
     animSpeed: 0.05
   enemySprites: []
   objectSprites: []
   maxSpawnCount: 0
   spawnDelay: 5
-  wallAnimations:
-  - name: anim
-    frameTexIDs: 040000000500000006000000070000000600000005000000
-    minInterval: 0.2
-    maxInterval: 0.2
-  fogColor: {r: 0.9860432, g: 1, b: 0, a: 1}
+  wallAnimations: []
+  fogColor: {r: 0, g: 1, b: 0, a: 1}
   lightingIntensity: 0.55
   useGridLighting: 0
   bgmID: 0
   moduleEnable: 1
   monsterList: []
-  useDustEffect: 0
+  useDustEffect: 1
   dustParticleCount: 300
   dustSwayAmplitude: 0.01
   dustMovesUp: 0
@@ -58,7 +55,7 @@ MonoBehaviour:
   dustTwinkleSpeed: 15
   dustColor:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4278255546
   useOrganicEffect: 0
   organicFreqX: 4
   organicSpeed: 0.3

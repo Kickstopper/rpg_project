@@ -700,6 +700,96 @@ namespace Controller
             // 진동이 끝나면 시점을 정면(0)으로
             _player.Pitch = 0f;
         }
+
+        private IEnumerator OpenDoorAndMoveRoutine(CellData doorCell, int tx, int ty, Vector2Int moveVec, DoorAnimConfig doorConfig)
+        {
+            _inputLocked = true;
+            
+            // TODO: 문이 열리는 효과음 재생
+            // SoundManager.Instance.PlaySFX(SfxID.Door_Open); 
+
+            // 문이 열리는 애니메이션
+            if (doorConfig.openFrameTexIds != null && doorConfig.openFrameTexIds.Length > 0)
+            {
+                for (int i = 0; i < doorConfig.openFrameTexIds.Length; i++)
+                {
+                    // 해당 셀의 4면 중 벽이 있는 면의 텍스처를 프레임 텍스처로 덮어씌움
+                    for (int face = 0; face < 4; face++)
+                    {
+                        if (doorCell.wallTextureIDs[face] != -1) 
+                            doorCell.wallTextureIDs[face] = doorConfig.openFrameTexIds[i];
+                    }
+                    
+                    yield return new WaitForSeconds(doorConfig.animSpeed); 
+                }
+            }
+
+            // 문이 열렸으면 통과할 수 있게 벽 속성을 제거
+            for (int face = 0; face < 4; face++)
+            {
+                doorCell.wallTextureIDs[face] = -1; // 텍스처 삭제
+            }
+            doorCell.value = 0; // 타일을 막힌 벽(1)에서 빈 공간(0)으로 변경
+
+            // 전진 실행
+            float duration = _player.IsRunning ? moveDuration / 2f : moveDuration;
+            if (miniMap) miniMap.TranslateToNewPosition(tx, ty, duration);
+            
+            yield return StartCoroutine(_player.MoveGridRoutine(tx, ty, duration, null));
+
+            _inputLocked = false;
+        }
+
+        // 문을 열고 맵을 전환하거나 상점으로 진입하는 연출
+        private IEnumerator OpenDoorAndTransitionRoutine(CellData doorCell, EntranceData entrance, Vector2Int moveDir, DoorAnimConfig doorConfig)
+        {
+            _inputLocked = true;
+            
+            // 원래 문이 배치되어 있던 면과 타일의 원래 value를 저장
+            bool[] originalDoorFaces = new bool[4];
+            int originalValue = doorCell.value;
+            for (int face = 0; face < 4; face++)
+            {
+                if (doorCell.wallTextureIDs[face] == doorConfig.closedTexId)
+                {
+                    originalDoorFaces[face] = true;
+                }
+            }
+
+            // 문 열림 애니메이션 재생 (문이 있던 면만 교체)
+            if (doorConfig.openFrameTexIds != null && doorConfig.openFrameTexIds.Length > 0)
+            {
+                for (int i = 0; i < doorConfig.openFrameTexIds.Length; i++)
+                {
+                    for (int face = 0; face < 4; face++)
+                    {
+                        if (originalDoorFaces[face]) 
+                            doorCell.wallTextureIDs[face] = doorConfig.openFrameTexIds[i];
+                    }
+                    yield return new WaitForSeconds(doorConfig.animSpeed); 
+                }
+            }
+
+            yield return new WaitForSeconds(0.1f);
+
+            // // 통과를 위해 물리적 벽 속성 제거
+            // for (int face = 0; face < 4; face++)
+            // {
+            //     if (originalDoorFaces[face])
+            //         doorCell.wallTextureIDs[face] = -1;
+            // }
+            // doorCell.value = 0; 
+
+            yield return StartCoroutine(TransitionToOtherPlace(entrance, moveDir));
+            
+            // 문을 다시 원래의 닫힘(closedTexId) 상태와 벽 속성으로 복구
+            doorCell.value = originalValue; // 원래 벽 속성 복구
+            for (int face = 0; face < 4; face++)
+            {
+                if (originalDoorFaces[face])
+                    doorCell.wallTextureIDs[face] = doorConfig.closedTexId; // 원래 문 텍스처 복구
+            }
+        }
         
         private void PerformMove(Vector2Int moveVec)
         {
@@ -737,48 +827,75 @@ namespace Controller
             }
             else
             {
+                // 앞을 막고 있는 타일의 문 여부를 체크
+                CellData currentCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
+                CellData targetCell = _currentMap.GetCell(tx, ty);
+
+                int targetEnterFace = -1;
+                int currentExitFace = -1;
+
+                if (moveVec.x > 0)      { targetEnterFace = 3; currentExitFace = 1; }
+                else if (moveVec.x < 0) { targetEnterFace = 1; currentExitFace = 3; }
+                else if (moveVec.y > 0) { targetEnterFace = 2; currentExitFace = 0; }
+                else if (moveVec.y < 0) { targetEnterFace = 0; currentExitFace = 2; }
+
+                bool isBlockedByWall = false;
+                CellData hitCell = null;
+                int hitTexID = -1; 
+
+                // 내벽 및 외벽 충돌 검사
+                if (currentCell != null && currentExitFace != -1 && currentCell.HasWall() && currentCell.wallTextureIDs[currentExitFace] != -1)
+                {
+                    isBlockedByWall = true; hitCell = currentCell; hitTexID = currentCell.wallTextureIDs[currentExitFace];
+                }
+                else if (targetCell != null && targetEnterFace != -1 && targetCell.HasWall() && targetCell.wallTextureIDs[targetEnterFace] != -1)
+                {
+                    isBlockedByWall = true; hitCell = targetCell; hitTexID = targetCell.wallTextureIDs[targetEnterFace];
+                }
+                else if (targetCell == null)
+                {
+                    isBlockedByWall = true;
+                }
+
+                // 부딪힌 벽이 테마의 문으로 등록되어 있는지 확인
+                DoorAnimConfig doorConfig = null;
+                if (isBlockedByWall && hitTexID != -1)
+                {
+                    doorConfig = theme?.doorAnimations?.Find(d => d.closedTexId == hitTexID);
+                }
+
+                // 입구 데이터를 확인한 뒤 상황에 맞게 분기
                 EntranceData validEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, tx, ty, moveVec);
 
                 if (validEntrance != null)
                 {
-                    // 입구가 있다면 레벨 전환 시작
-                    Debug.Log($"[Entrance] {validEntrance.destinationID}으로 이동합니다.");
-                    StartCoroutine(TransitionToOtherPlace(validEntrance, moveVec));
-                }
-                else
-                {
-                    CellData currentCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
-                    CellData targetCell = _currentMap.GetCell(tx, ty);
-
-                    int targetEnterFace = -1;
-                    int currentExitFace = -1;
-
-                    if (moveVec.x > 0)      { targetEnterFace = 3; currentExitFace = 1; } // 동쪽 이동
-                    else if (moveVec.x < 0) { targetEnterFace = 1; currentExitFace = 3; } // 서쪽 이동
-                    else if (moveVec.y > 0) { targetEnterFace = 2; currentExitFace = 0; } // 북쪽 이동
-                    else if (moveVec.y < 0) { targetEnterFace = 0; currentExitFace = 2; } // 남쪽 이동
-
-                    bool isBlockedByWall = false;
-
-                    // 현재 칸에서 나가는 내벽이 존재하는가?
-                    if (currentCell != null && currentExitFace != -1 && currentCell.HasWall() && currentCell.wallTextureIDs[currentExitFace] != -1)
-                        isBlockedByWall = true;
-                    // 진입하려는 칸의 외벽이 존재하는가?
-                    else if (targetCell != null && targetEnterFace != -1 && targetCell.HasWall() && targetCell.wallTextureIDs[targetEnterFace] != -1)
-                        isBlockedByWall = true;
-                    // 맵 경계선 바깥인가?
-                    else if (targetCell == null)
-                        isBlockedByWall = true;
-
-                    // 실제로 텍스처가 발라진 벽이거나 맵 경계일 때만 충돌 효과 발생
-                    if (isBlockedByWall)
+                    if (doorConfig != null && hitCell != null)
                     {
-                        StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
-                        SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
+                        // 문을 열고 전환 코루틴 실행
+                        StartCoroutine(OpenDoorAndTransitionRoutine(hitCell, validEntrance, moveVec, doorConfig));
                     }
                     else
                     {
-                        // Void에 막힌 경우 무시
+                        // 문이 아닐 경우 바로 전환 코루틴 실행
+                        Debug.Log($"[Entrance] {validEntrance.destinationID}으로 이동합니다.");
+                        StartCoroutine(TransitionToOtherPlace(validEntrance, moveVec));
+                    }
+                }
+                else
+                {
+                    if (isBlockedByWall)
+                    {
+                        if (doorConfig != null && hitCell != null)
+                        {
+                            // 일반 문 (입구 데이터는 없음). 문을 열고 한 칸 전진
+                            StartCoroutine(OpenDoorAndMoveRoutine(hitCell, tx, ty, moveVec, doorConfig));
+                        }
+                        else
+                        {
+                            // 일반 벽은 충돌
+                            StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
+                            SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
+                        }
                     }
                 }
             }

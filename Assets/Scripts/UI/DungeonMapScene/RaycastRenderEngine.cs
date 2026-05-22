@@ -160,7 +160,6 @@ namespace UI.DungeonMapScene
         // 애니메이션으로 인해 바닥이나 천장 텍스처가 변경될 때 호출
         public void UpdateFloorCeilingTex(int floorTexIdx, int ceilTexIdx)
         {
-            Debug.Log($"{floorTexIdx},{ceilTexIdx}");
             _floorTexIdx = floorTexIdx;
             _ceilTexIdx = ceilTexIdx;
         }
