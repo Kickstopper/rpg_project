@@ -3106,10 +3106,10 @@ namespace Controller
                     GameObject popupObj = Instantiate(damagePopupPrefab, damagePopupContainer);
                     
                     popupObj.transform.position = target.transform.position; 
-                    popupObj.transform.localPosition += new Vector3(0, 50f, 0); 
+                    popupObj.transform.localPosition += new Vector3(0, 150f, 0); 
                     
-                    float randomX = Random.Range(-20f, 20f);
-                    popupObj.transform.localPosition += new Vector3(randomX, 0, 0);
+                    // float randomX = Random.Range(-20f, 20f);
+                    // popupObj.transform.localPosition += new Vector3(randomX, 0, 0);
 
                     var popupScript = popupObj.GetComponent<DamagePopupController>();
                     if (popupScript != null)
