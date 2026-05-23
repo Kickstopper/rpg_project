@@ -48,6 +48,7 @@ namespace Controller
         private bool _isLookTransitioning = false; // 시점이 부드럽게 변하는 애니메이션 중인지 여부
 
         // 몬스터 리스폰 관련 변수
+        private bool monsterExist;
         private int _maxSpawnCount = 0;
         private float _spawnDelay = 0f;
         private float _currentSpawnTimer = 0f;
@@ -266,7 +267,7 @@ namespace Controller
             UpdateWallAnimations();
             
             // 심볼 몬스터 로직은 랜덤 인카운터 모드가 아닐 때만 실행
-            if (_maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random)
+            if (monsterExist && _maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random)
             {
                 // 몬스터 심볼의 이동과 스폰
                 UpdateEnemyAI();
@@ -570,37 +571,56 @@ namespace Controller
                 yield return null;
             }
 
-            // 레벨 전환 실행
-            DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
-            DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
-            
-            // 새로운 맵 로드
-            LoadMapData(entrance);
-            
-            yield return new WaitForSeconds(0.1f);
-
-            StartCoroutine(LandingImpactRoutine(10f));
-
             _player.BackwardOffset = this.backwardOffset;
             _currentLookState = LookState.None;
 
-            // 페이드 인 및 상태 초기화
-            if (fadeOverlay != null)
+            if (entrance.isWorldMap)
             {
-                float fadeElapsed = 0f;
-                while (fadeElapsed < 0.5f)
-                {
-                    fadeElapsed += Time.deltaTime;
-                    fadeOverlay.alpha = 1f - (fadeElapsed / 0.5f);
-                    yield return null;
-                }
-                fadeOverlay.alpha = 0f;
-                fadeOverlay.blocksRaycasts = false;
-            }
+                if (DungeonEventManager.Instance)
+                    DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
 
-            // 상태 복구
-            _inputLocked = false;
-            _isLookTransitioning = false;
+                WorldManager.Instance.SetCurrentRegionTheme(entrance.destinationID);
+                WorldManager.Instance.isLoadGame = true;
+                
+                var data = WorldManager.Instance.currentRegionTheme;
+                WorldManager.Instance.loadedPosition = data.startPosition;
+                
+                SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
+                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                
+                yield break;
+            }
+            else
+            {
+                // 기존의 일반 던전 레벨 전환 로직
+                DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
+                DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
+                
+                // 새로운 맵 로드
+                LoadMapData(entrance);
+                
+                yield return new WaitForSeconds(0.1f);
+
+                // 착지 흔들림 코루틴
+                StartCoroutine(LandingImpactRoutine(10f));
+
+                // 페이드 인 및 상태 초기화
+                if (fadeOverlay != null)
+                {
+                    float fadeElapsed = 0f;
+                    while (fadeElapsed < 0.5f)
+                    {
+                        fadeElapsed += Time.deltaTime;
+                        fadeOverlay.alpha = 1f - (fadeElapsed / 0.5f);
+                        yield return null;
+                    }
+                    fadeOverlay.alpha = 0f;
+                    fadeOverlay.blocksRaycasts = false;
+                }
+
+                _inputLocked = false;
+                _isLookTransitioning = false;
+            }
         }
 
         private IEnumerator JumpDownRoutine(EntranceData entrance, Vector2Int moveDir)
@@ -650,38 +670,59 @@ namespace Controller
                 yield return null;
             }
 
-            // 레벨 전환
-            DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
-            DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
-            
-            // 새로운 맵 로드
-            LoadMapData(entrance);
-            
-            yield return new WaitForSeconds(0.1f);
-
-            // 착지 흔들림 코루틴
-            StartCoroutine(LandingImpactRoutine(150f));
-
-            // 흔들림이 시작되기 전, 상태와 오프셋을 미리 원상 복구
+            // 맵을 로드하기 전에 오프셋과 시점 상태를 먼저 원상 복구
             _player.BackwardOffset = this.backwardOffset; 
             _currentLookState = LookState.None;
 
-            // 페이드 인 및 상태 초기화
-            if (fadeOverlay != null)
+            if (entrance.isWorldMap)
             {
-                float fadeElapsed = 0f;
-                while (fadeElapsed < 0.5f)
-                {
-                    fadeElapsed += Time.deltaTime;
-                    fadeOverlay.alpha = 1f - (fadeElapsed / 0.5f);
-                    yield return null;
-                }
-                fadeOverlay.alpha = 0f;
-                fadeOverlay.blocksRaycasts = false;
-            }
+                if (DungeonEventManager.Instance)
+                    DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
 
-            _inputLocked = false;
-            _isLookTransitioning = false;
+                WorldManager.Instance.SetCurrentRegionTheme(entrance.destinationID);
+                WorldManager.Instance.isLoadGame = true;
+                
+                var data = WorldManager.Instance.currentRegionTheme;
+                WorldManager.Instance.loadedPosition = data.startPosition;
+                
+                // 월드맵 씬 로드 및 상태 변경
+                SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
+                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                
+                // 씬이 파괴되므로 코루틴을 즉시 종료
+                yield break; 
+            }
+            else
+            {
+                // 기존의 일반 던전 레벨 전환 로직
+                DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
+                DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
+                
+                // 새로운 맵 로드
+                LoadMapData(entrance);
+                
+                yield return new WaitForSeconds(0.1f);
+
+                // 착지 흔들림 코루틴
+                StartCoroutine(LandingImpactRoutine(150f));
+
+                // 페이드 인 및 상태 초기화
+                if (fadeOverlay != null)
+                {
+                    float fadeElapsed = 0f;
+                    while (fadeElapsed < 0.5f)
+                    {
+                        fadeElapsed += Time.deltaTime;
+                        fadeOverlay.alpha = 1f - (fadeElapsed / 0.5f);
+                        yield return null;
+                    }
+                    fadeOverlay.alpha = 0f;
+                    fadeOverlay.blocksRaycasts = false;
+                }
+
+                _inputLocked = false;
+                _isLookTransitioning = false;
+            }
         }
 
         private IEnumerator LandingImpactRoutine(float magnitude, float duration = 0.6f)
@@ -725,12 +766,12 @@ namespace Controller
                 }
             }
 
-            // 문이 열렸으면 통과할 수 있게 벽 속성을 제거
-            for (int face = 0; face < 4; face++)
-            {
-                doorCell.wallTextureIDs[face] = -1; // 텍스처 삭제
-            }
-            doorCell.value = 0; // 타일을 막힌 벽(1)에서 빈 공간(0)으로 변경
+            // // 문이 열렸으면 통과할 수 있게 벽 속성을 제거
+            // for (int face = 0; face < 4; face++)
+            // {
+            //     doorCell.wallTextureIDs[face] = -1; // 텍스처 삭제
+            // }
+            // doorCell.value = 0; // 타일을 막힌 벽(1)에서 빈 공간(0)으로 변경
 
             // 전진 실행
             float duration = _player.IsRunning ? moveDuration / 2f : moveDuration;
@@ -779,17 +820,20 @@ namespace Controller
             //     if (originalDoorFaces[face])
             //         doorCell.wallTextureIDs[face] = -1;
             // }
-            // doorCell.value = 0; 
+            // doorCell.value = 0;
 
-            yield return StartCoroutine(TransitionToOtherPlace(entrance, moveDir));
-            
-            // 문을 다시 원래의 닫힘(closedTexId) 상태와 벽 속성으로 복구
-            doorCell.value = originalValue; // 원래 벽 속성 복구
-            for (int face = 0; face < 4; face++)
-            {
-                if (originalDoorFaces[face])
-                    doorCell.wallTextureIDs[face] = doorConfig.closedTexId; // 원래 문 텍스처 복구
-            }
+            // 코루틴이 파괴되기 전 시점에 실행할 복구 함수
+            Action restoreDoorAction = () => {
+                // 문을 다시 원래의 닫힘(closedTexId) 상태와 벽 속성으로 복구
+                doorCell.value = originalValue;  // 원래 벽 속성 복구
+                for (int face = 0; face < 4; face++)
+                {
+                    if (originalDoorFaces[face])
+                        doorCell.wallTextureIDs[face] = doorConfig.closedTexId; // 원래 문 텍스처 복구
+                }
+            };
+
+            yield return StartCoroutine(TransitionToOtherPlace(entrance, moveDir, restoreDoorAction));
         }
         
         private void PerformMove(Vector2Int moveVec)
@@ -1174,7 +1218,7 @@ namespace Controller
         }
 
         // 레벨 전환 및 상점 진입 코루틴
-        private IEnumerator TransitionToOtherPlace(EntranceData entrance, Vector2Int moveDir)
+        private IEnumerator TransitionToOtherPlace(EntranceData entrance, Vector2Int moveDir, Action onFadeOutComplete = null)
         {
             _inputLocked = true; // 입력 잠금
 
@@ -1219,6 +1263,9 @@ namespace Controller
             }
 
             yield return new WaitForSeconds(0.2f);
+            
+            // 화면이 완전히 암전된 직후, 씬이나 맵이 변경되기 전에 콜백 실행
+            onFadeOutComplete?.Invoke();
 
             if (entrance.type == EntranceType.Map)
             {
@@ -1350,6 +1397,78 @@ namespace Controller
             
             SoundManager.Instance.PlayBGM(theme.bgmID);
 
+            UpdateRenderSettings(theme);
+
+            if (backgroundImage != null) backgroundImage.texture = theme.background;
+            
+            // 시스템 초기화
+            _renderer.LoadAssets(theme, 64, 64, null);
+            // 테마에 설정된 인카운터 모드로 초기화
+            encounterSystem.Initialize(theme.monsterList, theme.encounterMode);
+
+            int finalStartX = _currentMap.startX;
+            int finalStartY = _currentMap.startY;
+            Direction finalStartDir = _currentMap.startDirection;
+
+            if (entryEntrance != null)
+            {
+                // 케이스 1: 다른 던전 문을 통해 명시적으로 들어온 경우
+                finalStartDir = entryEntrance.targetDirection;
+                finalStartX = entryEntrance.targetX;
+                finalStartY = entryEntrance.targetY;
+            }
+            else
+            {
+                // 케이스 2: 월드맵 등에서 매개변수 없이(null) 새로 씬이 켜진 경우
+                // DungeonMapStateManager에 이 맵에 대한 세이브/마지막 위치 정보가 있는지 확인합니다.
+                if (DungeonMapStateManager.Instance != null)
+                {
+                    // 만약 해당 데이터 매니저에 마지막 위치를 기억하는 전역 기능이 있다면 가져옵니다.
+                    // 예시: DungeonMapStateManager에 마지막 좌표를 반환하는 메서드가 있다고 가정할 때
+                    // var lastPos = DungeonMapStateManager.Instance.GetLastPosition(_currentMap.mapID);
+                    // if (lastPos != null) { finalStartX = lastPos.x; finalStartY = lastPos.y; finalStartDir = (int)lastPos.dir; }
+                }
+                
+                // 만약 월드맵에서 던전으로 들어올 때 전용 시작 좌표를 DungeonManager에 세팅해 주었다면 그것을 사용합니다.
+                // 예시: DungeonManager.Instance.reservedSpawnX 등이 구현되어 있다면 적용
+            }
+
+            if (DungeonEventManager.Instance)
+                DungeonEventManager.Instance.SetCurrentMapID(_currentMap.mapID);
+            
+            // 최종 결정된 좌표로 플레이어를 완벽하게 배치합니다.
+            _player.SetMapData(_currentMap, finalStartX, finalStartY, finalStartDir);
+
+            RefreshAppVisible();
+            
+            // 벽 애니메이션 초기화
+            InitializeWallAnims(theme);
+            _renderer.SetMapData(_currentMap, theme, _tileAnimStates);
+            
+            UpdateMapDiscovery(_player.LogicX, _player.LogicY);
+            
+            _maxSpawnCount = theme.maxSpawnCount;
+            _spawnDelay = theme.spawnDelay;
+            _currentSpawnTimer = 0f;
+            _activeEnemies.Clear();
+
+            SpawnStaticObjects(theme);
+            
+            monsterExist = theme.monsterList != null && theme.monsterList.Count > 0;
+            // 심볼 인카운터 모드일 때만 몬스터 스폰
+            if (monsterExist && _maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random) 
+            {
+                SpawnSymbolEnemies(_maxSpawnCount);
+            }
+            else
+            {
+                // 몬스터가 없어도 고정 오브젝트를 렌더러로 보내야 하므로
+                UpdateSpriteData();
+            }
+        }
+
+        private void UpdateRenderSettings(DungeonTheme theme)
+        {
             renderSettings.useGridLighting = theme.useGridLighting;
             renderSettings.lightingIntensity = theme.lightingIntensity;
             renderSettings.fogColor = theme.fogColor;
@@ -1383,52 +1502,6 @@ namespace Controller
             renderSettings.useDustTwinkle = theme.useDustTwinkle;
             renderSettings.dustTwinkleSpeed = theme.dustTwinkleSpeed;
             renderSettings.dustColor = theme.dustColor;
-
-            if (backgroundImage != null) backgroundImage.texture = theme.background;
-            
-            // 시스템 초기화
-            _renderer.LoadAssets(theme, 64, 64, null);
-            // 테마에 설정된 인카운터 모드로 초기화
-            encounterSystem.Initialize(theme.monsterList, theme.encounterMode);
-
-            // 플레이어 위치 초기화
-            if (entryEntrance != null)
-            {
-                _currentMap.startDirection = entryEntrance.targetDirection;
-                _currentMap.startX = entryEntrance.targetX;
-                _currentMap.startY = entryEntrance.targetY;
-            }
-
-            if (DungeonEventManager.Instance)
-                DungeonEventManager.Instance.SetCurrentMapID(_currentMap.mapID);
-            
-            _player.SetMapData(_currentMap, _currentMap.startX, _currentMap.startY, _currentMap.startDirection);
-            
-            RefreshAppVisible();
-            
-            // 벽 애니메이션 초기화
-            InitializeWallAnims(theme);
-            _renderer.SetMapData(_currentMap, theme, _tileAnimStates);
-            
-            UpdateMapDiscovery(_player.LogicX, _player.LogicY);
-            
-            _maxSpawnCount = theme.maxSpawnCount;
-            _spawnDelay = theme.spawnDelay;
-            _currentSpawnTimer = 0f;
-            _activeEnemies.Clear();
-
-            SpawnStaticObjects(theme);
-            
-            // 심볼 인카운터 모드일 때만 몬스터 스폰
-            if (_maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random) 
-            {
-                SpawnSymbolEnemies(_maxSpawnCount);
-            }
-            else
-            {
-                // 몬스터가 없어도 고정 오브젝트를 렌더러로 보내야 하므로
-                UpdateSpriteData();
-            }
         }
 
         // 모듈 UI의 표시 여부 결정
@@ -1438,6 +1511,9 @@ namespace Controller
             {
                 miniMap.Initialize(_currentMap);
                 miniMap.gameObject.SetActive(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.LocalRadar));
+                
+                if (miniMap.gameObject.activeSelf)
+                    miniMap.SnapToGrid(_player.LogicX, _player.LogicY, _player.DirectionIdx);
             }
             if (compassUI != null)
             {
