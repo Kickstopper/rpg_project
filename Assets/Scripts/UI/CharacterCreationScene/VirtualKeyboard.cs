@@ -15,7 +15,8 @@ namespace UI.CharacterCreationScene
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D))
+            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) ||
+                Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow))
             {
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                 return;
@@ -50,7 +51,7 @@ namespace UI.CharacterCreationScene
         // Backspace 버튼 OnClick에 할당됨
         public void OnBackspacePress()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
             if (targetInputField.text.Length > 0)
             {
                 targetInputField.text = targetInputField.text.Substring(0, targetInputField.text.Length - 1);

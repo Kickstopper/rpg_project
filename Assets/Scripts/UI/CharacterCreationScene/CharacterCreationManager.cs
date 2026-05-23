@@ -72,6 +72,7 @@ namespace UI.CharacterCreationScene
                     break;
 
                 case CreationStep.PlayerStats:
+                    SoundManager.Instance.PlayBGM(BgmID.LevelUp);
                     nameInputPanel.SetActive(false);
                     levelUpUI.LeveUpUI.SetActive(true);
 
@@ -81,6 +82,8 @@ namespace UI.CharacterCreationScene
                     break;
 
                 case CreationStep.PartnerStats:
+                    SoundManager.Instance.StopBGM(false);
+                    SoundManager.Instance.PlayBGM(BgmID.LevelUp);
                     SetCharacterStats(PartyID.CHARACTER_01, CreateBaseStat(5)); // 히로인 기본 스탯 저장
                     levelUpUI.ShowForCreation(PartyID.CHARACTER_01, 15, OnPartnerStatsConfirmed);
                     break;

@@ -60,7 +60,8 @@ namespace Data
         ItemShop,
         HealShop,
         Laboatory,
-        Terminal
+        Terminal,
+        LevelUp,
     }
 
     [CreateAssetMenu(fileName = "AudioLibrary", menuName = "Audio/AudioLibrary")]

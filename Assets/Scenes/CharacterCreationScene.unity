@@ -15630,7 +15630,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.CharacterCreationScene.VirtualKeyboard
   targetInputField: {fileID: 952776598}
-  firstSelectedKey: {fileID: 1172022214}
+  firstSelectedKey: {fileID: 1963663248}
 --- !u!1 &1740403367
 GameObject:
   m_ObjectHideFlags: 0
