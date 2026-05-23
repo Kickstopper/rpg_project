@@ -50,8 +50,8 @@ MonoBehaviour:
   bgmID: 0
   moduleEnable: 1
   monsterList: []
-  useDustEffect: 0
-  dustParticleCount: 300
+  useDustEffect: 1
+  dustParticleCount: 100
   dustSwayAmplitude: 0.01
   dustMovesUp: 0
   useDustTwinkle: 1
