@@ -184,13 +184,6 @@ namespace Controller
                 statusFxText.text = string.Empty; 
             }
 
-            resistPhysText.text = ((int)charData.resistances.phys).ToString();
-            resistFireText.text = ((int)charData.resistances.fire).ToString();
-            resistIceText.text = ((int)charData.resistances.ice).ToString();
-            resistElecText.text = ((int)charData.resistances.elec).ToString();
-            resistForceText.text = ((int)charData.resistances.force).ToString();
-            resistPsychText.text = ((int)charData.resistances.psyche).ToString();
-
             // Vitals (HP/MP)
             UpdateSliderAndText(hpSlider, hpText, charData.currentHp, charData.maxHp);
             UpdateSliderAndText(mpSlider, mpText, charData.currentMp, charData.maxMp);
@@ -205,14 +198,7 @@ namespace Controller
             UpdateStat(lucSlider, lucText, charData.stats.luc, maxStatVal);
 
             // Battle Stats
-            atkText.text = charData.GetTotalAttack().ToString();
-            atkHitText.text = charData.GetHitRate().ToString();
-            gunText.text = charData.GetGunAttack().ToString();     // 총 공격력
-            gunHitText.text = charData.GetGunHitRate().ToString(); // 총 명중률
-            defText.text = charData.GetTotalDefense().ToString();
-            evaText.text = charData.GetEvasion().ToString();       // 물리 회피율
-            magPowText.text = charData.GetMagicPower().ToString(); // 마법 위력
-            magFxText.text = charData.GetMagicEffect().ToString(); // 마법 효과(명중률 등)
+            UpdateBattleStatDisplay(charData);
 
             // resonance 및 Skills (ScrollView 갱신)
             List<string> skills = new(charData.learnedSkills);
@@ -237,6 +223,64 @@ namespace Controller
             }
             else hasResonance = false;
             UpdateSkillList(skills);
+        }
+
+        private void UpdateBattleStatDisplay(RuntimeCharacterData charData)
+        {
+            resistPhysText.text = ((int)charData.resistances.phys).ToString();
+            resistFireText.text = ((int)charData.resistances.fire).ToString();
+            resistIceText.text = ((int)charData.resistances.ice).ToString();
+            resistElecText.text = ((int)charData.resistances.elec).ToString();
+            resistForceText.text = ((int)charData.resistances.force).ToString();
+            resistPsychText.text = ((int)charData.resistances.psyche).ToString();
+            
+            int str = charData.stats.str;
+            int vit = charData.stats.vit;
+            int mag = charData.stats.mag;
+            int agi = charData.stats.agi;
+            int luc = charData.stats.luc;
+            int intel = charData.stats.intel;
+            int lv = charData.stats.level;
+
+            WeaponData weapon = DatabaseManager.Instance.GetWeapon(charData.equippedWeaponId);
+            WeaponData gun = DatabaseManager.Instance.GetWeapon(charData.equippedGunId);
+            AmmoData ammo = DatabaseManager.Instance.GetAmmo(charData.equippedAmmoId);
+            
+            int armorDef = 0;
+            int armorEva = 0;
+            foreach(var id in charData.equippedArmorIds)
+            {
+                var a = DatabaseManager.Instance.GetArmor(id);
+                if(a) { armorDef += a.defense; armorEva += a.evasionMod; }
+            }
+
+            // 기획서 공식 적용
+            int atk = str + (weapon != null ? weapon.attackPower : 0) + (lv / 4);
+            int hit = agi + (weapon != null ? weapon.hitRateBonus : 0) + (luc / 2) + lv;
+            
+            int gunAtk = 0;
+            int gunHit = 0;
+            if (gun != null && ammo != null)
+            {
+                gunAtk = gun.attackPower + ammo.damageBonus + (lv / 4);
+                gunHit = gun.hitRateBonus + ammo.hitRateBonus + agi + (luc / 2) + lv;
+            }
+
+            int def = armorDef + vit + agi;
+            int eva = armorEva + agi + (intel / 4) + (luc / 4) + lv;
+
+            int magPow = (mag * 2) + (intel / 2); // MATK
+            int magFx = ((mag + vit + agi) / 4) + intel + (armorDef / 4); // MDEF
+
+            // UI 텍스트 반영
+            atkText.text = atk.ToString();
+            atkHitText.text = hit.ToString();
+            gunText.text = gunAtk.ToString();
+            gunHitText.text = gunHit.ToString();
+            magPowText.text = magPow.ToString();
+            magFxText.text = magFx.ToString(); 
+            defText.text = def.ToString();
+            evaText.text = eva.ToString();
         }
 
         private void UpdatePortraitImage(RuntimeCharacterData data)

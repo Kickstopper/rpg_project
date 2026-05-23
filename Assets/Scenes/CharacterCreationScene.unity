@@ -1777,7 +1777,7 @@ GameObject:
   - component: {fileID: 189333022}
   - component: {fileID: 189333021}
   m_Layer: 5
-  m_Name: Portrait
+  m_Name: title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15775,6 +15775,7 @@ GameObject:
   - component: {fileID: 1753675950}
   - component: {fileID: 1753675952}
   - component: {fileID: 1753675951}
+  - component: {fileID: 1753675953}
   m_Layer: 5
   m_Name: PortraitBg
   m_TagString: Untagged
@@ -15841,6 +15842,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1753675949}
   m_CullTransparentMesh: 1
+--- !u!114 &1753675953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1753675949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1769923579
 GameObject:
   m_ObjectHideFlags: 0
@@ -23745,6 +23761,7 @@ GameObject:
   - component: {fileID: 961681220843048435}
   - component: {fileID: 6922866179724795339}
   - component: {fileID: 5991281050415002663}
+  - component: {fileID: 6922866179724795340}
   m_Layer: 5
   m_Name: PortraitContainer
   m_TagString: Untagged
@@ -26046,6 +26063,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4448795550211814268}
   m_CullTransparentMesh: 1
+--- !u!114 &6922866179724795340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4448795550211814268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!224 &6934287499507256867
 RectTransform:
   m_ObjectHideFlags: 0

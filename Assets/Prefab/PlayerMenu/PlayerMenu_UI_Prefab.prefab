@@ -25406,6 +25406,7 @@ GameObject:
   - component: {fileID: 7747408840877479954}
   - component: {fileID: 479035694277314419}
   - component: {fileID: 4717189895499917955}
+  - component: {fileID: 1097346497535137873}
   m_Layer: 5
   m_Name: PortraitPanel
   m_TagString: Untagged
@@ -25471,6 +25472,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1097346497535137873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015358836289148263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!1 &5055261247379035814
 GameObject:
   m_ObjectHideFlags: 0
