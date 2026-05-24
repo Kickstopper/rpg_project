@@ -22,7 +22,9 @@ namespace Data
         Attack_Gun,     // 총 공격
         Attack_Magic,   // 마법 공격
         PC_Boot,        // 컴퓨터 부팅
-
+        Slide_Door,     // 슬라이드 도어 열림
+        Jump,           // 위층으로 올라가는 소리
+        Fall,           // 아래층으로 떨어진 소리
     }
 
     public enum BgmID
