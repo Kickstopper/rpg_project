@@ -124,6 +124,8 @@ namespace Controller
 
         void Start()
         {
+            _inputLocked = true;
+
             HideSystemMessage();
 
             _renderer.Initialize(renderSettings.screenWidth, renderSettings.screenHeight);
@@ -228,41 +230,21 @@ namespace Controller
                 return;
             }
 
-            if (theme.moduleEnable && (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown()))
+            if (!_inputLocked && theme.moduleEnable && (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown()))
             {
                 GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
                 inputCooldown = 0.2f;
                 return;
             }
             
-            if (Input.GetKeyDown(KeyCode.M))
+            if (!_inputLocked && Input.GetKeyDown(KeyCode.M))
             {
                 if (!theme.moduleEnable || !ModuleManager.Instance.IsMounted(ModuleFeature.AutoMapper)) return;
                 autoMapContainer.SetActive(!autoMapContainer.activeSelf);
                 return;
             }
 
-            // if (Input.GetKeyDown(KeyCode.O)) 
-            // {
-            //     ToggleMovementMode();
-            //     return;
-            // }
-            // if (Input.GetKeyDown(KeyCode.P)) 
-            // {
-            //     GameSettingManager.Instance.useAnaglyph = !GameSettingManager.Instance.useAnaglyph;
-            //     Debug.Log($"Anaglyph: {GameSettingManager.Instance.useAnaglyph}");
-            //     return;
-            // }
-
-            // 입력 처리 분기
-            if (_player.IsGridMove)
-            {
-                HandleInput(); // 그리드 입력
-            }
-            else
-            {
-                HandleFreeMoveInput(); // 자유 이동 입력
-            }
+            if (!_inputLocked) HandleInput(); // 그리드 입력
 
             UpdateWallAnimations();
             
@@ -281,58 +263,58 @@ namespace Controller
         }
 
         // 모드 전환 메서드
-        private void ToggleMovementMode()
-        {
-            if (_player.IsGridMove)
-            {
-                _player.IsGridMove = false;
-                Debug.Log("Switched to Free Move");
-            }
-            else
-            {
-                // 그리드 상태로 스냅핑
-                _player.SnapToGrid();
-                _player.IsGridMove = true;
+        // private void ToggleMovementMode()
+        // {
+        //     if (_player.IsGridMove)
+        //     {
+        //         _player.IsGridMove = false;
+        //         Debug.Log("Switched to Free Move");
+        //     }
+        //     else
+        //     {
+        //         // 그리드 상태로 스냅핑
+        //         _player.SnapToGrid();
+        //         _player.IsGridMove = true;
                 
-                // 스냅 후 미니맵/아이콘 동기화
-                if (miniMap) miniMap.SnapToGrid(_player.LogicX, _player.LogicY, _player.DirectionIdx);
-                if (compassUI) compassUI.SetDirection(_player.DirectionIdx);
-                UpdateMapDiscovery(_player.LogicX, _player.LogicY);
+        //         // 스냅 후 미니맵/아이콘 동기화
+        //         if (miniMap) miniMap.SnapToGrid(_player.LogicX, _player.LogicY, _player.DirectionIdx);
+        //         if (compassUI) compassUI.SetDirection(_player.DirectionIdx);
+        //         UpdateMapDiscovery(_player.LogicX, _player.LogicY);
                 
-                Debug.Log("Switched to Grid Move");
-            }
-        }
+        //         Debug.Log("Switched to Grid Move");
+        //     }
+        // }
 
         // 자유 이동 입력 처리
-        private void HandleFreeMoveInput()
-        {
-            if (_inputLocked) return;
+        // private void HandleFreeMoveInput()
+        // {
+        //     if (_inputLocked) return;
 
-            float moveSpeed = Time.deltaTime * 3.0f; // 속도 조절
-            float rotSpeed = Time.deltaTime * 2.0f;
+        //     float moveSpeed = Time.deltaTime * 3.0f; // 속도 조절
+        //     float rotSpeed = Time.deltaTime * 2.0f;
 
-            // 점프
-            //if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
-            // 스캔
-            if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
+        //     // 점프
+        //     //if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
+        //     // 스캔
+        //     if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
 
-            // 이동
-            if (Input.GetKey(KeyCode.W)) _player.MoveFree(moveSpeed);
-            if (Input.GetKey(KeyCode.S)) _player.MoveFree(-moveSpeed);
+        //     // 이동
+        //     if (Input.GetKey(KeyCode.W)) _player.MoveFree(moveSpeed);
+        //     if (Input.GetKey(KeyCode.S)) _player.MoveFree(-moveSpeed);
 
-            if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) 
-            {
-                _player.RotateFree(rotSpeed); // 왼쪽 회전
-            }
-            if (Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) 
-            {
-                _player.RotateFree(-rotSpeed); // 오른쪽 회전
-            }
+        //     if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) 
+        //     {
+        //         _player.RotateFree(rotSpeed); // 왼쪽 회전
+        //     }
+        //     if (Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) 
+        //     {
+        //         _player.RotateFree(-rotSpeed); // 오른쪽 회전
+        //     }
 
-            // Free Move 시 미니맵 갱신 (즉시 갱신)
-            if (miniMap) miniMap.SetFreeDirection(_player.DirX, _player.DirY);
-            autoMapRenderer.UpdatePlayerIconFree(_player.PosX, _player.PosY, _player.DirX, _player.DirY);
-        }
+        //     // Free Move 시 미니맵 갱신 (즉시 갱신)
+        //     if (miniMap) miniMap.SetFreeDirection(_player.DirX, _player.DirY);
+        //     autoMapRenderer.UpdatePlayerIconFree(_player.PosX, _player.PosY, _player.DirX, _player.DirY);
+        // }
 
         // ================= Input & Logic =================
         private void HandleInput()
@@ -1044,6 +1026,25 @@ namespace Controller
             StartCoroutine(TurnRoutine(1));
         }
 
+        // 특정 절대 방향(Direction enum)으로 회전
+        public void UI_TurnToDirection(Direction targetDirection)
+        {
+            if (_inputLocked || _player.IsMoving) return;
+            
+            StartCoroutine(TurnToDirectionRoutine((int)targetDirection));
+        }
+
+        // 특정 절대 방향으로 회전
+        public void UI_TurnToDirection(int targetDir)
+        {
+            if (_inputLocked || _player.IsMoving) return;
+            
+            // 입력값이 0~3 사이를 유지하도록
+            targetDir = ((targetDir % 4) + 4) % 4; 
+            
+            StartCoroutine(TurnToDirectionRoutine(targetDir));
+        }
+
         public void UI_Action()
         {
             // 입력이 잠겨있거나, 이동 중이거나, 시점이 움직이는 중이면 무시
@@ -1392,6 +1393,33 @@ namespace Controller
             CheckFrontForShop();
         }
 
+        // 특정 절대 방향(0: 북, 1: 동, 2: 남, 3: 서)으로 회전
+        private IEnumerator TurnToDirectionRoutine(int targetDir)
+        {
+            int currentDir = _player.DirectionIdx;
+
+            // 이미 목표 방향을 바라보고 있다면 즉시 종료
+            if (currentDir == targetDir) yield break;
+
+            // 최단 회전 방향 계산 -1: 왼쪽, 1: 오른쪽, 2: 뒤로 돌기
+            int dirStep = targetDir - currentDir;
+
+            // 회전 최적화: 시계 반대 방향(-3)은 시계 방향(+1)과 같고, 시계 방향(+3)은 시계 반대 방향(-1)과 같음
+            if (dirStep == -3) dirStep = 1;
+            else if (dirStep == 3) dirStep = -1;
+
+            if (Mathf.Abs(dirStep) == 2)
+            {
+                // 오른쪽으로 90도씩 두 번 회전
+                yield return StartCoroutine(TurnRoutine(1));
+                yield return StartCoroutine(TurnRoutine(1));
+            }
+            else
+            {
+                yield return StartCoroutine(TurnRoutine(dirStep));
+            }
+        }
+
         // ================= Map & Game Logic =================
         private void LoadMapData(EntranceData entryEntrance = null)
         {
@@ -1588,11 +1616,18 @@ namespace Controller
         {
             if (DungeonEventManager.Instance == null) return;
 
-            string eventID = DungeonEventManager.Instance.CheckEvent(_player.LogicX, _player.LogicY);
+            (string eventID, int forceDir) = DungeonEventManager.Instance.CheckEvent(_player.LogicX, _player.LogicY);
             if (!string.IsNullOrEmpty(eventID))
+                StartCoroutine(ShowDialog(eventID, forceDir));
+        }
+
+        IEnumerator ShowDialog(string eventID, int forceDir)
+        {
+            if (forceDir != -1)
             {
-                GameStateManager.Instance.StartEventDialogue(eventID);
-            }
+                yield return TurnToDirectionRoutine(forceDir);
+            } 
+            GameStateManager.Instance.StartEventDialogue(eventID);
         }
 
         private void UpdateMapDiscovery(int x, int y)

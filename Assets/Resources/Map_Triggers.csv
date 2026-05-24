@@ -1,7 +1,3 @@
-MapID,X,Y,EventID,Repeatable,Description
-Outpost,5,0,OUTPOST_1,FALSE,NPC의 주의 (최초 1회만)
-Outpost,5,10,OUTPOST_2,FALSE,NPC의 주의 (최초 1회만)
-Dream,15,1,DREAM_1,FALSE,독백 (최초 1회만)
-Dream,6,24,DREAM_2,TRUE,독백
-Dungeon_F1,10,10,EVT_FOUNTAIN,TRUE,회복의 샘 (반복 가능)
-Dungeon_F2,5,2,EVT_BOSS_WARNING,FALSE,보스방 앞 경고
+MapID,X,Y,EventID,Repeatable,ForceDir,Description
+Outpost,5,0,OUTPOST_1,FALSE,,파트너의 주의 (최초 1회만)
+Outpost,5,10,OUTPOST_2,FALSE,0,NPC의 주의 (최초 1회만)

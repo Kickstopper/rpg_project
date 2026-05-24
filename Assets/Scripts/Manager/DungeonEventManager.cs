@@ -8,9 +8,7 @@ namespace Manager
     {
         public static DungeonEventManager Instance;
 
-        // Key: "FloorID_X_Y" 형태의 문자열 (예: "F1_3_5")
-        // Value: 트리거 정보
-        private Dictionary<string, EventTriggerData> triggerMap = new Dictionary<string, EventTriggerData>();
+        private Dictionary<string, List<EventTriggerData>> triggerMap = new Dictionary<string, List<EventTriggerData>>();
 
         private string currentMapID = string.Empty; // 현재 층 ID
 
@@ -31,52 +29,59 @@ namespace Manager
 
         void LoadTriggerData()
         {
-            // Map_Triggers.csv 로드
             var rawData = CSVReader.Read(Resources.Load<TextAsset>("Map_Triggers"));
 
             foreach (var row in rawData)
             {
-                // CSV 컬럼: MapID, X, Y, EventID, Repeatable
                 string mapID = row["MapID"];
                 string x = row["X"];
                 string y = row["Y"];
-                string key = $"{mapID}_{x}_{y}"; // 고유 키 생성
+                string key = $"{mapID}_{x}_{y}";
 
-                bool repeatable = row["Repeatable"].ToUpper() == "TRUE";
-                string eventID = row["EventID"];
+                bool repeatable = row.ContainsKey("Repeatable") && row["Repeatable"].ToUpper() == "TRUE";
+                string eventID = row.ContainsKey("EventID") ? row["EventID"] : "";
 
-                triggerMap[key] = new EventTriggerData(eventID, repeatable);
+                int forceDir = -1;
+                if (row.ContainsKey("ForceDir") && int.TryParse(row["ForceDir"], out int parsedDir))
+                {
+                    forceDir = parsedDir;
+                }
+
+                EventTriggerData newData = new EventTriggerData(eventID, repeatable, forceDir);
+
+                if (!triggerMap.ContainsKey(key)) 
+                    triggerMap[key] = new List<EventTriggerData>();
+
+                triggerMap[key].Add(newData);
             }
         }
 
-        // 플레이어가 이동을 마칠 때마다 호출
-        public string CheckEvent(int x, int y)
+        public (string eventID, int forceDir) CheckEvent(int x, int y)
         {
             string key = $"{currentMapID}_{x}_{y}";
 
-            string eventID = null;
-
             if (triggerMap.ContainsKey(key))
             {
-                EventTriggerData trigger = triggerMap[key];
+                List<EventTriggerData> eventsAtLocation = triggerMap[key];
 
-                // 이미 완료된 1회성 이벤트라면 무시
-                if (!trigger.Repeatable && trigger.IsCompleted)
+                foreach (EventTriggerData trigger in eventsAtLocation)
                 {
-                    return null;
-                }
+                    // 이미 완료된 1회성 이벤트는 무시하고 다음 이벤트로 넘김
+                    if (!trigger.Repeatable && trigger.IsCompleted)
+                    {
+                        continue;
+                    }
 
-                // 이벤트 발생! -> DialogueManager에게 "내용 재생해줘"라고 요청
-                Debug.Log($"Event Triggered: {trigger.EventID}");
-                // 상태 업데이트
-                trigger.IsCompleted = true;
-                
-                return trigger.EventID;
+                    // 실행 조건을 만족하는 첫 번째 이벤트를 완료 처리함
+                    trigger.IsCompleted = true;
+                    
+                    return (trigger.EventID, trigger.ForceDir);
+                }
             }
-            return eventID;
+
+            return (null, -1); 
         }
 
-        // 층 이동 시 호출
         public void SetCurrentMapID(string mapID)
         {
             currentMapID = mapID;

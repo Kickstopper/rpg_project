@@ -6,10 +6,8 @@ namespace Manager
     {
         public static DialogueManager Instance;
 
-        // 전체 데이터를 저장할 리스트
         private List<Dictionary<string, string>> allDialogueData;
         
-        // 빠른 검색을 위해 EventID를 키로 그룹화
         private Dictionary<string, List<Dictionary<string, string>>> eventDatabase;
 
         void Awake()
@@ -29,7 +27,7 @@ namespace Manager
 
         void LoadData()
         {
-            // Resources 폴더 안의 "Event_Scripts" 파일을 로드 (.csv 확장자 생략)
+            // Resources/Event_Scripts.csv 로드
             TextAsset csvFile = Resources.Load<TextAsset>("Event_Scripts");
             
             if (csvFile == null)
