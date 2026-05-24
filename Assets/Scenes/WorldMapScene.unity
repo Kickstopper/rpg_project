@@ -15639,6 +15639,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 514247600}
     - target: {fileID: 1263032844844120448, guid: 87e890a5e645756408afa24ef87b8670, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1263032844844120448, guid: 87e890a5e645756408afa24ef87b8670, type: 3}
       propertyPath: m_PlaneDistance
       value: 1
       objectReference: {fileID: 0}

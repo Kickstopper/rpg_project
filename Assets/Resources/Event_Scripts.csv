@@ -1,7 +1,10 @@
 EventID,Seq,Type,Speaker,Portrait,Text,Condition,Action / Param,NextID
-DREAM_1,1,TALK,,,안개가 자욱해 앞이 잘 보이지 않는다,None,None,2
-DREAM_1,2,TALK,,,......,None,None,3
-DREAM_1,3,TALK,,,앞으로 나아가지 않으면 안 될 것 같다,None,None,END
+OUTPOST_1,1,TALK,파트너,chr_01,뭔가 불길하네...,None,None,2
+OUTPOST_1,2,TALK,파트너,chr_01,꼭 가야하는 거야?,None,None,END
+
+OUTPOST_2,1,TALK,???,npc,이보게 젊은이. 이 앞으로 가려는 건가?,None,None,2
+OUTPOST_2,2,TALK,???,npc,그렇다면 조심하는 게 좋아. 이 앞은 E입자에 심하게 오염되었다네.,None,None,3
+OUTPOST_2,3,TALK,???,npc,나 같은 몬스터가 언제 튀어나올지 모른다고. 껄껄껄.,None,None,END
 
 DREAM_2,1,TALK,,,바닥에 구멍이 있다,None,None,2
 DREAM_2,2,TALK,,,Shift + ↓를 눌러 내려다볼까?,None,None,END

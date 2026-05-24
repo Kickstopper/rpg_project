@@ -147,7 +147,6 @@ namespace UI
                         standingImageUI.sprite = entry.standingImage;
                         standingImageUI.SetNativeSize();
                         standingImageUI.enabled = true;
-                        // standingImageUI.SetNativeSize(); // 필요시 원본 비율 유지
                     }
                     else
                     {
