@@ -110,6 +110,12 @@ namespace Manager
             Debug.Log($"레벨 로드 완료: ID {data.mapID}, Theme {data.themeName}");
         }
 
+        public DungeonTheme GetCurrentDungeonTheme()
+        {
+            if (CurrentDungeonData == null || string.IsNullOrEmpty(CurrentDungeonData.themeName)) return null;
+            return GetDungeonTheme(CurrentDungeonData.themeName);
+        }
+
         // 던전 테마 가져오기
         public DungeonTheme GetDungeonTheme(string dungeonID)
         {

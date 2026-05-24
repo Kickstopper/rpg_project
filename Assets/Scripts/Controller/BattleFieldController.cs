@@ -64,7 +64,7 @@ public class BattleFieldController : MonoBehaviour
         public bool isFrontRow;
         public int columnIndex; // 0:왼쪽, 1:가운데, 2:오른쪽
     }
-    
+
     private WaitForSeconds wait10 = new WaitForSeconds(1f);
 
     public void InitializeSlots()
@@ -531,8 +531,9 @@ public class BattleFieldController : MonoBehaviour
             seq.Join(monster.transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.OutQuad));
             seq.Join(monster.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutQuad));
             // 색상 보간
-            Color startColor = new Color(0.6f, 0.6f, 0.6f, 1f);
-            seq.Join(DOVirtual.Color(startColor, Color.white, 0.5f, (c) => monster.SetColor(c)));
+            Color startColor = monster.backRowColor; 
+            Color endColor = monster.frontRowColor;
+            seq.Join(DOVirtual.Color(startColor, endColor, 0.5f, (c) => monster.SetColor(c)));
 
             yield return seq.WaitForCompletion();
         }

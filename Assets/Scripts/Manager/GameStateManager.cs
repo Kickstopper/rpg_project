@@ -126,14 +126,13 @@ namespace Manager
         }
 
         // 적을 만났을 때 호출
-        public void StartEncounter(List<string> monsterList, EncounterType encType = EncounterType.Normal)
+        public void StartEncounter(List<string> monsterList, Color fogColor, EncounterType encType = EncounterType.Normal)
         {
             Debug.Log("적 출현!");
             
             if (currentBattleManager != null)
             {
-                // [수정] BattleManager.Initialize에 encType 전달
-                currentBattleManager.Initialize(monsterList, encType);
+                currentBattleManager.Initialize(monsterList, fogColor, encType);
                 ChangeState(GameState.Battle);
             }
             else

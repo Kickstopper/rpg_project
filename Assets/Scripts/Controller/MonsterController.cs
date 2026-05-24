@@ -17,8 +17,8 @@ namespace Controller
         public Material baseAnaglyphMaterial;
         
         // Monster 전용 필드
-        private Color backRowColor = new Color(0.6f, 0.6f, 0.6f, 1f); 
-        private Color frontRowColor = Color.white;
+        public Color backRowColor = new Color(0.6f, 0.6f, 0.6f, 1f); 
+        public Color frontRowColor = Color.white;
         public Button selectButton;
 
         public RowType currentRow;
@@ -163,6 +163,9 @@ namespace Controller
         {
             this.manager = manager;
             
+            backRowColor = Color.Lerp(manager.fogColor, Color.white, 0.4f);
+            frontRowColor = Color.Lerp(manager.fogColor, Color.white, 0.8f);
+
             sourceData = data;
             entityName = data.name;
             level = data.stats.level;

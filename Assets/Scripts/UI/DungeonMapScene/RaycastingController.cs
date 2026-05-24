@@ -601,6 +601,7 @@ namespace Controller
                 
                 yield return new WaitForSeconds(0.1f);
 
+                SoundManager.Instance.PlaySFX(SfxID.Fall);
                 // 착지 흔들림 코루틴
                 StartCoroutine(LandingImpactRoutine(10f));
 
@@ -703,6 +704,7 @@ namespace Controller
                 
                 yield return new WaitForSeconds(0.1f);
 
+                SoundManager.Instance.PlaySFX(SfxID.Fall);
                 // 착지 흔들림 코루틴
                 StartCoroutine(LandingImpactRoutine(150f));
 
@@ -747,8 +749,7 @@ namespace Controller
         {
             _inputLocked = true;
             
-            // TODO: 문이 열리는 효과음 재생
-            // SoundManager.Instance.PlaySFX(SfxID.Door_Open); 
+            SoundManager.Instance.PlaySFX(SfxID.Slide_Door); 
 
             // 문이 열리는 애니메이션
             if (doorConfig.openFrameTexIds != null && doorConfig.openFrameTexIds.Length > 0)
@@ -786,6 +787,8 @@ namespace Controller
         private IEnumerator OpenDoorAndTransitionRoutine(CellData doorCell, EntranceData entrance, Vector2Int moveDir, DoorAnimConfig doorConfig)
         {
             _inputLocked = true;
+            
+            SoundManager.Instance.PlaySFX(SfxID.Slide_Door); 
             
             // 원래 문이 배치되어 있던 면과 타일의 원래 value를 저장
             bool[] originalDoorFaces = new bool[4];
@@ -966,7 +969,7 @@ namespace Controller
             yield return null;
 
             // 전투 개시 명령
-            GameStateManager.Instance.StartEncounter(encounterSystem.MonsterCandidate, encType); 
+            GameStateManager.Instance.StartEncounter(encounterSystem.MonsterCandidate, theme.fogColor, encType); 
 
             // 전투가 끝나고 탐험 상태로 돌아올 때까지 대기
             yield return new WaitUntil(() => GameStateManager.Instance.CurrentState == GameState.Exploration);

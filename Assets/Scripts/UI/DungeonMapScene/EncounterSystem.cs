@@ -132,7 +132,7 @@ namespace UI.DungeonMapScene
             if (GameStateManager.Instance && GameStateManager.Instance.CurrentState != GameState.Battle &&
                 monsters != null && monsters.Count > 0)
             {
-                GameStateManager.Instance.StartEncounter(monsters);
+                GameStateManager.Instance.StartEncounter(monsters, Color.white);
             }
             ResetSteps();
         }
