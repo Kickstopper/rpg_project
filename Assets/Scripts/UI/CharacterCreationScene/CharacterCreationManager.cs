@@ -5,6 +5,7 @@ using UI.Battle;
 using Manager;
 using UnityEngine.UI;
 using Data;
+using Helper;
 
 namespace UI.CharacterCreationScene
 {
@@ -53,6 +54,7 @@ namespace UI.CharacterCreationScene
             switch (currentStep)
             {
                 case CreationStep.PlayerName:
+                    SoundManager.Instance.PlayBGM(BgmID.LevelUp);
                     levelUpUI.LeveUpUI.SetActive(false);
                     titleText.text = "당신의 이름을 입력하세요";
 
@@ -181,7 +183,12 @@ namespace UI.CharacterCreationScene
         private void SetCharacterStats(string characterId, StatData stats)
         {
             var characterData = PartyManager.Instance.GetCharacterByID(characterId);
-            if (characterData != null) characterData.stats = stats;
+            if (characterData != null)
+            {
+                characterData.stats = stats;
+                characterData.currentHp = characterData.maxHp = BattleCalculator.GetMaxHP(stats.level, stats.str, stats.vit);  
+                characterData.currentMp = characterData.maxMp = BattleCalculator.GetMaxMP(stats.level, stats.mag, stats.intel);  
+            } 
         }
 
         private void TransitionToNextScene()
