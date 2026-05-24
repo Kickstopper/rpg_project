@@ -49,8 +49,6 @@ MonoBehaviour:
     - hands_000
     - legs_000
     - acc_000
-    maxHp: 0
-    maxMp: 0
   - id: chr_01
     name: "\uD30C\uD2B8\uB108"
     resonanceId: 
@@ -78,7 +76,7 @@ MonoBehaviour:
       force: 0
       psyche: 0
     initialSkills:
-    - {fileID: 11400000, guid: 862a96975acc81e4fa327954455489bf, type: 2}
+    - {fileID: 11400000, guid: 8689075a897d3d6449ed7536b0ab4c5f, type: 2}
     initialWeaponId: sword_001
     initialGunId: gun_001
     initialAmmoId: ammo_001
@@ -88,5 +86,34 @@ MonoBehaviour:
     - body_000
     - hands_000
     - acc_000
-    maxHp: 0
-    maxMp: 0
+  - id: npc
+    name: ???
+    resonanceId: 
+    expTable: {fileID: 0}
+    exp: 0
+    isCommander: 0
+    isRegular: 0
+    portraitImage: {fileID: 0}
+    battlePortraitImg: {fileID: 0}
+    standingImage: {fileID: 21300000, guid: 5919f9c43146101479012185c1bb860a, type: 3}
+    align: 6
+    stats:
+      level: 0
+      str: 0
+      mag: 0
+      intel: 0
+      vit: 0
+      agi: 0
+      luc: 0
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    initialSkills: []
+    initialWeaponId: sword_001
+    initialGunId: gun_001
+    initialAmmoId: ammo_001
+    initialArmorIds: []
