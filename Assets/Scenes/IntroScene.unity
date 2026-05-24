@@ -686,8 +686,8 @@ MonoBehaviour:
   cutsceneText: {fileID: 834021688}
   bgmId: 27
   fadeOverlay: {fileID: 63047163}
-  fadeInColor: {r: 0, g: 0, b: 0, a: 1}
-  fadeOutColor: {r: 1, g: 1, b: 1, a: 1}
+  fadeInColor: {r: 0, g: 0.278, b: 0, a: 1}
+  fadeOutColor: {r: 0, g: 0, b: 0, a: 1}
   fadeInDuration: 1.5
   fadeOutDuration: 1.5
   cutsceneList:
