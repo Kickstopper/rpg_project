@@ -74,6 +74,7 @@ namespace UI.CharacterCreationScene
                     break;
 
                 case CreationStep.PlayerStats:
+                    virtualKeyboard.enabled = false;
                     SoundManager.Instance.PlayBGM(BgmID.LevelUp);
                     nameInputPanel.SetActive(false);
                     levelUpUI.LeveUpUI.SetActive(true);
