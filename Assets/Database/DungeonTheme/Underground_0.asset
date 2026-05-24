@@ -36,17 +36,29 @@ MonoBehaviour:
   - closedTexId: 8
     openFrameTexIds: 090000000a0000000b0000000c000000
     animSpeed: 0.05
-  enemySprites: []
+  enemySprites:
+  - {fileID: 21300000, guid: b29ac828bb8d5204791056d1574c2550, type: 3}
+  - {fileID: 21300000, guid: 0e0c687bfb6fdc84d875547b14420a07, type: 3}
+  - {fileID: 21300000, guid: db6227537a8ea43499c4deada0449d3e, type: 3}
+  - {fileID: 21300000, guid: 7458706a6be8c5542aaaa5e1c1d34f3d, type: 3}
+  - {fileID: 21300000, guid: b29ac828bb8d5204791056d1574c2550, type: 3}
+  - {fileID: 21300000, guid: 0e0c687bfb6fdc84d875547b14420a07, type: 3}
+  - {fileID: 21300000, guid: b29ac828bb8d5204791056d1574c2550, type: 3}
+  - {fileID: 21300000, guid: 0e0c687bfb6fdc84d875547b14420a07, type: 3}
   objectSprites: []
-  maxSpawnCount: 0
+  maxSpawnCount: 5
   spawnDelay: 5
   wallAnimations: []
   fogColor: {r: 0, g: 1, b: 0, a: 1}
   lightingIntensity: 0.55
   useGridLighting: 0
-  bgmID: 0
+  bgmID: 7
   moduleEnable: 1
-  monsterList: []
+  monsterList:
+  - 004
+  - 009
+  - 014
+  - 016
   useDustEffect: 1
   dustParticleCount: 300
   dustSwayAmplitude: 0.01
