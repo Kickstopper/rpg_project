@@ -267,7 +267,7 @@ namespace UI
                 if (activeChoiceButtons[currentChoiceIndex].interactable)
                 {
                     SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
-                    activeChoiceButtons[currentChoiceIndex].onClick.Invoke();
+                    //activeChoiceButtons[currentChoiceIndex].onClick.Invoke();
                 }
             }
         }
