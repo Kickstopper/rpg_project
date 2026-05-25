@@ -355,7 +355,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
+                2,
                 -1,
                 -1
             ],
@@ -535,7 +535,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
+                2,
                 -1,
                 -1
             ],
@@ -1255,7 +1255,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
+                2,
                 -1,
                 -1
             ],
@@ -1615,7 +1615,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
+                2,
                 -1,
                 -1
             ],
@@ -1795,7 +1795,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
+                2,
                 -1,
                 -1
             ],
@@ -1975,7 +1975,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
+                2,
                 -1,
                 -1
             ],
@@ -1995,7 +1995,7 @@
                 -1,
                 -1,
                 -1,
-                -1
+                2
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2155,7 +2155,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
+                2,
                 -1,
                 -1
             ],
@@ -2278,7 +2278,7 @@
         {
             "x": 6,
             "y": 12,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -2355,7 +2355,7 @@
                 -1,
                 -1,
                 -1,
-                -1
+                2
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2515,7 +2515,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
+                2,
                 -1,
                 -1
             ],
@@ -2550,7 +2550,7 @@
             "y": 14,
             "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 -1,
                 -1,
                 -1
@@ -2568,7 +2568,7 @@
             "y": 14,
             "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 -1,
                 -1,
                 -1
@@ -2586,7 +2586,7 @@
             "y": 14,
             "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 -1,
                 -1,
                 -1
@@ -2604,7 +2604,7 @@
             "y": 14,
             "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 -1,
                 -1,
                 -1
@@ -2622,7 +2622,7 @@
             "y": 14,
             "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 -1,
                 -1,
                 -1
@@ -2640,7 +2640,7 @@
             "y": 14,
             "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 -1,
                 -1,
                 -1
@@ -2658,7 +2658,7 @@
             "y": 14,
             "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 -1,
                 -1,
                 -1
@@ -2676,7 +2676,7 @@
             "y": 14,
             "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 -1,
                 -1,
                 -1

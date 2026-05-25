@@ -1919,9 +1919,9 @@
             "triggerDirection": 2,
             "isWorldMap": false,
             "destinationID": "Underground_1",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
+            "targetX": 6,
+            "targetY": 12,
+            "targetDirection": 2
         },
         {
             "type": 0,
