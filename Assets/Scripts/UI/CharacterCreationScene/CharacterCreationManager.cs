@@ -36,16 +36,16 @@ namespace UI.CharacterCreationScene
             UpdateStep(CreationStep.PlayerName);
         }
 
-        private void Update()
-        {
-            if (currentStep == CreationStep.PlayerName || currentStep == CreationStep.PartnerName)
-            {
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-                {
-                    OnNameConfirmClicked();
-                }
-            }
-        }
+        // private void Update()
+        // {
+        //     if (currentStep == CreationStep.PlayerName || currentStep == CreationStep.PartnerName)
+        //     {
+        //         if (Input.GetKeyDown(KeyCode.Return))
+        //         {
+        //             OnNameConfirmClicked();
+        //         }
+        //     }
+        // }
 
         private void UpdateStep(CreationStep nextStep)
         {
