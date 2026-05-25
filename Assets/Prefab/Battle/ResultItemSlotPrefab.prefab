@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 307622597236084002}
   - component: {fileID: 634378004782985950}
   - component: {fileID: 2204781563935935785}
-  - component: {fileID: 7420215860516149239}
   - component: {fileID: 6407314566388536907}
   m_Layer: 5
   m_Name: ResultItemSlotPrefab
@@ -40,7 +39,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 422, y: 94}
+  m_SizeDelta: {x: 422, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &307622597236084002
 CanvasRenderer:
@@ -101,10 +100,10 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.4117647, g: 0, b: 0.30980393, a: 1}
-    m_HighlightedColor: {r: 0.735849, g: 0, b: 0.5568628, a: 1}
-    m_PressedColor: {r: 0.7372549, g: 0, b: 0.5568628, a: 1}
-    m_SelectedColor: {r: 0.7372549, g: 0, b: 0.5568628, a: 1}
+    m_NormalColor: {r: 0.4264151, g: 0, b: 0.23863585, a: 0.101960786}
+    m_HighlightedColor: {r: 0.85882354, g: 0, b: 0.47843137, a: 0.29803923}
+    m_PressedColor: {r: 0.85882354, g: 0, b: 0.47843137, a: 0.29803923}
+    m_SelectedColor: {r: 0.85882354, g: 0, b: 0.47843137, a: 0.29803923}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -124,21 +123,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7420215860516149239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 940030084927157362}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0.15294118, g: 0.15294118, b: 0.15294118, a: 1}
-  m_EffectDistance: {x: 2, y: -2}
-  m_UseGraphicAlpha: 1
 --- !u!114 &6407314566388536907
 MonoBehaviour:
   m_ObjectHideFlags: 0
