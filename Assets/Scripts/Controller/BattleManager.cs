@@ -1012,7 +1012,8 @@ namespace Controller
             {
                 if (currentList[currentIndex].interactable)
                 {
-                    currentList[currentIndex].onClick.Invoke();
+                    // EventSystem이 입력을 감지하고 onClick을 실행하므로 주석 처리
+                    //currentList[currentIndex].onClick.Invoke();
                 }
                 else
                 {
