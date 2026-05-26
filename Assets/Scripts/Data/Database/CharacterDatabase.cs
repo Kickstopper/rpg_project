@@ -10,6 +10,7 @@ namespace Data.Database
         {
             public string id;
             public string name;
+            public Gender gender;
 
             public string resonanceId;
             

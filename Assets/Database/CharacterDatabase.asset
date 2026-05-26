@@ -15,6 +15,7 @@ MonoBehaviour:
   entries:
   - id: chr_00
     name: "\uC8FC\uC778\uACF5"
+    gender: 0
     resonanceId: 
     expTable: {fileID: 11400000, guid: 0a109a7319f60bb47bb30d455147ed4f, type: 2}
     exp: 0
@@ -51,6 +52,7 @@ MonoBehaviour:
     - acc_000
   - id: chr_01
     name: "\uD30C\uD2B8\uB108"
+    gender: 1
     resonanceId: 
     expTable: {fileID: 11400000, guid: 29b10d8d523d03547bd72504aa972be3, type: 2}
     exp: 0
@@ -88,6 +90,7 @@ MonoBehaviour:
     - acc_000
   - id: npc
     name: ???
+    gender: 0
     resonanceId: 
     expTable: {fileID: 0}
     exp: 0

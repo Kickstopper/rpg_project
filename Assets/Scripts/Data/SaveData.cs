@@ -64,6 +64,7 @@ namespace Data
     {
         public string characterId; // DB에서 원본 데이터를 찾기 위한 ID (예: "char_warrior")
         public string name;
+        public string gender;
         public int level;
 
         public StatData stats;
@@ -83,7 +84,6 @@ namespace Data
         public int currentMp;
         public int maxMp;
         public int exp;
-        public ExpTable expTable;
         
         // 장비 상태
         public string weaponId;

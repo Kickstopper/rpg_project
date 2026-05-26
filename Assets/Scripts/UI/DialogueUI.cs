@@ -7,6 +7,7 @@ using System;
 using Manager;
 using Data.Database;
 using UnityEngine.EventSystems;
+using Data;
 
 namespace UI
 {
@@ -17,7 +18,7 @@ namespace UI
         public GameObject choiceButtonPrefab;    // 선택지 프리팹
 
         [Header("Settings")]
-        public CharacterDatabase portraitDB;     // inspector에서 설정
+        public CharacterDatabase characterDB;     // inspector에서 설정
         public float typingSpeed = 0.05f;        // 글자당 시간 (작을수록 빠름)
         public AudioClip typingSound;            // 타이핑 효과음
         private AudioSource audioSource;
@@ -118,40 +119,29 @@ namespace UI
                 AdvanceLine();
                 return;
             }
-            
-            // 텍스트 및 이름 설정
-            nameText.text = lineData.ContainsKey("Speaker") ? lineData["Speaker"] : "";
-            contentText.text = lineData.ContainsKey("Text") ? lineData["Text"] : "";
 
-            string portraitID = lineData.ContainsKey("Portrait") ? lineData["Portrait"] : "";
-        
-            if (!string.IsNullOrEmpty(portraitID))
+            contentText.text = lineData.ContainsKey("Text") ? lineData["Text"] : "";
+            string name = lineData.ContainsKey("Speaker") ? lineData["Speaker"] : "";
+
+            float pitch = 1f;
+            string characterId = lineData.ContainsKey("CharacterID") ? lineData["CharacterID"] : "";
+            if (!string.IsNullOrEmpty(characterId))
             {
-                var entry = portraitDB.GetEntry(portraitID);
-                
+                var entry = characterDB.GetEntry(characterId);
                 if (entry != null)
                 {
-                    if (entry.portraitImage != null)
-                    {
-                        portraitImageUI.sprite = entry.portraitImage;
-                        portraitImageUI.SetNativeSize();
-                        portraitImageUI.enabled = true;
-                    }
-                    else
-                    {
-                        portraitImageUI.enabled = false;
-                    }
+                    pitch = GetMedianPitch(entry.gender);
+                    SetImage(entry);
+                }
 
-                    if (entry.standingImage != null)
-                    {
-                        standingImageUI.sprite = entry.standingImage;
-                        standingImageUI.SetNativeSize();
-                        standingImageUI.enabled = true;
-                    }
-                    else
-                    {
-                        standingImageUI.enabled = false; 
-                    }
+                // Speaker값을 우선하여 표시
+                if (string.IsNullOrEmpty(name))
+                {
+                    var chrData = PartyManager.Instance.GetCharacterByID(characterId);
+                    if (chrData != null)
+                        name = chrData.name;
+                    else if (entry != null)
+                        name = entry.name;
                 }
             }
             else
@@ -160,6 +150,8 @@ namespace UI
                 standingImageUI.enabled = false;
             }
 
+            nameText.text = name;
+
             // 텍스트 설정 및 타이핑 효과 시작
             string fullText = lineData.ContainsKey("Text") ? lineData["Text"] : "";
             contentText.text = fullText;
@@ -167,11 +159,11 @@ namespace UI
 
             // 기존 타이핑이 있다면 중지하고 새로 시작
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-            typingCoroutine = StartCoroutine(TypeText(type));
+            typingCoroutine = StartCoroutine(TypeText(type, pitch));
         }
 
         // 타이핑 효과 코루틴. Type을 매개변수로 받아서, 타이핑이 끝나면 어떻게 할지 결정
-        IEnumerator TypeText(string lineType)
+        IEnumerator TypeText(string lineType, float medianPitch = 1f)
         {
             isTyping = true;
             contentText.ForceMeshUpdate(); 
@@ -184,7 +176,7 @@ namespace UI
                 contentText.maxVisibleCharacters = counter + 1;
                 if (typingSound != null)
                 {
-                    audioSource.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+                    audioSource.pitch = UnityEngine.Random.Range(medianPitch - 0.1f, medianPitch + 0.1f);
                     audioSource.PlayOneShot(typingSound);
                 }
                 counter++;
@@ -197,6 +189,39 @@ namespace UI
             // 타이핑이 끝난 후, 현재 타입이 CHOICE라면 선택지를 띄움
             if (lineType == "CHOICE")
                 GenerateChoices();
+        }
+
+        float GetMedianPitch(Gender gender)
+        {
+            if (gender == Gender.Male) return 0.8f;
+            if (gender == Gender.Female) return 2.5f;
+
+            return 1f;
+        }
+
+        void SetImage(CharacterDatabase.CharacterEntry entry)
+        {
+            if (entry.portraitImage != null)
+            {
+                portraitImageUI.sprite = entry.portraitImage;
+                portraitImageUI.SetNativeSize();
+                portraitImageUI.enabled = true;
+            }
+            else
+            {
+                portraitImageUI.enabled = false;
+            }
+
+            if (entry.standingImage != null)
+            {
+                standingImageUI.sprite = entry.standingImage;
+                standingImageUI.SetNativeSize();
+                standingImageUI.enabled = true;
+            }
+            else
+            {
+                standingImageUI.enabled = false; 
+            }
         }
 
         void Update()
@@ -239,13 +264,13 @@ namespace UI
 
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                 currentChoiceIndex = (currentChoiceIndex - 1 + activeChoiceButtons.Count) % activeChoiceButtons.Count;
                 changed = true;
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
-                SoundManager.Instance.PlaySFX(Data.SfxID.UI_Cursor);
+                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
                 currentChoiceIndex = (currentChoiceIndex + 1) % activeChoiceButtons.Count;
                 changed = true;
             }
@@ -266,7 +291,7 @@ namespace UI
             {
                 if (activeChoiceButtons[currentChoiceIndex].interactable)
                 {
-                    SoundManager.Instance.PlaySFX(Data.SfxID.UI_Click);
+                    SoundManager.Instance.PlaySFX(SfxID.UI_Click);
                     //activeChoiceButtons[currentChoiceIndex].onClick.Invoke();
                 }
             }

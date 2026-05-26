@@ -69,7 +69,8 @@ namespace Data
             if (System.Enum.TryParse(save.align, out Align parsedAlign)) align = parsedAlign;
             if (System.Enum.TryParse(save.row, out RowType parsedRow)) row = parsedRow;
             if (System.Enum.TryParse(save.column, out ColumnType parsedCol)) column = parsedCol;
-
+            if (System.Enum.TryParse(save.gender, out Gender parsedGender)) gender = parsedGender;
+            
             resonanceId = save.resonanceId;
 
             stats = save.stats;
@@ -92,6 +93,7 @@ namespace Data
         {
             characterId = entry.id;
             name = entry.name;
+            gender = entry.gender;
             align = entry.align;
             resonanceId = entry.resonanceId;
             stats = entry.stats;
@@ -123,6 +125,8 @@ namespace Data
 
             data.characterId = this.characterId;
             data.name = this.name;
+            data.gender = this.gender.ToString();
+
             data.resonanceId = this.resonanceId;
             data.align = this.align.ToString();
             
