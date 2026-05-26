@@ -841,7 +841,7 @@ namespace Controller
             if (blockingObj != null)
             {
                 // 부딪히는 사운드와 애니메이션 재생 후 이동 막음
-                StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
+                StartCoroutine(_player.BumpRoutine(moveVec));
                 SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                 return; 
             }
@@ -894,9 +894,12 @@ namespace Controller
                     doorConfig = theme?.doorAnimations?.Find(d => d.closedTexId == hitTexID);
                 }
 
-                // 입구 데이터를 확인한 뒤 상황에 맞게 분기
-                EntranceData validEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, tx, ty, moveVec);
+                // 플레이어가 정면을 보고 이동 중인지 체크
+                Direction inputDir = VectorToDirection(moveVec);
+                Direction facingDir = (Direction)_player.DirectionIdx;
+                bool isMovingForward = (inputDir == facingDir);
 
+                EntranceData validEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, tx, ty, moveVec);
                 if (validEntrance != null)
                 {
                     if (doorConfig != null && hitCell != null)
@@ -906,8 +909,7 @@ namespace Controller
                     }
                     else
                     {
-                        // 문이 아닐 경우 바로 전환 코루틴 실행
-                        Debug.Log($"[Entrance] {validEntrance.destinationID}으로 이동합니다.");
+                        // 문이 아닐 경우 즉시 전환
                         StartCoroutine(TransitionToOtherPlace(validEntrance, moveVec));
                     }
                 }
@@ -915,15 +917,15 @@ namespace Controller
                 {
                     if (isBlockedByWall)
                     {
-                        if (doorConfig != null && hitCell != null)
+                        // 문은 플레이어가 정면으로 전진 중일 때만 열리도록 제한
+                        if (doorConfig != null && hitCell != null && isMovingForward)
                         {
-                            // 일반 문 (입구 데이터는 없음). 문을 열고 한 칸 전진
+                            // 문을 열고 한 칸 전진
                             StartCoroutine(OpenDoorAndMoveRoutine(hitCell, tx, ty, moveVec, doorConfig));
                         }
                         else
                         {
-                            // 일반 벽은 충돌
-                            StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
+                            StartCoroutine(_player.BumpRoutine(moveVec));
                             SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                         }
                     }
@@ -937,7 +939,7 @@ namespace Controller
 
             // 적에게 부딪히는 연출 (벽 충돌과 같음)
             SoundManager.Instance.PlaySFX(SfxID.Bump_Wall); 
-            yield return StartCoroutine(_player.BumpRoutine(moveVec, 0.2f, 0.3f, null));
+            yield return StartCoroutine(_player.BumpRoutine(moveVec));
 
             if (_currentLookState != LookState.None)
             {
@@ -1169,21 +1171,25 @@ namespace Controller
             if (_currentMap == null) return null;
 
             Direction inputDir = VectorToDirection(moveDir);
+            Direction facingDir = (Direction)_player.DirectionIdx;
 
             // 방 안쪽 벽에 있는 입구인지 체크
             EntranceData currentEntrance = _currentMap.GetEntranceAt(currentX, currentY);
-            if (currentEntrance != null && currentEntrance.isWallEntrance && currentEntrance.triggerDirection == inputDir)
+            if (currentEntrance != null && currentEntrance.isWallEntrance)
             {
-                return currentEntrance;
+                // triggerDirection 일치 여부, 플레이어가 정면으로 전진 중인지 체크
+                if (currentEntrance.triggerDirection == inputDir && inputDir == facingDir)
+                    return currentEntrance;
             }
 
             // 진입 시 방 바깥쪽 벽에 있는 입구인지 체크 (맵 범위를 벗어나지 않았을 때만 체크함)
             if (targetX >= 0 && targetX < _currentMap.width && targetY >= 0 && targetY < _currentMap.height)
             {
                 EntranceData targetEntrance = _currentMap.GetEntranceAt(targetX, targetY);
-                if (targetEntrance != null && targetEntrance.isWallEntrance && targetEntrance.triggerDirection == inputDir)
+                if (targetEntrance != null && targetEntrance.isWallEntrance)
                 {
-                    return targetEntrance;
+                    if (targetEntrance.triggerDirection == inputDir && inputDir == facingDir)
+                        return targetEntrance;
                 }
             }
 

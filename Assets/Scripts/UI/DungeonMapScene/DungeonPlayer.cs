@@ -178,27 +178,43 @@ namespace UI.DungeonMapScene
             onRender?.Invoke();
         }
 
-        public IEnumerator BumpRoutine(Vector2Int dirVec, float duration, float intensity, System.Action onRender)
+        public IEnumerator BumpRoutine(Vector2Int dirVec, float duration = 0.2f, float intensity = 0.5f, System.Action onRender = null)
         {
             IsMoving = true;
+            
+            // 후진 체크. 바라보는 방향과 이동 방향이 반대면 후진
+            Vector2Int fwd = GetForwardVector();
+            bool isMovingBackward = (fwd.x * dirVec.x + fwd.y * dirVec.y) < 0;
+
+            // 후진 충돌 시엔 등 뒤 공간이 없으므로 물리적 이동을 차단
+            float actualIntensity = isMovingBackward ? 0f : intensity;
+
             float elapsed = 0f;
             float startX = PosX;
             float startY = PosY;
+            float startPitch = Pitch;
 
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
-                float t = elapsed / duration;
+                
+                float t = Mathf.Clamp01(elapsed / duration); // t값이 1.0을 초과하여 사인파가 음수가 되는 것을 차단
                 float sine = Mathf.Sin(t * Mathf.PI);
                 
-                PosX = startX + dirVec.x * intensity * sine;
-                PosY = startY + dirVec.y * intensity * sine;
+                PosX = startX + dirVec.x * actualIntensity * sine;
+                PosY = startY + dirVec.y * actualIntensity * sine;
                 
+                if (isMovingBackward)
+                    Pitch = startPitch + Mathf.Sin(t * Mathf.PI * 2f) * 15f; // 후진 시 상하 흔들기
+
                 onRender?.Invoke();
                 yield return null;
             }
+            
             PosX = startX;
             PosY = startY;
+            if (isMovingBackward) Pitch = startPitch;
+
             onRender?.Invoke();
             IsMoving = false;
         }
