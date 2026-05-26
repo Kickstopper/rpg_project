@@ -28,7 +28,7 @@
         {
             "x": 1,
             "y": 0,
-            "value": -1,
+            "value": 6,
             "wallTextureIDs": [
                 0,
                 3,
@@ -658,7 +658,7 @@
         {
             "x": 3,
             "y": 3,
-            "value": -1,
+            "value": 3,
             "wallTextureIDs": [
                 -1,
                 3,
@@ -730,7 +730,7 @@
         {
             "x": 7,
             "y": 3,
-            "value": -1,
+            "value": 5,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -1292,7 +1292,7 @@
             "wallTextureIDs": [
                 -1,
                 0,
-                3,
+                0,
                 0
             ],
             "centerObjectID": -1,
@@ -1450,7 +1450,7 @@
         {
             "x": 3,
             "y": 7,
-            "value": -1,
+            "value": 2,
             "wallTextureIDs": [
                 -1,
                 3,
@@ -1522,7 +1522,7 @@
         {
             "x": 7,
             "y": 7,
-            "value": -1,
+            "value": 4,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -2152,12 +2152,12 @@
         {
             "x": 9,
             "y": 10,
-            "value": -1,
+            "value": 7,
             "wallTextureIDs": [
                 0,
                 -1,
                 0,
-                0
+                3
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2187,18 +2187,6 @@
         }
     ],
     "entrances": [
-        {
-            "type": 1,
-            "sourceX": 5,
-            "sourceY": 5,
-            "isWallEntrance": true,
-            "triggerDirection": 0,
-            "isWorldMap": false,
-            "destinationID": "terminal",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
-        },
         {
             "type": 1,
             "sourceX": 4,
@@ -2282,6 +2270,18 @@
             "targetX": 1,
             "targetY": 1,
             "targetDirection": 0
+        },
+        {
+            "type": 1,
+            "sourceX": 8,
+            "sourceY": 10,
+            "isWallEntrance": true,
+            "triggerDirection": 1,
+            "isWorldMap": false,
+            "destinationID": "terminal",
+            "targetX": 1,
+            "targetY": 1,
+            "targetDirection": 2
         }
     ]
 }

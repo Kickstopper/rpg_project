@@ -1,6 +1,7 @@
 using UnityEngine;
 using Data;
 using UnityEngine.UI;
+using TMPro;
 namespace Controller
 {
     public class GridCellController : MonoBehaviour
@@ -10,16 +11,20 @@ namespace Controller
         public Image upWall;
         public Image rightWall;
         public Image downWall;
-        public Image floor;
+        public Image face;
+        public TextMeshProUGUI text; 
 
         [Header("Wall Color")]
         public Color defaultWallColor;
-        public Color defaultFloorColor;
         
         public Color noCellWallColor;
         public Color noWallColor;
-        public Color noFloorColor;
         
+        [Header("Ceil & Floor Color")]
+        public Color defaultFloorColor;
+        public Color roomColor;
+        public Color noFloorColor;
+        public Color noCeilColor;
 
         public void UpdateWallState(CellData data)
         {
@@ -32,7 +37,8 @@ namespace Controller
                 downWall.color = GetWallColor(wallIds[2]);
                 leftWall.color = GetWallColor(wallIds[3]);
 
-                floor.color = GetFloorColor(data.value);
+                face.color = GetFaceColor(data.value);
+                text.text = GetText(data.value);
             }
             else
             {
@@ -40,7 +46,8 @@ namespace Controller
                 upWall.color = noCellWallColor;
                 rightWall.color = noCellWallColor;
                 downWall.color = noCellWallColor;
-                floor.color = noFloorColor;
+                face.color = noFloorColor;
+                text.text = string.Empty;
             }
         }
 
@@ -54,16 +61,25 @@ namespace Controller
             }
         }
 
-        Color GetFloorColor(int floorId)
+        Color GetFaceColor(int cellValue)
         {
-            switch(floorId)
-            {
-                //case 0: return noFloorColor;
-
-                default: return defaultFloorColor;
-            }
+            if (cellValue == -1) return noFloorColor;
+            if (cellValue == 1) return noCeilColor;
+            if (cellValue >= 2) return roomColor;
+            
+            return defaultFloorColor;
         }
 
+        string GetText(int cellValue)
+        {
+            if (cellValue == 2) return "W";
+            if (cellValue == 3) return "A";
+            if (cellValue == 4) return "I";
+            if (cellValue == 5) return "H";
+            if (cellValue == 6) return "L";
+            if (cellValue == 7) return "T";
+            return string.Empty;
+        }
     }
     
 }
