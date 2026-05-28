@@ -2027,6 +2027,12 @@ namespace Controller
 
         public void StartNegotiation(MonsterController targetMonster)
         {
+            if (targetMonster == null || targetMonster.sourceData == null)
+            {
+                Debug.LogWarning("교섭할 대상 몬스터가 없습니다.");
+                return;
+            }
+
             SoundManager.Instance.PlayBGM(BgmID.Encounter);
             
             // 불필요한 UI 비활성화
@@ -2037,71 +2043,51 @@ namespace Controller
 
             targetMonster.CurrentAnger = 0; targetMonster.CurrentJoy = 0; targetMonster.CurrentInterest = 0;
 
-            List<Dictionary<string, string>> negotiationScript = GetNegotiationScript(targetMonster);
-            
-            dialogueUI.InitializeDynamic(
-                negotiationScript, 
-                () => OnNegotiationEnded(targetMonster),
-                (choiceToneString) => {
-                    if (System.Enum.TryParse(choiceToneString, out ChoiceTone tone))
-                    {
-                        OnUserSelectedChoice(tone, targetMonster);
-                    }
-                }
-            );
+            var sourceData = targetMonster.sourceData;
+            // 카테고리 키
+            string categoryKey = $"{sourceData.personality}_{sourceData.gender}";
+
+            List<Dictionary<string, string>> negotiationLines = DialogueManager.Instance.GetCategoryDialogues(categoryKey);
+
+            if (negotiationLines != null && negotiationLines.Count > 0)
+            {
+                dialogueUI.StartNegotiation(negotiationLines, targetMonster, OnNegotiationEnded); 
+                
+                Debug.Log($"[{categoryKey}] 카테고리로 교섭 대화를 시작합니다. 총 {negotiationLines.Count}줄");
+            }
+            else
+            {
+                Debug.LogError($"[{categoryKey}]에 해당하는 교섭 스크립트를 DialogueManager에서 찾을 수 없습니다. CSV 파일을 확인해주세요.");
+                
+                // 대사가 없을 경우 기본 대사 처리 혹은 교섭 취소
+                List<Dictionary<string, string>> fallbackLines = new List<Dictionary<string, string>>
+                {
+                    new Dictionary<string, string> { { "Name", targetMonster.entityName }, { "Content", "으르렁거리고 있다..." }, { "NextID", "END" } }
+                };
+                dialogueUI.StartNegotiation(fallbackLines, targetMonster, OnNegotiationEnded);
+            }
         }
         
-        // 교섭 선택지의 결과 반영
-        public void OnUserSelectedChoice(ChoiceTone selectedTone, MonsterController target)
-        {
-            MoodDelta delta = NegotiationCalculator.CalculateMoodChange(selectedTone, target, currentEnv);
-
-            target.CurrentAnger += delta.addedAnger;
-            target.CurrentJoy += delta.addedJoy;
-            target.CurrentInterest += delta.addedInterest;
-            
-            // 결과 판정
-            if (target.CurrentAnger >= 100) { /* 교섭 결렬 및 적 턴 시작 */ }
-            else if (target.CurrentJoy >= 100) { /* 아이템 획득 및 적 퇴각 */ }
-            else if (target.CurrentInterest >= 100) { /* 대화 종료. 아무 변화 없음 */ }
-        }
-
-        private List<Dictionary<string, string>> GetNegotiationScript(MonsterController monster)
-        {
-            var lines = new List<Dictionary<string, string>>();
-            
-            var line1 = new Dictionary<string, string>();
-            line1["Speaker"] = monster.entityName;
-            line1["Text"] = "인간...! 나에게 말을 걸다니 배짱이 좋군. 돈을 주면 살려주마.";
-            line1["Type"] = "CHOICE"; // 선택지 띄우기 트리거
-            lines.Add(line1);
-
-            var branch1 = new Dictionary<string, string>();
-            branch1["Type"] = "BRANCH";
-            branch1["Text"] = "OK!";
-            branch1["NextID"] = ChoiceTone.Friendly.ToString(); 
-            lines.Add(branch1);
-
-            var branch2 = new Dictionary<string, string>();
-            branch2["Type"] = "BRANCH";
-            branch2["Text"] = "F**K YOU!";
-            branch2["NextID"] = ChoiceTone.Aggressive.ToString();
-            lines.Add(branch2);
-
-            return lines;
-        }
-
         // 대화가 종료되었을 때 선택지 결과(Tone)를 판정
-        private void OnNegotiationEnded(MonsterController targetMonster)
+        private void OnNegotiationEnded(int result = -1)
         {
-            // TODO: DialogueUI에서 버튼 클릭 시 어떤 버튼을 눌렀는지 정보를 넘겨주는 이벤트 처리가 필요
-            
-            // Fight UI 켜기
-            uiController.SetCmdPanelVisible(true);
-            fieldController.SetPartyVisible(true);
-            uiController.SetBreakSliderVisible(true);
-            
-            ProcessTurn();
+            if (result == 0)
+            {
+                // 아이템 획득하고 전투 종료
+            }
+            else if (result == 1)
+            {
+                // 동료가 되고 전투 종료
+            }
+            else
+            {
+                // Fight UI 켜기
+                uiController.SetCmdPanelVisible(true);
+                fieldController.SetPartyVisible(true);
+                uiController.SetBreakSliderVisible(true);
+                
+                ProcessTurn();
+            }
         }
 
         void ProcessTurn()

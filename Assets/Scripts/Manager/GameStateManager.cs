@@ -146,7 +146,7 @@ namespace Manager
             if (dialogueController != null)
             {
                 ChangeState(GameState.Event);
-                dialogueController.Initialize(eventID, ()=> ChangeState(GameState.Exploration));
+                dialogueController.Initialize(eventID, (result)=> ChangeState(GameState.Exploration));
             }
             else
             {

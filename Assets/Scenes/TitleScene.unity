@@ -215,6 +215,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -650,6 +651,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -698,7 +700,7 @@ LightingSettings:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Settings.lighting
-  serializedVersion: 9
+  serializedVersion: 10
   m_EnableBakedLightmaps: 0
   m_EnableRealtimeLightmaps: 0
   m_RealtimeEnvironmentLighting: 1
@@ -713,6 +715,12 @@ LightingSettings:
   m_BakeResolution: 40
   m_Padding: 2
   m_LightmapCompression: 3
+  m_LightmapPackingMode: 1
+  m_LightmapPackingMethod: 0
+  m_XAtlasPackingAttempts: 16384
+  m_XAtlasBruteForce: 0
+  m_XAtlasBlockAlign: 0
+  m_XAtlasRepackUnderutilizedLightmaps: 1
   m_AO: 0
   m_AOMaxDistance: 1
   m_CompAOExponent: 1
@@ -1181,6 +1189,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d49aff6b86503994fa8a636d6e03b83a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  negotiationCSV: {fileID: 4900000, guid: 9b1c5c1687b96e9468bbd27c33ff3901, type: 3}
+  eventScriptsCSV: {fileID: 4900000, guid: b3e0b3763bf7cbd45a346120d7c98626, type: 3}
 --- !u!1 &511304152
 GameObject:
   m_ObjectHideFlags: 0
@@ -2076,6 +2086,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -3070,6 +3081,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 417cad70ace7d0f4f8ca81b1af6ed7f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapTriggerCSV: {fileID: 4900000, guid: 7885264bc93b7224f9f98b8a518b0da9, type: 3}
 --- !u!1 &1753277292
 GameObject:
   m_ObjectHideFlags: 0
@@ -3298,6 +3310,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -3863,6 +3876,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

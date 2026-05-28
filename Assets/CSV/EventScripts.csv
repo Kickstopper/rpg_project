@@ -1,4 +1,4 @@
-EventID,Seq,Type,Speaker,CharacterID,Text,Condition,Action,NextID
+EventID,Seq,Type,Name,CharacterID,Text,Condition,Action,NextID
 OUTPOST_1,1,TALK,,chr_01,뭔가 불길하네...,None,None,2
 OUTPOST_1,2,TALK,,chr_01,꼭 가야하는 거야?,None,None,END
 

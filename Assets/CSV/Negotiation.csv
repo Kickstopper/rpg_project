@@ -1,0 +1,13 @@
+Seq,Type,Category,Situation,Name,CharacterID,Text,NextID,Param
+N_SLY_F_001,TALK,Sly_Female,Intro,라미아,,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",N_SLY_F_002,
+N_SLY_F_002,TALK,Sly_Female,Intro,라미아,,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+N_SLY_F_REACT_LOGICAL,REACT,Sly_Female,React_Logical,라미아,,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+N_SLY_F_REACT_FLIRT,REACT,Sly_Female,React_Flirt,라미아,,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {Gender_Call}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+N_SLY_F_REACT_BRIBE,REACT,Sly_Female,React_Bribe,라미아,,"어머나, 예쁜 보석이네? 좋아. {Gender_Call}도 깡통도 무사히 지나가게 해줄게.",END,1
+N_AGG_M_001,TALK,Aggressive_Male,Intro,미노타우로스,,"크르르... 내 영역에 함부로 발을 들인 대가를 치르게 해주마!",WAIT_FOR_CHOICE,
+N_AGG_M_REACT_FRIENDLY,TALK,Aggressive_Male,React_Friendly,미노타우로스,,"흥, 약해빠진 녀석. 겁에 질려 꼬리를 내리는 꼴이라니. 역겨워서 입맛이 떨어지는군. 당장 꺼져라!",END,
+N_AGG_M_REACT_AGGRO,TALK,Aggressive_Male,React_Aggro,미노타우로스,,"감히 나에게 이빨을 드러내다니! 네놈의 뼈를 통째로 씹어먹어주마!",END,
+N_FOOL_N_001,TALK,Foolish_Genderless,Intro,슬라임,,"뽀글... 뽀글... 배고파... 밥 줘...",N_FOOL_N_002,
+N_FOOL_N_002,TALK,Foolish_Genderless,Intro,슬라임,,"안 주면... 너희들 먹을 거야...",WAIT_FOR_CHOICE,
+N_FOOL_N_REACT_BRIBE,TALK,Foolish_Genderless,React_Bribe,슬라임,,"우와! 밥이다! 뽀글뽀글... 냠냠...",END,
+N_FOOL_N_REACT_LOGICAL,TALK,Foolish_Genderless,React_Logical,슬라임,,"어려운 말... 모른다... 머리 아파! 화난다!!",END,

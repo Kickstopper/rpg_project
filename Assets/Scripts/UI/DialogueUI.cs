@@ -8,6 +8,8 @@ using Manager;
 using Data.Database;
 using UnityEngine.EventSystems;
 using Data;
+using Helper;
+using Controller;
 
 namespace UI
 {
@@ -31,6 +33,7 @@ namespace UI
         public TextMeshProUGUI contentText;
 
         private List<Dictionary<string, string>> currentEventLines;
+        private MonsterController currentMonster;
         private int currentLineIndex = 0;
         private bool isDialogueActive = false;
         public bool IsDialogueActive => isDialogueActive;
@@ -45,9 +48,8 @@ namespace UI
 
         private float inputCooldown = 0f;
 
-        public event Action OnDialogueFinished;
+        public event Action<int> OnDialogueFinished;
         public event Action<string> OnChoiceMade;
-
 
         void Awake()
         {
@@ -60,7 +62,7 @@ namespace UI
             uiCanvas.SetActive(false);
         }
 
-        public void Initialize(string eventID, Action onComplete = null)
+        public void Initialize(string eventID, Action<int> onComplete = null)
         {
             currentEventLines = DialogueManager.Instance.GetEventData(eventID);
             if (currentEventLines == null || currentEventLines.Count == 0) return;
@@ -70,15 +72,22 @@ namespace UI
             StartDialogueFlow();
         }
 
-        // CSV를 거치지 않고, 전투 시스템이 실시간으로 조립한 대화 스크립트로 초기화
-        public void InitializeDynamic(List<Dictionary<string, string>> dynamicLines, Action onComplete = null, Action<string> onChoice = null)
+        public void StartNegotiation(List<Dictionary<string, string>> lines, MonsterController monster, Action<int> onNegotiationEnded)
         {
-            currentEventLines = dynamicLines;
-            if (currentEventLines == null || currentEventLines.Count == 0) return;
+            currentEventLines = lines;
+            currentMonster = monster;
+            OnDialogueFinished = onNegotiationEnded;
+            // 첫 시작 라인을 찾아서 인덱스를 설정
+            currentLineIndex = 0;
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (lines[i].ContainsKey("Situation") && lines[i]["Situation"] == "Intro")
+                {
+                    currentLineIndex = i;
+                    break;
+                }
+            }
 
-            OnDialogueFinished = onComplete;
-            OnChoiceMade = onChoice;
-            
             StartDialogueFlow();
         }
 
@@ -91,14 +100,14 @@ namespace UI
             ShowCurrentLine();
         }
 
-        void EndDialogue()
+        void EndDialogue(int result = -1)
         {
             isDialogueActive = false;
             uiCanvas.SetActive(false);
             choiceContainer.SetActive(false);
             
             // BattleManager가 알아서 다음 턴을 이어감
-            OnDialogueFinished?.Invoke();
+            OnDialogueFinished?.Invoke(result);
         }
 
         void ShowCurrentLine()
@@ -112,17 +121,14 @@ namespace UI
             var lineData = currentEventLines[currentLineIndex];
 
             string type = lineData.ContainsKey("Type") ? lineData["Type"].ToUpper() : "TALK";
-
             // BRANCH 라인은 패스 (CHOICE가 알아서 처리함)
             if (type == "BRANCH")
             {
                 AdvanceLine();
                 return;
             }
-
-            contentText.text = lineData.ContainsKey("Text") ? lineData["Text"] : "";
-            string name = lineData.ContainsKey("Speaker") ? lineData["Speaker"] : "";
-
+            
+            string name = lineData.ContainsKey("Name") ? lineData["Name"] : "";
             float pitch = 1f;
             string characterId = lineData.ContainsKey("CharacterID") ? lineData["CharacterID"] : "";
             if (!string.IsNullOrEmpty(characterId))
@@ -134,7 +140,7 @@ namespace UI
                     SetImage(entry);
                 }
 
-                // Speaker값을 우선하여 표시
+                // CSV의 값을 우선하여 표시
                 if (string.IsNullOrEmpty(name))
                 {
                     var chrData = PartyManager.Instance.GetCharacterByID(characterId);
@@ -156,7 +162,7 @@ namespace UI
             string fullText = lineData.ContainsKey("Text") ? lineData["Text"] : "";
             contentText.text = fullText;
             contentText.maxVisibleCharacters = 0; // 글자 표시 개수를 0으로 초기화
-
+            
             // 기존 타이핑이 있다면 중지하고 새로 시작
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
             typingCoroutine = StartCoroutine(TypeText(type, pitch));
@@ -167,7 +173,6 @@ namespace UI
         {
             isTyping = true;
             contentText.ForceMeshUpdate(); 
-
             int totalChars = contentText.textInfo.characterCount;
             int counter = 0;
 
@@ -188,7 +193,14 @@ namespace UI
 
             // 타이핑이 끝난 후, 현재 타입이 CHOICE라면 선택지를 띄움
             if (lineType == "CHOICE")
+            {
                 GenerateChoices();
+            }
+            else if (lineType == "REACT")
+            {
+                // 임시 처리. 전투 재개
+                EndDialogue(-1);
+            }
         }
 
         float GetMedianPitch(Gender gender)
@@ -307,8 +319,15 @@ namespace UI
             // 스킵했을 때도 CHOICE라면 선택지를 띄워야 함
             var lineData = currentEventLines[currentLineIndex];
             string type = lineData.ContainsKey("Type") ? lineData["Type"].ToUpper() : "TALK";
-            
-            if (type == "CHOICE") GenerateChoices();
+            if (type == "CHOICE")
+            {
+                GenerateChoices();
+            }
+            else if (type == "REACT")
+            {
+                // 임시 처리. 전투 재개
+                EndDialogue(-1);
+            }
         }
 
         // 선택지 로직
@@ -317,15 +336,7 @@ namespace UI
             isWaitingForChoice = true;
             choiceContainer.SetActive(true);
 
-            // 리스트와 인덱스 초기화
-            activeChoiceButtons.Clear();
-            currentChoiceIndex = 0;
-
-            // 기존 버튼 모두 제거
-            foreach (Transform child in choiceContainer.transform)
-            {
-                Destroy(child.gameObject);
-            }
+            ClearChoiceContainer();
 
             int lookAheadIndex = currentLineIndex + 1;
 
@@ -426,6 +437,12 @@ namespace UI
                 return;
             }
 
+            if (nextTargetID == "WAIT_FOR_CHOICE")
+            {
+                ShowNegotiationChoices(); // 새로 만든 호출 메서드 실행
+                return; 
+            }
+
             // 특정 Seq로 점프해야 하는 경우 (일반 대화 중 컷씬 스킵 등)
             if (!string.IsNullOrEmpty(nextTargetID) && nextTargetID.ToUpper() != "END")
             {
@@ -446,15 +463,126 @@ namespace UI
 
             // 아무 지시가 없으면 바로 다음 줄로 이동
             currentLineIndex++;
-
-            // 더 이상 읽을 줄이 남아있지 않다면 종료
             if (currentLineIndex < currentEventLines.Count)
             {
                 ShowCurrentLine();
             }
             else
             {
+                // 더 이상 읽을 줄이 남아있지 않다면 종료
                 EndDialogue(); 
+            }
+        }
+
+        private void ClearChoiceContainer()
+        {
+            // 리스트와 인덱스 초기화
+            activeChoiceButtons.Clear();
+            currentChoiceIndex = 0;
+
+            // 기존 버튼 모두 제거
+            foreach (Transform child in choiceContainer.transform)
+                Destroy(child.gameObject);
+        }
+
+        public void GenerateChoices(List<string> choiceTexts, Action<int> onChoiceClicked)
+        {
+            isWaitingForChoice = true;
+            choiceContainer.SetActive(true);
+
+            ClearChoiceContainer();
+
+            for (int i = 0; i < choiceTexts.Count; i++)
+            {
+                GameObject newBtnObj = Instantiate(choiceButtonPrefab, choiceContainer.transform);
+                Button btn = newBtnObj.GetComponent<Button>();
+                activeChoiceButtons.Add(btn);
+
+                TextMeshProUGUI btnText = newBtnObj.GetComponentInChildren<TextMeshProUGUI>();
+                if (btnText != null)
+                    btnText.text = choiceTexts[i];
+
+                // 클릭 이벤트 연동
+                int index = i;
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => 
+                {
+                    choiceContainer.SetActive(false);
+                    onChoiceClicked?.Invoke(index);
+                });
+            }
+
+            // 첫 번째 버튼에 포커스
+            if (activeChoiceButtons.Count > 0)
+            {
+                EventSystem.current.SetSelectedGameObject(null); 
+                EventSystem.current.SetSelectedGameObject(activeChoiceButtons[0].gameObject);
+            }
+        }
+
+        private void ShowNegotiationChoices()
+        {
+            List<string> texts = new List<string> { "논리적으로 설득", "유혹하기", "뇌물 주기" };
+            List<ChoiceTone> targetTones = new List<ChoiceTone> { ChoiceTone.Logical, ChoiceTone.Flirt, ChoiceTone.Bribe };
+
+            GenerateChoices(texts, (selectedIndex) => 
+            {
+                ChoiceTone selectedTone = targetTones[selectedIndex];
+                ProcessNegotiationTurn(selectedTone);
+            });
+        }
+
+        private void ProcessNegotiationTurn(ChoiceTone selectedTone)
+        {
+            // 몬스터의 성향과 플레이어의 선택을 넘겨 점수를 계산
+            MoodDelta mood = NegotiationCalculator.CalculateMoodChange(selectedTone, currentMonster, new EnvironmentState());
+            currentMonster.CurrentAnger += mood.addedAnger;
+            currentMonster.CurrentJoy += mood.addedJoy;
+            currentMonster.CurrentInterest += mood.addedInterest;
+            
+            // 결과 판정
+            if (currentMonster.CurrentAnger >= 100) 
+            {
+                // 교섭 결렬 및 적 턴 시작
+                JumpToNegotiationReaction("Result_Fail");
+            }
+            else if (currentMonster.CurrentJoy >= 100 || currentMonster.CurrentInterest >= 100)
+            {
+                // 아이템 획득 및 적 퇴각
+                JumpToNegotiationReaction("Result_Success");
+            }
+            else 
+            {
+                // 교섭이 진행 중이라면, 선택한 Tone에 맞는 중간 리액션 대사 출력
+                // 대사 출력이 끝나면 CSV에 적힌 NextID(WAIT_FOR_CHOICE)를 타고 다시 루프
+                string reactionSituation = $"React_{selectedTone.ToString()}";
+                JumpToNegotiationReaction(reactionSituation);
+            }
+        }
+
+        // 선택 결과에 따라 대사 인덱스를 점프하는 메서드
+        private void JumpToNegotiationReaction(string targetSituation)
+        {
+            int targetIndex = -1;
+            for (int i = 0; i < currentEventLines.Count; i++)
+            {
+                if (currentEventLines[i].ContainsKey("Situation") && 
+                    currentEventLines[i]["Situation"] == targetSituation)
+                {
+                    targetIndex = i;
+                    break;
+                }
+            }
+            if (targetIndex != -1)
+            {
+                currentLineIndex = targetIndex;
+                ShowCurrentLine(); // 리액션 대사 출력
+            }
+            else
+            {
+                Debug.LogWarning($"[DialogueUI] {targetSituation} 에 해당하는 리액션 스크립트가 없습니다!");
+                // 임시 처리. 전투 재개
+                EndDialogue(-1);
             }
         }
 

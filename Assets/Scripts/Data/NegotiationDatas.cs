@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Data
 {
     public enum Personality { Polite, Aggressive, Sly, Foolish, Childish } // 공손, 공격적, 교활, 멍청, 유치
@@ -30,6 +32,36 @@ namespace Data
             this.addedAnger = anger;
             this.addedJoy = joy;
             this.addedInterest = interest;
+        }
+    }
+
+    [System.Serializable]
+    public class NegotiationData
+    {
+        public string Seq;
+        public string Type;
+        public string Category;
+        public string Situation;
+        public string Name;
+        public string CharacterID;
+        public string Text;
+        public string NextID;
+        public string Param;
+
+        public Dictionary<string, string> ToDictionary()
+        {
+            return new Dictionary<string, string>
+            {
+                { "Seq", Seq },
+                { "Type", Type },  
+                { "Category", Category },
+                { "Situation", Situation },
+                { "Name", Name },
+                { "CharacterID", CharacterID },
+                { "Text", Text },
+                { "NextID", NextID },
+                { "Param", Param },
+            };
         }
     }
 }

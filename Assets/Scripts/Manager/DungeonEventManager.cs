@@ -8,6 +8,9 @@ namespace Manager
     {
         public static DungeonEventManager Instance;
 
+        [Header("Data Files")]
+        public TextAsset mapTriggerCSV; // 인스펙터에서 할당
+
         private Dictionary<string, List<EventTriggerData>> triggerMap = new Dictionary<string, List<EventTriggerData>>();
 
         private string currentMapID = string.Empty; // 현재 층 ID
@@ -29,7 +32,7 @@ namespace Manager
 
         void LoadTriggerData()
         {
-            var rawData = CSVReader.Read(Resources.Load<TextAsset>("Map_Triggers"));
+            var rawData = CSVReader.Read(mapTriggerCSV);
 
             foreach (var row in rawData)
             {
