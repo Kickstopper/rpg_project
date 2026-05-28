@@ -2044,20 +2044,16 @@ namespace Controller
             targetMonster.CurrentAnger = 0; targetMonster.CurrentJoy = 0; targetMonster.CurrentInterest = 0;
 
             var sourceData = targetMonster.sourceData;
-            // 카테고리 키
-            string categoryKey = $"{sourceData.personality}_{sourceData.gender}";
-
-            List<Dictionary<string, string>> negotiationLines = DialogueManager.Instance.GetCategoryDialogues(categoryKey);
+            
+            List<Dictionary<string, string>> negotiationLines = DialogueManager.Instance.GetNegotiationDialogues(sourceData);
 
             if (negotiationLines != null && negotiationLines.Count > 0)
             {
                 dialogueUI.StartNegotiation(negotiationLines, targetMonster, OnNegotiationEnded); 
-                
-                Debug.Log($"[{categoryKey}] 카테고리로 교섭 대화를 시작합니다. 총 {negotiationLines.Count}줄");
             }
             else
             {
-                Debug.LogError($"[{categoryKey}]에 해당하는 교섭 스크립트를 DialogueManager에서 찾을 수 없습니다. CSV 파일을 확인해주세요.");
+                Debug.LogError($"교섭 스크립트를 DialogueManager에서 찾을 수 없습니다. CSV 파일을 확인해주세요.");
                 
                 // 대사가 없을 경우 기본 대사 처리 혹은 교섭 취소
                 List<Dictionary<string, string>> fallbackLines = new List<Dictionary<string, string>>

@@ -48,6 +48,9 @@ namespace UI
 
         private float inputCooldown = 0f;
 
+        List<string> negotiationChoices = new List<string> { "논리적으로 설득", "유혹하기", "뇌물 주기" };
+        List<ChoiceTone> targetTones = new List<ChoiceTone> { ChoiceTone.Logical, ChoiceTone.Flirt, ChoiceTone.Bribe };
+
         public event Action<int> OnDialogueFinished;
         public event Action<string> OnChoiceMade;
 
@@ -303,6 +306,7 @@ namespace UI
             {
                 if (activeChoiceButtons[currentChoiceIndex].interactable)
                 {
+                    isWaitingForChoice = false;
                     SoundManager.Instance.PlaySFX(SfxID.UI_Click);
                     //activeChoiceButtons[currentChoiceIndex].onClick.Invoke();
                 }
@@ -353,6 +357,7 @@ namespace UI
                     string nextTargetID = branchData.ContainsKey("NextID") ? branchData["NextID"] : "END";
                     
                     Button btn = btnObj.GetComponent<Button>();
+                    btn.onClick.RemoveAllListeners();
                     btn.onClick.AddListener(() => OnChoiceSelected(nextTargetID));
 
                     activeChoiceButtons.Add(btn);
@@ -485,14 +490,14 @@ namespace UI
                 Destroy(child.gameObject);
         }
 
-        public void GenerateChoices(List<string> choiceTexts, Action<int> onChoiceClicked)
+        private void ShowNegotiationChoices()
         {
             isWaitingForChoice = true;
             choiceContainer.SetActive(true);
 
             ClearChoiceContainer();
 
-            for (int i = 0; i < choiceTexts.Count; i++)
+            for (int i = 0; i < negotiationChoices.Count; i++)
             {
                 GameObject newBtnObj = Instantiate(choiceButtonPrefab, choiceContainer.transform);
                 Button btn = newBtnObj.GetComponent<Button>();
@@ -500,16 +505,12 @@ namespace UI
 
                 TextMeshProUGUI btnText = newBtnObj.GetComponentInChildren<TextMeshProUGUI>();
                 if (btnText != null)
-                    btnText.text = choiceTexts[i];
+                    btnText.text = negotiationChoices[i];
 
                 // 클릭 이벤트 연동
                 int index = i;
                 btn.onClick.RemoveAllListeners();
-                btn.onClick.AddListener(() => 
-                {
-                    choiceContainer.SetActive(false);
-                    onChoiceClicked?.Invoke(index);
-                });
+                btn.onClick.AddListener(() => OnNegotiationChoiceSelected(index));
             }
 
             // 첫 번째 버튼에 포커스
@@ -520,20 +521,16 @@ namespace UI
             }
         }
 
-        private void ShowNegotiationChoices()
+        private void OnNegotiationChoiceSelected(int index)
         {
-            List<string> texts = new List<string> { "논리적으로 설득", "유혹하기", "뇌물 주기" };
-            List<ChoiceTone> targetTones = new List<ChoiceTone> { ChoiceTone.Logical, ChoiceTone.Flirt, ChoiceTone.Bribe };
-
-            GenerateChoices(texts, (selectedIndex) => 
-            {
-                ChoiceTone selectedTone = targetTones[selectedIndex];
-                ProcessNegotiationTurn(selectedTone);
-            });
+            choiceContainer.SetActive(false);
+            ProcessNegotiationTurn(index);
         }
 
-        private void ProcessNegotiationTurn(ChoiceTone selectedTone)
+        private void ProcessNegotiationTurn(int index)
         {
+            ChoiceTone selectedTone = targetTones[index];
+            
             // 몬스터의 성향과 플레이어의 선택을 넘겨 점수를 계산
             MoodDelta mood = NegotiationCalculator.CalculateMoodChange(selectedTone, currentMonster, new EnvironmentState());
             currentMonster.CurrentAnger += mood.addedAnger;

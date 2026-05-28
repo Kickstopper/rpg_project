@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Data;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 
 namespace Manager
@@ -108,20 +109,24 @@ namespace Manager
             return new List<Dictionary<string, string>>();
         }
 
-        public List<Dictionary<string, string>> GetCategoryDialogues(string category)
+        public List<Dictionary<string, string>> GetNegotiationDialogues(MonsterDatabase.MonsterEntry sourceData)
         {
+            string key = $"{sourceData.personality}_{sourceData.gender}";
+            string monsterName = sourceData.name;
+            
             List<Dictionary<string, string>> eventLines = new List<Dictionary<string, string>>();
 
             foreach (var data in negotiationDB.Values)
             {
-                if (data.Category == category)
+                if (data.Category == key)
                 {
                     Dictionary<string, string> dict = data.ToDictionary();
 
-                    bool isScientistLeading = true; // TODO: 실제 상태값 연동
-                    string genderCall = isScientistLeading ? "아가씨" : "깡통";
+                    dict["Name"] = monsterName;
 
-                    dict["Text"] = dict["Text"].Replace("{Gender_Call}", genderCall);
+                    string callName = "너";
+                    
+                    dict["Text"] = dict["Text"].Replace("{CallName}", callName);
 
                     eventLines.Add(dict);
                 }
