@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
   m_Name: Outpost
   m_EditorClassIdentifier: 
-  dungeonID: Base
+  dungeonID: Outpost
   useWakeUpEffect: 0
   encounterMode: 1
   background: {fileID: 0}
