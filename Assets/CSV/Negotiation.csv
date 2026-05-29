@@ -1,13 +1,122 @@
-Seq,Type,Category,Situation,Name,CharacterID,Text,NextID,Param
-N_SLY_F_001,TALK,Sly_Female,Intro,라미아,,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",N_SLY_F_002,
-N_SLY_F_002,TALK,Sly_Female,Intro,라미아,,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
-N_SLY_F_REACT_LOGICAL,REACT,Sly_Female,React_Logical,라미아,,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
-N_SLY_F_REACT_FLIRT,REACT,Sly_Female,React_Flirt,라미아,,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {Gender_Call}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
-N_SLY_F_REACT_BRIBE,REACT,Sly_Female,React_Bribe,라미아,,"어머나, 예쁜 보석이네? 좋아. {Gender_Call}도 깡통도 무사히 지나가게 해줄게.",END,1
-N_AGG_M_001,TALK,Aggressive_Male,Intro,미노타우로스,,"크르르... 내 영역에 함부로 발을 들인 대가를 치르게 해주마!",WAIT_FOR_CHOICE,
-N_AGG_M_REACT_FRIENDLY,TALK,Aggressive_Male,React_Friendly,미노타우로스,,"흥, 약해빠진 녀석. 겁에 질려 꼬리를 내리는 꼴이라니. 역겨워서 입맛이 떨어지는군. 당장 꺼져라!",END,
-N_AGG_M_REACT_AGGRO,TALK,Aggressive_Male,React_Aggro,미노타우로스,,"감히 나에게 이빨을 드러내다니! 네놈의 뼈를 통째로 씹어먹어주마!",END,
-N_FOOL_N_001,TALK,Foolish_Genderless,Intro,슬라임,,"뽀글... 뽀글... 배고파... 밥 줘...",N_FOOL_N_002,
-N_FOOL_N_002,TALK,Foolish_Genderless,Intro,슬라임,,"안 주면... 너희들 먹을 거야...",WAIT_FOR_CHOICE,
-N_FOOL_N_REACT_BRIBE,TALK,Foolish_Genderless,React_Bribe,슬라임,,"우와! 밥이다! 뽀글뽀글... 냠냠...",END,
-N_FOOL_N_REACT_LOGICAL,TALK,Foolish_Genderless,React_Logical,슬라임,,"어려운 말... 모른다... 머리 아파! 화난다!!",END,
+Seq,Type,Category,Situation,Text,NextID,Param
+POLITE_F_001,TALK,Polite_Female,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",POLITE_F_002,
+POLITE_F_002,TALK,Polite_Female,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+POLITE_F_REACT_FRIENDLY,REACT,Polite_Female,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+POLITE_F_REACT_AGGRESSIVE,REACT,Polite_Female,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+POLITE_F_REACT_LOGICAL,REACT,Polite_Female,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+POLITE_F_REACT_FLIRT,REACT,Polite_Female,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+POLITE_F_REACT_BRIBE,REACT,Polite_Female,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+AGGRESSIVE_F_001,TALK,Aggressive_Female,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",AGGRESSIVE_F_002,
+AGGRESSIVE_F_002,TALK,Aggressive_Female,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+AGGRESSIVE_F_REACT_FRIENDLY,REACT,Aggressive_Female,React_Friendly,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+AGGRESSIVE_F_REACT_AGGRESSIVE,REACT,Aggressive_Female,React_Aggressive,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+AGGRESSIVE_F_REACT_LOGICAL,REACT,Aggressive_Female,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+AGGRESSIVE_F_REACT_FLIRT,REACT,Aggressive_Female,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+AGGRESSIVE_F_REACT_BRIBE,REACT,Aggressive_Female,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+SLY_F_001,TALK,Sly_Female,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",SLY_F_002,
+SLY_F_002,TALK,Sly_Female,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+SLY_F_REACT_FRIENDLY,REACT,Sly_Female,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+SLY_F_REACT_AGGRESSIVE,REACT,Sly_Female,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+SLY_F_REACT_LOGICAL,REACT,Sly_Female,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+SLY_F_REACT_FLIRT,REACT,Sly_Female,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+SLY_F_REACT_BRIBE,REACT,Sly_Female,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+FOOLISH_F_001,TALK,Foolish_Female,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",FOOLISH_F_002,
+FOOLISH_F_002,TALK,Foolish_Female,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+FOOLISH_F_REACT_FRIENDLY,REACT,Foolish_Female,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+FOOLISH_F_REACT_AGGRESSIVE,REACT,Foolish_Female,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+FOOLISH_F_REACT_LOGICAL,REACT,Foolish_Female,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+FOOLISH_F_REACT_FLIRT,REACT,Foolish_Female,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+FOOLISH_F_REACT_BRIBE,REACT,Foolish_Female,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+CHILDISH_F_001,TALK,Childish_Female,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",CHILDISH_F_002,
+CHILDISH_F_002,TALK,Childish_Female,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+CHILDISH_F_REACT_FRIENDLYL,REACT,Childish_Female,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+CHILDISH_F_REACT_AGGRESSIVE,REACT,Childish_Female,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+CHILDISH_F_REACT_LOGICAL,REACT,Childish_Female,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+CHILDISH_F_REACT_FLIRT,REACT,Childish_Female,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+CHILDISH_F_REACT_BRIBE,REACT,Childish_Female,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+
+POLITE_M_001,TALK,Polite_Male,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",POLITE_M_002,
+POLITE_M_002,TALK,Polite_Male,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+POLITE_M_REACT_FRIENDLY,REACT,Polite_Male,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+POLITE_M_REACT_AGGRESSIVE,REACT,Polite_Male,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+POLITE_M_REACT_LOGICAL,REACT,Polite_Male,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+POLITE_M_REACT_FLIRT,REACT,Polite_Male,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+POLITE_M_REACT_BRIBE,REACT,Polite_Male,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+AGGRESSIVE_M_001,TALK,Aggressive_Male,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",AGGRESSIVE_M_002,
+AGGRESSIVE_M_002,TALK,Aggressive_Male,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+AGGRESSIVE_M_REACT_FRIENDLY,REACT,Aggressive_Male,React_Friendly,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+AGGRESSIVE_M_REACT_AGGRESSIVE,REACT,Aggressive_Male,React_Aggressive,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+AGGRESSIVE_M_REACT_LOGICAL,REACT,Aggressive_Male,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+AGGRESSIVE_M_REACT_FLIRT,REACT,Aggressive_Male,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+AGGRESSIVE_M_REACT_BRIBE,REACT,Aggressive_Male,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+SLY_M_001,TALK,Sly_Male,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",SLY_M_002,
+SLY_M_002,TALK,Sly_Male,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+SLY_M_REACT_FRIENDLY,REACT,Sly_Male,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+SLY_M_REACT_AGGRESSIVE,REACT,Sly_Male,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+SLY_M_REACT_LOGICAL,REACT,Sly_Male,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+SLY_M_REACT_FLIRT,REACT,Sly_Male,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+SLY_M_REACT_BRIBE,REACT,Sly_Male,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+FOOLISH_M_001,TALK,Foolish_Male,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",FOOLISH_M_002,
+FOOLISH_M_002,TALK,Foolish_Male,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+FOOLISH_M_REACT_FRIENDLY,REACT,Foolish_Male,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+FOOLISH_M_REACT_AGGRESSIVE,REACT,Foolish_Male,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+FOOLISH_M_REACT_LOGICAL,REACT,Foolish_Male,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+FOOLISH_M_REACT_FLIRT,REACT,Foolish_Male,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+FOOLISH_M_REACT_BRIBE,REACT,Foolish_Male,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+CHILDISH_M_001,TALK,Childish_Male,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",CHILDISH_M_002,
+CHILDISH_M_002,TALK,Childish_Male,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+CHILDISH_M_REACT_FRIENDLYL,REACT,Childish_Male,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+CHILDISH_M_REACT_AGGRESSIVE,REACT,Childish_Male,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+CHILDISH_M_REACT_LOGICAL,REACT,Childish_Male,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+CHILDISH_M_REACT_FLIRT,REACT,Childish_Male,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+CHILDISH_M_REACT_BRIBE,REACT,Childish_Male,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+
+POLITE_V_001,TALK,Polite_Void,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",POLITE_V_002,
+POLITE_V_002,TALK,Polite_Void,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+POLITE_V_REACT_FRIENDLY,REACT,Polite_Void,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+POLITE_V_REACT_AGGRESSIVE,REACT,Polite_Void,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+POLITE_V_REACT_LOGICAL,REACT,Polite_Void,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+POLITE_V_REACT_FLIRT,REACT,Polite_Void,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+POLITE_V_REACT_BRIBE,REACT,Polite_Void,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+AGGRESSIVE_V_001,TALK,Aggressive_Void,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",AGGRESSIVE_V_002,
+AGGRESSIVE_V_002,TALK,Aggressive_Void,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+AGGRESSIVE_V_REACT_FRIENDLY,REACT,Aggressive_Void,React_Friendly,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+AGGRESSIVE_V_REACT_AGGRESSIVE,REACT,Aggressive_Void,React_Aggressive,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+AGGRESSIVE_V_REACT_LOGICAL,REACT,Aggressive_Void,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+AGGRESSIVE_V_REACT_FLIRT,REACT,Aggressive_Void,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+AGGRESSIVE_V_REACT_BRIBE,REACT,Aggressive_Void,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+SLY_V_001,TALK,Sly_Void,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",SLY_V_002,
+SLY_V_002,TALK,Sly_Void,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+SLY_V_REACT_FRIENDLY,REACT,Sly_Void,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+SLY_V_REACT_AGGRESSIVE,REACT,Sly_Void,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+SLY_V_REACT_LOGICAL,REACT,Sly_Void,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+SLY_V_REACT_FLIRT,REACT,Sly_Void,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+SLY_V_REACT_BRIBE,REACT,Sly_Void,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+FOOLISH_V_001,TALK,Foolish_Void,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",FOOLISH_V_002,
+FOOLISH_V_002,TALK,Foolish_Void,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+FOOLISH_V_REACT_FRIENDLY,REACT,Foolish_Void,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+FOOLISH_V_REACT_AGGRESSIVE,REACT,Foolish_Void,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+FOOLISH_V_REACT_LOGICAL,REACT,Foolish_Void,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+FOOLISH_V_REACT_FLIRT,REACT,Foolish_Void,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+FOOLISH_V_REACT_BRIBE,REACT,Foolish_Void,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
+
+CHILDISH_V_001,TALK,Childish_Void,Intro,"어머, 꽤 흥미로운 조합이네? 피가 흐르는 연약한 여자와... 차갑고 딱딱한 고철 덩어리라니.",CHILDISH_V_002,
+CHILDISH_V_002,TALK,Childish_Void,Intro,"내 매력적인 꼬리에 홀려서 스스로 찾아온 걸까? 후후...",WAIT_FOR_CHOICE,
+CHILDISH_V_REACT_FRIENDLYL,REACT,Childish_Void,React_Friendly,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+CHILDISH_V_REACT_AGGRESSIVE,REACT,Childish_Void,React_Aggressive,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+CHILDISH_V_REACT_LOGICAL,REACT,Childish_Void,React_Logical,"뭐? 내 하반신 골격을 생물학적으로 분석하겠다고? 기분 나쁜 깡통이네! 당장 부숴버리겠어!",END,1
+CHILDISH_V_REACT_FLIRT,REACT,Childish_Void,React_Flirt,"후후... 기계 주제에 제법 발칙한 농담을 하잖아? {CallName}, 이 깡통 꽤 마음에 드는데? 이번만 봐줄게.",END,1
+CHILDISH_V_REACT_BRIBE,REACT,Childish_Void,React_Bribe,"어머나, 예쁜 보석이네? 좋아. {CallName}도 깡통도 무사히 지나가게 해줄게.",END,1
