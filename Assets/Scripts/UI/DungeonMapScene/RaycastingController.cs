@@ -1624,7 +1624,11 @@ namespace Controller
 
             (string eventID, int forceDir) = DungeonEventManager.Instance.CheckEvent(_player.LogicX, _player.LogicY);
             if (!string.IsNullOrEmpty(eventID))
+            {
+                _inputLocked = true;
+                _player.SetRunning(false);
                 StartCoroutine(ShowDialog(eventID, forceDir));
+            }
         }
 
         IEnumerator ShowDialog(string eventID, int forceDir)
@@ -1634,6 +1638,10 @@ namespace Controller
                 yield return TurnToDirectionRoutine(forceDir);
             } 
             GameStateManager.Instance.StartEventDialogue(eventID);
+
+            yield return new WaitUntil(() => GameStateManager.Instance.CurrentState == GameState.Exploration);
+
+            _inputLocked = false;
         }
 
         private void UpdateMapDiscovery(int x, int y)
