@@ -11,10 +11,17 @@ namespace Manager
     {
         public static DungeonManager Instance;
 
-        [Header("테마 리스트 (이름으로 검색용)")]
-        [SerializeField] private List<DungeonTheme> allDungeons;
+        [Header("맵 데이터 리스트 (json)")]
+        public List<TextAsset> mapJsonFiles; // 인스펙터에서 할당
         
+        [Header("테마 리스트 (DungeonTheme)")]
+        [SerializeField] private List<DungeonTheme> allDungeonThemes; // 인스펙터에서 할당
+
+        [Header("맵 데이터 리스트")]
+        private Dictionary<string, TextAsset> mapAssetDict = new Dictionary<string, TextAsset>();
+
         private Dictionary<string, DungeonTheme> dungeonThemes;
+
 
         // 로드된 맵 데이터 캐싱 (ID -> MapData)
         private Dictionary<string, MapData> loadedDungeons = new Dictionary<string, MapData>();
@@ -30,6 +37,7 @@ namespace Manager
                 DontDestroyOnLoad(gameObject);
                 
                 InitializeDungeonThemes();
+                InitializeMapAssets();
             }
             else
             {
@@ -37,55 +45,54 @@ namespace Manager
             }
         }
 
-        // 테마 리스트를 딕셔너리로 변환 (빠른 검색)
-        private void InitializeDungeonThemes()
+        // 던전 데이터 사전 초기화
+        private void InitializeMapAssets()
         {
-            dungeonThemes = new Dictionary<string, DungeonTheme>();
-            foreach (var theme in allDungeons)
+            mapAssetDict.Clear();
+            foreach (var jsonAsset in mapJsonFiles)
             {
-                if (!dungeonThemes.ContainsKey(theme.dungeonID))
-                {
-                    dungeonThemes.Add(theme.dungeonID, theme);
-                }
+                if (jsonAsset != null && !mapAssetDict.ContainsKey(jsonAsset.name))
+                    mapAssetDict.Add(jsonAsset.name, jsonAsset); // TextAsset의 name은 파일명과 정확히 일치. 확장자를 제외
             }
         }
 
-        // JSON 파일 로드 함수
-        // 파일 위치: Assets/StreamingAssets/Levels/{fileName}.json
+        // 던전 테마 사전 초기화
+        private void InitializeDungeonThemes()
+        {
+            dungeonThemes = new Dictionary<string, DungeonTheme>();
+            foreach (var theme in allDungeonThemes)
+            {
+                if (!dungeonThemes.ContainsKey(theme.dungeonID))
+                    dungeonThemes.Add(theme.dungeonID, theme);
+            }
+        }
+
         public void LoadDungeonFromJson(string fileName)
         {
-            string path = Path.Combine(Application.streamingAssetsPath, "Levels", fileName + ".json");
-
-            if (loadedDungeons.ContainsKey(path))
+            if (loadedDungeons.ContainsKey(fileName))
             {
-                SetCurrentDungeonLevel(loadedDungeons[path]);
+                SetCurrentDungeonLevel(loadedDungeons[fileName]);
                 return;
             }
-                
-            if (File.Exists(path))
+
+            // 딕셔너리에서 파일명으로 에셋을 찾습니다.
+            if (mapAssetDict.TryGetValue(fileName, out TextAsset asset))
             {
-                string json = File.ReadAllText(path);
-                
-                // JSON -> MapData 변환
+                string json = asset.text;
                 MapData data = JsonUtility.FromJson<MapData>(json);
 
                 if (data != null)
                 {
-                    loadedDungeons[path] = data;
+                    loadedDungeons[fileName] = data;
                     SetCurrentDungeonLevel(data);
                 }
             }
             else
             {
-                Debug.LogError($"[DungeonManager] JSON 파일을 찾을 수 없습니다: {path}");
+                Debug.LogError($"[DungeonManager] 맵 에셋을 찾을 수 없습니다: {fileName}");
             }
         }
         
-        public void LoadDungeonFromJson(string fileName, System.Action onComplete)
-        {
-            StartCoroutine(LoadDungeonCoroutine(fileName, onComplete));
-        }
-
         // 레벨 적용 로직
         private void SetCurrentDungeonLevel(MapData data)
         {
@@ -124,7 +131,7 @@ namespace Manager
                 return theme;
             }
             Debug.LogWarning($"테마를 찾을 수 없습니다: {dungeonID}, 기본 테마를 반환합니다.");
-            return allDungeons.Count > 0 ? allDungeons[0] : null;
+            return allDungeonThemes.Count > 0 ? allDungeonThemes[0] : null;
         }
 
         // 던전 내의 시작 좌표 업데이트
@@ -134,61 +141,6 @@ namespace Manager
             CurrentDungeonData.startX = px;
             CurrentDungeonData.startY = py;
             CurrentDungeonData.startDirection = dir;
-        }
-
-        private IEnumerator LoadDungeonCoroutine(string fileName, System.Action onComplete)
-        {
-            string path = Path.Combine(Application.streamingAssetsPath, "Levels", fileName + ".json");
-
-            if (loadedDungeons.ContainsKey(path))
-            {
-                SetCurrentDungeonLevel(loadedDungeons[path]);
-                onComplete?.Invoke();
-                yield break;
-            }
-
-            string json = "";
-
-            // 안드로이드 환경일 경우 UnityWebRequest 사용
-            if (path.Contains("://") || path.Contains(":///"))
-            {
-                using (UnityWebRequest www = UnityWebRequest.Get(path))
-                {
-                    yield return www.SendWebRequest();
-
-                    if (www.result == UnityWebRequest.Result.Success)
-                    {
-                        json = www.downloadHandler.text;
-                    }
-                    else
-                    {
-                        Debug.LogError($"[DungeonManager] JSON 파일 로드 에러: {www.error}");
-                    }
-                }
-            }
-            else // PC, 에디터 환경
-            {
-                if (File.Exists(path))
-                {
-                    json = File.ReadAllText(path);
-                }
-                else
-                {
-                    Debug.LogError($"[DungeonManager] JSON 파일을 찾을 수 없습니다: {path}");
-                }
-            }
-
-            if (!string.IsNullOrEmpty(json))
-            {
-                MapData data = JsonUtility.FromJson<MapData>(json);
-                if (data != null)
-                {
-                    loadedDungeons[path] = data;
-                    SetCurrentDungeonLevel(data);
-                }
-            }
-
-            onComplete?.Invoke();
         }
     }
 }

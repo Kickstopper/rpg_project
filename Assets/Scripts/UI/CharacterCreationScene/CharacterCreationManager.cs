@@ -198,9 +198,8 @@ namespace UI.CharacterCreationScene
             {
                 if (nextSceneName.Equals(GameScene.DUNGEON_MAP_SCENE))
                 {
-                    DungeonManager.Instance.LoadDungeonFromJson(nextSceneParam, () => {
-                        SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
-                    });
+                    DungeonManager.Instance.LoadDungeonFromJson(nextSceneParam);
+                    SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
                 }
                 else if (nextSceneName.Equals(GameScene.WORLD_MAP_SCENE))
                 {

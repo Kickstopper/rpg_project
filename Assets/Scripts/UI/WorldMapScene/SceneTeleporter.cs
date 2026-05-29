@@ -113,15 +113,7 @@ namespace UI.WorldMapScene
 
             fadeImage.color = new Color(color.r, color.g, color.b, 1f);
             
-            // 비동기 로드를 기다린 후 씬 전환
-            bool isLoadComplete = false;
-            DungeonManager.Instance.LoadDungeonFromJson(targetDungeonID, () => 
-            {
-                isLoadComplete = true;
-            });
-
-            yield return new WaitUntil(() => isLoadComplete);
-
+            DungeonManager.Instance.LoadDungeonFromJson(targetDungeonID);
             SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
         }
     }
