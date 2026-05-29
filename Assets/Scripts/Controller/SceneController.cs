@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Manager;
 using Data;
 using DG.Tweening;
+using UnityEngine.EventSystems;
 
 public static class GameScene
 {
@@ -169,6 +170,24 @@ namespace Controller
         void HandleMenuNavigation(ref int currentIndex)
         {
             if (allMenuBtns == null || allMenuBtns.Count == 0) return;
+            
+            GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
+
+            // 화면 빈 공간을 클릭해 선택된 객체가 아예 없을 때 포커스 유실 방지 
+            if (currentSelected == null)
+            {
+                EventSystem.current.SetSelectedGameObject(allMenuBtns[currentIndex].gameObject);
+            }
+            else
+            {
+                // 마우스 클릭 등으로 선택된 버튼이 변경되었다면 currentIndex 갱신
+                int selectedIndex = allMenuBtns.FindIndex(b => b.gameObject == currentSelected);
+                if (selectedIndex != -1 && selectedIndex != currentIndex)
+                {
+                    currentIndex = selectedIndex;
+                }
+            }
+
             bool changed = false;
 
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
@@ -181,9 +200,13 @@ namespace Controller
                 currentIndex = (currentIndex + 1) % allMenuBtns.Count;
                 changed = true;
             }
-
-            if (changed) UpdateSelection(currentIndex);
-
+            
+            if (changed) 
+            {
+                EventSystem.current.SetSelectedGameObject(null); // 기존 포커스 해제
+                UpdateSelection(currentIndex);                   // 포커스 이동 및 사운드 재생
+            }
+            
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 if (allMenuBtns[currentIndex].interactable)

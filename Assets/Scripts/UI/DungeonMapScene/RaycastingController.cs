@@ -1279,7 +1279,7 @@ namespace Controller
 
             if (entrance.type == EntranceType.Map)
             {
-                if (DungeonEventManager.Instance) {}
+                if (DungeonEventManager.Instance)
                     DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
                 
                 if (entrance.isWorldMap)
