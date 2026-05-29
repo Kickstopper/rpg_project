@@ -46,7 +46,6 @@ namespace UI.IntroScene
         public string nextSceneParam;
 
         // 스킵 기능을 위한 상태 변수
-        private bool isTyping = false;
         private bool skipRequested = false;
 
         private void Start()
@@ -96,7 +95,7 @@ namespace UI.IntroScene
                 cutsceneText.maxVisibleCharacters = 0;
 
                 int totalCharacters = data.text.Length;
-                isTyping = true;
+
                 skipRequested = false; // 새로운 컷 시작 시 스킵 요청 초기화
 
                 // 1단계 스킵 감지. 텍스트 타이핑 중
@@ -113,7 +112,6 @@ namespace UI.IntroScene
                     cutsceneText.maxVisibleCharacters = i;
                     yield return new WaitForSeconds(data.lineDelay); 
                 }
-                isTyping = false;
 
                 // 2단계 스킵 감지. 대기 시간 중
                 float timer = 0f;
