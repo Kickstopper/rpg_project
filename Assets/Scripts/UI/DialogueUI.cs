@@ -34,6 +34,8 @@ namespace UI
 
         private List<Dictionary<string, string>> currentEventLines;
         private MonsterController currentMonster;
+        private EnvironmentState currentEnvState;
+
         private int currentLineIndex = 0;
         private bool isDialogueActive = false;
         public bool IsDialogueActive => isDialogueActive;
@@ -79,6 +81,12 @@ namespace UI
         {
             currentEventLines = lines;
             currentMonster = monster;
+
+            // 교섭 시작 시 몬스터 감정 수치 초기화
+            currentMonster.CurrentAnger = 0;
+            currentMonster.CurrentJoy = 0;
+            currentMonster.CurrentInterest = 0;
+
             OnDialogueFinished = onNegotiationEnded;
             // 첫 시작 라인을 찾아서 인덱스를 설정
             currentLineIndex = 0;
@@ -198,11 +206,6 @@ namespace UI
             if (lineType == "CHOICE")
             {
                 GenerateChoices();
-            }
-            else if (lineType == "REACT")
-            {
-                // 임시 처리. 전투 재개
-                EndDialogue(-1);
             }
         }
 
@@ -327,11 +330,6 @@ namespace UI
             {
                 GenerateChoices();
             }
-            else if (type == "REACT")
-            {
-                // 임시 처리. 전투 재개
-                EndDialogue(-1);
-            }
         }
 
         // 선택지 로직
@@ -351,14 +349,30 @@ namespace UI
 
                 if (branchType == "BRANCH")
                 {
+                    // Condition 검사
+                    string condition = branchData.ContainsKey("Condition") ? branchData["Condition"] : "";
+                    if (!CheckCondition(condition))
+                    {
+                        // 조건을 만족하지 못하면 버튼을 만들지 않고 다음 줄로 넘어감
+                        lookAheadIndex++;
+                        continue; 
+                    }
+
                     GameObject btnObj = Instantiate(choiceButtonPrefab, choiceContainer.transform);
                     btnObj.GetComponentInChildren<TextMeshProUGUI>().text = branchData["Text"];
 
                     string nextTargetID = branchData.ContainsKey("NextID") ? branchData["NextID"] : "END";
                     
+                    // Action 데이터 추출
+                    string actionStr = branchData.ContainsKey("Action") ? branchData["Action"] : "";
+                    
                     Button btn = btnObj.GetComponent<Button>();
-                    btn.onClick.RemoveAllListeners();
-                    btn.onClick.AddListener(() => OnChoiceSelected(nextTargetID));
+                    
+                    // 버튼 클릭 시 액션 실행 후 대사 넘기기 연동
+                    btn.onClick.AddListener(() => {
+                        ExecuteAction(actionStr);          // 액션 먼저 실행
+                        OnChoiceSelected(nextTargetID);    // 그 다음 목표 ID로 점프
+                    });
 
                     activeChoiceButtons.Add(btn);
                 }
@@ -375,7 +389,7 @@ namespace UI
                 EventSystem.current.SetSelectedGameObject(null); 
                 EventSystem.current.SetSelectedGameObject(activeChoiceButtons[0].gameObject);
             }
-        }
+}
 
         // 버튼을 클릭했을 때 호출됨
         void OnChoiceSelected(string nextTargetID)
@@ -416,7 +430,7 @@ namespace UI
             }
         }
 
-        // Seq 값으로 줄 번호(Index)를 찾아주는 유틸리티 함수
+        // Seq 값으로 줄 번호를 찾아주는 함수
         int FindIndexBySeq(string seqValue)
         {
             for (int i = 0; i < currentEventLines.Count; i++)
@@ -426,14 +440,119 @@ namespace UI
                     return i;
                 }
             }
-            return -1; // 못 찾음
+            return -1;
+        }
+
+        private bool CheckCondition(string conditionData)
+        {
+            // 조건이 비어있으면 검사 없이 무조건 통과 (선택지 표시)
+            if (string.IsNullOrEmpty(conditionData)) return true;
+
+            string[] parts = conditionData.Trim().Split(':');
+            if (parts.Length == 0) return true;
+
+            string command = parts[0].ToUpper();
+
+            switch (command)
+            {
+                case "HASITEM":
+                    // parts[0]="HasItem", parts[1]="Gold_100"
+                    if (parts.Length >= 2)
+                    {
+                        string itemID = parts[1];
+                        Debug.Log($"[Condition] 아이템 소지 여부 확인: {itemID}");
+                        return InventoryManager.Instance.HasItem(itemID);
+                    }
+                    break;
+                    
+                case "FLAG":
+                    // 특정 퀘스트나 이벤트 플래그 확인 (예: "Flag:passed_guard")
+                    if (parts.Length >= 2)
+                    {
+                        string flagName = parts[1];
+                        return FlagManager.Instance.CheckFlag(flagName);
+                    }
+                    break;
+            }
+
+            return false; // 조건을 만족하지 못하면 false 반환 -> 버튼 생성 안 됨
+        }
+
+        private void ExecuteAction(string actionData)
+        {
+            if (string.IsNullOrEmpty(actionData)) return;
+
+            string[] actions = actionData.Split(';'); 
+
+            foreach (string act in actions)
+            {
+                string[] parts = act.Trim().Split(':'); 
+                if (parts.Length == 0) continue;
+
+                string command = parts[0].ToUpper();
+
+                switch (command)
+                {
+                    case "TONE":
+                        // 교섭 선택 시 (예: "TONE:Logical")
+                        if (currentMonster != null && Enum.TryParse<ChoiceTone>(parts[1], true, out ChoiceTone tone))
+                        {
+                            MoodDelta delta = NegotiationCalculator.CalculateMoodChange(tone, currentMonster, new EnvironmentState());
+                            
+                            currentMonster.CurrentAnger += delta.addedAnger;
+                            currentMonster.CurrentJoy += delta.addedJoy;
+                            currentMonster.CurrentInterest += delta.addedInterest;
+                            
+                            Debug.Log($"[교섭 액션] {tone} 선택 -> 분노:{currentMonster.CurrentAnger}, 기쁨:{currentMonster.CurrentJoy}, 흥미:{currentMonster.CurrentInterest}");
+                        }
+                        break;
+
+                    case "ADD_MOOD":
+                        // TODO: 강제 감정치 조절 (예: "ADD_MOOD:-50", "ADD_JOY:30", "ADD_ANGER:50")
+                        break;
+
+                    case "REMOVE":
+                        if (parts.Length >= 2)
+                        {
+                            string itemID = parts[1];
+                            // TODO: 돈과 인벤토리 아이템 차감 로직 연동
+                            InventoryManager.Instance.RemoveItem(itemID, 1);
+                            Debug.Log($"[Action] 아이템 차감: {itemID}");
+                        }
+                        break;
+
+                    case "BATTLE":
+                        // TODO: 전투 재개
+                        Debug.Log("[Action] 전투 개시 트리거 발생!");
+                        break;
+                }
+            }
         }
 
         // 유저가 타이핑이 끝난 후 클릭했을 때 실행되는 함수
         void AdvanceLine()
         {
             var currentData = currentEventLines[currentLineIndex];
-            string nextTargetID = currentData.ContainsKey("NextID") ? currentData["NextID"] : "";
+            string nextTargetID = currentData.ContainsKey("NextID") ? currentData["NextID"].Trim() : "";
+
+            // NextID가 "CHECK_MOOD:목적지" 형태일 경우 점수 판정
+            if (nextTargetID.StartsWith("CHECK_MOOD"))
+            {
+                if (currentMonster.CurrentJoy >= 100 || currentMonster.CurrentInterest >= 100) 
+                {
+                    nextTargetID = "SUCCESS"; // 교섭 성공
+                }
+                else if (currentMonster.CurrentAnger >= 100) 
+                {
+                    nextTargetID = "FAIL";    // 교섭 결렬
+                }
+                else
+                {
+                    // 0~99점 사이라면 지정한 루프 시작점으로 돌아감 (CHECK_MOOD:LOOP_START -> LOOP_START)
+                    string[] parts = nextTargetID.Split(':');
+                    nextTargetID = parts.Length > 1 ? parts[1].Trim() : "LOOP_START";
+                }
+            }
 
             // 현재 줄의 NextID가 "END"라면 즉시 대화 종료
             if (nextTargetID.ToUpper() == "END")
@@ -442,14 +561,8 @@ namespace UI
                 return;
             }
 
-            if (nextTargetID == "WAIT_FOR_CHOICE")
-            {
-                ShowNegotiationChoices(); // 새로 만든 호출 메서드 실행
-                return; 
-            }
-
-            // 특정 Seq로 점프해야 하는 경우 (일반 대화 중 컷씬 스킵 등)
-            if (!string.IsNullOrEmpty(nextTargetID) && nextTargetID.ToUpper() != "END")
+            // 특정 Seq로 점프
+            if (!string.IsNullOrEmpty(nextTargetID))
             {
                 int targetIndex = FindIndexBySeq(nextTargetID);
                 if (targetIndex != -1)
@@ -474,7 +587,6 @@ namespace UI
             }
             else
             {
-                // 더 이상 읽을 줄이 남아있지 않다면 종료
                 EndDialogue(); 
             }
         }
@@ -488,99 +600,6 @@ namespace UI
             // 기존 버튼 모두 제거
             foreach (Transform child in choiceContainer.transform)
                 Destroy(child.gameObject);
-        }
-
-        private void ShowNegotiationChoices()
-        {
-            isWaitingForChoice = true;
-            choiceContainer.SetActive(true);
-
-            ClearChoiceContainer();
-
-            for (int i = 0; i < negotiationChoices.Count; i++)
-            {
-                GameObject newBtnObj = Instantiate(choiceButtonPrefab, choiceContainer.transform);
-                Button btn = newBtnObj.GetComponent<Button>();
-                activeChoiceButtons.Add(btn);
-
-                TextMeshProUGUI btnText = newBtnObj.GetComponentInChildren<TextMeshProUGUI>();
-                if (btnText != null)
-                    btnText.text = negotiationChoices[i];
-
-                // 클릭 이벤트 연동
-                int index = i;
-                btn.onClick.RemoveAllListeners();
-                btn.onClick.AddListener(() => OnNegotiationChoiceSelected(index));
-            }
-
-            // 첫 번째 버튼에 포커스
-            if (activeChoiceButtons.Count > 0)
-            {
-                EventSystem.current.SetSelectedGameObject(null); 
-                EventSystem.current.SetSelectedGameObject(activeChoiceButtons[0].gameObject);
-            }
-        }
-
-        private void OnNegotiationChoiceSelected(int index)
-        {
-            choiceContainer.SetActive(false);
-            ProcessNegotiationTurn(index);
-        }
-
-        private void ProcessNegotiationTurn(int index)
-        {
-            ChoiceTone selectedTone = targetTones[index];
-            
-            // 몬스터의 성향과 플레이어의 선택을 넘겨 점수를 계산
-            MoodDelta mood = NegotiationCalculator.CalculateMoodChange(selectedTone, currentMonster, new EnvironmentState());
-            currentMonster.CurrentAnger += mood.addedAnger;
-            currentMonster.CurrentJoy += mood.addedJoy;
-            currentMonster.CurrentInterest += mood.addedInterest;
-            
-            // 결과 판정
-            if (currentMonster.CurrentAnger >= 100) 
-            {
-                // 교섭 결렬 및 적 턴 시작
-                JumpToNegotiationReaction("Result_Fail");
-            }
-            else if (currentMonster.CurrentJoy >= 100 || currentMonster.CurrentInterest >= 100)
-            {
-                // 아이템 획득 및 적 퇴각
-                JumpToNegotiationReaction("Result_Success");
-            }
-            else 
-            {
-                // 교섭이 진행 중이라면, 선택한 Tone에 맞는 중간 리액션 대사 출력
-                // 대사 출력이 끝나면 CSV에 적힌 NextID(WAIT_FOR_CHOICE)를 타고 다시 루프
-                string reactionSituation = $"React_{selectedTone.ToString()}";
-                JumpToNegotiationReaction(reactionSituation);
-            }
-        }
-
-        // 선택 결과에 따라 대사 인덱스를 점프하는 메서드
-        private void JumpToNegotiationReaction(string targetSituation)
-        {
-            int targetIndex = -1;
-            for (int i = 0; i < currentEventLines.Count; i++)
-            {
-                if (currentEventLines[i].ContainsKey("Situation") && 
-                    currentEventLines[i]["Situation"] == targetSituation)
-                {
-                    targetIndex = i;
-                    break;
-                }
-            }
-            if (targetIndex != -1)
-            {
-                currentLineIndex = targetIndex;
-                ShowCurrentLine(); // 리액션 대사 출력
-            }
-            else
-            {
-                Debug.LogWarning($"[DialogueUI] {targetSituation} 에 해당하는 리액션 스크립트가 없습니다!");
-                // 임시 처리. 전투 재개
-                EndDialogue(-1);
-            }
         }
 
     }
