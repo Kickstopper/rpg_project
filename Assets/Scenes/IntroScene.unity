@@ -687,7 +687,7 @@ MonoBehaviour:
   cutsceneText: {fileID: 834021688}
   bgmId: 27
   fadeOverlay: {fileID: 63047163}
-  fadeInColor: {r: 0, g: 0.278, b: 0, a: 1}
+  fadeInColor: {r: 0.4716981, g: 0.024998188, b: 0, a: 1}
   fadeOutColor: {r: 0, g: 0, b: 0, a: 1}
   fadeInDuration: 1.5
   fadeOutDuration: 1.5
@@ -716,14 +716,15 @@ MonoBehaviour:
     delayAfter: 5
   - image: {fileID: 21300000, guid: 5db50c05165facd4ba680a0bf4dee4d2, type: 3}
     text: "\uC774\uACC4\uC785\uC790\uC758 \uD750\uB984\uC744 \uC5ED\uCD94\uC801\uD558\uB294
-      \uC2E4\uD5D8 \uC911 \uBC1C\uC0DD\uD55C \uACF5\uAC04 \uADE0\uC5F4\uACFC \uB300\uD3ED\uBC1C."
+      \uC2E4\uD5D8 \uC911 \uBC1C\uC0DD\uD55C \uACF5\uAC04 \uADE0\uC5F4\uACFC \uB300\uD3ED\uBC1C\uB85C
+      \uC5F0\uAD6C\uC18C \uC77C\uB300\uB294 \uC774\uD615\uC758 \uC874\uC7AC\uB4E4\uC774
+      \uB4E4\uB053\uAE30 \uC2DC\uC791\uD588\uB2E4."
     lineDelay: 0.1
     delayAfter: 4
   - image: {fileID: 21300000, guid: 9e4e6518238d48540b1b4e4a44479614, type: 3}
-    text: "\uADFC\uCC98\uC5D0\uC11C \uB370\uC774\uD2B8 \uC911\uC774\uC5C8\uB358 \uB300\uD559\uC6D0\uC0DD\uC778
-      \uB2F9\uC2E0\uC740 \uAD50\uC218\uC758 \uBA85\uB839\uC73C\uB85C \uC0AC\uAC74\uC744
-      \uC870\uC0AC\uD558\uAE30 \uC704\uD574 \uC774\uACC4\uC785\uC790\uC5D0 \uC624\uC5FC\uB41C
-      \uC5F0\uAD6C\uC18C\uB85C \uD5A5\uD55C\uB2E4."
+    text: "\uCD08\uACFC\uD559\uC801 \uC0AC\uAC74\uC758 \uCC98\uB9AC\uB97C \uB2F4\uB2F9\uD558\uB294
+      \uBE44\uBC00\uC694\uC6D0\uC778 \uB2F9\uC2E0\uC740 \uD30C\uD2B8\uB108\uC640
+      \uD568\uAED8 \uC11C\uB458\uB7EC \uD604\uC7A5\uC73C\uB85C \uD5A5\uD588\uB2E4."
     lineDelay: 0.1
     delayAfter: 8
   nextSceneName: CharacterCreationScene
