@@ -1,15 +1,55 @@
 EventID,Seq,Type,Name,Text,Condition,Action,NextID
 SLY_FEMALE,INTRO,CHOICE,System,(어떻게 할까?),,,"1,2,3"
-SLY_FEMALE,1,BRANCH,,[우호적],,TONE:Friendly,3
-SLY_FEMALE,2,BRANCH,,[위압적],,TONE:Aggressive,4
-SLY_FEMALE,3,TALK,,"어머, 상냥하네.",,,CHECK_MOOD:LOOP_START
-SLY_FEMALE,4,TALK,,"어머, 뭐지 이 새끼는?",,,CHECK_MOOD:LOOP_START
-SLY_FEMALE,LOOP_START,CHOICE,System,(어떻게 할까?),,,"5,6,7"
-SLY_FEMALE,5,BRANCH,플레이어,[논리적으로 설득],,TONE:Logical,10
-SLY_FEMALE,6,BRANCH,플레이어,[뇌물 건네기],HasItem:Gold:100,REMOVE_ITEM:Gold:100; ADD_MOOD:30,20
-SLY_FEMALE,7,BRANCH,플레이어,[위협하기],,ADD_MOOD:-50,30
-SLY_FEMALE,10,TALK,,기분 나쁜 깡통이네!,,,CHECK_MOOD:LOOP_START
-SLY_FEMALE,20,TALK,,어머 예쁜 보석이네.,,,CHECK_MOOD:LOOP_START
-SLY_FEMALE,30,TALK,,감히 날 위협해?!,,,CHECK_MOOD:LOOP_START
-SLY_FEMALE,SUCCESS,TALK,,좋아. 얌전히 길을 열어주지.,,RECRUIT,END
-SLY_FEMALE,FAIL,TALK,,당장 찢어죽여주마!,,BATTLE,END
+SLY_FEMALE,1,BRANCH,,[우호적],,TONE:Gentle,3
+SLY_FEMALE,2,BRANCH,,[위압적],,TONE:Threat,4
+SLY_FEMALE,3,TALK,,"어머, 괜찮은 남자잖아.",,,CHECK_MOOD:GENTLE_START
+SLY_FEMALE,4,TALK,,"어머, 고약한 인상이네.",,,CHECK_MOOD:THREAT_START
+
+SLY_FEMALE,GENTLE_START,CHOICE,System,(어떻게 할까?),,,"5,6,7"
+SLY_FEMALE,5,BRANCH,플레이어,[안심시킨다],,TONE:Relieve,10
+SLY_FEMALE,6,BRANCH,플레이어,[설득한다],,TONE:Persuade,12
+SLY_FEMALE,7,BRANCH,플레이어,[상납한다],,TONE:Bribe,14
+SLY_FEMALE,10,TALK,,흐음. 레이디를 어떻게 다루는지 잘 알고 있구나?,,,11
+SLY_FEMALE,11,TALK,,그래서 뭘 원하는데?,,,NEGO_START
+SLY_FEMALE,12,TALK,,내가 돕길 바라는 거야?,,,13
+SLY_FEMALE,13,TALK,,흐음... 어떻게 할까...,,,NEGO_START
+SLY_FEMALE,14,TALK,,호오 성의를 보이시겠다?,,,15
+SLY_FEMALE,15,TALK,,그럼 100 GOLD 줄 수 있어?,,,BRIBE_START
+
+SLY_FEMALE,NEGO_START,CHOICE,System,(어떻게 할까?),,,"16,17"
+SLY_FEMALE,16,BRANCH,플레이어,[나와 함께해줘],,TONE:Persuade,18
+SLY_FEMALE,17,BRANCH,플레이어,[뭔가 줘],,TONE:Request,19
+SLY_FEMALE,18,TALK,,잠깐! 잠깐만 고민할 시간을 줘. 흐음......,,,CHECK_MOOD:RECRUIT
+SLY_FEMALE,19,TALK,,아이템을 달라고?,,,CHECK_MOOD:ITEM
+
+SLY_FEMALE,BRIBE_START,CHOICE,System,(어떻게 할까?),,,"20,21"
+SLY_FEMALE,20,BRANCH,플레이어,[준다],,TONE:Accept,22
+SLY_FEMALE,21,BRANCH,플레이어,[거절한다],,TONE:Refuse,23
+SLY_FEMALE,22,TALK,,정말로 주는 거야?,,,CHECK_MOOD:GIVE:ACCEPT
+SLY_FEMALE,23,TALK,,뭐야. 구두쇠 같으니라고.,,,CHECK_MOOD:GIVE:REFUSE
+
+SLY_FEMALE,THREAT_START,CHOICE,System,(어떻게 할까?),,,"24,25,26"
+SLY_FEMALE,24,BRANCH,플레이어,[유혹한다],,TONE:Flirt,27
+SLY_FEMALE,25,BRANCH,플레이어,[모욕한다],,TONE:Insult,29
+SLY_FEMALE,26,BRANCH,플레이어,[화낸다],,TONE:Mad,31
+SLY_FEMALE,27,TALK,,지금 나를 꼬시는 거야?,,,28
+SLY_FEMALE,28,TALK,,좋아 뭐든 원하는 걸 말해,,,NEGO_START
+SLY_FEMALE,29,TALK,,이런 취급 받은 건 처음이야.,,,30
+SLY_FEMALE,30,TALK,,나 화났다고!,,,CHECK_MOOD:ANGRY
+SLY_FEMALE,31,TALK,,부모님도 나한테 화낸 적이 없는데!,,,CHECK_MOOD:DISAPPOINT
+
+SLY_FEMALE,SUCCESS_RECRUIT,TALK,,결정했다! 이제부터 너를 섬기며 살아가겠어!,ADD_PARTY,END
+SLY_FEMALE,FAIL_RECRUIT,TALK,,미안하지만. 너의 마음은 받아줄 수 없어.,,,32
+SLY_FEMALE,32,TALK,,나는 남편이 있어.,,,END
+
+SLY_FEMALE,SUCCESS_ITEM,TALK,,불쌍한 녀석. 이걸 주마,,ADD_ITEM,END
+SLY_FEMALE,FAIL_ITEM,TALK,,미안. 너에게 줄 아이템 따윈 없어.,,,END
+
+SLY_FEMALE,INSUFFICIENT_ITEM,TALK,,뭐야... 가지고 있지도 않은 걸 준다고 한 거야?,,,33
+SLY_FEMALE,33,TALK,,돈도 없으면서 허세부리는 남자가 제일 싫어!,,,END
+
+SLY_FEMALE,NEGO_REJECT,흥! 나 지금 화났다고!,,,END
+
+SLY_FEMALE,FAIL,TALK,,당장 찢어죽여주마!,,,END
+
+

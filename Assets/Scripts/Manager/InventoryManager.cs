@@ -111,6 +111,12 @@ namespace Manager
             this.money += money;
         }
 
+        public void SubMoney(int money)
+        {
+            this.money -= money;
+            if (this.money < 0) this.money = 0;
+        }
+
         public void AddItem(string id, int amount = 1)
         {
             if (inventoryDict.ContainsKey(id)) inventoryDict[id] += amount;

@@ -13,6 +13,7 @@ using Controller;
 
 namespace UI
 {
+    public enum NegotiationResult { PLAYER_TURN, MONSTER_TURN, BATTLE_END }
     public class DialogueUI : MonoBehaviour
     {
         [Header("Choice Components")]
@@ -50,11 +51,9 @@ namespace UI
 
         private float inputCooldown = 0f;
 
-        List<string> negotiationChoices = new List<string> { "논리적으로 설득", "유혹하기", "뇌물 주기" };
-        List<ChoiceTone> targetTones = new List<ChoiceTone> { ChoiceTone.Logical, ChoiceTone.Flirt, ChoiceTone.Bribe };
-
         public event Action<int> OnDialogueFinished;
         public event Action<string> OnChoiceMade;
+        private NegotiationResult negotiationResult = NegotiationResult.PLAYER_TURN; // 교섭 종료 뒤의
 
         void Awake()
         {
@@ -79,6 +78,7 @@ namespace UI
 
         public void StartNegotiation(List<Dictionary<string, string>> lines, MonsterController monster, Action<int> onNegotiationEnded)
         {
+            negotiationResult = NegotiationResult.PLAYER_TURN;
             currentEventLines = lines;
             currentMonster = monster;
 
@@ -111,14 +111,14 @@ namespace UI
             ShowCurrentLine();
         }
 
-        void EndDialogue(int result = -1)
+        void EndDialogue()
         {
             isDialogueActive = false;
             uiCanvas.SetActive(false);
             choiceContainer.SetActive(false);
             
             // BattleManager가 알아서 다음 턴을 이어감
-            OnDialogueFinished?.Invoke(result);
+            OnDialogueFinished?.Invoke((int)negotiationResult);
         }
 
         void ShowCurrentLine()
@@ -367,7 +367,6 @@ namespace UI
                     string actionStr = branchData.ContainsKey("Action") ? branchData["Action"] : "";
                     
                     Button btn = btnObj.GetComponent<Button>();
-                    
                     // 버튼 클릭 시 액션 실행 후 대사 넘기기 연동
                     btn.onClick.AddListener(() => {
                         ExecuteAction(actionStr);          // 액션 먼저 실행
@@ -394,6 +393,8 @@ namespace UI
         // 버튼을 클릭했을 때 호출됨
         void OnChoiceSelected(string nextTargetID)
         {
+            inputCooldown = 0.2f;
+
             // 선택지 UI 정리
             isWaitingForChoice = false;
             choiceContainer.SetActive(false);
@@ -534,23 +535,82 @@ namespace UI
         {
             var currentData = currentEventLines[currentLineIndex];
             string nextTargetID = currentData.ContainsKey("NextID") ? currentData["NextID"].Trim() : "";
+            string[] parts = nextTargetID.Split(':');
+            string param = parts.Length > 1 ? parts[1].Trim() : "";
+            string choice = parts.Length > 2 ? parts[2].Trim() : "";
+            string item = parts.Length > 3 ? parts[3].Trim() : "";
 
             // NextID가 "CHECK_MOOD:목적지" 형태일 경우 점수 판정
+
             if (nextTargetID.StartsWith("CHECK_MOOD"))
             {
-                if (currentMonster.CurrentJoy >= 100 || currentMonster.CurrentInterest >= 100) 
+                negotiationResult = NegotiationResult.PLAYER_TURN;
+                // 플레이어의 원군 요청
+                if (param == "RECRUIT")
                 {
-                    nextTargetID = "SUCCESS"; // 교섭 성공
+                    if (currentMonster.CurrentJoy >= 100 || currentMonster.CurrentInterest >= 100) 
+                    {
+                        nextTargetID = "SUCCESS_RECRUIT"; // 테이밍 성공
+                    }
+                    else
+                    {
+                        nextTargetID = "FAIL_RECRUIT"; // 테이밍 실패
+                    }
                 }
-                else if (currentMonster.CurrentAnger >= 100) 
+                // 플레이어의 아이템 요구
+                else if (param == "ITEM")
                 {
-                    nextTargetID = "FAIL";    // 교섭 결렬
+                    if (currentMonster.CurrentJoy >= 50 && currentMonster.CurrentInterest >= 50)
+                    {
+                        nextTargetID = "SUCCESS_ITEM";
+                    }
+                    else
+                    {
+                        nextTargetID = "FAIL_ITEM";
+                    }
+                }
+                // 몬스터의 아이템 요구
+                else if (param == "GIVE")
+                {
+                    nextTargetID = "NEGO_START";
+                    if (choice == "ACCEPT")
+                    {
+                        if (int.TryParse(item, out int gold))
+                        {
+                            int currentGold = InventoryManager.Instance.GetMoney();
+                            if (currentGold >= gold)
+                            {
+                                InventoryManager.Instance.SubMoney(gold);
+                            }
+                        }
+                        else if (InventoryManager.Instance.HasItem(item))
+                        {
+                            InventoryManager.Instance.RemoveItem(item, 1);
+                        }
+                        else
+                        {
+                            negotiationResult = NegotiationResult.MONSTER_TURN;
+                            nextTargetID = "INSUFFICIENT_ITEM";
+                        }
+                    }
+                    else
+                    {
+                        nextTargetID = "END";
+                    }
+                }
+                else if (param == "ANGRY")
+                {
+                    negotiationResult = NegotiationResult.MONSTER_TURN;
+                    nextTargetID = "FAIL";
+                }
+                else if (param == "DISAPPOINT")
+                {
+                    negotiationResult = NegotiationResult.MONSTER_TURN;
+                    nextTargetID = "FAIL";
                 }
                 else
                 {
-                    // 0~99점 사이라면 지정한 루프 시작점으로 돌아감 (CHECK_MOOD:LOOP_START -> LOOP_START)
-                    string[] parts = nextTargetID.Split(':');
-                    nextTargetID = parts.Length > 1 ? parts[1].Trim() : "LOOP_START";
+                    nextTargetID = param;
                 }
             }
 

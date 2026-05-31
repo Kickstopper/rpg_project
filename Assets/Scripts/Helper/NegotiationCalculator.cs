@@ -19,13 +19,13 @@ namespace Helper
             switch (personality)
             {
                 case Personality.Aggressive: // 다혈질
-                    if (choice == ChoiceTone.Friendly) anger += 20;    // 친절하게 대하면 얕봄
-                    if (choice == ChoiceTone.Aggressive) interest += 30; // 같이 화내면 마음에 들어함
+                    if (choice == ChoiceTone.Gentle) anger += 20;    // 친절하게 대하면 얕봄
+                    if (choice == ChoiceTone.Threat) interest += 30; // 같이 화내면 마음에 들어함
                     break;
 
                 case Personality.Foolish: // 우둔함
                     if (choice == ChoiceTone.Bribe) joy += 50;         // 돈/아이템을 가장 좋아함
-                    if (choice == ChoiceTone.Logical) anger += 30;     // 논리적으로 따지면 화를 냄
+                    if (choice == ChoiceTone.Insult) anger += 30;     // 논리적으로 따지면 화를 냄
                     break;
             }
 

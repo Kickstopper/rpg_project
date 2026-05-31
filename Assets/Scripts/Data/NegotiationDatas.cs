@@ -9,7 +9,7 @@ namespace Data
     public enum TimeOfDay { Morning, Day, Evening, Night }
     public enum Weather { Clear, Cloud, Rain, Storm }
     public enum MoonPhase { New, Half, Full }
-    public enum ChoiceTone { Friendly, Aggressive, Logical, Bribe, Flirt }
+    public enum ChoiceTone { Gentle, Threat, Relieve, Persuade, Request, Bribe, Flirt, Insult, Mad, Accept, Refuse } // 우호적, 위압적, 안심, 설득, 요구, 상납, 희롱, 모욕, 화냄, 수락, 거절
 
     // 환경 상태를 통째로 담아 계산기에 던져줄 구조체
     [System.Serializable]

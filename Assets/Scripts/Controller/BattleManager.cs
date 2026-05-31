@@ -2065,23 +2065,24 @@ namespace Controller
         }
         
         // 대화가 종료되었을 때 선택지 결과(Tone)를 판정
-        private void OnNegotiationEnded(int result = -1)
+        private void OnNegotiationEnded(int result)
         {
-            if (result == 0)
+            // Fight UI 켜기
+            uiController.SetCmdPanelVisible(true);
+            fieldController.SetPartyVisible(true);
+            uiController.SetBreakSliderVisible(true);
+            if (result == (int)NegotiationResult.BATTLE_END)
             {
-                // 아이템 획득하고 전투 종료
+                // 전투 없이 상황 종료
             }
-            else if (result == 1)
+            else if (result == (int)NegotiationResult.PLAYER_TURN)
             {
-                // 동료가 되고 전투 종료
+                // 플레이어의 턴으로 전투 재개
+                PreparePlayerTurn();
             }
             else
             {
-                // Fight UI 켜기
-                uiController.SetCmdPanelVisible(true);
-                fieldController.SetPartyVisible(true);
-                uiController.SetBreakSliderVisible(true);
-                
+                // 몬스터의 턴으로 전투 재개 
                 ProcessTurn();
             }
         }

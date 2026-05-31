@@ -77,7 +77,7 @@ namespace Manager
 
         public List<Dictionary<string, string>> GetNegotiationDialogues(MonsterDatabase.MonsterEntry sourceData)
         {
-            string key = "SLY_FEMALE";// $"{sourceData.personality}_{sourceData.gender}";
+            string key = $"{sourceData.personality}_{sourceData.gender}";
             string monsterName = sourceData.name;
             
             List<Dictionary<string, string>> eventLines = GetEventData(key);
