@@ -464,7 +464,7 @@
             "wallTextureIDs": [
                 -1,
                 0,
-                0,
+                2,
                 0
             ],
             "centerObjectID": -1,
@@ -46833,6 +46833,7 @@
             "sourceY": 40,
             "isWallEntrance": false,
             "triggerDirection": 0,
+            "isWorldMap": false,
             "destinationID": "Police_Station",
             "targetX": 8,
             "targetY": 0,
@@ -46844,9 +46845,22 @@
             "sourceY": 40,
             "isWallEntrance": true,
             "triggerDirection": 0,
+            "isWorldMap": false,
             "destinationID": "Police_Station",
             "targetX": 8,
             "targetY": 0,
+            "targetDirection": 0
+        },
+        {
+            "type": 0,
+            "sourceX": 25,
+            "sourceY": 0,
+            "isWallEntrance": true,
+            "triggerDirection": 2,
+            "isWorldMap": false,
+            "destinationID": "Underground_0",
+            "targetX": 6,
+            "targetY": 13,
             "targetDirection": 0
         }
     ]

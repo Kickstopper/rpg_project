@@ -1918,10 +1918,10 @@
             "isWallEntrance": true,
             "triggerDirection": 2,
             "isWorldMap": false,
-            "destinationID": "Underground_1",
-            "targetX": 6,
-            "targetY": 12,
-            "targetDirection": 2
+            "destinationID": "Dream",
+            "targetX": 25,
+            "targetY": 0,
+            "targetDirection": 0
         },
         {
             "type": 0,

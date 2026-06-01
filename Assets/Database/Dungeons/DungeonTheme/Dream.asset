@@ -19,8 +19,17 @@ MonoBehaviour:
   texture:
   - {fileID: 2800000, guid: eaa37948b936cdd4f947e6987a2e78c6, type: 3}
   - {fileID: 2800000, guid: dc179bea276f2534eaeec81487282600, type: 3}
+  - {fileID: 2800000, guid: a5bf58618e8e7ec478814275e2b7b829, type: 3}
+  - {fileID: 2800000, guid: e59edfa2d641fb149ba65a3f42e51d16, type: 3}
+  - {fileID: 2800000, guid: d65075aeea6fff84eaf35ec32389bb0c, type: 3}
+  - {fileID: 2800000, guid: b70fa08e0791aad4091302d3b9968630, type: 3}
+  - {fileID: 2800000, guid: 0a8359ec91578d24c957c9d74626529a, type: 3}
   floorTexIdx: 1
   ceilingTexIdx: 1
+  doorAnimations:
+  - closedTexId: 2
+    openFrameTexIds: 03000000040000000500000006000000
+    animSpeed: 0.05
   enemySprites: []
   objectSprites:
   - objectID: 0
