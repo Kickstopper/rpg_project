@@ -1,11 +1,11 @@
 EventID,Seq,Type,Name,Text,Condition,Action,NextID
-SLY_FEMALE,INTRO,CHOICE,System,(어떻게 할까?),,,"1,2,3"
-SLY_FEMALE,1,BRANCH,,[우호적],,TONE:Gentle,3
-SLY_FEMALE,2,BRANCH,,[위압적],,TONE:Threat,4
+SLY_FEMALE,INTRO,CHOICE,System,(어떤 태도를 취할까?),,,"1,2,3"
+SLY_FEMALE,1,BRANCH,,[친절하게],,TONE:Gentle,3
+SLY_FEMALE,2,BRANCH,,[거칠게],,TONE:Threat,4
 SLY_FEMALE,3,TALK,,"어머, 괜찮은 남자잖아.",,,CHECK_MOOD:GENTLE_START
 SLY_FEMALE,4,TALK,,"어머, 고약한 인상이네.",,,CHECK_MOOD:THREAT_START
 
-SLY_FEMALE,GENTLE_START,CHOICE,System,(어떻게 할까?),,,"5,6,7"
+SLY_FEMALE,GENTLE_START,CHOICE,System,(무엇을 할까?),,,"5,6,7"
 SLY_FEMALE,5,BRANCH,플레이어,[안심시킨다],,TONE:Relieve,10
 SLY_FEMALE,6,BRANCH,플레이어,[설득한다],,TONE:Persuade,12
 SLY_FEMALE,7,BRANCH,플레이어,[상납한다],,TONE:Bribe,14
@@ -16,7 +16,7 @@ SLY_FEMALE,13,TALK,,흐음... 어떻게 할까...,,,NEGO_START
 SLY_FEMALE,14,TALK,,호오 성의를 보이시겠다?,,,15
 SLY_FEMALE,15,TALK,,그럼 100 GOLD 줄 수 있어?,,,BRIBE_START
 
-SLY_FEMALE,NEGO_START,CHOICE,System,(어떻게 할까?),,,"16,17"
+SLY_FEMALE,NEGO_START,CHOICE,System,(무엇을 요구할까?),,,"16,17"
 SLY_FEMALE,16,BRANCH,플레이어,[나와 함께해줘],,TONE:Persuade,18
 SLY_FEMALE,17,BRANCH,플레이어,[뭔가 줘],,TONE:Request,19
 SLY_FEMALE,18,TALK,,잠깐! 잠깐만 고민할 시간을 줘. 흐음......,,,CHECK_MOOD:RECRUIT
@@ -28,7 +28,7 @@ SLY_FEMALE,21,BRANCH,플레이어,[거절한다],,TONE:Refuse,23
 SLY_FEMALE,22,TALK,,정말로 주는 거야?,,,CHECK_MOOD:GIVE:ACCEPT
 SLY_FEMALE,23,TALK,,뭐야. 구두쇠 같으니라고.,,,CHECK_MOOD:GIVE:REFUSE
 
-SLY_FEMALE,THREAT_START,CHOICE,System,(어떻게 할까?),,,"24,25,26"
+SLY_FEMALE,THREAT_START,CHOICE,System,(무엇을 할까?),,,"24,25,26"
 SLY_FEMALE,24,BRANCH,플레이어,[유혹한다],,TONE:Flirt,27
 SLY_FEMALE,25,BRANCH,플레이어,[모욕한다],,TONE:Insult,29
 SLY_FEMALE,26,BRANCH,플레이어,[화낸다],,TONE:Mad,31
