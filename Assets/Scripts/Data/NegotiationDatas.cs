@@ -4,7 +4,7 @@ namespace Data
 {
     public enum Personality { Polite, Aggressive, Sly, Foolish, Childish } // 공손, 공격적, 교활, 멍청, 유치
     public enum Gender { Male, Female, Void }
-    public enum Race { Human, Beast, Fairy, Angel, Robot, Undead }
+    public enum Race { Human, Beast, Demihuman, Demon, Dragon, Machine, Plant, Spirit, Undead }
 
     public enum TimeOfDay { Morning, Day, Evening, Night }
     public enum Weather { Clear, Cloud, Rain, Storm }
