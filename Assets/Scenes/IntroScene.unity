@@ -294,7 +294,7 @@ GameObject:
   - component: {fileID: 218173398}
   - component: {fileID: 218173397}
   m_Layer: 0
-  m_Name: Background
+  m_Name: BaseImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -684,6 +684,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneController
   cutsceneImage: {fileID: 391111877}
+  backgroundImage: {fileID: 1647677414}
   cutsceneText: {fileID: 834021688}
   bgmId: 27
   fadeOverlay: {fileID: 63047163}
@@ -693,11 +694,13 @@ MonoBehaviour:
   fadeOutDuration: 1.5
   cutsceneList:
   - image: {fileID: 21300000, guid: 592e90f87260607468de0206f87dadd6, type: 3}
+    background: {fileID: 0}
     text: "\uAC70\uB300 \uD14C\uD06C \uAE30\uC5C5 NEXT WORLD\uB294 \uC0C8\uB85C\uC6B4
       \uBB3C\uC9C8\uC744 \uBC1C\uACAC\uD588\uB2E4."
     lineDelay: 0.1
     delayAfter: 4
   - image: {fileID: 21300000, guid: 33aca312661749049b942ec6192b8d83, type: 3}
+    background: {fileID: 0}
     text: "\uB9C9\uB300\uD55C \uC5D0\uB108\uC9C0 \uC0DD\uC131\uACFC \uACF5\uAC04
       \uC65C\uACE1 \uD6A8\uACFC\uB97C \uAC00\uC9C4 \uC2E0\uBE44\uB85C\uC6B4 \uBB3C\uC9C8.\n\uC9C0\uAE08\uAE4C\uC9C0
       \uC54C\uACE0 \uC788\uC5C8\uB358 \uBB3C\uB9AC \uBC95\uCE59\uC744 \uC544\uB4DD\uD788
@@ -705,28 +708,32 @@ MonoBehaviour:
     lineDelay: 0.1
     delayAfter: 4
   - image: {fileID: 21300000, guid: e600d22a285129348acc10112e29c26d, type: 3}
+    background: {fileID: 0}
     text: "\uC5F0\uAD6C\uC9C4\uB4E4\uC740 \uC774 \uBB3C\uC9C8\uC774 \uB2E4\uB978
       \uC138\uACC4\uC5D0\uC11C \uD758\uB7EC\uB4E4\uC5B4\uC654\uC74C\uC744 \uBC1D\uD600\uB0B4\uACE0
       \uC774\uACC4\uC785\uC790\uB77C\uACE0 \uBA85\uBA85\uD588\uB2E4.\n"
     lineDelay: 0.1
     delayAfter: 4
   - image: {fileID: 0}
+    background: {fileID: 0}
     text: "\uADF8\uB7EC\uB098..."
     lineDelay: 0.1
     delayAfter: 5
   - image: {fileID: 21300000, guid: 5db50c05165facd4ba680a0bf4dee4d2, type: 3}
+    background: {fileID: 0}
     text: "\uC774\uACC4\uC785\uC790\uC758 \uD750\uB984\uC744 \uC5ED\uCD94\uC801\uD558\uB294
-      \uC2E4\uD5D8 \uC911 \uBC1C\uC0DD\uD55C \uACF5\uAC04 \uADE0\uC5F4\uACFC \uB300\uD3ED\uBC1C\uB85C
-      \uC5F0\uAD6C\uC18C \uC77C\uB300\uB294 \uC774\uD615\uC758 \uC874\uC7AC\uB4E4\uC774
-      \uB4E4\uB053\uAE30 \uC2DC\uC791\uD588\uB2E4."
+      \uC2E4\uD5D8 \uC911 \uBC1C\uC0DD\uD55C \uACF5\uAC04 \uADE0\uC5F4\uB85C \uC5F0\uAD6C\uC18C
+      \uC77C\uB300\uB294 \uC774\uD615\uC758 \uC874\uC7AC\uB4E4\uC774 \uB4E4\uB053\uAE30
+      \uC2DC\uC791\uD588\uB2E4."
     lineDelay: 0.1
     delayAfter: 4
   - image: {fileID: 21300000, guid: 9e4e6518238d48540b1b4e4a44479614, type: 3}
-    text: "\uCD08\uACFC\uD559\uC801 \uC0AC\uAC74\uC758 \uCC98\uB9AC\uB97C \uB2F4\uB2F9\uD558\uB294
-      \uBE44\uBC00\uC694\uC6D0\uC778 \uB2F9\uC2E0\uC740 \uD30C\uD2B8\uB108\uC640
+    background: {fileID: 21300000, guid: c10f011237459e84aace4505bf93c0d2, type: 3}
+    text: "\uCD08\uC0C1\uD604\uC0C1\uC758 \uC0AC\uAC74 \uCC98\uB9AC\uB97C \uB2F4\uB2F9\uD558\uB294
+      \uD2B9\uC218\uC694\uC6D0\uC778 \uB2F9\uC2E0\uC740 \uD30C\uD2B8\uB108\uC640
       \uD568\uAED8 \uC11C\uB458\uB7EC \uD604\uC7A5\uC73C\uB85C \uD5A5\uD588\uB2E4."
     lineDelay: 0.1
-    delayAfter: 8
+    delayAfter: 6
   nextSceneName: CharacterCreationScene
   nextSceneParam: 
 --- !u!4 &679237706
@@ -1198,7 +1205,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1647677412}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -1211,7 +1218,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c10f011237459e84aace4505bf93c0d2, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

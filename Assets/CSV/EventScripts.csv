@@ -1,6 +1,6 @@
 EventID,Seq,Type,Name,CharacterID,Text,Condition,Action,NextID
-OUTPOST_1,1,TALK,,chr_01,뭔가 불길하네...,None,None,2
-OUTPOST_1,2,TALK,,chr_01,긴장을 풀 수 없겠어.,None,None,END
+OUTPOST_1,1,TALK,,chr_01,근처에서 뭔가 느껴져.,None,None,2
+OUTPOST_1,2,TALK,,chr_01,긴장 풀지 마.,None,None,END
 
 OUTPOST_2,1,TALK,???,npc,이보게 젊은이. 이 앞으로 가려는 건가?,None,None,2
 OUTPOST_2,2,TALK,???,npc,그렇다면 조심하는 게 좋아. 이 앞은 E입자에 심하게 오염되었다네.,None,None,3

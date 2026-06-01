@@ -13,6 +13,7 @@ namespace UI.IntroScene
     public class CutsceneData
     {
         public Sprite image;
+        public Sprite background;
         [TextArea(3, 5)]
         public string text;
         [Tooltip("글자당 출력 딜레이 (초)")]
@@ -25,6 +26,7 @@ namespace UI.IntroScene
     {
         [Header("UI References")]
         public Image cutsceneImage;
+        public Image backgroundImage;
         public TextMeshProUGUI cutsceneText;
 
         [Header("BGM")]
@@ -80,6 +82,16 @@ namespace UI.IntroScene
 
             foreach (CutsceneData data in cutsceneList)
             {
+                if (data.background != null)
+                {
+                    backgroundImage.enabled = true;
+                    backgroundImage.sprite = data.background;
+                }
+                else
+                {
+                    backgroundImage.enabled = false;
+                }
+                
                 if (data.image != null)
                 {
                     cutsceneImage.sprite = data.image;
