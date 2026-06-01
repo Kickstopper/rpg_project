@@ -501,18 +501,20 @@
             "sourceY": 0,
             "isWallEntrance": true,
             "triggerDirection": 2,
+            "isWorldMap": false,
             "destinationID": "Outpost",
             "targetX": 5,
             "targetY": 10,
             "targetDirection": 2
         },
         {
-            "type": 0,
+            "type": 2,
             "sourceX": 1,
             "sourceY": 8,
             "isWallEntrance": true,
             "triggerDirection": 0,
-            "destinationID": "Underground_0",
+            "isWorldMap": false,
+            "destinationID": "elv_000",
             "targetX": 6,
             "targetY": 2,
             "targetDirection": 2

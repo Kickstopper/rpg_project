@@ -1795,6 +1795,7 @@ MonoBehaviour:
   BattleCanvas: {fileID: 0}
   menuCanvas: {fileID: 0}
   shopCanvas: {fileID: 0}
+  elevatorCanvas: {fileID: 0}
   currentBattleManager: {fileID: 0}
   shopUIController: {fileID: 0}
   dialogueController: {fileID: 0}
@@ -2742,6 +2743,21 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 58e3fa0c172ea0a4f9ff3610255facad, type: 3}
   - {fileID: 4900000, guid: 5c7a8fa6816c281428602f9e0922bab6, type: 3}
   - {fileID: 4900000, guid: 9942680bb7d500c4e81dac51ff074861, type: 3}
+  elevatorList:
+  - id: elv_000
+    floorData:
+    - floorNumber: -1
+      displayName: B1
+      mapID: Underground_0
+      mapX: 6
+      mapY: 2
+      targetDirection: 2
+    - floorNumber: 1
+      displayName: 1F
+      mapID: Bridge_0
+      mapX: 1
+      mapY: 8
+      targetDirection: 2
   allDungeonThemes:
   - {fileID: 11400000, guid: a4f1c135cc26eb64a959d30f7fd84156, type: 2}
   - {fileID: 11400000, guid: 61cd4570e47182647b174e1f3c15c4c3, type: 2}

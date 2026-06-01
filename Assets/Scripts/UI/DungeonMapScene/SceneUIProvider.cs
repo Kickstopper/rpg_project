@@ -12,12 +12,12 @@ public class SceneUIProvider : MonoBehaviour
     public GameObject BattleCanvas;
     public GameObject menuCanvas;
     public GameObject shopCanvas;
+    public GameObject elevatorCanvas;
 
     // 인스펙터에서 연결하거나 Start에서 찾음
     public BattleManager BattletManager; 
     public ShopModeSelectUI shopUI;
     public DialogueUI dialogueUI;
-
     void Start()
     {
         if (BattletManager == null)
@@ -31,14 +31,15 @@ public class SceneUIProvider : MonoBehaviour
         if (GameStateManager.Instance != null)
         {
             GameStateManager.Instance.RegisterSceneComponents(
-                eventCanvas,
-                explorationCanvas, 
-                BattleCanvas, 
-                menuCanvas,
-                shopCanvas,
+                explorationCanvas,
+                eventCanvas, 
                 dialogueUI,
+                menuCanvas,
+                BattleCanvas,
                 BattletManager,
-                shopUI
+                shopCanvas,
+                shopUI,
+                elevatorCanvas
             );
         }
     }

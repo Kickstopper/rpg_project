@@ -1,9 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.IO;
 using Data;
-using System.Collections;
-using UnityEngine.Networking;
 
 namespace Manager
 {
@@ -13,6 +10,15 @@ namespace Manager
 
         [Header("맵 데이터 리스트 (json)")]
         public List<TextAsset> mapJsonFiles; // 인스펙터에서 할당
+        
+        [Header("엘리베이터 세팅")]
+        public List<ElevatorData> elevatorList = new List<ElevatorData>();
+
+        // ID로 엘리베이터 데이터를 찾는 헬퍼 메서드
+        public ElevatorData GetElevatorData(string id)
+        {
+            return elevatorList.Find(e => e.id == id);
+        }
         
         [Header("테마 리스트 (DungeonTheme)")]
         [SerializeField] private List<DungeonTheme> allDungeonThemes; // 인스펙터에서 할당

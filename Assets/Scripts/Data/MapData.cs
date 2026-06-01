@@ -3,8 +3,27 @@ using System.Collections.Generic;
 namespace Data
 {
     public enum Direction { North, East, South, West }
-    public enum EntranceType { Map, Shop } // 다른 맵으로의 이동과 상점으로의 이동
+    public enum EntranceType { Map, Shop, Elevator } // 다른 맵으로의 이동과 상점으로의 이동
     
+    [Serializable]
+    public struct FloorData 
+    {
+        public int floorNumber;         // 정렬 및 내부 로직용 층수 (예: -1, 1, 2)
+        public string displayName;      // UI에 표시될 이름 (예: "B1", "1F", "옥상")
+        
+        public string mapID;            // 이동할 맵의 ID
+        public int mapX;                // 스폰될 X 좌표
+        public int mapY;                // 스폰될 Y 좌표
+        public Direction targetDirection; // 내렸을 때 바라볼 방향
+    }
+
+    [Serializable]
+    public class ElevatorData 
+    {
+        public string id;               // 엘리베이터 고유 ID (entrance.destinationID 와 매칭)
+        public FloorData[] floorData;   // 이 엘리베이터에서 갈 수 있는 층 목록
+    }
+
     [Serializable]
     public class MapData
     {

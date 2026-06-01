@@ -1313,6 +1313,72 @@ namespace Controller
                     fadeOverlay.blocksRaycasts = false;
                 }
             }
+            else if (entrance.type == EntranceType.Elevator)
+            {
+                GameStateManager.Instance.ChangeState(GameState.Elevator);
+
+                // 맵에 설정된 destinationID로 엘베 데이터 취득
+                ElevatorData elvData = DungeonManager.Instance.GetElevatorData(entrance.destinationID);
+                
+                if (elvData != null)
+                {
+                    // 엘리베이터에 들어가는 애니메이션 (UI 켜기)
+                    ElevatorUIManager.Instance.OpenElevator(elvData);
+
+                    // 플레이어가 UI에서 층 버튼을 누를 때까지 대기
+                    yield return new WaitUntil(() => ElevatorUIManager.Instance.IsSelectionComplete);
+
+                    // 버튼을 눌렀다면, 엘리베이터 이동 연출
+                    yield return new WaitUntil(() => ElevatorUIManager.Instance.IsAnimationFinished);
+
+                    // UI에서 선택된 층의 데이터를 가져옴
+                    FloorData destFloor = ElevatorUIManager.Instance.SelectedFloor;
+
+                    EntranceData dynamicDest = new EntranceData
+                    {
+                        destinationID = destFloor.mapID,
+                        targetX = destFloor.mapX,
+                        targetY = destFloor.mapY,
+                        targetDirection = destFloor.targetDirection
+                    };
+
+                    // 선택한 층의 맵을 로드
+                    if (DungeonEventManager.Instance) 
+                        DungeonEventManager.Instance.SetCurrentMapID(dynamicDest.destinationID);
+                    
+                    if (DungeonManager.Instance)
+                    {
+                        DungeonManager.Instance.LoadDungeonFromJson(dynamicDest.destinationID);
+                        LoadMapData(dynamicDest); // EntranceData를 넘겨 좌표 세팅
+                    }
+                    yield return null; // 렌더링 동기화를 위해 1프레임 대기
+                }
+                else
+                {
+                    Debug.LogError($"[Elevator] ID가 '{entrance.destinationID}'인 엘리베이터 데이터가 없습니다!");
+                }
+
+                // 엘리베이터 문이 열리는 애니메이션 (UI 끄기)
+                ElevatorUIManager.Instance.CloseElevator();
+
+                // 일반 페이드인 연출
+                if (fadeOverlay != null)
+                {
+                    float elapsedFade = 0f;
+                    float fadeDuration = 0.5f;
+                    while (elapsedFade < fadeDuration)
+                    {
+                        elapsedFade += Time.deltaTime;
+                        fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsedFade / fadeDuration);
+                        yield return null;
+                    }
+                    fadeOverlay.alpha = 0f;
+                    fadeOverlay.blocksRaycasts = false;
+                }
+
+                // 탐험 상태로 복귀
+                GameStateManager.Instance.ChangeState(GameState.Exploration);
+            }
             else if (entrance.type == EntranceType.Shop)
             {
                 if (GameStateManager.Instance != null)

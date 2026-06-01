@@ -12,6 +12,7 @@ public enum GameState
     PlayerMenu,  // 메뉴/인벤토리
     Event,       // 이벤트
     Shop,        // 상점
+    Elevator,    // 엘레베이터
 }
 
 namespace Manager
@@ -26,6 +27,7 @@ namespace Manager
         public GameObject BattleCanvas;      // 전투용 UI (커맨드, 적 이미지 등)
         public GameObject menuCanvas;        // 메뉴 UI
         public GameObject shopCanvas;        // 상점 UI
+        public GameObject elevatorCanvas;    // 엘레베이터 UI
 
         public BattleManager currentBattleManager;
         public ShopModeSelectUI shopUIController;
@@ -70,7 +72,7 @@ namespace Manager
         private void RefreshUIState()
         {
             // 아직 UI가 연결되지 않았다면 무시
-            if (eventCanvas == null || explorationCanvas == null || BattleCanvas == null || menuCanvas == null || shopCanvas == null) return;
+            if (eventCanvas == null || explorationCanvas == null || BattleCanvas == null || menuCanvas == null || shopCanvas == null || elevatorCanvas == null) return;
             
             // 모든 캔버스 일단 끄기
             eventCanvas.SetActive(false);
@@ -78,10 +80,16 @@ namespace Manager
             BattleCanvas.SetActive(false);
             menuCanvas.SetActive(false);
             shopCanvas.SetActive(false);
+            elevatorCanvas.SetActive(false);
+
             switch (CurrentState)
             {
                 case GameState.Event:
                     eventCanvas.SetActive(true);
+                    break;
+
+                case GameState.Elevator:
+                    elevatorCanvas.SetActive(true);
                     break;
 
                 case GameState.Exploration:
@@ -110,17 +118,20 @@ namespace Manager
         }
 
         // UI 등록 시 컨트롤러도 함께 등록받음
-        public void RegisterSceneComponents(GameObject eventCanvas, GameObject explCanvas, GameObject battleCanvas, GameObject menuCanvas, GameObject shopCanvas, 
-                                            DialogueUI dialogUI, BattleManager battleManager, ShopModeSelectUI shopController)
+        public void RegisterSceneComponents(GameObject explCanvas, GameObject eventCanvas, DialogueUI dialogUI, GameObject menuCanvas,
+                                            GameObject battleCanvas, BattleManager battleManager, 
+                                            GameObject shopCanvas, ShopModeSelectUI shopController, 
+                                            GameObject elevatorCanvas)
         {
-            this.eventCanvas = eventCanvas;
             this.explorationCanvas = explCanvas;
-            this.BattleCanvas = battleCanvas;
-            this.menuCanvas = menuCanvas;
-            this.shopCanvas = shopCanvas;
-            this.currentBattleManager = battleManager;
-            this.shopUIController = shopController;
+            this.eventCanvas = eventCanvas;
             this.dialogueController = dialogUI;
+            this.menuCanvas = menuCanvas;
+            this.BattleCanvas = battleCanvas;
+            this.currentBattleManager = battleManager;
+            this.shopCanvas = shopCanvas;
+            this.shopUIController = shopController;
+            this.elevatorCanvas = elevatorCanvas;
 
             RefreshUIState();
         }
@@ -166,5 +177,6 @@ namespace Manager
                 Debug.LogWarning("Shop UI가 연결되지 않았습니다!");
             }
         }
+
     }
 }

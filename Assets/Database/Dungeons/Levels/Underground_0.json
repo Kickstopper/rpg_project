@@ -1900,13 +1900,13 @@
     ],
     "entrances": [
         {
-            "type": 0,
+            "type": 2,
             "sourceX": 6,
             "sourceY": 2,
             "isWallEntrance": true,
             "triggerDirection": 0,
             "isWorldMap": false,
-            "destinationID": "Bridge_0",
+            "destinationID": "elv_000",
             "targetX": 1,
             "targetY": 8,
             "targetDirection": 2
