@@ -64,6 +64,8 @@ namespace Data
         Laboatory,
         Terminal,
         LevelUp,
+        Title,
+        
     }
 
     [CreateAssetMenu(fileName = "AudioLibrary", menuName = "Audio/AudioLibrary")]

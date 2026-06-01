@@ -37,6 +37,7 @@ namespace Controller
 
         private StringBuilder sb = new StringBuilder();
         private bool isBooting = false;
+        private bool isType = false;
         private bool isTransitioning = false; // 이미 전환 중인지 체크
 
         void Start()
@@ -45,7 +46,9 @@ namespace Controller
             
             // 초기 투명도 설정
             if (terminalCanvasGroup != null) terminalCanvasGroup.alpha = 1f;
+            SoundManager.Instance.PlayBGM(Data.BgmID.Title);
             SoundManager.Instance.PlaySFX(Data.SfxID.PC_Boot);
+            StartCoroutine(BlinkCursor());
             StartCoroutine(RunBootSequence());
             
         }
@@ -55,7 +58,8 @@ namespace Controller
             // 부팅 중이고, 아직 전환이 시작되지 않았을 때 키 입력 체크
             if (isBooting && !isTransitioning && Input.anyKeyDown)
             {
-                SoundManager.Instance.StopAllSFX(true);
+                SoundManager.Instance.StopAllSFX(true, 1);
+                SoundManager.Instance.StopBGM();
                 StartCoroutine(SkipAndTransition());
             }
         }
@@ -103,12 +107,13 @@ namespace Controller
             {
                 isBooting = false;
                 isTransitioning = true;
-                SoundManager.Instance.StopAllSFX(true);
+                SoundManager.Instance.StopAllSFX(true, 1);
+                SoundManager.Instance.StopBGM();
                 StartCoroutine(TransitionSequence());
             }
         }
 
-        // 페이드 아웃 -> 페이드 인 처리
+        // 페이드 아웃/인 처리
         IEnumerator TransitionSequence()
         {
             float timer = 0f;
@@ -123,22 +128,54 @@ namespace Controller
             }
             if (terminalCanvasGroup != null) terminalCanvasGroup.alpha = 0f;
 
-            // 잠시 대기 (연출상 매끄러움을 위해 0.5초 정도)
             yield return new WaitForSeconds(0.5f);
-            // 이후 로직 (예: "Press Start" 버튼 활성화 등)
-            Debug.Log("Intro Finished. Game Ready.");
+            
             if (!sceneController.IsEnable) sceneController.ShowAnimation();
         }
 
         IEnumerator TypewriterText(string line)
         {
-            for (int i = 0; i < line.Length; i++)
+            // typeSpeed가 0 이하일 경우 딜레이 없이 한 줄을 즉시 출력
+            if (typeSpeed <= 0f)
             {
-                sb.Append(line[i]);
+                sb.Append(line);
                 UpdateTerminalText();
                 Canvas.ForceUpdateCanvases();
-                if(scrollRect != null) scrollRect.verticalNormalizedPosition = 0f;
-                yield return new WaitForSeconds(typeSpeed);
+                if (scrollRect != null) scrollRect.verticalNormalizedPosition = 0f;
+                yield break; 
+            }
+
+            float timer = 0f;
+            int charIndex = 0;
+            isType = true;
+            while (charIndex < line.Length)
+            {
+                // 프레임이 넘어가는 동안 걸린 시간을 누적
+                timer += Time.deltaTime;
+
+                // 누적된 시간이 typeSpeed를 넘었다면, 그만큼 계산해서 여러 글자를 한 번에 출력
+                int charsToAdd = Mathf.FloorToInt(timer / typeSpeed);
+                
+                if (charsToAdd > 0)
+                {
+                    // 남은 글자 수보다 많이 출력하지 않도록 제한
+                    int remainingChars = line.Length - charIndex;
+                    int charsToActuallyAdd = Mathf.Min(charsToAdd, remainingChars);
+
+                    // 한 번에 잘라내서 추가
+                    sb.Append(line.Substring(charIndex, charsToActuallyAdd));
+                    charIndex += charsToActuallyAdd;
+                    
+                    // 처리한 글자 수만큼 누적 시간 차감
+                    timer -= (charsToActuallyAdd * typeSpeed);
+
+                    UpdateTerminalText();
+                    Canvas.ForceUpdateCanvases();
+                    if (scrollRect != null) scrollRect.verticalNormalizedPosition = 0f;
+                }
+                isType = false;
+                // 다음 프레임까지 대기
+                yield return null; 
             }
         }
 
@@ -160,12 +197,25 @@ namespace Controller
 
         IEnumerator BlinkCursor()
         {
+            // TextMeshPro에서 글자를 투명하게 만드는 태그
+            string invisibleCursor = $"<alpha=#00>{cursorChar}</alpha=#FF>";
+
             while (true)
             {
-                terminalText.text = sb.ToString() + cursorChar;
-                yield return new WaitForSeconds(cursorBlinkRate);
-                terminalText.text = sb.ToString();
-                yield return new WaitForSeconds(cursorBlinkRate);
+                if (isType)
+                {
+                    // 부팅 텍스트가 한창 출력 중일 때는 깜빡이지 않고 커서를 켜둠
+                    yield return null; 
+                }
+                else
+                {
+                    // 대기 상태일 때만 깜빡임
+                    terminalText.text = sb.ToString() + cursorChar;
+                    yield return new WaitForSeconds(cursorBlinkRate);
+                    
+                    terminalText.text = sb.ToString() + invisibleCursor;
+                    yield return new WaitForSeconds(cursorBlinkRate);
+                }
             }
         }
 
