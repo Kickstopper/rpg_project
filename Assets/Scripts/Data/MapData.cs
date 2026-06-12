@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 namespace Data
 {
     public enum Direction { North, East, South, West }
@@ -21,6 +22,9 @@ namespace Data
     public class ElevatorData 
     {
         public string id;               // 엘리베이터 고유 ID (entrance.destinationID 와 매칭)
+
+        public int minFloor; // 추가: 최저층 (예: -2)
+        public int maxFloor; // 추가: 최고층 (예: 5)
         public FloorData[] floorData;   // 이 엘리베이터에서 갈 수 있는 층 목록
     }
 

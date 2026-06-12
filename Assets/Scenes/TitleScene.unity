@@ -2745,6 +2745,8 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 9942680bb7d500c4e81dac51ff074861, type: 3}
   elevatorList:
   - id: elv_000
+    minFloor: -1
+    maxFloor: 1
     floorData:
     - floorNumber: -1
       displayName: B1

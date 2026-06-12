@@ -1317,23 +1317,39 @@ namespace Controller
             {
                 GameStateManager.Instance.ChangeState(GameState.Elevator);
 
-                // 맵에 설정된 destinationID로 엘베 데이터 취득
                 ElevatorData elvData = DungeonManager.Instance.GetElevatorData(entrance.destinationID);
                 
                 if (elvData != null)
                 {
-                    // 엘리베이터에 들어가는 애니메이션 (UI 켜기)
-                    ElevatorUIManager.Instance.OpenElevator(elvData);
+                    // 어느 맵에 있는지 파악하기 위해 _currentMap.mapID를 함께 넘겨줌.
+                    ElevatorUIManager.Instance.OpenElevator(elvData, _currentMap.mapID);
 
-                    // 플레이어가 UI에서 층 버튼을 누를 때까지 대기
+                    // 유저가 UI에서 층 버튼을 누를 때까지 대기
                     yield return new WaitUntil(() => ElevatorUIManager.Instance.IsSelectionComplete);
 
-                    // 버튼을 눌렀다면, 엘리베이터 이동 연출
+                    // 빛 애니메이션이 끝날 때까지 대기
                     yield return new WaitUntil(() => ElevatorUIManager.Instance.IsAnimationFinished);
 
-                    // UI에서 선택된 층의 데이터를 가져옴
-                    FloorData destFloor = ElevatorUIManager.Instance.SelectedFloor;
+                    // 페이드 아웃
+                    if (fadeOverlay != null)
+                    {
+                        float elapsedFade = 0f;
+                        float fadeDuration = 0.5f;
+                        fadeOverlay.blocksRaycasts = true;
+                        
+                        while (elapsedFade < fadeDuration)
+                        {
+                            elapsedFade += Time.deltaTime;
+                            fadeOverlay.alpha = Mathf.Clamp01(elapsedFade / fadeDuration);
+                            yield return null;
+                        }
+                    }
 
+                    // 화면이 완전히 어두워지면 엘리베이터 UI 숨김
+                    ElevatorUIManager.Instance.CloseElevator();
+
+                    // 목적지 맵 데이터 로드
+                    FloorData destFloor = ElevatorUIManager.Instance.SelectedFloor;
                     EntranceData dynamicDest = new EntranceData
                     {
                         destinationID = destFloor.mapID,
@@ -1342,26 +1358,18 @@ namespace Controller
                         targetDirection = destFloor.targetDirection
                     };
 
-                    // 선택한 층의 맵을 로드
                     if (DungeonEventManager.Instance) 
                         DungeonEventManager.Instance.SetCurrentMapID(dynamicDest.destinationID);
                     
                     if (DungeonManager.Instance)
                     {
                         DungeonManager.Instance.LoadDungeonFromJson(dynamicDest.destinationID);
-                        LoadMapData(dynamicDest); // EntranceData를 넘겨 좌표 세팅
+                        LoadMapData(dynamicDest); 
                     }
-                    yield return null; // 렌더링 동기화를 위해 1프레임 대기
+                    yield return null; // 렌더링 프레임 대기
                 }
-                else
-                {
-                    Debug.LogError($"[Elevator] ID가 '{entrance.destinationID}'인 엘리베이터 데이터가 없습니다!");
-                }
-
-                // 엘리베이터 문이 열리는 애니메이션 (UI 끄기)
-                ElevatorUIManager.Instance.CloseElevator();
-
-                // 일반 페이드인 연출
+                
+                // 다시 화면을 밝게 페이드 인
                 if (fadeOverlay != null)
                 {
                     float elapsedFade = 0f;
@@ -1376,47 +1384,7 @@ namespace Controller
                     fadeOverlay.blocksRaycasts = false;
                 }
 
-                // 탐험 상태로 복귀
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
-            }
-            else if (entrance.type == EntranceType.Shop)
-            {
-                if (GameStateManager.Instance != null)
-                {
-                    GameStateManager.Instance.ShowShop(entrance.destinationID);
-                }
-
-                // 상점이 열려있는 동안 코루틴 대기
-                yield return new WaitUntil(() => GameStateManager.Instance.CurrentState != GameState.Shop);
-
-                // 상점을 나설 때 180도 회전
-                int reverseDir = (_player.DirectionIdx + 2) % 4; 
-                
-                // 뒤집힌 방향을 기준으로 원래 위치의 오프셋을 다시 계산
-                Vector2 originalPos = _player.GetOffsetPosition(preEntranceLogicX, preEntranceLogicY, reverseDir);
-                _player.SetDirectPosition(originalPos.x, originalPos.y, reverseDir);
-
-                // 회전한 방향에 맞춰 나침반과 미니맵도 즉시 동기화
-                if (compassUI) compassUI.SetDirection(reverseDir);
-                if (miniMap) miniMap.SnapToGrid(preEntranceLogicX, preEntranceLogicY, reverseDir);
-                
-                UpdateMapDiscovery(preEntranceLogicX, preEntranceLogicY);
-
-                // 페이드인
-                if (fadeOverlay != null)
-                {
-                    float elapsedFade = 0f;
-                    float fadeDuration = 0.5f;
-                    
-                    while (elapsedFade < fadeDuration)
-                    {
-                        elapsedFade += Time.deltaTime;
-                        fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsedFade / fadeDuration);
-                        yield return null;
-                    }
-                    fadeOverlay.alpha = 0f;
-                    fadeOverlay.blocksRaycasts = false;
-                }
             }
 
             _inputLocked = false;
