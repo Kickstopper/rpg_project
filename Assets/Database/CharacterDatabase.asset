@@ -60,7 +60,7 @@ MonoBehaviour:
     isRegular: 1
     portraitImage: {fileID: 21300000, guid: f78113a154b16e5439720e662538b0a6, type: 3}
     battlePortraitImg: {fileID: 21300000, guid: 70e4b58033885144da08ffa653855d03, type: 3}
-    standingImage: {fileID: 0}
+    standingImage: {fileID: 21300000, guid: 71451bc49e152564282712189b0ac0a5, type: 3}
     align: 1
     stats:
       level: 1
