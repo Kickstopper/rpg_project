@@ -71,7 +71,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 420, y: 420}
+  m_SizeDelta: {x: 660, y: 660}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4183548302868837607
 CanvasRenderer:
@@ -123,8 +123,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 641636adc6943794582897dbbbd8a10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.SimpleGradient
-  colorLeft: {r: 0.13207549, g: 0.13207549, b: 0.13207549, a: 1}
-  colorRight: {r: 0.23773581, g: 0.23773581, b: 0.23773581, a: 1}
+  colorLeft: {r: 0.13207549, g: 0.13207549, b: 0.13207549, a: 0.9019608}
+  colorRight: {r: 0.23773581, g: 0.23773581, b: 0.23773581, a: 0.9019608}
   m_Angle: 45
 --- !u!114 &805182828324630367
 MonoBehaviour:
@@ -146,8 +146,8 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 60, y: 60}
-  m_Spacing: {x: 0, y: 0}
+  m_CellSize: {x: 100, y: 100}
+  m_Spacing: {x: 10, y: 10}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!114 &7328822973792569221
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
-  m_EffectColor: {r: 0.7056604, g: 0.7056604, b: 0.7056604, a: 1}
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
 --- !u!1 &2113193264065915344
