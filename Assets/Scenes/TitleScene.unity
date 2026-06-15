@@ -2747,6 +2747,7 @@ MonoBehaviour:
   - id: elv_000
     minFloor: -1
     maxFloor: 1
+    doorType: 0
     floorData:
     - floorNumber: -1
       displayName: B1
@@ -2758,7 +2759,7 @@ MonoBehaviour:
       displayName: 1F
       mapID: Bridge_0
       mapX: 1
-      mapY: 8
+      mapY: 7
       targetDirection: 2
   allDungeonThemes:
   - {fileID: 11400000, guid: a4f1c135cc26eb64a959d30f7fd84156, type: 2}

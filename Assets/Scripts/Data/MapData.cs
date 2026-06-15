@@ -5,6 +5,7 @@ namespace Data
 {
     public enum Direction { North, East, South, West }
     public enum EntranceType { Map, Shop, Elevator } // 다른 맵으로의 이동과 상점으로의 이동
+    public enum ElevatorDoorType { Split, SlideLeft, SlideUp }
     
     [Serializable]
     public struct FloorData 
@@ -25,6 +26,7 @@ namespace Data
 
         public int minFloor; // 추가: 최저층 (예: -2)
         public int maxFloor; // 추가: 최고층 (예: 5)
+        public ElevatorDoorType doorType = ElevatorDoorType.Split;
         public FloorData[] floorData;   // 이 엘리베이터에서 갈 수 있는 층 목록
     }
 

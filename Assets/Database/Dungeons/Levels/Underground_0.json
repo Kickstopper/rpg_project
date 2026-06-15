@@ -496,12 +496,12 @@
         {
             "x": 6,
             "y": 3,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 2,
                 2,
                 8,
-                -1
+                2
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -1635,7 +1635,7 @@
                 8,
                 2,
                 2,
-                -1
+                2
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -1908,7 +1908,7 @@
             "isWorldMap": false,
             "destinationID": "elv_000",
             "targetX": 1,
-            "targetY": 8,
+            "targetY": 7,
             "targetDirection": 2
         },
         {

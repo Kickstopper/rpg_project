@@ -462,9 +462,9 @@
             "y": 8,
             "value": 0,
             "wallTextureIDs": [
-                2,
                 0,
-                -1,
+                0,
+                2,
                 0
             ],
             "centerObjectID": -1,
@@ -510,7 +510,7 @@
         {
             "type": 2,
             "sourceX": 1,
-            "sourceY": 8,
+            "sourceY": 7,
             "isWallEntrance": true,
             "triggerDirection": 0,
             "isWorldMap": false,

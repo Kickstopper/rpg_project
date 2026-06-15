@@ -1321,35 +1321,32 @@ namespace Controller
                 
                 if (elvData != null)
                 {
-                    // 어느 맵에 있는지 파악하기 위해 _currentMap.mapID를 함께 넘겨줌.
                     ElevatorUIManager.Instance.OpenElevator(elvData, _currentMap.mapID);
 
-                    // 유저가 UI에서 층 버튼을 누를 때까지 대기
+                    // 층 선택 및 엘리베이터 이동 연출 완료 대기
                     yield return new WaitUntil(() => ElevatorUIManager.Instance.IsSelectionComplete);
-
-                    // 빛 애니메이션이 끝날 때까지 대기
                     yield return new WaitUntil(() => ElevatorUIManager.Instance.IsAnimationFinished);
 
-                    // 페이드 아웃
-                    if (fadeOverlay != null)
-                    {
-                        float elapsedFade = 0f;
-                        float fadeDuration = 0.5f;
-                        fadeOverlay.blocksRaycasts = true;
-                        
-                        while (elapsedFade < fadeDuration)
-                        {
-                            elapsedFade += Time.deltaTime;
-                            fadeOverlay.alpha = Mathf.Clamp01(elapsedFade / fadeDuration);
-                            yield return null;
-                        }
-                    }
-
-                    // 화면이 완전히 어두워지면 엘리베이터 UI 숨김
-                    ElevatorUIManager.Instance.CloseElevator();
-
-                    // 목적지 맵 데이터 로드
                     FloorData destFloor = ElevatorUIManager.Instance.SelectedFloor;
+
+                    // 같은 층에서 내릴 경우
+                    if (destFloor.mapID == _currentMap.mapID)
+                    {
+                        int exitDir = (_player.DirectionIdx + 2) % 4; 
+                        _player.SetMapData(_currentMap, preEntranceLogicX, preEntranceLogicY, (Direction)exitDir);
+                        
+                        if (miniMap) miniMap.SnapToGrid(preEntranceLogicX, preEntranceLogicY, exitDir);
+                        if (compassUI) compassUI.SetDirection(exitDir);
+
+                        // 통괄 시퀀스 코루틴 하나로 모든 연출과 복구 해결!
+                        yield return StartCoroutine(HandleElevatorExitSequence(elvData));
+
+                        GameStateManager.Instance.ChangeState(GameState.Exploration);
+                        _inputLocked = false;
+                        yield break; 
+                    }
+                    
+                    // 다른 층으로 이동하여 내릴 경우 (새 맵 전환)
                     EntranceData dynamicDest = new EntranceData
                     {
                         destinationID = destFloor.mapID,
@@ -1358,30 +1355,16 @@ namespace Controller
                         targetDirection = destFloor.targetDirection
                     };
 
-                    if (DungeonEventManager.Instance) 
-                        DungeonEventManager.Instance.SetCurrentMapID(dynamicDest.destinationID);
-                    
                     if (DungeonManager.Instance)
                     {
                         DungeonManager.Instance.LoadDungeonFromJson(dynamicDest.destinationID);
                         LoadMapData(dynamicDest); 
                     }
-                    yield return null; // 렌더링 프레임 대기
-                }
-                
-                // 다시 화면을 밝게 페이드 인
-                if (fadeOverlay != null)
-                {
-                    float elapsedFade = 0f;
-                    float fadeDuration = 0.5f;
-                    while (elapsedFade < fadeDuration)
-                    {
-                        elapsedFade += Time.deltaTime;
-                        fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsedFade / fadeDuration);
-                        yield return null;
-                    }
-                    fadeOverlay.alpha = 0f;
-                    fadeOverlay.blocksRaycasts = false;
+                    
+                    yield return new WaitForSeconds(0.2f); // 렉 스파이크 대기
+
+                    // 통괄 시퀀스 코루틴 하나로 모든 연출과 복구 해결!
+                    yield return StartCoroutine(HandleElevatorExitSequence(elvData));
                 }
 
                 GameStateManager.Instance.ChangeState(GameState.Exploration);
@@ -1458,6 +1441,133 @@ namespace Controller
             {
                 yield return StartCoroutine(TurnRoutine(dirStep));
             }
+        }
+
+        private IEnumerator HandleElevatorExitSequence(ElevatorData elvData)
+        {
+            Vector2Int forward = _player.GetForwardVector();
+            int backX = _player.LogicX - forward.x;
+            int backY = _player.LogicY - forward.y;
+
+            CellData corridorCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
+            CellData doorCell = _currentMap.GetCell(backX, backY);
+
+            int corridorBackFace = -1;
+            int doorFrontFace = -1;
+
+            if (forward.x > 0)      { corridorBackFace = 3; doorFrontFace = 1; }
+            else if (forward.x < 0) { corridorBackFace = 1; doorFrontFace = 3; }
+            else if (forward.y > 0) { corridorBackFace = 2; doorFrontFace = 0; }
+            else if (forward.y < 0) { corridorBackFace = 0; doorFrontFace = 2; }
+
+            int origDoorVal = 0;
+            int origDoorTex = -1;
+            int origCorridorTex = -1;
+
+            if (doorCell != null && doorFrontFace != -1)
+            {
+                origDoorTex = doorCell.wallTextureIDs[doorFrontFace];
+            }
+
+            // Logic 좌표계가 덮어써지기 전에, 도착점(복도)과 시작점(엘리베이터 안)의 물리적 위치를 미리 계산하여 저장
+            Vector2 targetPos = _player.GetOffsetPosition(_player.LogicX, _player.LogicY, _player.DirectionIdx);
+            Vector2 startPos = new Vector2(targetPos.x - (forward.x * 0.8f), targetPos.y - (forward.y * 0.8f));
+            
+            // 카메라 물리적 위치 임시 변경 (이때 플레이어의 Logic 좌표가 엘리베이터로 바뀜)
+            _player.SetDirectPosition(startPos.x, startPos.y, _player.DirectionIdx);
+
+            _renderer.RenderFrame(_player, renderSettings);
+
+            if (GameStateManager.Instance.explorationCanvas != null)
+                GameStateManager.Instance.explorationCanvas.SetActive(true);
+
+            if (fadeOverlay != null)
+            {
+                fadeOverlay.alpha = 0f;
+                fadeOverlay.blocksRaycasts = false;
+            }
+
+            // 내부 도어(UI) 오픈
+            yield return StartCoroutine(ElevatorUIManager.Instance.OpenDoorsRoutine(elvData.doorType));
+
+            // 외부 도어(3D) 오픈
+            DoorAnimConfig doorConfig = null;
+            if (origDoorTex != -1 && theme != null && theme.doorAnimations != null)
+            {
+                doorConfig = theme.doorAnimations.Find(d => d.closedTexId == origDoorTex);
+            }
+
+            if (doorConfig != null && doorConfig.openFrameTexIds != null && doorConfig.openFrameTexIds.Length > 0 && doorCell != null)
+            {
+                SoundManager.Instance.PlaySFX(SfxID.Slide_Door); 
+                
+                for (int i = 0; i < doorConfig.openFrameTexIds.Length; i++)
+                {
+                    doorCell.wallTextureIDs[doorFrontFace] = doorConfig.openFrameTexIds[i];
+                    _renderer.RenderFrame(_player, renderSettings); 
+                    yield return new WaitForSeconds(doorConfig.animSpeed);
+                }
+            }
+
+            if (doorCell != null)
+            {
+                origDoorVal = doorCell.value;
+                doorCell.value = 0; 
+                if (doorFrontFace != -1) doorCell.wallTextureIDs[doorFrontFace] = -1; 
+            }
+            if (corridorCell != null && corridorBackFace != -1)
+            {
+                origCorridorTex = corridorCell.wallTextureIDs[corridorBackFace];
+                corridorCell.wallTextureIDs[corridorBackFace] = -1;
+            }
+
+            _renderer.RenderFrame(_player, renderSettings);
+
+            // 복도로 걸어나가기
+            float stepOutTime = 0.6f;
+            StartCoroutine(ElevatorUIManager.Instance.StepOutZoomRoutine(stepOutTime)); 
+            
+            // 미리 계산해둔 startPos와 targetPos를 강제로 전달하여 전진.
+            yield return StartCoroutine(StepOutOfElevatorRoutine(stepOutTime, startPos, targetPos));
+
+            // 문 닫기(복구)
+            if (doorCell != null)
+            {
+                doorCell.value = origDoorVal;
+                if (doorFrontFace != -1) doorCell.wallTextureIDs[doorFrontFace] = origDoorTex;
+            }
+            if (corridorCell != null && corridorBackFace != -1)
+            {
+                corridorCell.wallTextureIDs[corridorBackFace] = origCorridorTex;
+            }
+
+            ElevatorUIManager.Instance.CloseElevator();
+        }
+
+        // 내부에서 좌표를 다시 구하지 않고 외부에서 받아오도록 파라미터 변경
+        private IEnumerator StepOutOfElevatorRoutine(float duration, Vector2 startPos, Vector2 targetPos)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                float easeT = t < 0.5f ? 4f * t * t * t : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
+
+                _player.SetDirectPosition(
+                    Mathf.Lerp(startPos.x, targetPos.x, easeT),
+                    Mathf.Lerp(startPos.y, targetPos.y, easeT),
+                    _player.DirectionIdx
+                );
+
+                _renderer.RenderFrame(_player, renderSettings);
+                yield return null;
+            }
+
+            // 도착 후 강제 갱신으로 어긋난 Logic 좌표까지 복도 칸으로 복구.
+            _player.SetDirectPosition(targetPos.x, targetPos.y, _player.DirectionIdx);
+            _renderer.RenderFrame(_player, renderSettings);
         }
 
         // ================= Map & Game Logic =================

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using Data;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 namespace UI
 {
@@ -12,11 +13,24 @@ namespace UI
         public static ElevatorUIManager Instance;
 
         [Header("UI 연결")]
+        public CanvasGroup visualCG;
         public Image elevatorBackgroundImage; 
         public Image elevatorCharacterImage;
         public GameObject buttonPanel;
         public Transform buttonContainer;     
-        public GameObject buttonPrefab;       
+        public GameObject buttonPrefab;
+        
+        [Header("도어 애니메이션 (RectTransform)")]
+        public RectTransform leftDoor;   // Split용 좌측 도어
+        public RectTransform rightDoor;  // Split용 우측 도어
+        public RectTransform singleDoor; // SlideLeft, SlideUp용 단일 도어
+        public RectTransform characterTransform; // 문이 열릴 때 캐릭터도 같이 치우고 싶다면 할당
+
+        // 원래 위치를 기억할 변수들
+        private Vector2 _leftDoorOrigin;
+        private Vector2 _rightDoorOrigin;
+        private Vector2 _singleDoorOrigin;
+        private Vector2 _characterOrigin;
 
         [Header("캐릭터 세팅")]
         public Sprite[] characterImages;
@@ -40,6 +54,12 @@ namespace UI
         {
             Instance = this;
             gameObject.SetActive(false);
+
+            // 도어들의 원래 앵커 위치를 저장
+            if (leftDoor != null) _leftDoorOrigin = leftDoor.anchoredPosition;
+            if (rightDoor != null) _rightDoorOrigin = rightDoor.anchoredPosition;
+            if (singleDoor != null) _singleDoorOrigin = singleDoor.anchoredPosition;
+            if (characterTransform != null) _characterOrigin = characterTransform.anchoredPosition;
 
             if (elevatorBackgroundImage != null)
             {
@@ -270,10 +290,8 @@ namespace UI
             float startLoc = (floorDiff > 0) ? 2.0f : -2.0f;
             float endLoc   = (floorDiff > 0) ? -2.0f : 2.0f;
 
-            // Parallax 처리. 배경과 캐릭터 간의 물리적 위치 오프셋 설정 (추천값: 0.3 ~ 0.5)
+            // Parallax 처리. 배경과 캐릭터 간의 물리적 위치 오프셋 설정
             float parallaxOffset = (floorDiff > 0) ? 0.4f : -0.4f;
-
-            // SoundManager.Instance.PlaySFX(SfxID.Elevator_Move);
 
             for (int i = 0; i < absDiff; i++)
             {
@@ -283,10 +301,7 @@ namespace UI
                     elapsed += Time.deltaTime;
                     float t = elapsed / timePerFloor;
                     
-                    // 배경은 정상적으로 끝에서 끝으로 이동
                     float bgLoc = Mathf.Lerp(startLoc, endLoc, t);
-                    
-                    // 캐릭터는 배경 위치에 오프셋을 더해 약간 뒤쳐져서 따라오게 함
                     float chrLoc = bgLoc + parallaxOffset; 
                     
                     _bgSweepMat.SetFloat("_ShineLocation", bgLoc);
@@ -296,37 +311,91 @@ namespace UI
                 }
             }
 
-            // 연출이 끝나면 두 빛 모두 화면 밖(-3.0)으로 완전히 치운다.
             _bgSweepMat.SetFloat("_ShineLocation", -3.0f);
             _chrSweepMat.SetFloat("_ShineLocation", -3.0f);
             
-            // SoundManager.Instance.PlaySFX(SfxID.Elevator_Arrive);
-
             if (elevatorCharacterImage != null && characterImages != null && characterImages.Length > 1)
             {
-                // 동승한 캐릭터의 뒷모습을 표시한다
                 elevatorCharacterImage.sprite = characterImages[1];
                 elevatorCharacterImage.SetNativeSize();
-            }
-
-            if (_containerCanvasGroup != null)
-            {
-                float elapsedFade = 0f;
-                while (elapsedFade < fadeOutTime)
-                {
-                    elapsedFade += Time.deltaTime;
-                    _containerCanvasGroup.alpha = Mathf.Clamp01(elapsedFade / fadeOutTime);
-                    yield return null;
-                }
-                _containerCanvasGroup.alpha = 1f;
             }
 
             IsAnimationFinished = true;
         }
 
+        // 문 열림 연출 코루틴
+        public IEnumerator OpenDoorsRoutine(ElevatorDoorType doorType)
+        {
+            elevatorBackgroundImage.gameObject.SetActive(false);
+            float animDuration = 1.0f; 
+            Sequence seq = DOTween.Sequence();
+            seq.Join(visualCG.DOFade(0f, animDuration)).SetEase(Ease.InOutCubic);
+            seq.Join(visualCG.transform.DOScale(1.5f, animDuration)).SetEase(Ease.InOutCubic);
+
+            // 열기 전에 현재 사용될 문을 활성화
+            if (doorType == ElevatorDoorType.Split)
+            {
+                if(singleDoor) singleDoor.gameObject.SetActive(false);
+                if(leftDoor) leftDoor.gameObject.SetActive(true);
+                if(rightDoor) rightDoor.gameObject.SetActive(true);
+                
+                float moveDist = 1200f; 
+                seq.Join(leftDoor.DOAnchorPosX(_leftDoorOrigin.x - moveDist, animDuration).SetEase(Ease.InOutCubic));
+                seq.Join(rightDoor.DOAnchorPosX(_rightDoorOrigin.x + moveDist, animDuration).SetEase(Ease.InOutCubic));
+            }
+            else if (doorType == ElevatorDoorType.SlideLeft)
+            {
+                if(singleDoor) singleDoor.gameObject.SetActive(true);
+                if(leftDoor) leftDoor.gameObject.SetActive(false);
+                if(rightDoor) rightDoor.gameObject.SetActive(false);
+
+                float moveDist = 2000f;
+                seq.Join(singleDoor.DOAnchorPosX(_singleDoorOrigin.x - moveDist, animDuration).SetEase(Ease.InOutCubic));
+            }
+            else if (doorType == ElevatorDoorType.SlideUp)
+            {
+                if(singleDoor) singleDoor.gameObject.SetActive(true);
+                if(leftDoor) leftDoor.gameObject.SetActive(false);
+                if(rightDoor) rightDoor.gameObject.SetActive(false);
+
+                float moveDist = 1200f; 
+                seq.Join(singleDoor.DOAnchorPosY(_singleDoorOrigin.y + moveDist, animDuration).SetEase(Ease.InOutCubic));
+            }
+
+            if (characterTransform != null)
+            {
+                CanvasGroup charGroup = characterTransform.GetComponent<CanvasGroup>();
+                if (charGroup != null) seq.Join(charGroup.DOFade(0f, animDuration * 0.8f));
+                else seq.Join(characterTransform.DOAnchorPosX(_characterOrigin.x - 500f, animDuration));
+            }
+
+            yield return seq.WaitForCompletion();
+        }
+
+        // 밖으로 걸어 나가는 줌인만 전담하는 코루틴
+        public IEnumerator StepOutZoomRoutine(float duration)
+        {
+            yield return transform.DOScale(1.2f, duration).SetEase(Ease.InOutCubic).WaitForCompletion();
+        }
+
+        // UI를 닫을 때 다음 탑승을 위해 도어 위치를 원상 복구하는 메서드
         public void CloseElevator()
         {
             gameObject.SetActive(false);
+
+            visualCG.alpha = 1f;
+            visualCG.transform.localScale = Vector3.one;
+            elevatorBackgroundImage.gameObject.SetActive(true);
+            // 도어 위치 및 캐릭터 원상 복구
+            if (leftDoor != null) leftDoor.anchoredPosition = _leftDoorOrigin;
+            if (rightDoor != null) rightDoor.anchoredPosition = _rightDoorOrigin;
+            if (singleDoor != null) singleDoor.anchoredPosition = _singleDoorOrigin;
+            if (characterTransform != null) 
+            {
+                characterTransform.anchoredPosition = _characterOrigin;
+                CanvasGroup charGroup = characterTransform.GetComponent<CanvasGroup>();
+                if (charGroup != null) charGroup.alpha = 1f;
+            }
         }
     }
 }
