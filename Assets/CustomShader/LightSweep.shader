@@ -11,7 +11,7 @@ Shader "UI/Custom/LightSweep"
         [HDR] _ShineColor ("Shine Color", Color) = (1, 1, 1, 0.5)
         _ShineWidth ("Shine Width", Range(0.01, 1.0)) = 0.1
         _ShineSoftness ("Shine Softness", Range(0.001, 1.0)) = 0.05
-        _ShineSpeed ("Shine Speed", Float) = 1.0
+        _ShineLocation ("Shine Location", Float) = -2.0
         _ShineAngle ("Shine Angle", Range(0, 360)) = -45.0
 
         // 자연스러운 합성 세팅
@@ -95,7 +95,7 @@ Shader "UI/Custom/LightSweep"
             float4 _ShineColor;
             float _ShineWidth;
             float _ShineSoftness;
-            float _ShineSpeed;
+            float _ShineLocation;
             float _ShineAngle;
             
             float _ShineBlend;
@@ -126,7 +126,7 @@ Shader "UI/Custom/LightSweep"
                 float rotatedY = centeredUV.x * s + centeredUV.y * c;
 
                 // 시간 계산 (음수 Speed 완벽 지원)
-                float currentPos = frac(_Time.y * _ShineSpeed) * 3.0 - 1.5;
+                float currentPos = _ShineLocation;
 
                 // 중심선으로부터의 거리를 계산해 빛의 두께와 부드러움 적용
                 float dist = abs(rotatedY - currentPos);
