@@ -13,7 +13,7 @@ namespace UI
         public static ElevatorUIManager Instance;
 
         [Header("UI 연결")]
-        public CanvasGroup visualCG;
+        public Transform visualContainer;
         public Image elevatorBackgroundImage; 
         public Image elevatorCharacterImage;
         public GameObject buttonPanel;
@@ -254,6 +254,10 @@ namespace UI
                 _containerCanvasGroup.blocksRaycasts = false;
             }
 
+            if (singleDoor) singleDoor.gameObject.SetActive(false);
+            if (leftDoor) leftDoor.gameObject.SetActive(false);
+            if (rightDoor) rightDoor.gameObject.SetActive(false);
+
             StartCoroutine(ElevatorMovingAnimation(floor.floorNumber));
         }
 
@@ -329,15 +333,14 @@ namespace UI
             elevatorBackgroundImage.gameObject.SetActive(false);
             float animDuration = 1.0f; 
             Sequence seq = DOTween.Sequence();
-            seq.Join(visualCG.DOFade(0f, animDuration)).SetEase(Ease.InOutCubic);
-            seq.Join(visualCG.transform.DOScale(1.5f, animDuration)).SetEase(Ease.InOutCubic);
+            seq.Join(visualContainer.DOScale(2f, animDuration)).SetEase(Ease.InOutCubic);
 
             // 열기 전에 현재 사용될 문을 활성화
             if (doorType == ElevatorDoorType.Split)
             {
-                if(singleDoor) singleDoor.gameObject.SetActive(false);
-                if(leftDoor) leftDoor.gameObject.SetActive(true);
-                if(rightDoor) rightDoor.gameObject.SetActive(true);
+                if (singleDoor) singleDoor.gameObject.SetActive(false);
+                if (leftDoor) leftDoor.gameObject.SetActive(true);
+                if (rightDoor) rightDoor.gameObject.SetActive(true);
                 
                 float moveDist = 1200f; 
                 seq.Join(leftDoor.DOAnchorPosX(_leftDoorOrigin.x - moveDist, animDuration).SetEase(Ease.InOutCubic));
@@ -345,18 +348,18 @@ namespace UI
             }
             else if (doorType == ElevatorDoorType.SlideLeft)
             {
-                if(singleDoor) singleDoor.gameObject.SetActive(true);
-                if(leftDoor) leftDoor.gameObject.SetActive(false);
-                if(rightDoor) rightDoor.gameObject.SetActive(false);
+                if (singleDoor) singleDoor.gameObject.SetActive(true);
+                if (leftDoor) leftDoor.gameObject.SetActive(false);
+                if (rightDoor) rightDoor.gameObject.SetActive(false);
 
                 float moveDist = 2000f;
                 seq.Join(singleDoor.DOAnchorPosX(_singleDoorOrigin.x - moveDist, animDuration).SetEase(Ease.InOutCubic));
             }
             else if (doorType == ElevatorDoorType.SlideUp)
             {
-                if(singleDoor) singleDoor.gameObject.SetActive(true);
-                if(leftDoor) leftDoor.gameObject.SetActive(false);
-                if(rightDoor) rightDoor.gameObject.SetActive(false);
+                if (singleDoor) singleDoor.gameObject.SetActive(true);
+                if (leftDoor) leftDoor.gameObject.SetActive(false);
+                if (rightDoor) rightDoor.gameObject.SetActive(false);
 
                 float moveDist = 1200f; 
                 seq.Join(singleDoor.DOAnchorPosY(_singleDoorOrigin.y + moveDist, animDuration).SetEase(Ease.InOutCubic));
@@ -383,13 +386,24 @@ namespace UI
         {
             gameObject.SetActive(false);
 
-            visualCG.alpha = 1f;
-            visualCG.transform.localScale = Vector3.one;
+            visualContainer.localScale = Vector3.one;
             elevatorBackgroundImage.gameObject.SetActive(true);
             // 도어 위치 및 캐릭터 원상 복구
-            if (leftDoor != null) leftDoor.anchoredPosition = _leftDoorOrigin;
-            if (rightDoor != null) rightDoor.anchoredPosition = _rightDoorOrigin;
-            if (singleDoor != null) singleDoor.anchoredPosition = _singleDoorOrigin;
+            if (leftDoor != null)
+            {
+                leftDoor.anchoredPosition = _leftDoorOrigin;
+                leftDoor.gameObject.SetActive(false);
+            }
+            if (rightDoor != null)
+            {
+                rightDoor.anchoredPosition = _rightDoorOrigin;
+                rightDoor.gameObject.SetActive(false);  
+            } 
+            if (singleDoor != null)
+            {
+                singleDoor.anchoredPosition = _singleDoorOrigin;
+                singleDoor.gameObject.SetActive(false);
+            }
             if (characterTransform != null) 
             {
                 characterTransform.anchoredPosition = _characterOrigin;
