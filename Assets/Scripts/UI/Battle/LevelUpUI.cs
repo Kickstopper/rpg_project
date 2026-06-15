@@ -331,16 +331,28 @@ namespace UI.Battle
                 isChanged = true;
                 SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
 
-                // 스킬 리스트에서 마우스로 스탯 취소 버튼을 클릭했을 때 다시 스탯 섹션으로 강제 이동
                 if (currentSection == FocusSection.Skill)
                 {
                     SetSectionFocus(FocusSection.Stat);
                 }
             }
+            // 값의 증감은 없지만, 좌/우 방향키 조작 시 하이라이트만 자연스럽게 이동시켜주는 처리
+            else 
+            {
+                if (currentSection == FocusSection.Stat)
+                {
+                    StatUIRow row = GetStatRow(type);
+                    Button targetBtn = (amount > 0) ? row.upButton : row.downButton;
+                    if (targetBtn.interactable && targetBtn.gameObject.activeInHierarchy)
+                    {
+                        EventSystem.current.SetSelectedGameObject(targetBtn.gameObject);
+                        lastSelectedObject = targetBtn.gameObject;
+                    }
+                }
+            }
 
             if (isChanged)
             {
-                GameObject lastSelected = EventSystem.current.currentSelectedGameObject;
                 RefreshUI();
 
                 // 포인트가 0이 되면 스킬 섹션으로 포커스 이동
@@ -349,14 +361,52 @@ namespace UI.Battle
                     SetSectionFocus(FocusSection.Skill);
                     StartCoroutine(SelectFirstAvailableButton());
                 }
-                else if (lastSelected != null && currentSection == FocusSection.Stat)
+                else if (currentSection == FocusSection.Stat)
                 {
-                    Selectable sel = lastSelected.GetComponent<Selectable>();
-                    if (sel != null && !sel.interactable)
+                    // 변경된 스탯 방향(up/down)의 버튼으로 포커스 시각적 유지
+                    StatUIRow row = GetStatRow(type);
+                    Button targetBtn = (amount > 0) ? row.upButton : row.downButton;
+
+                    // 방금 누른 버튼이 비활성화(interactable=false) 상태가 되었다면 반대편 버튼을 강제 지정
+                    if (!targetBtn.interactable)
+                    {
+                        targetBtn = (amount > 0) ? row.downButton : row.upButton;
+                    }
+
+                    if (targetBtn != null && targetBtn.interactable && targetBtn.gameObject.activeInHierarchy)
+                    {
+                        EventSystem.current.SetSelectedGameObject(targetBtn.gameObject);
+                        lastSelectedObject = targetBtn.gameObject;
+                    }
+                    else
                     {
                         StartCoroutine(SelectFirstAvailableButton());
                     }
                 }
+            }
+        }
+
+        private StatType? GetFocusedStatType(GameObject obj)
+        {
+            if (obj == strRow.upButton.gameObject || obj == strRow.downButton.gameObject) return StatType.STR;
+            if (obj == magRow.upButton.gameObject || obj == magRow.downButton.gameObject) return StatType.MAG;
+            if (obj == intRow.upButton.gameObject || obj == intRow.downButton.gameObject) return StatType.INT;
+            if (obj == vitRow.upButton.gameObject || obj == vitRow.downButton.gameObject) return StatType.VIT;
+            if (obj == agiRow.upButton.gameObject || obj == agiRow.downButton.gameObject) return StatType.AGI;
+            if (obj == lucRow.upButton.gameObject || obj == lucRow.downButton.gameObject) return StatType.LUC;
+            return null;
+        }
+
+        private StatUIRow GetStatRow(StatType type)
+        {
+            switch (type) {
+                case StatType.STR: return strRow;
+                case StatType.MAG: return magRow;
+                case StatType.INT: return intRow;
+                case StatType.VIT: return vitRow;
+                case StatType.AGI: return agiRow;
+                case StatType.LUC: return lucRow;
+                default: return strRow;
             }
         }
 
@@ -446,16 +496,16 @@ namespace UI.Battle
                 if (downBtn != null)
                 {
                     Navigation nav = downBtn.navigation;
-                    nav.selectOnRight = upBtn != null ? upBtn : downBtn;
-                    nav.selectOnLeft = upBtn != null ? upBtn : downBtn; 
+                    nav.selectOnRight = null; // 수정됨
+                    nav.selectOnLeft = null;  // 수정됨
                     downBtn.navigation = nav;
                 }
 
                 if (upBtn != null)
                 {
                     Navigation nav = upBtn.navigation;
-                    nav.selectOnLeft = downBtn != null ? downBtn : upBtn;
-                    nav.selectOnRight = downBtn != null ? downBtn : upBtn; 
+                    nav.selectOnLeft = null;  // 수정됨
+                    nav.selectOnRight = null; // 수정됨
                     upBtn.navigation = nav;
                 }
             }
@@ -599,6 +649,32 @@ namespace UI.Battle
                     {
                         confirmButton.onClick.Invoke();
                         return;
+                    }
+                }
+            }
+
+            if (currentSection == FocusSection.Stat)
+            {
+                bool isLeftPressed = Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A);
+                bool isRightPressed = Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D);
+
+                if (isLeftPressed || isRightPressed)
+                {
+                    GameObject currentObj = EventSystem.current.currentSelectedGameObject;
+                    if (currentObj != null)
+                    {
+                        StatType? focusedType = GetFocusedStatType(currentObj);
+                        if (focusedType.HasValue)
+                        {
+                            // 방향키 입력에 따라 -1(Left) 또는 +1(Right) 실행
+                            if (isLeftPressed) ChangeStat(focusedType.Value, -1);
+                            else if (isRightPressed) ChangeStat(focusedType.Value, 1);
+                            
+                            // 좌/우 입력 후 상하 이동 타이머가 꼬이지 않도록 초기화
+                            inputTimer = 0f;
+                            isKeyHeld = false;
+                            return; 
+                        }
                     }
                 }
             }
