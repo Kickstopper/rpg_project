@@ -1313,6 +1313,45 @@ namespace Controller
                     fadeOverlay.blocksRaycasts = false;
                 }
             }
+            else if (entrance.type == EntranceType.Shop)
+            {
+                if (GameStateManager.Instance != null)
+                {
+                    GameStateManager.Instance.ShowShop(entrance.destinationID);
+                }
+
+                // 상점이 열려있는 동안 코루틴 대기
+                yield return new WaitUntil(() => GameStateManager.Instance.CurrentState != GameState.Shop);
+
+                // 상점을 나설 때 180도 회전
+                int reverseDir = (_player.DirectionIdx + 2) % 4; 
+                
+                // 뒤집힌 방향을 기준으로 원래 위치의 오프셋을 다시 계산
+                Vector2 originalPos = _player.GetOffsetPosition(preEntranceLogicX, preEntranceLogicY, reverseDir);
+                _player.SetDirectPosition(originalPos.x, originalPos.y, reverseDir);
+
+                // 회전한 방향에 맞춰 나침반과 미니맵도 즉시 동기화
+                if (compassUI) compassUI.SetDirection(reverseDir);
+                if (miniMap) miniMap.SnapToGrid(preEntranceLogicX, preEntranceLogicY, reverseDir);
+                
+                UpdateMapDiscovery(preEntranceLogicX, preEntranceLogicY);
+
+                // 페이드인
+                if (fadeOverlay != null)
+                {
+                    float elapsedFade = 0f;
+                    float fadeDuration = 0.5f;
+                    
+                    while (elapsedFade < fadeDuration)
+                    {
+                        elapsedFade += Time.deltaTime;
+                        fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsedFade / fadeDuration);
+                        yield return null;
+                    }
+                    fadeOverlay.alpha = 0f;
+                    fadeOverlay.blocksRaycasts = false;
+                }
+            }
             else if (entrance.type == EntranceType.Elevator)
             {
                 GameStateManager.Instance.ChangeState(GameState.Elevator);
