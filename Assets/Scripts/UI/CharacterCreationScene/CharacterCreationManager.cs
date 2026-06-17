@@ -117,6 +117,18 @@ namespace UI.CharacterCreationScene
             }
         }
 
+        public void OnCharacterSetToggleClicked()
+        {
+            if (virtualKeyboard != null)
+            {
+                virtualKeyboard.ToggleLanguage();
+            }
+            else
+            {
+                Debug.LogWarning("VirtualKeyboard 참조가 누락되었습니다.");
+            }
+        }
+
         public void OnNameConfirmClicked()
         {
             string finalName = nameInputField.text;

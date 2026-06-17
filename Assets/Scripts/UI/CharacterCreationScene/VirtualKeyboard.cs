@@ -3,15 +3,26 @@ using TMPro;
 using UnityEngine.UI;
 using Data;
 using Manager;
+using Helper;
 
 namespace UI.CharacterCreationScene
 {
     public class VirtualKeyboard : MonoBehaviour
     {
+        [Header("Keyboard Panels")]
+        [SerializeField] private GameObject englishPanel;
+        [SerializeField] private GameObject koreanPanel;
+        [SerializeField] private GameObject japanesePanel;
+
+        [Header("First Keys For Navigation")]
+        [SerializeField] private Button firstSelectedKey;
+
         [SerializeField] private TMP_InputField targetInputField;
 
-        [Header("Keyboard Navigation")]
-        [SerializeField] private Button firstSelectedKey;
+        private HangulCombiner hangulCombiner = new HangulCombiner();
+        
+        public enum KeyboardLanguage { English, Korean, Japanese }
+        private KeyboardLanguage currentLanguage = KeyboardLanguage.English;
 
         private void Update()
         {
@@ -34,6 +45,19 @@ namespace UI.CharacterCreationScene
             }
         }
 
+        // 언어 전환 및 패널 활성화 로직
+        public void ToggleLanguage()
+        {
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            
+            // 다음 언어로 순환
+            currentLanguage = (KeyboardLanguage)(((int)currentLanguage + 1) % 3);
+            
+            englishPanel.SetActive(currentLanguage == KeyboardLanguage.English);
+            koreanPanel.SetActive(currentLanguage == KeyboardLanguage.Korean);
+            japanesePanel.SetActive(currentLanguage == KeyboardLanguage.Japanese);
+        }
+        
         public void FocusFirstKey()
         {
             if (firstSelectedKey != null)
@@ -42,26 +66,25 @@ namespace UI.CharacterCreationScene
             }
         }
 
-        // ㄱㄴㄷ, A~Z 등 문자 버튼 OnClick에 할당됨
         public void OnKeyPress(string character)
         {
-            targetInputField.text += character;
+            if (character.Length > 0)
+            {
+                // 한글 조합기에 현재 텍스트와 입력된 단일 자모를 넘겨서 처리된 문자열을 받아옴.
+                targetInputField.text = hangulCombiner.InputChar(targetInputField.text, character[0]);
+            }
         }
 
-        // Backspace 버튼 OnClick에 할당됨
         public void OnBackspacePress()
         {
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
-            if (targetInputField.text.Length > 0)
-            {
-                targetInputField.text = targetInputField.text.Substring(0, targetInputField.text.Length - 1);
-            }
+            targetInputField.text = hangulCombiner.DeleteChar(targetInputField.text);
         }
         
-        // 입력창 초기화
         public void ClearInput()
         {
             targetInputField.text = "";
+            hangulCombiner.ResetState(); // 초기화 시 오토마타 상태도 반드시 초기화 필요
         }
     }
 }
