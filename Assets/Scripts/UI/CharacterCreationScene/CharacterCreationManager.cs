@@ -99,11 +99,14 @@ namespace UI.CharacterCreationScene
 
         public void ChangePlaceholder(string newText)
         {
-            // placeholder 속성을 TextMeshProUGUI로 형변환
             TextMeshProUGUI placeholder = nameInputField.placeholder as TextMeshProUGUI;
             
             if (placeholder != null)
                 placeholder.text = newText;
+            
+            // Placeholder 글자가 바뀌었으므로 가상 키보드 화면도 즉시 새로고침
+            if (virtualKeyboard != null)
+                virtualKeyboard.ForceUpdateDisplay();
         }
 
         private void SetDefaultCharacterInfo(string characterId)
@@ -131,20 +134,19 @@ namespace UI.CharacterCreationScene
 
         public void OnNameConfirmClicked()
         {
-            string finalName = nameInputField.text;
+            string finalName = virtualKeyboard.GetInputText();
 
+            // 순수 입력 데이터가 비어있다면 Placeholder 텍스트를 최종 이름으로 사용
             if (string.IsNullOrWhiteSpace(finalName))
             {
                 TextMeshProUGUI placeholderText = nameInputField.placeholder as TextMeshProUGUI;
                 
                 if (placeholderText != null && !string.IsNullOrWhiteSpace(placeholderText.text))
                 {
-                    // Placeholder의 텍스트를 최종 이름으로 확정
                     finalName = placeholderText.text.Trim();
                 }
                 else
                 {
-                    // 예외 처리
                     if (currentStep == CreationStep.PlayerName)
                         finalName = "HERO";
                     else
