@@ -93,18 +93,39 @@ namespace UI.CharacterCreationScene
         {
             if (character.Length > 0)
             {
+                // 조합 전 오토마타 상태를 백업
+                hangulCombiner.CloneState(out int prevCho, out int prevJung, out int prevJong);
+
                 // 오토마타를 거친 예상 결합 텍스트를 미리 생성
                 string nextText = hangulCombiner.InputChar(inputText, character[0]);
 
-                // 만약 결과물의 길이가 설정된 최대 글자 수를 초과한다면 입력을 무시
+                // 3글자 수 초과 검사
                 if (nextText.Length > maxCharacterLimit)
                 {
-                    // 글자 수 초과 시 경고음
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); 
+                    hangulCombiner.RestoreState(prevCho, prevJung, prevJong); // 상태 롤백
                     return;
                 }
 
-                // 제한 조건을 통과했을 때만 실제 텍스트로 반영
+                // 폰트 지원 여부 검사
+                if (nextText.Length > 0)
+                {
+                    char lastChar = nextText[nextText.Length - 1];
+                    
+                    // TMP_InputField의 Text 컴포넌트에 적용된 폰트 에셋이 해당 글자를 지원하는지 확인
+                    bool isCharacterSupported = targetInputField.textComponent.font.HasCharacter(lastChar);
+                    
+                    if (!isCharacterSupported)
+                    {
+                        // 폰트에 없는 글자라면 결합을 취소하고 오토마타 상태를 이전으로 되돌림
+                        hangulCombiner.RestoreState(prevCho, prevJung, prevJong);
+                        
+                        // 지원하지 않는 글자 입력 시 경고음
+                        SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                        return;
+                    }
+                }
+
+                // 모든 조건을 통과했을 때만 실제 텍스트로 반영
                 inputText = nextText;
                 
                 isCursorVisible = true;

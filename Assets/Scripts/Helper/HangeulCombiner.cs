@@ -200,6 +200,21 @@ namespace Helper
             return text.Substring(0, text.Length - 1) + newChar;
         }
 
+        // 상태 백업용 메서드
+        public void CloneState(out int cho, out int jung, out int jong)
+        {
+            cho = currentCho;
+            jung = currentJung;
+            jong = currentJong;
+        }
+        // 복구용 메서드
+        public void RestoreState(int cho, int jung, int jong)
+        {
+            currentCho = cho;
+            currentJung = jung;
+            currentJong = jong;
+        }
+
         public void ResetState()
         {
             currentCho = -1;
