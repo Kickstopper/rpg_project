@@ -23,7 +23,8 @@ namespace Data
     {
         // 원본 데이터 참조 (이름, 기본 스탯 등)
         public string characterId;
-        public bool isRegular;
+        public bool isRegular; // 전투에 참여하는 멤버인지 아닌지
+        public bool isMonster;
 
         public string name;
         public Race race;         // 인간

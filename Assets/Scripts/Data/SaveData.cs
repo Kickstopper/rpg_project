@@ -49,6 +49,8 @@ namespace Data
 
         // 파티원 정보 리스트
         public List<CharacterSaveData> partyMembers = new List<CharacterSaveData>();
+        // 해금된(한 번이라도 영입한) 전체 동료 명부
+        public List<CharacterSaveData> unlockedRoster = new List<CharacterSaveData>();
 
         // 이벤트 플래그
         public List<string> eventFlags = new List<string>();

@@ -51,6 +51,7 @@ MonoBehaviour:
   choiceContainer: {fileID: 2677833861554354253}
   choiceButtonPrefab: {fileID: 4233283787199395685, guid: 130f35968c2fbed42832da8de4c8ab71, type: 3}
   characterDB: {fileID: 11400000, guid: 89d0e2e30bc8d6c40985b195be7ff30d, type: 2}
+  monsterDB: {fileID: 11400000, guid: 5a02d40de261d314a98aeca05c430997, type: 2}
   typingSpeed: 0.05
   typingSound: {fileID: 8300000, guid: 1e32dfd682842a84e878385091e385de, type: 3}
   uiCanvas: {fileID: 2439952145935944111}

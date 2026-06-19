@@ -74,11 +74,8 @@ namespace Manager
             data.money = InventoryManager.Instance.GetMoney();
             data.inventory = InventoryManager.Instance.GetSaveData(); 
 
-            // 파티원 정보 저장
-            foreach(var i in PartyManager.Instance.partyData)
-            {
-                data.partyMembers.Add(i.ToSaveData());
-            }
+            // 파티와 로스터 정보 저장
+            PartyManager.Instance.SaveToData(data);
 
             // 이벤트 플래그 저장
             data.eventFlags = FlagManager.Instance.GetSaveData();
@@ -113,7 +110,7 @@ namespace Manager
 
             // 파티원 복구
             // 기존 파티 클리어 후 재생성 로직 필요
-            PartyManager.Instance.LoadFromSave(data.partyMembers);
+            PartyManager.Instance.LoadFromSave(data);
             
             // 맵 매니저 설정
             if (DungeonMapStateManager.Instance != null)

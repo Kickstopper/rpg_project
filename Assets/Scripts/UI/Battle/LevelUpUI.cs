@@ -106,7 +106,7 @@ namespace UI.Battle
             nextExpText.text = "";
             if (portraitImage != null)
             {
-                var dbEntry = PartyManager.Instance.charDB.GetEntry(characterID);
+                var dbEntry = DatabaseManager.Instance.charDB.GetEntry(characterID);
                 if (dbEntry != null && dbEntry.portraitImage != null)
                 {
                     portraitImage.sprite = dbEntry.portraitImage;
@@ -189,7 +189,7 @@ namespace UI.Battle
 
             if (portraitImage != null && currentTarget.sourceData != null)
             {
-                var dbEntry = PartyManager.Instance.charDB.GetEntry(currentTarget.sourceData.characterId);
+                var dbEntry = DatabaseManager.Instance.charDB.GetEntry(currentTarget.sourceData.characterId);
                 if (dbEntry != null && dbEntry.portraitImage != null)
                 {
                     portraitImage.sprite = dbEntry.portraitImage;

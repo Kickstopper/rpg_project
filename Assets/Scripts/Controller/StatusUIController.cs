@@ -6,6 +6,7 @@ using Manager;
 using Data;
 using static Data.Database.CharacterDatabase;
 using UI.Common;
+using static MonsterDatabase;
 
 namespace Controller
 {
@@ -286,19 +287,27 @@ namespace Controller
         private void UpdatePortraitImage(RuntimeCharacterData data)
         {
             if (data == null || string.IsNullOrEmpty(data.characterId)) return;
-
-            CharacterEntry entry = PartyManager.Instance.charDB.GetEntry(data.characterId);
-            if (entry != null)
+            
+            Sprite portrait = null;
+            if (data.isMonster)
             {
-                if (entry.portraitImage != null)
-                {
-                    portraitImage.sprite = entry.portraitImage;
-                    portraitImage.color = Color.white;
-                }
-                else
-                {
-                    portraitImage.color = Color.black;
-                }
+                MonsterEntry entry = DatabaseManager.Instance.monsterDB.GetEntry(data.characterId);
+                if (entry != null) portrait = entry.portrait;
+            }
+            else
+            {
+                CharacterEntry entry = DatabaseManager.Instance.charDB.GetEntry(data.characterId);
+                if (entry != null) portrait = entry.portraitImage;
+            }
+            
+            if (portrait != null)
+            {
+                portraitImage.sprite = portrait;
+                portraitImage.color = Color.white;
+            }
+            else
+            {
+                portraitImage.color = Color.clear;
             }
         }
 

@@ -143,8 +143,10 @@ namespace Controller
             this.sourceData = runtimeData;
             this.entityName = runtimeData.name;
             this.gameObject.name = entityName;
-
-            this.resonanceData = DatabaseManager.Instance.GetResonance(runtimeData.resonanceId);
+            if (!string.IsNullOrEmpty(runtimeData.resonanceId))
+            {
+                this.resonanceData = DatabaseManager.Instance.GetResonance(runtimeData.resonanceId);
+            }
 
             // 데이터 융합
             if (this.resonanceData != null)
@@ -190,12 +192,20 @@ namespace Controller
             if (nameText) nameText.text = entityName;
 
             // DB에서 이미지 가져오기
-            var dbEntry = PartyManager.Instance.charDB.GetEntry(runtimeData.characterId);
-            if (dbEntry != null && portraitImage)
+            if (runtimeData.isMonster)
             {
-                portraitImage.sprite = dbEntry.battlePortraitImg;
-                portraitImage.color = new Color(1,1,1,0.1f);
+                portraitImage.color = Color.clear;
             }
+            else
+            {
+                var dbEntry = DatabaseManager.Instance.charDB.GetEntry(runtimeData.characterId);
+                if (dbEntry != null && portraitImage)
+                {
+                    portraitImage.sprite = dbEntry.battlePortraitImg;
+                    portraitImage.color = new Color(1,1,1,0.1f);
+                }
+            }
+            
             
             // 장비 및 스킬 복구
             EquipWeapon(runtimeData.equippedWeaponId);

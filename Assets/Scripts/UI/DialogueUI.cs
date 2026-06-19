@@ -22,6 +22,7 @@ namespace UI
 
         [Header("Settings")]
         public CharacterDatabase characterDB;     // inspector에서 설정
+        public MonsterDatabase monsterDB;
         public float typingSpeed = 0.05f;        // 글자당 시간 (작을수록 빠름)
         public AudioClip typingSound;            // 타이핑 효과음
         private AudioSource audioSource;
@@ -138,6 +139,35 @@ namespace UI
                 AdvanceLine();
                 return;
             }
+
+            // JOIN 라인 처리
+            if (type == "JOIN")
+            {
+                string targetCharId = lineData.ContainsKey("CharacterID") ? lineData["CharacterID"] : "";
+                ExecuteJoinCharacter(targetCharId);
+
+                // 출력할 Text가 아예 없다면, 화면 갱신 없이 시스템 로직만 처리하고 바로 다음 줄로
+                string textContent = lineData.ContainsKey("Text") ? lineData["Text"] : "";
+                if (string.IsNullOrEmpty(textContent))
+                {
+                    AdvanceLine();
+                    return;
+                }
+            }
+            // LEAVE 라인 처리
+            if (type == "LEAVE")
+            {
+                string targetCharId = lineData.ContainsKey("CharacterID") ? lineData["CharacterID"] : "";
+                ExecuteLeaveCharacter(targetCharId);
+
+                // 출력할 텍스트가 없다면 바로 다음 줄로 넘깁니다. (숨은 이탈 처리)
+                string textContent = lineData.ContainsKey("Text") ? lineData["Text"] : "";
+                if (string.IsNullOrEmpty(textContent))
+                {
+                    AdvanceLine();
+                    return;
+                }
+            }
             
             string name = lineData.ContainsKey("Name") ? lineData["Name"] : "";
             float pitch = 1f;
@@ -177,6 +207,53 @@ namespace UI
             // 기존 타이핑이 있다면 중지하고 새로 시작
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
             typingCoroutine = StartCoroutine(TypeText(type, pitch));
+        }
+
+        // 특정 ID의 캐릭터를 파티에 영입
+        private void ExecuteJoinCharacter(string charId)
+        {
+            if (string.IsNullOrEmpty(charId)) return;
+
+            CharacterDatabase.CharacterEntry entry = null;
+            bool isMonster = false; // 몬스터 여부를 판별
+
+            // Character Database에서 먼저 검색
+            if (characterDB != null && characterDB.GetEntry(charId) != null)
+            {
+                entry = characterDB.GetEntry(charId);
+                isMonster = false;
+            }
+            // 없다면 Monster Database에서 검색
+            else if (monsterDB != null && monsterDB.GetEntry(charId) != null)
+            {
+                var monsterEntry = monsterDB.GetEntry(charId);
+                entry = monsterEntry.ToCharacterEntry();
+                isMonster = true;
+            }
+
+            // DB에 유효한 ID가 존재할 경우 파티 추가 로직 실행
+            if (entry != null)
+            {
+                PartyManager.Instance.AddMember(entry, isMonster);
+            }
+            else
+            {
+                Debug.LogError($"[DialogueUI - JOIN] ID '{charId}'를 CharacterDB나 MonsterDB에서 찾을 수 없습니다. 오타를 확인해 주세요.");
+            }
+        }
+
+        // 특정 ID의 멤버를 파티에서 제외시킴
+        private void ExecuteLeaveCharacter(string charId)
+        {
+            if (string.IsNullOrEmpty(charId)) return;
+
+            if (PartyManager.Instance == null || PartyManager.Instance.partyData == null)
+            {
+                Debug.LogError("[DialogueUI - LEAVE] PartyManager 인스턴스 또는 partyData 리스트를 찾을 수 없습니다.");
+                return;
+            }
+
+            PartyManager.Instance.RemoveMember(charId);
         }
 
         // 타이핑 효과 코루틴. Type을 매개변수로 받아서, 타이핑이 끝나면 어떻게 할지 결정

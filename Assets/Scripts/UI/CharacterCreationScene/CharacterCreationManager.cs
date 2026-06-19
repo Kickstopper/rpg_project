@@ -111,7 +111,7 @@ namespace UI.CharacterCreationScene
 
         private void SetDefaultCharacterInfo(string characterId)
         {
-            var dbEntry = PartyManager.Instance.charDB.GetEntry(characterId);
+            var dbEntry = DatabaseManager.Instance.charDB.GetEntry(characterId);
             if (dbEntry != null)
             {
                 portraitImage.sprite = dbEntry.portraitImage;

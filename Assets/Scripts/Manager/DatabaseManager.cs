@@ -1,5 +1,6 @@
 using UnityEngine;
 using Data;
+using Data.Database;
 
 namespace Manager
 {
@@ -8,6 +9,8 @@ namespace Manager
         public static DatabaseManager Instance;
 
         [Header("Databases")]
+        public CharacterDatabase charDB;
+        public MonsterDatabase monsterDB;
         public WeaponDatabase weaponDB;
         public AmmoDatabase ammoDB;
         public ArmorDatabase armorDB;
@@ -23,6 +26,8 @@ namespace Manager
                 transform.SetParent(null);
                 DontDestroyOnLoad(gameObject);
                 // 게임 시작 시 딕셔너리 초기화
+                charDB.Initialize();
+                monsterDB.Initialize();
                 weaponDB.Initialize();
                 ammoDB.Initialize();
                 armorDB.Initialize();
