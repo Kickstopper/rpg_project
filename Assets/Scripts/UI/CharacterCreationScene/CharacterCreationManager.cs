@@ -132,6 +132,18 @@ namespace UI.CharacterCreationScene
             }
         }
 
+        public void OnCapsToggleClicked()
+        {
+            if (virtualKeyboard != null)
+            {
+                virtualKeyboard.ToggleCapsLock();
+            }
+            else
+            {
+                Debug.LogWarning("VirtualKeyboard 참조가 누락되었습니다.");
+            }
+        }
+
         public void OnNameConfirmClicked()
         {
             string finalName = virtualKeyboard.GetInputText();

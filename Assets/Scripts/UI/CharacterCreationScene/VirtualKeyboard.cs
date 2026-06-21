@@ -10,7 +10,8 @@ namespace UI.CharacterCreationScene
     public class VirtualKeyboard : MonoBehaviour
     {
         [Header("Keyboard Panels")]
-        [SerializeField] private GameObject englishPanel;
+        [SerializeField] private GameObject englishUpperPanel;
+        [SerializeField] private GameObject englishLowerPanel;
         [SerializeField] private GameObject koreanPanel;
         [SerializeField] private GameObject japanesePanel;
 
@@ -35,6 +36,9 @@ namespace UI.CharacterCreationScene
         // 커서 깜박임 상태 관리
         private bool isCursorVisible = true;
         private float cursorTimer = 0f;
+        
+        // 대문자 고정 여부
+        private bool isCapsLock = false;
         
         public enum KeyboardLanguage { English, Korean, Japanese }
         private KeyboardLanguage currentLanguage = KeyboardLanguage.English;
@@ -74,19 +78,17 @@ namespace UI.CharacterCreationScene
         {
             SoundManager.Instance.PlaySFX(SfxID.UI_Click);
             currentLanguage = (KeyboardLanguage)(((int)currentLanguage + 1) % 3);
-            
-            englishPanel.SetActive(currentLanguage == KeyboardLanguage.English);
+
+            isCapsLock = false; // 언어가 바뀌면 무조건 소문자를 우선 표시
+            englishUpperPanel.SetActive(false); 
+            englishLowerPanel.SetActive(currentLanguage == KeyboardLanguage.English);
             koreanPanel.SetActive(currentLanguage == KeyboardLanguage.Korean);
             japanesePanel.SetActive(currentLanguage == KeyboardLanguage.Japanese);
-
         }
         
         public void FocusFirstKey()
         {
-            if (firstSelectedKey != null)
-            {
-                firstSelectedKey.Select();
-            }
+            firstSelectedKey?.Select();
         }
 
         public void OnKeyPress(string character)
@@ -141,6 +143,24 @@ namespace UI.CharacterCreationScene
             isCursorVisible = true;
             cursorTimer = 0f;
             UpdateDisplay();
+        }
+
+        public void ToggleCapsLock()
+        {
+            if (currentLanguage != KeyboardLanguage.English) return;
+
+            isCapsLock = !isCapsLock;
+            
+            if (isCapsLock)
+            {
+                englishUpperPanel.SetActive(true);
+                englishLowerPanel.SetActive(false);
+            }
+            else
+            {
+                englishUpperPanel.SetActive(false);
+                englishLowerPanel.SetActive(true);
+            }
         }
         
         public void ClearInput()
