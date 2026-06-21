@@ -20,7 +20,7 @@ namespace Controller
     public class BattleManager : MonoBehaviour
     {
         [Header("UI References")]
-        // 인스펙터에서 할당
+        public Image battleBackgroundImage;
         public BattleUIController uiController;
         public DialogueUI dialogueUI;
         public BattleFieldController fieldController;
@@ -141,11 +141,25 @@ namespace Controller
             }
         }
 
-        public void Initialize(List<string> monsterIds, Color fogColor, EncounterType encType = EncounterType.Random)
+        public void Initialize(List<string> monsterIds, Color fogColor, EncounterType encType, Sprite capturedBg)
         {
             this.fogColor = fogColor;
             currentEncounterType = encType;
 
+            // 이전 전투에서 쓰던 캡처 이미지는 메모리에서 삭제
+            if (battleBackgroundImage != null && battleBackgroundImage.sprite != null)
+            {
+                Destroy(battleBackgroundImage.sprite.texture);
+                Destroy(battleBackgroundImage.sprite);
+            }
+
+            // 넘겨받은 던전 이미지를 배경으로 설정
+            if (battleBackgroundImage != null && capturedBg != null)
+            {
+                battleBackgroundImage.sprite = capturedBg;
+                battleBackgroundImage.color = Color.white; 
+            }
+            
             // 전투 진입 시 UI를 일단 모두 숨김
             uiController.Initialize();
             fieldController.SetEnemyVisualsActive(false);
@@ -1983,6 +1997,9 @@ namespace Controller
                 fieldController.StopBlinkEffects();
             }
 
+            // uiController에게 줌 연출을 지시
+            // uiController.StartZoomEffect(targetEntity.transform, 1.15f, 0.15f, 0f, 0.2f);
+
             PlayerController actor = fieldController.GetCurrentCharacter();
 
             // 타겟 정보까지 함께 저장
@@ -3069,6 +3086,15 @@ namespace Controller
             }
             
             ApplyDamage(target, damage, isCritical);
+
+            // 치명타나 약점 공격으로 적이 방금 사망했는지 확인
+            BattleEntity hitEntity = target.GetComponent<BattleEntity>();
+            
+            if (hitEntity != null && hitEntity.currentHp <= 0 && (hitEntity.currentHp + damage > 0))
+            {
+                uiController.StopZoomCoroutine();
+                yield return StartCoroutine(uiController.UIZoomRoutine(target.transform, 1.3f, 0.1f, 1f, 0.2f));
+            }
         }
 
         void AddGauge(bool isParty, float amount)
@@ -3294,6 +3320,5 @@ namespace Controller
             // RectTransform이 없는 예외적인 경우
             return target.transform.position;
         }
-        
     }
 }

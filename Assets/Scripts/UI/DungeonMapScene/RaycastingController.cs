@@ -952,9 +952,11 @@ namespace Controller
             UpdateSpriteData(); // 화면에서 스프라이트 제거
             yield return null;
 
+            // 화면을 캡처
+            Sprite bgSprite = CaptureCurrentDungeonView();
             // 전투 개시 명령
-            GameStateManager.Instance.StartEncounter(encounterSystem.MonsterCandidate, theme.fogColor, encType); 
-
+            GameStateManager.Instance.StartEncounter(encounterSystem.MonsterCandidate, theme.fogColor, encType, bgSprite);
+            
             // 전투가 끝나고 탐험 상태로 돌아올 때까지 대기
             yield return new WaitUntil(() => GameStateManager.Instance.CurrentState == GameState.Exploration);
 
@@ -2416,6 +2418,28 @@ namespace Controller
 
             // 탐험 상태로 돌아왔을 때 정면 체크 
             CheckFrontForShop();
+        }
+
+        // 전투 돌입 시 호출하여 현재 던전 뷰를 캡처
+        public Sprite CaptureCurrentDungeonView()
+        {
+            if (screenImage == null || screenImage.material == null || screenImage.material.mainTexture == null) return null;
+
+            Texture sourceTex = screenImage.material.mainTexture;
+            Texture2D capturedTex = null;
+
+            if (sourceTex is Texture2D t2d)
+            {
+                capturedTex = new Texture2D(t2d.width, t2d.height, t2d.format, false);
+                Graphics.CopyTexture(t2d, capturedTex);
+            }
+            else
+            {
+                return null;
+            }
+
+            // 복사된 텍스처를 Sprite로 변환하여 반환 (Pivot은 정중앙)
+            return Sprite.Create(capturedTex, new Rect(0, 0, capturedTex.width, capturedTex.height), new Vector2(0.5f, 0.5f));
         }
     }
 }

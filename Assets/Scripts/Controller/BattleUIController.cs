@@ -6,15 +6,15 @@ using DG.Tweening;
 using Controller;
 using System;
 using UI;
-using Manager;
 using System.Collections;
 using static Controller.BattleManager;
 
 public class BattleUIController : MonoBehaviour
 {
     [Header("Basic UI")]
-    public GameObject raycastScreen;
-    public GameObject battleUIContainer;
+    public RectTransform backgroundContainer;
+    public RectTransform monsterContainer;
+    public Transform battleUIContainer;
     public GameObject phaseIndicator;
     public TextMeshProUGUI phaseIndicatorText;
     public SimpleGradient phaseIndicatorBg;
@@ -63,10 +63,20 @@ public class BattleUIController : MonoBehaviour
 
     private float targetPartyGauge = 0f;
     private float targetEnemyGauge = 0f;
-    
+
+    [Range(0f, 1f)]
+    public float bgParallaxRatio = 0.4f;
+
+    private Coroutine zoomCoroutine;
+
+    private Vector3 defaultBgPos;
+    private Vector3 defaultBgScale;
+    private Vector3 defaultMonsterPos;
+    private Vector3 defaultMonsterScale;
+    private bool isZoomInitialized = false;
+
     public void Initialize()
     {
-        if (raycastScreen == null) raycastScreen = GameStateManager.Instance.explorationCanvas;
         baseCmdContainer.SetActive(false);
         fightCmdContainer.SetActive(false);
         commandPanel.SetActive(false);
@@ -331,17 +341,17 @@ public class BattleUIController : MonoBehaviour
         float duration = 0.3f;
 
         // 초기 위치 설정
-        battleUIContainer.transform.localPosition = new Vector3(0, -screenPy, 0);
-        raycastScreen.transform.localPosition = Vector3.zero;
+        battleUIContainer.localPosition = new Vector3(0, -screenPy, 0);
+        backgroundContainer.localPosition = Vector3.zero;
 
         DOTween.Sequence()
-            .Join(raycastScreen.transform.DOLocalMoveY(screenPy, duration).SetEase(Ease.OutBounce))
-            .Join(battleUIContainer.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutBounce))
+            .Join(backgroundContainer.DOLocalMoveY(screenPy, duration).SetEase(Ease.OutBounce))
+            .Join(battleUIContainer.DOLocalMoveY(0f, duration).SetEase(Ease.OutBounce))
             .OnComplete(() => 
             {
                 // 종료 후 위치 확정 (Floating point 오차 방지)
-                raycastScreen.transform.localPosition = new Vector3(0, screenPy, 0);
-                battleUIContainer.transform.localPosition = Vector3.zero;
+                backgroundContainer.localPosition = new Vector3(0, screenPy, 0);
+                battleUIContainer.localPosition = Vector3.zero;
                 onCompleteCallback?.Invoke();
             });
     }
@@ -355,11 +365,11 @@ public class BattleUIController : MonoBehaviour
         float duration = 0.1f;
         float battleUIPy = -216f;
         DOTween.Sequence()
-        .Join(raycastScreen.transform.DOLocalMoveY(0f, duration).SetEase(Ease.OutSine))
-        .Join(battleUIContainer.transform.DOLocalMoveY(battleUIPy, duration).SetEase(Ease.OutSine))
+        .Join(backgroundContainer.DOLocalMoveY(0f, duration).SetEase(Ease.OutSine))
+        .Join(battleUIContainer.DOLocalMoveY(battleUIPy, duration).SetEase(Ease.OutSine))
         .OnComplete(() => 
         {
-            raycastScreen.transform.localPosition = Vector3.zero;
+            backgroundContainer.localPosition = Vector3.zero;
             onCompleteCallback?.Invoke();
         });
     }
@@ -449,6 +459,74 @@ public class BattleUIController : MonoBehaviour
     public void SetTargetCursorPosition(Vector3 pos)
     {
         if (targetCursor) targetCursor.position = pos;
+    }
+
+    public IEnumerator UIZoomRoutine(Transform target, float zoomScale, float zoomInTime, float holdTime, float zoomOutTime)
+    {
+        if (backgroundContainer == null || monsterContainer == null || target == null) yield break;
+
+        if (!isZoomInitialized)
+        {
+            defaultBgPos = backgroundContainer.localPosition;
+            defaultBgScale = backgroundContainer.localScale;
+            
+            defaultMonsterPos = monsterContainer.localPosition;
+            defaultMonsterScale = monsterContainer.localScale;
+            
+            isZoomInitialized = true;
+        }
+
+        backgroundContainer.DOKill();
+        monsterContainer.DOKill();
+
+        Vector3 targetLocalPos = monsterContainer.InverseTransformPoint(target.position);
+        targetLocalPos = new Vector3(
+            targetLocalPos.x * monsterContainer.localScale.x,
+            targetLocalPos.y * monsterContainer.localScale.y,
+            targetLocalPos.z * monsterContainer.localScale.z
+        );
+
+        Vector3 monsterMoveOffset = -targetLocalPos * (zoomScale - 1f) * 0.7f; 
+        Vector3 monsterTargetPos = defaultMonsterPos + monsterMoveOffset;
+        float monsterTargetScale = zoomScale;
+
+        Vector3 bgTargetPos = defaultBgPos + (monsterMoveOffset * bgParallaxRatio);
+        float bgTargetScale = 1f + ((zoomScale - 1f) * bgParallaxRatio);
+
+        Sequence zoomInSeq = DOTween.Sequence();
+        zoomInSeq.Join(monsterContainer.DOLocalMove(monsterTargetPos, zoomInTime).SetEase(Ease.OutCubic));
+        zoomInSeq.Join(monsterContainer.DOScale(monsterTargetScale, zoomInTime).SetEase(Ease.OutCubic));
+        zoomInSeq.Join(backgroundContainer.DOLocalMove(bgTargetPos, zoomInTime).SetEase(Ease.OutCubic));
+        zoomInSeq.Join(backgroundContainer.DOScale(bgTargetScale, zoomInTime).SetEase(Ease.OutCubic));
+
+        yield return zoomInSeq.WaitForCompletion();
+
+        if (holdTime > 0) yield return new WaitForSeconds(holdTime);
+
+        Sequence zoomOutSeq = DOTween.Sequence();
+        zoomOutSeq.Join(monsterContainer.DOLocalMove(defaultMonsterPos, zoomOutTime).SetEase(Ease.InOutQuad));
+        zoomOutSeq.Join(monsterContainer.DOScale(defaultMonsterScale, zoomOutTime).SetEase(Ease.InOutQuad));
+        zoomOutSeq.Join(backgroundContainer.DOLocalMove(defaultBgPos, zoomOutTime).SetEase(Ease.InOutQuad));
+        zoomOutSeq.Join(backgroundContainer.DOScale(defaultBgScale, zoomOutTime).SetEase(Ease.InOutQuad));
+
+        yield return zoomOutSeq.WaitForCompletion();
+    }
+
+    // 줌 코루틴을 중단
+    public void StopZoomCoroutine()
+    {
+        if (zoomCoroutine != null)
+        {
+            StopCoroutine(zoomCoroutine);
+            zoomCoroutine = null;
+        }
+    }
+
+    // 외부에서 코루틴을 시작하고 추적하기 위한 래퍼 함수
+    public void StartZoomEffect(Transform target, float zoomScale, float zoomInTime, float holdTime, float zoomOutTime)
+    {
+        StopZoomCoroutine();
+        zoomCoroutine = StartCoroutine(UIZoomRoutine(target, zoomScale, zoomInTime, holdTime, zoomOutTime));
     }
 
     // 전투 종료 UI 표시
