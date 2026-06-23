@@ -6,6 +6,7 @@ using Manager;
 using UnityEngine.UI;
 using Data;
 using Helper;
+using Unity.VisualScripting;
 
 namespace UI.CharacterCreationScene
 {
@@ -17,9 +18,12 @@ namespace UI.CharacterCreationScene
         public string nextSceneName;
         public string nextSceneParam;
 
-        [Header("UI Panels")]
+        [Header("UI References")]
         public GameObject nameInputPanel;
-        public LevelUpUI levelUpUI;
+        public GameObject levelUpPanel;
+
+        public LevelUpUI statUIController;
+        public VirtualKeyboard virtualKeyboard;
         
         [Header("Name Input Elements")]
         public Image portraitImage;
@@ -27,25 +31,20 @@ namespace UI.CharacterCreationScene
 
         public TextMeshProUGUI titleText;
         public TMP_InputField nameInputField;
-        public VirtualKeyboard virtualKeyboard;
+        
 
         private CreationStep currentStep = CreationStep.PlayerName;
-        
-        private void Start()
+
+        void Start()
+        {
+            if (nameInputPanel != null) nameInputPanel.SetActive(false);
+            if (levelUpPanel != null) levelUpPanel.SetActive(false);
+        }
+
+        public void StartFirstStep()
         {
             UpdateStep(CreationStep.PlayerName);
         }
-
-        // private void Update()
-        // {
-        //     if (currentStep == CreationStep.PlayerName || currentStep == CreationStep.PartnerName)
-        //     {
-        //         if (Input.GetKeyDown(KeyCode.Return))
-        //         {
-        //             OnNameConfirmClicked();
-        //         }
-        //     }
-        // }
 
         private void UpdateStep(CreationStep nextStep)
         {
@@ -54,8 +53,8 @@ namespace UI.CharacterCreationScene
             switch (currentStep)
             {
                 case CreationStep.PlayerName:
-                    SoundManager.Instance.PlayBGM(BgmID.LevelUp);
-                    levelUpUI.LeveUpUI.SetActive(false);
+                    if (SoundManager.Instance != null)
+                        SoundManager.Instance.PlayBGM(BgmID.LevelUp);
                     titleText.text = "당신의 이름을 입력하세요";
 
                     nameInputPanel.SetActive(true);
@@ -74,21 +73,25 @@ namespace UI.CharacterCreationScene
                     break;
 
                 case CreationStep.PlayerStats:
-                    virtualKeyboard.enabled = false;
-                    SoundManager.Instance.PlayBGM(BgmID.LevelUp);
+                    if (SoundManager.Instance != null)
+                        SoundManager.Instance.PlayBGM(BgmID.LevelUp);
                     nameInputPanel.SetActive(false);
-                    levelUpUI.LeveUpUI.SetActive(true);
+                    levelUpPanel.SetActive(true);
 
                     SetCharacterStats(PartyID.CHARACTER_00, CreateBaseStat(5)); // 주인공 기본 스탯 저장
                     // 스탯 보너스 포인트 15
-                    levelUpUI.ShowForCreation(PartyID.CHARACTER_00, 15, OnPlayerStatsConfirmed);
+                    statUIController.ShowForCreation(PartyID.CHARACTER_00, 15, OnPlayerStatsConfirmed);
                     break;
 
                 case CreationStep.PartnerStats:
-                    SoundManager.Instance.StopBGM(false);
-                    SoundManager.Instance.PlayBGM(BgmID.LevelUp);
+                    if (SoundManager.Instance != null)
+                    {
+                        SoundManager.Instance.StopBGM(false);
+                        SoundManager.Instance.PlayBGM(BgmID.LevelUp);
+                    }
+                    
                     SetCharacterStats(PartyID.CHARACTER_01, CreateBaseStat(5)); // 히로인 기본 스탯 저장
-                    levelUpUI.ShowForCreation(PartyID.CHARACTER_01, 15, OnPartnerStatsConfirmed);
+                    statUIController.ShowForCreation(PartyID.CHARACTER_01, 15, OnPartnerStatsConfirmed);
                     break;
 
                 case CreationStep.Done:

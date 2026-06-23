@@ -48,6 +48,7 @@ namespace UI.IntroScene
         public string nextSceneParam;
 
         // 스킵 기능을 위한 상태 변수
+        private Coroutine seqCoroutine;
         private bool skipRequested = false;
 
         private void Start()
@@ -63,7 +64,8 @@ namespace UI.IntroScene
             }
             if (cutsceneList.Count > 0)
             {
-                StartCoroutine(PlayCutsceneSequence());
+                if (seqCoroutine != null) StopCoroutine(seqCoroutine);
+                seqCoroutine = StartCoroutine(PlayCutsceneSequence());
             }
         }
 
@@ -74,11 +76,16 @@ namespace UI.IntroScene
             {
                 skipRequested = true;
             }
+            // 컷씬 시퀀스 전체를 스킵
+            else if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            {
+                SkipCutscene();
+            }
         }
 
         private IEnumerator PlayCutsceneSequence()
         {
-            yield return StartCoroutine(FadeIn());
+            StartCoroutine(FadeIn());
 
             foreach (CutsceneData data in cutsceneList)
             {
@@ -182,6 +189,13 @@ namespace UI.IntroScene
             }
 
             fadeOverlay.color = endColor;
+        }
+
+        private void SkipCutscene()
+        {
+            SoundManager.Instance.StopBGM();
+            StopAllCoroutines();
+            TransitionToNextScene();
         }
 
         private void TransitionToNextScene()

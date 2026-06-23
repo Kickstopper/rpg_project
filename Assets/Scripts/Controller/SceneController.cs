@@ -10,10 +10,11 @@ using UnityEngine.EventSystems;
 
 public static class GameScene
 {
-    public const string TITLE_SCENE = "TitleScene";
     public const string INTRO_SCENE = "IntroScene";
-    public const string WORLD_MAP_SCENE = "WorldMapScene";
+    public const string TITLE_SCENE = "TitleScene";
+    public const string CHARACTER_CREATION_SCENE = "CharacterCreationScene";
     public const string DUNGEON_MAP_SCENE = "DungeonMapScene";
+    public const string WORLD_MAP_SCENE = "WorldMapScene";
 }
 
 namespace Controller 
@@ -48,7 +49,7 @@ namespace Controller
         {
             if (UI_Canvas) UI_Canvas.SetActive(false);
             if (matrixGO) matrixGO.SetActive(false);
-            
+            ShowAnimation();
         }
 
         public void ShowAnimation()
@@ -225,7 +226,7 @@ namespace Controller
 
         public void OnClick_NewGame()
         {
-            SceneManager.LoadScene(GameScene.INTRO_SCENE);
+            SceneManager.LoadScene(GameScene.CHARACTER_CREATION_SCENE);
         }
 
         public void OnClick_LoadGame()

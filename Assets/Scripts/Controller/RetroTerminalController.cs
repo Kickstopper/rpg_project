@@ -5,15 +5,16 @@ using TMPro;
 using UnityEngine.UI;
 using System.Text;
 using Manager;
+using UI.CharacterCreationScene;
 namespace Controller
 {
-    public class RetroBootTerminal : MonoBehaviour
+    public class RetroTerminalController : MonoBehaviour
     {
         [Header("UI References")]
         public TextMeshProUGUI terminalText;
         public ScrollRect scrollRect;
         public CanvasGroup terminalCanvasGroup; // 텍스트들이 묶인 그룹 (페이드 아웃용)
-        public SceneController sceneController; // 게임 모드 선택 및 화면 이동 조작
+        public CharacterCreationManager charCreationManager;
 
         [Header("Settings")]
         public float typeSpeed = 0.01f;
@@ -36,31 +37,32 @@ namespace Controller
         public List<BootLine> bootSequence;
 
         private StringBuilder sb = new StringBuilder();
-        private bool isBooting = false;
+        private bool isProgress = false;
         private bool isType = false;
         private bool isTransitioning = false; // 이미 전환 중인지 체크
 
         void Start()
         {
+            charCreationManager.enabled = false;
+
             terminalText.text = "";
-            
             // 초기 투명도 설정
             if (terminalCanvasGroup != null) terminalCanvasGroup.alpha = 1f;
-            SoundManager.Instance.PlayBGM(Data.BgmID.Title);
-            SoundManager.Instance.PlaySFX(Data.SfxID.PC_Boot);
             StartCoroutine(BlinkCursor());
-            StartCoroutine(RunBootSequence());
-            
+            StartCoroutine(RunSequence());
         }
 
         void Update()
         {
-            // 부팅 중이고, 아직 전환이 시작되지 않았을 때 키 입력 체크
-            if (isBooting && !isTransitioning && Input.anyKeyDown)
+            if (isProgress || isTransitioning) return;
+            if (Input.anyKeyDown)
             {
-                SoundManager.Instance.StopAllSFX(true, 1);
-                SoundManager.Instance.StopBGM();
-                StartCoroutine(SkipAndTransition());
+                if (SoundManager.Instance != null)
+                {
+                    SoundManager.Instance.StopAllSFX(true, 1);
+                    SoundManager.Instance.StopBGM();
+                }
+                StartTransitionSequence();
             }
         }
 
@@ -68,7 +70,7 @@ namespace Controller
         IEnumerator SkipAndTransition()
         {
             isTransitioning = true;
-            isBooting = false;
+            isProgress = false;
 
             // 현재 돌아가는 모든 부팅/타이핑 관련 코루틴 강제 중지
             StopAllCoroutines(); 
@@ -77,15 +79,14 @@ namespace Controller
             yield return StartCoroutine(TransitionSequence());
         }
 
-        IEnumerator RunBootSequence()
+        IEnumerator RunSequence()
         {
-            isBooting = true;
+            isProgress = true;
             yield return new WaitForSeconds(3f);
             
-
             foreach (var line in bootSequence)
             {
-                if (!isBooting) yield break; // 스킵되었으면 중단
+                if (!isProgress) yield break; // 스킵되었으면 중단
 
                 yield return new WaitForSeconds(line.preDelay);
 
@@ -103,14 +104,24 @@ namespace Controller
             }
 
             // 모든 텍스트 출력이 끝났으면 자연스럽게 전환
-            if (isBooting) 
+            if (isProgress) 
             {
-                isBooting = false;
-                isTransitioning = true;
+                isProgress = false;
+            }
+        }
+
+        private void StartTransitionSequence()
+        {
+            if (isTransitioning) return;
+            
+            isTransitioning = true;
+            if (SoundManager.Instance != null)
+            {
                 SoundManager.Instance.StopAllSFX(true, 1);
                 SoundManager.Instance.StopBGM();
-                StartCoroutine(TransitionSequence());
             }
+            
+            StartCoroutine(TransitionSequence());
         }
 
         // 페이드 아웃/인 처리
@@ -129,8 +140,12 @@ namespace Controller
             if (terminalCanvasGroup != null) terminalCanvasGroup.alpha = 0f;
 
             yield return new WaitForSeconds(0.5f);
-            
-            if (!sceneController.IsEnable) sceneController.ShowAnimation();
+
+            if (charCreationManager != null)
+            {
+                charCreationManager.enabled = true;
+                charCreationManager.StartFirstStep();
+            } 
         }
 
         IEnumerator TypewriterText(string line)
