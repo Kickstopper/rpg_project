@@ -1,8 +1,8 @@
 {
     "width": 51,
     "height": 51,
-    "mapID": "Dream",
-    "themeName": "Dream",
+    "mapID": "Underworld",
+    "themeName": "Underworld",
     "startX": 25,
     "startY": 0,
     "startDirection": 0,
@@ -46834,7 +46834,7 @@
             "isWallEntrance": false,
             "triggerDirection": 0,
             "isWorldMap": false,
-            "destinationID": "Police_Station",
+            "destinationID": "Underworld_1",
             "targetX": 8,
             "targetY": 0,
             "targetDirection": 0
@@ -46846,7 +46846,7 @@
             "isWallEntrance": true,
             "triggerDirection": 0,
             "isWorldMap": false,
-            "destinationID": "Police_Station",
+            "destinationID": "Underworld_1",
             "targetX": 8,
             "targetY": 0,
             "targetDirection": 0

@@ -9,7 +9,7 @@ public class DungeonMapEditor : EditorWindow
 {
     string currentFilePath = null; // 현재 로드된 파일 경로 (null이면 미로드 상태)
 
-    string[] availableMapIDs = new string[] { "Outpost", "Bridge_0", "Underground_0", "Underground_0_0", "Underground_1", "Underground_2", "Underground_3", "Dream", "Police_Station", "Downtown" }; 
+    string[] availableMapIDs = new string[] { "Outpost", "Bridge_0", "Underground_0", "Underground_0_0", "Underground_1", "Underworld_0", "Underworld_1", "Cave_0", "Cave_1", "Cave_2", "Cave_3", "Cave_4", "Cave_5", "Cave_6" }; 
     bool isInvalidIDLoaded = false;
 
     MapData mapData;

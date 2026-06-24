@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
-  m_Name: cave
+  m_Name: Building
   m_EditorClassIdentifier: 
-  dungeonID: cave
+  dungeonID: Building
   useWakeUpEffect: 0
   encounterMode: 1
   background: {fileID: 2800000, guid: 5005efcc13ea09d48b4c0454fdd2abee, type: 3}
@@ -24,15 +24,9 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 16de071c12c3fbb49900c1ffcecb25fe, type: 3}
   floorTexIdx: 3
   ceilingTexIdx: -1
-  spriteTextures:
-  - {fileID: -137211449224041512, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
-  - {fileID: -5478674400631355457, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
-  - {fileID: -2631205595881985455, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
-  - {fileID: -8592587084538253407, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
-  - {fileID: 7556728160588841100, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
-  - {fileID: -4759437863653782067, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
-  - {fileID: 7903781024494958643, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
-  - {fileID: -6788500882895127655, guid: 8e40fb7d964b986488dd407e8ab23b8d, type: 3}
+  doorAnimations: []
+  enemySprites: []
+  objectSprites: []
   maxSpawnCount: 3
   spawnDelay: 5
   wallAnimations: []
@@ -47,6 +41,8 @@ MonoBehaviour:
   dustParticleCount: 300
   dustSwayAmplitude: 0.15
   dustMovesUp: 0
+  useDustTwinkle: 1
+  dustTwinkleSpeed: 10
   dustColor:
     serializedVersion: 2
     rgba: 4290040540

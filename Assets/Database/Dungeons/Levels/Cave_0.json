@@ -1,11 +1,11 @@
 {
-    "width": 11,
-    "height": 11,
-    "mapID": "Outpost",
-    "themeName": "Outpost",
-    "startX": 5,
-    "startY": 0,
-    "startDirection": 0,
+    "width": 12,
+    "height": 12,
+    "mapID": "Cave_0",
+    "themeName": "Cave_0",
+    "startX": 10,
+    "startY": 5,
+    "startDirection": 2,
     "cells": [
         {
             "x": 0,
@@ -14,8 +14,8 @@
             "wallTextureIDs": [
                 -1,
                 -1,
-                0,
-                0
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -28,11 +28,11 @@
         {
             "x": 1,
             "y": 0,
-            "value": 6,
+            "value": -1,
             "wallTextureIDs": [
-                0,
-                3,
-                0,
+                -1,
+                -1,
+                -1,
                 -1
             ],
             "centerObjectID": -1,
@@ -46,11 +46,11 @@
         {
             "x": 2,
             "y": 0,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
-                0,
+                -1,
                 -1
             ],
             "centerObjectID": -1,
@@ -66,10 +66,10 @@
             "y": 0,
             "value": -1,
             "wallTextureIDs": [
-                0,
-                0,
                 -1,
-                0
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -82,11 +82,11 @@
         {
             "x": 4,
             "y": 0,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
-                2,
+                -1,
                 -1
             ],
             "centerObjectID": -1,
@@ -104,8 +104,8 @@
             "wallTextureIDs": [
                 -1,
                 -1,
-                3,
-                -1
+                0,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -120,9 +120,9 @@
             "y": 0,
             "value": 0,
             "wallTextureIDs": [
+                1,
                 -1,
-                -1,
-                2,
+                0,
                 -1
             ],
             "centerObjectID": -1,
@@ -136,12 +136,12 @@
         {
             "x": 7,
             "y": 0,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 0,
-                0,
                 -1,
-                0
+                0,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -156,8 +156,8 @@
             "y": 0,
             "value": 0,
             "wallTextureIDs": [
-                -1,
-                -1,
+                0,
+                0,
                 0,
                 -1
             ],
@@ -174,10 +174,10 @@
             "y": 0,
             "value": -1,
             "wallTextureIDs": [
-                0,
                 -1,
-                0,
-                0
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -193,9 +193,27 @@
             "value": -1,
             "wallTextureIDs": [
                 -1,
-                0,
-                0,
+                -1,
+                -1,
                 -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 0,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                2,
+                0,
+                1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -210,10 +228,10 @@
             "y": 1,
             "value": -1,
             "wallTextureIDs": [
-                0,
-                0,
                 -1,
-                0
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -226,12 +244,12 @@
         {
             "x": 1,
             "y": 1,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
+                1,
                 -1,
-                -1,
-                -1,
-                -1
+                1,
+                3
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -246,9 +264,9 @@
             "y": 1,
             "value": 0,
             "wallTextureIDs": [
+                1,
                 -1,
-                -1,
-                -1,
+                2,
                 -1
             ],
             "centerObjectID": -1,
@@ -265,8 +283,8 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
-                -1,
+                0,
+                0,
                 -1
             ],
             "centerObjectID": -1,
@@ -280,7 +298,7 @@
         {
             "x": 4,
             "y": 1,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -301,9 +319,9 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
+                0,
                 -1,
-                -1,
-                -1
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -316,7 +334,7 @@
         {
             "x": 6,
             "y": 1,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -334,7 +352,7 @@
         {
             "x": 7,
             "y": 1,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -352,7 +370,7 @@
         {
             "x": 8,
             "y": 1,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -374,8 +392,8 @@
             "wallTextureIDs": [
                 -1,
                 -1,
-                -1,
-                -1
+                1,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -388,12 +406,30 @@
         {
             "x": 10,
             "y": 1,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
+                1,
+                -1,
                 0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 1,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
                 0,
                 -1,
-                0
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -406,12 +442,12 @@
         {
             "x": 0,
             "y": 2,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
                 -1,
-                2
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -424,7 +460,7 @@
         {
             "x": 1,
             "y": 2,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -446,8 +482,8 @@
             "wallTextureIDs": [
                 -1,
                 -1,
-                2,
-                0
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -460,12 +496,12 @@
         {
             "x": 3,
             "y": 2,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
-                0,
-                2,
-                -1
+                1,
+                -1,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -478,7 +514,7 @@
         {
             "x": 4,
             "y": 2,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -496,11 +532,11 @@
         {
             "x": 5,
             "y": 2,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
+                0,
                 -1,
-                0,
-                0,
+                -1,
                 0
             ],
             "centerObjectID": -1,
@@ -518,7 +554,7 @@
             "wallTextureIDs": [
                 -1,
                 -1,
-                -1,
+                0,
                 -1
             ],
             "centerObjectID": -1,
@@ -532,12 +568,12 @@
         {
             "x": 7,
             "y": 2,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
+                1,
                 -1,
-                -1,
-                2,
-                0
+                0,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -550,11 +586,11 @@
         {
             "x": 8,
             "y": 2,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
+                0,
                 -1,
                 0,
-                2,
                 -1
             ],
             "centerObjectID": -1,
@@ -571,7 +607,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
+                0,
                 -1,
                 -1
             ],
@@ -586,12 +622,30 @@
         {
             "x": 10,
             "y": 2,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 2,
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                2,
+                0,
                 -1,
-                -1
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -607,9 +661,9 @@
             "value": -1,
             "wallTextureIDs": [
                 -1,
-                0,
-                0,
-                0
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -622,7 +676,7 @@
         {
             "x": 1,
             "y": 3,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -644,6 +698,24 @@
             "wallTextureIDs": [
                 -1,
                 -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 3,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
                 -1,
                 1
             ],
@@ -656,27 +728,9 @@
             ]
         },
         {
-            "x": 3,
-            "y": 3,
-            "value": 3,
-            "wallTextureIDs": [
-                -1,
-                3,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
             "x": 4,
             "y": 3,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -697,9 +751,9 @@
             "value": -1,
             "wallTextureIDs": [
                 -1,
-                2,
                 -1,
-                2
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -715,9 +769,9 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
+                0,
                 -1,
-                -1,
-                -1
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -730,12 +784,12 @@
         {
             "x": 7,
             "y": 3,
-            "value": 5,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
                 -1,
-                3
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -751,7 +805,7 @@
             "value": -1,
             "wallTextureIDs": [
                 -1,
-                1,
+                -1,
                 -1,
                 -1
             ],
@@ -769,673 +823,7 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 10,
-            "y": 3,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                0,
-                0,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 0,
-            "y": 4,
-            "value": -1,
-            "wallTextureIDs": [
-                0,
                 2,
-                -1,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 1,
-            "y": 4,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 2,
-            "y": 4,
-            "value": -1,
-            "wallTextureIDs": [
-                2,
-                -1,
-                -1,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 3,
-            "y": 4,
-            "value": -1,
-            "wallTextureIDs": [
-                2,
-                0,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 4,
-            "y": 4,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 5,
-            "y": 4,
-            "value": -1,
-            "wallTextureIDs": [
-                0,
-                0,
-                -1,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 6,
-            "y": 4,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 7,
-            "y": 4,
-            "value": -1,
-            "wallTextureIDs": [
-                2,
-                -1,
-                -1,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 8,
-            "y": 4,
-            "value": -1,
-            "wallTextureIDs": [
-                2,
-                0,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 9,
-            "y": 4,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 10,
-            "y": 4,
-            "value": -1,
-            "wallTextureIDs": [
-                0,
-                0,
-                -1,
-                2
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 0,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                2
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 1,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 2,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 3,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 4,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 5,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 6,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 7,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 8,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 9,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 10,
-            "y": 5,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                2,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 0,
-            "y": 6,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                2,
-                0,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 1,
-            "y": 6,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 2,
-            "y": 6,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                2,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 3,
-            "y": 6,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                0,
-                2,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 4,
-            "y": 6,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 5,
-            "y": 6,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                0,
-                0,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 6,
-            "y": 6,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 7,
-            "y": 6,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                2,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 8,
-            "y": 6,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                0,
-                2,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 9,
-            "y": 6,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 10,
-            "y": 6,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                0,
-                0,
-                2
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 0,
-            "y": 7,
-            "value": -1,
-            "wallTextureIDs": [
-                0,
-                0,
-                -1,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 1,
-            "y": 7,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 2,
-            "y": 7,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                -1,
                 -1,
                 1
             ],
@@ -1448,12 +836,750 @@
             ]
         },
         {
-            "x": 3,
-            "y": 7,
-            "value": 2,
+            "x": 10,
+            "y": 3,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
-                3,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 3,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                2,
+                -1,
+                1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                1,
+                2
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                2,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 4,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 5,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                0,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 6,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 7,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 8,
+            "y": 4,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 9,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 10,
+            "y": 4,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 5,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 5,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 5,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 5,
+            "value": 0,
+            "wallTextureIDs": [
+                2,
+                -1,
+                -1,
+                2
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 5,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 5,
+            "y": 5,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                2,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 6,
+            "y": 5,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 7,
+            "y": 5,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 8,
+            "y": 5,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 9,
+            "y": 5,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 10,
+            "y": 5,
+            "value": 0,
+            "wallTextureIDs": [
+                5,
+                -1,
+                2,
+                1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 5,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                2,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 6,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                0,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 6,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 6,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 6,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 6,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 5,
+            "y": 6,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 6,
+            "y": 6,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 7,
+            "y": 6,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 8,
+            "y": 6,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 9,
+            "y": 6,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 10,
+            "y": 6,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 6,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 7,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 7,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 7,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 7,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
                 -1,
                 -1
             ],
@@ -1468,7 +1594,7 @@
         {
             "x": 4,
             "y": 7,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -1486,12 +1612,12 @@
         {
             "x": 5,
             "y": 7,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
+                0,
                 -1,
-                2,
                 -1,
-                2
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -1505,6 +1631,222 @@
             "x": 6,
             "y": 7,
             "value": 0,
+            "wallTextureIDs": [
+                1,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 7,
+            "y": 7,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 8,
+            "y": 7,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 9,
+            "y": 7,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 10,
+            "y": 7,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 7,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 8,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 8,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 8,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 8,
+            "value": 0,
+            "wallTextureIDs": [
+                1,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 8,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 5,
+            "y": 8,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 6,
+            "y": 8,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -1521,13 +1863,13 @@
         },
         {
             "x": 7,
-            "y": 7,
-            "value": 4,
+            "y": 8,
+            "value": -1,
             "wallTextureIDs": [
                 -1,
                 -1,
                 -1,
-                3
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -1539,427 +1881,247 @@
         },
         {
             "x": 8,
-            "y": 7,
+            "y": 8,
             "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 9,
+            "y": 8,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 10,
+            "y": 8,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 8,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 9,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 9,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 9,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 9,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 9,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 5,
+            "y": 9,
+            "value": 0,
+            "wallTextureIDs": [
+                1,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 6,
+            "y": 9,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 7,
+            "y": 9,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 8,
+            "y": 9,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 9,
+            "y": 9,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
                 1,
                 -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 9,
-            "y": 7,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 10,
-            "y": 7,
-            "value": -1,
-            "wallTextureIDs": [
-                0,
-                0,
-                -1,
                 0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 0,
-            "y": 8,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                2
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 1,
-            "y": 8,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 2,
-            "y": 8,
-            "value": -1,
-            "wallTextureIDs": [
-                2,
-                -1,
-                -1,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 3,
-            "y": 8,
-            "value": -1,
-            "wallTextureIDs": [
-                2,
-                0,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 4,
-            "y": 8,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 5,
-            "y": 8,
-            "value": -1,
-            "wallTextureIDs": [
-                0,
-                0,
-                -1,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 6,
-            "y": 8,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 7,
-            "y": 8,
-            "value": -1,
-            "wallTextureIDs": [
-                2,
-                -1,
-                -1,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 8,
-            "y": 8,
-            "value": -1,
-            "wallTextureIDs": [
-                2,
-                0,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 9,
-            "y": 8,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 10,
-            "y": 8,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                2,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 0,
-            "y": 9,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                0,
-                0,
-                0
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 1,
-            "y": 9,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 2,
-            "y": 9,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 3,
-            "y": 9,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 4,
-            "y": 9,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 5,
-            "y": 9,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 6,
-            "y": 9,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 7,
-            "y": 9,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 8,
-            "y": 9,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 9,
-            "y": 9,
-            "value": 0,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -1975,9 +2137,27 @@
             "value": -1,
             "wallTextureIDs": [
                 -1,
-                0,
-                0,
-                0
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 9,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -1992,10 +2172,10 @@
             "y": 10,
             "value": -1,
             "wallTextureIDs": [
-                0,
                 -1,
                 -1,
-                0
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2008,12 +2188,12 @@
         {
             "x": 1,
             "y": 10,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
+                -1,
+                -1,
                 0,
-                0,
-                0,
-                -1
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2028,8 +2208,8 @@
             "y": 10,
             "value": 0,
             "wallTextureIDs": [
-                2,
-                -1,
+                0,
+                0,
                 -1,
                 -1
             ],
@@ -2047,9 +2227,9 @@
             "value": -1,
             "wallTextureIDs": [
                 -1,
-                0,
-                0,
-                0
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2064,10 +2244,10 @@
             "y": 10,
             "value": 0,
             "wallTextureIDs": [
-                2,
                 -1,
+                0,
                 -1,
-                -1
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2080,9 +2260,9 @@
         {
             "x": 5,
             "y": 10,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
-                3,
+                -1,
                 -1,
                 -1,
                 -1
@@ -2098,9 +2278,9 @@
         {
             "x": 6,
             "y": 10,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
-                2,
+                -1,
                 -1,
                 -1,
                 -1
@@ -2116,11 +2296,11 @@
         {
             "x": 7,
             "y": 10,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
+                0,
                 -1,
-                0,
-                0,
+                -1,
                 0
             ],
             "centerObjectID": -1,
@@ -2136,7 +2316,223 @@
             "y": 10,
             "value": 0,
             "wallTextureIDs": [
+                1,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 9,
+            "y": 10,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 10,
+            "y": 10,
+            "value": 0,
+            "wallTextureIDs": [
+                1,
+                -1,
                 2,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 10,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 0,
+            "y": 11,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 1,
+            "y": 11,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 11,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 11,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 11,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 5,
+            "y": 11,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                0,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 6,
+            "y": 11,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 7,
+            "y": 11,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 8,
+            "y": 11,
+            "value": -1,
+            "wallTextureIDs": [
+                -1,
                 -1,
                 -1,
                 -1
@@ -2151,13 +2547,13 @@
         },
         {
             "x": 9,
-            "y": 10,
-            "value": 7,
+            "y": 11,
+            "value": -1,
             "wallTextureIDs": [
-                0,
                 -1,
-                0,
-                3
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2169,13 +2565,31 @@
         },
         {
             "x": 10,
-            "y": 10,
+            "y": 11,
             "value": -1,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 11,
+            "y": 11,
+            "value": 0,
             "wallTextureIDs": [
                 0,
                 0,
                 -1,
-                -1
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2188,100 +2602,28 @@
     ],
     "entrances": [
         {
-            "type": 1,
-            "sourceX": 4,
-            "sourceY": 7,
-            "isWallEntrance": true,
-            "triggerDirection": 3,
-            "isWorldMap": false,
-            "destinationID": "weapon",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
-        },
-        {
-            "type": 1,
-            "sourceX": 6,
-            "sourceY": 7,
-            "isWallEntrance": true,
-            "triggerDirection": 1,
-            "isWorldMap": false,
-            "destinationID": "item",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
-        },
-        {
-            "type": 1,
-            "sourceX": 6,
-            "sourceY": 3,
-            "isWallEntrance": true,
-            "triggerDirection": 1,
-            "isWorldMap": false,
-            "destinationID": "heal",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
-        },
-        {
-            "type": 1,
-            "sourceX": 4,
-            "sourceY": 3,
-            "isWallEntrance": true,
-            "triggerDirection": 3,
-            "isWorldMap": false,
-            "destinationID": "armor",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
-        },
-        {
-            "type": 1,
-            "sourceX": 2,
-            "sourceY": 0,
-            "isWallEntrance": true,
-            "triggerDirection": 3,
-            "isWorldMap": false,
-            "destinationID": "special",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
-        },
-        {
             "type": 0,
-            "sourceX": 5,
-            "sourceY": 10,
+            "sourceX": 10,
+            "sourceY": 5,
             "isWallEntrance": true,
             "triggerDirection": 0,
             "isWorldMap": false,
-            "destinationID": "Bridge_0",
+            "destinationID": "NewDestination",
             "targetX": 1,
-            "targetY": 0,
+            "targetY": 1,
             "targetDirection": 0
         },
         {
             "type": 0,
-            "sourceX": 5,
-            "sourceY": 0,
-            "isWallEntrance": true,
-            "triggerDirection": 2,
-            "isWorldMap": true,
-            "destinationID": "region_00",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
-        },
-        {
-            "type": 1,
-            "sourceX": 8,
-            "sourceY": 10,
-            "isWallEntrance": true,
+            "sourceX": 1,
+            "sourceY": 1,
+            "isWallEntrance": false,
             "triggerDirection": 1,
             "isWorldMap": false,
-            "destinationID": "terminal",
-            "targetX": 1,
+            "destinationID": "Cave_1",
+            "targetX": 4,
             "targetY": 1,
-            "targetDirection": 2
+            "targetDirection": 3
         }
     ]
 }

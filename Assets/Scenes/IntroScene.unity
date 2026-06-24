@@ -686,54 +686,33 @@ MonoBehaviour:
   cutsceneImage: {fileID: 391111877}
   backgroundImage: {fileID: 1647677414}
   cutsceneText: {fileID: 834021688}
-  bgmId: 27
+  bgmId: 35
   fadeOverlay: {fileID: 63047163}
   fadeInColor: {r: 0, g: 0, b: 0, a: 1}
   fadeOutColor: {r: 0, g: 0, b: 0, a: 1}
   fadeInDuration: 1.5
   fadeOutDuration: 1.5
   cutsceneList:
-  - image: {fileID: 21300000, guid: 592e90f87260607468de0206f87dadd6, type: 3}
+  - image: {fileID: 0}
     background: {fileID: 0}
-    text: "\uAC70\uB300 \uD14C\uD06C \uAE30\uC5C5 NEXT WORLD\uB294 \uC0C8\uB85C\uC6B4
-      \uBB3C\uC9C8\uC744 \uBC1C\uACAC\uD588\uB2E4."
+    text: "20XX\uB144 \uC5EC\uB984"
     lineDelay: 0.1
     delayAfter: 4
-  - image: {fileID: 21300000, guid: 33aca312661749049b942ec6192b8d83, type: 3}
+  - image: {fileID: 21300000, guid: f5907b4de32fe0e4395a38471ccd1a26, type: 3}
     background: {fileID: 0}
-    text: "\uB9C9\uB300\uD55C \uC5D0\uB108\uC9C0 \uC0DD\uC131\uACFC \uACF5\uAC04
-      \uC65C\uACE1 \uD6A8\uACFC\uB97C \uAC00\uC9C4 \uC2E0\uBE44\uB85C\uC6B4 \uBB3C\uC9C8.\n\uC9C0\uAE08\uAE4C\uC9C0
-      \uC54C\uACE0 \uC788\uC5C8\uB358 \uBB3C\uB9AC \uBC95\uCE59\uC744 \uC544\uB4DD\uD788
-      \uBC97\uC5B4\uB09C \uAC83\uC774\uC5C8\uB2E4."
+    text: "\uAC11\uC790\uAE30 \uB098\uD0C0\uB09C \uB9C8\uBB3C\uB4E4\uC5D0 \uC758\uD574"
     lineDelay: 0.1
     delayAfter: 4
-  - image: {fileID: 21300000, guid: e600d22a285129348acc10112e29c26d, type: 3}
-    background: {fileID: 0}
-    text: "\uC5F0\uAD6C\uC9C4\uB4E4\uC740 \uC774 \uBB3C\uC9C8\uC774 \uB2E4\uB978
-      \uC138\uACC4\uC5D0\uC11C \uD758\uB7EC\uB4E4\uC5B4\uC654\uC74C\uC744 \uBC1D\uD600\uB0B4\uACE0
-      \uC774\uACC4\uC785\uC790\uB77C\uACE0 \uBA85\uBA85\uD588\uB2E4.\n"
+  - image: {fileID: 21300000, guid: d45d361938ee36844880ec5fe14b5cef, type: 3}
+    background: {fileID: 21300000, guid: a1fd49298ca208e45abe1ca76932b099, type: 3}
+    text: "\uC778\uB958\uC758 \uBB38\uBA85\uC740 \uB05D\uB0AC\uB2E4"
     lineDelay: 0.1
     delayAfter: 4
   - image: {fileID: 0}
     background: {fileID: 0}
-    text: "\uADF8\uB7EC\uB098..."
-    lineDelay: 0.1
-    delayAfter: 5
-  - image: {fileID: 21300000, guid: 5db50c05165facd4ba680a0bf4dee4d2, type: 3}
-    background: {fileID: 0}
-    text: "\uC774\uACC4\uC785\uC790\uC758 \uD750\uB984\uC744 \uC5ED\uCD94\uC801\uD558\uB294
-      \uC2E4\uD5D8 \uC911 \uBC1C\uC0DD\uD55C \uACF5\uAC04 \uADE0\uC5F4\uB85C \uC5F0\uAD6C\uC18C
-      \uC77C\uB300\uB294 \uC774\uD615\uC758 \uC874\uC7AC\uB4E4\uC774 \uB4E4\uB053\uAE30
-      \uC2DC\uC791\uD588\uB2E4."
+    text: "\n\n\uADF8\uB9AC\uACE0 \uC2DC\uAC04\uC740 \uD758\uB7EC..."
     lineDelay: 0.1
     delayAfter: 4
-  - image: {fileID: 21300000, guid: 9e4e6518238d48540b1b4e4a44479614, type: 3}
-    background: {fileID: 21300000, guid: c10f011237459e84aace4505bf93c0d2, type: 3}
-    text: "\uCD08\uC0C1\uD604\uC0C1\uC758 \uC0AC\uAC74 \uCC98\uB9AC\uB97C \uB2F4\uB2F9\uD558\uB294
-      \uD2B9\uC218\uC694\uC6D0\uC778 \uB2F9\uC2E0\uC740 \uD30C\uD2B8\uB108\uC640
-      \uD568\uAED8 \uC11C\uB458\uB7EC \uD604\uC7A5\uC73C\uB85C \uD5A5\uD588\uB2E4."
-    lineDelay: 0.1
-    delayAfter: 6
   nextSceneName: TitleScene
   nextSceneParam: 
 --- !u!4 &679237706
@@ -786,7 +765,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -240}
-  m_SizeDelta: {x: 1280, y: 190}
+  m_SizeDelta: {x: 640, y: 190}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &834021688
 MonoBehaviour:
@@ -1196,7 +1175,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 120}
-  m_SizeDelta: {x: 590, y: 332}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1647677414
 MonoBehaviour:
@@ -1404,14 +1383,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapJsonFiles:
-  - {fileID: 4900000, guid: cc8726d8fa431714ba4cfa67978199ef, type: 3}
-  - {fileID: 4900000, guid: 23540c9db04fe25419aba8c3e4cd3c6f, type: 3}
-  - {fileID: 4900000, guid: 5d66656de40b1d54cb01ddcd1b383cbb, type: 3}
   - {fileID: 4900000, guid: 38856c894f39cac41ba673251873fb83, type: 3}
-  - {fileID: 4900000, guid: abd854bcaa1a1ab42977b1722d25f961, type: 3}
+  - {fileID: 4900000, guid: cc8726d8fa431714ba4cfa67978199ef, type: 3}
   - {fileID: 4900000, guid: 58e3fa0c172ea0a4f9ff3610255facad, type: 3}
   - {fileID: 4900000, guid: 5c7a8fa6816c281428602f9e0922bab6, type: 3}
   - {fileID: 4900000, guid: 9942680bb7d500c4e81dac51ff074861, type: 3}
+  - {fileID: 4900000, guid: 5d66656de40b1d54cb01ddcd1b383cbb, type: 3}
+  - {fileID: 4900000, guid: abd854bcaa1a1ab42977b1722d25f961, type: 3}
+  - {fileID: 4900000, guid: c87e61b7f27c4a346b8dce3df7ab8bc0, type: 3}
+  - {fileID: 4900000, guid: ed3d2300c01ce764c9b52fa7eead7260, type: 3}
+  - {fileID: 4900000, guid: e5deb8f131a2b1d4fae173eb6544515c, type: 3}
+  - {fileID: 4900000, guid: 23540c9db04fe25419aba8c3e4cd3c6f, type: 3}
   elevatorList:
   - id: elv_000
     minFloor: -1
@@ -1437,6 +1419,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c8b2d0b9da5a240459f5a54a14eeae32, type: 2}
   - {fileID: 11400000, guid: 095e49405ca1fbc4b8eecbd799e6c2a7, type: 2}
   - {fileID: 11400000, guid: 17674db496c89214f81f0c8cdc86fe12, type: 2}
+  - {fileID: 11400000, guid: 6d8a5ce81fa7ccc4988cddb533815f5a, type: 2}
 --- !u!114 &300400626869433266
 MonoBehaviour:
   m_ObjectHideFlags: 0
