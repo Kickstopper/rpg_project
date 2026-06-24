@@ -93,6 +93,7 @@ namespace UI.IntroScene
                 {
                     backgroundImage.enabled = true;
                     backgroundImage.sprite = data.background;
+                    backgroundImage.SetNativeSize();
                 }
                 else
                 {

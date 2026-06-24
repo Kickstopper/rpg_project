@@ -46,11 +46,11 @@ Material:
     m_Ints: []
     m_Floats:
     - PixelSnap: 0
-    - _CycleSpeed: 1.6
+    - _CycleSpeed: 1
     - _EnableExternalAlpha: 0
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 1, g: 0.7810548, b: 0, a: 1}
+    - _Color: {r: 1, g: 1, b: 0, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
