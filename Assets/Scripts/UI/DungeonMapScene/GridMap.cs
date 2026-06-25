@@ -35,9 +35,20 @@ namespace UI.DungeonMapScene
 
         private int wallWidth = 11;
 
-        public void Initialize(MapData mapData)
+        private HashSet<int> illusionTextures;
+
+        public void Initialize(MapData mapData, List<int> illusions)
         {
             ClearMap();
+
+            if (illusions != null)
+            {
+                illusionTextures = new HashSet<int>(illusions);
+            }
+            else
+            {
+                illusionTextures = new HashSet<int>();
+            }
 
             _map = mapData;
             
@@ -79,6 +90,9 @@ namespace UI.DungeonMapScene
         private void ClearMap()
         {
             transform.DOKill();
+
+            illusionTextures = null;
+
             if (_mapParent != null) _mapParent.DOKill();
             if (_arrowImg != null) _arrowImg.rectTransform.DOKill();
 
@@ -221,7 +235,7 @@ namespace UI.DungeonMapScene
                         cellData = _map.GetCell(mapX, mapY); 
                     }
 
-                    _gridCellDict[r * mapSize + c].UpdateWallState(cellData);
+                    _gridCellDict[r * mapSize + c].UpdateWallState(cellData, illusionTextures);
                 }
             }
         }

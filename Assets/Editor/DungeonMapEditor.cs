@@ -424,8 +424,8 @@ public class DungeonMapEditor : EditorWindow
                                            inputTheme.passableWallTexIDs != null && 
                                            inputTheme.passableWallTexIDs.Contains(texID));
 
-                        // 꽉 막힌 벽은 기존의 불투명 빨간색, 통과 가능한 아치는 반투명한 시안(Cyan) 색상
-                        Color wc = isPassable ? new Color(0f, 1f, 1f, 0.6f) : new Color(1f, 0.3f, 0.3f, 1f);
+                        // 꽉 막힌 벽은 기존의 불투명 빨간색, 통과 가능한 벽은 반투명한 시안 컬러
+                        Color wc = isPassable ? new Color(0f, 1f, 1f, 0.2f) : new Color(1f, 0.3f, 0.3f, 1f);
 
                         if (i == 0) EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, wt), wc); // 북쪽 (Top)
                         else if (i == 1) EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y, wt, rect.height), wc); // 동쪽 (Right)
@@ -433,19 +433,6 @@ public class DungeonMapEditor : EditorWindow
                         else if (i == 3) EditorGUI.DrawRect(new Rect(rect.x, rect.y, wt, rect.height), wc); // 서쪽 (Left)
                     }
                 }
-                
-                // // 북쪽 벽 (Top) - Index 0
-                // if (cell.wallTextureIDs[0] != -1)
-                //     EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, wt), wc);
-                // // 동쪽 벽 (Right) - Index 1
-                // if (cell.wallTextureIDs[1] != -1)
-                //     EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y, wt, rect.height), wc);
-                // // 남쪽 벽 (Bottom) - Index 2
-                // if (cell.wallTextureIDs[2] != -1)
-                //     EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - wt, rect.width, wt), wc);
-                // // 서쪽 벽 (Left) - Index 3
-                // if (cell.wallTextureIDs[3] != -1)
-                //     EditorGUI.DrawRect(new Rect(rect.x, rect.y, wt, rect.height), wc);
                 
                 // 중앙 고정 오브젝트 시각화
                 if (cell.centerObjectID != -1)

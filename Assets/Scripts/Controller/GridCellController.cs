@@ -2,6 +2,7 @@ using UnityEngine;
 using Data;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 namespace Controller
 {
     public class GridCellController : MonoBehaviour
@@ -27,16 +28,16 @@ namespace Controller
         public Color noCeilColor;
         public Color noCellColor;
 
-        public void UpdateWallState(CellData data)
+        public void UpdateWallState(CellData data, HashSet<int> illusions)
         {
             if (data != null && data.wallTextureIDs != null && data.wallTextureIDs.Length > 3)
             {
                 int[] wallIds = data.wallTextureIDs;
                 
-                upWall.color = GetWallColor(wallIds[0]);
-                rightWall.color = GetWallColor(wallIds[1]);
-                downWall.color = GetWallColor(wallIds[2]);
-                leftWall.color = GetWallColor(wallIds[3]);
+                upWall.color = GetWallColor(wallIds[0], illusions);
+                rightWall.color = GetWallColor(wallIds[1], illusions);
+                downWall.color = GetWallColor(wallIds[2], illusions);
+                leftWall.color = GetWallColor(wallIds[3], illusions);
 
                 face.color = GetFaceColor(data.value);
                 text.text = GetText(data.value);
@@ -52,19 +53,17 @@ namespace Controller
             }
         }
 
-        Color GetWallColor(int wallId)
+        Color GetWallColor(int wallId, HashSet<int> illusions)
         {
-            switch(wallId)
-            {
-                case -1: return noWallColor;
 
-                default: return defaultWallColor;
-            }
+            if (wallId == -1 || (illusions != null && illusions.Contains(wallId))) return noWallColor;
+
+            return defaultWallColor;
         }
 
         Color GetFaceColor(int cellValue)
         {
-            if (cellValue == -1) return noFloorColor;
+            if (cellValue == -1 || cellValue >= 99) return noFloorColor;
             if (cellValue == 0) return defaultFloorColor;
             if (cellValue == 1) return noCeilColor;
             if (cellValue == 2) return roomColor;

@@ -3,6 +3,7 @@ using UnityEngine;
 using Data;
 using Manager;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace UI.DungeonMapScene
 {
@@ -16,6 +17,18 @@ namespace UI.DungeonMapScene
 
     public class RaycastRenderEngine
     {
+        // 통과한 illusionWall의 정보를 저장할 배열 (GC 방지용 캐싱)
+        private struct IllusionHit
+        {
+            public float perpWallDist;
+            public int texX;
+            public int hitTexId;
+            public int side;
+            public int mapX;
+            public int mapY;
+        }
+        private IllusionHit[] _illusionHits = new IllusionHit[32]; // 한 줄당 최대 32개의 환영의 벽 통과 가능
+
         private Color32[] _buffer;
         private Color32[] _leftEyeBuffer;
         private float[] _zBuffer;
@@ -292,6 +305,9 @@ namespace UI.DungeonMapScene
 
             for (int x = 0; x < _screenWidth; x += step)
             {
+                // 현재 수직선(Ray)이 통과한 환영의 벽 개수 초기화
+                int illusionHitCount = 0;
+
                 float cameraX = 2 * x / (float)_screenWidth - 1;
                 float rayDirX = player.DirX + player.PlaneX * cameraX;
                 float rayDirY = player.DirY + player.PlaneY * cameraX;
@@ -419,18 +435,64 @@ namespace UI.DungeonMapScene
                             }
                         }
 
-                        // 벽 충돌 처리
+                        // 벽 충돌 처리: 솔리드 벽은 멈추고, 통과 가능한 벽은 illusionWall로 기록
                         if (currCell != null && currCell.HasWall())
                         {
                             int fId = GetTextureIdOnSide(currCell, side, stepX, stepY, false);
-                            if (fId != -1) { hit = 1; hitTexId = fId; hitBackFace = false; }
+                            if (fId != -1) 
+                            { 
+                                if (currCell.value == 1) // 진짜 막힌 벽 (Solid)
+                                {
+                                    hit = 1; hitTexId = fId; hitBackFace = false; 
+                                }
+                                else // 통과 가능한 복도인데 벽 텍스처(illusionWall)가 있음
+                                {
+                                    if (illusionHitCount < 32)
+                                    {
+                                        float perpDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
+                                        if (settings.useCylinderEffect) perpDist *= (1.0f + cameraX * cameraX * settings.cylinderStrength);
+                                        if (perpDist <= 0.001f) perpDist = 0.001f;
+
+                                        float wX = (side == 0) ? py + perpDist * rayDirY : px + perpDist * rayDirX;
+                                        wX -= Mathf.Floor(wX);
+                                        int tX = (int)(wX * _texWidth);
+                                        if ((side == 0 && rayDirX > 0)) tX = _texWidth - tX - 1;
+                                        if ((side == 1 && rayDirY < 0)) tX = _texWidth - tX - 1;
+
+                                        _illusionHits[illusionHitCount++] = new IllusionHit { perpWallDist = perpDist, texX = tX, hitTexId = fId, side = side, mapX = mapX, mapY = mapY };
+                                    }
+                                }
+                            }
                         }
                         if (hit == 0)
                         {
                             if (prevCell != null && prevCell.HasWall())
                             {
                                 int bId = GetTextureIdOnSide(prevCell, side, stepX, stepY, true);
-                                if (bId != -1) { hit = 1; hitTexId = bId; hitBackFace = true; }
+                                if (bId != -1) 
+                                { 
+                                    if (prevCell.value == 1)
+                                    {
+                                        hit = 1; hitTexId = bId; hitBackFace = true; 
+                                    }
+                                    else // 뒷면 환영의 벽 처리
+                                    {
+                                        if (illusionHitCount < 32)
+                                        {
+                                            float perpDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
+                                            if (settings.useCylinderEffect) perpDist *= (1.0f + cameraX * cameraX * settings.cylinderStrength);
+                                            if (perpDist <= 0.001f) perpDist = 0.001f;
+
+                                            float wX = (side == 0) ? py + perpDist * rayDirY : px + perpDist * rayDirX;
+                                            wX -= Mathf.Floor(wX);
+                                            int tX = (int)(wX * _texWidth);
+                                            if ((side == 0 && rayDirX > 0) ^ true) tX = _texWidth - tX - 1;
+                                            if ((side == 1 && rayDirY < 0) ^ true) tX = _texWidth - tX - 1;
+
+                                            _illusionHits[illusionHitCount++] = new IllusionHit { perpWallDist = perpDist, texX = tX, hitTexId = bId, side = side, mapX = prevX, mapY = prevY };
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -531,42 +593,64 @@ namespace UI.DungeonMapScene
                     isVEdge = (texX == 0 || texX == _texWidth - 1);
                 }
 
-                float stepVal = 1.0f * _texHeight / lineHeight;
-                
-                for (int y = drawStart; y < drawEnd; y++)
+                // 세로줄 전체가 어둠에 잠겼을 때 텍스처 계산 생략
+                if (lightScale <= 0 && !isWire)
                 {
-                    Color32 col;
-                    if (isWire)
+                    for (int y = drawStart; y < drawEnd; y++)
                     {
-                        bool isHEdge = (y == drawStart || y == drawEnd - 1);
-                        col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
-                    }
-                    else
-                    {
-                        int sTexX = texX;
-                        int d = y * 256 - _screenHeight * 128 + lineHeight * 128 - (int)player.Pitch * 256 + (int)player.JumpOffset * 256;
-                        int texY = ((d * _texHeight) / lineHeight) / 256;
-
-                        if (settings.useWallDistortion) {
-                            sTexX = (int)(texX + Mathf.Sin((y + x) * settings.distortionFreq) * settings.distortionAmp) & (_texWidth - 1);
-                            float noiseY = Mathf.PerlinNoise(texX * 0.1f, y * settings.distortionFreq);
-                            texY = Mathf.Clamp((int)(texY + (noiseY * 2f - 1f) * settings.distortionAmp), 0, _texHeight - 1);
-                        }
-                        
-                        col = GetWallPixelFast(hitTexId, sTexX, texY);
-                        if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
-                    }
-
-                    int bIdx = y * _screenWidth + x;
-                    for (int s = 0; s < step; s++)
-                    {
-                        if (x + s < _screenWidth)
+                        int bIdx = y * _screenWidth + x;
+                        for (int s = 0; s < step; s++)
                         {
-                            _buffer[bIdx + s] = col;
-                            _zBuffer[x + s] = perpWallDist;
+                            if (x + s < _screenWidth)
+                            {
+                                _buffer[bIdx + s] = settings.fogColor;
+                                _zBuffer[x + s] = perpWallDist; // Z버퍼는 무조건 기록해야 몬스터가 묻힘 
+                            }
                         }
                     }
                 }
+                else
+                {
+                    // 빛이 닿는 곳만 텍스처 픽셀을 읽어서 그린다
+                    float stepVal = 1.0f * _texHeight / lineHeight;
+                
+                    for (int y = drawStart; y < drawEnd; y++)
+                    {
+                        Color32 col;
+                        if (isWire)
+                        {
+                            bool isHEdge = (y == drawStart || y == drawEnd - 1);
+                            col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
+                        }
+                        else
+                        {
+                            int sTexX = texX;
+                            int d = y * 256 - _screenHeight * 128 + lineHeight * 128 - (int)player.Pitch * 256 + (int)player.JumpOffset * 256;
+                            int texY = ((d * _texHeight) / lineHeight) / 256;
+
+                            if (settings.useWallDistortion) {
+                                sTexX = (int)(texX + Mathf.Sin((y + x) * settings.distortionFreq) * settings.distortionAmp) & (_texWidth - 1);
+                                float noiseY = Mathf.PerlinNoise(texX * 0.1f, y * settings.distortionFreq);
+                                texY = Mathf.Clamp((int)(texY + (noiseY * 2f - 1f) * settings.distortionAmp), 0, _texHeight - 1);
+                            }
+                            
+                            col = GetWallPixelFast(hitTexId, sTexX, texY);
+                            if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
+                        }
+
+                        int bIdx = y * _screenWidth + x;
+                        for (int s = 0; s < step; s++)
+                        {
+                            if (x + s < _screenWidth)
+                            {
+                                _buffer[bIdx + s] = col;
+                                _zBuffer[x + s] = perpWallDist;
+                            }
+                        }
+                    }
+                }
+
+                
 
                 // void 내벽. horizon부터 그려서 본 벽 하단을 덮어씀
                 if (voidEdgeDist > 0f)
@@ -598,6 +682,54 @@ namespace UI.DungeonMapScene
                                     ceilEdgeDist, ceilClipY, 
                                     player, settings, step,
                                     pulseColor, wireframeColor, pulseWidth);
+                }
+
+                // 환영의 벽 그리기. 솔리드 벽을 다 그린 후 먼 곳부터 덧그림
+                for (int i = illusionHitCount - 1; i >= 0; i--)
+                {
+                    IllusionHit illusion = _illusionHits[i];
+                    
+                    int aLineHeight = (int)((_screenHeight / illusion.perpWallDist) * hScale);
+                    int aDrawStart = Mathf.Max(0, -aLineHeight / 2 + horizon);
+                    int aDrawEnd = Mathf.Min(_screenHeight - 1, aLineHeight / 2 + horizon);
+                    
+                    int aLightScale;
+                    if (settings.useGridLighting)
+                    {
+                        float dist = Mathf.Max(Mathf.Abs(illusion.mapX - player.LogicX), Mathf.Abs(illusion.mapY - player.LogicY));
+                        aLightScale = (int)(Mathf.Clamp(settings.lightingIntensity / (dist + 1.0f), 0f, 1f) * 255);
+                    }
+                    else
+                    {
+                        aLightScale = (int)(Mathf.Clamp(settings.lightingIntensity / illusion.perpWallDist, 0f, 1f) * 255);
+                    }
+                    if (illusion.side == 1) aLightScale = (aLightScale * 230) >> 8;
+
+                    for (int y = aDrawStart; y < aDrawEnd; y++)
+                    {
+                        int d = y * 256 - _screenHeight * 128 + aLineHeight * 128 - (int)player.Pitch * 256 + (int)player.JumpOffset * 256;
+                        int texY = ((d * _texHeight) / aLineHeight) / 256;
+
+                        Color32 col = GetWallPixelFast(illusion.hitTexId, illusion.texX, texY);
+                        
+                        // Alpha가 0인 픽셀은 그리지 않고 무시하여 뒤쪽 복도가 보이게 함
+                        if (col.a > 0)
+                        {
+                            if (aLightScale <= 0) col = settings.fogColor; // 어차피 시커먼 안개색이므로 수식 계산 무시
+                            else if (aLightScale < 255) ApplyLight(ref col, aLightScale, settings.fogColor);
+
+                            int bIdx = y * _screenWidth + x;
+                            for (int s = 0; s < step; s++)
+                            {
+                                if (x + s < _screenWidth)
+                                {
+                                    _buffer[bIdx + s] = col;
+                                    // Z버퍼를 덮어씌워야, 나중에 그려질 몬스터가 환영의 벽 뒤에 정상적으로 가려진다
+                                    _zBuffer[x + s] = illusion.perpWallDist; 
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -652,38 +784,61 @@ namespace UI.DungeonMapScene
                 texPos = (drawStart - rawDrawStart) * stepVal;
             }
 
-            bool isWire  = _isScanning && (perpVoidDist < _currentScanRadius);
-            bool isPulse = isWire && Mathf.Abs(perpVoidDist - _currentScanRadius) < pulseWidth;
-            bool isVEdge = isWire && (voidTexX == 0 || voidTexX == _texWidth - 1);
-
-            for (int y = drawStart; y < drawEnd; y++) 
+            bool isWire = _isScanning && (perpVoidDist < _currentScanRadius);
+            bool isPulse = false;
+            bool isVEdge = false;
+            if (isWire)
             {
-                int voidTexY = (int)texPos & (_texHeight - 1);
-                texPos += stepVal;
+                isPulse = Mathf.Abs(perpVoidDist - _currentScanRadius) < pulseWidth;
+                isVEdge = (voidTexX == 0 || voidTexX == _texWidth - 1);
+            }
 
-                Color32 col;
-                if (isWire)
+            if (lightScale <= 0 && !isWire)
+            {
+                for (int y = drawStart; y < drawEnd; y++)
                 {
-                    bool isHEdge = (y == drawStart || y == drawEnd - 1);
-                    col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
+                    int bIdx = y * _screenWidth + x;
+                    for (int s = 0; s < step; s++)
+                    {
+                        if (x + s < _screenWidth)
+                        {
+                            _buffer[bIdx + s] = settings.fogColor;
+                            _zBuffer[x + s] = perpVoidDist; // Z버퍼는 무조건 기록해야 몬스터가 묻힘
+                        }
+                    }
                 }
-                else
+            }
+            else 
+            {
+                for (int y = drawStart; y < drawEnd; y++) 
                 {
-                    col = GetWallPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
-                    
-                    // y가 drawStart(바닥)일 때 0.2, drawEnd(천장)일 때 1.0이 되는 계수 계산. 0.2는 최소 밝기
-                    float verticalFactor = Mathf.Clamp01((float)(y - drawStart) / (drawEnd - drawStart));
-                    float depthDimmer = Mathf.Lerp(0.2f, 1.0f, verticalFactor); 
-                    
-                    int finalLight = (int)(lightScale * depthDimmer);
-                    if (finalLight < 255) ApplyLight(ref col, finalLight, settings.fogColor);
-                }
+                    int voidTexY = (int)texPos & (_texHeight - 1);
+                    texPos += stepVal;
 
-                int bIdx = y * _screenWidth + x;
-                for (int s = 0; s < step; s++)
-                {
-                    if (x + s < _screenWidth)
-                        _buffer[bIdx + s] = col;
+                    Color32 col;
+                    if (isWire)
+                    {
+                        bool isHEdge = (y == drawStart || y == drawEnd - 1);
+                        col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
+                    }
+                    else
+                    {
+                        col = GetWallPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
+                        
+                        // y가 drawStart(바닥)일 때 0.2, drawEnd(천장)일 때 1.0이 되는 계수 계산. 0.2는 최소 밝기
+                        float verticalFactor = Mathf.Clamp01((float)(y - drawStart) / (drawEnd - drawStart));
+                        float depthDimmer = Mathf.Lerp(0.2f, 1.0f, verticalFactor); 
+                        
+                        int finalLight = (int)(lightScale * depthDimmer);
+                        if (finalLight < 255) ApplyLight(ref col, finalLight, settings.fogColor);
+                    }
+
+                    int bIdx = y * _screenWidth + x;
+                    for (int s = 0; s < step; s++)
+                    {
+                        if (x + s < _screenWidth)
+                            _buffer[bIdx + s] = col;
+                    }
                 }
             }
         }
@@ -734,37 +889,59 @@ namespace UI.DungeonMapScene
             }
 
             bool isWire = _isScanning && (perpVoidDist < _currentScanRadius);
-            bool isPulse = isWire && Mathf.Abs(perpVoidDist - _currentScanRadius) < pulseWidth;
-            bool isVEdge = isWire && (voidTexX == 0 || voidTexX == _texWidth - 1);
-
-            for (int y = drawStart; y < drawEnd; y++) 
+            bool isPulse = false;
+            bool isVEdge = false;
+            if (isWire)
             {
-                int voidTexY = (int)texPos & (_texHeight - 1);
-                texPos += stepVal;
+                isPulse = Mathf.Abs(perpVoidDist - _currentScanRadius) < pulseWidth;
+                isVEdge = (voidTexX == 0 || voidTexX == _texWidth - 1);
+            }
 
-                Color32 col;
-                if (isWire)
+            if (lightScale <= 0 && !isWire)
+            {
+                for (int y = drawStart; y < drawEnd; y++)
                 {
-                    bool isHEdge = (y == drawStart || y == drawEnd - 1);
-                    col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
+                    int bIdx = y * _screenWidth + x;
+                    for (int s = 0; s < step; s++)
+                    {
+                        if (x + s < _screenWidth)
+                        {
+                            _buffer[bIdx + s] = settings.fogColor;
+                            _zBuffer[x + s] = perpVoidDist; // Z버퍼는 무조건 기록해야 몬스터가 묻힘 
+                        }
+                    }
                 }
-                else
+            }
+            else
+            {
+                for (int y = drawStart; y < drawEnd; y++) 
                 {
-                    // settings.voidWallTexIdx가 아닌 천장 구멍 전용 텍스처 인덱스가 있다면 수정 필요
-                    col = GetWallPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
-                    
-                    // 수직 그라데이션. 위로 올라갈수록(y가 커질수록) 어두워짐
-                    float verticalFactor = Mathf.Clamp01((float)(y - rawDrawStart) / voidHeight);
-                    float depthDimmer = Mathf.Lerp(1.0f, 0.2f, verticalFactor); 
-                    
-                    int finalLight = (int)(lightScale * depthDimmer);
-                    if (finalLight < 255) ApplyLight(ref col, finalLight, settings.fogColor);
-                }
+                    int voidTexY = (int)texPos & (_texHeight - 1);
+                    texPos += stepVal;
 
-                int bIdx = y * _screenWidth + x;
-                for (int s = 0; s < step; s++)
-                {
-                    if (x + s < _screenWidth) _buffer[bIdx + s] = col;
+                    Color32 col;
+                    if (isWire)
+                    {
+                        bool isHEdge = (y == drawStart || y == drawEnd - 1);
+                        col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
+                    }
+                    else
+                    {
+                        col = GetWallPixelFast(settings.voidWallTexIdx, voidTexX, voidTexY);
+                        
+                        // 수직 그라데이션. 위로 올라갈수록(y가 커질수록) 어두워짐
+                        float verticalFactor = Mathf.Clamp01((float)(y - rawDrawStart) / voidHeight);
+                        float depthDimmer = Mathf.Lerp(1.0f, 0.2f, verticalFactor); 
+                        
+                        int finalLight = (int)(lightScale * depthDimmer);
+                        if (finalLight < 255) ApplyLight(ref col, finalLight, settings.fogColor);
+                    }
+
+                    int bIdx = y * _screenWidth + x;
+                    for (int s = 0; s < step; s++)
+                    {
+                        if (x + s < _screenWidth) _buffer[bIdx + s] = col;
+                    }
                 }
             }
         }
@@ -812,6 +989,20 @@ namespace UI.DungeonMapScene
                 int lightScale = 255;
                 if (!isRowScanned) 
                     lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / rowDist, 0f, 1f) * 255);
+
+                // 가로줄 전체가 완전히 어두워졌을 때 UV 계산, 텍스처 읽기, 빛 섞기 연산을 모두 생략하고 안개색만 바르고 넘김.
+                if (lightScale <= 0 && !isRowScanned)
+                {
+                    int baseIdx = y * _screenWidth;
+                    for (int x = 0; x < _screenWidth; x += step)
+                    {
+                        for (int s = 0; s < step; s++)
+                        {
+                            if (x + s < _screenWidth) _buffer[baseIdx + x + s] = settings.fogColor;
+                        }
+                    }
+                    continue;
+                }
 
                 for (int x = 0; x < _screenWidth; x += step)
                 {
@@ -1085,8 +1276,9 @@ namespace UI.DungeonMapScene
                             
                             if (col.a == 255) 
                             {
-                                if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
-
+                                if (lightScale <= 0) col = settings.fogColor; // 어차피 시커먼 안개색이므로 수식 계산 무시
+                                else if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
+                                
                                 int bIdx = y * _screenWidth + stripe;
                                 
                                 // Step 처리 (가로 픽셀 채우기)
@@ -1104,6 +1296,7 @@ namespace UI.DungeonMapScene
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ApplyLight(ref Color32 c, int scale, Color32 fog)
         {
             int invScale = 255 - scale; // 안개 농도 (거리가 멀어 빛이 줄어들수록 안개가 짙어짐)

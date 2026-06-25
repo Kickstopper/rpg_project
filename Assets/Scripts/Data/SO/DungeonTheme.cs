@@ -47,7 +47,7 @@ namespace Data
         public int floorTexIdx = 2;   // 바닥 텍스처 인덱스
 
         [Header("특수 벽 설정")]
-        [Tooltip("아치, 환영의 벽 등 텍스처는 보이지만 통과 가능한 텍스처 ID 목록")]
+        [Tooltip("텍스처는 보이지만 통과 가능한 텍스처 ID 목록")]
         public List<int> passableWallTexIDs = new List<int>();
 
         [Header("Door Settings")]

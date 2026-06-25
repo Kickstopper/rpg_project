@@ -42,6 +42,12 @@ namespace UI.DungeonMapScene
             _illusionTextureIds = illusions;
         }
 
+        // 테마 로드 시 리스트를 받아올 Setter 메서드
+        public void SetIllusionTextures(List<int> passableIds)
+        {
+            _illusionTextureIds = passableIds ?? new List<int>();
+        }
+
         public void SetMapData(MapData map, int startX, int startY, Direction startDir)
         {
             _currentMap = map;
@@ -319,8 +325,8 @@ namespace UI.DungeonMapScene
             if (targetCell.HasWall() && targetEnterFace != -1)
             {
                 int texID = targetCell.wallTextureIDs[targetEnterFace];
-                if (texID != -1 && !_illusionTextureIds.Contains(texID)) 
-                    return false;
+                // 통과 가능 텍스처 리스트에 없다면 충돌(false)
+                if (texID != -1 && !_illusionTextureIds.Contains(texID)) return false;
             }
 
             return true;

@@ -34,7 +34,7 @@ MonoBehaviour:
   maxSpawnCount: 3
   spawnDelay: 5
   fogColor: {r: 0, g: 0, b: 0, a: 1}
-  lightingIntensity: 0.3
+  lightingIntensity: 0.5
   useGridLighting: 0
   bgmID: 0
   moduleEnable: 1

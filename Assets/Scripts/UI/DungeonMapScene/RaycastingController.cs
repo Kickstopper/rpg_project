@@ -700,7 +700,7 @@ namespace Controller
                 {
                     SoundManager.Instance.PlaySFX(SfxID.Fall);
                 }
-                
+
                 // 착지 흔들림 코루틴
                 StartCoroutine(LandingImpactRoutine(150f));
 
@@ -835,12 +835,14 @@ namespace Controller
             yield return StartCoroutine(TransitionToOtherPlace(entrance, moveDir, restoreDoorAction));
         }
         
+        // [RaycastingController.cs] PerformMove 메서드 전체 교체
+
         private void PerformMove(Vector2Int moveVec)
         {
             int tx = _player.LogicX + moveVec.x;
             int ty = _player.LogicY + moveVec.y;
 
-            // 심볼 인카운터. 적과 부딪혔는지 검사
+            // 심볼 인카운터 검사
             MapEnemy encounteredEnemy = _activeEnemies.Find(e => Mathf.FloorToInt(e.x) == tx && Mathf.FloorToInt(e.y) == ty && e.isAlive);
             if (encounteredEnemy != null)
             {
@@ -849,20 +851,68 @@ namespace Controller
                 return;
             }
 
-            // 통과할 수 없는 고정 오브젝트 충돌 (예: 잠긴 상자, 기둥)
+            // 고정 오브젝트 충돌 검사
             MapObject blockingObj = _staticObjects.Find(o => Mathf.FloorToInt(o.x) == tx && Mathf.FloorToInt(o.y) == ty && o.isActive && o.isSolid);
-            
             if (blockingObj != null)
             {
-                // 부딪히는 사운드와 애니메이션 재생 후 이동 막음
                 StartCoroutine(_player.BumpRoutine(moveVec));
                 SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                 return; 
             }
 
-            // 이동 가능 여부 체크
+            // =========================================================
+            // 1차 체크: DungeonPlayer의 순수 물리 판정 (텍스처가 있으면 일단 막음)
             bool walkable = _player.IsWalkable(tx, ty, moveVec.x, moveVec.y);
-            
+            // =========================================================
+
+            CellData currentCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
+            CellData targetCell = _currentMap.GetCell(tx, ty);
+
+            int targetEnterFace = -1;
+            int currentExitFace = -1;
+
+            if (moveVec.x > 0)      { targetEnterFace = 3; currentExitFace = 1; }
+            else if (moveVec.x < 0) { targetEnterFace = 1; currentExitFace = 3; }
+            else if (moveVec.y > 0) { targetEnterFace = 2; currentExitFace = 0; }
+            else if (moveVec.y < 0) { targetEnterFace = 0; currentExitFace = 2; }
+
+            CellData hitCell = null;
+            int hitTexID = -1; 
+
+            // 내벽 및 외벽에서 부딪힌 텍스처 검출
+            if (currentCell != null && currentExitFace != -1 && currentCell.HasWall() && currentCell.wallTextureIDs[currentExitFace] != -1)
+            {
+                hitCell = currentCell; 
+                hitTexID = currentCell.wallTextureIDs[currentExitFace];
+            }
+            else if (targetCell != null && targetEnterFace != -1 && targetCell.HasWall() && targetCell.wallTextureIDs[targetEnterFace] != -1)
+            {
+                hitCell = targetCell; 
+                hitTexID = targetCell.wallTextureIDs[targetEnterFace];
+            }
+
+            // 부딪힌 텍스처가 문(Door)인지 확인
+            DoorAnimConfig doorConfig = null;
+            if (hitTexID != -1)
+            {
+                doorConfig = theme?.doorAnimations?.Find(d => d.closedTexId == hitTexID);
+            }
+
+            // illusionWall 예외 처리 로직
+            // DungeonPlayer은 텍스처 때문에 막혔다고 해도
+            // 부딪힌 텍스처가 열리는 문(doorConfig)이 아니고
+            // 부딪힌 벽의 속성이 꽉 막힌 벽(1)이 아닌 빈 복도(0)이며
+            // 넘어가려는 목표 타일 역시 정상적인 빈 복도(0)일 경우
+            // illusionWall로 판단하고 강제로 통과 시킴
+            if (!walkable && hitTexID != -1 && doorConfig == null && hitCell != null && hitCell.value == 0)
+            {
+                if (targetCell != null && targetCell.value == 0)
+                {
+                    walkable = true; 
+                }
+            }
+
+            // 최종 이동 및 충돌 연출 처리
             if (walkable)
             {
                 float duration = _player.IsRunning ? moveDuration / 2f : moveDuration;
@@ -871,77 +921,30 @@ namespace Controller
             }
             else
             {
-                // 앞을 막고 있는 타일의 문 여부를 체크
-                CellData currentCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
-                CellData targetCell = _currentMap.GetCell(tx, ty);
-
-                int targetEnterFace = -1;
-                int currentExitFace = -1;
-
-                if (moveVec.x > 0)      { targetEnterFace = 3; currentExitFace = 1; }
-                else if (moveVec.x < 0) { targetEnterFace = 1; currentExitFace = 3; }
-                else if (moveVec.y > 0) { targetEnterFace = 2; currentExitFace = 0; }
-                else if (moveVec.y < 0) { targetEnterFace = 0; currentExitFace = 2; }
-
-                bool isBlockedByWall = false;
-                CellData hitCell = null;
-                int hitTexID = -1; 
-
-                // 내벽 및 외벽 충돌 검사
-                if (currentCell != null && currentExitFace != -1 && currentCell.HasWall() && currentCell.wallTextureIDs[currentExitFace] != -1)
-                {
-                    isBlockedByWall = true; hitCell = currentCell; hitTexID = currentCell.wallTextureIDs[currentExitFace];
-                }
-                else if (targetCell != null && targetEnterFace != -1 && targetCell.HasWall() && targetCell.wallTextureIDs[targetEnterFace] != -1)
-                {
-                    isBlockedByWall = true; hitCell = targetCell; hitTexID = targetCell.wallTextureIDs[targetEnterFace];
-                }
-                else if (targetCell == null)
-                {
-                    isBlockedByWall = true;
-                }
-
-                // 부딪힌 벽이 테마의 문으로 등록되어 있는지 확인
-                DoorAnimConfig doorConfig = null;
-                if (isBlockedByWall && hitTexID != -1)
-                {
-                    doorConfig = theme?.doorAnimations?.Find(d => d.closedTexId == hitTexID);
-                }
-
-                // 플레이어가 정면을 보고 이동 중인지 체크
                 Direction inputDir = VectorToDirection(moveVec);
                 Direction facingDir = (Direction)_player.DirectionIdx;
                 bool isMovingForward = (inputDir == facingDir);
 
                 EntranceData validEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, tx, ty, moveVec);
+                
                 if (validEntrance != null)
                 {
                     if (doorConfig != null && hitCell != null)
-                    {
-                        // 문을 열고 전환 코루틴 실행
                         StartCoroutine(OpenDoorAndTransitionRoutine(hitCell, validEntrance, moveVec, doorConfig));
-                    }
                     else
-                    {
-                        // 문이 아닐 경우 즉시 전환
                         StartCoroutine(TransitionToOtherPlace(validEntrance, moveVec));
-                    }
                 }
                 else
                 {
-                    if (isBlockedByWall)
+                    if (doorConfig != null && hitCell != null && isMovingForward)
                     {
-                        // 문은 플레이어가 정면으로 전진 중일 때만 열리도록 제한
-                        if (doorConfig != null && hitCell != null && isMovingForward)
-                        {
-                            // 문을 열고 한 칸 전진
-                            StartCoroutine(OpenDoorAndMoveRoutine(hitCell, tx, ty, moveVec, doorConfig));
-                        }
-                        else
-                        {
-                            StartCoroutine(_player.BumpRoutine(moveVec));
-                            SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
-                        }
+                        StartCoroutine(OpenDoorAndMoveRoutine(hitCell, tx, ty, moveVec, doorConfig));
+                    }
+                    else
+                    {
+                        // 낭떠러지(-1), 진짜 꽉 막힌 벽(1), 혹은 맵의 끝을 만났을 경우 무조건 Bump!
+                        StartCoroutine(_player.BumpRoutine(moveVec));
+                        SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
                     }
                 }
             }
@@ -1705,6 +1708,12 @@ namespace Controller
 
         private void UpdateRenderSettings(DungeonTheme theme)
         {
+            // 물리 플레이어에게 현재 테마의 통과 가능한 텍스처 목록 주입
+            if (theme != null && theme.passableWallTexIDs != null)
+            {
+                _player.SetIllusionTextures(theme.passableWallTexIDs);
+            }
+
             // 머티리얼의 일렁임 스위치 조작
             if (screenImage != null && screenImage.material != null)
             {
@@ -1760,7 +1769,7 @@ namespace Controller
         {
             if (miniMap != null)
             {
-                miniMap.Initialize(_currentMap);
+                miniMap.Initialize(_currentMap, theme.passableWallTexIDs);
                 miniMap.gameObject.SetActive(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.LocalRadar));
                 
                 if (miniMap.gameObject.activeSelf)
