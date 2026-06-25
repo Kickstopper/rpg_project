@@ -11545,7 +11545,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.CharacterCreationScene.CharacterCreationManager
   nextSceneName: DungeonMapScene
-  nextSceneParam: Outpost
+  nextSceneParam: Cave_0
   nameInputPanel: {fileID: 2027975336}
   levelUpPanel: {fileID: 6998854896704582013}
   statUIController: {fileID: 628800148}
@@ -43711,7 +43711,7 @@ MonoBehaviour:
   lineDelay: 0.1
   cursorChar: _
   cursorBlinkRate: 0.1
-  fadeDuration: 3
+  fadeDuration: 1
   skipFadeDuration: 0.3
   bootSequence:
   - text: '> [SYSTEM BOOT SEQUENCE INITIATED]
@@ -43751,20 +43751,20 @@ MonoBehaviour:
       II    III III   II  I     II    II    III      III  III II     II     | \n|              
       IIIIIIII  IIIIIIII  IIIIIIII    II    IIIIIIII III   IIIIIIIIIIII     | \n|              
       IIIIIII    IIIIII   IIIIIII     II    IIIIIIII III    II IIIIIII      | \n+-----------------------------------------------------+"
-    preDelay: 3
+    preDelay: 0.5
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
   - text: "> \uD604 \uC2DC\uAC04\uBD80\uB85C \uADC0\uD558\uB294 \uCD08\uAD6D\uAC00\uC801
       \uB300\uB9C8\uBD80\uB300 \n> '\uBAAC\uC2A4\uD130\uBC84\uC2A4\uD130\uC988'\uC758
       \uC815\uC2DD \uB300\uC6D0\uC73C\uB85C \uC778\uAC00\uB418\uC5C8\uC2B5\uB2C8\uB2E4.\n"
-    preDelay: 2
+    preDelay: 0.5
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
   - text: "> \uC0AC\uC545\uD55C \uB9C8\uBB3C\uB4E4\uC744 \uC12C\uBA78\uD558\uACE0,
       \r\n> \uC138\uACC4\uC758 \uD3C9\uD654\uB97C \uD0C8\uD658\uD558\uC2ED\uC2DC\uC624.\n"
-    preDelay: 2
+    preDelay: 0.5
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
@@ -43773,21 +43773,21 @@ MonoBehaviour:
       \uAC15\uB9C8\uC220\uACFC \uCCA8\uB2E8 \uACFC\uD559\uC758 \uACB0\uD569, \r\n>
       \uB9C8\uBB3C \uC18C\uD658\uAE30 [PACT]\uC758 \uC811\uADFC \uAD8C\uD55C\uC744
       \uBD80\uC5EC\uD569\uB2C8\uB2E4.\n"
-    preDelay: 2
+    preDelay: 0.5
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
   - text: "> \uB9C8\uBB3C\uC744 \uD1B5\uC81C\uD558\uC5EC \uB9C8\uBB3C\uC5D0 \uB300\uC751\uD558\uC2ED\uC2DC\uC624.\r\n>
       PACT \uC870\uC791 \uC219\uB828\uB3C4\uAC00 \uACE7 \uB2F9\uC2E0\uC758 \uC0DD\uC874\uC744
       \uACB0\uC815\uC9C0\uC744 \uAC83\uC785\uB2C8\uB2E4.\n"
-    preDelay: 2
+    preDelay: 0.5
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
   - text: '> GOOD LUCK.
 
 '
-    preDelay: 2
+    preDelay: 1
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
