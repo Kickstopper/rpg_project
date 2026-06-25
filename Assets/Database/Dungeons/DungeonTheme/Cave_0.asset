@@ -17,31 +17,33 @@ MonoBehaviour:
   encounterMode: 1
   background: {fileID: 0}
   texture:
-  - {fileID: 2800000, guid: ea3c7562c44281047aa28b21fd7706be, type: 3}
+  - {fileID: 2800000, guid: 4da2a9a8421078d4dada383c98db9730, type: 3}
   - {fileID: 2800000, guid: 4da2a9a8421078d4dada383c98db9730, type: 3}
   - {fileID: 2800000, guid: 03214d16602490d48942e7d5a280b63c, type: 3}
-  - {fileID: 2800000, guid: e04341259aac88a4daa6b0c23517c82d, type: 3}
-  - {fileID: 2800000, guid: 68575b7cb8d03694caea0f536954d17a, type: 3}
+  - {fileID: 2800000, guid: aee36f78e13c70f43a48dd4e619baae9, type: 3}
+  - {fileID: 2800000, guid: 460bc6938b65cf74788ea963fe829cf8, type: 3}
   - {fileID: 2800000, guid: add88eab5daa2b94f9d123e661500149, type: 3}
-  floorTexIdx: 4
+  - {fileID: 2800000, guid: 21f7af638a86d1045bffb62586e3e6af, type: 3}
   ceilingTexIdx: 3
+  floorTexIdx: 4
+  passableWallTexIDs: 06000000
   doorAnimations: []
+  wallAnimations: []
   enemySprites: []
   objectSprites: []
   maxSpawnCount: 3
   spawnDelay: 5
-  wallAnimations: []
-  fogColor: {r: 0.20754719, g: 0.18018109, b: 0.15154861, a: 1}
-  lightingIntensity: 3.5
-  useGridLighting: 1
+  fogColor: {r: 0, g: 0, b: 0, a: 1}
+  lightingIntensity: 0.3
+  useGridLighting: 0
   bgmID: 0
   moduleEnable: 1
   monsterList: []
-  useDustEffect: 1
+  useDustEffect: 0
   dustParticleCount: 300
   dustSwayAmplitude: 0.01
   dustMovesUp: 0
-  useDustTwinkle: 1
+  useDustTwinkle: 0
   dustTwinkleSpeed: 10
   dustColor:
     serializedVersion: 2
@@ -59,4 +61,5 @@ MonoBehaviour:
   distortionAmp: 2
   useCylinderEffect: 0
   cylinderStrength: 3
+  isUnderwater: 0
   stereoSeparation: 0.05

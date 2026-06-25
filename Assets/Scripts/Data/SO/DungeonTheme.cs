@@ -43,20 +43,24 @@ namespace Data
         public Texture2D background; // 던전 아래에 깔릴 스카이박스
         public Texture2D[] texture;
         
-        public int floorTexIdx = 1;   // 바닥 텍스처 인덱스
-        public int ceilingTexIdx = 2; // 천장 텍스처 인덱스
+        public int ceilingTexIdx = 1; // 천장 텍스처 인덱스
+        public int floorTexIdx = 2;   // 바닥 텍스처 인덱스
+
+        [Header("특수 벽 설정")]
+        [Tooltip("아치, 환영의 벽 등 텍스처는 보이지만 통과 가능한 텍스처 ID 목록")]
+        public List<int> passableWallTexIDs = new List<int>();
 
         [Header("Door Settings")]
         public List<DoorAnimConfig> doorAnimations; // 맵에 존재하는 문들의 세팅 리스트
+
+        [Header("Animations")]
+        public List<WallAnimConfig> wallAnimations; // 테마별 애니메이션 설정
         
         public Sprite[] enemySprites;
         public ObjectSpriteData[] objectSprites;
 
         public int maxSpawnCount = 3;
         public int spawnDelay = 5;
-
-        [Header("Animations")]
-        public List<WallAnimConfig> wallAnimations; // 테마별 애니메이션 설정
 
         [Header("Environment Options")]
         public Color fogColor = Color.black; // 심도 표현을 위한 안개의 색
