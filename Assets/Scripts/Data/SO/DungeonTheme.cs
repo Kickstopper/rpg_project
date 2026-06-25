@@ -96,6 +96,9 @@ namespace Data
         public bool useCylinderEffect = false;
         [Range(-10f, 10f)] public float cylinderStrength = 3.0f;
 
+        [Header("WaterEffect")]
+        public bool isUnderwater;
+
         [Header("Anaglyph")]
         [Range(0.03f, 0.07f)] public float stereoSeparation = 0.05f;
     }

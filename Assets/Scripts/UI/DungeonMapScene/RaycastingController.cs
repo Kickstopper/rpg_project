@@ -582,8 +582,14 @@ namespace Controller
                 LoadMapData(entrance);
                 
                 yield return new WaitForSeconds(0.1f);
-
-                SoundManager.Instance.PlaySFX(SfxID.Fall);
+                if (theme.isUnderwater)
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.Spash);
+                }
+                else 
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.Fall);
+                }
                 // 착지 흔들림 코루틴
                 StartCoroutine(LandingImpactRoutine(10f));
 
@@ -686,7 +692,15 @@ namespace Controller
                 
                 yield return new WaitForSeconds(0.1f);
 
-                SoundManager.Instance.PlaySFX(SfxID.Fall);
+                if (theme.isUnderwater)
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.Spash);
+                }
+                else 
+                {
+                    SoundManager.Instance.PlaySFX(SfxID.Fall);
+                }
+                
                 // 착지 흔들림 코루틴
                 StartCoroutine(LandingImpactRoutine(150f));
 
@@ -1691,6 +1705,21 @@ namespace Controller
 
         private void UpdateRenderSettings(DungeonTheme theme)
         {
+            // 머티리얼의 일렁임 스위치 조작
+            if (screenImage != null && screenImage.material != null)
+            {
+                if (theme.isUnderwater)
+                {
+                    screenImage.material.SetFloat("_WaveAmount", 0.01f); // 디폴트 0.01
+                    screenImage.material.SetFloat("_WaveSpeed", 1.0f);
+                    screenImage.material.SetFloat("_WaveFrequency", 10.0f);
+                }
+                else
+                {
+                    // 일렁임 효과 끄기
+                    screenImage.material.SetFloat("_WaveAmount", 0.0f);
+                }
+            }
             renderSettings.useGridLighting = theme.useGridLighting;
             renderSettings.lightingIntensity = theme.lightingIntensity;
             renderSettings.fogColor = theme.fogColor;

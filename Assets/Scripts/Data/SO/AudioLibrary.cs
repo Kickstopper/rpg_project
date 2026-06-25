@@ -25,6 +25,7 @@ namespace Data
         Slide_Door,     // 슬라이드 도어 열림
         Jump,           // 위층으로 올라가는 소리
         Fall,           // 아래층으로 떨어진 소리
+        Spash,          // 물에 빠지는 소리
     }
 
     public enum BgmID

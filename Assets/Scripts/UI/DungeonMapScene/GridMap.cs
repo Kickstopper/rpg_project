@@ -76,8 +76,6 @@ namespace UI.DungeonMapScene
             }
         }
 
-        
-
         private void ClearMap()
         {
             transform.DOKill();

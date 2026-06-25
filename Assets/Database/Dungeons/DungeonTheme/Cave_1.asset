@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
+  m_Name: Cave_1
+  m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
+  dungeonID: Cave_1
+  useWakeUpEffect: 0
+  encounterMode: 1
+  background: {fileID: 0}
+  texture:
+  - {fileID: 2800000, guid: ea3c7562c44281047aa28b21fd7706be, type: 3}
+  - {fileID: 2800000, guid: 4da2a9a8421078d4dada383c98db9730, type: 3}
+  - {fileID: 2800000, guid: 03214d16602490d48942e7d5a280b63c, type: 3}
+  - {fileID: 2800000, guid: e04341259aac88a4daa6b0c23517c82d, type: 3}
+  - {fileID: 2800000, guid: 68575b7cb8d03694caea0f536954d17a, type: 3}
+  - {fileID: 2800000, guid: add88eab5daa2b94f9d123e661500149, type: 3}
+  floorTexIdx: 4
+  ceilingTexIdx: 3
+  doorAnimations: []
+  enemySprites: []
+  objectSprites: []
+  maxSpawnCount: 3
+  spawnDelay: 5
+  wallAnimations: []
+  fogColor: {r: 0.04970444, g: 0.052289385, b: 0.6754716, a: 1}
+  lightingIntensity: 0.25
+  useGridLighting: 0
+  bgmID: 7
+  moduleEnable: 1
+  monsterList: []
+  useDustEffect: 1
+  dustParticleCount: 300
+  dustSwayAmplitude: 0.01
+  dustMovesUp: 1
+  useDustTwinkle: 1
+  dustTwinkleSpeed: 10
+  dustColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  useOrganicEffect: 0
+  organicFreqX: 4
+  organicSpeed: 0.3
+  organicBreath: 0.35
+  organicAmplitude: 0.2
+  useMeltEffect: 0
+  meltEdgeBump: 1
+  meltEdgeSpeed: 0.3
+  useWallDistortion: 0
+  distortionFreq: 0.5
+  distortionAmp: 2
+  useCylinderEffect: 0
+  cylinderStrength: 3
+  isUnderwater: 1
+  stereoSeparation: 0.05

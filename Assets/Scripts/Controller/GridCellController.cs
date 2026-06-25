@@ -25,6 +25,7 @@ namespace Controller
         public Color roomColor;
         public Color noFloorColor;
         public Color noCeilColor;
+        public Color noCellColor;
 
         public void UpdateWallState(CellData data)
         {
@@ -64,10 +65,11 @@ namespace Controller
         Color GetFaceColor(int cellValue)
         {
             if (cellValue == -1) return noFloorColor;
+            if (cellValue == 0) return defaultFloorColor;
             if (cellValue == 1) return noCeilColor;
-            if (cellValue >= 2) return roomColor;
-            
-            return defaultFloorColor;
+            if (cellValue == 2) return roomColor;
+
+            return noCellColor;
         }
 
         string GetText(int cellValue)

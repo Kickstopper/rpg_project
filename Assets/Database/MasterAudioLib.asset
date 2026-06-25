@@ -41,6 +41,8 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 382d58d1904a3f448ae6e5ebda6e7799, type: 3}
   - id: 19
     clip: {fileID: 8300000, guid: 7f2852b16f833314d812bad6c7aac6f9, type: 3}
+  - id: 20
+    clip: {fileID: 8300000, guid: 99048bc68d58ab946b4d50ce85a1534b, type: 3}
   BgmList:
   - id: 35
     clip: {fileID: 8300000, guid: 24a732873a5fe734887967e6773f7824, type: 3}
