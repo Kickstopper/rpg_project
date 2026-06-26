@@ -766,7 +766,7 @@
         {
             "x": 2,
             "y": 8,
-            "value": 0,
+            "value": 99,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -802,7 +802,7 @@
         {
             "x": 4,
             "y": 8,
-            "value": 0,
+            "value": 99,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -1090,7 +1090,7 @@
         {
             "x": 0,
             "y": 12,
-            "value": 0,
+            "value": 99,
             "wallTextureIDs": [
                 -1,
                 -1,
