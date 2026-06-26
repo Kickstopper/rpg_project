@@ -250,9 +250,7 @@ namespace UI.DungeonMapScene
             // 맵 데이터 참조 확인
             if (_currentMap == null) return false;
 
-            // ---------------------------------------------------------
             // 맵 범위 체크
-            // ---------------------------------------------------------
             if (targetGridX < 0 || targetGridX >= _currentMap.width || 
                 targetGridY < 0 || targetGridY >= _currentMap.height)
                 return false;
@@ -293,126 +291,35 @@ namespace UI.DungeonMapScene
                 }
             }
 
-            // ---------------------------------------------------------
-            // 현재 셀 탈출 검사 (Exit Check)
-            // ---------------------------------------------------------
-            // 현재 셀 내부에 갇혀있는지 확인 (예: 내 방의 북쪽 벽이 막혀있음)
+            // 현재 셀 탈출 검사
             if (currentX >= 0 && currentX < _currentMap.width && 
                 currentY >= 0 && currentY < _currentMap.height)
             {
                 CellData currentCell = _currentMap.GetCell(currentX, currentY);
-                if (currentCell != null && currentCell.HasWall() && currentExitFace != -1)
+                if (currentCell != null && currentExitFace != -1)
                 {
                     int texID = currentCell.wallTextureIDs[currentExitFace];
-                    // 벽 텍스처가 존재하고(-1 아님), 일루전 월(통과 가능)이 아니라면 이동 불가
                     if (texID != -1 && !_illusionTextureIds.Contains(texID)) 
                         return false;
                 }
             }
 
-            // ---------------------------------------------------------
-            // 목표 셀 진입 검사 (Enter Check)
-            // ---------------------------------------------------------
+            // 목표 셀 진입 검사
             CellData targetCell = _currentMap.GetCell(targetGridX, targetGridY);
             
-            // 목표 셀이 없거나 null이면 이동 불가 (안전장치)
             if (targetCell == null) return false;
-
-            // 목표 셀이 void(-1) 바닥인 경우 이동 불가
+            
+            // 바닥 구멍(-1)만 막고, 천장 구멍(1)은 통과
             if (targetCell.value == -1) return false;
 
-            // 목표 셀에 벽이 있다면 진입 방향의 면을 검사
-            if (targetCell.HasWall() && targetEnterFace != -1)
+            if (targetEnterFace != -1)
             {
                 int texID = targetCell.wallTextureIDs[targetEnterFace];
-                // 통과 가능 텍스처 리스트에 없다면 충돌(false)
-                if (texID != -1 && !_illusionTextureIds.Contains(texID)) return false;
+                if (texID != -1 && !_illusionTextureIds.Contains(texID)) 
+                    return false;
             }
 
             return true;
-        }
-
-        
-        // Free Move & Snap Logic
-        
-
-        // 자유 이동 (Free Move) - 충돌 처리 포함 (슬라이딩)
-        public void MoveFree(float speed)
-        {
-            // X축 이동 시도
-            float nextX = PosX + DirX * speed;
-            if (IsWalkable(nextX, PosY, DirX * speed, 0))
-            {
-                PosX = nextX;
-            }
-
-            // Y축 이동 시도
-            float nextY = PosY + DirY * speed;
-            if (IsWalkable(PosX, nextY, 0, DirY * speed))
-            {
-                PosY = nextY;
-            }
-
-            // 논리 좌표 갱신
-            LogicX = Mathf.FloorToInt(PosX);
-            LogicY = Mathf.FloorToInt(PosY);
-            
-            // 걸음 수 이벤트 (Free Move에서는 이동 거리에 따라 호출하거나 생략 가능)
-            // 여기서는 생략하고, 필요시 거리를 누적해서 호출
-        }
-
-        // 자유 회전 (Free Rotate)
-        public void RotateFree(float rotSpeed)
-        {
-            float oldDirX = DirX;
-            DirX = oldDirX * Mathf.Cos(rotSpeed) - DirY * Mathf.Sin(rotSpeed);
-            DirY = oldDirX * Mathf.Sin(rotSpeed) + DirY * Mathf.Cos(rotSpeed);
-            
-            float oldPlaneX = PlaneX;
-            PlaneX = oldPlaneX * Mathf.Cos(rotSpeed) - PlaneY * Mathf.Sin(rotSpeed);
-            PlaneY = oldPlaneX * Mathf.Sin(rotSpeed) + PlaneY * Mathf.Cos(rotSpeed);
-        }
-
-        // 그리드 모드로 복귀 시 위치 및 각도 보정 (Snap)
-        public void SnapToGrid()
-        {
-            // 가장 가까운 정수 좌표로 스냅
-            int gridX = Mathf.RoundToInt(PosX);
-            int gridY = Mathf.RoundToInt(PosY);
-
-            // 맵 범위 제한
-            if (_currentMap != null)
-            {
-                gridX = Mathf.Clamp(gridX, 0, _currentMap.width - 1);
-                gridY = Mathf.Clamp(gridY, 0, _currentMap.height - 1);
-            }
-
-            // 가장 가까운 4방향(N, E, S, W) 찾기
-            int bestDir = 0;
-            float maxDot = -2.0f;
-
-            for (int i = 0; i < 4; i++)
-            {
-                var vectors = GetVectorsForDirection(i);
-                // 현재 바라보는 방향(DirX, DirY)과 4방향 벡터 내적
-                float dot = DirX * vectors.dir.x + DirY * vectors.dir.y;
-                if (dot > maxDot)
-                {
-                    maxDot = dot;
-                    bestDir = i;
-                }
-            }
-
-            // 데이터 확정
-            DirectionIdx = bestDir;
-            LogicX = gridX;
-            LogicY = gridY;
-
-            // 벡터 및 위치 재설정
-            UpdateDirectionVectors();
-            Vector2 finalPos = GetOffsetPosition(gridX, gridY, DirectionIdx);
-            PosX = finalPos.x;
-            PosY = finalPos.y;
         }
 
         public Vector2Int GetForwardVector()
@@ -433,5 +340,84 @@ namespace UI.DungeonMapScene
             Vector2Int fwd = GetForwardVector();
             return new Vector2Int(fwd.y, -fwd.x);
         }
+
+        // 자유 이동 (Free Move) - 충돌 처리 포함 (슬라이딩)
+        // public void MoveFree(float speed)
+        // {
+        //     // X축 이동 시도
+        //     float nextX = PosX + DirX * speed;
+        //     if (IsWalkable(nextX, PosY, DirX * speed, 0))
+        //     {
+        //         PosX = nextX;
+        //     }
+
+        //     // Y축 이동 시도
+        //     float nextY = PosY + DirY * speed;
+        //     if (IsWalkable(PosX, nextY, 0, DirY * speed))
+        //     {
+        //         PosY = nextY;
+        //     }
+
+        //     // 논리 좌표 갱신
+        //     LogicX = Mathf.FloorToInt(PosX);
+        //     LogicY = Mathf.FloorToInt(PosY);
+            
+        //     // 걸음 수 이벤트 (Free Move에서는 이동 거리에 따라 호출하거나 생략 가능)
+        //     // 여기서는 생략하고, 필요시 거리를 누적해서 호출
+        // }
+
+        // // 자유 회전 (Free Rotate)
+        // public void RotateFree(float rotSpeed)
+        // {
+        //     float oldDirX = DirX;
+        //     DirX = oldDirX * Mathf.Cos(rotSpeed) - DirY * Mathf.Sin(rotSpeed);
+        //     DirY = oldDirX * Mathf.Sin(rotSpeed) + DirY * Mathf.Cos(rotSpeed);
+            
+        //     float oldPlaneX = PlaneX;
+        //     PlaneX = oldPlaneX * Mathf.Cos(rotSpeed) - PlaneY * Mathf.Sin(rotSpeed);
+        //     PlaneY = oldPlaneX * Mathf.Sin(rotSpeed) + PlaneY * Mathf.Cos(rotSpeed);
+        // }
+
+        // // 그리드 모드로 복귀 시 위치 및 각도 보정 (Snap)
+        // public void SnapToGrid()
+        // {
+        //     // 가장 가까운 정수 좌표로 스냅
+        //     int gridX = Mathf.RoundToInt(PosX);
+        //     int gridY = Mathf.RoundToInt(PosY);
+
+        //     // 맵 범위 제한
+        //     if (_currentMap != null)
+        //     {
+        //         gridX = Mathf.Clamp(gridX, 0, _currentMap.width - 1);
+        //         gridY = Mathf.Clamp(gridY, 0, _currentMap.height - 1);
+        //     }
+
+        //     // 가장 가까운 4방향(N, E, S, W) 찾기
+        //     int bestDir = 0;
+        //     float maxDot = -2.0f;
+
+        //     for (int i = 0; i < 4; i++)
+        //     {
+        //         var vectors = GetVectorsForDirection(i);
+        //         // 현재 바라보는 방향(DirX, DirY)과 4방향 벡터 내적
+        //         float dot = DirX * vectors.dir.x + DirY * vectors.dir.y;
+        //         if (dot > maxDot)
+        //         {
+        //             maxDot = dot;
+        //             bestDir = i;
+        //         }
+        //     }
+
+        //     // 데이터 확정
+        //     DirectionIdx = bestDir;
+        //     LogicX = gridX;
+        //     LogicY = gridY;
+
+        //     // 벡터 및 위치 재설정
+        //     UpdateDirectionVectors();
+        //     Vector2 finalPos = GetOffsetPosition(gridX, gridY, DirectionIdx);
+        //     PosX = finalPos.x;
+        //     PosY = finalPos.y;
+        // }
     }
 }

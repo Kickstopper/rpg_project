@@ -28,6 +28,7 @@ namespace UI.DungeonMapScene
             public int mapY;
         }
         private IllusionHit[] _illusionHits = new IllusionHit[32]; // 한 줄당 최대 32개의 환영의 벽 통과 가능
+        private HashSet<int> _passableTexIDs = new HashSet<int>();
 
         private Color32[] _buffer;
         private Color32[] _leftEyeBuffer;
@@ -197,6 +198,11 @@ namespace UI.DungeonMapScene
             _ceilTexIdx = theme.ceilingTexIdx;
             _floorTexIdx = theme.floorTexIdx;
             _tileAnimStates = animStates;
+
+            if (theme.passableWallTexIDs != null)
+                _passableTexIDs = new HashSet<int>(theme.passableWallTexIDs);
+            else
+                _passableTexIDs.Clear();
         }
 
         public void SetScanState(bool scanning, float radius)
@@ -441,11 +447,11 @@ namespace UI.DungeonMapScene
                             int fId = GetTextureIdOnSide(currCell, side, stepX, stepY, false);
                             if (fId != -1) 
                             { 
-                                if (currCell.value == 1) // 진짜 막힌 벽 (Solid)
+                                if (!_passableTexIDs.Contains(fId)) // 진짜 막힌 벽
                                 {
                                     hit = 1; hitTexId = fId; hitBackFace = false; 
                                 }
-                                else // 통과 가능한 복도인데 벽 텍스처(illusionWall)가 있음
+                                else // 통과 가능한 복도인데 illusionWall이 있음
                                 {
                                     if (illusionHitCount < 32)
                                     {
@@ -471,7 +477,7 @@ namespace UI.DungeonMapScene
                                 int bId = GetTextureIdOnSide(prevCell, side, stepX, stepY, true);
                                 if (bId != -1) 
                                 { 
-                                    if (prevCell.value == 1)
+                                    if (!_passableTexIDs.Contains(bId))
                                     {
                                         hit = 1; hitTexId = bId; hitBackFace = true; 
                                     }
