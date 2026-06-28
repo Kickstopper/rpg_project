@@ -31,7 +31,8 @@ namespace Controller
         public List<Button> allMenuBtns;
         public Button btnContinue; 
         public Button btnLoad;     
-        public Button btnNewGame;  
+        public Button btnNewGame;
+        public Button btnQuit;
 
         private int currentBtnIndex = 0;
         
@@ -49,6 +50,14 @@ namespace Controller
         {
             if (UI_Canvas) UI_Canvas.SetActive(false);
             if (matrixGO) matrixGO.SetActive(false);
+#if UNITY_ANDROID || UNITY_IOS
+        // 모바일용으로 빌드할 경우 QUIT버튼 비활성화
+        if (btnQuit != null && allMenuBtns != null && allMenuBtns.Contains(btnQuit))
+        {
+            allMenuBtns.Remove(btnQuit);
+            btnQuit.gameObject.SetActive(false);
+        }
+#endif
             ShowAnimation();
         }
 
@@ -191,12 +200,12 @@ namespace Controller
 
             bool changed = false;
 
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A))
             {
                 currentIndex = (currentIndex - 1 + allMenuBtns.Count) % allMenuBtns.Count;
                 changed = true;
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D))
             {
                 currentIndex = (currentIndex + 1) % allMenuBtns.Count;
                 changed = true;
