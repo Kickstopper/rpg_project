@@ -10,7 +10,9 @@ namespace Controller
 {
     public class PlayerMenuController : MonoBehaviour
     {
-        private enum MenuState { Main, Status, Skill, Item, Move, Equip, Memory, System, Suspend, SelectEquipChar, SelectStatusChar }        private MenuState currentState;
+        private enum MenuState { Main, Status, Skill, Item, Move, Equip, Module, 
+                                Compile, System, Suspend, SelectEquipChar, SelectStatusChar }        
+        private MenuState currentState;
         public List<Button> allMenuBtns;
         private int currentBtnIndex;
 
@@ -22,7 +24,8 @@ namespace Controller
         public GameObject skillUI;
         public GameObject itemUI;
         public GameObject equipUI;
-        public GameObject memoryUI;
+        public GameObject moduleUI;
+        public GameObject compileUI;
         public GameObject playerPrefab;
         
         [Header("Background")]
@@ -34,7 +37,6 @@ namespace Controller
         public Button popupYesBtn;            // '예' 버튼
         public Button popupNoBtn;             // '아니오' 버튼
 
-        [Header("Input Settings")]
         [Header("Input Settings")]
         [SerializeField] private float inputDelay = 0.15f; 
         private float lastInputTime; 
@@ -48,7 +50,8 @@ namespace Controller
 
         // 입력을 처리할 수 있는 상태인지 확인하는 프로퍼티. 시간 조건과 프레임 조건을 모두 만족해야 입력 가능
         public bool CanProcessInput => (Time.unscaledTime >= lastInputTime + inputDelay) && (Time.frameCount > lastInputFrame);
-
+        public bool isInputLocked = false;
+        
         public void ResetInputTimer() 
         {
             lastInputTime = Time.unscaledTime;
@@ -97,6 +100,9 @@ namespace Controller
         void Update()
         {
             if (!isMenuOpen) return;
+    
+            // 컷신(연출) 중일 때 메뉴의 모든 조작을 강제로 무시합니다. (이 줄을 추가!)
+            if (isInputLocked) return; 
             
             // 서브 UI가 닫히면서 타이머가 리셋되었다면, 여기서 바로 차단됨
             if (!CanProcessInput) return; 
@@ -456,9 +462,14 @@ namespace Controller
             Debug.Log("SPIRIT 미구현");
         }
 
-        public void OnClick_Memory()
+        public void OnClick_Compile()
         {
-            OpenMemoryUI();
+            OpenCompileUI();
+        }
+
+        public void OnClick_Module()
+        {
+            OpenModuleUI();
         }
 
         public void OnClick_Tactics()
@@ -516,7 +527,7 @@ namespace Controller
             if (skillUI != null && skillUI.activeInHierarchy) return true;
             if (itemUI != null && itemUI.activeInHierarchy) return true;
             if (equipUI != null && equipUI.activeInHierarchy) return true;
-            if (memoryUI != null && memoryUI.activeInHierarchy) return true;
+            if (moduleUI != null && moduleUI.activeInHierarchy) return true;
             return false;
         }
 
@@ -553,11 +564,49 @@ namespace Controller
             SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
         }
 
-        // MemoryUI 열기
-        private void OpenMemoryUI()
+        private void OpenCompileUI()
         {
-            currentState = MenuState.Memory;
-            memoryUI.SetActive(true);
+            currentState = MenuState.Compile;
+            compileUI.SetActive(true);
+
+            // CompileUI가 열릴 때 Controller를 초기화
+            CompileUIController compileController = compileUI.GetComponentInChildren<CompileUIController>();
+            
+            if (compileController != null)
+                compileController.Initialize(this);
+            
+            EventSystem.current.SetSelectedGameObject(null);
+            ResetInputTimer();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+        }
+
+        // CompileUIController에서 몬스터 2마리를 골랐을 때 호출할 함수
+        public void RequestCompilePopup()
+        {
+            currentState = MenuState.Compile;
+            UpdatePopupMessage();
+            confirmPopup.SetActive(true);
+            isPopupOpen = true;
+            popupNoBtn.Select();
+            ResetInputTimer();
+            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+        }
+
+        public void CloseCompileUI()
+        {
+            compileUI.SetActive(false);
+            currentState = MenuState.Main;
+            
+            ResetInputTimer();
+            UpdateSelection(currentBtnIndex); 
+            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+        }
+
+        // ModuleUI 열기
+        private void OpenModuleUI()
+        {
+            currentState = MenuState.Module;
+            moduleUI.SetActive(true);
 
             // 버튼 포커스 해제 
             EventSystem.current.SetSelectedGameObject(null);
@@ -568,9 +617,9 @@ namespace Controller
         }
 
         // 닫을 때 캐릭터 선택 화면으로 복귀
-        public void CloseMemoryUI()
+        public void CloseModuleUI()
         {
-            memoryUI.SetActive(false);
+            moduleUI.SetActive(false);
             currentState = MenuState.Main;
             
             ResetInputTimer();
@@ -691,8 +740,11 @@ namespace Controller
                 case MenuState.Equip:
                     popupMessage.SetText("선택한 아이템을 장비합니까?");
                 break;
-                case MenuState.Memory:
+                case MenuState.Module:
                     popupMessage.SetText("설치할 공간이 부족합니다.");
+                break;
+                case MenuState.Compile:
+                    popupMessage.SetText("선택한 몬스터들을 Compile 하시겠습니까?");
                 break;
                 case MenuState.System:
                     popupMessage.SetText("설정을 저장합니까?");
@@ -719,15 +771,31 @@ namespace Controller
             switch (currentState)
             {
                 case MenuState.Suspend:
-                    // 중단 저장 및 타이틀 이동
                     SaveManager.Instance.SaveGame(SaveManager.SUSPEND_SLOT_INDEX);
                     GameStateManager.Instance.ChangeState(GameState.None);
                     UnityEngine.SceneManagement.SceneManager.LoadScene(GameScene.TITLE_SCENE);
                     break;
 
+                case MenuState.Compile:
+                    // 이때 내부 로직에 의해 currentState가 Main으로 바뀌고, 메인 메뉴 버튼이 강제 선택됨
+                    ClosePopup();
+
+                    // Main으로 덮어씌워진 상태를 다시 Compile 상태로 복구
+                    currentState = MenuState.Compile;
+
+                    // EventSystem이 방금 강제로 선택해버린 메인 메뉴 버튼의 포커스를 날림
+                    // 이 처리가 없으면 합체 중 스페이스바를 누를 때 메인 메뉴 버튼이 클릭돼버림
+                    UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+
+                    // 연출을 시작
+                    CompileUIController compileController = compileUI.GetComponentInChildren<CompileUIController>();
+                    if (compileController != null)
+                        compileController.ExecuteCompileCutscene();
+                    break;
+
                 case MenuState.Item:
                 case MenuState.Skill:
-                case MenuState.Memory:
+                case MenuState.Module:
                     ClosePopup();
                     break;
 
@@ -758,7 +826,7 @@ namespace Controller
         // 팝업 닫기
         private void ClosePopup()
         {
-            // 알림 모드였다면 상태(currentState)를 초기화하지 않음 (Item 등 현재 상태 유지)
+            // 알림 모드였다면 currentState를 초기화하지 않음 (Item 등 현재 상태 유지)
             if (!isAlertMode)
             {
                 currentState = MenuState.Main;
@@ -778,11 +846,29 @@ namespace Controller
             }
         }
 
-        // NO 버튼
+        // 팝업 NO 버튼
         public void OnClickCancelButton()
         {
             ResetInputTimer();
+            
+            // 팝업이 닫히면 ClosePopup() 내부에서 currentState가 Main으로 덮어씌워지므로 임시 저장
+            MenuState tempState = currentState;
+
             ClosePopup();
+            
+            // Compile 팝업을 취소한 경우의 예외 처리
+            if (tempState == MenuState.Compile)
+            {
+                // 메인으로 돌아가버린 상태를 다시 Compile 상태로 복구
+                currentState = MenuState.Compile; 
+
+                // CompileUIController의 선택 초기화 함수 호출
+                CompileUIController compileController = compileUI.GetComponentInChildren<CompileUIController>();
+                if (compileController != null)
+                {
+                    compileController.ClearSelection();
+                }
+            }
             
             UpdatePopupMessage();
         }

@@ -184,7 +184,7 @@ namespace UI.PlayerMenu
             {
                 if (menuController != null)
                 {
-                    menuController.CloseMemoryUI();
+                    menuController.CloseModuleUI();
                 }
             }
         }
