@@ -47,8 +47,8 @@ namespace Controller
             foreach (Transform child in monsterGridList) Destroy(child.gameObject);
             spawnedPanels.Clear();
 
-            var monA = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("000"));
-            var monB = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("001")); 
+            var monA = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_000"));
+            var monB = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_001")); 
             PartyManager.Instance.AddMember(monA, true);
             PartyManager.Instance.AddMember(monB, true);
             
@@ -57,7 +57,7 @@ namespace Controller
             // "enemy_"로 시작하는 몬스터만 필터링하여 새 리스트 생성
             var validMonsters = party.FindAll(m => m != null && 
                                                  !string.IsNullOrEmpty(m.characterId) && 
-                                                 !m.characterId.StartsWith("chr_"));
+                                                 m.characterId.StartsWith("enemy_"));
 
             // 1. 합체 가능한 몬스터가 한 마리도 없는 경우 처리
             if (validMonsters.Count == 0)

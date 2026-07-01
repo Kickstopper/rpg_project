@@ -30,12 +30,14 @@ MonoBehaviour:
   - {fileID: 2800000, guid: d65075aeea6fff84eaf35ec32389bb0c, type: 3}
   - {fileID: 2800000, guid: b70fa08e0791aad4091302d3b9968630, type: 3}
   - {fileID: 2800000, guid: 0a8359ec91578d24c957c9d74626529a, type: 3}
-  floorTexIdx: 5
   ceilingTexIdx: 1
+  floorTexIdx: 5
+  passableWallTexIDs: 
   doorAnimations:
   - closedTexId: 8
     openFrameTexIds: 090000000a0000000b0000000c000000
     animSpeed: 0.05
+  wallAnimations: []
   enemySprites:
   - {fileID: 21300000, guid: b29ac828bb8d5204791056d1574c2550, type: 3}
   - {fileID: 21300000, guid: 0e0c687bfb6fdc84d875547b14420a07, type: 3}
@@ -48,17 +50,20 @@ MonoBehaviour:
   objectSprites: []
   maxSpawnCount: 5
   spawnDelay: 5
-  wallAnimations: []
   fogColor: {r: 0, g: 1, b: 0, a: 1}
   lightingIntensity: 0.55
   useGridLighting: 0
   bgmID: 7
   moduleEnable: 1
   monsterList:
-  - 004
-  - 009
-  - 014
-  - 016
+  - enemy_000
+  - enemy_001
+  - enemy_002
+  - enemy_003
+  - enemy_004
+  - enemy_005
+  - enemy_006
+  - enemy_007
   useDustEffect: 1
   dustParticleCount: 300
   dustSwayAmplitude: 0.01
@@ -81,4 +86,5 @@ MonoBehaviour:
   distortionAmp: 2
   useCylinderEffect: 0
   cylinderStrength: 3
+  isUnderwater: 0
   stereoSeparation: 0.05

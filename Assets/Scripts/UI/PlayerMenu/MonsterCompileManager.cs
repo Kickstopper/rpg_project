@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Manager;
 
 public class MonsterCompileManager : MonoBehaviour
 {
@@ -22,13 +23,13 @@ public class MonsterCompileManager : MonoBehaviour
     [Header("Result Monster")]
     [SerializeField] private Image spriteResult;
     [SerializeField] private TextAsset asciiResult;
-    [SerializeField] private TextMeshProUGUI greetingText;
+    [SerializeField] private TextMeshProUGUI compileResultText;
     
     [SerializeField] private CanvasGroup matrixEffectGroup; 
     
     // 타자기 연출 속도 제어
     public float lineDelay = 0.05f; 
-    [SerializeField] private string greetingMessage = "System: New entity successfully synthesized.";
+    [SerializeField] private string compileResultMsg = "HELLO WORLD";
 
     [Header("Timing Settings")]
     [SerializeField] private float moveAndFadeDuration = 1.0f;
@@ -48,7 +49,35 @@ public class MonsterCompileManager : MonoBehaviour
     // CompileUIController에서 이 함수를 호출하여 컷신을 시작
     public void StartCompileSequence(string monsterA_ID, string monsterB_ID)
     {
-        // TODO: 전달받은 ID를 통해 이미지 및 아스키 아트 세팅
+        var monsterA = DatabaseManager.Instance.monsterDB.GetEntry(monsterA_ID);
+        if (monsterA != null)
+        {
+            if (spriteA != null && monsterA.image != null)
+            {
+                spriteA.sprite = monsterA.image[0];
+                spriteA.SetNativeSize();
+            }
+            asciiA = monsterA.compileAscii;
+        }
+        var monsterB = DatabaseManager.Instance.monsterDB.GetEntry(monsterB_ID);
+        if (monsterB != null)
+        {
+            if (spriteB != null && monsterB.image != null)
+            {
+                spriteB.sprite = monsterB.image[0];
+                spriteB.SetNativeSize();
+            }
+            asciiB = monsterB.compileAscii;
+        }
+
+        // TODO: 합체 공식에 따른 결과 세팅
+        if (spriteResult != null)
+        {
+            spriteResult.sprite = monsterA.image[0];
+            spriteResult.SetNativeSize();
+        }
+        asciiResult = monsterA.compileAscii;
+        compileResultMsg = monsterA.compileResultMsg;
 
         StartCoroutine(CompileSequenceRoutine());
     }
@@ -58,7 +87,7 @@ public class MonsterCompileManager : MonoBehaviour
         UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
 
         // 화면 초기화
-        greetingText.text = "";
+        compileResultText.text = "";
         spriteA.color = new Color(1, 1, 1, 0);
         spriteB.color = new Color(1, 1, 1, 0);
         spriteResult.color = new Color(1, 1, 1, 0);
@@ -99,15 +128,15 @@ public class MonsterCompileManager : MonoBehaviour
         yield return StartCoroutine(FadeOutAllAscii(1.0f));
 
         // 인사말 표시
-        greetingText.text = "";
+        compileResultText.text = "";
 
         // 키보드 연타로 인한 오작동을 막기 위해 프레임 버퍼를 한 번 비워줌
         yield return null; 
 
         bool isSkipped = false;
-        foreach (char c in greetingMessage)
+        foreach (char c in compileResultMsg)
         {
-            greetingText.text += c;
+            compileResultText.text += c;
             
             if (!isSkipped)
             {
@@ -130,7 +159,7 @@ public class MonsterCompileManager : MonoBehaviour
         // 스킵이 발동했다면 남은 문장을 한 번에 출력
         if (isSkipped)
         {
-            greetingText.text = greetingMessage;
+            compileResultText.text = compileResultMsg;
             
             // 스킵할 때 누른 키보드 입력이 아래의 창 닫기 로직까지 연달아 실행시키지 않도록 한 프레임 대기
             yield return null; 

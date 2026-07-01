@@ -38,7 +38,15 @@ MonoBehaviour:
   useGridLighting: 0
   bgmID: 0
   moduleEnable: 1
-  monsterList: []
+  monsterList:
+  - enemy_000
+  - enemy_001
+  - enemy_002
+  - enemy_003
+  - enemy_004
+  - enemy_005
+  - enemy_006
+  - enemy_007
   useDustEffect: 0
   dustParticleCount: 300
   dustSwayAmplitude: 0.01

@@ -21,6 +21,8 @@ public class MonsterDatabase : ScriptableObject
         public Gender gender;
         public Data.AI.MonsterAIProfile aiProfile;
         public List<SkillData> skills;
+        public TextAsset compileAscii;
+        public string compileResultMsg = "HELLO!";
         
         [Header("Visual")]
         public Sprite[] image;     // 이미지
