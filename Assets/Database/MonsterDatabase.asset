@@ -141,7 +141,7 @@ MonoBehaviour:
     - item_003
   - id: enemy_003
     name: "\uBC34\uC2DC"
-    race: 7
+    race: 8
     align: 6
     gender: 1
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}

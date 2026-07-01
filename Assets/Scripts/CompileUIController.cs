@@ -176,6 +176,7 @@ namespace Controller
         {
             string monsterID = spawnedPanels[index].currentMonsterID;
 
+            // 이미 선택된 몬스터를 다시 누르면 선택 취소
             if (selectedMonsterIDs.Contains(monsterID))
             {
                 selectedMonsterIDs.Remove(monsterID);
@@ -184,14 +185,40 @@ namespace Controller
                 return;
             }
 
+            // 2마리가 꽉 안 찼을 때만 추가
             if (selectedMonsterIDs.Count < 2)
             {
                 selectedMonsterIDs.Add(monsterID);
                 UpdateHighlight();
                 SoundManager.Instance.PlaySFX(SfxID.UI_Click);
 
+                // 2마리가 모두 선택된 순간, 합체 결과를 미리 예측하여 중복 검사를 수행
                 if (selectedMonsterIDs.Count == 2)
                 {
+                    string idA = selectedMonsterIDs[0];
+                    string idB = selectedMonsterIDs[1];
+
+                    // 합체 결과 몬스터 데이터를 미리 가져옴
+                    var resultEntry = DatabaseManager.Instance.monsterDB.GetCompileResult(idA, idB);
+
+                    if (resultEntry != null)
+                    {
+                        // partyData에 동일한 ID를 가진 몬스터가 존재하는지 검사
+                        bool isAlreadyInParty = PartyManager.Instance.partyData.Exists(m => 
+                            m != null && m.characterId == resultEntry.id);
+
+                        if (isAlreadyInParty)
+                        {
+                            menuController.ShowAlertPopup("이미 파티에 존재하는 몬스터입니다.\n다른 조합을 선택해 주세요.");
+
+                            // 직전에 선택한 두 번째 몬스터의 선택만 취소
+                            selectedMonsterIDs.RemoveAt(1);
+                            UpdateHighlight();
+                            return;
+                        }
+                    }
+
+                    // 중복이 없다면 정상 진행 팝업을 띄웁니다.
                     menuController.RequestCompilePopup();
                 }
             }

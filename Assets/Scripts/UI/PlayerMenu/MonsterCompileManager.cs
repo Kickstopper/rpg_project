@@ -70,16 +70,27 @@ public class MonsterCompileManager : MonoBehaviour
             asciiB = monsterB.compileAscii;
         }
 
-        // TODO: 합체 공식에 따른 결과 세팅
-        if (spriteResult != null)
+        var result = DatabaseManager.Instance.monsterDB.GetCompileResult(monsterA_ID, monsterB_ID);
+        if (result != null)
         {
-            spriteResult.sprite = monsterA.image[0];
-            spriteResult.SetNativeSize();
-        }
-        asciiResult = monsterA.compileAscii;
-        compileResultMsg = monsterA.compileResultMsg;
+            if (spriteResult != null && result.image != null)
+            {
+                spriteResult.sprite = result.image[0];
+                spriteResult.SetNativeSize();
 
-        StartCoroutine(CompileSequenceRoutine());
+                asciiResult = result.compileAscii;
+                compileResultMsg = result.compileResultMsg;
+                
+                StartCoroutine(CompileSequenceRoutine());
+            }
+        }
+        else
+        {
+            Debug.LogError($"[{monsterA_ID}]와 [{monsterB_ID}]의 합체 결과를 찾을 수 없어 연출을 취소합니다.");
+            
+            // UI를 강제로 원래대로 돌려놓기 위해 즉시 콜백 호출
+            OnCompileFinished?.Invoke(); 
+        }
     }
 
     private IEnumerator CompileSequenceRoutine()
