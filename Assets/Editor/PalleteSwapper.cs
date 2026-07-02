@@ -121,12 +121,20 @@ public class PaletteSwapper : EditorWindow
 
                 for (int j = 0; j < pixels.Length; j++)
                 {
-                    if (pixels[j].a == 0)
+                    // 원본 픽셀의 알파값이 1보다 작으면 완전 투명 처리
+                    if (pixels[j].a < 1f)
                     {
-                        newPixels[j] = pixels[j];
+                        newPixels[j] = new Color(0, 0, 0, 0); // R, G, B, A 모두 0으로 덮어쓰기
                         continue;
                     }
-                    newPixels[j] = GetClosestColor(pixels[j], activePalette);
+
+                    // 완전히 불투명한 픽셀인 경우에만 팔레트 색상 매핑
+                    Color closest = GetClosestColor(pixels[j], activePalette);
+                    
+                    // 반투명 픽셀이 모두 걸러졌으므로, 매핑된 픽셀의 알파값은 1로 고정
+                    closest.a = 1f; 
+                    
+                    newPixels[j] = closest;
                 }
 
                 newTexture.SetPixels(newPixels);
