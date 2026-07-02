@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Data
 {
     public enum Direction { North, East, South, West }
-    public enum EntranceType { Map, Shop, Elevator } // 다른 맵으로의 이동과 상점으로의 이동
+    public enum EntranceType { Map, Shop, Elevator, Terminal } // 다른 맵으로의 이동과 상점으로의 이동
     public enum ElevatorDoorType { Split, SlideLeft, SlideUp }
     
     [Serializable]

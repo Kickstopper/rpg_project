@@ -13,6 +13,7 @@ public enum GameState
     Event,       // 이벤트
     Shop,        // 상점
     Elevator,    // 엘레베이터
+    Terminal,    // 터미널 (순간이동)
 }
 
 namespace Manager
@@ -28,6 +29,7 @@ namespace Manager
         public GameObject menuCanvas;        // 메뉴 UI
         public GameObject shopCanvas;        // 상점 UI
         public GameObject elevatorCanvas;    // 엘레베이터 UI
+        public GameObject terminalCanvas;    // 터미널 UI
 
         public BattleManager currentBattleManager;
         public ShopModeSelectUI shopUIController;
@@ -72,7 +74,8 @@ namespace Manager
         private void RefreshUIState()
         {
             // 아직 UI가 연결되지 않았다면 무시
-            if (eventCanvas == null || explorationCanvas == null || BattleCanvas == null || menuCanvas == null || shopCanvas == null || elevatorCanvas == null) return;
+            if (eventCanvas == null || explorationCanvas == null || BattleCanvas == null || menuCanvas == null || 
+                shopCanvas == null || terminalCanvas == null || elevatorCanvas == null) return;
             
             // 모든 캔버스 일단 끄기
             eventCanvas.SetActive(false);
@@ -81,6 +84,7 @@ namespace Manager
             menuCanvas.SetActive(false);
             shopCanvas.SetActive(false);
             elevatorCanvas.SetActive(false);
+            terminalCanvas.SetActive(false);
 
             switch (CurrentState)
             {
@@ -111,6 +115,10 @@ namespace Manager
                     shopCanvas.SetActive(true);
                     break;
 
+                case GameState.Terminal:
+                    terminalCanvas.SetActive(true);
+                    break;
+
                 case GameState.None:
                 default:
                     break;
@@ -120,7 +128,8 @@ namespace Manager
         // UI 등록 시 컨트롤러도 함께 등록받음
         public void RegisterSceneComponents(GameObject explCanvas, GameObject eventCanvas, DialogueUI dialogUI, GameObject menuCanvas,
                                             GameObject battleCanvas, BattleManager battleManager, 
-                                            GameObject shopCanvas, ShopModeSelectUI shopController, 
+                                            GameObject shopCanvas, ShopModeSelectUI shopController,
+                                            GameObject terminalCanvas,
                                             GameObject elevatorCanvas)
         {
             this.explorationCanvas = explCanvas;
@@ -132,6 +141,7 @@ namespace Manager
             this.shopCanvas = shopCanvas;
             this.shopUIController = shopController;
             this.elevatorCanvas = elevatorCanvas;
+            this.terminalCanvas = terminalCanvas;
 
             RefreshUIState();
         }

@@ -1356,6 +1356,92 @@ namespace Controller
                     fadeOverlay.blocksRaycasts = false;
                 }
             }
+            else if (entrance.type == EntranceType.Terminal)
+            {
+                if (GameStateManager.Instance != null)
+                    GameStateManager.Instance.ChangeState(GameState.Terminal);
+
+                string currentTerminalID = entrance.destinationID;
+                
+                // 빠져나올 때 돌아갈 좌표 (처음 들어올 때는 들어오기 직전의 위치와 반대 방향으로 세팅)
+                int exitLogicX = preEntranceLogicX;
+                int exitLogicY = preEntranceLogicY;
+                int exitDir = (_player.DirectionIdx + 2) % 4; 
+
+                // 취소를 누를 때까지 터미널 안에서 무한 반복
+                while (true)
+                {
+                    TerminalManager.Instance.UnlockTerminal(currentTerminalID);
+                    TerminalUIManager.Instance.OpenTerminal(currentTerminalID);
+
+                    // 유저가 워프 목적지를 고르거나 취소할 때까지 대기
+                    yield return new WaitUntil(() => TerminalUIManager.Instance.IsSelectionComplete);
+
+                    if (TerminalUIManager.Instance.IsCanceled)
+                    {
+                        // 취소 시 터미널에서 던전으로 빠져나옴
+                        Vector2 originalPos = _player.GetOffsetPosition(exitLogicX, exitLogicY, exitDir);
+                        _player.SetDirectPosition(originalPos.x, originalPos.y, exitDir);
+
+                        if (compassUI) compassUI.SetDirection(exitDir);
+                        if (miniMap) miniMap.SnapToGrid(exitLogicX, exitLogicY, exitDir);
+                        UpdateMapDiscovery(exitLogicX, exitLogicY);
+
+                        // 페이드 인 직전 바뀐 맵과 방향으로 화면 강제 갱신
+                        _renderer.RenderFrame(_player, renderSettings);
+
+                        if (GameStateManager.Instance != null)
+                            GameStateManager.Instance.ChangeState(GameState.Exploration);
+
+                        if (fadeOverlay != null)
+                        {
+                            float elapsedFade = 0f;
+                            float fadeDuration = 0.5f;
+                            while (elapsedFade < fadeDuration)
+                            {
+                                elapsedFade += Time.deltaTime;
+                                fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsedFade / fadeDuration);
+                                yield return null;
+                            }
+                            fadeOverlay.alpha = 0f;
+                            fadeOverlay.blocksRaycasts = false;
+                        }
+
+                        // 코루틴 종료 및 탐험 시작
+                        break; 
+                    }
+                    else
+                    {
+                        // 다른 터미널로 워프
+                        TerminalData dest = TerminalUIManager.Instance.SelectedTerminal;
+
+                        EntranceData dynamicDest = new EntranceData
+                        {
+                            destinationID = dest.mapID,
+                            targetX = dest.targetX,
+                            targetY = dest.targetY,
+                            targetDirection = dest.targetDir
+                        };
+
+                        // 화면이 암전되어 있는 상태에서 새 맵 데이터 로드
+                        if (DungeonManager.Instance)
+                        {
+                            DungeonManager.Instance.LoadDungeonFromJson(dynamicDest.destinationID);
+                            LoadMapData(dynamicDest); 
+                        }
+                        
+                        yield return new WaitForSeconds(0.2f); // 렉 스파이크 대기
+
+                        // 워프가 끝났으므로 변수들을 도착한 새 터미널 기준으로 갱신
+                        currentTerminalID = dest.terminalID;
+                        exitLogicX = dest.targetX;
+                        exitLogicY = dest.targetY;
+                        exitDir = (int)dest.targetDir;
+
+                        // break 없이 루프의 처음으로 돌아감. 새 터미널 ID를 가지고 OpenTerminal()이 재실행되어 리프레시 효과 발생
+                    }
+                }
+            }
             else if (entrance.type == EntranceType.Elevator)
             {
                 GameStateManager.Instance.ChangeState(GameState.Elevator);

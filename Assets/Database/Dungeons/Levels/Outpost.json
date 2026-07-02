@@ -2272,16 +2272,16 @@
             "targetDirection": 0
         },
         {
-            "type": 1,
+            "type": 3,
             "sourceX": 8,
             "sourceY": 10,
             "isWallEntrance": true,
             "triggerDirection": 1,
             "isWorldMap": false,
-            "destinationID": "terminal",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 2
+            "destinationID": "Terminal_Outpost",
+            "targetX": 8,
+            "targetY": 10,
+            "targetDirection": 3
         }
     ]
 }

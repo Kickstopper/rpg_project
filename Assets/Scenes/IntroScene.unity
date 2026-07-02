@@ -654,6 +654,69 @@ Transform:
   - {fileID: 1214734118}
   m_Father: {fileID: 1307258124}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &527695768
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 527695769}
+  - component: {fileID: 527695770}
+  m_Layer: 0
+  m_Name: TerminalManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &527695769
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527695768}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6831504765933425996}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &527695770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527695768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44da0c6466d29c44ca27763f3b725f22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Manager.TerminalManager
+  allTerminals:
+  - terminalID: Terminal_Outpost
+    displayName: "\uC544\uC6C3\uD3EC\uC2A4\uD2B8"
+    mapID: Outpost
+    targetX: 8
+    targetY: 10
+    targetDir: 3
+    destinationImage: {fileID: 0}
+    floorNumber: 2
+    description: FINALLY
+  - terminalID: Terminal_Bridge_0
+    displayName: "\uBE0C\uB9BF\uC9C0"
+    mapID: Bridge_0
+    targetX: 1
+    targetY: 7
+    targetDir: 2
+    destinationImage: {fileID: 0}
+    floorNumber: 2
+    description: FINALLY
 --- !u!1 &679237704
 GameObject:
   m_ObjectHideFlags: 0
@@ -1565,6 +1628,7 @@ MonoBehaviour:
   menuCanvas: {fileID: 0}
   shopCanvas: {fileID: 0}
   elevatorCanvas: {fileID: 0}
+  terminalCanvas: {fileID: 0}
   currentBattleManager: {fileID: 0}
   shopUIController: {fileID: 0}
   dialogueController: {fileID: 0}
@@ -2049,6 +2113,7 @@ Transform:
   - {fileID: 3610373616224753382}
   - {fileID: 9137468785865546119}
   - {fileID: 1735507490957044432}
+  - {fileID: 527695769}
   - {fileID: 8462999702048826074}
   - {fileID: 8504960244262196308}
   - {fileID: 7142236786666981268}
