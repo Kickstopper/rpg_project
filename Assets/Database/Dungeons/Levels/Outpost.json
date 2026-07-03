@@ -28,10 +28,10 @@
         {
             "x": 1,
             "y": 0,
-            "value": 6,
+            "value": -1,
             "wallTextureIDs": [
                 0,
-                3,
+                0,
                 0,
                 -1
             ],
@@ -46,12 +46,12 @@
         {
             "x": 2,
             "y": 0,
-            "value": 0,
+            "value": 6,
             "wallTextureIDs": [
-                -1,
-                -1,
+                3,
                 0,
-                -1
+                0,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -68,7 +68,7 @@
             "wallTextureIDs": [
                 0,
                 0,
-                -1,
+                0,
                 0
             ],
             "centerObjectID": -1,
@@ -140,7 +140,7 @@
             "wallTextureIDs": [
                 0,
                 0,
-                -1,
+                0,
                 0
             ],
             "centerObjectID": -1,
@@ -154,12 +154,12 @@
         {
             "x": 8,
             "y": 0,
-            "value": 0,
+            "value": 7,
             "wallTextureIDs": [
-                -1,
-                -1,
+                3,
                 0,
-                -1
+                0,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -660,10 +660,10 @@
             "y": 3,
             "value": 3,
             "wallTextureIDs": [
-                -1,
+                0,
                 3,
-                -1,
-                -1
+                0,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -732,9 +732,9 @@
             "y": 3,
             "value": 5,
             "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
+                0,
+                0,
+                0,
                 3
             ],
             "centerObjectID": -1,
@@ -1452,10 +1452,10 @@
             "y": 7,
             "value": 2,
             "wallTextureIDs": [
-                -1,
+                0,
                 3,
-                -1,
-                -1
+                0,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -1524,9 +1524,9 @@
             "y": 7,
             "value": 4,
             "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
+                0,
+                0,
+                0,
                 3
             ],
             "centerObjectID": -1,
@@ -2046,7 +2046,7 @@
             "y": 10,
             "value": -1,
             "wallTextureIDs": [
-                -1,
+                0,
                 0,
                 0,
                 0
@@ -2118,7 +2118,7 @@
             "y": 10,
             "value": -1,
             "wallTextureIDs": [
-                -1,
+                0,
                 0,
                 0,
                 0
@@ -2152,12 +2152,12 @@
         {
             "x": 9,
             "y": 10,
-            "value": 7,
+            "value": -1,
             "wallTextureIDs": [
                 0,
                 -1,
                 0,
-                3
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -2236,18 +2236,6 @@
             "targetDirection": 0
         },
         {
-            "type": 1,
-            "sourceX": 2,
-            "sourceY": 0,
-            "isWallEntrance": true,
-            "triggerDirection": 3,
-            "isWorldMap": false,
-            "destinationID": "special",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
-        },
-        {
             "type": 0,
             "sourceX": 5,
             "sourceY": 10,
@@ -2274,14 +2262,26 @@
         {
             "type": 3,
             "sourceX": 8,
-            "sourceY": 10,
+            "sourceY": 1,
             "isWallEntrance": true,
-            "triggerDirection": 1,
+            "triggerDirection": 2,
             "isWorldMap": false,
-            "destinationID": "Terminal_Outpost",
+            "destinationID": "Terminal_Outporst",
             "targetX": 8,
-            "targetY": 10,
-            "targetDirection": 3
+            "targetY": 1,
+            "targetDirection": 0
+        },
+        {
+            "type": 1,
+            "sourceX": 2,
+            "sourceY": 1,
+            "isWallEntrance": true,
+            "triggerDirection": 2,
+            "isWorldMap": false,
+            "destinationID": "NewDestination",
+            "targetX": 1,
+            "targetY": 1,
+            "targetDirection": 0
         }
     ]
 }

@@ -278,7 +278,7 @@ namespace UI
                 yield return StartCoroutine(ExplodeAndReturnAsciiRoutine(0.6f, 0.5f, 0.5f, 15f, 30f));
 
                 // 데이터 전송 중인 느낌을 주기 위해 짧은 대기
-                yield return wait05;
+                yield return new WaitForSeconds(0.2f);
 
                 digitalRain.DOFade(1f, 1f);
 

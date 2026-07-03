@@ -703,11 +703,11 @@ MonoBehaviour:
     displayName: "\uC544\uC6C3\uD3EC\uC2A4\uD2B8"
     mapID: Outpost
     targetX: 8
-    targetY: 10
-    targetDir: 3
+    targetY: 1
+    targetDir: 0
     destinationImage: {fileID: 0}
-    floorNumber: 2
-    description: FINALLY
+    floorNumber: 1
+    description: "\uC804\uCD08\uAE30\uC9C0"
   - terminalID: Terminal_Bridge_0
     displayName: "\uBE0C\uB9BF\uC9C0"
     mapID: Bridge_0
