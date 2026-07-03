@@ -259,7 +259,7 @@ namespace UI
             {
                 // 플레이어 원본 이미지 페이드 인
                 characterImage.gameObject.SetActive(true);
-                yield return StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 0.5f));
+                yield return StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 0.5f, Color.white));
 
                 // 아스키 아트 노드 생성 (투명상태)
                 DrawAscii(characterAscii, 0f);
@@ -267,8 +267,9 @@ namespace UI
 
                 digitalRain.DOFade(0f, 0.5f);
 
+                Color digitalTint = Color.cyan;
                 // 원본 이미지 -> 아스키 아트로 분해
-                StartCoroutine(FadeSpriteAlpha(characterImage, 1f, 0f, 1.0f));
+                StartCoroutine(FadeSpriteAlpha(characterImage, 1f, 0f, 1.0f, digitalTint));
                 yield return StartCoroutine(RevealAsciiRandomly(1.0f));
 
                 yield return wait05;
@@ -283,7 +284,7 @@ namespace UI
                 digitalRain.DOFade(1f, 1f);
 
                 // 아스키 아트 -> 원본 이미지로 재결합
-                StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 1.0f));
+                StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 1.0f, digitalTint));
                 yield return StartCoroutine(DissolveAsciiRandomly(1.0f));
                 
                 // 다 쓴 노드 반환 및 초기화
@@ -296,7 +297,7 @@ namespace UI
                 digitalRain.DOFade(0f, 0.5f);
 
                 // 원본 이미지 페이드 아웃
-                yield return StartCoroutine(FadeSpriteAlpha(characterImage, 1f, 0f, 0.5f));
+                yield return StartCoroutine(FadeSpriteAlpha(characterImage, 1f, 0f, 0.5f, digitalTint));
 
                 characterImage.gameObject.SetActive(false);
             }
@@ -354,16 +355,30 @@ namespace UI
             }
         }
 
-        private IEnumerator FadeSpriteAlpha(Image img, float startAlpha, float endAlpha, float duration)
+        private IEnumerator FadeSpriteAlpha(Image img, float startAlpha, float endAlpha, float duration, Color tint)
         {
             float time = 0;
             while (time < duration)
             {
                 time += Time.deltaTime;
-                img.color = new Color(1, 1, 1, Mathf.Lerp(startAlpha, endAlpha, time / duration));
+                
+                // 현재 프레임의 알파값 계산 (0 ~ 1)
+                float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, time / duration);
+                
+                // 알파값이 0에 가까울수록 tint 색상에, 1에 가까울수록 흰색(원본 색상)에 가까워짐
+                Color currentColor = Color.Lerp(tint, Color.white, currentAlpha);
+                
+                // 섞인 색상에 최종 알파값을 적용
+                currentColor.a = currentAlpha;
+                img.color = currentColor;
+                
                 yield return null;
             }
-            img.color = new Color(1, 1, 1, endAlpha);
+
+            // 루프 종료 후 오차 없는 최종값 세팅
+            Color finalColor = Color.Lerp(tint, Color.white, endAlpha);
+            finalColor.a = endAlpha;
+            img.color = finalColor;
         }
 
         private IEnumerator RevealAsciiRandomly(float duration)
