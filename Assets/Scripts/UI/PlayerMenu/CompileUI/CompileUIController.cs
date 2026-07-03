@@ -5,6 +5,7 @@ using Data;
 using Manager;
 using UI.PlayerMenu;
 using Helper;
+using UnityEngine.UI;
 
 namespace Controller
 {
@@ -17,8 +18,7 @@ namespace Controller
         public GameObject compilePanel;       // 연출 화면
         public MonsterCompileManager compileManager;
 
-        [Header("Grid Settings")]
-        public int columns = 2; // GridLayoutGroup의 열 개수
+        private int columns; // GridLayoutGroup의 열 개수
 
         private PlayerMenuController menuController;
         private List<MonsterPanelController> spawnedPanels = new List<MonsterPanelController>();
@@ -30,6 +30,21 @@ namespace Controller
         public void Initialize(PlayerMenuController controller)
         {
             this.menuController = controller;
+
+            GridLayoutGroup gridLayout = monsterGridList.GetComponent<GridLayoutGroup>();
+            if (gridLayout != null)
+            {
+                // Constraint 설정이 Fixed Column Count로 되어있는지 확인
+                if (gridLayout.constraint == GridLayoutGroup.Constraint.FixedColumnCount)
+                {
+                    columns = gridLayout.constraintCount;
+                }
+                else
+                {
+                    Debug.LogWarning("[CompileUI] GridLayoutGroup의 Constraint가 'Fixed Column Count'가 아닙니다! 상/하 이동이 꼬일 수 있습니다.");
+                    columns = gridLayout.constraintCount > 0 ? gridLayout.constraintCount : 3; // 임시 예외 처리
+                }
+            }
             
             // 패널 및 상태 초기화
             compilePanel.SetActive(false);
@@ -47,10 +62,19 @@ namespace Controller
             foreach (Transform child in monsterGridList) Destroy(child.gameObject);
             spawnedPanels.Clear();
 
-            var monA = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_000"));
-            var monB = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_001")); 
-            PartyManager.Instance.AddMember(monA, true);
-            PartyManager.Instance.AddMember(monB, true);
+            // 테스트를 위한 몬스터 추가
+            // var monA = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_000"));
+            // var monB = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_001")); 
+            // var monC = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_002")); 
+            // var monD = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_003")); 
+            // var monE = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_004")); 
+            // var monF = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_005")); 
+            // PartyManager.Instance.AddMember(monA, true);
+            // PartyManager.Instance.AddMember(monB, true);
+            // PartyManager.Instance.AddMember(monC, true);
+            // PartyManager.Instance.AddMember(monD, true);
+            // PartyManager.Instance.AddMember(monE, true);
+            // PartyManager.Instance.AddMember(monF, true);
             
             // 파티 리스트 불러오기
             var party = PartyManager.Instance.partyData;
@@ -112,7 +136,7 @@ namespace Controller
             // 몬스터가 없어서 화면이 가려진 상태일 때의 단독 입력 처리
             if (isEmptyState)
             {
-                if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Escape))
+                if (Input.anyKeyDown)
                 {
                     SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
                     menuController.CloseCompileUI();

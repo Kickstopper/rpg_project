@@ -15554,7 +15554,7 @@ MonoBehaviour:
   monsterSelectPanel: {fileID: 4980377268925068920}
   compilePanel: {fileID: 6022345379991741774}
   compileManager: {fileID: 7279635872585324725}
-  columns: 2
+  columns: 3
 --- !u!1 &2888090302660112319
 GameObject:
   m_ObjectHideFlags: 0
