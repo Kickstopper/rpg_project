@@ -208,6 +208,12 @@ public class MonsterCompileManager : MonoBehaviour
 
                 Vector2 pos = new Vector2(startX + (x * gridSpacing), startY - (y * gridSpacing));
                 GameObject nodeObj = objectPool.GetObjectFromPool(uiCanvasRoot, pos);
+
+                // 몬스터 합체 반복 시 스케일 축소 버그 방지
+                RectTransform rect = nodeObj.GetComponent<RectTransform>();
+                rect.localScale = Vector3.one; 
+                rect.localPosition = new Vector3(rect.localPosition.x, rect.localPosition.y, 0f);
+                rect.localRotation = Quaternion.identity;
                 
                 TextMeshProUGUI tmp = nodeObj.GetComponent<TextMeshProUGUI>();
                 tmp.text = lines[y][x].ToString();

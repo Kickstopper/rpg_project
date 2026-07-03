@@ -57,7 +57,7 @@ namespace Manager
             List<TerminalData> available = new List<TerminalData>();
             foreach (var terminal in allTerminals)
             {
-                if (terminal.terminalID != currentTerminalID && _unlockedTerminals.Contains(terminal.terminalID))
+                //if (terminal.terminalID != currentTerminalID && _unlockedTerminals.Contains(terminal.terminalID))
                 {
                     available.Add(terminal);
                 }
