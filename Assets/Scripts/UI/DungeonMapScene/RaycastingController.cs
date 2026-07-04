@@ -747,15 +747,28 @@ namespace Controller
             
             SoundManager.Instance.PlaySFX(SfxID.Slide_Door); 
 
+            // 원래 문이 배치되어 있던 면과 타일의 원래 value를 저장
+            bool[] originalDoorFaces = new bool[4];
+            int originalValue = doorCell.value;
+
+            for (int face = 0; face < 4; face++)
+            {
+                // 해당 면이 현재 열어야 할 문의 텍스처(closedTexId)와 일치하는지 확인
+                if (doorCell.wallTextureIDs[face] == doorConfig.closedTexId)
+                {
+                    originalDoorFaces[face] = true;
+                }
+            }
+
             // 문이 열리는 애니메이션
             if (doorConfig.openFrameTexIds != null && doorConfig.openFrameTexIds.Length > 0)
             {
                 for (int i = 0; i < doorConfig.openFrameTexIds.Length; i++)
                 {
-                    // 해당 셀의 4면 중 벽이 있는 면의 텍스처를 프레임 텍스처로 덮어씌움
                     for (int face = 0; face < 4; face++)
                     {
-                        if (doorCell.wallTextureIDs[face] != -1) 
+                        // 아무 벽이나 덮어씌우지 않고, 문의 원래 면이었던 곳만 애니메이션 프레임으로 덮어씌움
+                        if (originalDoorFaces[face]) 
                             doorCell.wallTextureIDs[face] = doorConfig.openFrameTexIds[i];
                     }
                     
@@ -763,18 +776,19 @@ namespace Controller
                 }
             }
 
-            // // 문이 열렸으면 통과할 수 있게 벽 속성을 제거
-            // for (int face = 0; face < 4; face++)
-            // {
-            //     doorCell.wallTextureIDs[face] = -1; // 텍스처 삭제
-            // }
-            // doorCell.value = 0; // 타일을 막힌 벽(1)에서 빈 공간(0)으로 변경
-
             // 전진 실행
             float duration = _player.IsRunning ? moveDuration / 2f : moveDuration;
             if (miniMap) miniMap.TranslateToNewPosition(tx, ty, duration);
             
             yield return StartCoroutine(_player.MoveGridRoutine(tx, ty, duration, null));
+
+            // 문을 완전히 지나간 직후, 타일 속성과 텍스처를 닫힌 문으로 복원
+            doorCell.value = originalValue; 
+            for (int face = 0; face < 4; face++)
+            {
+                if (originalDoorFaces[face])
+                    doorCell.wallTextureIDs[face] = doorConfig.closedTexId;
+            }
 
             _inputLocked = false;
         }
