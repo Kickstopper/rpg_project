@@ -120,6 +120,16 @@ namespace Controller
         public override int GetTotalVit() => sourceData.stats.vit;
         public override int GetTotalInt() => sourceData.stats.intel;
 
+        public override VfxID GetBasicAttackVfx()
+        {
+            return sourceData.basicAttackVfxId;
+        }
+
+        public override VfxID GetGunAttackVfx()
+        {
+           return VfxID.Gun_Auto;
+        }
+
         public override int GetAttack()
         {
             float baseAtk = (level + GetTotalStr()) * 2;

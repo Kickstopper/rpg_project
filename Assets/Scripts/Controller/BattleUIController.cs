@@ -492,18 +492,21 @@ public class BattleUIController : MonoBehaviour
 
         Vector3 bgTargetPos = defaultBgPos + (monsterMoveOffset * bgParallaxRatio);
         float bgTargetScale = 1f + ((zoomScale - 1f) * bgParallaxRatio);
-
-        Sequence zoomInSeq = DOTween.Sequence();
+        
+        Sequence zoomInSeq = DOTween.Sequence().SetUpdate(true); // .SetUpdate(true)를 붙이면 Time.timeScale이 0.1이 되어도 애니메이션은 원래 속도로 재생됨
+    
         zoomInSeq.Join(monsterContainer.DOLocalMove(monsterTargetPos, zoomInTime).SetEase(Ease.OutCubic));
         zoomInSeq.Join(monsterContainer.DOScale(monsterTargetScale, zoomInTime).SetEase(Ease.OutCubic));
         zoomInSeq.Join(backgroundContainer.DOLocalMove(bgTargetPos, zoomInTime).SetEase(Ease.OutCubic));
         zoomInSeq.Join(backgroundContainer.DOScale(bgTargetScale, zoomInTime).SetEase(Ease.OutCubic));
 
         yield return zoomInSeq.WaitForCompletion();
+        
+        // 원상 복구
+        Sequence zoomOutSeq = DOTween.Sequence().SetUpdate(true);
+        // 슬로우 모션 연출 유지 시간. 정확한 시간을 대기하도록 Realtime 함수를 사용
+        if (holdTime > 0) yield return new WaitForSecondsRealtime(holdTime);
 
-        if (holdTime > 0) yield return new WaitForSeconds(holdTime);
-
-        Sequence zoomOutSeq = DOTween.Sequence();
         zoomOutSeq.Join(monsterContainer.DOLocalMove(defaultMonsterPos, zoomOutTime).SetEase(Ease.InOutQuad));
         zoomOutSeq.Join(monsterContainer.DOScale(defaultMonsterScale, zoomOutTime).SetEase(Ease.InOutQuad));
         zoomOutSeq.Join(backgroundContainer.DOLocalMove(defaultBgPos, zoomOutTime).SetEase(Ease.InOutQuad));

@@ -2646,7 +2646,7 @@ namespace Controller
                         int dmg = BattleCalculator.CalculateGunDamage(shooter, enemyEntity, false);
                         
                         ApplyDamage(enemy.gameObject, dmg, false);
-                        visualController.SpawnVFX(VfxID.Gun, GetCenterPosition(enemy.gameObject));
+                        visualController.SpawnVFX(VfxID.Gun_Auto, GetCenterPosition(enemy.gameObject));
                     }
                 }
                 
@@ -3069,10 +3069,10 @@ namespace Controller
             }
             else
             {
-                var sfxId = SfxID.None;
-                VfxID vfxID = VfxID.None;
-                if (action.type == ActionType.Attack) { sfxId = SfxID.Attack_Sword; vfxID = VfxID.Slash; }
-                else if (action.type == ActionType.Shoot) { sfxId = SfxID.Attack_Gun; vfxID = VfxID.Gun; }
+                SfxID sfxId = SfxID.Attack_Sword;
+                VfxID vfxID = VfxID.Hit;
+                if (action.type == ActionType.Attack) { sfxId = SfxID.Attack_Sword; vfxID = attackerEntity.GetBasicAttackVfx(); }
+                else if (action.type == ActionType.Shoot) { sfxId = SfxID.Attack_Gun; vfxID = attackerEntity.GetGunAttackVfx(); }
                 else if (action.type == ActionType.Skill) { sfxId = SfxID.Attack_Magic; vfxID = VfxID.Magic; }
                 else if (action.type == ActionType.Item)
                 {
@@ -3093,7 +3093,11 @@ namespace Controller
             if (hitEntity != null && hitEntity.currentHp <= 0 && (hitEntity.currentHp + damage > 0))
             {
                 uiController.StopZoomCoroutine();
-                yield return StartCoroutine(uiController.UIZoomRoutine(target.transform, 1.3f, 0.1f, 1f, 0.2f));
+
+                // 슬로우 모션 실행. 0.1배속(10% 속도)으로 0.4초 동안 유지
+                StartCoroutine(SlowMotionRoutine(0.1f, 0.4f));
+                // 카메라 줌은 내부적으로 SetUpdate(true)가 되어있어 혼자 빠르게 줌인됨
+                yield return StartCoroutine(uiController.UIZoomRoutine(target.transform, 1.3f, 0.2f, 0.5f, 0.3f));
             }
         }
 
@@ -3133,6 +3137,24 @@ namespace Controller
 
             entity.TriggerHitShake(isCritical); 
             StartCoroutine(entity.OnDamageTaken(damage)); 
+        }
+
+        // 타격 시 일시적으로 시간을 느리게 만드는 슬로우 모션 코루틴
+        // 목표 배속 (예: 0.1f = 10% 속도), 유지할 리얼타임 시간 (초)
+        private IEnumerator SlowMotionRoutine(float slowScale, float duration)
+        {
+            // 타격 순간 즉시 느려짐
+            Time.timeScale = slowScale;
+            
+            // 지정된 시간 동안 현실 시간 기준으로 대기
+            yield return new WaitForSecondsRealtime(duration);
+            
+            // 다시 원래 속도로 부드럽게 복구
+            // (오토 모드일 때는 2배속, 아닐 때는 1배속으로 원상 복구합니다)
+            float targetScale = isAutoMode ? 2.0f : 1.0f;
+            
+            // 0.2초에 걸쳐 타임스케일을 서서히 복구 (SetUpdate(true) 필수)
+            DOTween.To(() => Time.timeScale, x => Time.timeScale = x, targetScale, 0.2f).SetUpdate(true);
         }
 
         // 유니온 어택 참가 가능한 파티 찾기

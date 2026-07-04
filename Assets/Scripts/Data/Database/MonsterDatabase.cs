@@ -31,6 +31,7 @@ public class MonsterDatabase : ScriptableObject
         public float animInterval = 0.5f; // 애니메이션 프레임 간격
         public Sprite portrait;     // 초상화
         public GameObject prefab;   // 3D 모델 또는 전투용 프리팹
+        public VfxID basicAttackVfxId;    // 기본 공격 이펙트 ID
         
         [Header("Negotiation")]
         public Personality personality;

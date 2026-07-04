@@ -254,5 +254,7 @@ namespace Controller
         
         public abstract ResistanceData GetResistances();
         public abstract void SetSelectionState(bool isSelected);
+        public abstract VfxID GetBasicAttackVfx();
+        public abstract VfxID GetGunAttackVfx();
     }
 }

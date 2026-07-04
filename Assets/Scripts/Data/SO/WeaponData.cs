@@ -1,6 +1,7 @@
 using UnityEngine;
 
 public enum WeaponType { Melee, Gun } // 무기 타입 구분
+public enum WeaponCategory { Hit, Cut, Slash, Stab, Claw, Gun_Shot, Gun_Auto };
 namespace Data
 {
     [CreateAssetMenu(fileName = "New Weapon", menuName = "RPG/Item/Weapon")]
@@ -8,6 +9,7 @@ namespace Data
     {
         [Header("Weapon")]
         public WeaponType type; // 근접(Melee)인지 총(Gun)인지 설정
+        public WeaponCategory category;
         public TargetScope attackRange = TargetScope.Front_Single_Enemy; // 공격 범위
         public int attackPower;       
         public int hitRateBonus;      
