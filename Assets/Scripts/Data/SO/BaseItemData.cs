@@ -62,7 +62,7 @@ namespace Data
         
         [Header("Visual")]
         public Sprite icon;            // 아이콘
-        public GameObject effectPrefab; // 사용 시 이펙트 (옵션)
+        public VfxID vfxId = VfxID.None; // 사용 이펙트
 
         [Header("Skill")]
         public EffectType effectType;

@@ -3069,15 +3069,35 @@ namespace Controller
             }
             else
             {
-                SfxID sfxId = SfxID.Attack_Sword;
-                VfxID vfxID = VfxID.Hit;
-                if (action.type == ActionType.Attack) { sfxId = SfxID.Attack_Sword; vfxID = attackerEntity.GetBasicAttackVfx(); }
-                else if (action.type == ActionType.Shoot) { sfxId = SfxID.Attack_Gun; vfxID = attackerEntity.GetGunAttackVfx(); }
-                else if (action.type == ActionType.Skill) { sfxId = SfxID.Attack_Magic; vfxID = VfxID.Magic; }
+                SfxID sfxId = SfxID.None;
+                VfxID vfxID = VfxID.None;
+                if (action.type == ActionType.Attack)
+                {
+                    sfxId = SfxID.Attack_Sword;
+                    vfxID = attackerEntity.GetBasicAttackVfx();
+                }
+                else if (action.type == ActionType.Shoot) 
+                { 
+                    sfxId = SfxID.Attack_Gun;
+                    vfxID = attackerEntity.GetGunAttackVfx();
+                }
+                else if (action.type == ActionType.Skill)
+                {
+                    sfxId = SfxID.Attack_Magic;
+                    if (action.skillData != null && action.skillData.vfxId != VfxID.None)
+                    {
+                        vfxID = action.skillData.vfxId;
+                    }
+                    else vfxID = VfxID.Magic;
+                }
                 else if (action.type == ActionType.Item)
                 {
-                    if (action.itemData.effectType == EffectType.Special_Atk || action.itemData.effectType == EffectType.Magic_Atk)
-                    { sfxId = SfxID.Attack_Magic; vfxID = VfxID.Magic; }
+                    sfxId = SfxID.Attack_Magic;
+                    if (action.itemData != null && action.itemData.vfxId != VfxID.None)
+                    {
+                        vfxID = action.itemData.vfxId;
+                    }
+                    else vfxID = VfxID.Magic;
                 }
 
                 if (sfxId != SfxID.None) SoundManager.Instance.PlaySFX(sfxId);
