@@ -6824,10 +6824,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ElevatorUI
       objectReference: {fileID: 0}
-    - target: {fileID: 107112188833894916, guid: a1825b9576c21544bb0785d5a2ff8ccf, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 441519108325613571, guid: a1825b9576c21544bb0785d5a2ff8ccf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -6872,14 +6868,6 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1433639888}
-    - target: {fileID: 4533018509613481014, guid: a1825b9576c21544bb0785d5a2ff8ccf, type: 3}
-      propertyPath: m_PlaneDistance
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8781548789175777362, guid: a1825b9576c21544bb0785d5a2ff8ccf, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
