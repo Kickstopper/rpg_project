@@ -8,7 +8,6 @@ using System.Linq;
 using UnityEditor; // 에디터 기능 추가
 #endif
 
-
 [CreateAssetMenu(fileName = "MonsterDatabase", menuName = "Game Data/Monster Database")]
 public class MonsterDatabase : ScriptableObject
 {
@@ -16,29 +15,23 @@ public class MonsterDatabase : ScriptableObject
     public class MonsterEntry
     {
         [Header("Basic Info")]
+        public bool isBoss;
         public string id;           // "M001_Slime"
         public string name;         // "슬라임"
         public Race race;         // "요정"
         public Align align;
         public Gender gender;
-        public Data.AI.MonsterAIProfile aiProfile;
-        public List<SkillData> skills;
-        public TextAsset compileAscii;
-        public string compileResultMsg = "HELLO!";
-        
+
         [Header("Visual")]
         public Sprite[] image;     // 이미지
         public float animInterval = 0.5f; // 애니메이션 프레임 간격
         public Sprite portrait;     // 초상화
-        public GameObject prefab;   // 3D 모델 또는 전투용 프리팹
-        public VfxID basicAttackVfxId;    // 기본 공격 이펙트 ID
+        public GameObject prefab;   // 우선 순위가 더 높은 몬스터 프리팹 (비어있을 경우 기본 프리팹 사용)
         
-        [Header("Negotiation")]
-        public Personality personality;
-        public TimeOfDay timeOfDay; // Morning, Day, Evening, Night
-        public Weather weather; // Clear, Rain, Storm
-        public MoonPhase moonPhase; // New, Half, Full
-        public ChoiceTone choiceTone; // Friendly, Aggressive, Logical, Bribe, Flirt
+        [Header("Battle")]
+        public VfxID basicAttackVfxId;    // 기본 공격 이펙트 ID
+        public Data.AI.MonsterAIProfile aiProfile;
+        public List<SkillData> skills;
 
         [Header("Battle Position")]
         public RowType preferredRow; // Front 또는 Back
@@ -47,6 +40,17 @@ public class MonsterDatabase : ScriptableObject
         [Header("Battle Stats")]
         public StatData stats;             // 레벨, 힘, 마력, 체력 등
         public ResistanceData resistances; // 물리, 화염, 빙결 내성 등
+
+        [Header("Compile")]        
+        public TextAsset compileAscii;
+        public string compileResultMsg = "HELLO!";
+        
+        [Header("Negotiation")]
+        public Personality personality;
+        public TimeOfDay timeOfDay; // Morning, Day, Evening, Night
+        public Weather weather; // Clear, Rain, Storm
+        public MoonPhase moonPhase; // New, Half, Full
+        public ChoiceTone choiceTone; // Friendly, Aggressive, Logical, Bribe, Flirt
 
         [Header("Rewards")]
         public List<string> dropItemIds; // 드랍 아이템 ID 리스트

@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: MonsterDatabase
   m_EditorClassIdentifier: 
   entries:
-  - id: enemy_000
+  - isBoss: 1
+    id: enemy_000
     name: "\uC544\uCE58\uB370\uBAAC"
     race: 3
     align: 5
@@ -28,6 +29,7 @@ MonoBehaviour:
     animInterval: 0.05
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 1
     timeOfDay: 0
     weather: 0
@@ -55,7 +57,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_001
+  - isBoss: 0
+    id: enemy_001
     name: "\uC5B4\uC0C8\uC2E0"
     race: 0
     align: 6
@@ -70,6 +73,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -97,7 +101,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_002
+  - isBoss: 0
+    id: enemy_002
     name: "\uC544\uD2C0\uB77C\uC2A4"
     race: 7
     align: 6
@@ -112,6 +117,7 @@ MonoBehaviour:
     animInterval: 0.05
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -139,7 +145,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_003
+  - isBoss: 0
+    id: enemy_003
     name: "\uBC34\uC2DC"
     race: 8
     align: 6
@@ -154,6 +161,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -181,7 +189,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_004
+  - isBoss: 0
+    id: enemy_004
     name: "\uBCA0\uD5E4\uBAA8\uC2A4"
     race: 1
     align: 6
@@ -196,6 +205,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -223,7 +233,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_005
+  - isBoss: 0
+    id: enemy_005
     name: "\uB2E4\uD06C\uC5D8\uD504"
     race: 2
     align: 6
@@ -238,6 +249,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -265,7 +277,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_006
+  - isBoss: 0
+    id: enemy_006
     name: "\uB2E4\uD06C\uC5D8\uD504"
     race: 2
     align: 6
@@ -280,6 +293,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -307,7 +321,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_007
+  - isBoss: 1
+    id: enemy_007
     name: "\uB2E4\uD06C\uB85C\uB4DC"
     race: 3
     align: 6
@@ -322,6 +337,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -349,7 +365,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_008
+  - isBoss: 0
+    id: enemy_008
     name: "\uB2E4\uD06C\uC100\uB3C4"
     race: 3
     align: 6
@@ -364,6 +381,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -391,7 +409,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_009
+  - isBoss: 0
+    id: enemy_009
     name: "\uB370\uBE4C\uD50C\uB79C\uD2B8"
     race: 6
     align: 6
@@ -406,6 +425,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -433,7 +453,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_010
+  - isBoss: 1
+    id: enemy_010
     name: "\uB4DC\uB798\uACE4"
     race: 4
     align: 6
@@ -448,6 +469,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -475,7 +497,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_011
+  - isBoss: 0
+    id: enemy_011
     name: "\uB4DC\uB860"
     race: 5
     align: 6
@@ -490,6 +513,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -517,7 +541,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_012
+  - isBoss: 0
+    id: enemy_012
     name: "\uB4DC\uB77C\uC774\uC5B4\uB4DC"
     race: 6
     align: 6
@@ -532,6 +557,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -559,9 +585,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_013
+  - isBoss: 0
+    id: enemy_013
     name: "\uB4C0\uB77C\uD55C"
-    race: 6
+    race: 2
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -574,6 +601,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -601,7 +629,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_014
+  - isBoss: 0
+    id: enemy_014
     name: "\uC774\uBE14\uC544\uC774"
     race: 5
     align: 6
@@ -616,6 +645,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -643,7 +673,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_015
+  - isBoss: 0
+    id: enemy_015
     name: "\uC774\uBE14\uC6E8\uD3F0"
     race: 5
     align: 6
@@ -661,6 +692,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -688,7 +720,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_016
+  - isBoss: 0
+    id: enemy_016
     name: "\uD398\uC5B4\uB9AC"
     race: 7
     align: 6
@@ -703,6 +736,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -730,7 +764,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_017
+  - isBoss: 0
+    id: enemy_017
     name: "\uAC00\uACE0\uC77C"
     race: 3
     align: 6
@@ -745,6 +780,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -772,7 +808,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_018
+  - isBoss: 0
+    id: enemy_018
     name: "\uC790\uC774\uC5B8\uD2B8\uBC43"
     race: 1
     align: 6
@@ -787,6 +824,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -814,7 +852,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_019
+  - isBoss: 0
+    id: enemy_019
     name: "\uC790\uC774\uC5B8\uD2B8\uD1A0\uB4DC"
     race: 1
     align: 6
@@ -829,6 +868,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -856,8 +896,9 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_020
-    name: "\uAE00\uB808\uB514\uC5D0\uC774\uD130"
+  - isBoss: 0
+    id: enemy_020
+    name: "\uAE00\uB798\uB514\uC5D0\uC774\uD130"
     race: 0
     align: 6
     gender: 0
@@ -871,6 +912,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -898,9 +940,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_021
+  - isBoss: 0
+    id: enemy_021
     name: "\uACE0\uBE14\uB9B0"
-    race: 2
+    race: 7
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -913,6 +956,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -940,9 +984,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_022
+  - isBoss: 0
+    id: enemy_022
     name: "\uACE0\uB818"
-    race: 5
+    race: 7
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -955,6 +1000,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -982,9 +1028,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_023
+  - isBoss: 0
+    id: enemy_023
     name: "\uADF8\uB79C\uB4DC\uC704\uC800\uB4DC"
-    race: 3
+    race: 0
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -997,6 +1044,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1024,7 +1072,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_024
+  - isBoss: 1
+    id: enemy_024
     name: "\uADF8\uB808\uC774\uD2B8\uB370\uBAAC"
     race: 3
     align: 6
@@ -1039,6 +1088,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1066,9 +1116,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_025
+  - isBoss: 0
+    id: enemy_025
     name: "\uADF8\uB9AC\uD3F0"
-    race: 3
+    race: 1
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -1081,6 +1132,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1108,7 +1160,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_026
+  - isBoss: 0
+    id: enemy_026
     name: "\uAC00\uB4DC"
     race: 5
     align: 6
@@ -1123,6 +1176,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1150,11 +1204,12 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_027
+  - isBoss: 0
+    id: enemy_027
     name: "\uD558\uD53C"
-    race: 5
+    race: 1
     align: 6
-    gender: 0
+    gender: 1
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
     compileAscii: {fileID: 4900000, guid: daf42f4a643900a4ab3acaa7e011e5bd, type: 3}
@@ -1165,6 +1220,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1192,7 +1248,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_028
+  - isBoss: 0
+    id: enemy_028
     name: "\uD638\uC800"
     race: 1
     align: 6
@@ -1207,6 +1264,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1234,7 +1292,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_029
+  - isBoss: 0
+    id: enemy_029
     name: "\uD799\uD3EC\uCE84\uD478\uC2A4"
     race: 1
     align: 6
@@ -1249,6 +1308,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1276,7 +1336,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_030
+  - isBoss: 0
+    id: enemy_030
     name: "\uC774\uD504\uB9AC\uD2B8"
     race: 7
     align: 6
@@ -1291,6 +1352,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1318,7 +1380,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_031
+  - isBoss: 0
+    id: enemy_031
     name: "\uC784\uD504"
     race: 3
     align: 6
@@ -1333,6 +1396,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1360,7 +1424,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_032
+  - isBoss: 0
+    id: enemy_032
     name: "\uC824\uB9AC\uD53C\uC2DC"
     race: 1
     align: 6
@@ -1375,6 +1440,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1402,9 +1468,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_033
+  - isBoss: 0
+    id: enemy_033
     name: "\uC9C4"
-    race: 1
+    race: 7
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -1417,6 +1484,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1444,7 +1512,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_034
+  - isBoss: 0
+    id: enemy_034
     name: "\uC694\uB974\uBB38\uAC04\uB4DC"
     race: 4
     align: 6
@@ -1459,6 +1528,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1486,7 +1556,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_035
+  - isBoss: 0
+    id: enemy_035
     name: "\uD0AC\uB7EC\uBE44"
     race: 1
     align: 6
@@ -1501,6 +1572,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1528,7 +1600,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_036
+  - isBoss: 0
+    id: enemy_036
     name: "\uD0AC\uB7EC\uD53C\uC2DC"
     race: 1
     align: 6
@@ -1543,6 +1616,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1570,7 +1644,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_037
+  - isBoss: 0
+    id: enemy_037
     name: "\uD06C\uB77C\uCF04"
     race: 1
     align: 6
@@ -1585,6 +1660,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1612,7 +1688,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_038
+  - isBoss: 0
+    id: enemy_038
     name: "\uB77C\uBBF8\uC544"
     race: 4
     align: 6
@@ -1627,6 +1704,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1654,7 +1732,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_039
+  - isBoss: 0
+    id: enemy_039
     name: "\uB79C\uB4DC\uD130\uD2C0"
     race: 1
     align: 6
@@ -1669,6 +1748,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1696,9 +1776,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_040
+  - isBoss: 0
+    id: enemy_040
     name: "\uB808\uBE44\uC544\uD0C4"
-    race: 1
+    race: 4
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -1711,6 +1792,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1738,9 +1820,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_041
+  - isBoss: 0
+    id: enemy_041
     name: "\uB9AC\uC790\uB4DC"
-    race: 2
+    race: 1
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -1753,6 +1836,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1780,7 +1864,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_042
+  - isBoss: 0
+    id: enemy_042
     name: "\uB9E8\uB4DC\uB808\uC774\uD06C"
     race: 6
     align: 6
@@ -1795,6 +1880,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1822,7 +1908,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_043
+  - isBoss: 0
+    id: enemy_043
     name: "\uB9CC\uD2F0\uCF54\uC5B4"
     race: 1
     align: 6
@@ -1837,6 +1924,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1864,11 +1952,12 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_044
+  - isBoss: 1
+    id: enemy_044
     name: "\uBA54\uB450\uC0AC"
-    race: 4
+    race: 2
     align: 6
-    gender: 0
+    gender: 1
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
     compileAscii: {fileID: 4900000, guid: 2a958f5595d163b41aa9bf40c0071f21, type: 3}
@@ -1879,6 +1968,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1906,9 +1996,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_045
+  - isBoss: 0
+    id: enemy_045
     name: "\uBA38\uBA54\uC774\uB4DC"
-    race: 4
+    race: 1
     align: 6
     gender: 1
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -1921,6 +2012,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1948,7 +2040,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_046
+  - isBoss: 0
+    id: enemy_046
     name: "\uBA38\uB9E8"
     race: 1
     align: 6
@@ -1963,6 +2056,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1990,7 +2084,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_047
+  - isBoss: 0
+    id: enemy_047
     name: "\uBBF8\uBBF9"
     race: 3
     align: 6
@@ -2005,6 +2100,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2032,9 +2128,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_048
+  - isBoss: 1
+    id: enemy_048
     name: "\uBBF8\uB178\uD0C0\uC6B0\uB974\uC2A4"
-    race: 3
+    race: 2
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -2047,6 +2144,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2074,7 +2172,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_049
+  - isBoss: 0
+    id: enemy_049
     name: "\uBA38\uBBF8"
     race: 8
     align: 6
@@ -2089,6 +2188,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2116,9 +2216,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_050
+  - isBoss: 0
+    id: enemy_050
     name: "\uC624\uD06C"
-    race: 8
+    race: 1
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -2131,6 +2232,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2158,7 +2260,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_051
+  - isBoss: 0
+    id: enemy_051
     name: "\uD3EC\uC774\uC98C\uC13C\uD2F0\uD53C\uB4DC"
     race: 4
     align: 6
@@ -2173,6 +2276,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2200,9 +2304,10 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_052
+  - isBoss: 1
+    id: enemy_052
     name: "\uB77C\uBB34"
-    race: 2
+    race: 0
     align: 6
     gender: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -2215,6 +2320,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2242,7 +2348,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_053
+  - isBoss: 0
+    id: enemy_053
     name: "\uB9AC\uD37C"
     race: 3
     align: 6
@@ -2257,6 +2364,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2284,7 +2392,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_054
+  - isBoss: 0
+    id: enemy_054
     name: "\uC2A4\uD0AC\uB77C"
     race: 3
     align: 6
@@ -2299,6 +2408,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2326,7 +2436,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_055
+  - isBoss: 0
+    id: enemy_055
     name: "\uC2DC\uBC14"
     race: 2
     align: 6
@@ -2341,6 +2452,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2368,7 +2480,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_056
+  - isBoss: 0
+    id: enemy_056
     name: "\uC2A4\uCF08\uB808\uD1A4"
     race: 8
     align: 6
@@ -2383,6 +2496,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2410,7 +2524,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_057
+  - isBoss: 0
+    id: enemy_057
     name: "\uC2AC\uB808\uC774\uD504\uB2C8\uB974"
     race: 1
     align: 6
@@ -2425,6 +2540,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2452,7 +2568,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_058
+  - isBoss: 0
+    id: enemy_058
     name: "\uC2AC\uB77C\uC784"
     race: 1
     align: 6
@@ -2467,6 +2584,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2494,7 +2612,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_059
+  - isBoss: 0
+    id: enemy_059
     name: "\uC2DC\uD504"
     race: 0
     align: 6
@@ -2509,6 +2628,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2536,7 +2656,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_060
+  - isBoss: 0
+    id: enemy_060
     name: "\uD2B8\uB80C\uD2B8"
     race: 6
     align: 6
@@ -2551,6 +2672,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2578,7 +2700,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_061
+  - isBoss: 0
+    id: enemy_061
     name: "\uD2B8\uB864"
     race: 2
     align: 6
@@ -2593,6 +2716,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2620,7 +2744,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_062
+  - isBoss: 0
+    id: enemy_062
     name: "\uC6B4\uB514\uB124"
     race: 7
     align: 6
@@ -2635,6 +2760,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2662,7 +2788,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_063
+  - isBoss: 0
+    id: enemy_063
     name: "\uBC40\uD30C\uC774\uC5B4\uB85C\uB4DC"
     race: 3
     align: 6
@@ -2677,6 +2804,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2704,7 +2832,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_064
+  - isBoss: 0
+    id: enemy_064
     name: "\uBC40\uD30C\uC774\uC5B4"
     race: 3
     align: 6
@@ -2719,6 +2848,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2746,7 +2876,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_065
+  - isBoss: 0
+    id: enemy_065
     name: "\uC6CC\uC6B8\uD504"
     race: 1
     align: 6
@@ -2761,6 +2892,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2788,7 +2920,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_066
+  - isBoss: 0
+    id: enemy_066
     name: "\uC6CC\uB7AB"
     race: 1
     align: 6
@@ -2803,6 +2936,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2830,7 +2964,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_067
+  - isBoss: 0
+    id: enemy_067
     name: "\uC70C\uC624\uC704\uC2A4\uD504"
     race: 7
     align: 6
@@ -2845,6 +2980,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2872,7 +3008,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_068
+  - isBoss: 0
+    id: enemy_068
     name: "\uC704\uC800\uB4DC"
     race: 2
     align: 6
@@ -2887,6 +3024,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2914,7 +3052,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_069
+  - isBoss: 0
+    id: enemy_069
     name: "\uC6DC"
     race: 1
     align: 6
@@ -2929,6 +3068,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2956,7 +3096,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_070
+  - isBoss: 0
+    id: enemy_070
     name: "\uC608\uD2F0"
     race: 1
     align: 6
@@ -2971,6 +3112,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2998,7 +3140,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_071
+  - isBoss: 0
+    id: enemy_071
     name: "\uC9C0\uC988"
     race: 1
     align: 6
@@ -3013,6 +3156,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3040,7 +3184,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_072
+  - isBoss: 0
+    id: enemy_072
     name: "\uC880\uBE44"
     race: 1
     align: 6
@@ -3055,6 +3200,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3082,7 +3228,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_073
+  - isBoss: 0
+    id: enemy_073
     name: "\uCF04\uD0C0\uC6B0\uB85C\uC2A4"
     race: 1
     align: 6
@@ -3097,6 +3244,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3124,7 +3272,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_074
+  - isBoss: 0
+    id: enemy_074
     name: "\uCF00\uB974\uBCA0\uB85C\uC2A4"
     race: 1
     align: 6
@@ -3139,6 +3288,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3166,7 +3316,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_075
+  - isBoss: 0
+    id: enemy_075
     name: "\uD0A4\uBA54\uB77C"
     race: 1
     align: 6
@@ -3181,6 +3332,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3208,7 +3360,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_076
+  - isBoss: 0
+    id: enemy_076
     name: "\uD074\uB85C\uC6B4"
     race: 0
     align: 6
@@ -3223,6 +3376,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3250,7 +3404,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_077
+  - isBoss: 0
+    id: enemy_077
     name: "\uCF54\uCE74\uD2B8\uB9AC\uC2A4"
     race: 1
     align: 6
@@ -3265,6 +3420,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3292,7 +3448,8 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - id: enemy_078
+  - isBoss: 0
+    id: enemy_078
     name: "\uD06C\uB9AC\uD551\uBC14\uC778"
     race: 6
     align: 6
@@ -3307,6 +3464,7 @@ MonoBehaviour:
     animInterval: 0.5
     portrait: {fileID: 0}
     prefab: {fileID: 0}
+    basicAttackVfxId: 0
     personality: 4
     timeOfDay: 0
     weather: 0
