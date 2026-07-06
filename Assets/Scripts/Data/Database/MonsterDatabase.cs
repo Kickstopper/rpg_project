@@ -30,7 +30,6 @@ public class MonsterDatabase : ScriptableObject
         public Sprite[] image;     // 이미지
         public float animInterval = 0.5f; // 애니메이션 프레임 간격
         public Sprite portrait;     // 초상화
-        public GameObject prefab;   // 우선 순위가 더 높은 몬스터 프리팹 (비어있을 경우 기본 프리팹 사용)
         
         [Header("Battle")]
         public VfxID basicAttackVfxId;    // 기본 공격 이펙트 ID
@@ -253,7 +252,7 @@ public class MonsterDatabase : ScriptableObject
         {
             // "D3" 포맷 문자열은 숫자를 3자리로 맞추고 빈 자리는 0으로 채웁니다.
             // 예: 1 -> "001", 23 -> "023", 105 -> "105"
-            entries[i].id = i.ToString("D3");
+            entries[i].id = $"enemy_{i.ToString("D3")}";
         }
 
 #if UNITY_EDITOR

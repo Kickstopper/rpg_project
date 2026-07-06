@@ -263,10 +263,7 @@ public class BattleFieldController : MonoBehaviour
         Transform selectedSlot = targetSlots[randomIndex];
 
         // 생성
-        GameObject prefabToUse = (entry.prefab != null) ? entry.prefab : defaultMonsterPrefab;
-        if (prefabToUse == null) return;
-
-        GameObject newMonsterObj = Instantiate(prefabToUse, selectedSlot);
+        GameObject newMonsterObj = Instantiate(defaultMonsterPrefab, selectedSlot);
         newMonsterObj.transform.localPosition = Vector3.zero;
 
         MonsterController controller = newMonsterObj.GetComponentInChildren<MonsterController>();
