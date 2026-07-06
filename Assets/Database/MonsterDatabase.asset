@@ -59,15 +59,15 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_001
-    name: "\uC5B4\uC0C8\uC2E0"
-    race: 0
+    name: "\uCFE0\uAD6C\uCE20 \uB2CC\uC790"
+    race: 8
     align: 6
     gender: 1
     image:
-    - {fileID: 21300000, guid: 63e3759628c898247ad6515de443b774, type: 3}
-    - {fileID: 21300000, guid: 7e46a950eb8f8e4439a4d3e88a31d6fb, type: 3}
+    - {fileID: 4593729446998044006, guid: b74367dcc53b7e241aaa41c4056afb5c, type: 3}
+    - {fileID: 1750390061035014481, guid: 7b3b145e6638ed3438be0cecb1a81403, type: 3}
     animInterval: 0.5
-    portrait: {fileID: 21300000, guid: 2bc40d066df44cc46ada75842993d647, type: 3}
+    portrait: {fileID: -3915644702571324760, guid: da13c585de320734e96684b1961b001b, type: 3}
     prefab: {fileID: 0}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
@@ -411,7 +411,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_009
-    name: "\uB370\uBE4C\uD50C\uB79C\uD2B8"
+    name: "\uB370\uBE4C \uD50C\uB79C\uD2B8"
     race: 6
     align: 6
     gender: 0
@@ -455,7 +455,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 1
     id: enemy_010
-    name: "\uACE8\uB4DC\uB4DC\uB798\uACE4"
+    name: "\uACE8\uB4DC \uB4DC\uB798\uACE4"
     race: 4
     align: 6
     gender: 0
@@ -631,7 +631,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_014
-    name: "\uC774\uBE14\uC544\uC774"
+    name: "\uC774\uBE14 \uC544\uC774"
     race: 5
     align: 6
     gender: 0
@@ -675,7 +675,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_015
-    name: "\uC774\uBE14\uC6E8\uD3F0"
+    name: "\uC774\uBE14 \uC6E8\uD3F0"
     race: 5
     align: 6
     gender: 0
@@ -3459,6 +3459,1678 @@ MonoBehaviour:
     - {fileID: 21300000, guid: ff93238253109794daa4b7d6f12f8828, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 895c33a33d4cbc142bef203ac44c3885, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_079
+    name: "\uC544\uB354"
+    race: 6
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: f2350626541db8c419e3fa51266fa424, type: 3}
+    - {fileID: 21300000, guid: 29f1a47b82793d245a5bda41121e6680, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 783b9b5dbf7dd184fb0559b6e85c5aa1, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_080
+    name: "\uC5EC\uAE30\uC0AC"
+    race: 6
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: b85635e562747ba47a971197d34c062b, type: 3}
+    - {fileID: 21300000, guid: b85635e562747ba47a971197d34c062b, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 27a39b46f617d194087842dbc54c0168, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_081
+    name: "\uC81C\uCC9C\uB300\uC131"
+    race: 1
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 7fa229dbd7039ea47b298bd4b20b069f, type: 3}
+    - {fileID: 21300000, guid: 8d73f8d1a1222d547bbf3949c8f2fc8e, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 9ff64bc7ec3b6754988de01c3c324c97, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_082
+    name: "\uAD8C\uC0AC"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: 6a481890abe19334b81fe310c2998305, type: 3}
+    - {fileID: 21300000, guid: 6355fb876b390e24ba9ac07589d6dc4e, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 3399b8a70a155c846b62988f7ae98855, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_083
+    name: "\uB4DC\uB8E8\uC774\uB4DC"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: 2759d6091579de64bb817cc61c6c9204, type: 3}
+    - {fileID: 21300000, guid: b2ed450e1b58d1b46b9d2c666c501153, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: ad66767da30e1f346a73f1febefbd469, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_084
+    name: "\uAD81\uC218"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: b6b7fc7117003744392d9878362c5b9f, type: 3}
+    - {fileID: 21300000, guid: 82e9273d0cc991c4784e23a0c5f36865, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: fe5598c40cf709f478adce963f55f151, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_085
+    name: "\uBC31\uB9C8\uBC95\uC0AC"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: e7d4434aecdc01f438ff84455d2d5822, type: 3}
+    - {fileID: 21300000, guid: db463cf06de271f4cb73994d6b0b215f, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: b4aa5fdce93453d4591ce2c33cfab96b, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_086
+    name: "\uC5EC\uC2B9\uB824"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: d7a53f075725180409de723cb8a448d4, type: 3}
+    - {fileID: 21300000, guid: fcae5e7102237be43b8e4904a05985e1, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 91c0bd49dd634f2408d854aeeaa453fe, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_087
+    name: "\uD751\uB9C8\uBC95\uC0AC"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: 0c37471d3ea4f3149905c1ff855f4e0b, type: 3}
+    - {fileID: 21300000, guid: c49df7d0a07fdd3438cbc982412135dc, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 35a54bbcec77a0b4d80a9497139564cb, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_087
+    name: "\uD751\uB9C8\uBC95\uC0AC"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: d8fed56d62bcb494da4a274d2ca43b04, type: 3}
+    - {fileID: 21300000, guid: 48b87af41f101bd49929d8f050afa137, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 1d0bebe075871294289c59e205f755e7, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_087
+    name: "\uD574\uC801"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 1c3a87ba97bd2c74b947658a7735c8b1, type: 3}
+    - {fileID: 21300000, guid: 3d670677626d52d4c90dc305067f0d40, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 291e7a57b21d1654d9feea0e2bf79fbd, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_087
+    name: "\uC5EC\uD574\uC801"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: 1c3a87ba97bd2c74b947658a7735c8b1, type: 3}
+    - {fileID: 21300000, guid: 3d670677626d52d4c90dc305067f0d40, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: a4b42a28fdcd96d4b9918142f4d2248a, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_091
+    name: "\uBC1C\uD0A4\uB9AC"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: 1a6a74a3c79100f4fbb2cd7b0643d7d6, type: 3}
+    - {fileID: 21300000, guid: 8c15dda534b648c4a9a99930bdbf0da5, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 3c489e5d9a2a23a4197719523b6f5d76, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_092
+    name: "\uBC15\uAC00\uC2A4"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: afb4fc228b0ac54498fd9a82d38d89f2, type: 3}
+    - {fileID: 21300000, guid: 858353e629650304bb72afe563aff1a5, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 116227473791b4c44bdf29898de8dcfc, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_093
+    name: "\uB4DC\uB798\uACE4 \uB098\uC774\uD2B8"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 17eac93e3e602964097f79eade467154, type: 3}
+    - {fileID: 21300000, guid: 2115ec65407e4fb4890936358cc64784, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 26d271487d6e0874b96d6040650bd5d0, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_094
+    name: "\uBBF8\uB0A8\uAE30\uC0AC"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 0ac28e6439544654c8715d518dbfe1f9, type: 3}
+    - {fileID: 21300000, guid: eccf5943b9aea044cb0e0677cf660529, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: c5bda23215df5a04682de3e0c2cd5521, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_095
+    name: "\uBC34\uB514\uD2B8"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: f3231e54d170a824cb9877e68607a5ad, type: 3}
+    - {fileID: 21300000, guid: 3e2a6b42d6549c64da545cb9308f462c, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 34aed709f6dac8f44ac71b2f4b803c5d, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_096
+    name: "\uC5EC\uC7A5\uBD80"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: f9f8278ce85d63d43962f39278e7544c, type: 3}
+    - {fileID: 21300000, guid: df06c7a3c25eb1f4c822d59f6e934263, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: d0edeb075abd867408246ac72d4649b1, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_097
+    name: "\uC758\uC0AC"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 552e3dd22cf41c94f852ea1dfa7ff040, type: 3}
+    - {fileID: 21300000, guid: f8a0fe462ee39424881f37ca62e1e811, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: b37a20538d76d224a82d2e6f37eefad6, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_098
+    name: "\uC5EC\uD604\uC790"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: c95cc82dd4981b541951416095860493, type: 3}
+    - {fileID: 21300000, guid: 47b45badc4a32e846942c0a6c9e62051, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: ffa2a62ce15957e479d5da90933fa698, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_099
+    name: "\uBBFC\uD2B8 \uC5EC\uC804\uC0AC"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 4dc00c7fc92eaca4aa60868ff78a79be, type: 3}
+    - {fileID: 21300000, guid: d8687c1a18adcfa40885d54791590cb3, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 54766a70610d3d64185359c927c803ef, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_100
+    name: "\uC5D8\uD504\uB0A8"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 683a266754f90bd42b9da5f048be5cb2, type: 3}
+    - {fileID: 21300000, guid: 5e602c2ca8e64c843b9950e3665d7722, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 883427eb0c0508c4d9c5d3130c46d858, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_101
+    name: "\uC5D8\uD504\uB140"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 5e9f48b76af4a8240963e521edc72c71, type: 3}
+    - {fileID: 21300000, guid: 4d39ee549abb8414c84c7287a048202a, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 2bfa483cfd7dd1148a48e4ea852d9c32, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_102
+    name: "\uC911\uB144\uAE30\uC0AC"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 0df187915a72f0c4aafaf8335b9aeb99, type: 3}
+    - {fileID: 21300000, guid: bc8b10f0d0d493b45b11e8d413c12edf, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: af6bf3f69b9bc194aa2d4801004dcdcc, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_103
+    name: "\uD504\uB808\uC774"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: b7560889e7fc13c45aad745bc897d1f6, type: 3}
+    - {fileID: 21300000, guid: e1fe9329a5c024c4faf1bc7216ba6229, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 15ccfa3a6015ebd4faa841b42c724003, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_104
+    name: "\uB2EC\uB77C\uC774\uC2E0"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: 0848ffef9b5b6eb489daf93acaeba7c8, type: 3}
+    - {fileID: 21300000, guid: 5268fafb547b11b488823d7c2c1eccfc, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 16146f97043974f4b86a32bad8bc7d21, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_105
+    name: "\uC74C\uC720\uC2DC\uC778"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: a28ec8744d45dec46abca16d53ae8ba6, type: 3}
+    - {fileID: 21300000, guid: 94524b3aba458364898a755eafe46de0, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 7db76e8c520c5f04f82f8c6c6a4cf8e7, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_106
+    name: "\uB291\uB300\uC18C\uB144"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 5c0de5b98c823cd429ea184ee4c9aba9, type: 3}
+    - {fileID: 21300000, guid: 202d30eb59d5deb4f9770f966dc5fa46, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 93d38c5c1b7f09540b4143b66a475cc5, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_107
+    name: "\uC0AC\uC2B4\uC18C\uB140"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: e2fa95bb5ed6ded4e8a4cce8451e5334, type: 3}
+    - {fileID: 21300000, guid: 57102d929dd1c5740aaec360e918a1a4, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 02669b0480ada7f478d30ca335877dbd, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_108
+    name: "\uB3C4\uB07C\uAE30\uC0AC"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: c3656d93a27dff24ba1ebd24b7cef100, type: 3}
+    - {fileID: 21300000, guid: 431b26c43b0a68f489343801f51034d0, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 32c2538cb49a7184880b99d23a08aa2a, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_109
+    name: "\uB9E4\uD639\uC758 \uB304\uC11C"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: 2e9fd4a19e97c224cbd9443776c290e8, type: 3}
+    - {fileID: 21300000, guid: 1518952ce60a17242a6f86ac56b618d8, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 7017a10c2d0a74145a2e1110f8d01bf6, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_110
+    name: "\uB2CC\uC790"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: d74781b7b2a30034a978bfc569d78242, type: 3}
+    - {fileID: 21300000, guid: 542fc9b7efd2f954985742e179bb7f1c, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 0ec481d6a5acc434897376985e1f68a7, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_111
+    name: "\uCFE0\uB178\uC774\uCE58"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: 024dae8794d874044ab3c83bc22a0b39, type: 3}
+    - {fileID: 21300000, guid: 7fa8423b0fd000647bf0542760dd2d4d, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 9854cad3db1d8e64495fa73a44c5bad1, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_112
+    name: "\uBBF8\uB798\uBCD1\uC0AC"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 54e0ce5f7657edd4c86322721577344c, type: 3}
+    - {fileID: 21300000, guid: 0d08cb3a9af2b274aaec67b228e5a8dd, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: f1d990255c54e0c48877727edb135a2a, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_113
+    name: "\uC5EC\uC790\uBBF8\uB798\uBCD1\uC0AC"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: f8408adef51c8fe4ab665a9c200f78c2, type: 3}
+    - {fileID: 21300000, guid: 00094edfdb5409647baded27c90c8e06, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: f7121e9ea57232d4abccefef7ea1a684, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_114
+    name: "\uD138\uBCF5\uC22D\uC774"
+    race: 0
+    align: 6
+    gender: 0
+    image:
+    - {fileID: 21300000, guid: 7fd0d6198d0cd7a4d8b65a3abd6a84e9, type: 3}
+    - {fileID: 21300000, guid: 949698667a609424e8d03f0d052f4f6d, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 393c3f2ca06cd6543809306a285c6d0f, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_115
+    name: "\uB4DC\uB77C\uACE0\uB098"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: 4632e300b0857da48ae84c2a2b196b7e, type: 3}
+    - {fileID: 21300000, guid: 2ad75df192daacd488a3af8fbf9ea070, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 0bcad9ddfd263b34a892f7525ec08832, type: 3}
+    prefab: {fileID: 0}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 1
+      str: 5
+      mag: 5
+      intel: 3
+      vit: 3
+      agi: 4
+      luc: 5
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileResultMsg: HELLO!
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_116
+    name: "\uB124\uCF54\uB9C8\uD0C0"
+    race: 0
+    align: 6
+    gender: 1
+    image:
+    - {fileID: 21300000, guid: ece4cdd628194fc49970d86748964501, type: 3}
+    - {fileID: 21300000, guid: 84c2f6f60f9f0d544a2642544421cd9a, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: c0fdc6fe652088f42a754c28ac07718e, type: 3}
     prefab: {fileID: 0}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
