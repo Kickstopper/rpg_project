@@ -15,7 +15,7 @@ MonoBehaviour:
   entries:
   - isBoss: 0
     id: enemy_000
-    name: "\uBC15\uAC00\uC2A4"
+    name: "\uD504\uB808\uC774\uC57C"
     race: 0
     align: 6
     gender: 1
@@ -101,7 +101,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_002
-    name: "\uBBF8\uB0A8\uAE30\uC0AC"
+    name: "\uC9C0\uD06C\uD504\uB9AC\uD2B8"
     race: 0
     align: 6
     gender: 0
@@ -111,7 +111,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 0ac28e6439544654c8715d518dbfe1f9, type: 3}
     - {fileID: 21300000, guid: eccf5943b9aea044cb0e0677cf660529, type: 3}
     animInterval: 0.5
-    portrait: {fileID: 21300000, guid: c5bda23215df5a04682de3e0c2cd5521, type: 3}
+    portrait: {fileID: 21300000, guid: a432534ca45bb714c92b41bac9b69712, type: 3}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -230,10 +230,10 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_005
-    name: "\uBC1C\uD0A4\uB9AC"
+    name: "\uCFE0\uD6CC\uB9B0"
     race: 0
     align: 6
-    gender: 1
+    gender: 0
     compileResultMsg: HELLO!
     compileAscii: {fileID: 4900000, guid: fec91129768e25244a97ba24414947b6, type: 3}
     image:
@@ -273,7 +273,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_006
-    name: "\uC5EC\uD574\uC801"
+    name: "\uC564 \uBCF4\uB2C8"
     race: 0
     align: 6
     gender: 1
@@ -316,7 +316,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_007
-    name: "\uD574\uC801"
+    name: "\uBA54\uB9AC \uB9AC\uB4DC"
     race: 0
     align: 6
     gender: 0
@@ -402,7 +402,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_009
-    name: "\uD751\uB9C8\uBC95\uC0AC"
+    name: "\uCF00\uB9AC\uB4DC\uC6EC"
     race: 0
     align: 6
     gender: 1
@@ -445,7 +445,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_010
-    name: "\uC5EC\uC2B9\uB824"
+    name: "\uBA54\uB370\uC774\uC544"
     race: 0
     align: 6
     gender: 1
@@ -488,7 +488,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_011
-    name: "\uBC31\uB9C8\uBC95\uC0AC"
+    name: "\uD540 \uB9C9 \uCFE8"
     race: 0
     align: 6
     gender: 0
@@ -531,12 +531,12 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_012
-    name: "\uAD81\uC218"
+    name: "\uBE4C\uD5EC\uB984 \uD154"
     race: 0
     align: 6
-    gender: 1
+    gender: 0
     compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 375a81afe457e8b4f8e31d6b99b18afe, type: 3}
+    compileAscii: {fileID: 4900000, guid: 361d315baebc0244c86d84a9133449f3, type: 3}
     image:
     - {fileID: 21300000, guid: 2759d6091579de64bb817cc61c6c9204, type: 3}
     - {fileID: 21300000, guid: b2ed450e1b58d1b46b9d2c666c501153, type: 3}
@@ -574,12 +574,12 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_013
-    name: "\uB4DC\uB8E8\uC774\uB4DC"
+    name: "\uBCA8\uB808\uB2E4"
     race: 0
     align: 6
     gender: 1
     compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 361d315baebc0244c86d84a9133449f3, type: 3}
+    compileAscii: {fileID: 4900000, guid: 375a81afe457e8b4f8e31d6b99b18afe, type: 3}
     image:
     - {fileID: 21300000, guid: b6b7fc7117003744392d9878362c5b9f, type: 3}
     - {fileID: 21300000, guid: 82e9273d0cc991c4784e23a0c5f36865, type: 3}
@@ -617,7 +617,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_014
-    name: "\uAD8C\uC0AC"
+    name: "\uC190\uC0C1\uD5A5"
     race: 0
     align: 6
     gender: 1
@@ -703,7 +703,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_016
-    name: "\uC2DC\uD504"
+    name: "\uB85C\uADF8"
     race: 0
     align: 6
     gender: 0
@@ -746,7 +746,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_017
-    name: "\uD751\uB9C8\uBC95\uC0AC"
+    name: "\uC554\uC0B4\uC790"
     race: 0
     align: 6
     gender: 1
@@ -789,7 +789,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_018
-    name: "\uC5EC\uC7A5\uBD80"
+    name: "\uBCA8\uB85C\uB098"
     race: 0
     align: 6
     gender: 1
@@ -832,7 +832,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 1
     id: enemy_019
-    name: "\uB77C\uBB34"
+    name: "\uCE74\uD750\uBC14\uB4DC"
     race: 0
     align: 6
     gender: 0
@@ -875,7 +875,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_020
-    name: "\uC5EC\uD604\uC790"
+    name: "\uBE0C\uB9AC\uC9C0\uB4DC"
     race: 0
     align: 6
     gender: 1
@@ -961,50 +961,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_022
-    name: "\uC758\uC0AC"
-    race: 0
-    align: 6
-    gender: 0
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 55bfa42fc1c0f6641baacc9a011056dd, type: 3}
-    image:
-    - {fileID: 21300000, guid: 552e3dd22cf41c94f852ea1dfa7ff040, type: 3}
-    - {fileID: 21300000, guid: f8a0fe462ee39424881f37ca62e1e811, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: b37a20538d76d224a82d2e6f37eefad6, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 1
-      str: 5
-      mag: 5
-      intel: 3
-      vit: 3
-      agi: 4
-      luc: 5
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_023
-    name: "\uCFE0\uB178\uC774\uCE58"
+    name: "\uBAA8\uCE58\uC988\uD0A4 \uCE58\uC694\uBA54"
     race: 0
     align: 6
     gender: 1
@@ -1046,8 +1003,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_024
-    name: "\uB2CC\uC790"
+    id: enemy_023
+    name: "\uD6C4\uC6B0\uB9C8 \uCF54\uD0C0\uB85C\uC6B0"
     race: 0
     align: 6
     gender: 0
@@ -1089,8 +1046,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_025
-    name: "\uB9E4\uD639\uC758 \uB304\uC11C"
+    id: enemy_024
+    name: "\uD788\uBBF8\uCF54"
     race: 0
     align: 6
     gender: 1
@@ -1132,8 +1089,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_026
-    name: "\uB3C4\uB07C\uAE30\uC0AC"
+    id: enemy_025
+    name: "\uC544\uC2A4\uD14C\uB9AC\uC628"
     race: 0
     align: 6
     gender: 0
@@ -1175,11 +1132,11 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_027
-    name: "\uC0AC\uC2B4\uC18C\uB140"
+    id: enemy_026
+    name: "\uD5E4\uCE74\uD14C"
     race: 0
     align: 6
-    gender: 0
+    gender: 1
     compileResultMsg: HELLO!
     compileAscii: {fileID: 4900000, guid: c32759fa06bc9bc42b80497d983da989, type: 3}
     image:
@@ -1218,8 +1175,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_028
-    name: "\uB291\uB300\uC18C\uB144"
+    id: enemy_027
+    name: "\uD37D"
     race: 0
     align: 6
     gender: 0
@@ -1261,7 +1218,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_029
+    id: enemy_028
     name: "\uBBF8\uB798\uBCD1\uC0AC"
     race: 0
     align: 6
@@ -1304,8 +1261,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_030
-    name: "\uB2EC\uB77C\uC774\uC2E0"
+    id: enemy_029
+    name: "\uBCF4\uB514\uB2E4\uB974\uB9C8"
     race: 0
     align: 6
     gender: 1
@@ -1347,8 +1304,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_031
-    name: "\uD504\uB808\uC774"
+    id: enemy_030
+    name: "\uD0A4\uB974\uCF00"
     race: 0
     align: 6
     gender: 1
@@ -1390,8 +1347,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_032
-    name: "\uC911\uB144\uAE30\uC0AC"
+    id: enemy_031
+    name: "\uB864\uB791"
     race: 0
     align: 6
     gender: 0
@@ -1433,8 +1390,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_033
-    name: "\uC5D8\uD504\uB140"
+    id: enemy_032
+    name: "\uB8CC\uC0B4\uD30C\uB974"
     race: 0
     align: 6
     gender: 0
@@ -1476,8 +1433,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_034
-    name: "\uC5D8\uD504\uB0A8"
+    id: enemy_033
+    name: "\uB8CC\uC0B4\uD504"
     race: 0
     align: 6
     gender: 0
@@ -1519,8 +1476,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_035
-    name: "\uBBFC\uD2B8 \uC5EC\uC804\uC0AC"
+    id: enemy_034
+    name: "\uC2A4\uCE74\uD558\uD06C"
     race: 0
     align: 6
     gender: 0
@@ -1562,8 +1519,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_036
-    name: "\uBC14\uC988"
+    id: enemy_035
+    name: "\uD0C8\uB9AC\uC5D0\uC2E0"
     race: 0
     align: 6
     gender: 1
@@ -1605,8 +1562,8 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_037
-    name: "\uB4DC\uB77C\uACE0\uB098"
+    id: enemy_036
+    name: "\uB4DC\uB798\uACE4\uD3EC\uD06C"
     race: 1
     align: 6
     gender: 1
@@ -1648,7 +1605,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_038
+    id: enemy_037
     name: "\uD138\uBCF5\uC22D\uC774"
     race: 1
     align: 6
@@ -1691,7 +1648,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_039
+    id: enemy_038
     name: "\uC6E8\uC5B4\uC6B8\uD504"
     race: 1
     align: 6
@@ -1734,7 +1691,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_040
+    id: enemy_039
     name: "\uC6E8\uC5B4\uB7AB"
     race: 1
     align: 6
@@ -1777,7 +1734,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_041
+    id: enemy_040
     name: "\uC6DC"
     race: 1
     align: 6
@@ -1820,7 +1777,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_042
+    id: enemy_041
     name: "\uC608\uD2F0"
     race: 1
     align: 6
@@ -1863,7 +1820,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_043
+    id: enemy_042
     name: "\uCF00\uB974\uBCA0\uB85C\uC2A4"
     race: 1
     align: 6
@@ -1906,7 +1863,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_044
+    id: enemy_043
     name: "\uC880\uBE44"
     race: 1
     align: 6
@@ -1949,7 +1906,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_045
+    id: enemy_044
     name: "\uCF04\uD0C0\uC6B0\uB85C\uC2A4"
     race: 1
     align: 6
@@ -1992,7 +1949,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_046
+    id: enemy_045
     name: "\uD0A4\uBA54\uB77C"
     race: 1
     align: 6
@@ -2035,7 +1992,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_047
+    id: enemy_046
     name: "\uCF54\uCE74\uD2B8\uB9AC\uC2A4"
     race: 1
     align: 6
@@ -2078,7 +2035,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_048
+    id: enemy_047
     name: "\uC81C\uCC9C\uB300\uC131"
     race: 1
     align: 6
@@ -2121,7 +2078,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_049
+    id: enemy_048
     name: "\uC2AC\uB808\uC774\uD504\uB2C8\uB974"
     race: 1
     align: 6
@@ -2164,7 +2121,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_050
+    id: enemy_049
     name: "\uC9C0\uC988"
     race: 1
     align: 6
@@ -2207,7 +2164,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_051
+    id: enemy_050
     name: "\uC2AC\uB77C\uC784"
     race: 1
     align: 6
@@ -2250,7 +2207,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_052
+    id: enemy_051
     name: "\uB124\uCF54\uB9C8\uD0C0"
     race: 1
     align: 6
@@ -2293,7 +2250,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_053
+    id: enemy_052
     name: "\uD0AC\uB7EC\uBE44"
     race: 1
     align: 6
@@ -2336,7 +2293,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_054
+    id: enemy_053
     name: "\uD638\uC800"
     race: 1
     align: 6
@@ -2379,7 +2336,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_055
+    id: enemy_054
     name: "\uB79C\uB4DC\uD130\uD2C0"
     race: 1
     align: 6
@@ -2422,7 +2379,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_056
+    id: enemy_055
     name: "\uD558\uD53C"
     race: 1
     align: 6
@@ -2465,7 +2422,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_057
+    id: enemy_056
     name: "\uC0D0\uB7EC\uB9E8\uB354"
     race: 1
     align: 6
@@ -2508,7 +2465,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_058
+    id: enemy_057
     name: "\uADF8\uB9AC\uD3F0"
     race: 1
     align: 6
@@ -2551,7 +2508,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_059
+    id: enemy_058
     name: "\uB9CC\uD2F0\uCF54\uC5B4"
     race: 1
     align: 6
@@ -2594,7 +2551,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_060
+    id: enemy_059
     name: "\uBA38\uBA54\uC774\uB4DC"
     race: 1
     align: 6
@@ -2637,7 +2594,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_061
+    id: enemy_060
     name: "\uD0AC\uB7EC\uD53C\uC2DC"
     race: 1
     align: 6
@@ -2680,7 +2637,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_062
+    id: enemy_061
     name: "\uBA38\uB9E8"
     race: 1
     align: 6
@@ -2723,7 +2680,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_063
+    id: enemy_062
     name: "\uD06C\uB77C\uCF04"
     race: 1
     align: 6
@@ -2766,7 +2723,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_064
+    id: enemy_063
     name: "\uC624\uC624\uAC00\uB9C8"
     race: 1
     align: 6
@@ -2809,7 +2766,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_065
+    id: enemy_064
     name: "\uC824\uB9AC\uD53C\uC2DC"
     race: 1
     align: 6
@@ -2852,7 +2809,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_066
+    id: enemy_065
     name: "\uC624\uD06C"
     race: 1
     align: 6
@@ -2895,7 +2852,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_067
+    id: enemy_066
     name: "\uBCA0\uD5E4\uBAA8\uC2A4"
     race: 1
     align: 6
@@ -2938,7 +2895,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_068
+    id: enemy_067
     name: "\uCE74\uB9C8\uC18C\uD2B8"
     race: 1
     align: 6
@@ -2981,7 +2938,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_069
+    id: enemy_068
     name: "\uCF08\uD53C"
     race: 1
     align: 6
@@ -3024,7 +2981,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_070
+    id: enemy_069
     name: "\uB4C0\uB77C\uD55C"
     race: 2
     align: 6
@@ -3067,7 +3024,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_071
+    id: enemy_070
     name: "\uD2B8\uB864"
     race: 2
     align: 6
@@ -3110,7 +3067,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_072
+    id: enemy_071
     name: "\uC704\uC800\uB4DC"
     race: 2
     align: 6
@@ -3153,7 +3110,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_073
+    id: enemy_072
     name: "\uBA54\uB450\uC0AC"
     race: 2
     align: 6
@@ -3196,7 +3153,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_074
+    id: enemy_073
     name: "\uBBF8\uB178\uD0C0\uC6B0\uB974\uC2A4"
     race: 2
     align: 6
@@ -3239,7 +3196,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_075
+    id: enemy_074
     name: "\uD6CC\uB4DC\uB808\uCE7C"
     race: 2
     align: 6
@@ -3282,7 +3239,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_076
+    id: enemy_075
     name: "\uD6CC\uB4DC\uB77C"
     race: 2
     align: 6
@@ -3325,7 +3282,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_077
+    id: enemy_076
     name: "\uC2DC\uBC14"
     race: 2
     align: 6
@@ -3368,7 +3325,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_078
+    id: enemy_077
     name: "\uC784\uD504"
     race: 3
     align: 6
@@ -3411,7 +3368,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_079
+    id: enemy_078
     name: "\uBCA8\uB9AC\uC54C"
     race: 3
     align: 6
@@ -3454,7 +3411,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_080
+    id: enemy_079
     name: "\uBC14\uC54C"
     race: 3
     align: 6
@@ -3497,7 +3454,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_081
+    id: enemy_080
     name: "\uAC00\uACE0\uC77C"
     race: 3
     align: 6
@@ -3540,7 +3497,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_082
+    id: enemy_081
     name: "\uB9AC\uD37C"
     race: 3
     align: 6
@@ -3583,7 +3540,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_083
+    id: enemy_082
     name: "\uB9B4\uB9AC\uC2A4"
     race: 3
     align: 5
@@ -3626,7 +3583,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_084
+    id: enemy_083
     name: "\uC2A4\uD0AC\uB77C"
     race: 3
     align: 6
@@ -3669,7 +3626,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_085
+    id: enemy_084
     name: "\uB4DC\uB77C\uD058\uB77C"
     race: 3
     align: 6
@@ -3712,7 +3669,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_086
+    id: enemy_085
     name: "\uBC40\uD30C\uC774\uC5B4"
     race: 3
     align: 6
@@ -3755,7 +3712,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_087
+    id: enemy_086
     name: "\uBBF8\uBBF9"
     race: 3
     align: 6
@@ -3798,7 +3755,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_088
+    id: enemy_087
     name: "\uD3EC\uC774\uC98C\uC13C\uD2F0\uD53C\uB4DC"
     race: 4
     align: 6
@@ -3841,7 +3798,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_089
+    id: enemy_088
     name: "\uACE8\uB4DC \uB4DC\uB798\uACE4"
     race: 4
     align: 6
@@ -3884,7 +3841,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_090
+    id: enemy_089
     name: "\uB77C\uBBF8\uC544"
     race: 4
     align: 6
@@ -3927,7 +3884,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_091
+    id: enemy_090
     name: "\uB808\uBE44\uC544\uD0C4"
     race: 4
     align: 6
@@ -3970,7 +3927,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_092
+    id: enemy_091
     name: "\uC694\uB974\uBB38\uAC04\uB4DC"
     race: 4
     align: 6
@@ -4013,7 +3970,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_093
+    id: enemy_092
     name: "\uB4DC\uB860"
     race: 5
     align: 6
@@ -4056,7 +4013,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_094
+    id: enemy_093
     name: "\uC774\uBE14 \uC544\uC774"
     race: 5
     align: 6
@@ -4099,7 +4056,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_095
+    id: enemy_094
     name: "\uC774\uBE14 \uC6E8\uD3F0"
     race: 5
     align: 6
@@ -4145,7 +4102,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_096
+    id: enemy_095
     name: "\uAC00\uB4DC"
     race: 5
     align: 6
@@ -4188,7 +4145,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_097
+    id: enemy_096
     name: "\uB370\uBE4C \uD50C\uB79C\uD2B8"
     race: 6
     align: 6
@@ -4231,7 +4188,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_098
+    id: enemy_097
     name: "\uB9E8\uB4DC\uB808\uC774\uD06C"
     race: 6
     align: 6
@@ -4274,7 +4231,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_099
+    id: enemy_098
     name: "\uC5EC\uAE30\uC0AC"
     race: 6
     align: 6
@@ -4317,7 +4274,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_100
+    id: enemy_099
     name: "\uD06C\uB9AC\uD551\uBC14\uC778"
     race: 6
     align: 6
@@ -4360,7 +4317,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_101
+    id: enemy_100
     name: "\uD2B8\uB80C\uD2B8"
     race: 6
     align: 6
@@ -4403,7 +4360,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_102
+    id: enemy_101
     name: "\uB4DC\uB77C\uC774\uC5B4\uB4DC"
     race: 6
     align: 6
@@ -4446,7 +4403,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_103
+    id: enemy_102
     name: "\uC544\uB354"
     race: 6
     align: 6
@@ -4489,7 +4446,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_104
+    id: enemy_103
     name: "\uC544\uD2C0\uB77C\uC2A4"
     race: 7
     align: 6
@@ -4532,7 +4489,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_105
+    id: enemy_104
     name: "\uBC1C\uB85C\uADF8"
     race: 7
     align: 6
@@ -4575,7 +4532,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_106
+    id: enemy_105
     name: "\uACE8\uB818"
     race: 7
     align: 6
@@ -4618,7 +4575,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_107
+    id: enemy_106
     name: "\uC774\uD504\uB9AC\uD2B8"
     race: 7
     align: 6
@@ -4661,7 +4618,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_108
+    id: enemy_107
     name: "\uC6B4\uB514\uB124"
     race: 7
     align: 6
@@ -4704,7 +4661,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_109
+    id: enemy_108
     name: "\uC2A4\uD504\uB77C\uC774\uD2B8"
     race: 7
     align: 6
@@ -4747,7 +4704,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_110
+    id: enemy_109
     name: "\uC70C\uC624\uC704\uC2A4\uD504"
     race: 7
     align: 6
@@ -4790,7 +4747,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_111
+    id: enemy_110
     name: "\uACE0\uBE14\uB9B0"
     race: 7
     align: 6
@@ -4833,7 +4790,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_112
+    id: enemy_111
     name: "\uC9C4"
     race: 7
     align: 6
@@ -4876,7 +4833,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_113
+    id: enemy_112
     name: "\uBA38\uBBF8"
     race: 8
     align: 6
@@ -4919,7 +4876,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_114
+    id: enemy_113
     name: "\uC2A4\uCF08\uB808\uD1A4"
     race: 8
     align: 6
@@ -4962,7 +4919,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_115
+    id: enemy_114
     name: "\uBC34\uC2DC"
     race: 8
     align: 6
@@ -5005,7 +4962,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_116
+    id: enemy_115
     name: "\uCFE0\uAD6C\uCE20 \uB2CC\uC790"
     race: 8
     align: 6
