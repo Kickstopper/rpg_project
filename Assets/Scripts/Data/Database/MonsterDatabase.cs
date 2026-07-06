@@ -21,6 +21,10 @@ public class MonsterDatabase : ScriptableObject
         public Race race;         // "요정"
         public Align align;
         public Gender gender;
+        
+        [Header("Compile")]
+        public string compileResultMsg = "HELLO!";
+        public TextAsset compileAscii;
 
         [Header("Visual")]
         public Sprite[] image;     // 이미지
@@ -40,10 +44,6 @@ public class MonsterDatabase : ScriptableObject
         [Header("Battle Stats")]
         public StatData stats;             // 레벨, 힘, 마력, 체력 등
         public ResistanceData resistances; // 물리, 화염, 빙결 내성 등
-
-        [Header("Compile")]        
-        public TextAsset compileAscii;
-        public string compileResultMsg = "HELLO!";
         
         [Header("Negotiation")]
         public Personality personality;
