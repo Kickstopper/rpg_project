@@ -13,7 +13,7 @@ namespace Helper
         // =======================================================
         // [데미지 공식]
         // =======================================================
-        public static int CalculateDamage(BattleEntity attacker, BattleEntity defender, BattleAction action, bool isCritical, float damageMultiplier)
+        public static int CalculateDamage(BattleEntity attacker, BattleEntity defender, BattleAction action, bool isCritical, float damageMultiplier = 1.0f)
         {
             if (attacker == null || defender == null) return 0;
 
@@ -21,9 +21,11 @@ namespace Helper
             bool isGun = (action.type == ActionType.Shoot);
 
             float rawDamage = 0f;
-
+            ElementType element = ElementType.None;
             if (isMagic)
             {
+                element = action.skillData.element;   
+
                 // [마법 대미지]: (MATK * effectValue) / MDEF
                 int matk = attacker.GetMagicAttack();
                 int mdef = defender.GetMagicDefense();
@@ -33,6 +35,8 @@ namespace Helper
             }
             else
             {
+                element = ElementType.Physical;
+
                 // [물리 대미지]: (ATK * (ATK / 4 + 4)) / DEF
                 int atk = isGun ? ((PlayerController)attacker).GetGunAttack() : attacker.GetAttack();
                 int def = defender.GetDefense();
@@ -42,8 +46,7 @@ namespace Helper
 
             // 성향 상성 및 내성 보정
             float alignBonus = AlignmentSystem.GetDamageModifier(attacker.align, defender.align);
-            float resistanceValue = GetResistanceValue(action.skillData, defender.GetResistances());
-            float resistanceMultiplier = 1.0f - resistanceValue;
+            float resistanceMultiplier = GetResistanceValue(element, defender.GetResistances());
 
             rawDamage *= damageMultiplier * alignBonus * resistanceMultiplier;
             
@@ -251,7 +254,23 @@ namespace Helper
             return  ((mag + intel) * (level + 4)) / 8 + 4;
         }
 
-        public static float GetResistanceValue(BaseRootData data, ResistanceData resist) { return 0f; }
+        public static float GetResistanceValue(ElementType element, ResistanceData resist) 
+        {
+            ResistTier tier = resist.GetResistanceTier(element);
+
+            switch (tier)
+            {
+                case ResistTier.Weak:   return 1.5f;  // 약점: 1.5배 데미지
+                case ResistTier.Normal: return 1.0f;  // 보통: 1.0배 (100%) 데미지
+                case ResistTier.Resist: return 0.5f;  // 내성: 0.5배 (50%) 데미지
+                case ResistTier.Null:   return 0.0f;  // 무효: 0 배율 (데미지 없음)
+                
+                case ResistTier.Repel:
+                case ResistTier.Drain:
+                default:
+                    return 1.0f;
+            }
+        }
         public static bool IsAlignCompatible(Align a, Align b) { return a == b || a == Align.True_Neutral || b == Align.True_Neutral; }
         public static void GetPositionalModifiers(BattleFieldController.BattlePosition atkPos, BattleFieldController.BattlePosition defPos, WeaponType wType, out float damageMultiplier, out float evasionBonus) { damageMultiplier=1f; evasionBonus=0f; }
         public static void ProcessSkillStatusEffect(BattleEntity attacker, BattleEntity defender, SkillData skill) { }

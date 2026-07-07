@@ -2945,6 +2945,7 @@ namespace Controller
             // 공격 속성 판별
             bool isMagicAttack = false;
             bool isPhysicalAttack = false;
+            ElementType element = ElementType.Physical;
 
             // 평타, 사격, 유니온 어택, 롤링 발칸 등은 물리 공격으로 간주
             if (action.type == ActionType.Attack || action.type == ActionType.Shoot || 
@@ -2958,6 +2959,7 @@ namespace Controller
                 if (action.itemData != null && action.itemData.effectType == EffectType.Magic_Atk)
                 {
                     isMagicAttack = true;
+                    element = action.itemData.element;
                 }
                 else 
                 {
@@ -2966,9 +2968,12 @@ namespace Controller
                 }
             }
 
+            ResistTier resistTier = targetEntity.GetResistances().GetResistanceTier(element);
+
             // 반사 로직
-            bool isReflected = (isPhysicalAttack && targetEntity.isPhysicalReflect) || 
-                               (isMagicAttack && targetEntity.isMagicReflect);
+            bool isReflected = (isPhysicalAttack && targetEntity.isPhysicalReflect) ||
+                               (isMagicAttack && targetEntity.isMagicReflect) || 
+                               resistTier == ResistTier.Repel;
             if (isReflected)
             {
                 // 반사 시 방어자 측 게이지 상승
@@ -2992,7 +2997,8 @@ namespace Controller
 
             // 흡수 로직
             bool isAbsorbed = (isPhysicalAttack && targetEntity.isPhysicalAbsorb) || 
-                              (isMagicAttack && targetEntity.isMagicAbsorb);
+                              (isMagicAttack && targetEntity.isMagicAbsorb) ||
+                              resistTier == ResistTier.Drain;
             if (isAbsorbed)
             {
                 // 흡수 시 방어자 측 게이지 상승
@@ -3048,7 +3054,7 @@ namespace Controller
                 damage = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCritical, posDmgMult);
             
             // 정상 타격 시 게이지 상승 계산
-            float resistValue = BattleCalculator.GetResistanceValue(action.skillData, targetEntity.GetResistances()); 
+            float resistValue = BattleCalculator.GetResistanceValue(element, targetEntity.GetResistances()); 
             float hitGaugeInc = 0.05f + (1.0f - resistValue) * 0.05f;
             if (action.type == ActionType.Shoot) hitGaugeInc /= 3f;
             if (isCritical) hitGaugeInc *= 2f; // 크리티컬 시, 게이지 상승 2배

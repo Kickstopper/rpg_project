@@ -28,4 +28,18 @@ public struct ResistanceData {
     public ResistTier elec;     // 전격 내성
     public ResistTier force;    // 염동 내성
     public ResistTier psyche;    // 정신 내성
+
+    public ResistTier GetResistanceTier(ElementType element)
+{
+    switch (element)
+    {
+        case ElementType.Physical:  return phys;
+        case ElementType.Fire:      return fire;
+        case ElementType.Ice:       return ice;
+        case ElementType.Elec:      return elec;
+        case ElementType.Force:     return force;
+        case ElementType.Psyche:    return psyche;
+        default:                    return ResistTier.Normal;
+    }
+}
 }
