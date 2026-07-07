@@ -58,7 +58,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_001
-    name: "\uBC34\uB514\uD2B8"
+    name: "\uC250\uB3C4\uC6B0\uBE14\uB808\uC774\uB4DC"
     race: 0
     align: 6
     gender: 0
@@ -278,7 +278,7 @@ MonoBehaviour:
     align: 6
     gender: 1
     compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 375a81afe457e8b4f8e31d6b99b18afe, type: 3}
+    compileAscii: {fileID: 4900000, guid: 15b145ea7429d364b83d40daac22e620, type: 3}
     image:
     - {fileID: 21300000, guid: b70a9e68e6db4de4184051fc7bae751e, type: 3}
     - {fileID: 21300000, guid: 57ede66f5e825e94a98bee760f59516d, type: 3}
@@ -918,7 +918,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_021
-    name: "\uC5EC\uC790\uBBF8\uB798\uBCD1\uC0AC"
+    name: "\uD4E8\uCC98 \uC194\uC800 F"
     race: 0
     align: 6
     gender: 1
@@ -1219,7 +1219,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_028
-    name: "\uBBF8\uB798\uBCD1\uC0AC"
+    name: "\uD4E8\uCC98 \uC194\uC800 M"
     race: 0
     align: 6
     gender: 0
@@ -1391,10 +1391,10 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_032
-    name: "\uB8CC\uC0B4\uD30C\uB974"
+    name: "\uB8CC\uC0B4\uD39C"
     race: 0
     align: 6
-    gender: 0
+    gender: 1
     compileResultMsg: HELLO!
     compileAscii: {fileID: 4900000, guid: ea1acffbfee6eff428e77c6108b821aa, type: 3}
     image:
@@ -1434,7 +1434,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_033
-    name: "\uB8CC\uC0B4\uD504"
+    name: "\uB8CC\uC0B4\uD504\uB974"
     race: 0
     align: 6
     gender: 0
@@ -1606,7 +1606,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_037
-    name: "\uD138\uBCF5\uC22D\uC774"
+    name: "\uC5D4\uD0A4\uB450"
     race: 1
     align: 6
     gender: 0
@@ -3498,7 +3498,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_081
-    name: "\uB9AC\uD37C"
+    name: "\uADF8\uB9BC \uB9AC\uD37C"
     race: 3
     align: 6
     gender: 0
@@ -3756,7 +3756,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_087
-    name: "\uD3EC\uC774\uC98C\uC13C\uD2F0\uD53C\uB4DC"
+    name: "\uC624\uC624\uBB34\uCE74\uB370"
     race: 4
     align: 6
     gender: 0
@@ -4232,15 +4232,15 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_098
-    name: "\uC5EC\uAE30\uC0AC"
-    race: 6
+    name: "\uBC1C\uD0A4\uB9AC"
+    race: 0
     align: 6
     gender: 1
     compileResultMsg: HELLO!
     compileAscii: {fileID: 4900000, guid: 7ce44ce1328307c4687287e8fd792088, type: 3}
     image:
     - {fileID: 21300000, guid: b85635e562747ba47a971197d34c062b, type: 3}
-    - {fileID: 21300000, guid: b85635e562747ba47a971197d34c062b, type: 3}
+    - {fileID: 21300000, guid: 4b3be45026816f341bd90aa6783958fa, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 27a39b46f617d194087842dbc54c0168, type: 3}
     basicAttackVfxId: 0
@@ -4404,7 +4404,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_102
-    name: "\uC544\uB354"
+    name: "\uC544\uB354\uC655"
     race: 6
     align: 6
     gender: 0
