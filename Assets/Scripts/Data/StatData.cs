@@ -10,12 +10,22 @@ public struct StatData
     public int luc; // 운
 }
 
+public enum ResistTier 
+{ 
+    Normal,   // 보통 (데미지 100%)
+    Weak,     // 약점 (데미지 증폭)
+    Resist,   // 내성 (데미지 감소)
+    Null,     // 무효 (데미지 0)
+    Repel,    // 반사 (데미지 반사)
+    Drain     // 흡수 (데미지만큼 회복)
+}
+
 [System.Serializable]
 public struct ResistanceData {
-    public float phys; // 물리 내성 (1.0 = 100%)
-    public float fire;     // 화염 내성
-    public float ice;      // 빙결 내성
-    public float elec;     // 전격 내성
-    public float force;    // 염동 내성
-    public float psyche;    // 정신 내성
+    public ResistTier phys; // 물리 내성
+    public ResistTier fire;     // 화염 내성
+    public ResistTier ice;      // 빙결 내성
+    public ResistTier elec;     // 전격 내성
+    public ResistTier force;    // 염동 내성
+    public ResistTier psyche;    // 정신 내성
 }

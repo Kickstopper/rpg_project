@@ -986,12 +986,12 @@ MonoBehaviour:
       agi: 50
       luc: 49
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 3
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1201,12 +1201,12 @@ MonoBehaviour:
       agi: 34
       luc: 27
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 3
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1373,12 +1373,12 @@ MonoBehaviour:
       agi: 30
       luc: 50
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
+      phys: 2
+      fire: 2
+      ice: 2
+      elec: 2
+      force: 2
+      psyche: 4
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1631,8 +1631,8 @@ MonoBehaviour:
       agi: 2
       luc: 1
     resistances:
-      phys: 0
-      fire: 0
+      phys: 2
+      fire: 1
       ice: 0
       elec: 0
       force: 0
@@ -1675,8 +1675,8 @@ MonoBehaviour:
       luc: 11
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
+      fire: 5
+      ice: 1
       elec: 0
       force: 0
       psyche: 0
@@ -1717,11 +1717,11 @@ MonoBehaviour:
       agi: 25
       luc: 28
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
-      elec: 0
-      force: 0
+      elec: 1
+      force: 3
       psyche: 0
     personality: 4
     timeOfDay: 0
@@ -1760,12 +1760,12 @@ MonoBehaviour:
       agi: 50
       luc: 50
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
+      phys: 2
+      fire: 2
+      ice: 2
+      elec: 2
+      force: 2
+      psyche: 4
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1803,7 +1803,7 @@ MonoBehaviour:
       agi: 12
       luc: 23
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
@@ -1846,7 +1846,7 @@ MonoBehaviour:
       agi: 28
       luc: 20
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
@@ -1933,11 +1933,11 @@ MonoBehaviour:
       luc: 18
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -1976,11 +1976,11 @@ MonoBehaviour:
       luc: 2
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2018,7 +2018,7 @@ MonoBehaviour:
       agi: 38
       luc: 46
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
@@ -2062,11 +2062,11 @@ MonoBehaviour:
       luc: 27
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
+      elec: 1
+      force: 3
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2105,9 +2105,9 @@ MonoBehaviour:
       luc: 10
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      fire: 1
+      ice: 5
+      elec: 1
       force: 0
       psyche: 0
     personality: 4
@@ -2148,11 +2148,11 @@ MonoBehaviour:
       luc: 7
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2191,11 +2191,11 @@ MonoBehaviour:
       luc: 7
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2233,10 +2233,10 @@ MonoBehaviour:
       agi: 27
       luc: 31
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      phys: 2
+      fire: 1
+      ice: 5
+      elec: 1
       force: 0
       psyche: 0
     personality: 4
@@ -2277,11 +2277,11 @@ MonoBehaviour:
       luc: 5
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2319,11 +2319,11 @@ MonoBehaviour:
       agi: 23
       luc: 34
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
-      elec: 0
-      force: 0
+      elec: 1
+      force: 5
       psyche: 0
     personality: 4
     timeOfDay: 0
@@ -2363,11 +2363,11 @@ MonoBehaviour:
       luc: 1
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2405,12 +2405,12 @@ MonoBehaviour:
       agi: 50
       luc: 30
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 3
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2491,9 +2491,9 @@ MonoBehaviour:
       agi: 16
       luc: 22
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 5
+      ice: 1
       elec: 0
       force: 0
       psyche: 0
@@ -2534,12 +2534,12 @@ MonoBehaviour:
       agi: 8
       luc: 10
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 1
+      ice: 2
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2577,7 +2577,7 @@ MonoBehaviour:
       agi: 22
       luc: 22
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
@@ -2621,11 +2621,11 @@ MonoBehaviour:
       luc: 1
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2664,9 +2664,9 @@ MonoBehaviour:
       luc: 5
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      fire: 1
+      ice: 5
+      elec: 1
       force: 0
       psyche: 0
     personality: 4
@@ -2749,8 +2749,8 @@ MonoBehaviour:
       agi: 13
       luc: 17
     resistances:
-      phys: 0
-      fire: 0
+      phys: 2
+      fire: 2
       ice: 0
       elec: 0
       force: 0
@@ -2793,11 +2793,11 @@ MonoBehaviour:
       luc: 18
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -2924,8 +2924,8 @@ MonoBehaviour:
       phys: 0
       fire: 0
       ice: 0
-      elec: 0
-      force: 0
+      elec: 1
+      force: 5
       psyche: 0
     personality: 4
     timeOfDay: 0
@@ -2965,9 +2965,9 @@ MonoBehaviour:
       luc: 4
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      fire: 1
+      ice: 5
+      elec: 1
       force: 0
       psyche: 0
     personality: 4
@@ -3007,7 +3007,7 @@ MonoBehaviour:
       agi: 25
       luc: 15
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
@@ -3222,12 +3222,12 @@ MonoBehaviour:
       agi: 41
       luc: 29
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 1
+      ice: 2
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3308,12 +3308,12 @@ MonoBehaviour:
       agi: 33
       luc: 38
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
+      phys: 2
+      fire: 2
+      ice: 2
+      elec: 2
+      force: 2
+      psyche: 4
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3437,12 +3437,12 @@ MonoBehaviour:
       agi: 23
       luc: 36
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 4
+      ice: 1
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 3
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3480,7 +3480,7 @@ MonoBehaviour:
       agi: 28
       luc: 20
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
@@ -3523,12 +3523,12 @@ MonoBehaviour:
       agi: 5
       luc: 7
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 2
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3566,12 +3566,12 @@ MonoBehaviour:
       agi: 21
       luc: 18
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 1
+      ice: 2
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3609,12 +3609,12 @@ MonoBehaviour:
       agi: 43
       luc: 49
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 1
+      ice: 2
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3652,12 +3652,12 @@ MonoBehaviour:
       agi: 48
       luc: 29
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 4
+      ice: 1
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 3
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3695,12 +3695,12 @@ MonoBehaviour:
       agi: 33
       luc: 50
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 4
+      ice: 1
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 3
     personality: 1
     timeOfDay: 0
     weather: 0
@@ -3738,12 +3738,12 @@ MonoBehaviour:
       agi: 10
       luc: 11
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 2
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3781,12 +3781,12 @@ MonoBehaviour:
       agi: 13
       luc: 9
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 2
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3825,11 +3825,11 @@ MonoBehaviour:
       luc: 13
     resistances:
       phys: 0
-      fire: 0
+      fire: 1
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -3867,7 +3867,7 @@ MonoBehaviour:
       agi: 46
       luc: 50
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
@@ -3910,10 +3910,10 @@ MonoBehaviour:
       agi: 50
       luc: 50
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      phys: 2
+      fire: 2
+      ice: 3
+      elec: 1
       force: 0
       psyche: 0
     personality: 4
@@ -3953,8 +3953,8 @@ MonoBehaviour:
       agi: 34
       luc: 43
     resistances:
-      phys: 0
-      fire: 0
+      phys: 2
+      fire: 4
       ice: 0
       elec: 0
       force: 0
@@ -4215,9 +4215,9 @@ MonoBehaviour:
       luc: 14
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      fire: 1
+      ice: 1
+      elec: 2
       force: 0
       psyche: 0
     personality: 4
@@ -4258,9 +4258,9 @@ MonoBehaviour:
       luc: 7
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      fire: 1
+      ice: 1
+      elec: 2
       force: 0
       psyche: 0
     personality: 4
@@ -4344,9 +4344,9 @@ MonoBehaviour:
       luc: 8
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      fire: 1
+      ice: 1
+      elec: 2
       force: 0
       psyche: 0
     personality: 4
@@ -4430,9 +4430,9 @@ MonoBehaviour:
       luc: 14
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      fire: 1
+      ice: 1
+      elec: 2
       force: 0
       psyche: 0
     personality: 4
@@ -4475,8 +4475,8 @@ MonoBehaviour:
       phys: 0
       fire: 0
       ice: 0
-      elec: 0
-      force: 0
+      elec: 1
+      force: 5
       psyche: 0
     personality: 4
     timeOfDay: 0
@@ -4515,12 +4515,12 @@ MonoBehaviour:
       agi: 50
       luc: 42
     resistances:
-      phys: 0
+      phys: 2
       fire: 0
       ice: 0
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 3
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -4604,8 +4604,8 @@ MonoBehaviour:
       phys: 0
       fire: 0
       ice: 0
-      elec: 0
-      force: 0
+      elec: 5
+      force: 1
       psyche: 0
     personality: 4
     timeOfDay: 0
@@ -4647,8 +4647,8 @@ MonoBehaviour:
       phys: 0
       fire: 0
       ice: 0
-      elec: 0
-      force: 0
+      elec: 5
+      force: 1
       psyche: 0
     personality: 4
     timeOfDay: 0
@@ -4688,8 +4688,8 @@ MonoBehaviour:
       luc: 28
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
+      fire: 5
+      ice: 1
       elec: 0
       force: 0
       psyche: 0
@@ -4730,12 +4730,12 @@ MonoBehaviour:
       agi: 19
       luc: 28
     resistances:
-      phys: 0
+      phys: 3
       fire: 0
       ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
+      elec: 1
+      force: 2
+      psyche: 3
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -4773,12 +4773,12 @@ MonoBehaviour:
       agi: 31
       luc: 30
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 4
+      ice: 1
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 3
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -4817,9 +4817,9 @@ MonoBehaviour:
       luc: 15
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      fire: 1
+      ice: 5
+      elec: 1
       force: 0
       psyche: 0
     personality: 4
@@ -4859,12 +4859,12 @@ MonoBehaviour:
       agi: 9
       luc: 4
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 1
+      ice: 2
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -4902,12 +4902,12 @@ MonoBehaviour:
       agi: 39
       luc: 26
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 1
+      ice: 2
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
@@ -4945,12 +4945,12 @@ MonoBehaviour:
       agi: 12
       luc: 9
     resistances:
-      phys: 0
-      fire: 0
-      ice: 0
+      phys: 2
+      fire: 1
+      ice: 2
       elec: 0
       force: 0
-      psyche: 0
+      psyche: 1
     personality: 4
     timeOfDay: 0
     weather: 0
