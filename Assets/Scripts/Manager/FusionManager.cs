@@ -41,7 +41,7 @@ namespace Manager
 
         void Start()
         {
-            SoundManager.Instance.PlayBGM(Data.BgmID.Fusion);
+            ManagerRoot.Sound.PlayBGM(Data.BgmID.Fusion);
             // 몬스터 이미지 세팅 (시퀀스 시작 전 필수)
             SetupMonstersFromDatabase();
 
@@ -123,7 +123,7 @@ namespace Manager
             yield return new WaitForSeconds(particleDuration);
             
             // 화면 화이트 아웃 (Flash)
-            SoundManager.Instance.PlaySFX(Data.SfxID.Explosion);
+            ManagerRoot.Sound.PlaySFX(Data.SfxID.Explosion);
             yield return StartCoroutine(FadeImage(flashPanel, 0, 1, 0.2f)); // 빠르게 하얗게
             StopFusionParticles();
             yield return new WaitForSeconds(0.5f);

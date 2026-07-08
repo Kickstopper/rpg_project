@@ -43,7 +43,7 @@ namespace UI.Shop
 
         void Update()
         {
-            if (GameStateManager.Instance.CurrentState != GameState.Shop) return;
+            if (ManagerRoot.GameState.CurrentState != GameState.Shop) return;
             if (string.IsNullOrEmpty(currentShopID)) return;
 
             bool isCurrentlyActive = IsAnySubPanelActive();
@@ -83,8 +83,8 @@ namespace UI.Shop
                 }
                 if (data.bgmID != BgmID.None)
                 {
-                    prevBgmID = SoundManager.Instance.CurrentBgmID;
-                    SoundManager.Instance.PlayBGM(data.bgmID);
+                    prevBgmID = ManagerRoot.Sound.CurrentBgmID;
+                    ManagerRoot.Sound.PlayBGM(data.bgmID);
                 }
             }
 
@@ -107,7 +107,7 @@ namespace UI.Shop
 
         private void UpdateTextUI()
         {
-            if (moneyText != null) moneyText.text = $"${InventoryManager.Instance.GetMoney()}";
+            if (moneyText != null) moneyText.text = $"${ManagerRoot.Inventory.GetMoney()}";
             if (totalPriceText != null) totalPriceText.text = "-";
             if (possessionText != null) possessionText.text = "-";
         }
@@ -202,18 +202,18 @@ namespace UI.Shop
             if (SoundManager.Instance != null)
             {
                 if (prevBgmID != BgmID.None)
-                    SoundManager.Instance.PlayBGM(prevBgmID);
+                    ManagerRoot.Sound.PlayBGM(prevBgmID);
                 else
-                    SoundManager.Instance.StopBGM();
+                    ManagerRoot.Sound.StopBGM();
                 
             }
 
             prevBgmID = BgmID.None;
             currentShopID = null;
 
-            if (GameStateManager.Instance != null)
+            if (ManagerRoot.GameState != null)
             {
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                ManagerRoot.GameState.ChangeState(GameState.Exploration);
             }
         }
 

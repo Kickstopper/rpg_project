@@ -70,7 +70,7 @@ namespace UI.Shop
             currentTabIndex = tabIndex;
             tabButtons[tabIndex].Select();
             
-            currentFilteredItems = InventoryManager.Instance.GetSellableItems((ItemCategory)currentTabIndex);
+            currentFilteredItems = ManagerRoot.Inventory.GetSellableItems((ItemCategory)currentTabIndex);
             PopulateList(currentFilteredItems);
             // 탭을 전환하면 포커스를 탭 영역(-1)으로 초기화
             ChangeHighlight(-1);
@@ -251,8 +251,8 @@ namespace UI.Shop
             int sellPrice = Mathf.FloorToInt(invItem.baseData.price / 2f);
             int totalEarned = sellPrice * currentSellQuantity;
 
-            InventoryManager.Instance.RemoveItem(invItem.baseData.id, currentSellQuantity);
-            InventoryManager.Instance.AddMoney(totalEarned);
+            ManagerRoot.Inventory.RemoveItem(invItem.baseData.id, currentSellQuantity);
+            ManagerRoot.Inventory.AddMoney(totalEarned);
 
             Debug.Log($"{invItem.baseData.dataName} {currentSellQuantity}개 판매 완료. (+${totalEarned})");
 
@@ -275,7 +275,7 @@ namespace UI.Shop
 
         private void UpdatePlayerMoneyUI()
         {
-            moneyText.text = $"${InventoryManager.Instance.GetMoney()}";
+            moneyText.text = $"${ManagerRoot.Inventory.GetMoney()}";
         }
 
         private void ClearContent()

@@ -60,7 +60,7 @@ namespace Controller
 
         private void ResolvePositionConflicts()
         {
-            var party = PartyManager.Instance.partyData;
+            var party  = ManagerRoot.Party.partyData;
             if (party == null || party.Count == 0) return;
 
             RuntimeCharacterData[] slotAssignments = new RuntimeCharacterData[6];
@@ -105,11 +105,11 @@ namespace Controller
             foreach (Transform child in itemContent) Destroy(child.gameObject);
             itemContent.DetachChildren(); 
 
-            inventoryItemIds = InventoryManager.Instance.GetAllItemIds();
+            inventoryItemIds = ManagerRoot.Inventory.GetAllItemIds();
             inventoryItemIds.Sort((idA, idB) => 
             {
-                var itemA = DatabaseManager.Instance.GetConsumable(idA);
-                var itemB = DatabaseManager.Instance.GetConsumable(idB);
+                var itemA = ManagerRoot.Database.GetConsumable(idA);
+                var itemB = ManagerRoot.Database.GetConsumable(idB);
                 if (itemA == null && itemB == null) return 0;
                 if (itemA == null) return 1;
                 if (itemB == null) return -1;
@@ -120,11 +120,11 @@ namespace Controller
             {
                 GameObject go = Instantiate(itemSlotPrefab, itemContent);
                 var slot = go.GetComponent<SimpleListItemView>();
-                var itemData = DatabaseManager.Instance.GetConsumable(inventoryItemIds[i]);
+                var itemData = ManagerRoot.Database.GetConsumable(inventoryItemIds[i]);
 
                 if (slot != null && itemData != null)
                 {
-                    int count = InventoryManager.Instance.GetItemCount(itemData.id);
+                    int count = ManagerRoot.Inventory.GetItemCount(itemData.id);
                     slot.SetData(itemData.dataName, count);
                     bool isUsable = (itemData.useType == UseType.All || itemData.useType == UseType.Exploration);
                     var texts = go.GetComponentsInChildren<TextMeshProUGUI>();
@@ -150,7 +150,7 @@ namespace Controller
                         if (!isSelectingTarget && currentItemIndex != itemIndex)
                         {
                             currentItemIndex = itemIndex;
-                            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                             UpdateItemSelection(); // 포커스 이동 및 중앙 itemInfo 갱신
                         }
                     });
@@ -167,7 +167,7 @@ namespace Controller
 
         public void RefreshPartyList()
         {
-            var party = PartyManager.Instance.partyData;
+            var party  = ManagerRoot.Party.partyData;
             for (int i = 0; i < 6; i++)
             {
                 foreach (Transform child in partySlots[i]) Destroy(child.gameObject);
@@ -202,7 +202,7 @@ namespace Controller
                 if (isSelectingTarget && canMove && currentPartyIndex != index)
                 {
                     currentPartyIndex = index;
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                     UpdatePartyCursorVisuals();
                 }
             });
@@ -293,7 +293,7 @@ namespace Controller
         private ConsumableItemData GetFocusedItemData()
         {
             string itemId = inventoryItemIds[currentItemIndex];
-            return DatabaseManager.Instance.GetConsumable(itemId);
+            return ManagerRoot.Database.GetConsumable(itemId);
         }
 
         private void OnClickListItem(int itemIndex)
@@ -310,14 +310,14 @@ namespace Controller
             if (currentItemIndex >= inventoryItemIds.Count) currentItemIndex = inventoryItemIds.Count - 1;
 
             string itemId = inventoryItemIds[currentItemIndex];
-            selectedItemData = DatabaseManager.Instance.GetConsumable(itemId);
+            selectedItemData = ManagerRoot.Database.GetConsumable(itemId);
 
             if (selectedItemData == null) return;
 
             // 사용 불가 아이템 체크
             if (selectedItemData.useType != UseType.All && selectedItemData.useType != UseType.Exploration)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 return;
             }
 
@@ -345,7 +345,7 @@ namespace Controller
             localCooldown = 0.2f;
 
             if (descriptionText) descriptionText.text = "누구에게 아이템을 사용합니까?";
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             ApplyTargetHighlight();
         }
 
@@ -452,7 +452,7 @@ namespace Controller
 
                 if (moved)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                     UpdatePartyCursorVisuals();
                 }
             }
@@ -469,7 +469,7 @@ namespace Controller
                 else
                 {
                     // 조건에 맞지 않을 경우 에러음
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 }
             }
 
@@ -500,7 +500,7 @@ namespace Controller
             localCooldown = 0.2f;
 
             foreach (var pc in partyControllers) pc.ResetHighlightColor(); 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
             // 아이템 리스트로 포커스 복귀
             UpdateItemSelection();
             ResetDescriptionText();
@@ -520,16 +520,16 @@ namespace Controller
             if (EffectManager.Instance.ApplyEffect(battleTarget, selectedItemData))
             {
                 // 아이템 소모 (인벤토리 반영)
-                InventoryManager.Instance.UseItem(selectedItemData.id);
+                ManagerRoot.Inventory.UseItem(selectedItemData.id);
                 
                 // 효과음 재생
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Click); 
 
                 // UI 리스트 갱신 (수량 변화 반영)
                 RefreshItemList(); 
 
                 // 연속 사용 처리 로직 (UX)
-                int remainingCount = InventoryManager.Instance.GetItemCount(selectedItemData.id);
+                int remainingCount = ManagerRoot.Inventory.GetItemCount(selectedItemData.id);
 
                 if (remainingCount > 0)
                 {
@@ -553,7 +553,7 @@ namespace Controller
             else
             {
                 // 실패 처리 (예: HP가 가득 찬 대상에게 회복약 사용 시도)
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 // 필요하다면: menuController.ShowAlertPopup("효과가 없습니다.");
             }
         }

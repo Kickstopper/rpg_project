@@ -100,7 +100,7 @@ namespace Controller
             gameObject.SetActive(false);
             if (skillInfoView != null) skillInfoView.ResetText();
             battleManager.OnPopupMenuClosed();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
         void SwitchTab(int categoryIndex)
@@ -109,7 +109,7 @@ namespace Controller
             currentTab = categoryIndex;
             UpdateTabVisuals();
             RefreshList();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
         }
 
         void UpdateTabVisuals()
@@ -134,7 +134,7 @@ namespace Controller
 
             foreach (string id in currentSkillIds)
             {
-                SkillData data = DatabaseManager.Instance.GetSkill(id); 
+                SkillData data = ManagerRoot.Database.GetSkill(id); 
                 if (data == null) continue;
 
                 if (data.GetCategoryIndex() == currentTab)
@@ -182,7 +182,7 @@ namespace Controller
                     if (canUse)
                         OnItemClicked(data);
                     else
-                        SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                        ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 });
                 
             }
@@ -204,7 +204,7 @@ namespace Controller
 
         void OnItemSelect(SkillData skillData)
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
             if (skillInfoView != null) skillInfoView.UpdateInfo(skillData);
         }
 
@@ -213,7 +213,7 @@ namespace Controller
             gameObject.SetActive(false);
             battleManager.OnPopupMenuClosed(); 
             battleManager.OnPopupItemSelected(itemData);
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         IEnumerator SelectFirstItem()

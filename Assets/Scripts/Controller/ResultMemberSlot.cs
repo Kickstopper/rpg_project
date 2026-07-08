@@ -61,7 +61,7 @@ namespace Controller
                     currentSimLevel++;
                     levelText.text = $"Lv.{currentSimLevel}";
                     levelUpEffect.SetActive(true);
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                     
                     expSlider.value = 0;
                     currentSimExp = 0;

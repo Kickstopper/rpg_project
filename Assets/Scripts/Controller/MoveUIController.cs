@@ -40,7 +40,7 @@ namespace Controller
 
         private void ResolvePositionConflicts()
         {
-            var party = PartyManager.Instance.partyData;
+            var party  = ManagerRoot.Party.partyData;
             if (party == null) return;
 
             for (int i = 0; i < 6; i++) currentSlotData[i] = null;
@@ -106,7 +106,7 @@ namespace Controller
                 if (currentCursorIndex != index)
                 {
                     currentCursorIndex = index;
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                     UpdateVisualFeedback();
                 }
             });
@@ -143,7 +143,7 @@ namespace Controller
 
             if (moved)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 UpdateVisualFeedback();
             }
 
@@ -157,7 +157,7 @@ namespace Controller
                 if (firstSelectedIndex != -1)
                 {
                     firstSelectedIndex = -1;
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                     UpdateVisualFeedback();
                 }
                 else
@@ -188,7 +188,7 @@ namespace Controller
                 if (currentSlotData[currentCursorIndex] != null)
                 {
                     firstSelectedIndex = currentCursorIndex;
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                     // 선택 시 살짝 위로 튀어오르는 효과
                     spawnedModels[firstSelectedIndex].transform.DOPunchPosition(Vector3.up * 10f, 0.3f, 2, 0.5f);
                 }
@@ -207,7 +207,7 @@ namespace Controller
             if (idxA == idxB) yield break;
 
             isAnimating = true;
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
             GameObject modelA = spawnedModels[idxA];
             GameObject modelB = spawnedModels[idxB];

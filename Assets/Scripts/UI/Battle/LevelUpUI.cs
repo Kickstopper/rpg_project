@@ -91,7 +91,7 @@ namespace UI.Battle
             isCreationMode = true;
             LeveUpUI.SetActive(true);
             
-            var characterData = PartyManager.Instance.GetCharacterByID(characterID);
+            var characterData  = ManagerRoot.Party.GetCharacterByID(characterID);
 
             this.onCreationFinished = onFinished;
             this.availablePoints = bonusPoints;
@@ -106,7 +106,7 @@ namespace UI.Battle
             nextExpText.text = "";
             if (portraitImage != null)
             {
-                var dbEntry = DatabaseManager.Instance.charDB.GetEntry(characterID);
+                var dbEntry = ManagerRoot.Database.charDB.GetEntry(characterID);
                 if (dbEntry != null && dbEntry.portraitImage != null)
                 {
                     portraitImage.sprite = dbEntry.portraitImage;
@@ -189,7 +189,7 @@ namespace UI.Battle
 
             if (portraitImage != null && currentTarget.sourceData != null)
             {
-                var dbEntry = DatabaseManager.Instance.charDB.GetEntry(currentTarget.sourceData.characterId);
+                var dbEntry = ManagerRoot.Database.charDB.GetEntry(currentTarget.sourceData.characterId);
                 if (dbEntry != null && dbEntry.portraitImage != null)
                 {
                     portraitImage.sprite = dbEntry.portraitImage;
@@ -233,7 +233,7 @@ namespace UI.Battle
 
             foreach (string skillId in currentTarget.learnedSkillIds)
             {
-                var skillData = DatabaseManager.Instance.GetSkill(skillId);
+                var skillData = ManagerRoot.Database.GetSkill(skillId);
                 if (skillData != null && skillSlotPrefab != null)
                 {
                     GameObject go = Instantiate(skillSlotPrefab, skillContent);
@@ -323,7 +323,7 @@ namespace UI.Battle
         {
             if (availablePoints <= 0) return;
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
             // 잔여 포인트가 0이 될 때까지 랜덤한 스탯에 1씩 분배
             while (availablePoints > 0)
@@ -351,14 +351,14 @@ namespace UI.Battle
                 AddAllocatedStat(type, 1);
                 availablePoints -= 1;
                 isChanged = true;
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
             }
             else if (amount < 0 && currentAllocated > 0)
             {
                 AddAllocatedStat(type, -1);
                 availablePoints += 1;
                 isChanged = true;
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
 
                 if (currentSection == FocusSection.Skill)
                 {
@@ -707,7 +707,7 @@ namespace UI.Battle
         private void Update()
         {
             // 생성 모드가 아닐 때만 전투 상태 체크
-            if (!isCreationMode && GameStateManager.Instance.CurrentState != GameState.Battle) return;
+            if (!isCreationMode && ManagerRoot.GameState.CurrentState != GameState.Battle) return;
             
             // 포커스 강제 유지 로직 (마우스 클릭 방어)
             if (EventSystem.current.currentSelectedGameObject != null)
@@ -755,7 +755,7 @@ namespace UI.Battle
                 // 현재 포커스가 ConfirmButton에 있는 경우 스킬(있으면) 또는 스탯으로
                 if (currentSelected == confirmButton.gameObject)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                     EventSystem.current.SetSelectedGameObject(null); 
                     lastSelectedObject = null; // 복구 방지
                     
@@ -769,7 +769,7 @@ namespace UI.Battle
                 // 현재 포커스가 스킬 리스트 중 하나인 경우 스탯으로
                 if (currentSection == FocusSection.Skill)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                     EventSystem.current.SetSelectedGameObject(null); 
                     lastSelectedObject = null; // [핵심 추가] 강제 복구 방지
                     
@@ -781,7 +781,7 @@ namespace UI.Battle
                 // 현재 포커스가 스탯 영역인 경 분배된 스탯 롤백 후 RANDOM으로
                 if (currentSection == FocusSection.Stat)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                     
                     int totalAllocated = allocatedStats.str + allocatedStats.mag + allocatedStats.intel + allocatedStats.vit + allocatedStats.agi + allocatedStats.luc;
                     if (totalAllocated > 0)
@@ -896,7 +896,7 @@ namespace UI.Battle
 
         private void OnConfirmClicked()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
             if (isCreationMode)
             {

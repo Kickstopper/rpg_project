@@ -39,9 +39,6 @@ namespace Manager
             if (Instance == null)
             {
                 Instance = this;
-                transform.SetParent(null);
-                DontDestroyOnLoad(gameObject);
-                
                 InitializeDungeonThemes();
                 InitializeMapAssets();
             }
@@ -107,7 +104,7 @@ namespace Manager
             // 맵 상태(방문 여부, 아이템 획득 등) 관리
             string mapIDKey = data.mapID; 
 
-            DungeonMapState mapState = DungeonMapStateManager.Instance.GetMapState(mapIDKey);
+            DungeonMapState mapState = ManagerRoot.DungeonMapState.GetMapState(mapIDKey);
 
             if (mapState != null)
             {
@@ -117,7 +114,7 @@ namespace Manager
             {
                 CurrentDungeonState = new DungeonMapState(CurrentDungeonData.width, CurrentDungeonData.height, mapIDKey);
                 
-                DungeonMapStateManager.Instance.RegisterDungeonMapState(CurrentDungeonState);
+                ManagerRoot.DungeonMapState.RegisterDungeonMapState(CurrentDungeonState);
             }
             
             Debug.Log($"레벨 로드 완료: ID {data.mapID}, Theme {data.themeName}");

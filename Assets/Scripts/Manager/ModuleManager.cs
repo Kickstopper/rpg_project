@@ -38,7 +38,6 @@ namespace Manager
             if (Instance == null)
             {
                 Instance = this;
-                transform.SetParent(null);
                 
                 _moduleLookup = new Dictionary<ModuleFeature, GameModuleData>();
                 foreach (var module in moduleDatabase)
@@ -63,7 +62,7 @@ namespace Manager
                 // 백업된 데이터를 바탕으로 초기 보드 세팅
                 Initialize();
 
-                DontDestroyOnLoad(gameObject);
+                
             }
             else Destroy(gameObject);
         }

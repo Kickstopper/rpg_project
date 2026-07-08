@@ -154,8 +154,8 @@ namespace Controller
             // 맵 초기화
             LoadMapData();
             
-            GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
-            GameStateManager.Instance.ChangeState(GameState.Exploration);
+            ManagerRoot.GameState.OnStateChanged += OnGameStateChanged;
+            ManagerRoot.GameState.ChangeState(GameState.Exploration);
 
             if (theme != null && theme.useWakeUpEffect)
                 StartCoroutine(WakeUpFadeInRoutine());
@@ -216,8 +216,8 @@ namespace Controller
 
         void OnDestroy()
         {
-            if(GameStateManager.Instance) 
-                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            if(ManagerRoot.GameState) 
+                ManagerRoot.GameState.OnStateChanged -= OnGameStateChanged;
         }
 
         void Update()
@@ -232,14 +232,14 @@ namespace Controller
 
             if (!_inputLocked && theme.moduleEnable && (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown()))
             {
-                GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
+                ManagerRoot.GameState.ChangeState(GameState.PlayerMenu);
                 inputCooldown = 0.2f;
                 return;
             }
             
             if (!_inputLocked && Input.GetKeyDown(KeyCode.M))
             {
-                if (!theme.moduleEnable || !ModuleManager.Instance.IsMounted(ModuleFeature.AutoMapper)) return;
+                if (!theme.moduleEnable || !ManagerRoot.Module.IsMounted(ModuleFeature.AutoMapper)) return;
                 autoMapContainer.SetActive(!autoMapContainer.activeSelf);
                 return;
             }
@@ -401,7 +401,7 @@ namespace Controller
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
             if (Input.GetKeyDown(KeyCode.M))
             {
-                if (!ModuleManager.Instance.IsMounted(ModuleFeature.AutoMapper)) return;
+                if (!ManagerRoot.Module.IsMounted(ModuleFeature.AutoMapper)) return;
                 autoMapContainer.SetActive(!autoMapContainer.activeSelf);
             } 
             if (Input.GetKeyDown(KeyCode.P))
@@ -558,25 +558,25 @@ namespace Controller
 
             if (entrance.isWorldMap)
             {
-                if (DungeonEventManager.Instance)
-                    DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
+                if (ManagerRoot.DungeonEvent)
+                    ManagerRoot.DungeonEvent.SetCurrentMapID(entrance.destinationID);
 
-                WorldManager.Instance.SetCurrentRegionTheme(entrance.destinationID);
-                WorldManager.Instance.isLoadGame = true;
+                ManagerRoot.World.SetCurrentRegionTheme(entrance.destinationID);
+                ManagerRoot.World.isLoadGame = true;
                 
-                var data = WorldManager.Instance.currentRegionTheme;
-                WorldManager.Instance.loadedPosition = data.startPosition;
+                var data = ManagerRoot.World.currentRegionTheme;
+                ManagerRoot.World.loadedPosition = data.startPosition;
                 
                 SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                ManagerRoot.GameState.ChangeState(GameState.Exploration);
                 
                 yield break;
             }
             else
             {
                 // 기존의 일반 던전 레벨 전환 로직
-                DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
-                DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
+                ManagerRoot.DungeonEvent.SetCurrentMapID(entrance.destinationID);
+                ManagerRoot.Dungeon.LoadDungeonFromJson(entrance.destinationID);
                 
                 // 새로운 맵 로드
                 LoadMapData(entrance);
@@ -584,11 +584,11 @@ namespace Controller
                 yield return new WaitForSeconds(0.1f);
                 if (theme.isUnderwater)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.Spash);
+                    ManagerRoot.Sound.PlaySFX(SfxID.Spash);
                 }
                 else 
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.Fall);
+                    ManagerRoot.Sound.PlaySFX(SfxID.Fall);
                 }
                 // 착지 흔들림 코루틴
                 StartCoroutine(LandingImpactRoutine(10f));
@@ -665,18 +665,18 @@ namespace Controller
 
             if (entrance.isWorldMap)
             {
-                if (DungeonEventManager.Instance)
-                    DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
+                if (ManagerRoot.DungeonEvent)
+                    ManagerRoot.DungeonEvent.SetCurrentMapID(entrance.destinationID);
 
-                WorldManager.Instance.SetCurrentRegionTheme(entrance.destinationID);
-                WorldManager.Instance.isLoadGame = true;
+                ManagerRoot.World.SetCurrentRegionTheme(entrance.destinationID);
+                ManagerRoot.World.isLoadGame = true;
                 
-                var data = WorldManager.Instance.currentRegionTheme;
-                WorldManager.Instance.loadedPosition = data.startPosition;
+                var data = ManagerRoot.World.currentRegionTheme;
+                ManagerRoot.World.loadedPosition = data.startPosition;
                 
                 // 월드맵 씬 로드 및 상태 변경
                 SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                ManagerRoot.GameState.ChangeState(GameState.Exploration);
                 
                 // 씬이 파괴되므로 코루틴을 즉시 종료
                 yield break; 
@@ -684,8 +684,8 @@ namespace Controller
             else
             {
                 // 기존의 일반 던전 레벨 전환 로직
-                DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
-                DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
+                ManagerRoot.DungeonEvent.SetCurrentMapID(entrance.destinationID);
+                ManagerRoot.Dungeon.LoadDungeonFromJson(entrance.destinationID);
                 
                 // 새로운 맵 로드
                 LoadMapData(entrance);
@@ -694,11 +694,11 @@ namespace Controller
 
                 if (theme.isUnderwater)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.Spash);
+                    ManagerRoot.Sound.PlaySFX(SfxID.Spash);
                 }
                 else 
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.Fall);
+                    ManagerRoot.Sound.PlaySFX(SfxID.Fall);
                 }
 
                 // 착지 흔들림 코루틴
@@ -745,7 +745,7 @@ namespace Controller
         {
             _inputLocked = true;
             
-            SoundManager.Instance.PlaySFX(SfxID.Slide_Door); 
+            ManagerRoot.Sound.PlaySFX(SfxID.Slide_Door); 
 
             // 원래 문이 배치되어 있던 면과 타일의 원래 value를 저장
             bool[] originalDoorFaces = new bool[4];
@@ -798,7 +798,7 @@ namespace Controller
         {
             _inputLocked = true;
             
-            SoundManager.Instance.PlaySFX(SfxID.Slide_Door); 
+            ManagerRoot.Sound.PlaySFX(SfxID.Slide_Door); 
             
             // 원래 문이 배치되어 있던 면과 타일의 원래 value를 저장
             bool[] originalDoorFaces = new bool[4];
@@ -868,7 +868,7 @@ namespace Controller
             if (blockingObj != null)
             {
                 StartCoroutine(_player.BumpRoutine(moveVec));
-                SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
+                ManagerRoot.Sound.PlaySFX(SfxID.Bump_Wall);
                 return; 
             }
 
@@ -943,7 +943,7 @@ namespace Controller
                     {
                         // 낭떠러지(-1), 진짜 꽉 막힌 벽(1), 혹은 맵의 끝을 만났을 경우 무조건 Bump!
                         StartCoroutine(_player.BumpRoutine(moveVec));
-                        SoundManager.Instance.PlaySFX(SfxID.Bump_Wall);
+                        ManagerRoot.Sound.PlaySFX(SfxID.Bump_Wall);
                     }
                 }
             }
@@ -954,7 +954,7 @@ namespace Controller
             _inputLocked = true;
 
             // 적에게 부딪히는 연출 (벽 충돌과 같음)
-            SoundManager.Instance.PlaySFX(SfxID.Bump_Wall); 
+            ManagerRoot.Sound.PlaySFX(SfxID.Bump_Wall); 
             yield return StartCoroutine(_player.BumpRoutine(moveVec));
 
             if (_currentLookState != LookState.None)
@@ -971,10 +971,10 @@ namespace Controller
             // 화면을 캡처
             Sprite bgSprite = CaptureCurrentDungeonView();
             // 전투 개시 명령
-            GameStateManager.Instance.StartEncounter(encounterSystem.MonsterCandidate, theme.fogColor, encType, bgSprite);
+            ManagerRoot.GameState.StartEncounter(encounterSystem.MonsterCandidate, theme.fogColor, encType, bgSprite);
             
             // 전투가 끝나고 탐험 상태로 돌아올 때까지 대기
-            yield return new WaitUntil(() => GameStateManager.Instance.CurrentState == GameState.Exploration);
+            yield return new WaitUntil(() => ManagerRoot.GameState.CurrentState == GameState.Exploration);
 
             _inputLocked = false;
         }
@@ -1152,11 +1152,11 @@ namespace Controller
                     // 변경된 텍스처를 렌더러에 즉시 반영
                     UpdateSpriteData();
 
-                    // SoundManager.Instance.PlaySFX(SfxID.Open_Chest);
+                    // ManagerRoot.Sound.PlaySFX(SfxID.Open_Chest);
                     ShowSystemMessage("낡은 보물상자를 열었다.");
 
                     // TODO: 획득한 아이템이 있을 경우, 인벤토리에 저장한다
-                    // InventoryManager.Instance.AddMoney(100);
+                    // ManagerRoot.Inventory.AddMoney(100);
                 }
                 else if (targetObj.texIdx == 1)
                 {
@@ -1220,7 +1220,7 @@ namespace Controller
             if (_player == null || _currentMap == null) return;
 
             // 탐험 상태가 아닐 때는 무조건 숨김
-            if (GameStateManager.Instance != null && GameStateManager.Instance.CurrentState != GameState.Exploration)
+            if (ManagerRoot.GameState != null && ManagerRoot.GameState.CurrentState != GameState.Exploration)
             {
                 HideRoomName();
                 return;
@@ -1297,22 +1297,22 @@ namespace Controller
 
             if (entrance.type == EntranceType.Map)
             {
-                if (DungeonEventManager.Instance)
-                    DungeonEventManager.Instance.SetCurrentMapID(entrance.destinationID);
+                if (ManagerRoot.DungeonEvent)
+                    ManagerRoot.DungeonEvent.SetCurrentMapID(entrance.destinationID);
                 
                 if (entrance.isWorldMap)
                 {
-                    WorldManager.Instance.SetCurrentRegionTheme(entrance.destinationID);
-                    WorldManager.Instance.isLoadGame = true;
+                    ManagerRoot.World.SetCurrentRegionTheme(entrance.destinationID);
+                    ManagerRoot.World.isLoadGame = true;
                     
-                    var data = WorldManager.Instance.currentRegionTheme;
-                    WorldManager.Instance.loadedPosition = data.startPosition;
+                    var data = ManagerRoot.World.currentRegionTheme;
+                    ManagerRoot.World.loadedPosition = data.startPosition;
                     SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
-                    GameStateManager.Instance.ChangeState(GameState.Exploration);
+                    ManagerRoot.GameState.ChangeState(GameState.Exploration);
                 }
-                else if (DungeonManager.Instance)
+                else if (ManagerRoot.Dungeon)
                 {
-                    DungeonManager.Instance.LoadDungeonFromJson(entrance.destinationID);
+                    ManagerRoot.Dungeon.LoadDungeonFromJson(entrance.destinationID);
                     LoadMapData(entrance); 
                 } 
                 yield return null; 
@@ -1333,13 +1333,13 @@ namespace Controller
             }
             else if (entrance.type == EntranceType.Shop)
             {
-                if (GameStateManager.Instance != null)
+                if (ManagerRoot.GameState != null)
                 {
-                    GameStateManager.Instance.ShowShop(entrance.destinationID);
+                    ManagerRoot.GameState.ShowShop(entrance.destinationID);
                 }
 
                 // 상점이 열려있는 동안 코루틴 대기
-                yield return new WaitUntil(() => GameStateManager.Instance.CurrentState != GameState.Shop);
+                yield return new WaitUntil(() => ManagerRoot.GameState.CurrentState != GameState.Shop);
 
                 // 상점을 나설 때 180도 회전
                 int reverseDir = (_player.DirectionIdx + 2) % 4; 
@@ -1372,8 +1372,8 @@ namespace Controller
             }
             else if (entrance.type == EntranceType.Terminal)
             {
-                if (GameStateManager.Instance != null)
-                    GameStateManager.Instance.ChangeState(GameState.Terminal);
+                if (ManagerRoot.GameState != null)
+                    ManagerRoot.GameState.ChangeState(GameState.Terminal);
 
                 string currentTerminalID = entrance.destinationID;
                 
@@ -1404,8 +1404,8 @@ namespace Controller
                         // 페이드 인 직전 바뀐 맵과 방향으로 화면 강제 갱신
                         _renderer.RenderFrame(_player, renderSettings);
 
-                        if (GameStateManager.Instance != null)
-                            GameStateManager.Instance.ChangeState(GameState.Exploration);
+                        if (ManagerRoot.GameState != null)
+                            ManagerRoot.GameState.ChangeState(GameState.Exploration);
 
                         if (fadeOverlay != null)
                         {
@@ -1438,9 +1438,9 @@ namespace Controller
                         };
 
                         // 화면이 암전되어 있는 상태에서 새 맵 데이터 로드
-                        if (DungeonManager.Instance)
+                        if (ManagerRoot.Dungeon)
                         {
-                            DungeonManager.Instance.LoadDungeonFromJson(dynamicDest.destinationID);
+                            ManagerRoot.Dungeon.LoadDungeonFromJson(dynamicDest.destinationID);
                             LoadMapData(dynamicDest); 
                         }
                         
@@ -1458,9 +1458,9 @@ namespace Controller
             }
             else if (entrance.type == EntranceType.Elevator)
             {
-                GameStateManager.Instance.ChangeState(GameState.Elevator);
+                ManagerRoot.GameState.ChangeState(GameState.Elevator);
 
-                ElevatorData elvData = DungeonManager.Instance.GetElevatorData(entrance.destinationID);
+                ElevatorData elvData = ManagerRoot.Dungeon.GetElevatorData(entrance.destinationID);
                 
                 if (elvData != null)
                 {
@@ -1484,7 +1484,7 @@ namespace Controller
                         // 통괄 시퀀스 코루틴 하나로 모든 연출과 복구 해결!
                         yield return StartCoroutine(HandleElevatorExitSequence(elvData));
 
-                        GameStateManager.Instance.ChangeState(GameState.Exploration);
+                        ManagerRoot.GameState.ChangeState(GameState.Exploration);
                         _inputLocked = false;
                         yield break; 
                     }
@@ -1498,9 +1498,9 @@ namespace Controller
                         targetDirection = destFloor.targetDirection
                     };
 
-                    if (DungeonManager.Instance)
+                    if (ManagerRoot.Dungeon)
                     {
-                        DungeonManager.Instance.LoadDungeonFromJson(dynamicDest.destinationID);
+                        ManagerRoot.Dungeon.LoadDungeonFromJson(dynamicDest.destinationID);
                         LoadMapData(dynamicDest); 
                     }
                     
@@ -1510,7 +1510,7 @@ namespace Controller
                     yield return StartCoroutine(HandleElevatorExitSequence(elvData));
                 }
 
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                ManagerRoot.GameState.ChangeState(GameState.Exploration);
             }
 
             _inputLocked = false;
@@ -1621,8 +1621,8 @@ namespace Controller
 
             _renderer.RenderFrame(_player, renderSettings);
 
-            if (GameStateManager.Instance.explorationCanvas != null)
-                GameStateManager.Instance.explorationCanvas.SetActive(true);
+            if (ManagerRoot.GameState.explorationCanvas != null)
+                ManagerRoot.GameState.explorationCanvas.SetActive(true);
 
             if (fadeOverlay != null)
             {
@@ -1642,7 +1642,7 @@ namespace Controller
 
             if (doorConfig != null && doorConfig.openFrameTexIds != null && doorConfig.openFrameTexIds.Length > 0 && doorCell != null)
             {
-                SoundManager.Instance.PlaySFX(SfxID.Slide_Door); 
+                ManagerRoot.Sound.PlaySFX(SfxID.Slide_Door); 
                 
                 for (int i = 0; i < doorConfig.openFrameTexIds.Length; i++)
                 {
@@ -1716,10 +1716,10 @@ namespace Controller
         // ================= Map & Game Logic =================
         private void LoadMapData(EntranceData entryEntrance = null)
         {
-            _currentMap = DungeonManager.Instance.CurrentDungeonData;
-            theme = DungeonManager.Instance.GetDungeonTheme(_currentMap.themeName);
+            _currentMap = ManagerRoot.Dungeon.CurrentDungeonData;
+            theme = ManagerRoot.Dungeon.GetDungeonTheme(_currentMap.themeName);
             
-            SoundManager.Instance.PlayBGM(theme.bgmID);
+            ManagerRoot.Sound.PlayBGM(theme.bgmID);
 
             UpdateRenderSettings(theme);
 
@@ -1745,20 +1745,20 @@ namespace Controller
             {
                 // 케이스 2: 월드맵 등에서 매개변수 없이(null) 새로 씬이 켜진 경우
                 // DungeonMapStateManager에 이 맵에 대한 세이브/마지막 위치 정보가 있는지 확인합니다.
-                if (DungeonMapStateManager.Instance != null)
+                if (ManagerRoot.DungeonMapState != null)
                 {
                     // 만약 해당 데이터 매니저에 마지막 위치를 기억하는 전역 기능이 있다면 가져옵니다.
                     // 예시: DungeonMapStateManager에 마지막 좌표를 반환하는 메서드가 있다고 가정할 때
-                    // var lastPos = DungeonMapStateManager.Instance.GetLastPosition(_currentMap.mapID);
+                    // var lastPos = ManagerRoot.DungeonMapState.GetLastPosition(_currentMap.mapID);
                     // if (lastPos != null) { finalStartX = lastPos.x; finalStartY = lastPos.y; finalStartDir = (int)lastPos.dir; }
                 }
                 
                 // 만약 월드맵에서 던전으로 들어올 때 전용 시작 좌표를 DungeonManager에 세팅해 주었다면 그것을 사용합니다.
-                // 예시: DungeonManager.Instance.reservedSpawnX 등이 구현되어 있다면 적용
+                // 예시: ManagerRoot.Dungeon.reservedSpawnX 등이 구현되어 있다면 적용
             }
 
-            if (DungeonEventManager.Instance)
-                DungeonEventManager.Instance.SetCurrentMapID(_currentMap.mapID);
+            if (ManagerRoot.DungeonEvent)
+                ManagerRoot.DungeonEvent.SetCurrentMapID(_currentMap.mapID);
             
             // 최종 결정된 좌표로 플레이어를 완벽하게 배치합니다.
             _player.SetMapData(_currentMap, finalStartX, finalStartY, finalStartDir);
@@ -1855,7 +1855,7 @@ namespace Controller
             if (miniMap != null)
             {
                 miniMap.Initialize(_currentMap, theme.passableWallTexIDs);
-                miniMap.gameObject.SetActive(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.LocalRadar));
+                miniMap.gameObject.SetActive(theme.moduleEnable && ManagerRoot.Module.IsMounted(ModuleFeature.LocalRadar));
                 
                 if (miniMap.gameObject.activeSelf)
                     miniMap.SnapToGrid(_player.LogicX, _player.LogicY, _player.DirectionIdx);
@@ -1863,20 +1863,20 @@ namespace Controller
             if (compassUI != null)
             {
                 compassUI.SetDirection(_player.DirectionIdx);
-                compassUI.gameObject.SetActive(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.GyroCompass));   
+                compassUI.gameObject.SetActive(theme.moduleEnable && ManagerRoot.Module.IsMounted(ModuleFeature.GyroCompass));   
             }
             if (autoMapContainer != null)
             {
                 autoMapContainer.SetActive(false);
-                autoMapRenderer.DrawFullMap(_currentMap, DungeonManager.Instance.CurrentDungeonState);
+                autoMapRenderer.DrawFullMap(_currentMap, ManagerRoot.Dungeon.CurrentDungeonState);
             }
             if (encounterSystem != null)
             {
-                encounterSystem.SetVisible(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.MobSensor));
+                encounterSystem.SetVisible(theme.moduleEnable && ManagerRoot.Module.IsMounted(ModuleFeature.MobSensor));
             }
             if (weatherUI != null)
             {
-                weatherUI.gameObject.SetActive(theme.moduleEnable && ModuleManager.Instance.IsMounted(ModuleFeature.WeatherWidget));
+                weatherUI.gameObject.SetActive(theme.moduleEnable && ManagerRoot.Module.IsMounted(ModuleFeature.WeatherWidget));
             }
         }
 
@@ -1928,9 +1928,9 @@ namespace Controller
         // 현재 서 있는 칸의 이벤트를 확인하고 발동
         private void CheckCurrentTileEvent()
         {
-            if (DungeonEventManager.Instance == null) return;
+            if (ManagerRoot.DungeonEvent == null) return;
 
-            (string eventID, int forceDir) = DungeonEventManager.Instance.CheckEvent(_player.LogicX, _player.LogicY);
+            (string eventID, int forceDir) = ManagerRoot.DungeonEvent.CheckEvent(_player.LogicX, _player.LogicY);
             if (!string.IsNullOrEmpty(eventID))
             {
                 _inputLocked = true;
@@ -1945,19 +1945,19 @@ namespace Controller
             {
                 yield return TurnToDirectionRoutine(forceDir);
             } 
-            GameStateManager.Instance.StartEventDialogue(eventID);
+            ManagerRoot.GameState.StartEventDialogue(eventID);
 
-            yield return new WaitUntil(() => GameStateManager.Instance.CurrentState == GameState.Exploration);
+            yield return new WaitUntil(() => ManagerRoot.GameState.CurrentState == GameState.Exploration);
 
             _inputLocked = false;
         }
 
         private void UpdateMapDiscovery(int x, int y)
         {
-            DungeonManager.Instance.CurrentDungeonState.MarkVisited(x, y);
+            ManagerRoot.Dungeon.CurrentDungeonState.MarkVisited(x, y);
             autoMapRenderer.RevealCell(x, y);
             autoMapRenderer.UpdatePlayerIcon(x, y, (Direction)_player.DirectionIdx);
-            DungeonMapStateManager.Instance.UpdatePlayerPosition(x, y, (Direction)_player.DirectionIdx, _currentMap.mapID);
+            ManagerRoot.DungeonMapState.UpdatePlayerPosition(x, y, (Direction)_player.DirectionIdx, _currentMap.mapID);
         }
 
         private void InitializeWallAnims(DungeonTheme theme)
@@ -2536,7 +2536,7 @@ namespace Controller
                 return;
             }
             
-            SoundManager.Instance.PlayBGM(DungeonManager.Instance.GetDungeonTheme(_currentMap.themeName).bgmID);
+            ManagerRoot.Sound.PlayBGM(ManagerRoot.Dungeon.GetDungeonTheme(_currentMap.themeName).bgmID);
             RefreshAppVisible();
 
             // 탐험 상태로 돌아왔을 때 정면 체크 

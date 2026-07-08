@@ -12,7 +12,7 @@ namespace UI.WorldMapScene
 
         void Update()
         {
-            if (GameStateManager.Instance == null || GameStateManager.Instance.CurrentState != GameState.Exploration) return;
+            if (ManagerRoot.GameState == null || ManagerRoot.GameState.CurrentState != GameState.Exploration) return;
             
             if (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
@@ -22,16 +22,16 @@ namespace UI.WorldMapScene
 
         private void ShowMenu()
         {
-            if (GameStateManager.Instance) 
-                GameStateManager.Instance.ChangeState(GameState.PlayerMenu);
+            if (ManagerRoot.GameState) 
+                ManagerRoot.GameState.ChangeState(GameState.PlayerMenu);
         }
 
         private void RefreshModules()
         {
             if (weatherWidget)
-                weatherWidget.SetActive(ModuleManager.Instance.IsMounted(Data.ModuleFeature.WeatherWidget));
+                weatherWidget.SetActive(ManagerRoot.Module.IsMounted(Data.ModuleFeature.WeatherWidget));
             if (encounterSlider)
-                encounterSlider.SetActive(ModuleManager.Instance.IsMounted(Data.ModuleFeature.MobSensor));
+                encounterSlider.SetActive(ManagerRoot.Module.IsMounted(Data.ModuleFeature.MobSensor));
         }
 
         private void HideModules()

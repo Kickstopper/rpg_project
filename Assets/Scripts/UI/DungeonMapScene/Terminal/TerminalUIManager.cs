@@ -226,7 +226,7 @@ namespace UI
             else
             {
                 // 에러 사운드 출력
-                // SoundManager.Instance.PlaySFX(SfxID.Error);
+                // ManagerRoot.Sound.PlaySFX(SfxID.Error);
             }
         }
 

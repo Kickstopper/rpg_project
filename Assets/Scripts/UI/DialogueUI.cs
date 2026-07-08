@@ -184,7 +184,7 @@ namespace UI
                 // CSV의 값을 우선하여 표시
                 if (string.IsNullOrEmpty(name))
                 {
-                    var chrData = PartyManager.Instance.GetCharacterByID(characterId);
+                    var chrData  = ManagerRoot.Party.GetCharacterByID(characterId);
                     if (chrData != null)
                         name = chrData.name;
                     else if (entry != null)
@@ -234,7 +234,7 @@ namespace UI
             // DB에 유효한 ID가 존재할 경우 파티 추가 로직 실행
             if (entry != null)
             {
-                PartyManager.Instance.AddMember(entry, isMonster);
+                ManagerRoot.Party.AddMember(entry, isMonster);
             }
             else
             {
@@ -247,13 +247,13 @@ namespace UI
         {
             if (string.IsNullOrEmpty(charId)) return;
 
-            if (PartyManager.Instance == null || PartyManager.Instance.partyData == null)
+            if (ManagerRoot.Party == null || ManagerRoot.Party.partyData == null)
             {
                 Debug.LogError("[DialogueUI - LEAVE] PartyManager 인스턴스 또는 partyData 리스트를 찾을 수 없습니다.");
                 return;
             }
 
-            PartyManager.Instance.RemoveMember(charId);
+            ManagerRoot.Party.RemoveMember(charId);
         }
 
         // 타이핑 효과 코루틴. Type을 매개변수로 받아서, 타이핑이 끝나면 어떻게 할지 결정
@@ -359,13 +359,13 @@ namespace UI
 
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 currentChoiceIndex = (currentChoiceIndex - 1 + activeChoiceButtons.Count) % activeChoiceButtons.Count;
                 changed = true;
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 currentChoiceIndex = (currentChoiceIndex + 1) % activeChoiceButtons.Count;
                 changed = true;
             }
@@ -387,7 +387,7 @@ namespace UI
                 if (activeChoiceButtons[currentChoiceIndex].interactable)
                 {
                     isWaitingForChoice = false;
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                     //activeChoiceButtons[currentChoiceIndex].onClick.Invoke();
                 }
             }
@@ -539,7 +539,7 @@ namespace UI
                     {
                         string itemID = parts[1];
                         Debug.Log($"[Condition] 아이템 소지 여부 확인: {itemID}");
-                        return InventoryManager.Instance.HasItem(itemID);
+                        return ManagerRoot.Inventory.HasItem(itemID);
                     }
                     break;
                     
@@ -548,7 +548,7 @@ namespace UI
                     if (parts.Length >= 2)
                     {
                         string flagName = parts[1];
-                        return FlagManager.Instance.CheckFlag(flagName);
+                        return ManagerRoot.Flag.CheckFlag(flagName);
                     }
                     break;
             }
@@ -594,7 +594,7 @@ namespace UI
                         {
                             string itemID = parts[1];
                             // TODO: 돈과 인벤토리 아이템 차감 로직 연동
-                            InventoryManager.Instance.RemoveItem(itemID, 1);
+                            ManagerRoot.Inventory.RemoveItem(itemID, 1);
                             Debug.Log($"[Action] 아이템 차감: {itemID}");
                         }
                         break;
@@ -654,15 +654,15 @@ namespace UI
                     {
                         if (int.TryParse(item, out int gold))
                         {
-                            int currentGold = InventoryManager.Instance.GetMoney();
+                            int currentGold = ManagerRoot.Inventory.GetMoney();
                             if (currentGold >= gold)
                             {
-                                InventoryManager.Instance.SubMoney(gold);
+                                ManagerRoot.Inventory.SubMoney(gold);
                             }
                         }
-                        else if (InventoryManager.Instance.HasItem(item))
+                        else if (ManagerRoot.Inventory.HasItem(item))
                         {
-                            InventoryManager.Instance.RemoveItem(item, 1);
+                            ManagerRoot.Inventory.RemoveItem(item, 1);
                         }
                         else
                         {

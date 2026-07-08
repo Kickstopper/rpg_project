@@ -134,12 +134,12 @@ public class BattleFieldController : MonoBehaviour
         // 자리를 잡지 못한 캐릭터들을 모아둘 리스트
         List<RuntimeCharacterData> pendingCharacters = new List<RuntimeCharacterData>();
 
-        int partyCount = PartyManager.Instance.partyData.Count;
+        int partyCount  = ManagerRoot.Party.partyData.Count;
 
         // 선호하는 위치에 우선 배치
         for (int i = 0; i < partyCount; i++)
         {
-            var member = PartyManager.Instance.GetMember(i);
+            var member  = ManagerRoot.Party.GetMember(i);
             if (member == null || (!member.isRegular && member.currentHp <= 0)) continue;
 
             // 데이터상의 위치를 인덱스로 변환
@@ -236,7 +236,7 @@ public class BattleFieldController : MonoBehaviour
 
     public void SpawnMonster(string id)
     {
-        SoundManager.Instance.PlaySFX(SfxID.Encounter);
+        ManagerRoot.Sound.PlaySFX(SfxID.Encounter);
         var entry = GetMonsterEntry(id);
         if (entry == null) return;
         // 생성된 몬스터의 데이터를 로그에 기록 (보상 계산용)
@@ -1085,7 +1085,7 @@ public class BattleFieldController : MonoBehaviour
 
     public void SyncPositionsToPartyManager()
     {
-        if (PartyManager.Instance == null) return;
+        if (ManagerRoot.Party == null) return;
 
         for (int i = 0; i < allSlotControllers.Count; i++)
         {

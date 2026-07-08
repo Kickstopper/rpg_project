@@ -62,10 +62,10 @@ namespace Controller
         public bool IsPopupOpen => isPopupOpen;
         void Start()
         {
-            if (GameStateManager.Instance)
+            if (ManagerRoot.GameState)
             {
-                GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
-                OnGameStateChanged(GameStateManager.Instance.CurrentState);
+                ManagerRoot.GameState.OnStateChanged += OnGameStateChanged;
+                OnGameStateChanged(ManagerRoot.GameState.CurrentState);
             }
             
             if (confirmPopup != null) confirmPopup.SetActive(false);
@@ -73,8 +73,8 @@ namespace Controller
 
         void OnDestroy()
         {
-            if (GameStateManager.Instance != null)
-                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            if (ManagerRoot.GameState != null)
+                ManagerRoot.GameState.OnStateChanged -= OnGameStateChanged;
         }
 
         void OnGameStateChanged(GameState newState)
@@ -135,13 +135,13 @@ namespace Controller
                 if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) 
                 {
                     popupYesBtn.Select();
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                     ResetInputTimer(); 
                 }
                 else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) 
                 {
                     popupNoBtn.Select();
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                     ResetInputTimer();
                 }
             }
@@ -250,16 +250,16 @@ namespace Controller
             // 취소 키
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 ResetInputTimer();
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                ManagerRoot.GameState.ChangeState(GameState.Exploration);
             }
         }
 
         // 파티 슬롯 갱신 (MoveUI 로직 차용)
         private void RefreshPartyUI()
         {
-            var party = PartyManager.Instance.partyData;
+            var party  = ManagerRoot.Party.partyData;
             RuntimeCharacterData[] slotAssignments = new RuntimeCharacterData[6];
             List<RuntimeCharacterData> pending = new List<RuntimeCharacterData>();
 
@@ -320,7 +320,7 @@ namespace Controller
                     if (spawnedControllers[index] != null)
                     {
                         currentPartySelectIndex = index;
-                        SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                        ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                         foreach(var pc in spawnedControllers) pc.ResetHighlightColor();
                         spawnedControllers[index].SetHighlightColor(charHighlightColor);
                     }
@@ -347,7 +347,7 @@ namespace Controller
                 }
                 else
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 }
             });
             trigger.triggers.Add(clickEntry);
@@ -371,7 +371,7 @@ namespace Controller
             if (moved)
             {
                 UpdatePartyHighlight();
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 ResetInputTimer();
             }
 
@@ -392,7 +392,7 @@ namespace Controller
                 }
                 else
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 }
             }
 
@@ -423,14 +423,14 @@ namespace Controller
             currentState = MenuState.Main;
             ResetInputTimer();
             UpdateSelection(currentBtnIndex); // EQUIP 버튼 재선택
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
         void UpdateSelection(int index, bool sound = true)
         {
             if (allMenuBtns == null || allMenuBtns.Count == 0 || index < 0 || index >= allMenuBtns.Count) return;
             allMenuBtns[index].Select();
-            if (sound) SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            if (sound) ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
         }
 
         public void OnClick_Skill()
@@ -438,7 +438,7 @@ namespace Controller
             currentState = MenuState.Skill;
             skillUI.SetActive(true);
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         public void CloseSkillUI()
@@ -451,7 +451,7 @@ namespace Controller
             currentState = MenuState.Main;
             ResetInputTimer();
             UpdateSelection(currentBtnIndex);
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
         public void OnClick_Spirit()
@@ -499,7 +499,7 @@ namespace Controller
             ResetInputTimer();
             UpdateSelection(currentBtnIndex); // 마지막으로 선택했던 메인 메뉴 버튼에 다시 포커스
             
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
         public void OnClick_Status()
@@ -516,7 +516,7 @@ namespace Controller
             EventSystem.current.SetSelectedGameObject(null);
             
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         private bool IsAnySubMenuOpen()
@@ -546,7 +546,7 @@ namespace Controller
 
             UpdatePopupMessage();
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         // 닫을 때 캐릭터 선택 화면으로 복귀
@@ -561,7 +561,7 @@ namespace Controller
             UpdatePartyHighlight();
             
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
         private void OpenCompileUI()
@@ -577,7 +577,7 @@ namespace Controller
             
             EventSystem.current.SetSelectedGameObject(null);
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         // CompileUIController에서 몬스터 2마리를 골랐을 때 호출할 함수
@@ -589,7 +589,7 @@ namespace Controller
             isPopupOpen = true;
             popupNoBtn.Select();
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         public void CloseCompileUI()
@@ -599,7 +599,7 @@ namespace Controller
             
             ResetInputTimer();
             UpdateSelection(currentBtnIndex); 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
         // ModuleUI 열기
@@ -613,7 +613,7 @@ namespace Controller
 
             UpdatePopupMessage();
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         // 닫을 때 캐릭터 선택 화면으로 복귀
@@ -627,7 +627,7 @@ namespace Controller
             // 메인 메뉴를 다시 조작할 수 있도록 원래 누르던 버튼으로 포커스 복구
             UpdateSelection(currentBtnIndex); 
             
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
         
         public void OnClick_Equip()
@@ -647,7 +647,7 @@ namespace Controller
             EventSystem.current.SetSelectedGameObject(null);
             
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         // 실제 장비창 열기
@@ -666,7 +666,7 @@ namespace Controller
 
             UpdatePopupMessage();
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         // 장비창 닫기 -> 캐릭터 선택 화면으로 복귀
@@ -681,7 +681,7 @@ namespace Controller
             UpdatePartyHighlight();
             
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
         
         public void OnClick_Move()
@@ -689,7 +689,7 @@ namespace Controller
             currentState = MenuState.Move;
             moveUI.SetActive(true);
             ResetInputTimer();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         public void CloseMoveUI()
@@ -702,7 +702,7 @@ namespace Controller
             currentState = MenuState.Main;
             ResetInputTimer();
             UpdateSelection(currentBtnIndex);
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
         public void OnClick_System()
@@ -723,7 +723,7 @@ namespace Controller
                 isPopupOpen = true;
                 popupNoBtn.Select();
                 ResetInputTimer();
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             }
         }
 
@@ -772,7 +772,7 @@ namespace Controller
             {
                 case MenuState.Suspend:
                     SaveManager.Instance.SaveGame(SaveManager.SUSPEND_SLOT_INDEX);
-                    GameStateManager.Instance.ChangeState(GameState.None);
+                    ManagerRoot.GameState.ChangeState(GameState.None);
                     UnityEngine.SceneManagement.SceneManager.LoadScene(GameScene.TITLE_SCENE);
                     break;
 
@@ -818,7 +818,7 @@ namespace Controller
             isPopupOpen = true;
             isAlertMode = true;
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
 
             ResetInputTimer();
         }

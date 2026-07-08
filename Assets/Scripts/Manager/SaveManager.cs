@@ -17,8 +17,6 @@ namespace Manager
             if (Instance == null)
             {
                 Instance = this;
-                transform.SetParent(null);
-                DontDestroyOnLoad(gameObject);
             }
             else Destroy(gameObject);
         }
@@ -45,23 +43,23 @@ namespace Manager
             data.sceneName = SceneManager.GetActiveScene().name;
 
             // 플레이어 위치 저장
-            data.dungeonId = DungeonMapStateManager.Instance.currentDungeonId;
-            data.playerPosX = DungeonMapStateManager.Instance.currentPx;
-            data.playerPosY = DungeonMapStateManager.Instance.currentPy;
-            data.playerDirection = DungeonMapStateManager.Instance.currentDirection;
+            data.dungeonId = ManagerRoot.DungeonMapState.currentDungeonId;
+            data.playerPosX = ManagerRoot.DungeonMapState.currentPx;
+            data.playerPosY = ManagerRoot.DungeonMapState.currentPy;
+            data.playerDirection = ManagerRoot.DungeonMapState.currentDirection;
             // 던전 탐색 상태 저장
-            data.dungeonMapStates = DungeonMapStateManager.Instance.GetAllMapStates();
+            data.dungeonMapStates = ManagerRoot.DungeonMapState.GetAllMapStates();
 
             if (data.sceneName == GameScene.WORLD_MAP_SCENE)
             {
                 data.worldMapState = new WorldMapState();
                 
                 // 현재 지역 ID 저장
-                if (WorldManager.Instance.currentRegionTheme != null)
-                    data.worldMapState.regionId = WorldManager.Instance.currentRegionTheme.regionID;
+                if (ManagerRoot.World.currentRegionTheme != null)
+                    data.worldMapState.regionId = ManagerRoot.World.currentRegionTheme.regionID;
 
                 // 플레이어 3D 위치 저장
-                Transform player = WorldManager.Instance.currentPlayerTransform;
+                Transform player = ManagerRoot.World.currentPlayerTransform;
                 if (player != null)
                 {
                     data.worldMapState.x = player.position.x;
@@ -71,22 +69,22 @@ namespace Manager
             }
             
             // 인벤토리 & 골드 저장
-            data.money = InventoryManager.Instance.GetMoney();
-            data.inventory = InventoryManager.Instance.GetSaveData(); 
+            data.money = ManagerRoot.Inventory.GetMoney();
+            data.inventory = ManagerRoot.Inventory.GetSaveData(); 
 
             // 파티와 로스터 정보 저장
-            PartyManager.Instance.SaveToData(data);
+            ManagerRoot.Party.SaveToData(data);
 
             // 이벤트 플래그 저장
-            data.eventFlags = FlagManager.Instance.GetSaveData();
+            data.eventFlags = ManagerRoot.Flag.GetSaveData();
 
             // 대화 이벤트 발생 여부 저장
-            data.completedDialogues = DungeonEventManager.Instance.GetCompletedTriggers();
-
+            data.completedDialogues = ManagerRoot.DungeonEvent.GetCompletedTriggers();
+            
             // 모듈과 메모리 정보
-            data.maxBlockSize = ModuleManager.Instance.maxBlockSize;
-            data.ownedModules = new List<ModuleFeature>(ModuleManager.Instance.ownedModules);
-            data.mountedModules = new List<PlacedModuleData>(ModuleManager.Instance.GetMountedModules());
+            data.maxBlockSize = ManagerRoot.Module.maxBlockSize;
+            data.ownedModules = new List<ModuleFeature>(ManagerRoot.Module.ownedModules);
+            data.mountedModules = new List<PlacedModuleData>(ManagerRoot.Module.GetMountedModules());
 
             // 파일 쓰기
             string json = JsonUtility.ToJson(data, true);
@@ -106,52 +104,51 @@ namespace Manager
             SaveData data = JsonUtility.FromJson<SaveData>(json);
 
             // 골드 및 인벤토리 복구
-            InventoryManager.Instance.SetMoney(data.money);
-            InventoryManager.Instance.LoadFromSaveData(data.inventory);
+            ManagerRoot.Inventory.SetMoney(data.money);
+            ManagerRoot.Inventory.LoadFromSaveData(data.inventory);
             
             // 플래그 복구
-            FlagManager.Instance.LoadFromSaveData(data.eventFlags);
+            ManagerRoot.Flag.LoadFromSaveData(data.eventFlags);
 
             // 대화 이벤트 발생 정보 복구
-            DungeonEventManager.Instance.ApplyCompletedTriggers(data.completedDialogues);
+            ManagerRoot.DungeonEvent.ApplyCompletedTriggers(data.completedDialogues);
 
             // 파티원 복구
             // 기존 파티 클리어 후 재생성 로직 필요
-            PartyManager.Instance.LoadFromSave(data);
+            ManagerRoot.Party.LoadFromSave(data);
             
             // 맵 매니저 설정
-            if (DungeonMapStateManager.Instance != null)
+            if (ManagerRoot.DungeonMapState != null)
             {
                 if (data.dungeonMapStates != null && data.dungeonMapStates.Count > 0)
                 {
-                    DungeonMapStateManager.Instance.LoadMapStates(data.dungeonMapStates);
+                    ManagerRoot.DungeonMapState.LoadMapStates(data.dungeonMapStates);
                 }
-                DungeonMapStateManager.Instance.UpdatePlayerPosition(data.playerPosX, data.playerPosY, data.playerDirection, data.dungeonId);
+                ManagerRoot.DungeonMapState.UpdatePlayerPosition(data.playerPosX, data.playerPosY, data.playerDirection, data.dungeonId);
             }
 
             // 모듈과 메모리 정보
-            ModuleManager.Instance.LoadGame(data);
+            ManagerRoot.Module.LoadGame(data);
             
             if (data.sceneName == GameScene.WORLD_MAP_SCENE)
             {
                 if (data.worldMapState != null)
                 {
                     // 저장된 지역 테마 복원
-                    WorldManager.Instance.SetCurrentRegionTheme(data.worldMapState.regionId);
+                    ManagerRoot.World.SetCurrentRegionTheme(data.worldMapState.regionId);
                     
                     // 불러오기를 통해 진입했음을 알리고 좌표를 전달
-                    WorldManager.Instance.isLoadGame = true;
-                    WorldManager.Instance.loadedPosition = new Vector3(data.worldMapState.x, data.worldMapState.y, data.worldMapState.z);
+                    ManagerRoot.World.isLoadGame = true;
+                    ManagerRoot.World.loadedPosition = new Vector3(data.worldMapState.x, data.worldMapState.y, data.worldMapState.z);
                 }
             }
             else //if (data.sceneName == GameScene.DUNGEON_MAP_SCENE)
             {
                 // 던전 탐색 상태 복구
-                DungeonManager.Instance.LoadDungeonFromJson(data.dungeonId);
-                DungeonManager.Instance.UpdateDungeonStartPosition(data.playerPosX, data.playerPosY, data.playerDirection);
+                ManagerRoot.Dungeon.LoadDungeonFromJson(data.dungeonId);
+                ManagerRoot.Dungeon.UpdateDungeonStartPosition(data.playerPosX, data.playerPosY, data.playerDirection);
             }
             
-
             // 중단 데이터라면 로드 후 즉시 삭제
             if (slotIndex == SUSPEND_SLOT_INDEX)
             {
@@ -160,7 +157,7 @@ namespace Manager
             }
             
             SceneManager.LoadScene(data.sceneName);
-            GameStateManager.Instance.ChangeState(GameState.Exploration);
+            ManagerRoot.GameState.ChangeState(GameState.Exploration);
             Debug.Log("게임 불러오기 완료");
         }
 

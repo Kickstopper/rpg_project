@@ -25,17 +25,17 @@ namespace UI.DungeonMapScene
         void Start()
         {
             HideController();
-            if (GameStateManager.Instance != null)
+            if (ManagerRoot.GameState != null)
             {
-                GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
+                ManagerRoot.GameState.OnStateChanged += OnGameStateChanged;
             }
         }
 
         void OnDestroy()
         {
-            if (GameStateManager.Instance != null)
+            if (ManagerRoot.GameState != null)
             {
-                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+                ManagerRoot.GameState.OnStateChanged -= OnGameStateChanged;
             }
         }
         
@@ -49,7 +49,7 @@ namespace UI.DungeonMapScene
 
         void Update()
         {
-            if (GameStateManager.Instance.CurrentState != GameState.Exploration) return;
+            if (ManagerRoot.GameState.CurrentState != GameState.Exploration) return;
             
             // 마우스 클릭 시 패널 나타남
             if (Input.GetMouseButtonDown(0))

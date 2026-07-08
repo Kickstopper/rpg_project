@@ -49,7 +49,7 @@ public class MonsterCompileManager : MonoBehaviour
     // CompileUIController에서 이 함수를 호출하여 컷신을 시작
     public void StartCompileSequence(string monsterA_ID, string monsterB_ID)
     {
-        var monsterA = DatabaseManager.Instance.monsterDB.GetEntry(monsterA_ID);
+        var monsterA = ManagerRoot.Database.monsterDB.GetEntry(monsterA_ID);
         if (monsterA != null)
         {
             if (spriteA != null && monsterA.image != null)
@@ -59,7 +59,7 @@ public class MonsterCompileManager : MonoBehaviour
             }
             asciiA = monsterA.compileAscii;
         }
-        var monsterB = DatabaseManager.Instance.monsterDB.GetEntry(monsterB_ID);
+        var monsterB = ManagerRoot.Database.monsterDB.GetEntry(monsterB_ID);
         if (monsterB != null)
         {
             if (spriteB != null && monsterB.image != null)
@@ -70,7 +70,7 @@ public class MonsterCompileManager : MonoBehaviour
             asciiB = monsterB.compileAscii;
         }
 
-        var result = DatabaseManager.Instance.monsterDB.GetCompileResult(monsterA_ID, monsterB_ID);
+        var result = ManagerRoot.Database.monsterDB.GetCompileResult(monsterA_ID, monsterB_ID);
         if (result != null)
         {
             if (spriteResult != null && result.image != null)

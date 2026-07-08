@@ -14,7 +14,7 @@ namespace Controller
         {
             if (SoundManager.Instance != null)
             {
-                SoundManager.Instance.PlayBGM(bgmID, volume);
+                ManagerRoot.Sound.PlayBGM(bgmID, volume);
             }
             else
             {

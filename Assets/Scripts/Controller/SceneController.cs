@@ -230,17 +230,17 @@ namespace Controller
         {
             if (allMenuBtns == null || allMenuBtns.Count == 0 || index < 0 || index >= allMenuBtns.Count) return;
             allMenuBtns[index].Select();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
         }
 
         public void OnClick_NewGame()
         {
-            if (DungeonEventManager.Instance != null) DungeonEventManager.Instance.ResetAllEvents();
-            if (InventoryManager.Instance != null) InventoryManager.Instance.ClearInventory();
-            if (FlagManager.Instance != null) FlagManager.Instance.ClearFlag();
-            if (PartyManager.Instance != null) PartyManager.Instance.Initialize();
-            if (DungeonMapStateManager.Instance != null) DungeonMapStateManager.Instance.ClearAllMapData();
-            if (ModuleManager.Instance != null) ModuleManager.Instance.Initialize();
+            if (ManagerRoot.DungeonEvent != null) ManagerRoot.DungeonEvent.ResetAllEvents();
+            if (InventoryManager.Instance != null) ManagerRoot.Inventory.ClearInventory();
+            if (ManagerRoot.Flag != null) ManagerRoot.Flag.ClearFlag();
+            if (ManagerRoot.Party != null) ManagerRoot.Party.Initialize();
+            if (ManagerRoot.DungeonMapState != null) ManagerRoot.DungeonMapState.ClearAllMapData();
+            if (ManagerRoot.Module != null) ManagerRoot.Module.Initialize();
             SceneManager.LoadScene(GameScene.CHARACTER_CREATION_SCENE);
         }
 

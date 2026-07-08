@@ -55,8 +55,8 @@ namespace Controller
         
         public void SetCharacter(RuntimeCharacterData character)
         {
-            if (PartyManager.Instance == null) return;
-            partyMembers = PartyManager.Instance.partyData;
+            if (ManagerRoot.Party == null) return;
+            partyMembers  = ManagerRoot.Party.partyData;
 
             // 전달받은 캐릭터가 파티 리스트의 몇 번째 인덱스인지 찾음
             int foundIndex = partyMembers.IndexOf(character);
@@ -107,7 +107,7 @@ namespace Controller
             if (currentIndex < 0) currentIndex = partyMembers.Count - 1;
             else if (currentIndex >= partyMembers.Count) currentIndex = 0;
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
 
             SetCharacter(partyMembers[currentIndex]);
         }
@@ -154,7 +154,7 @@ namespace Controller
         private void SelectSlot(int index)
         {
             equipSlots[index].button.Select();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
             string itemId = GetEquippedId(equipSlots[index].type);
             UpdateItemInfoText(itemId);
         }
@@ -165,7 +165,7 @@ namespace Controller
             {
                 string itemId = GetEquippedId(equipSlots[i].type);
                 string itemName = "EMPTY";
-                BaseRootData itemData = DatabaseManager.Instance.GetItem(itemId);
+                BaseRootData itemData = ManagerRoot.Database.GetItem(itemId);
                 if (itemData != null) itemName = itemData.dataName;
                 equipSlots[i].UpdateText(itemName);
                 int slotIndex = i;
@@ -210,7 +210,7 @@ namespace Controller
         {
             foreach (string id in currentCharacter.equippedArmorIds)
             {
-                ArmorData armor = DatabaseManager.Instance.GetArmor(id);
+                ArmorData armor = ManagerRoot.Database.GetArmor(id);
                 if (armor != null && armor.slot == slotType) return id;
             }
             return "";
@@ -226,15 +226,15 @@ namespace Controller
             int intel = currentCharacter.stats.intel;
             int lv = currentCharacter.stats.level;
 
-            WeaponData weapon = DatabaseManager.Instance.GetWeapon(currentCharacter.equippedWeaponId);
-            WeaponData gun = DatabaseManager.Instance.GetWeapon(currentCharacter.equippedGunId);
-            AmmoData ammo = DatabaseManager.Instance.GetAmmo(currentCharacter.equippedAmmoId);
+            WeaponData weapon = ManagerRoot.Database.GetWeapon(currentCharacter.equippedWeaponId);
+            WeaponData gun = ManagerRoot.Database.GetWeapon(currentCharacter.equippedGunId);
+            AmmoData ammo = ManagerRoot.Database.GetAmmo(currentCharacter.equippedAmmoId);
             
             int armorDef = 0;
             int armorEva = 0;
             foreach(var id in currentCharacter.equippedArmorIds)
             {
-                var a = DatabaseManager.Instance.GetArmor(id);
+                var a = ManagerRoot.Database.GetArmor(id);
                 if(a) { armorDef += a.defense; armorEva += a.evasionMod; }
             }
 
@@ -281,16 +281,16 @@ namespace Controller
 
             CreateListItem(slotType, "", "REMOVE", 0);
 
-            List<string> uniqueItemIds = InventoryManager.Instance.GetAllItemIds().Distinct().ToList();
+            List<string> uniqueItemIds = ManagerRoot.Inventory.GetAllItemIds().Distinct().ToList();
 
             foreach (string itemId in uniqueItemIds)
             {
                 if (!IsItemMatchSlot(itemId, slotType)) continue;
 
-                int count = InventoryManager.Instance.GetItemCount(itemId);
+                int count = ManagerRoot.Inventory.GetItemCount(itemId);
                 if (count > 0)
                 {
-                    BaseRootData data = DatabaseManager.Instance.GetItem(itemId);
+                    BaseRootData data = ManagerRoot.Database.GetItem(itemId);
                     if (data != null)
                     {
                         CreateListItem(slotType, itemId, data.dataName, count);
@@ -323,7 +323,7 @@ namespace Controller
                 if (currentItemIndex != itemIndex)
                 {
                     currentItemIndex = itemIndex;
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                     UpdateItemSelection(); // 포커스 변경 및 정보창 갱신
                 }
             });
@@ -337,17 +337,17 @@ namespace Controller
         {
              if (string.IsNullOrEmpty(itemId)) return false;
             
-            WeaponData w = DatabaseManager.Instance.GetWeapon(itemId);
+            WeaponData w = ManagerRoot.Database.GetWeapon(itemId);
             if (w != null)
             {
                 if (slotType == EquipSlotType.Melee && w.type == WeaponType.Melee) return true;
                 if (slotType == EquipSlotType.Gun && w.type == WeaponType.Gun) return true;
                 return false;
             }
-            AmmoData am = DatabaseManager.Instance.GetAmmo(itemId);
+            AmmoData am = ManagerRoot.Database.GetAmmo(itemId);
             if (am != null) return slotType == EquipSlotType.Ammo;
             
-            ArmorData ar = DatabaseManager.Instance.GetArmor(itemId);
+            ArmorData ar = ManagerRoot.Database.GetArmor(itemId);
             if (ar != null)
             {
                 if (slotType == EquipSlotType.Head && ar.slot == ArmorSlot.Helmet) return true;
@@ -389,7 +389,7 @@ namespace Controller
         {
             if (displayedButtons.Count == 0) return;
             displayedButtons[currentItemIndex].Select();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
             
             string itemId = displayedItemIds[currentItemIndex];
             UpdateItemInfoText(itemId);
@@ -413,20 +413,20 @@ namespace Controller
             // 쿨타임 중이면 무시 (이벤트 시스템 중복 호출 방지용 안전장치)
             if (inputCooldown > 0) return;
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
             // 기존 장착 아이템 해제 (인벤토리 복구)
             string oldItemId = GetEquippedId(slotType);
             if (!string.IsNullOrEmpty(oldItemId))
             {
-                InventoryManager.Instance.AddItem(oldItemId, 1);
+                ManagerRoot.Inventory.AddItem(oldItemId, 1);
                 UnequipItemFromMe(slotType, oldItemId);
             }
 
             // 새 아이템 장착 (인벤토리 차감)
             if (!string.IsNullOrEmpty(newItemId))
             {
-                InventoryManager.Instance.UseItem(newItemId); 
+                ManagerRoot.Inventory.UseItem(newItemId); 
                 EquipItemToMe(slotType, newItemId);
             }
 
@@ -479,7 +479,7 @@ namespace Controller
                 itemInfoText.text = "EMPTY";
                 return;
             }
-            BaseRootData data = DatabaseManager.Instance.GetItem(itemId);
+            BaseRootData data = ManagerRoot.Database.GetItem(itemId);
             if (data != null)
             {
                 string stats = "";

@@ -91,7 +91,7 @@ namespace Controller
             gameObject.SetActive(false);
             if (itemInfoView != null) itemInfoView.ResetText();
             battleManager.OnPopupMenuClosed();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
         void SwitchTab(int categoryIndex)
@@ -104,7 +104,7 @@ namespace Controller
             // 리스트 새로고침
             RefreshList();
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
         }
 
         // 현재 선택된 탭을 시각적으로 강조
@@ -132,10 +132,10 @@ namespace Controller
             currentSlots.Clear();
 
             // 아이템 생성
-            List<string> allItemIds = InventoryManager.Instance.GetAllItemIds();
+            List<string> allItemIds = ManagerRoot.Inventory.GetAllItemIds();
             foreach (string id in allItemIds)
             {
-                ConsumableItemData data = DatabaseManager.Instance.GetConsumable(id);
+                ConsumableItemData data = ManagerRoot.Database.GetConsumable(id);
                 if (data == null) continue;
 
                 if (data.GetCategoryIndex() == currentTab)
@@ -155,7 +155,7 @@ namespace Controller
             GameObject slotObj = Instantiate(itemSlotPrefab, contentTransform);
             
             // 이름/개수 표시
-            int count = InventoryManager.Instance.GetItemCount(data.id);
+            int count = ManagerRoot.Inventory.GetItemCount(data.id);
             
             var itemView = slotObj.GetComponent<SimpleListItemView>();
             if (itemView != null) itemView.SetData(data.dataName, count);
@@ -183,7 +183,7 @@ namespace Controller
 
         void OnItemSelect(ConsumableItemData itemData)
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
             if (itemInfoView != null) itemInfoView.UpdateInfo(itemData);
         }
 
@@ -193,7 +193,7 @@ namespace Controller
             gameObject.SetActive(false);
             battleManager.OnPopupMenuClosed(); 
             battleManager.OnPopupItemSelected(itemData);
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
         }
 
         IEnumerator SelectFirstItem()

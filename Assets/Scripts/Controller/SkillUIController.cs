@@ -98,7 +98,7 @@ namespace Controller
 
             if (moved)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 RefreshSkillList(currentCasterIndex); // 빈 슬롯이면 내부에서 currentSkillIds.Clear() 되므로 안전함
                 UpdateVisuals();
             }
@@ -108,11 +108,11 @@ namespace Controller
                 // 빈 슬롯이거나, HP가 없거나, 스킬이 없을 때는 에러음 출력 및 선택 불가
                 if (partyControllers[currentCasterIndex].IsEmpty || partyControllers[currentCasterIndex].currentHp <= 0 || currentSkillIds.Count == 0)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                     return;
                 }
                 
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                 currentState = SkillUIState.SelectSkill;
                 currentSkillIndex = 0;
                 UpdateVisuals();
@@ -140,7 +140,7 @@ namespace Controller
 
                 if (moved)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                     UpdateVisuals();
                 }
             }
@@ -154,14 +154,14 @@ namespace Controller
                 }
                 else 
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 }
                 menuController.ResetInputTimer();
             }
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 currentState = SkillUIState.SelectSkill;
                 UpdateVisuals();
             }
@@ -186,7 +186,7 @@ namespace Controller
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 currentState = SkillUIState.SelectCaster;
                 UpdateVisuals();
             }
@@ -197,14 +197,14 @@ namespace Controller
             var buttons = skillContent.GetComponentsInChildren<Button>();
             if (buttons.Length > currentSkillIndex) buttons[currentSkillIndex].Select();
             UpdateSkillInfo();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
         }
 
         private void UpdateSkillInfo()
         {
             if (skillInfo == null || currentSkillIds == null || currentSkillIndex >= currentSkillIds.Count) return;
             string skillId = currentSkillIds[currentSkillIndex];
-            SkillData skillData = DatabaseManager.Instance.GetSkill(skillId);
+            SkillData skillData = ManagerRoot.Database.GetSkill(skillId);
             skillInfo.UpdateInfo(skillData);
         }
 
@@ -218,14 +218,14 @@ namespace Controller
         {
             // 유효성 검사 로직
             string skillId = currentSkillIds[currentSkillIndex];
-            selectedSkillData = DatabaseManager.Instance.GetSkill(skillId);
+            selectedSkillData = ManagerRoot.Database.GetSkill(skillId);
             currentCaster = partyControllers[currentCasterIndex];
 
             if (selectedSkillData == null) return;
 
             if (!IsCostEnough() || selectedSkillData.useType != UseType.All && selectedSkillData.useType != UseType.Exploration)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 return;
             }
 
@@ -238,7 +238,7 @@ namespace Controller
                 }
             }
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             currentState = SkillUIState.SelectTarget;
             InitializeTargetCursor();
             UpdateVisuals();
@@ -318,7 +318,7 @@ namespace Controller
             // 결과 처리
             if (success)
             {
-                SoundManager.Instance.PlaySFX(SfxID.Attack_Magic); 
+                ManagerRoot.Sound.PlaySFX(SfxID.Attack_Magic); 
 
                 // 코스트 차감 (시전자)
                 if (selectedSkillData.useHpCost)
@@ -336,7 +336,7 @@ namespace Controller
             }
             else
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
             }
         }
 
@@ -425,7 +425,7 @@ namespace Controller
             for (int i = 0; i < currentSkillIds.Count; i++)
             {
                 string skillId = currentSkillIds[i];
-                SkillData sData = DatabaseManager.Instance.GetSkill(skillId);
+                SkillData sData = ManagerRoot.Database.GetSkill(skillId);
                 if (sData == null) continue;
 
                 GameObject go = Instantiate(skillSlotPrefab, skillContent);
@@ -465,7 +465,7 @@ namespace Controller
                         if (currentSkillIndex != itemIndex)
                         {
                             currentSkillIndex = itemIndex;
-                            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                             btn.Select();
                             UpdateSkillInfo();
                         }
@@ -482,7 +482,7 @@ namespace Controller
 
         private void RefreshPartyList()
         {
-            var party = PartyManager.Instance.partyData;
+            var party  = ManagerRoot.Party.partyData;
             for (int i = 0; i < 6; i++)
             {
                 foreach (Transform child in partySlots[i]) Destroy(child.gameObject);
@@ -517,7 +517,7 @@ namespace Controller
                         if (currentCasterIndex != index)
                         {
                             currentCasterIndex = index;
-                            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                             UpdateVisuals(); 
                         }
                     }
@@ -526,7 +526,7 @@ namespace Controller
                         if (currentTargetIndex != index)
                         {
                             currentTargetIndex = index;
-                            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                             UpdateVisuals();
                         }
                     }
@@ -547,10 +547,10 @@ namespace Controller
 
                     if (partyControllers[currentCasterIndex].IsEmpty || partyControllers[currentCasterIndex].learnedSkillIds.Count == 0)
                     {
-                        SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                        ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                         return;
                     }
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                     currentState = SkillUIState.SelectSkill;
                     currentSkillIndex = 0;
                     
@@ -561,7 +561,7 @@ namespace Controller
                 else if (currentState == SkillUIState.SelectTarget)
                 {
                     if (IsCostEnough() && IsValidTarget(index)) UseSkill();
-                    else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    else ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 }
             });
             trigger.triggers.Add(clickEntry);
@@ -589,7 +589,7 @@ namespace Controller
         
         private void ResolvePositionConflicts()
         {
-            var party = PartyManager.Instance.partyData;
+            var party  = ManagerRoot.Party.partyData;
             if (party == null || party.Count == 0) return;
 
             RuntimeCharacterData[] slotAssignments = new RuntimeCharacterData[6];

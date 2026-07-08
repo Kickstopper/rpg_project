@@ -92,7 +92,7 @@ namespace UI.DungeonMapScene
 
         private void UpdateDangerUI(float ratio)
         {
-            if (ModuleManager.Instance && !ModuleManager.Instance.IsMounted(ModuleFeature.MobSensor)) return;
+            if (ManagerRoot.Module && !ManagerRoot.Module.IsMounted(ModuleFeature.MobSensor)) return;
             if (dangerSlider == null || fillImage == null) return;
 
             // 위험도를 5% 단위(0~20)로 나누어 단계가 변했을 때만 트윈과 색상을 갱신
@@ -129,10 +129,10 @@ namespace UI.DungeonMapScene
         private void TriggerEncounter()
         {
             _pulseTween?.Kill();
-            if (GameStateManager.Instance && GameStateManager.Instance.CurrentState != GameState.Battle &&
+            if (ManagerRoot.GameState && ManagerRoot.GameState.CurrentState != GameState.Battle &&
                 monsters != null && monsters.Count > 0)
             {
-                GameStateManager.Instance.StartEncounter(monsters, Color.white);
+                ManagerRoot.GameState.StartEncounter(monsters, Color.white);
             }
             ResetSteps();
         }

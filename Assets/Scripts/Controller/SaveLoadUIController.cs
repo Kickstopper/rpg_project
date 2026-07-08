@@ -138,7 +138,7 @@ namespace Controller
             if (nextIndex >= 0 && nextIndex < slots.Count)
             {
                 currentFocusIndex = nextIndex;
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 UpdateVisualFocus();
             }
         }
@@ -156,7 +156,7 @@ namespace Controller
 
         void OnCancel()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); // 취소 효과음
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel); // 취소 효과음
             Close();
         }
 

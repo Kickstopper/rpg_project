@@ -23,8 +23,8 @@ namespace Manager
             if (Instance == null)
             {
                 Instance = this;
-                transform.SetParent(null);
-                DontDestroyOnLoad(gameObject);
+                
+                
                 // 게임 시작 시 딕셔너리 초기화
                 charDB.Initialize();
                 monsterDB.Initialize();

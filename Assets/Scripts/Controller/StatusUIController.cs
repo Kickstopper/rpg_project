@@ -69,9 +69,9 @@ namespace Controller
 
         void OnEnable()
         {
-            if (PartyManager.Instance != null)
+            if (ManagerRoot.Party != null)
             {
-                partyMembers = PartyManager.Instance.partyData;
+                partyMembers  = ManagerRoot.Party.partyData;
                 
                 if (currentIndex >= partyMembers.Count) currentIndex = 0;
                 RefreshUI();
@@ -86,8 +86,8 @@ namespace Controller
 
         public void SetTargetCharacter(RuntimeCharacterData targetChar)
         {
-            if (PartyManager.Instance == null) return;
-            partyMembers = PartyManager.Instance.partyData;
+            if (ManagerRoot.Party == null) return;
+            partyMembers  = ManagerRoot.Party.partyData;
 
             // 전달받은 캐릭터가 파티 리스트의 몇 번째 인덱스인지 찾음
             int foundIndex = partyMembers.IndexOf(targetChar);
@@ -132,7 +132,7 @@ namespace Controller
             if (currentIndex < 0) currentIndex = partyMembers.Count - 1;
             else if (currentIndex >= partyMembers.Count) currentIndex = 0;
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
             RefreshUI();
         }
 
@@ -140,10 +140,10 @@ namespace Controller
         {
             if (hasResonance && resonanceStatusUI)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                 resonanceStatusUI.SetActive(true);
             }
-            else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            else ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
             
         }
 
@@ -153,7 +153,7 @@ namespace Controller
             {
                 resonanceStatusUI.SetActive(false);
             }
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
         public void OnClick_ResonanceViewButton()
@@ -205,7 +205,7 @@ namespace Controller
             List<string> skills = new(charData.learnedSkills);
             if (!string.IsNullOrEmpty(charData.resonanceId))
             {
-                ResonanceData resonance = DatabaseManager.Instance.GetResonance(charData.resonanceId);
+                ResonanceData resonance = ManagerRoot.Database.GetResonance(charData.resonanceId);
                 if (resonance != null)
                 {
                     hasResonance = true;
@@ -243,15 +243,15 @@ namespace Controller
             int intel = charData.stats.intel;
             int lv = charData.stats.level;
 
-            WeaponData weapon = DatabaseManager.Instance.GetWeapon(charData.equippedWeaponId);
-            WeaponData gun = DatabaseManager.Instance.GetWeapon(charData.equippedGunId);
-            AmmoData ammo = DatabaseManager.Instance.GetAmmo(charData.equippedAmmoId);
+            WeaponData weapon = ManagerRoot.Database.GetWeapon(charData.equippedWeaponId);
+            WeaponData gun = ManagerRoot.Database.GetWeapon(charData.equippedGunId);
+            AmmoData ammo = ManagerRoot.Database.GetAmmo(charData.equippedAmmoId);
             
             int armorDef = 0;
             int armorEva = 0;
             foreach(var id in charData.equippedArmorIds)
             {
-                var a = DatabaseManager.Instance.GetArmor(id);
+                var a = ManagerRoot.Database.GetArmor(id);
                 if(a) { armorDef += a.defense; armorEva += a.evasionMod; }
             }
 
@@ -291,12 +291,12 @@ namespace Controller
             Sprite portrait = null;
             if (data.isMonster)
             {
-                MonsterEntry entry = DatabaseManager.Instance.monsterDB.GetEntry(data.characterId);
+                MonsterEntry entry = ManagerRoot.Database.monsterDB.GetEntry(data.characterId);
                 if (entry != null) portrait = entry.portrait;
             }
             else
             {
-                CharacterEntry entry = DatabaseManager.Instance.charDB.GetEntry(data.characterId);
+                CharacterEntry entry = ManagerRoot.Database.charDB.GetEntry(data.characterId);
                 if (entry != null) portrait = entry.portraitImage;
             }
             
@@ -346,7 +346,7 @@ namespace Controller
                 GameObject item = Instantiate(skillItemPrefab, skillContent);
 
                 // 데이터 조회
-                SkillData skillData = DatabaseManager.Instance.GetSkill(skillId);
+                SkillData skillData = ManagerRoot.Database.GetSkill(skillId);
                 if (skillData == null) continue;
 
                 // SkillSlotUI 컴포넌트 가져오기

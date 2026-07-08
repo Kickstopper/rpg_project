@@ -46,8 +46,8 @@ namespace UI.Shop
             foreach (Transform child in charListContent) Destroy(child.gameObject);
             charButtons.Clear();
 
-            if (PartyManager.Instance == null) return;
-            partyMembers = PartyManager.Instance.partyData;
+            if (ManagerRoot.Party == null) return;
+            partyMembers  = ManagerRoot.Party.partyData;
 
             for (int i = 0; i < partyMembers.Count; i++)
             {
@@ -104,7 +104,7 @@ namespace UI.Shop
         {
             currentCharIndex = index;
             charButtons[index].Select();
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
         }
 
         private void ConfirmSelection(int index)

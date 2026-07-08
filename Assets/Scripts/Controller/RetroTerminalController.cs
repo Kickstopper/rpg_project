@@ -59,8 +59,8 @@ namespace Controller
             {
                 if (SoundManager.Instance != null)
                 {
-                    SoundManager.Instance.StopAllSFX(true, 1);
-                    SoundManager.Instance.StopBGM();
+                    ManagerRoot.Sound.StopAllSFX(true, 1);
+                    ManagerRoot.Sound.StopBGM();
                 }
                 StartTransitionSequence();
             }
@@ -117,8 +117,8 @@ namespace Controller
             isTransitioning = true;
             if (SoundManager.Instance != null)
             {
-                SoundManager.Instance.StopAllSFX(true, 1);
-                SoundManager.Instance.StopBGM();
+                ManagerRoot.Sound.StopAllSFX(true, 1);
+                ManagerRoot.Sound.StopBGM();
             }
             
             StartCoroutine(TransitionSequence());

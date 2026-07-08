@@ -53,7 +53,7 @@ namespace Controller
 
             foreach(var kvp in itemCounts)
             {
-                var itemData = DatabaseManager.Instance.GetItem(kvp.Key);
+                var itemData = ManagerRoot.Database.GetItem(kvp.Key);
                 if(itemData != null)
                 {
                     GameObject go = Instantiate(itemSlotPrefab, itemContainer);
@@ -111,7 +111,7 @@ namespace Controller
             if (isClosing) return;
             isClosing = true;
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
             gameObject.SetActive(false);
             onClosed?.Invoke();

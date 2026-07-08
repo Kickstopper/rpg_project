@@ -63,21 +63,21 @@ namespace Controller
             spawnedPanels.Clear();
 
             // 테스트를 위한 몬스터 추가
-            // var monA = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_000"));
-            // var monB = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_001")); 
-            // var monC = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_002")); 
-            // var monD = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_003")); 
-            // var monE = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_004")); 
-            // var monF = MonsterConversionHelper.ToCharacterEntry(DatabaseManager.Instance.monsterDB.GetEntry("enemy_005")); 
-            // PartyManager.Instance.AddMember(monA, true);
-            // PartyManager.Instance.AddMember(monB, true);
-            // PartyManager.Instance.AddMember(monC, true);
-            // PartyManager.Instance.AddMember(monD, true);
-            // PartyManager.Instance.AddMember(monE, true);
-            // PartyManager.Instance.AddMember(monF, true);
+            // var monA = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_000"));
+            // var monB = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_001")); 
+            // var monC = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_002")); 
+            // var monD = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_003")); 
+            // var monE = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_004")); 
+            // var monF = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_005")); 
+            // ManagerRoot.Party.AddMember(monA, true);
+            // ManagerRoot.Party.AddMember(monB, true);
+            // ManagerRoot.Party.AddMember(monC, true);
+            // ManagerRoot.Party.AddMember(monD, true);
+            // ManagerRoot.Party.AddMember(monE, true);
+            // ManagerRoot.Party.AddMember(monF, true);
             
             // 파티 리스트 불러오기
-            var party = PartyManager.Instance.partyData;
+            var party  = ManagerRoot.Party.partyData;
             // "enemy_"로 시작하는 몬스터만 필터링하여 새 리스트 생성
             var validMonsters = party.FindAll(m => m != null && 
                                                  !string.IsNullOrEmpty(m.characterId) && 
@@ -117,7 +117,7 @@ namespace Controller
                     if (menuController.IsPopupOpen || compilePanel.activeSelf) return; // 팝업 중 방지
                     currentFocusedIndex = index;
                     UpdateHighlight();
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 });
                 trigger.triggers.Add(enterEntry);
             }
@@ -138,7 +138,7 @@ namespace Controller
             {
                 if (Input.anyKeyDown)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                     menuController.CloseCompileUI();
                 }
                 return; 
@@ -167,7 +167,7 @@ namespace Controller
             if (moved)
             {
                 UpdateHighlight();
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 menuController.ResetInputTimer();
                 return;
             }
@@ -186,7 +186,7 @@ namespace Controller
                 {
                     selectedMonsterIDs.Clear();
                     UpdateHighlight();
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 }
                 else
                 {
@@ -205,7 +205,7 @@ namespace Controller
             {
                 selectedMonsterIDs.Remove(monsterID);
                 UpdateHighlight();
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 return;
             }
 
@@ -214,7 +214,7 @@ namespace Controller
             {
                 selectedMonsterIDs.Add(monsterID);
                 UpdateHighlight();
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
                 // 2마리가 모두 선택된 순간, 합체 결과를 미리 예측하여 중복 검사를 수행
                 if (selectedMonsterIDs.Count == 2)
@@ -223,12 +223,12 @@ namespace Controller
                     string idB = selectedMonsterIDs[1];
 
                     // 합체 결과 몬스터 데이터를 미리 가져옴
-                    var resultEntry = DatabaseManager.Instance.monsterDB.GetCompileResult(idA, idB);
+                    var resultEntry = ManagerRoot.Database.monsterDB.GetCompileResult(idA, idB);
 
                     if (resultEntry != null)
                     {
                         // partyData에 동일한 ID를 가진 몬스터가 존재하는지 검사
-                        bool isAlreadyInParty = PartyManager.Instance.partyData.Exists(m => 
+                        bool isAlreadyInParty  = ManagerRoot.Party.partyData.Exists(m => 
                             m != null && m.characterId == resultEntry.id);
 
                         if (isAlreadyInParty)

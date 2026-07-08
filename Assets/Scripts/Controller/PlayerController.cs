@@ -146,7 +146,7 @@ namespace Controller
             this.gameObject.name = entityName;
             if (!string.IsNullOrEmpty(runtimeData.resonanceId))
             {
-                this.resonanceData = DatabaseManager.Instance.GetResonance(runtimeData.resonanceId);
+                this.resonanceData = ManagerRoot.Database.GetResonance(runtimeData.resonanceId);
             }
 
             // 데이터 융합
@@ -199,7 +199,7 @@ namespace Controller
             }
             else
             {
-                var dbEntry = DatabaseManager.Instance.charDB.GetEntry(runtimeData.characterId);
+                var dbEntry = ManagerRoot.Database.charDB.GetEntry(runtimeData.characterId);
                 if (dbEntry != null && portraitImage)
                 {
                     portraitImage.sprite = dbEntry.battlePortraitImg;
@@ -332,7 +332,7 @@ namespace Controller
             equippedWeaponId = weaponId;
 
             if (!string.IsNullOrEmpty(weaponId))
-                currentWeapon = DatabaseManager.Instance.GetWeapon(weaponId);
+                currentWeapon = ManagerRoot.Database.GetWeapon(weaponId);
             else
                 currentWeapon = null;
         }
@@ -344,13 +344,13 @@ namespace Controller
             equippedAmmoId = ammoId;
 
             if (!string.IsNullOrEmpty(gunId))
-                currentGun = DatabaseManager.Instance.GetWeapon(gunId);
+                currentGun = ManagerRoot.Database.GetWeapon(gunId);
             else
                 currentGun = null;
 
             if (!string.IsNullOrEmpty(ammoId))
                 // 총알 데이터
-                currentAmmo = DatabaseManager.Instance.GetAmmo(ammoId);
+                currentAmmo = ManagerRoot.Database.GetAmmo(ammoId);
             else
                 currentAmmo = null;
             
@@ -366,7 +366,7 @@ namespace Controller
                 if (string.IsNullOrEmpty(id)) continue;
                 
                 // DatabaseManager를 사용하여 실제 데이터 로드
-                ArmorData armor = DatabaseManager.Instance.GetArmor(id);
+                ArmorData armor = ManagerRoot.Database.GetArmor(id);
                 if (armor != null)
                 {
                     totalArmorEvasion += armor.evasionMod;
@@ -434,7 +434,7 @@ namespace Controller
             // 장비한 무기가 없을 경우 기본 맨손 타격 이펙트 반환
             if (equippedWeaponId == null) return VfxID.Hit;
 
-            var weaponData = DatabaseManager.Instance.GetWeapon(equippedWeaponId);
+            var weaponData = ManagerRoot.Database.GetWeapon(equippedWeaponId);
 
             // 무기의 타입에 따라 이펙트 분기
             switch (weaponData.category)

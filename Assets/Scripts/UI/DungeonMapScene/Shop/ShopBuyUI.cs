@@ -158,7 +158,7 @@ namespace UI.Shop
             highlightNameText.text = item.dataName;
             highlightDescText.text = item.description;
 
-            int possessedAmount = InventoryManager.Instance.GetItemCount(item.id);
+            int possessedAmount = ManagerRoot.Inventory.GetItemCount(item.id);
             possessionText.text = $"{possessedAmount}/99"; // 일단은 전부 99개가 최대
             
             UpdatePriceUI();
@@ -189,14 +189,14 @@ namespace UI.Shop
         // 구매 확정 로직
         private void OnConfirmButtonClicked()
         {
-            int PlayerMoney = InventoryManager.Instance.GetMoney();
+            int PlayerMoney = ManagerRoot.Inventory.GetMoney();
             int totalCost = HighlightedItem.price * currentPurchaseQuantity;
             
             if(PlayerMoney >= totalCost)
             {
-                InventoryManager.Instance.AddItem(HighlightedItem.id, currentPurchaseQuantity);
+                ManagerRoot.Inventory.AddItem(HighlightedItem.id, currentPurchaseQuantity);
                 int currentMoney = PlayerMoney - totalCost;
-                InventoryManager.Instance.SetMoney(currentMoney);
+                ManagerRoot.Inventory.SetMoney(currentMoney);
                 Debug.Log($"{HighlightedItem.dataName} {currentPurchaseQuantity}개 구매 완료!");
 
             }
@@ -212,7 +212,7 @@ namespace UI.Shop
 
         private void UpdatePlayerMoneyUI()
         {
-            moneyText.text = $"${InventoryManager.Instance.GetMoney()}";
+            moneyText.text = $"${ManagerRoot.Inventory.GetMoney()}";
         }
 
         private void ClearContent()

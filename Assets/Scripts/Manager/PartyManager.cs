@@ -23,9 +23,6 @@ namespace Manager
             if (Instance == null) 
             { 
                 Instance = this; 
-                transform.SetParent(null);
-                DontDestroyOnLoad(gameObject); 
-                
             }
             else Destroy(gameObject);
         }
@@ -101,7 +98,7 @@ namespace Manager
             
             foreach (var id in starterIds)
             {
-                var entry = DatabaseManager.Instance.charDB.GetEntry(id);
+                var entry = ManagerRoot.Database.charDB.GetEntry(id);
                 if (entry != null)
                 {
                     RuntimeCharacterData newData = new RuntimeCharacterData(entry);

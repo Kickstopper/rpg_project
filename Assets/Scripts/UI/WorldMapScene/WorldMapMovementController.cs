@@ -19,7 +19,7 @@ namespace UI.WorldMapScene
 
         void FixedUpdate()
         {
-            if (GameStateManager.Instance && GameStateManager.Instance.CurrentState != GameState.Exploration) return;
+            if (ManagerRoot.GameState && ManagerRoot.GameState.CurrentState != GameState.Exploration) return;
 
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");

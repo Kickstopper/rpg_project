@@ -57,13 +57,13 @@ namespace UI.CharacterCreationScene
             if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) ||
                 Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow))
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 return;
             }
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                 return;
             }
             
@@ -76,7 +76,7 @@ namespace UI.CharacterCreationScene
         // 언어 전환 및 패널 활성화 로직
         public void ToggleLanguage()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             currentLanguage = (KeyboardLanguage)(((int)currentLanguage + 1) % 3);
 
             isCapsLock = false; // 언어가 바뀌면 무조건 소문자를 우선 표시
@@ -122,7 +122,7 @@ namespace UI.CharacterCreationScene
                         hangulCombiner.RestoreState(prevCho, prevJung, prevJong);
                         
                         // 지원하지 않는 글자 입력 시 경고음
-                        SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                        ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                         return;
                     }
                 }
@@ -138,7 +138,7 @@ namespace UI.CharacterCreationScene
 
         public void OnBackspacePress()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
             inputText = hangulCombiner.DeleteChar(inputText);
             isCursorVisible = true;
             cursorTimer = 0f;

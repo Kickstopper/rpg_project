@@ -43,7 +43,7 @@ namespace UI
             if (!button.interactable) return;
             
             UpdateColor(true);
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
         }
 
         // 포커스가 빠져나갔을 때
@@ -59,7 +59,7 @@ namespace UI
             if (!button.interactable) return;
             
             UpdateColor(true);
-            SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
         }
 
         // 마우스가 나갔을 때

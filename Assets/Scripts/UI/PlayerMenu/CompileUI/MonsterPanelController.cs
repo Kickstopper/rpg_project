@@ -27,7 +27,7 @@ namespace UI.PlayerMenu
         public void Initialize(string monsterID)
         {
             currentMonsterID = monsterID;
-            RuntimeCharacterData monster = PartyManager.Instance.GetCharacterByID(monsterID);
+            RuntimeCharacterData monster  = ManagerRoot.Party.GetCharacterByID(monsterID);
             
             if (monster == null)
             {

@@ -54,7 +54,7 @@ namespace UI.CharacterCreationScene
             {
                 case CreationStep.PlayerName:
                     if (SoundManager.Instance != null)
-                        SoundManager.Instance.PlayBGM(BgmID.LevelUp);
+                        ManagerRoot.Sound.PlayBGM(BgmID.LevelUp);
                     titleText.text = "당신의 이름을 입력하세요";
 
                     nameInputPanel.SetActive(true);
@@ -74,7 +74,7 @@ namespace UI.CharacterCreationScene
 
                 case CreationStep.PlayerStats:
                     if (SoundManager.Instance != null)
-                        SoundManager.Instance.PlayBGM(BgmID.LevelUp);
+                        ManagerRoot.Sound.PlayBGM(BgmID.LevelUp);
                     nameInputPanel.SetActive(false);
                     levelUpPanel.SetActive(true);
 
@@ -86,8 +86,8 @@ namespace UI.CharacterCreationScene
                 case CreationStep.PartnerStats:
                     if (SoundManager.Instance != null)
                     {
-                        SoundManager.Instance.StopBGM(false);
-                        SoundManager.Instance.PlayBGM(BgmID.LevelUp);
+                        ManagerRoot.Sound.StopBGM(false);
+                        ManagerRoot.Sound.PlayBGM(BgmID.LevelUp);
                     }
                     
                     SetCharacterStats(PartyID.CHARACTER_01, CreateBaseStat(5)); // 히로인 기본 스탯 저장
@@ -114,7 +114,7 @@ namespace UI.CharacterCreationScene
 
         private void SetDefaultCharacterInfo(string characterId)
         {
-            var dbEntry = DatabaseManager.Instance.charDB.GetEntry(characterId);
+            var dbEntry = ManagerRoot.Database.charDB.GetEntry(characterId);
             if (dbEntry != null)
             {
                 portraitImage.sprite = dbEntry.portraitImage;
@@ -206,13 +206,13 @@ namespace UI.CharacterCreationScene
 
         private void SetCharacterName(string characterId, string name)
         {
-            var characterData = PartyManager.Instance.GetCharacterByID(characterId);
+            var characterData  = ManagerRoot.Party.GetCharacterByID(characterId);
             if (characterData != null) characterData.name = name;
         }
 
         private void SetCharacterStats(string characterId, StatData stats)
         {
-            var characterData = PartyManager.Instance.GetCharacterByID(characterId);
+            var characterData  = ManagerRoot.Party.GetCharacterByID(characterId);
             if (characterData != null)
             {
                 characterData.stats = stats;
@@ -227,12 +227,12 @@ namespace UI.CharacterCreationScene
             {
                 if (nextSceneName.Equals(GameScene.DUNGEON_MAP_SCENE))
                 {
-                    DungeonManager.Instance.LoadDungeonFromJson(nextSceneParam);
+                    ManagerRoot.Dungeon.LoadDungeonFromJson(nextSceneParam);
                     SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
                 }
                 else if (nextSceneName.Equals(GameScene.WORLD_MAP_SCENE))
                 {
-                    WorldManager.Instance.SetCurrentRegionTheme(nextSceneParam); 
+                    ManagerRoot.World.SetCurrentRegionTheme(nextSceneParam); 
                     SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
                 }
                 else

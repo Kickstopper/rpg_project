@@ -1562,8 +1562,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6831504765933425996}
+  - component: {fileID: 6831504765933425997}
   m_Layer: 0
-  m_Name: Managers
+  m_Name: '@Managers'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2108,24 +2109,54 @@ Transform:
   m_Children:
   - {fileID: 3496321238596469039}
   - {fileID: 5462808604640683637}
-  - {fileID: 1172031081555811078}
-  - {fileID: 5432493558566063694}
-  - {fileID: 1462542171025784884}
   - {fileID: 455303184316482631}
-  - {fileID: 4505960558446358002}
-  - {fileID: 8995074089759345937}
-  - {fileID: 410988393808517482}
-  - {fileID: 8678562234907411995}
+  - {fileID: 5432493558566063694}
   - {fileID: 8247476971546614544}
-  - {fileID: 3610373616224753382}
-  - {fileID: 9137468785865546119}
-  - {fileID: 1735507490957044432}
+  - {fileID: 1172031081555811078}
+  - {fileID: 8678562234907411995}
+  - {fileID: 1462542171025784884}
   - {fileID: 527695769}
-  - {fileID: 8462999702048826074}
-  - {fileID: 8504960244262196308}
+  - {fileID: 3610373616224753382}
+  - {fileID: 8995074089759345937}
+  - {fileID: 4505960558446358002}
+  - {fileID: 9137468785865546119}
   - {fileID: 7142236786666981268}
+  - {fileID: 410988393808517482}
+  - {fileID: 1735507490957044432}
+  - {fileID: 8504960244262196308}
+  - {fileID: 8462999702048826074}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6831504765933425997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 711075612120401902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1cf78321bb98d541b459fccf30dc5fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Manager.ManagerRoot
+  gameSettingManager: {fileID: 5447546010577571032}
+  soundManager: {fileID: 4252246672531554310}
+  databaseManager: {fileID: 769614032995516167}
+  dialogueManager: {fileID: 8122039984613250064}
+  gameStateManager: {fileID: 1292333167152376082}
+  dungeonManager: {fileID: 14670680275765259}
+  dungeonMapStateManager: {fileID: 8484882110831269433}
+  dungeonEventManager: {fileID: 6273940470206311526}
+  terminalManager: {fileID: 527695770}
+  effectManager: {fileID: 2151758435391337827}
+  flagManager: {fileID: 3274105084407273714}
+  inventoryManager: {fileID: 5739797074736477215}
+  moduleManager: {fileID: 4853115297310281934}
+  partyManager: {fileID: 796750239148791581}
+  saveManager: {fileID: 8775825552231452310}
+  shopManager: {fileID: 3223804725601633529}
+  weatherManager: {fileID: 300400626869433266}
+  worldManager: {fileID: 4167022545302854056}
 --- !u!1 &6896106718060139186
 GameObject:
   m_ObjectHideFlags: 0
@@ -2137,7 +2168,7 @@ GameObject:
   - component: {fileID: 8678562234907411995}
   - component: {fileID: 8484882110831269433}
   m_Layer: 0
-  m_Name: MapPositionManager
+  m_Name: DungeonMapStateManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

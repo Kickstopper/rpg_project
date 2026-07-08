@@ -55,7 +55,7 @@ namespace UI.IntroScene
         {
             if (SoundManager.Instance != null && bgmId != BgmID.None)
             {
-                SoundManager.Instance.PlayBGM(bgmId, 1, false);
+                ManagerRoot.Sound.PlayBGM(bgmId, 1, false);
             }
             if (fadeOverlay != null)
             {
@@ -177,7 +177,7 @@ namespace UI.IntroScene
         private IEnumerator FadeOut()
         {
             if (fadeOverlay == null) yield break;
-            SoundManager.Instance.StopBGM(true, fadeOutDuration);
+            ManagerRoot.Sound.StopBGM(true, fadeOutDuration);
             float timer = 0f;
             Color startColor = new Color(fadeOutColor.r, fadeOutColor.g, fadeOutColor.b, 0);
             Color endColor = new Color(fadeOutColor.r, fadeOutColor.g, fadeOutColor.b, 1);
@@ -194,7 +194,7 @@ namespace UI.IntroScene
 
         private void SkipCutscene()
         {
-            SoundManager.Instance.StopBGM();
+            ManagerRoot.Sound.StopBGM();
             StopAllCoroutines();
             TransitionToNextScene();
         }
@@ -205,12 +205,12 @@ namespace UI.IntroScene
             {
                 if (nextSceneName.Equals(GameScene.DUNGEON_MAP_SCENE))
                 {
-                    DungeonManager.Instance.LoadDungeonFromJson(nextSceneParam);
+                    ManagerRoot.Dungeon.LoadDungeonFromJson(nextSceneParam);
                     SceneManager.LoadScene(GameScene.DUNGEON_MAP_SCENE);
                 }
                 else if (nextSceneName.Equals(GameScene.WORLD_MAP_SCENE))
                 {
-                    WorldManager.Instance.SetCurrentRegionTheme(nextSceneParam); 
+                    ManagerRoot.World.SetCurrentRegionTheme(nextSceneParam); 
                     SceneManager.LoadScene(GameScene.WORLD_MAP_SCENE);
                 }
                 else

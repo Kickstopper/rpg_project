@@ -118,21 +118,21 @@ namespace Controller
         
         void Start()
         {
-            GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
-            OnGameStateChanged(GameStateManager.Instance.CurrentState);
+            ManagerRoot.GameState.OnStateChanged += OnGameStateChanged;
+            OnGameStateChanged(ManagerRoot.GameState.CurrentState);
         }
 
         void OnDestroy()
         {
-            if (GameStateManager.Instance != null)
-                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            if (ManagerRoot.GameState != null)
+                ManagerRoot.GameState.OnStateChanged -= OnGameStateChanged;
         }
 
         void OnGameStateChanged(GameState newState)
         {
             if (newState == GameState.Battle)
             {
-                //SoundManager.Instance.PlayBGM();
+                //ManagerRoot.Sound.PlayBGM();
                 isBattleState = true;
             }
             else
@@ -201,7 +201,7 @@ namespace Controller
 
             if (fieldController.ActivePlayerCount() == 0)
             {
-                GameStateManager.Instance.ChangeState(GameState.Exploration);
+                ManagerRoot.GameState.ChangeState(GameState.Exploration);
                 return;  
             }  
             
@@ -279,7 +279,7 @@ namespace Controller
 
         IEnumerator SetupBattle(Dictionary<string, int> monsterList)
         {
-            SoundManager.Instance.PlayBGM(BgmID.Encounter);
+            ManagerRoot.Sound.PlayBGM(BgmID.Encounter);
             
             yield return fieldController.Refresh();
             
@@ -309,14 +309,14 @@ namespace Controller
             {
                 case EncounterType.Preemptive:
                     uiController.ShowStateMessage("PLAYER ADVANTAGE");
-                    SoundManager.Instance.PlaySFX(SfxID.Attack_Critical); // 임시
+                    ManagerRoot.Sound.PlaySFX(SfxID.Attack_Critical); // 임시
                     yield return new WaitForSeconds(1f);
                     uiController.HideStateMessage();
                     PreparePlayerTurn();
                     break;
 
                 case EncounterType.Ambush:
-                    SoundManager.Instance.PlaySFX(SfxID.Attack_Critical); // 임시
+                    ManagerRoot.Sound.PlaySFX(SfxID.Attack_Critical); // 임시
                     yield return uiController.ShowFlashEffect();
                     uiController.ShowStateMessage("ENEMY ADVANTAGE"); 
                     yield return uiController.ShowPhaseIndicator(true);
@@ -517,7 +517,7 @@ namespace Controller
                 currentProcessingAction.actor.transform.localScale = Vector3.one;
             }
 
-            //SoundManager.Instance.PlaySFX(SfxID.Action_Break); // 턴 파괴 효과음
+            //ManagerRoot.Sound.PlaySFX(SfxID.Action_Break); // 턴 파괴 효과음
             uiController.HideStateMessage();
             if (isPlayerInterrupting) uiController.ResetPartyGauge();
             else uiController.ResetEnemyGauge();
@@ -578,10 +578,10 @@ namespace Controller
                     }
                 }
             }
-            InventoryManager.Instance.AddMoney(reward.totalMoney);
-            foreach(var itemId in reward.dropItems) InventoryManager.Instance.AddItem(itemId, 1);
+            ManagerRoot.Inventory.AddMoney(reward.totalMoney);
+            foreach(var itemId in reward.dropItems) ManagerRoot.Inventory.AddItem(itemId, 1);
             
-            SoundManager.Instance.PlaySFX(SfxID.Attack_Sword); // 타격음 한번 재생
+            ManagerRoot.Sound.PlaySFX(SfxID.Attack_Sword); // 타격음 한번 재생
 
             // 결과 표시
             yield return uiController.ShowInstantWinPanel(reward);
@@ -590,7 +590,7 @@ namespace Controller
 
             // 전투 종료 처리
             fieldController.ClearMonsterField(); 
-            GameStateManager.Instance.ChangeState(GameState.Exploration);
+            ManagerRoot.GameState.ChangeState(GameState.Exploration);
         }
 
         // 인스턴트 킬 시뮬레이션
@@ -649,7 +649,7 @@ namespace Controller
         bool CheckInstantWinCondition()
         {
             // 모듈이 설치되지 않았으면 패스
-            if (!ModuleManager.Instance.IsMounted(ModuleFeature.KillSwitch)) return false;
+            if (!ManagerRoot.Module.IsMounted(ModuleFeature.KillSwitch)) return false;
             // 아직 몬스터나 플레이어가 세팅되지 않았으면 패스
             int mCount = fieldController.GetLivingMonsters().Count;
             int pCount = fieldController.GetLivingParty().Count;
@@ -739,7 +739,7 @@ namespace Controller
             bool canSkill = actor.learnedSkillIds.Count > 0 && !hasSilence;
 
             // Item 조건
-            bool canItem = (InventoryManager.Instance.GetAllItemIds().Count > 0);
+            bool canItem = (ManagerRoot.Inventory.GetAllItemIds().Count > 0);
 
             // Gun 메뉴 조건
             bool canShoot = actor.CanShootGun() && actor.currentGunAmmo > 0;
@@ -814,7 +814,7 @@ namespace Controller
         {
             if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 
                 // 서브 메뉴가 열려있다면 메인 메뉴로 돌아감
                 if (isSubMenuActive)
@@ -840,7 +840,7 @@ namespace Controller
             // 서브 메뉴 닫기. 취소 키와 동일
             if (isSubMenuActive && (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)))
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 CloseSubMenu();
                 return;
             }
@@ -874,7 +874,7 @@ namespace Controller
         // 서브 메뉴 진입
         void OpenSubMenu(ActionType menuType)
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             PlayerController actor = fieldController.GetCurrentCharacter() as PlayerController;
 
             // 메인 메뉴 인터랙션 비활성화
@@ -1031,7 +1031,7 @@ namespace Controller
                 }
                 else
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 }
             }
         }
@@ -1073,7 +1073,7 @@ namespace Controller
 
         public void OnBaseCommand_Auto()
         {
-            SoundManager.Instance.PlayBGM(BgmID.Normal_Battle);
+            ManagerRoot.Sound.PlayBGM(BgmID.Normal_Battle);
             isAutoMode = true;
             reserveAutoOff = false; 
             uiController.SetAutoButtonVisible(true);
@@ -1084,7 +1084,7 @@ namespace Controller
             uiController.SetCmdPanelVisible(false);
             
             uiController.ShowStateMessage("파티는 열심히 싸우고 있다");
-            
+
             PlayerController currentPlayer = fieldController.GetCurrentCharacter();
             ProcessAutoAction(currentPlayer);
         }
@@ -1121,7 +1121,7 @@ namespace Controller
             PlayerController actor = fieldController.GetCurrentCharacter();
             if (!actor.CanShootGun())
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); 
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel); 
                 uiController.ShowLog("총기 사용 불가");
                 return;
             }
@@ -1136,7 +1136,7 @@ namespace Controller
             // 이미 탄환이 가득 찬 경우
             if (currentActor.currentGun != null && currentActor.currentGunAmmo >= currentActor.currentGun.maxHits)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 uiController.ShowLog("재장전 불필요");
                 StartCoroutine(HideLogAfterDelay(1.0f));
                 return;
@@ -1158,7 +1158,7 @@ namespace Controller
         public void OnFightCommand_Next()
         {
             inputCooldown = 0.2f;
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
             PlayerController currentActor = fieldController.GetCurrentCharacter();
 
@@ -1196,7 +1196,7 @@ namespace Controller
 
         public void OnFightCommand_Item()
         {
-            if (InventoryManager.Instance.GetAllItemIds().Count == 0)
+            if (ManagerRoot.Inventory.GetAllItemIds().Count == 0)
             {
                 uiController.ShowLog("아이템 없음");
             }
@@ -1330,7 +1330,7 @@ namespace Controller
 
         public void OnFightCommand_Union_Attack()
         {
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             PlayerController leader = fieldController.GetCurrentCharacter();
 
             currentUnionParticipants = GetValidUnionPartners(leader);
@@ -1373,7 +1373,7 @@ namespace Controller
         public void OnFightCommand_LastStand()
         {
             inputCooldown = 0.2f;
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             PlayerController leader = fieldController.GetCurrentCharacter();
 
             BattleAction leaderAction = new BattleAction(leader.gameObject, leader.gameObject, ActionType.Last_Stand, 9999);
@@ -1387,7 +1387,7 @@ namespace Controller
         {
             inputCooldown = 0.2f;
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             PlayerController leader = fieldController.GetCurrentCharacter();
 
             // 참가자 정하기
@@ -1709,21 +1709,21 @@ namespace Controller
 
             if (moved)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 UpdateMoveCursor();
                 fieldController.RefreshMoveHighlights(currentMoveSlotIndex); 
             }
 
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 CancelMoveSelection();
                 return;
             }
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                 ConfirmMoveSelection();
             }
         }
@@ -1829,7 +1829,7 @@ namespace Controller
                 yield return wait10;
 
                 fieldController.ClearMonsterField(); // 전장 몬스터 지우기
-                uiController.ShowBattleEndAnimation(()=>{ GameStateManager.Instance.ChangeState(GameState.Exploration); });
+                uiController.ShowBattleEndAnimation(()=>{ ManagerRoot.GameState.ChangeState(GameState.Exploration); });
             }
             else
             {
@@ -1915,7 +1915,7 @@ namespace Controller
             // 포커스 변경 적용
             if (moved && nextEntity != null)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 fieldController.SetCurrentValidTargetIndex(nextEntity);
                 fieldController.UpdateValidTargetsHighlight();
             }
@@ -1934,13 +1934,13 @@ namespace Controller
                     // 하이라이트 이동
                     fieldController.SetCurrentValidTargetIndex(hoveredEntity);
                     fieldController.UpdateValidTargetsHighlight();
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 }
             }
             else if (isSelectingMoveTarget)
             {
                 currentMoveSlotIndex = fieldController.GetPlayerSlotIndex(hoveredEntity.transform.parent);
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 UpdateMoveCursor();
                 fieldController.RefreshMoveHighlights(currentMoveSlotIndex); 
             }
@@ -1960,19 +1960,19 @@ namespace Controller
                     var validTarget = fieldController.GetCurrentValidTarget();
                     validTarget.SetSelectionState(false);
                     
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                     
                     OnTargetSelected(validTarget); // 확정 처리
                 }
                 else
                 {
                     // 공격할 수 없는 아군이나 시체 등을 클릭했을 때의 피드백
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 }
             }
             else if (isSelectingMoveTarget)
             {
-                SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                 ConfirmMoveSelection();
             }
         }
@@ -2045,7 +2045,7 @@ namespace Controller
                 return;
             }
 
-            SoundManager.Instance.PlayBGM(BgmID.Encounter);
+            ManagerRoot.Sound.PlayBGM(BgmID.Encounter);
             
             // 불필요한 UI 비활성화
             uiController.HideLog();
@@ -2101,7 +2101,7 @@ namespace Controller
 
         void ProcessTurn()
         {
-            SoundManager.Instance.PlayBGM(BgmID.Normal_Battle);
+            ManagerRoot.Sound.PlayBGM(BgmID.Normal_Battle);
             state = BattleState.Processing; 
             
             uiController.SetCmdPanelVisible(false);
@@ -2272,7 +2272,7 @@ namespace Controller
             // 아이템 소모 로직
             if (item is ConsumableItemData consumable)
             {
-                if (!InventoryManager.Instance.UseItem(consumable.id))
+                if (!ManagerRoot.Inventory.UseItem(consumable.id))
                 {
                     uiController.ShowLog($"{item.name} 부족! 일반 공격으로 대체");
                     yield return wait10;
@@ -2314,7 +2314,7 @@ namespace Controller
                 if (isAttack)
                 {
                     // 공격
-                    SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
+                    ManagerRoot.Sound.PlaySFX(SfxID.Attack_Magic);
                     visualController.SpawnVFX(VfxID.Magic, targetObj.transform.position);
                     
                     // 아이템의 고정 데미지(effectValue)를 그대로 줄지, 계산식을 탈지는 기획이 확정되면 수정하자
@@ -2331,7 +2331,7 @@ namespace Controller
                         
                         if (success)
                         {
-                            SoundManager.Instance.PlaySFX(SfxID.Attack_Magic); // TODO: 회복 사운드로 교체 필요
+                            ManagerRoot.Sound.PlaySFX(SfxID.Attack_Magic); // TODO: 회복 사운드로 교체 필요
                             visualController.SpawnVFX(VfxID.Magic, targetObj.transform.position); // TODO: 회복 이펙트로 교체 필요
                         }
                     }
@@ -2415,7 +2415,7 @@ namespace Controller
                         
                         if (success)
                         {
-                            SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
+                            ManagerRoot.Sound.PlaySFX(SfxID.Attack_Magic);
                             visualController.SpawnVFX(VfxID.Magic, GetCenterPosition(targetObj));
                         }
                     }
@@ -2496,7 +2496,7 @@ namespace Controller
             }
 
             uiController.ShowLog("UNION ATTACK!");
-            SoundManager.Instance.PlaySFX(SfxID.Attack_Sword);
+            ManagerRoot.Sound.PlaySFX(SfxID.Attack_Sword);
 
             // 애니메이션: 타겟 앞으로 모이기
             GameObject target = action.target;
@@ -2516,7 +2516,7 @@ namespace Controller
 
             // 타격 및 데미지 계산
             visualController.SpawnVFX(VfxID.Slash, GetCenterPosition(target));
-            SoundManager.Instance.PlaySFX(SfxID.Attack_Sword);
+            ManagerRoot.Sound.PlaySFX(SfxID.Attack_Sword);
 
             float critChance = 0.3f + (partners.Count * 0.1f);
             bool allSameAlign = partners.All(p => p.align == leader.align);
@@ -2609,7 +2609,7 @@ namespace Controller
             fieldController.ResetCharacterMessage();
             
             uiController.ShowMessage("롤링 발칸~~~!!");
-            // SoundManager.Instance.PlaySFX(SfxID.Skill_Ultimate); 
+            // ManagerRoot.Sound.PlaySFX(SfxID.Skill_Ultimate); 
             Color bgColor = uiController.GetBackgroundColor();
             
             // 데이터 준비
@@ -2644,7 +2644,7 @@ namespace Controller
                 }
                 
                 // 효과음 및 애니메이션은 적 생존 여부와 무관하게 무조건 실행
-                SoundManager.Instance.PlaySFX(SfxID.Attack_Gun);
+                ManagerRoot.Sound.PlaySFX(SfxID.Attack_Gun);
                 
                 // 회전 대기
                 yield return fieldController.FastRotateParticipants(participants, true, shotInterval);
@@ -2725,7 +2725,7 @@ namespace Controller
                 actor.currentGunAmmo = actor.currentGun.maxHits;
                 
                 ShowCharacterMessage(actor, "탄환 장전 완료!");
-                // SoundManager.Instance.PlaySFX(SfxID.Reload); // 장전 효과음
+                // ManagerRoot.Sound.PlaySFX(SfxID.Reload); // 장전 효과음
                 
                 // 간단한 연출 위로 살짝 뛰기
                 yield return actor.transform.DOLocalMoveY(10f, 0.2f).SetLoops(2, LoopType.Yoyo).WaitForCompletion();
@@ -2781,7 +2781,7 @@ namespace Controller
                     ShowCharacterMessage(pc, "이런! 탄환이 부족해!");
                     
                     // 실패 효과음
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cancel); 
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel); 
 
                     // 메시지를 읽을 시간을 주고 턴 종료 (공격 애니메이션 실행 X)
                     yield return wait10; 
@@ -2848,7 +2848,7 @@ namespace Controller
                         if (actorEntity) actorEntity.nextTurnSpeedPenalty += delay;
                         uiController.ShowLog($"쏴라! ({currentHits}/{maxHits})");
                         
-                        SoundManager.Instance.PlaySFX(SfxID.Attack_Gun); 
+                        ManagerRoot.Sound.PlaySFX(SfxID.Attack_Gun); 
                     }
                     yield return null; 
                 }
@@ -2876,7 +2876,7 @@ namespace Controller
                 if (currentTargets.Count == 0) break; 
                 foreach (var target in currentTargets)
                 {
-                    SoundManager.Instance.PlaySFX(SfxID.Attack_Gun); 
+                    ManagerRoot.Sound.PlaySFX(SfxID.Attack_Gun); 
                     yield return StartCoroutine(ProcessSingleHit(action, target));
                 }
                 hitsPerformed++; // 실제 발사 수 증가
@@ -3094,7 +3094,7 @@ namespace Controller
                     else vfxID = VfxID.Magic;
                 }
 
-                if (sfxId != SfxID.None) SoundManager.Instance.PlaySFX(sfxId);
+                if (sfxId != SfxID.None) ManagerRoot.Sound.PlaySFX(sfxId);
                 if (vfxID != VfxID.None) visualController.SpawnVFX(vfxID, GetCenterPosition(target));
                 yield return wait01;
             }
@@ -3236,7 +3236,7 @@ namespace Controller
             uiController.ShowMessage((targetChar != null && !targetChar.IsEmpty) ? "위치 교대!" : "자리 이동!");
             fieldController.SwapPosition(actor, targetChar, targetSlotTransform);
 
-            SoundManager.Instance.PlaySFX(SfxID.UI_Click); 
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click); 
 
             Sequence seq = DOTween.Sequence();
             seq.Join(actor.transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.OutQuad));
@@ -3261,7 +3261,7 @@ namespace Controller
             {
                 fieldController.SyncPositionsToPartyManager();
 
-                SoundManager.Instance.PlayBGM(BgmID.Victory);
+                ManagerRoot.Sound.PlayBGM(BgmID.Victory);
                 
                 BattleReward reward = BattleCalculator.CalculateRewards(allPlayers, fieldController.encounterLog);
 
@@ -3295,8 +3295,8 @@ namespace Controller
                     }
                 }
                 
-                InventoryManager.Instance.AddMoney(reward.totalMoney);
-                foreach(var itemId in reward.dropItems) InventoryManager.Instance.AddItem(itemId, 1);
+                ManagerRoot.Inventory.AddMoney(reward.totalMoney);
+                foreach(var itemId in reward.dropItems) ManagerRoot.Inventory.AddItem(itemId, 1);
 
                 // 결과 UI 표시
                 bool isResultClosed = false;
@@ -3337,7 +3337,7 @@ namespace Controller
 
                 // 전투 종료
                 fieldController.ClearMonsterField(); // 전장의 몬스터들을 싹 지워버림
-                uiController.ShowBattleEndAnimation(()=>{GameStateManager.Instance.ChangeState(GameState.Exploration);});
+                uiController.ShowBattleEndAnimation(()=>{ManagerRoot.GameState.ChangeState(GameState.Exploration);});
             }
             else 
             {
@@ -3355,7 +3355,7 @@ namespace Controller
             EventSystem.current.SetSelectedGameObject(null); // 현재 포커스 해제
 
             // 게임 오버 BGM 재생
-            // SoundManager.Instance.PlayBGM(BgmID.GameOver); 
+            // ManagerRoot.Sound.PlayBGM(BgmID.GameOver); 
 
             // 몬스터 이미지 및 메시지 연출 대기
             bool isSequenceDone = false;

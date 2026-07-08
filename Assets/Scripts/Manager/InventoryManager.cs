@@ -34,8 +34,6 @@ namespace Manager
             if (Instance == null)
             {
                 Instance = this;
-                transform.SetParent(null);
-                DontDestroyOnLoad(gameObject);
                 InitializeInventory();
             }
             else Destroy(gameObject);
@@ -77,7 +75,7 @@ namespace Manager
             List<InventoryItem> list = new();
             foreach(var pair in inventoryDict)
             {
-                BaseItemData data = DatabaseManager.Instance.GetItem(pair.Key);
+                BaseItemData data = ManagerRoot.Database.GetItem(pair.Key);
                 if (data == null || !data.isSellable) continue;
 
                 if (category == ItemCategory.Weapon)

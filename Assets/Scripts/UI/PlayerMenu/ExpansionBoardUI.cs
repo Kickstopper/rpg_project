@@ -95,8 +95,8 @@ namespace UI.PlayerMenu
         // 초기화 및 리스트 갱신
         private void InitializeBoardUI()
         {
-            int width = ModuleManager.Instance.gridWidth;
-            int height = ModuleManager.Instance.gridHeight;
+            int width = ManagerRoot.Module.gridWidth;
+            int height = ManagerRoot.Module.gridHeight;
             gridSlots = new Image[width, height];
 
             foreach (Transform child in expansionBoardGrid) Destroy(child.gameObject);
@@ -121,12 +121,12 @@ namespace UI.PlayerMenu
             spawnedItems.Clear();
             availableModules.Clear();
 
-            if (ModuleManager.Instance != null)
-                ModuleManager.Instance.SyncexpansionBoardWithMountedModules(); 
+            if (ManagerRoot.Module != null)
+                ManagerRoot.Module.SyncexpansionBoardWithMountedModules(); 
 
-            foreach (ModuleFeature feature in ModuleManager.Instance.ownedModules)
+            foreach (ModuleFeature feature in ManagerRoot.Module.ownedModules)
             {
-                GameModuleData data = ModuleManager.Instance.GetModuleData(feature);
+                GameModuleData data = ManagerRoot.Module.GetModuleData(feature);
                 if (data != null) availableModules.Add(data);
             }
 
@@ -136,7 +136,7 @@ namespace UI.PlayerMenu
                 GameObject obj = Instantiate(moduleItemPrefab, moduleListContent);
                 ModuleItemUI itemUI = obj.GetComponent<ModuleItemUI>();
                 
-                bool isMounted = ModuleManager.Instance.IsMounted(moduleData.feature);
+                bool isMounted = ManagerRoot.Module.IsMounted(moduleData.feature);
                 itemUI.Setup(moduleData, isMounted);
                 spawnedItems.Add(itemUI);
 
@@ -166,10 +166,10 @@ namespace UI.PlayerMenu
             {
                 GameModuleData selectedModule = availableModules[selectedListIndex];
 
-                if (ModuleManager.Instance.IsMounted(selectedModule.feature))
+                if (ManagerRoot.Module.IsMounted(selectedModule.feature))
                 {
                     // 이미 설치된 모듈이면 즉시 해제
-                    ModuleManager.Instance.UnmountModule(selectedModule.feature);
+                    ManagerRoot.Module.UnmountModule(selectedModule.feature);
                     RefreshModuleList(); // 상태 갱신
                     UpdateFocus();
                 }
@@ -201,7 +201,7 @@ namespace UI.PlayerMenu
                 {
                     selectedListIndex = index;
                     UpdateFocus();
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 }
             });
             trigger.triggers.Add(enter);
@@ -217,9 +217,9 @@ namespace UI.PlayerMenu
                     menuController.ResetInputTimer();
                     GameModuleData selectedModule = availableModules[selectedListIndex];
 
-                    if (ModuleManager.Instance.IsMounted(selectedModule.feature))
+                    if (ManagerRoot.Module.IsMounted(selectedModule.feature))
                     {
-                        ModuleManager.Instance.UnmountModule(selectedModule.feature);
+                        ManagerRoot.Module.UnmountModule(selectedModule.feature);
                         RefreshModuleList();
                         UpdateFocus();
                     }
@@ -259,9 +259,9 @@ namespace UI.PlayerMenu
                 if (currentState == ExpansionBoardUIState.BoardPlacement && !menuController.IsPopupOpen)
                 {
                     menuController.ResetInputTimer();
-                    if (ModuleManager.Instance.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation))
+                    if (ManagerRoot.Module.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation))
                     {
-                        ModuleManager.Instance.MountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
+                        ManagerRoot.Module.MountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
                         
                         // 마우스로 마운트 성공 시 반투명 프리뷰 끔
                         previewContainer.gameObject.SetActive(false); 
@@ -269,11 +269,11 @@ namespace UI.PlayerMenu
                         currentState = ExpansionBoardUIState.ModuleList; // 설치 후 목록으로 돌아감
                         RefreshModuleList();
                         UpdateFocus();
-                        SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                        ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                     }
                     else
                     {
-                        SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                        ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                     }
                 }
             });
@@ -334,7 +334,7 @@ namespace UI.PlayerMenu
                 currentRotation = (currentRotation + 1) % 4; 
                 targetRotationAngle += 90f; 
                 UpdatePreviewColor(); 
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
             }
             else if (Input.GetKeyDown(KeyCode.E) || scroll < 0f)
             {
@@ -343,7 +343,7 @@ namespace UI.PlayerMenu
                 currentRotation = (currentRotation + 3) % 4; 
                 targetRotationAngle -= 90f; 
                 UpdatePreviewColor();
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
             }
 
             int prevX = cursorX;
@@ -358,10 +358,10 @@ namespace UI.PlayerMenu
             if (prevX != cursorX || prevY != cursorY)
             {
                 menuController.ResetInputTimer(); // 키보드로 움직일 때도 쿨타임 적용
-                cursorX = Mathf.Clamp(cursorX, 0, ModuleManager.Instance.gridWidth - 1);
-                cursorY = Mathf.Clamp(cursorY, 0, ModuleManager.Instance.gridHeight - 1);
+                cursorX = Mathf.Clamp(cursorX, 0, ManagerRoot.Module.gridWidth - 1);
+                cursorY = Mathf.Clamp(cursorY, 0, ManagerRoot.Module.gridHeight - 1);
                 UpdatePreviewColor(); 
-                SoundManager.Instance.PlaySFX(SfxID.UI_Cursor);
+                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
             }
 
             // 설치
@@ -370,16 +370,16 @@ namespace UI.PlayerMenu
                 // 스페이스바 연타로 인한 꼬임 방지
                 menuController.ResetInputTimer(); 
 
-                if (ModuleManager.Instance.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation))
+                if (ManagerRoot.Module.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation))
                 {
-                    ModuleManager.Instance.MountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
+                    ManagerRoot.Module.MountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
                     previewContainer.gameObject.SetActive(false); 
                     currentState = ExpansionBoardUIState.ModuleList; 
                     RefreshModuleList(); 
                     UpdateFocus();
-                    SoundManager.Instance.PlaySFX(SfxID.UI_Click);
+                    ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                 }
-                else SoundManager.Instance.PlaySFX(SfxID.UI_Cancel);
+                else ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
             }
             
             // 취소
@@ -393,16 +393,16 @@ namespace UI.PlayerMenu
         // 보드 렌더링
         private void DrawBoard()
         {
-            int width = ModuleManager.Instance.gridWidth;
-            int height = ModuleManager.Instance.gridHeight;
+            int width = ManagerRoot.Module.gridWidth;
+            int height = ManagerRoot.Module.gridHeight;
 
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
                     gridSlots[x, y].color = Color.black; 
 
-            foreach (PlacedModuleData placedModule in ModuleManager.Instance.GetMountedModules())
+            foreach (PlacedModuleData placedModule in ManagerRoot.Module.GetMountedModules())
             {
-                GameModuleData data = ModuleManager.Instance.GetModuleData(placedModule.feature);
+                GameModuleData data = ManagerRoot.Module.GetModuleData(placedModule.feature);
                 if (data == null) continue;
 
                 foreach (Vector2Int offset in data.GetRotatedBlocks(placedModule.rotation))
@@ -427,11 +427,11 @@ namespace UI.PlayerMenu
             // 회전 상태 0 ~ 3 순으로 검사
             for (int r = 0; r < 4; r++)
             {
-                for (int y = 0; y < ModuleManager.Instance.gridHeight; y++)
+                for (int y = 0; y < ManagerRoot.Module.gridHeight; y++)
                 {
-                    for (int x = 0; x < ModuleManager.Instance.gridWidth; x++)
+                    for (int x = 0; x < ManagerRoot.Module.gridWidth; x++)
                     {
-                        if (ModuleManager.Instance.CanMountModule(moduleData.feature, x, y, r))
+                        if (ManagerRoot.Module.CanMountModule(moduleData.feature, x, y, r))
                         {
                             pos = new Vector2Int(x, y);
                             foundRotation = r;
@@ -492,7 +492,7 @@ namespace UI.PlayerMenu
         private void UpdatePreviewColor()
         {
             if (currentlyPlacingModule == null) return;
-            bool canPlace = ModuleManager.Instance.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
+            bool canPlace = ManagerRoot.Module.CanMountModule(currentlyPlacingModule.feature, cursorX, cursorY, currentRotation);
             
             Color previewColor = canPlace ? currentlyPlacingModule.blockColor : Color.red;
             previewColor.a = 0.6f;

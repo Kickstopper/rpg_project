@@ -29,9 +29,9 @@ public class SceneUIProvider : MonoBehaviour
         if (dialogueUI == null)
             dialogueUI = FindFirstObjectByType<DialogueUI>();
 
-        if (GameStateManager.Instance != null)
+        if (ManagerRoot.GameState != null)
         {
-            GameStateManager.Instance.RegisterSceneComponents(
+            ManagerRoot.GameState.RegisterSceneComponents(
                 explorationCanvas,
                 eventCanvas, 
                 dialogueUI,

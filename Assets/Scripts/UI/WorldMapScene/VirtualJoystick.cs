@@ -23,14 +23,14 @@ namespace UI.WorldMapScene
             if (joystickBase != null) 
                 joystickBase.gameObject.SetActive(false);
                 
-            if (GameStateManager.Instance != null)
-                GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
+            if (ManagerRoot.GameState != null)
+                ManagerRoot.GameState.OnStateChanged += OnGameStateChanged;
         }
 
         void OnDestroy()
         {
-            if (GameStateManager.Instance != null)
-                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            if (ManagerRoot.GameState != null)
+                ManagerRoot.GameState.OnStateChanged -= OnGameStateChanged;
         }
         
         private void OnGameStateChanged(GameState state)
