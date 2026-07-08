@@ -27,6 +27,11 @@ namespace Manager
         public int gridWidth = 5;
         public int gridHeight = 5;
         private ModuleFeature[,] expansionBoard;
+
+        // New Game 시 복구할 기본값 백업용
+        private int _defaultMaxBlockSize;
+        private List<ModuleFeature> _defaultOwnedModules;
+        private List<PlacedModuleData> _defaultMountedModules;
         
         private void Awake()
         {
@@ -34,6 +39,7 @@ namespace Manager
             {
                 Instance = this;
                 transform.SetParent(null);
+                
                 _moduleLookup = new Dictionary<ModuleFeature, GameModuleData>();
                 foreach (var module in moduleDatabase)
                 {
@@ -43,32 +49,69 @@ namespace Manager
 
                 expansionBoard = new ModuleFeature[gridWidth, gridHeight];
 
-                List<PlacedModuleData> defaultModules = new List<PlacedModuleData>(mountedModules);
-                mountedModules.Clear();
-
-                foreach (var module in defaultModules)
+                // 인스펙터에 설정된 초기 상태를 백업(Deep Copy)
+                _defaultMaxBlockSize = maxBlockSize;
+                _defaultOwnedModules = new List<ModuleFeature>(ownedModules);
+                
+                // PlacedModuleData는 참조형이므로 메모리 주소가 꼬이지 않게 new로 깊은 복사
+                _defaultMountedModules = new List<PlacedModuleData>();
+                foreach (var m in mountedModules)
                 {
-                    if (module.feature == ModuleFeature.None) continue;
-
-                    if (CanMountModule(module.feature, module.x, module.y, module.rotation))
-                    {
-                        MountModule(module.feature, module.x, module.y, module.rotation);
-                    }
-                    else
-                    {
-                        if (FindAutoMountCoordinate(module.feature, out Vector2Int newPos, out int newRot))
-                        {
-                            MountModule(module.feature, newPos.x, newPos.y, newRot);
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"[ModuleManager] {module.feature}를 마운트할 메모리 공간이 부족합니다.");
-                        }
-                    }
+                    _defaultMountedModules.Add(new PlacedModuleData { feature = m.feature, x = m.x, y = m.y, rotation = m.rotation });
                 }
+
+                // 백업된 데이터를 바탕으로 초기 보드 세팅
+                Initialize();
+
                 DontDestroyOnLoad(gameObject);
             }
             else Destroy(gameObject);
+        }
+
+        // New Game 버튼을 눌렀을 때 호출될 함수
+        public void Initialize()
+        {
+            // 상태 변수들을 인스펙터 기본값으로 되돌림
+            maxBlockSize = _defaultMaxBlockSize;
+            
+            // 소유 모듈 초기화 및 기본값 복구
+            ownedModules.Clear();
+            ownedModules.AddRange(_defaultOwnedModules);
+
+            // 확장 보드 공간 완전히 비우기
+            mountedModules.Clear();
+            for (int y = 0; y < gridHeight; y++)
+            {
+                for (int x = 0; x < gridWidth; x++)
+                {
+                    expansionBoard[x, y] = ModuleFeature.None;
+                }
+            }
+
+            // 백업해둔 기본 모듈들을 확장 보드에 다시 마운트
+            foreach (var module in _defaultMountedModules)
+            {
+                if (module.feature == ModuleFeature.None) continue;
+
+                // 기존의 '안전한 자동 배치 로직' 재사용
+                if (CanMountModule(module.feature, module.x, module.y, module.rotation))
+                {
+                    MountModule(module.feature, module.x, module.y, module.rotation);
+                }
+                else
+                {
+                    if (FindAutoMountCoordinate(module.feature, out Vector2Int newPos, out int newRot))
+                    {
+                        MountModule(module.feature, newPos.x, newPos.y, newRot);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[ModuleManager] {module.feature}를 마운트할 메모리 공간이 부족합니다.");
+                    }
+                }
+            }
+            
+            Debug.Log("[ModuleManager] 새 게임(New Game) 모듈 데이터로 완벽히 초기화되었습니다.");
         }
 
         private bool FindAutoMountCoordinate(ModuleFeature feature, out Vector2Int pos, out int foundRotation)

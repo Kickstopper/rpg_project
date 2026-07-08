@@ -80,6 +80,9 @@ namespace Manager
             // 이벤트 플래그 저장
             data.eventFlags = FlagManager.Instance.GetSaveData();
 
+            // 대화 이벤트 발생 여부 저장
+            data.completedDialogues = DungeonEventManager.Instance.GetCompletedTriggers();
+
             // 모듈과 메모리 정보
             data.maxBlockSize = ModuleManager.Instance.maxBlockSize;
             data.ownedModules = new List<ModuleFeature>(ModuleManager.Instance.ownedModules);
@@ -105,8 +108,12 @@ namespace Manager
             // 골드 및 인벤토리 복구
             InventoryManager.Instance.SetMoney(data.money);
             InventoryManager.Instance.LoadFromSaveData(data.inventory);
-
+            
+            // 플래그 복구
             FlagManager.Instance.LoadFromSaveData(data.eventFlags);
+
+            // 대화 이벤트 발생 정보 복구
+            DungeonEventManager.Instance.ApplyCompletedTriggers(data.completedDialogues);
 
             // 파티원 복구
             // 기존 파티 클리어 후 재생성 로직 필요

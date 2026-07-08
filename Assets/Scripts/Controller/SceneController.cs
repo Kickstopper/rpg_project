@@ -235,6 +235,12 @@ namespace Controller
 
         public void OnClick_NewGame()
         {
+            if (DungeonEventManager.Instance != null) DungeonEventManager.Instance.ResetAllEvents();
+            if (InventoryManager.Instance != null) InventoryManager.Instance.ClearInventory();
+            if (FlagManager.Instance != null) FlagManager.Instance.ClearFlag();
+            if (PartyManager.Instance != null) PartyManager.Instance.Initialize();
+            if (DungeonMapStateManager.Instance != null) DungeonMapStateManager.Instance.ClearAllMapData();
+            if (ModuleManager.Instance != null) ModuleManager.Instance.Initialize();
             SceneManager.LoadScene(GameScene.CHARACTER_CREATION_SCENE);
         }
 

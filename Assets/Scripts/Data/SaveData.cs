@@ -54,6 +54,9 @@ namespace Data
 
         // 이벤트 플래그
         public List<string> eventFlags = new List<string>();
+        
+        // 대화 이벤트 종료 
+        public List<string> completedDialogues = new List<string>();
 
         // 가진 모듈과 인스톨된 모듈
         public List<ModuleFeature> ownedModules;

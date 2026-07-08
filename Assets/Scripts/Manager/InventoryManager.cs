@@ -161,6 +161,10 @@ namespace Manager
         // 보유 중인 모든 아이템 ID 반환
         public List<string> GetAllItemIds() => inventoryDict.Keys.ToList();
 
-        public void ClearInventory() => inventoryDict.Clear();
+        public void ClearInventory()
+        {
+            inventoryDict.Clear();
+            money = 0;
+        }
     }
 }

@@ -30,15 +30,6 @@ namespace Manager
             else Destroy(gameObject);
         }
 
-        void Start()
-        {
-            if (partyData.Count == 0)
-            {
-                Debug.Log("테스트 모드: 파티 데이터를 초기화합니다.");
-                SetDefaultCharacterData();
-            }
-        }
-
         // 저장 시, SaveManager가 호출할 메서드
         public void SaveToData(SaveData data)
         {
@@ -97,8 +88,9 @@ namespace Manager
         }
 
         // 새 게임 시작: 초기 멤버 세팅
-        public void SetDefaultCharacterData()
+        public void Initialize()
         {
+            unlockedRoster.Clear();
             partyData.Clear();
             string[] starterIds = { 
                 PartyID.CHARACTER_00, 

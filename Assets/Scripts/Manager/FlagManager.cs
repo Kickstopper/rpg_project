@@ -17,6 +17,11 @@ namespace Manager
             }
             else Destroy(gameObject);
         }
+
+        public void ClearFlag()
+        {
+            activeFlags = new HashSet<string>();
+        }
         
         public List<string> GetSaveData()
         {
