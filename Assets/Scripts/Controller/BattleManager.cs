@@ -349,9 +349,6 @@ namespace Controller
                     if (validTargets.Count == 0) validTargets = fieldController.GetLivingMonsters();
                 }
                 
-                validTargets = validTargets.OrderBy(m => m.transform.parent.parent == fieldController.enemyBackRowContainer)
-                                            .ThenBy(m => m.transform.position.x).ToList();
-
                 if (validTargets.Count == 0) return;
 
                 fieldController.SetValidTargets(validTargets);

@@ -1063,13 +1063,38 @@ public class BattleFieldController : MonoBehaviour
         if (playerBackRowContainer) playerBackRowContainer.gameObject.SetActive(isActive);
     }
 
+    // 전열 왼쪽(Column 0)을 우선으로 타겟을 정렬하는 전용 함수
+    public void SortValidTargets()
+    {
+        if (validTargets == null || validTargets.Count <= 1) return;
+
+        validTargets = validTargets.OrderBy(t => 
+        {
+            bool isBackRow = false;
+            
+            // 아군/적군 구분에 맞춰 후열 여부 판별
+            if (t is PlayerController) 
+                isBackRow = (t.transform.parent.parent == playerBackRowContainer);
+            else 
+                isBackRow = (t.transform.parent.parent == enemyBackRowContainer);
+            
+            // 전열은 0, 후열은 10의 가중치를 더해 전열이 무조건 앞쪽 인덱스(0)로 오게 함
+            // 그리고 columnIndex(0, 1, 2)를 더해 왼쪽부터 오름차순으로 정렬
+            return (isBackRow ? 10 : 0) + t.columnIndex;
+            
+        }).ToList();
+    }
+
     public void SetValidMonsterTargets()
     {
         validTargets.Clear();
         // 전열 몬스터만 필터링
+        validTargets.Clear();
         validTargets = activeMonsters
             .Where(m => m.currentHp > 0 && m.transform.parent.parent == enemyFrontRowContainer)
             .ToList();
+            
+        SortValidTargets();
     }
 
     public void SetValidTargetsByTargetScope(TargetScope scope)
@@ -1081,6 +1106,8 @@ public class BattleFieldController : MonoBehaviour
             validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp > 0));
         else if (scope == TargetScope.Dead_Ally)
             validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp <= 0));
+
+        SortValidTargets();
     }
 
     public void SyncPositionsToPartyManager()
@@ -1107,6 +1134,8 @@ public class BattleFieldController : MonoBehaviour
     public void SetValidTargets(List<BattleEntity> targets)
     {
         validTargets = targets;
+        
+        SortValidTargets();
     }
 
     public void SetCurrentValidTargetIndex(BattleEntity target)
