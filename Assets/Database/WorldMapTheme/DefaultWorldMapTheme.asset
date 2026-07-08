@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 65591b22da32d6844b847b1a118a9224, type: 3}
-  m_Name: DummyTheme
+  m_Name: DefaultWorldMapTheme
   m_EditorClassIdentifier: Assembly-CSharp::Data.RegionTheme
   regionID: region_00
   regionName: "\uC5F0\uAD6C\uC18C \uC815\uBB38 \uADFC\uCC98"
