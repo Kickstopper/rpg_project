@@ -11545,7 +11545,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.CharacterCreationScene.CharacterCreationManager
   nextSceneName: DungeonMapScene
-  nextSceneParam: Cave_0
+  nextSceneParam: Outpost
   nameInputPanel: {fileID: 2027975336}
   levelUpPanel: {fileID: 6998854896704582013}
   statUIController: {fileID: 628800148}
@@ -47382,7 +47382,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: OKAMASE
+  m_text: OMAKASE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
   m_sharedMaterial: {fileID: -8397786257170836654, guid: c15e44ea3dc3b8049bd8c9c3470af4c8, type: 2}
