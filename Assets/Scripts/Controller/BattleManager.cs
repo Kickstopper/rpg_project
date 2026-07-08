@@ -1084,7 +1084,9 @@ namespace Controller
             uiController.SetCmdPanelVisible(false);
             
             uiController.ShowStateMessage("파티는 열심히 싸우고 있다");
-            NextPlayerInput();
+            
+            PlayerController currentPlayer = fieldController.GetCurrentCharacter();
+            ProcessAutoAction(currentPlayer);
         }
 
         public void OnFightCommand_Menu_Gun() 
