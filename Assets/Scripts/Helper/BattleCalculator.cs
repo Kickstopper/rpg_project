@@ -17,25 +17,26 @@ namespace Helper
         {
             if (attacker == null || defender == null) return 0;
 
-            bool isMagic = (action.skillData != null && action.skillData.element != ElementType.Physical);
-            bool isGun = (action.type == ActionType.Shoot);
-
+            bool isMagic = (action.actionData != null && action.actionData.element != ElementType.Physical);
+            
             float rawDamage = 0f;
             ElementType element = ElementType.None;
+
             if (isMagic)
             {
-                element = action.skillData.element;   
-
+                element = action.actionData.element;   
+                
                 // [마법 대미지]: (MATK * effectValue) / MDEF
                 int matk = attacker.GetMagicAttack();
                 int mdef = defender.GetMagicDefense();
-                int effectValue = action.skillData.effectValue;
-                
+                int effectValue = action.actionData != null ? action.actionData.effectValue : 0;
+            
                 rawDamage = (matk * effectValue) / Mathf.Max(1f, (float)mdef);
             }
             else
             {
                 element = ElementType.Physical;
+                bool isGun = (action.type == ActionType.Shoot);
 
                 // [물리 대미지]: (ATK * (ATK / 4 + 4)) / DEF
                 int atk = isGun ? ((PlayerController)attacker).GetGunAttack() : attacker.GetAttack();
@@ -86,7 +87,7 @@ namespace Helper
         {
             if (attacker == null || defender == null) return false;
 
-            bool isMagic = (action != null && action.skillData != null && action.skillData.element != ElementType.Physical);
+            bool isMagic = (action != null && action.actionData != null && action.actionData.element != ElementType.Physical);
             float n = 0;
 
             if (isMagic)

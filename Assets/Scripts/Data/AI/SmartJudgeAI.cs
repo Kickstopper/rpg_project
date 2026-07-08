@@ -58,7 +58,7 @@ namespace Data.AI
                     if (healSkill != null)
                     {
                         var action = new BattleAction(self.gameObject, dyingAlly.gameObject, UI.ActionType.Skill, self.GetTotalAgi() + 10);
-                        action.skillData = healSkill;
+                        action.actionData = healSkill;
                         
                         // 체력이 40% 이하면 100점, 20% 이하면 150점으로 상황이 급할수록 점수가 급상승
                         int score = 100;
@@ -73,7 +73,7 @@ namespace Data.AI
                 if (aoeSkill != null)
                 {
                     var action = new BattleAction(self.gameObject, self.gameObject, UI.ActionType.Skill, self.GetTotalAgi());
-                    action.skillData = aoeSkill;
+                    action.actionData = aoeSkill;
                     
                     // 살아있는 플레이어가 많을수록 광역기의 효율(점수)이 올라감
                     int score = 40 + (livingPlayers.Count * 20) + Random.Range(0, 10);

@@ -35,6 +35,7 @@ public class MonsterDatabase : ScriptableObject
         public VfxID basicAttackVfxId;    // 기본 공격 이펙트 ID
         public Data.AI.MonsterAIProfile aiProfile;
         public List<SkillData> skills;
+        public string CondolenceText;
 
         [Header("Battle Position")]
         public RowType preferredRow; // Front 또는 Back

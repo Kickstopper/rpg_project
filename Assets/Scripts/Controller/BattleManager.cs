@@ -11,7 +11,6 @@ using UI;
 using DG.Tweening;
 using Helper;
 using Manager;
-
 namespace Controller
 {
     public enum BattleState { Start, PlayerInput, EnemyInput, Processing, Won, Lost }
@@ -22,12 +21,12 @@ namespace Controller
         [Header("UI References")]
         public Image battleBackgroundImage;
         public BattleUIController uiController;
-        public DialogueUI dialogueUI;
         public BattleFieldController fieldController;
         public BattleVisualController visualController; 
         public UI.Battle.LevelUpUI levelUpUI;
         public Transform damagePopupContainer;
-        
+        public DialogueUI dialogueUI;
+
         [Header("Escape Settings")]
         public int guaranteedEscapeAttempts = 3; // 몇 번째 시도부터 무조건 성공할지 설정
         private int currentEscapeAttempts = 0;   // 현재 전투에서의 시도 횟수
@@ -88,6 +87,9 @@ namespace Controller
         // 배수진(Last Stand) 활성화 플래그
         private bool isLastStandActive = false;
         private bool isLastStandInputMode = false; // isLastStandActive는 실행/데미지용, 이건 입력 스킵용
+        private bool isBattleState = false; // 현재 전투 상태인지 아닌지
+
+        private MonsterController lastAttacker; // 최종 공격자
 
         // 유니온 어택 참가자 목록 (턴 스킵 및 애니메이션용)
         private List<PlayerController> currentUnionParticipants = new List<PlayerController>();
@@ -103,8 +105,6 @@ namespace Controller
         private WaitForSeconds wait01 = new WaitForSeconds(0.1f);
         private WaitForSeconds wait05 = new WaitForSeconds(0.5f);
         private WaitForSeconds wait10 = new WaitForSeconds(1f);
-
-        private bool isBattleState = false; // 현재 전투 상태인지 아닌지
 
         public struct BattleReward
         {
@@ -1299,8 +1299,7 @@ namespace Controller
         {
             PlayerController actor = fieldController.GetCurrentCharacter();
             BattleAction action = new BattleAction(actor.gameObject, target, currentSelectedAction, actor.GetTotalAgi());
-            action.itemData = currentSelectedItem; 
-            if (currentSelectedItem is SkillData skill) action.skillData = skill;
+            action.actionData = currentSelectedItem; 
 
             // 즉시 실행되는 행동(All_Allies, Self 등)도 Auto 모드를 위해 저장
             int tIndex = -1;
@@ -1666,8 +1665,7 @@ namespace Controller
             actor.nextTurnSpeedPenalty = 0;
 
             BattleAction action = new BattleAction(actor.gameObject, finalTarget, actionType, speed);
-            action.itemData = autoData; 
-            if (autoData is SkillData skill) action.skillData = skill;
+            action.actionData = autoData; 
 
             actionQueue.Add(action);
             NextPlayerInput();
@@ -2023,13 +2021,8 @@ namespace Controller
             }
             if (currentSelectedAction == ActionType.Item || currentSelectedAction == ActionType.Skill)
             {
-                action.itemData = currentSelectedItem; 
+                action.actionData = currentSelectedItem; 
                 
-                // 스킬인 경우 추가 처리
-                if (currentSelectedItem is SkillData skill)
-                {
-                    action.skillData = skill;
-                }
                 // 아이템 및 스킬 사용 딜레이 (TODO: 스킬의 위력이나 TargetScope에 따라 딜레이가 커지게 하자)
                 action.speed += 500; 
             }
@@ -2214,11 +2207,11 @@ namespace Controller
             switch (action.type)
             {
                 case ActionType.Attack: baseDelay = 10; break;
-                case ActionType.Shoot:    baseDelay = 15; break;
+                case ActionType.Shoot:  baseDelay = 15; break;
                 case ActionType.Guard:  baseDelay = 0; break;
                 case ActionType.Move:   baseDelay = 5; break;
-                case ActionType.Item:   baseDelay = (action.itemData != null) ? action.itemData.actionDelay : 20; break;
-                case ActionType.Skill:  baseDelay = (action.itemData != null) ? action.itemData.actionDelay : 30; break;
+                case ActionType.Item:   baseDelay = (action.actionData != null) ? action.actionData.actionDelay : 20; break;
+                case ActionType.Skill:  baseDelay = (action.actionData != null) ? action.actionData.actionDelay : 30; break;
                 case ActionType.Next:   baseDelay = -50; break;
             }
             return baseDelay;
@@ -2228,7 +2221,17 @@ namespace Controller
         {
             isWin = false;
             if (fieldController.IsAllEnemiesDead()) { isWin = true; return true; }
-            if (fieldController.IsAllPartyDead()) { isWin = false; return true; }
+            
+            // 전멸했거나, 지휘관(isCommander)이 사망했는지 체크
+            bool isAllDead = fieldController.IsAllPartyDead();
+            bool isCommanderDead = fieldController.GetPlayerControllers().Any(p => p.currentHp <= 0 && p.isCommander);
+
+            if (isAllDead || isCommanderDead) 
+            { 
+                isWin = false; 
+                return true; 
+            }
+            
             return false;
         }
 
@@ -2263,7 +2266,7 @@ namespace Controller
 
         IEnumerator HandleItemAction(BattleAction action)
         {
-            BaseRootData item = action.itemData;
+            BaseRootData item = action.actionData;
             // 아이템 소모 로직
             if (item is ConsumableItemData consumable)
             {
@@ -2338,7 +2341,7 @@ namespace Controller
 
         IEnumerator HandleSkillAction(BattleAction action)
         {
-            SkillData skill = action.itemData as SkillData; 
+            var skill = action.actionData as SkillData; 
             PlayerController actor = action.actor.GetComponent<PlayerController>();
 
             bool isReviveSkill = skill != null && 
@@ -2389,7 +2392,7 @@ namespace Controller
             if (!isAutoMode)
             {
                 string magType = isAttack ? "공격마법" : "보조마법";
-                uiController.ShowStateMessage($"{action.actor.name}의 {magType} {action.skillData.dataName} 발동!");
+                uiController.ShowStateMessage($"{action.actor.name}의 {magType} {action.actionData.dataName} 발동!");
             }
 
             foreach (var targetObj in targets)
@@ -2398,19 +2401,7 @@ namespace Controller
                 if (isAttack)
                 {
                     // 공격
-                    SoundManager.Instance.PlaySFX(SfxID.Attack_Magic);
-
-                    visualController.SpawnVFX(VfxID.Magic, GetCenterPosition(targetObj));
-
-                    // 상성과 방어력 계산 적용
-                    BattleEntity attackerEntity = action.actor.GetComponent<BattleEntity>();
-                    BattleEntity targetEntity = targetObj.GetComponent<BattleEntity>();
-
-                    bool isCrit = BattleCalculator.CheckCritical(attackerEntity, targetEntity, action);
-                    int dmg = BattleCalculator.CalculateDamage(attackerEntity, targetEntity, action, isCrit, 1.0f);
-                    
-                    ApplyDamage(targetObj, dmg, isCrit);
-                    BattleCalculator.ProcessSkillStatusEffect(attackerEntity, targetEntity, skill);
+                    yield return StartCoroutine(ProcessSingleHit(action, targetObj));
                 }
                 else
                 {
@@ -2910,8 +2901,13 @@ namespace Controller
 
         IEnumerator ProcessSingleHit(BattleAction action, GameObject target)
         {
-            bool isPlayerActor = action.actor.GetComponent<PlayerController>() != null;
+            // 광역기 반사 데미지 등으로 인해 공격자가 이미 사망했다면 즉시 취소
+            BattleEntity checkAttacker = action.actor.GetComponent<BattleEntity>();
+            if (checkAttacker == null || checkAttacker.currentHp <= 0) yield break;
 
+            bool isPlayerActor = action.actor.GetComponent<PlayerController>() != null;
+            if (!isPlayerActor) lastAttacker = checkAttacker as MonsterController;
+            
             // 위치 보정 계산 호출
             BattleFieldController.BattlePosition atkPos = fieldController.GetUnitPosition(action.actor);
             BattleFieldController.BattlePosition defPos = fieldController.GetUnitPosition(target);
@@ -2953,18 +2949,17 @@ namespace Controller
             {
                 isPhysicalAttack = true;
             }
-            // 스킬이나 아이템은 내부 데이터를 확인하여 마법인지 판별
             else if (action.type == ActionType.Skill || action.type == ActionType.Item)
             {
-                if (action.itemData != null && action.itemData.effectType == EffectType.Magic_Atk)
+                if (action.actionData != null)
                 {
-                    isMagicAttack = true;
-                    element = action.itemData.element;
-                }
-                else 
-                {
-                    // Special_Atk 등은 물리로 취급
-                    isPhysicalAttack = true; 
+                    // 마법이든 물리 스킬이든 데이터에 지정된 속성(Element)을 최우선으로 가져옵니다!
+                    element = action.actionData.element; 
+
+                    if (action.actionData.effectType == EffectType.Magic_Atk)
+                        isMagicAttack = true;
+                    else 
+                        isPhysicalAttack = true; // Special_Atk 등
                 }
             }
 
@@ -3087,21 +3082,12 @@ namespace Controller
                     sfxId = SfxID.Attack_Gun;
                     vfxID = attackerEntity.GetGunAttackVfx();
                 }
-                else if (action.type == ActionType.Skill)
+                else if (action.type == ActionType.Skill || action.type == ActionType.Item)
                 {
                     sfxId = SfxID.Attack_Magic;
-                    if (action.skillData != null && action.skillData.vfxId != VfxID.None)
+                    if (action.actionData != null && action.actionData.vfxId != VfxID.None)
                     {
-                        vfxID = action.skillData.vfxId;
-                    }
-                    else vfxID = VfxID.Magic;
-                }
-                else if (action.type == ActionType.Item)
-                {
-                    sfxId = SfxID.Attack_Magic;
-                    if (action.itemData != null && action.itemData.vfxId != VfxID.None)
-                    {
-                        vfxID = action.itemData.vfxId;
+                        vfxID = action.actionData.vfxId;
                     }
                     else vfxID = VfxID.Magic;
                 }
@@ -3346,16 +3332,38 @@ namespace Controller
 
                     yield return new WaitUntil(() => isLevelUpClosed);
                 }
+
+                // 전투 종료
+                fieldController.ClearMonsterField(); // 전장의 몬스터들을 싹 지워버림
+                uiController.ShowBattleEndAnimation(()=>{GameStateManager.Instance.ChangeState(GameState.Exploration);});
             }
             else 
             {
-                uiController.ShowMessage("패배는 너의 것!");
-                yield return wait05;
+                // 패배 시 게임 오버 연출 코루틴으로 연결
+                yield return StartCoroutine(ProcessGameOverRoutine());
             }
+        }
 
-            // 전투 종료
-            fieldController.ClearMonsterField(); // 전장의 몬스터들을 싹 지워버림
-            uiController.ShowBattleEndAnimation(()=>{GameStateManager.Instance.ChangeState(GameState.Exploration);});
+        // 게임 오버 전용 코루틴
+        IEnumerator ProcessGameOverRoutine()
+        {
+            // 유저의 모든 UI 입력 완벽 차단
+            uiController.SetBaseCmdInteractable(false);
+            uiController.SetFightCmdInteractable(false);
+            EventSystem.current.SetSelectedGameObject(null); // 현재 포커스 해제
+
+            // 게임 오버 BGM 재생
+            // SoundManager.Instance.PlayBGM(BgmID.GameOver); 
+
+            // 몬스터 이미지 및 메시지 연출 대기
+            bool isSequenceDone = false;
+            yield return StartCoroutine(uiController.ShowGameOverSequence(lastAttacker, () => isSequenceDone = true));
+            yield return new WaitUntil(() => isSequenceDone);
+
+            // 메시지가 모두 출력된 후 아무 키나 누르기를 대기
+            yield return new WaitUntil(() => Input.anyKeyDown);
+
+            UnityEngine.SceneManagement.SceneManager.LoadScene("TitleScene");
         }
 
         // 피봇 설정과 무관하게 RectTransform의 시각적 중앙 월드 좌표를 반환하는 함수

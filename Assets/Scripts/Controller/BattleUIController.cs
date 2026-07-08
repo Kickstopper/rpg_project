@@ -27,14 +27,18 @@ public class BattleUIController : MonoBehaviour
     public BattleResultUI resultUI;
     public Image background;
     public RectTransform targetCursor; // 손가락 커서 이미지
-
     public Image screenFlashImage;       // 화면 번쩍임 효과용 이미지
+
+    [Header("Game Over UI")]
+    public GameObject gameOverPanel;
+    public Image gameOverFadeOverlay;     // 전체 패널 페이드인 용도
+    public Image gameOverMonsterImage;          // 몬스터 이미지
+    public TextMeshProUGUI gameOverMessageText; // 조롱 메시지 텍스트
 
     [Header("Instant Win Settings")]
     public GameObject instantResultPanel; // 결과 표시 패널
     public TextMeshProUGUI instantResultText; // 결과 텍스트
     public float instantWinDelay = 1.5f; // 결과 표시 후 대기 시간
-
     
     [Header("Command UI")]
     public GameObject baseCmdContainer;   
@@ -68,7 +72,9 @@ public class BattleUIController : MonoBehaviour
     public float bgParallaxRatio = 0.4f;
 
     private Coroutine zoomCoroutine;
+    private Coroutine monsterAnimCoroutine; // 게임 오버 시에 표시되는 몬스터의 애니메이션 코루틴 추적용 변수
 
+    //  BattleEntity 사망 시의 확대 관련 변수들
     private Vector3 defaultBgPos;
     private Vector3 defaultBgScale;
     private Vector3 defaultMonsterPos;
@@ -538,5 +544,92 @@ public class BattleUIController : MonoBehaviour
                         Action onCloseCallback)
     {
         resultUI.Show(reward, partyMembers, preBattleStates, onCloseCallback);
+    }
+
+    public IEnumerator ShowGameOverSequence(MonsterController killer, Action onComplete)
+    {
+        // 초기화 및 활성화
+        gameOverPanel.SetActive(true);
+        gameOverFadeOverlay.color = Color.black;
+        gameOverMessageText.text = "";
+        gameOverMessageText.maxVisibleCharacters = 0;
+
+        // 이미지 비율 유지
+        if (gameOverMonsterImage != null)
+            gameOverMonsterImage.preserveAspect = true;
+
+        // 혹시 기존에 돌고 있던 애니메이션이 있다면 안전하게 정지
+        if (monsterAnimCoroutine != null)
+        {
+            StopCoroutine(monsterAnimCoroutine);
+            monsterAnimCoroutine = null;
+        }
+
+        // 몬스터 이미지 세팅 및 애니메이션 시작
+        if (killer != null && killer.sourceData != null && killer.sourceData.image != null && killer.sourceData.image.Length > 0)
+        {
+            gameOverMonsterImage.sprite = killer.sourceData.image[0];
+            gameOverMonsterImage.color = new Color(1, 1, 1, 0); // 투명하게 시작
+            gameOverMonsterImage.gameObject.SetActive(true);
+
+            // 이미지가 2장 이상일 경우에만 애니메이션 코루틴 실행
+            if (killer.sourceData.image.Length > 1)
+            {
+                monsterAnimCoroutine = StartCoroutine(AnimateMonsterSprite(killer.sourceData));
+            }
+        }
+        else
+        {
+            gameOverMonsterImage.gameObject.SetActive(false);
+        }
+
+        // 패널 전체 페이드 인
+        yield return gameOverFadeOverlay.DOFade(0f, 1f).WaitForCompletion();
+
+        // 마지막 타격을 가한 몬스터 이미지 페이드 인
+        if (gameOverMonsterImage.gameObject.activeSelf)
+        {
+            yield return gameOverMonsterImage.DOFade(1f, 1.5f).WaitForCompletion();
+        }
+
+        // 메시지 타이핑 애니메이션
+        string msg = "건방진 녀석. 날 이기려면 백 년은 멀었다."; 
+        if (killer != null && killer.sourceData != null && !string.IsNullOrEmpty(killer.sourceData.CondolenceText))
+        {
+            msg = killer.sourceData.CondolenceText;
+        }
+
+        gameOverMessageText.text = msg;
+        
+        float typingDuration = msg.Length * 0.05f;
+        yield return DOTween.To(() => gameOverMessageText.maxVisibleCharacters, 
+                                x => gameOverMessageText.maxVisibleCharacters = x, 
+                                msg.Length, typingDuration)
+                            .SetEase(Ease.Linear)
+                            .WaitForCompletion();
+
+        // 연출 완료 콜백
+        onComplete?.Invoke();
+    }
+
+    // 몬스터 애니메이션 무한 반복 코루틴
+    private IEnumerator AnimateMonsterSprite(MonsterDatabase.MonsterEntry data)
+    {
+        int frameIndex = 0;
+        
+        // animInterval이 0이거나 너무 작을 경우 엔진의 무한루프를 방지하기 위한 최소값 세팅
+        float interval = Mathf.Max(0.05f, data.animInterval); 
+        WaitForSeconds wait = new WaitForSeconds(interval);
+
+        // 게임 오버 패널과 이미지가 켜져 있는 동안만 반복 작동하도록
+        while (gameOverPanel.activeSelf && gameOverMonsterImage.gameObject.activeSelf)
+        {
+            gameOverMonsterImage.sprite = data.image[frameIndex];
+            
+            // 인덱스를 1씩 증가시키되, 배열 길이에 도달하면 다시 0으로 순환시킴
+            frameIndex = (frameIndex + 1) % data.image.Length;
+            
+            yield return wait;
+        }
     }
 }

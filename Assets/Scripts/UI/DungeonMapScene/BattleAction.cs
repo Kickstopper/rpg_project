@@ -11,11 +11,7 @@ namespace UI.DungeonMapScene
         public ActionType type;
 
         // 스킬이나 아이템일 경우 상세 데이터
-        public SkillData skillData; 
-        // public ItemData itemData; // (아이템 구현 시 사용)
-
-        // 아이템 데이터
-        public BaseRootData itemData;
+        public BaseRootData actionData;
 
         public int speed; // 행동 속도 (AGI + 스킬 보정치 + 랜덤 변수)
 

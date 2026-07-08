@@ -142,6 +142,7 @@ namespace Controller
             // 데이터 초기화
             this.sourceData = runtimeData;
             this.entityName = runtimeData.name;
+            this.isCommander = runtimeData.isCommander;
             this.gameObject.name = entityName;
             if (!string.IsNullOrEmpty(runtimeData.resonanceId))
             {

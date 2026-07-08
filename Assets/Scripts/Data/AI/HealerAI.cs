@@ -61,7 +61,7 @@ namespace Data.AI
 
                         // 액션 생성 및 반환
                         var action = new BattleAction(self.gameObject, targetObj, UI.ActionType.Skill, self.GetTotalAgi() + 10);
-                        action.skillData = selectedSkill;
+                        action.actionData = selectedSkill;
                         return action;
                     }
                 }
