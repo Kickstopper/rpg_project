@@ -127,6 +127,7 @@ namespace Data
             data.characterId = this.characterId;
             data.name = this.name;
             data.gender = this.gender.ToString();
+            data.isCommander = this.isCommander;
 
             data.resonanceId = this.resonanceId;
             data.align = this.align.ToString();
