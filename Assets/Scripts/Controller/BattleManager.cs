@@ -1272,7 +1272,10 @@ namespace Controller
             fieldController.UpdateValidTargetsHighlight();
             inputCooldown = 0.2f;
 
-            // 메뉴 끄기
+            // 타겟팅이 시작될 때 시야를 가리지 않도록 커맨드 패널 전체를 숨김
+            uiController.SetCmdPanelVisible(false);
+
+            // 메뉴 끄기 (인터랙션 비활성화)
             uiController.SetFightCmdInteractable(false);
             uiController.SetBaseCmdInteractable(false); 
             
@@ -1770,15 +1773,30 @@ namespace Controller
         {
             isSelectingTarget = false;
             uiController.SetTargetCursorVisible(false);
-            uiController.ShowLog("대기중...");
             fieldController.HighlightToCurrentCharacter();
             inputCooldown = 0.2f; 
             
-            // 커맨드 윈도우의 상태에 따라 원래 있던 메뉴로 복귀시킴
+            // 타겟팅 진입 시 껐던 커맨드 패널을 다시 켬
+            uiController.SetCmdPanelVisible(true);
+
+            // 취소한 액션이 스킬이나 아이템이었다면, 해당 UI를 다시 호출하고 함수를 종료
+            if (currentSelectedAction == ActionType.Skill)
+            {
+                OnFightCommand_Skill();
+                return;
+            }
+            else if (currentSelectedAction == ActionType.Item)
+            {
+                OnFightCommand_Item();
+                return;
+            }
+
+            uiController.ShowLog("대기중...");
+
+            // 일반 공격 등 그 외의 커맨드 윈도우 상태에 따라 원래 있던 메뉴로 복귀시킴
             if (isFightMode)
             {
                 currentFightBtnIndex = 0;
-                uiController.SetCmdPanelVisible(true);
                 uiController.SetBaseCmdVisible(false);
                 uiController.SetFightCmdVisible(true);
                 uiController.SetFightCmdInteractable(true);
@@ -1787,7 +1805,6 @@ namespace Controller
             else
             {
                 currentBaseBtnIndex = 0;
-                uiController.SetCmdPanelVisible(true);
                 uiController.SetBaseCmdVisible(true);
                 uiController.SetFightCmdVisible(false);
                 uiController.SetBaseCmdInteractable(true);

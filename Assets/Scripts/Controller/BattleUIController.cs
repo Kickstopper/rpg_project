@@ -34,6 +34,7 @@ public class BattleUIController : MonoBehaviour
     public Image gameOverFadeOverlay;     // 전체 패널 페이드인 용도
     public Image gameOverMonsterImage;          // 몬스터 이미지
     public TextMeshProUGUI gameOverMessageText; // 조롱 메시지 텍스트
+    public TextMeshProUGUI gameOverTitleText;
 
     [Header("Instant Win Settings")]
     public GameObject instantResultPanel; // 결과 표시 패널
@@ -554,6 +555,14 @@ public class BattleUIController : MonoBehaviour
         gameOverMessageText.text = "";
         gameOverMessageText.maxVisibleCharacters = 0;
 
+        if (gameOverTitleText != null) 
+        {
+            Color titleColor = gameOverTitleText.color;
+            titleColor.a = 0f;
+            gameOverTitleText.color = titleColor;
+            gameOverTitleText.gameObject.SetActive(true);
+        }
+
         // 이미지 비율 유지
         if (gameOverMonsterImage != null)
             gameOverMonsterImage.preserveAspect = true;
@@ -608,6 +617,10 @@ public class BattleUIController : MonoBehaviour
                             .SetEase(Ease.Linear)
                             .WaitForCompletion();
 
+        if (gameOverTitleText != null)
+        {
+            yield return gameOverTitleText.DOFade(1f, 1.5f).SetEase(Ease.InOutQuad).WaitForCompletion();
+        }
         // 연출 완료 콜백
         onComplete?.Invoke();
     }
