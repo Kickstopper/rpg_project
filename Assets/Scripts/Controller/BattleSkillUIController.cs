@@ -53,23 +53,21 @@ namespace Controller
 
         void Update()
         {
-            if (gameObject.activeSelf)
+            if (!gameObject.activeSelf) return;
+            // 탭 전환
+            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Q))
             {
-                // 탭 전환
-                if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Q))
-                {
-                    ChangeTab(-1);
-                }
-                else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.E))
-                {
-                    ChangeTab(1);
-                }
+                ChangeTab(-1);
+            }
+            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.E))
+            {
+                ChangeTab(1);
+            }
 
-                // 닫기
-                if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
-                {
-                    Close();
-                }
+            // 닫기
+            if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
+            {
+                Close();
             }
         }
 

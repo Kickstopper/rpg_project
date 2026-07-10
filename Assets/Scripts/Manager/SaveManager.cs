@@ -150,11 +150,11 @@ namespace Manager
             }
             
             // 중단 데이터라면 로드 후 즉시 삭제
-            if (slotIndex == SUSPEND_SLOT_INDEX)
-            {
-                File.Delete(path);
-                Debug.Log("중단 저장 데이터가 로드되어 삭제되었습니다.");
-            }
+            // if (slotIndex == SUSPEND_SLOT_INDEX)
+            // {
+            //     File.Delete(path);
+            //     Debug.Log("중단 저장 데이터가 로드되어 삭제되었습니다.");
+            // }
             
             SceneManager.LoadScene(data.sceneName);
             ManagerRoot.GameState.ChangeState(GameState.Exploration);

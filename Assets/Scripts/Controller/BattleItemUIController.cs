@@ -48,23 +48,22 @@ namespace Controller
         // 방향키 입력 감지
         void Update()
         {
-            if (gameObject.activeSelf)
-            {
-                // 탭 전환 (왼쪽/오른쪽)
-                if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Q)) // Q키도 허용
-                {
-                    ChangeTab(-1);
-                }
-                else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.E)) // E키도 허용
-                {
-                    ChangeTab(1);
-                }
+            if (!gameObject.activeSelf) return;
 
-                // 닫기 (Cancel)
-                if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
-                {
-                    Close();
-                }
+            // 탭 전환 (왼쪽/오른쪽)
+            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Q)) // Q키도 허용
+            {
+                ChangeTab(-1);
+            }
+            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.E)) // E키도 허용
+            {
+                ChangeTab(1);
+            }
+
+            // 닫기 (Cancel)
+            if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
+            {
+                Close();
             }
         }
 

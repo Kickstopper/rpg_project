@@ -78,6 +78,10 @@ namespace Controller
         private bool isSelectingTarget = false;
 
         private GameObject lastSelectedObject; // 마지막으로 선택된 UI 오브젝트를 기억하는 변수
+
+        
+        // 메인 메뉴 인덱스 기억용 변수
+        private int lastMainIndex = 0;
         
         // 입력 중복 방지용 쿨타임
         private float inputCooldown = 0f;
@@ -361,7 +365,7 @@ namespace Controller
                 uiController.SetCmdPanelVisible(false);
                 uiController.ShowLog("타겟 선택");
                 
-                inputCooldown = 0.2f;
+                inputCooldown = 0.05f;
             }
             else
             {
@@ -979,7 +983,7 @@ namespace Controller
         // 서브 메뉴 닫기 (메인 메뉴로 복귀)
         void CloseSubMenu()
         {
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
 
             // 서브 메뉴 버튼들 정리
             uiController.HideSubMenu();
@@ -998,9 +1002,6 @@ namespace Controller
             StartCoroutine(SelectButtonDelayed(uiController.currentMenuButtons, currentFightBtnIndex));
         }
         
-        // 메인 메뉴 인덱스 기억용 변수
-        private int lastMainIndex = 0;
-
         void HandleMenuNavigation(List<Button> currentList, ref int currentIndex)
         {
             if (currentList == null || currentList.Count == 0) return;
@@ -1049,7 +1050,7 @@ namespace Controller
             // Fight 메뉴에 진입 시 무조건 인터랙션 활성화
             uiController.SetFightCmdInteractable(true);
 
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             currentFightBtnIndex = 0;
             StartCoroutine(SelectButtonDelayed(uiController.activeFightButtons, currentFightBtnIndex));
         }
@@ -1088,21 +1089,21 @@ namespace Controller
 
         public void OnFightCommand_Menu_Gun() 
         { 
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             lastMainIndex = currentFightBtnIndex; // 현재 메인 메뉴 위치 기억
             OpenSubMenu(ActionType.Menu_Gun); 
         }
         
         public void OnFightCommand_Menu_Extra() 
         { 
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             lastMainIndex = currentFightBtnIndex;
             OpenSubMenu(ActionType.Menu_Extra); 
         }
         
         public void OnFightCommand_Menu_Tactics() 
         {
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             lastMainIndex = currentFightBtnIndex;
             OpenSubMenu(ActionType.Menu_Tactics); 
         }
@@ -1127,7 +1128,7 @@ namespace Controller
 
         public void OnFightCommand_Reload()
         {
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             PlayerController currentActor = fieldController.GetCurrentCharacter();
 
             // 이미 탄환이 가득 찬 경우
@@ -1154,7 +1155,7 @@ namespace Controller
 
         public void OnFightCommand_Next()
         {
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
             PlayerController currentActor = fieldController.GetCurrentCharacter();
@@ -1207,10 +1208,9 @@ namespace Controller
 
         public void OnPopupMenuClosed()
         {
-            inputCooldown = 0.2f;
-            currentFightBtnIndex = 0;
+            inputCooldown = 0.05f;
             uiController.SetFightCmdInteractable(true);
-            StartCoroutine(SelectButton(attackButton)); 
+            StartCoroutine(SelectButtonDelayed(uiController.activeFightButtons, currentFightBtnIndex));
         }
         
         public void OnPopupItemSelected(BaseRootData item)
@@ -1247,7 +1247,7 @@ namespace Controller
             }
             else
             {
-                inputCooldown = 0.2f; 
+                inputCooldown = 0.05f; 
                 // All_Allies, Self, Front_Enemies, All_Enemies 등은 대상 선택 없이 즉시 사용 예약
                 // 이때 target은 null로 전달되지만, 수정한 HandleItemAction이 scope를 보고 대상을 찾음
                 QueuePolymorphicAction(null); 
@@ -1270,7 +1270,7 @@ namespace Controller
             
             fieldController.currentTargetIndex = 0; 
             fieldController.UpdateValidTargetsHighlight();
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
 
             // 타겟팅이 시작될 때 시야를 가리지 않도록 커맨드 패널 전체를 숨김
             uiController.SetCmdPanelVisible(false);
@@ -1318,7 +1318,7 @@ namespace Controller
 
         public void OnFightCommand_Guard()
         {
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             PlayerController currentActor = fieldController.GetCurrentCharacter();
             int guardSpeed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty + 2000;
             currentActor.nextTurnSpeedPenalty = 0; 
@@ -1360,7 +1360,7 @@ namespace Controller
             // UI 숨기기
             uiController.SetCmdPanelVisible(false);
             uiController.ShowLog("타겟 선택");
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
         }
 
         void CancelUnionSelection()
@@ -1372,7 +1372,7 @@ namespace Controller
 
         public void OnFightCommand_LastStand()
         {
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             PlayerController leader = fieldController.GetCurrentCharacter();
 
@@ -1385,7 +1385,7 @@ namespace Controller
 
         public void OnFightCommand_Rolling_Vulcan()
         {
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
 
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
             PlayerController leader = fieldController.GetCurrentCharacter();
@@ -1415,7 +1415,6 @@ namespace Controller
             // Base 메뉴 진입 시, 무조건 인터랙션 활성화
             uiController.SetBaseCmdInteractable(true);
 
-            currentBaseBtnIndex = 0; 
             UpdateSelection(uiController.baseButtons, currentBaseBtnIndex);
         }
 
@@ -1564,7 +1563,6 @@ namespace Controller
             yield return null; 
             if (list != null && list.Count > index)
             {
-                EventSystem.current.SetSelectedGameObject(null);
                 UpdateSelection(list, index);
             }
         }
@@ -1676,7 +1674,6 @@ namespace Controller
         IEnumerator SelectButton(GameObject btnToSelect)
         {
             yield return null; 
-            EventSystem.current.SetSelectedGameObject(null);
             if (btnToSelect != null)
             {
                 EventSystem.current.SetSelectedGameObject(btnToSelect);
@@ -1695,7 +1692,7 @@ namespace Controller
             currentMoveSlotIndex = fieldController.GetPlayerSlotIndex(currentActor.transform.parent);
             UpdateMoveCursor();
             fieldController.RefreshMoveHighlights(currentMoveSlotIndex);
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             EventSystem.current.SetSelectedGameObject(null);
         }
 
@@ -1765,7 +1762,7 @@ namespace Controller
             fieldController.HighlightToCurrentCharacter();
 
             uiController.SetTargetCursorVisible(false);
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             StartCoroutine(SelectButton(GetCommandButton(ActionType.Move).gameObject)); 
         }
 
@@ -1774,7 +1771,7 @@ namespace Controller
             isSelectingTarget = false;
             uiController.SetTargetCursorVisible(false);
             fieldController.HighlightToCurrentCharacter();
-            inputCooldown = 0.2f; 
+            inputCooldown = 0.05f; 
             
             // 타겟팅 진입 시 껐던 커맨드 패널을 다시 켬
             uiController.SetCmdPanelVisible(true);
@@ -1796,19 +1793,14 @@ namespace Controller
             // 일반 공격 등 그 외의 커맨드 윈도우 상태에 따라 원래 있던 메뉴로 복귀시킴
             if (isFightMode)
             {
-                currentFightBtnIndex = 0;
                 uiController.SetBaseCmdVisible(false);
                 uiController.SetFightCmdVisible(true);
                 uiController.SetFightCmdInteractable(true);
-                StartCoroutine(SelectButton(attackButton));
+                StartCoroutine(SelectButtonDelayed(uiController.currentMenuButtons, currentFightBtnIndex));
             }
             else
             {
-                currentBaseBtnIndex = 0;
-                uiController.SetBaseCmdVisible(true);
-                uiController.SetFightCmdVisible(false);
-                uiController.SetBaseCmdInteractable(true);
-                StartCoroutine(SelectButton(baseFirstButton));
+                ShowBaseMenu();
             }
         }
 

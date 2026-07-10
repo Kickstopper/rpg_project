@@ -706,6 +706,8 @@ namespace UI.Battle
 
         private void Update()
         {
+            if (LeveUpUI != null && !LeveUpUI.activeSelf) return;
+            
             // 생성 모드가 아닐 때만 전투 상태 체크
             if (!isCreationMode && ManagerRoot.GameState.CurrentState != GameState.Battle) return;
             
