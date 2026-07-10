@@ -25,7 +25,6 @@ namespace Controller
         
         [Header("UI Settings")]
         public GameObject UI_Canvas;
-        public GameObject matrixGO;
         public Image targetImage; 
         public SaveLoadUIController saveLoadUI;
         public List<Button> allMenuBtns;
@@ -38,8 +37,8 @@ namespace Controller
         
         [Header("Slide Settings")]
         public List<Sprite> backgroundImages; 
-        public float fadeDuration = 1.5f; 
-        public float displayDuration = 3.0f; 
+        public float fadeDuration = 1f; 
+        public float displayDuration = 0.5f; 
 
         private bool isEnable = false;     
         public bool IsEnable => isEnable;
@@ -49,7 +48,6 @@ namespace Controller
         void Start()
         {
             if (UI_Canvas) UI_Canvas.SetActive(false);
-            if (matrixGO) matrixGO.SetActive(false);
 #if UNITY_ANDROID || UNITY_IOS
         // 모바일용으로 빌드할 경우 QUIT버튼 비활성화
         if (btnQuit != null && allMenuBtns != null && allMenuBtns.Contains(btnQuit))
@@ -73,9 +71,9 @@ namespace Controller
                 {
                     targetImage.SetNativeSize();
                     Sequence seq = DOTween.Sequence();
-                    seq.Append(targetImage.DOFade(1f, fadeDuration).OnComplete(() => ShowDigitalRainEffect()));
+                    seq.Append(targetImage.DOFade(1f, fadeDuration).OnComplete(EnableUI));
                     seq.AppendInterval(displayDuration); // 이미지 감상 시간 추가
-                    seq.Append(targetImage.DOFade(0.85f, fadeDuration).OnStart(EnableUI));
+                    seq.Append(targetImage.DOFade(0.5f, fadeDuration));
                 }
             }
             else
@@ -128,7 +126,6 @@ namespace Controller
             targetImage.color = new Color(1, 1, 1, 0.85f);
             targetImage.SetNativeSize();
             
-            ShowDigitalRainEffect();
             EnableUI();
         }
 
@@ -149,7 +146,6 @@ namespace Controller
                 if (!isEnable)
                 {
                     targetImage.DOFade(0.85f, fadeDuration);
-                    ShowDigitalRainEffect();
                     EnableUI();
                 }
 
@@ -170,11 +166,6 @@ namespace Controller
             // UI가 켜질 때 첫 번째 버튼을 선택
             currentBtnIndex = 0;
             UpdateSelection(currentBtnIndex);
-        }
-
-        private void ShowDigitalRainEffect()
-        {
-            if (matrixGO && !matrixGO.activeInHierarchy) matrixGO.SetActive(true);
         }
 
         void HandleMenuNavigation(ref int currentIndex)
