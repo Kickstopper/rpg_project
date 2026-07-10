@@ -888,12 +888,12 @@ namespace Controller
             {
                 posY = -132f;
                 // 쏠 수 없으면 Shoot 버튼은 비활성화
-                bool canShoot = actor.CanShootGun() && actor.currentGunAmmo > 0;
+                bool canShoot = IsGunCommandUsable(actor, ActionType.Shoot);
                 AddSubButton(ActionType.Shoot, canShoot, subButtons); 
 
-                // 총이 있다면 Reload 버튼 항상 표시
-                bool hasGun = (actor.currentGun != null);
-                AddSubButton(ActionType.Reload, hasGun, subButtons);
+                // 총과 탄창이 있다면 Reload 버튼 항상 표시
+                bool canReload = IsGunCommandUsable(actor, ActionType.Reload);
+                AddSubButton(ActionType.Reload, canReload, subButtons);
             }
             else if (menuType == ActionType.Menu_Extra)
             {
@@ -921,40 +921,17 @@ namespace Controller
             isSubMenuActive = true;
             currentFightBtnIndex = 0;
 
-            // 선택되지 않은 버튼들의 비활성화 처리
-            RefreshButtonVisuals(uiController.currentMenuButtons);
             if (uiController.currentMenuButtons.Count > 0) StartCoroutine(SelectButtonDelayed(uiController.currentMenuButtons, 0));
         }
 
-        // 리스트 내 모든 버튼의 텍스트 컬러 갱신
-        void RefreshButtonVisuals(List<Button> buttons)
-        {
-            PlayerController actor = fieldController.GetCurrentCharacter() as PlayerController;
-            
-            foreach (var btn in buttons)
-            {
-                CommandButton cmdBtn = btn.GetComponent<CommandButton>();
-                if (cmdBtn == null) continue;
-
-                TextMeshProUGUI txt = btn.GetComponentInChildren<TextMeshProUGUI>();
-                if (txt == null) continue;
-
-                // 버튼의 사용 가능 여부 판별
-                bool isUsable = IsCommandUsable(actor, cmdBtn.type);
-
-                // 현재 선택된 버튼인지 확인
-                txt.color = isUsable ? colorNormal : colorGrayout;
-            }
-        }
-
         // 커맨드 사용 가능 여부 판별 로직
-        bool IsCommandUsable(PlayerController actor, ActionType type)
+        bool IsGunCommandUsable(PlayerController actor, ActionType type)
         {
             switch (type)
             {
                 case ActionType.Reload:
                     // 총이 있고, 탄환이 꽉 차지 않았을 때만 사용 가능
-                    return (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits);
+                    return actor.CanShootGun() && actor.currentGunAmmo < actor.currentGun.maxHits;
                 
                 case ActionType.Shoot:
                     return actor.CanShootGun() && actor.currentGunAmmo > 0;

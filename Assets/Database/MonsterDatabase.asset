@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entries:
   - isBoss: 0
-    id: enemy_037
+    id: enemy_000
     name: "\uC2AC\uB77C\uC784"
     race: 1
     align: 6
@@ -29,6 +29,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -57,7 +58,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_052
+    id: enemy_001
     name: "\uD638\uC800"
     race: 1
     align: 6
@@ -72,6 +73,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -100,7 +102,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_054
+    id: enemy_002
     name: "\uD0AC\uB7EC\uBE44"
     race: 1
     align: 6
@@ -115,6 +117,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -143,7 +146,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_060
+    id: enemy_003
     name: "\uD0AC\uB7EC\uD53C\uC2DC"
     race: 1
     align: 6
@@ -158,6 +161,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -186,7 +190,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_045
+    id: enemy_004
     name: "\uC824\uB9AC\uD53C\uC2DC"
     race: 1
     align: 6
@@ -201,6 +205,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -229,7 +234,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_049
+    id: enemy_005
     name: "\uC6DC"
     race: 1
     align: 6
@@ -244,6 +249,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -272,7 +278,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_050
+    id: enemy_006
     name: "\uB79C\uB4DC\uD130\uD2C0"
     race: 1
     align: 6
@@ -287,6 +293,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -315,7 +322,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_098
+    id: enemy_007
     name: "\uB370\uBE4C \uD50C\uB79C\uD2B8"
     race: 6
     align: 6
@@ -330,6 +337,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -358,7 +366,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_081
+    id: enemy_008
     name: "\uC784\uD504"
     race: 3
     align: 6
@@ -373,6 +381,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -401,7 +410,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_105
+    id: enemy_009
     name: "\uACE0\uBE14\uB9B0"
     race: 7
     align: 6
@@ -416,6 +425,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -444,7 +454,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_061
+    id: enemy_010
     name: "\uBA38\uB9E8"
     race: 1
     align: 6
@@ -459,6 +469,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -487,36 +498,37 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_099
-    name: "\uD06C\uB9AC\uD551 \uBC14\uC778"
+    id: enemy_011
+    name: "\uB9E8\uB4DC\uB808\uC774\uD06C"
     race: 6
     align: 6
     gender: 0
     compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
+    compileAscii: {fileID: 4900000, guid: 7271bab29802f914bb9711680d8c6c0b, type: 3}
     image:
-    - {fileID: 21300000, guid: 3332adda87f31e9479214eece24c075c, type: 3}
-    - {fileID: 21300000, guid: ff93238253109794daa4b7d6f12f8828, type: 3}
+    - {fileID: 21300000, guid: 1bc2edc13a1e77a4eb9bd946bd145f4b, type: 3}
+    - {fileID: 21300000, guid: c92c7b45086fc2346a550d45098bf366, type: 3}
     animInterval: 0.5
-    portrait: {fileID: 21300000, guid: 895c33a33d4cbc142bef203ac44c3885, type: 3}
+    portrait: {fileID: 21300000, guid: 979390d602ec485418dd71df6f9c80f6, type: 3}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
       level: 6
       str: 1
-      mag: 9
-      intel: 2
-      vit: 5
+      mag: 2
+      intel: 4
+      vit: 4
       agi: 5
       luc: 6
     resistances:
       phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
+      fire: 1
+      ice: 1
+      elec: 2
       force: 0
       psyche: 0
     personality: 4
@@ -530,7 +542,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_068
+    id: enemy_012
     name: "\uBA38\uBA54\uC774\uB4DC"
     race: 1
     align: 6
@@ -545,6 +557,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -573,36 +586,37 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_100
-    name: "\uB9E8\uB4DC\uB808\uC774\uD06C"
+    id: enemy_013
+    name: "\uD06C\uB9AC\uD551 \uBC14\uC778"
     race: 6
     align: 6
     gender: 0
     compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 7271bab29802f914bb9711680d8c6c0b, type: 3}
+    compileAscii: {fileID: 4900000, guid: 11cfda33ee4380e4cba90bf85c205df3, type: 3}
     image:
-    - {fileID: 21300000, guid: 1bc2edc13a1e77a4eb9bd946bd145f4b, type: 3}
-    - {fileID: 21300000, guid: c92c7b45086fc2346a550d45098bf366, type: 3}
+    - {fileID: 21300000, guid: 3332adda87f31e9479214eece24c075c, type: 3}
+    - {fileID: 21300000, guid: ff93238253109794daa4b7d6f12f8828, type: 3}
     animInterval: 0.5
-    portrait: {fileID: 21300000, guid: 979390d602ec485418dd71df6f9c80f6, type: 3}
+    portrait: {fileID: 21300000, guid: 895c33a33d4cbc142bef203ac44c3885, type: 3}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
       level: 6
       str: 1
-      mag: 2
-      intel: 4
-      vit: 4
+      mag: 9
+      intel: 2
+      vit: 5
       agi: 5
       luc: 6
     resistances:
       phys: 0
-      fire: 1
-      ice: 1
-      elec: 2
+      fire: 0
+      ice: 0
+      elec: 0
       force: 0
       psyche: 0
     personality: 4
@@ -616,7 +630,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_003
+    id: enemy_014
     name: "\uD074\uB85C\uC6B4"
     race: 0
     align: 6
@@ -631,6 +645,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -659,7 +674,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_004
+    id: enemy_015
     name: "\uB85C\uADF8"
     race: 0
     align: 6
@@ -674,6 +689,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -702,7 +718,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_065
+    id: enemy_016
     name: "\uC624\uD06C"
     race: 1
     align: 6
@@ -717,6 +733,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -745,7 +762,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_058
+    id: enemy_017
     name: "\uC880\uBE44"
     race: 1
     align: 6
@@ -760,6 +777,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -788,7 +806,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_112
+    id: enemy_018
     name: "\uC2A4\uCF08\uB808\uD1A4"
     race: 8
     align: 6
@@ -803,6 +821,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -831,7 +850,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_071
+    id: enemy_019
     name: "\uC704\uC800\uB4DC"
     race: 2
     align: 6
@@ -846,6 +865,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -874,7 +894,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_056
+    id: enemy_020
     name: "\uC6E8\uC5B4\uB7AB"
     race: 1
     align: 6
@@ -889,6 +909,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -917,7 +938,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_086
+    id: enemy_021
     name: "\uAC00\uACE0\uC77C"
     race: 3
     align: 6
@@ -932,6 +953,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -960,7 +982,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_087
+    id: enemy_022
     name: "\uBBF8\uBBF9"
     race: 3
     align: 6
@@ -975,6 +997,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1003,7 +1026,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_067
+    id: enemy_023
     name: "\uD558\uD53C"
     race: 1
     align: 6
@@ -1018,6 +1041,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1046,7 +1070,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_078
+    id: enemy_024
     name: "\uADF8\uB9BC \uB9AC\uD37C"
     race: 3
     align: 6
@@ -1061,6 +1085,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1089,7 +1114,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_062
+    id: enemy_025
     name: "\uB124\uCF54\uB9C8\uD0C0"
     race: 1
     align: 6
@@ -1104,6 +1129,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1132,7 +1158,51 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_096
+    id: enemy_026
+    name: "\uAC00\uB4DC"
+    race: 5
+    align: 6
+    gender: 0
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: ddf03b9c9cf89c34c9266d196519fe5b, type: 3}
+    image:
+    - {fileID: 21300000, guid: 9f62d21dc3a399c4dbe2352d5bb44931, type: 3}
+    - {fileID: 21300000, guid: 3da45bb2b6827ba459b558f3bbf8bcd5, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 401403ca2042199458929b90eb173d59, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 14
+      str: 6
+      mag: 10
+      intel: 4
+      vit: 8
+      agi: 8
+      luc: 9
+    resistances:
+      phys: 2
+      fire: 0
+      ice: 0
+      elec: 1
+      force: 0
+      psyche: 3
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_027
     name: "\uB4DC\uB860"
     race: 5
     align: 6
@@ -1147,6 +1217,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1175,50 +1246,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_095
-    name: "\uAC00\uB4DC"
-    race: 5
-    align: 6
-    gender: 0
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: ddf03b9c9cf89c34c9266d196519fe5b, type: 3}
-    image:
-    - {fileID: 21300000, guid: 9f62d21dc3a399c4dbe2352d5bb44931, type: 3}
-    - {fileID: 21300000, guid: 3da45bb2b6827ba459b558f3bbf8bcd5, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: 401403ca2042199458929b90eb173d59, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 14
-      str: 6
-      mag: 10
-      intel: 4
-      vit: 8
-      agi: 8
-      luc: 9
-    resistances:
-      phys: 2
-      fire: 0
-      ice: 0
-      elec: 1
-      force: 0
-      psyche: 3
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_102
+    id: enemy_028
     name: "\uB4DC\uB77C\uC774\uC5B4\uB4DC"
     race: 6
     align: 6
@@ -1233,6 +1261,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1261,7 +1290,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_107
+    id: enemy_029
     name: "\uC2A4\uD504\uB77C\uC774\uD2B8"
     race: 7
     align: 6
@@ -1276,6 +1305,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1304,7 +1334,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_010
+    id: enemy_030
     name: "\uD37D"
     race: 0
     align: 6
@@ -1319,6 +1349,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1347,7 +1378,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_094
+    id: enemy_031
     name: "\uC774\uBE14 \uC544\uC774"
     race: 5
     align: 6
@@ -1362,6 +1393,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1390,7 +1422,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_106
+    id: enemy_032
     name: "\uC70C\uC624\uC704\uC2A4\uD504"
     race: 7
     align: 6
@@ -1405,6 +1437,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1433,7 +1466,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_093
+    id: enemy_033
     name: "\uC774\uBE14 \uC6E8\uD3F0"
     race: 5
     align: 6
@@ -1451,6 +1484,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1479,7 +1513,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_111
+    id: enemy_034
     name: "\uC6B4\uB514\uB124"
     race: 7
     align: 6
@@ -1494,6 +1528,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1522,7 +1557,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_038
+    id: enemy_035
     name: "\uC0D0\uB7EC\uB9E8\uB354"
     race: 1
     align: 6
@@ -1537,6 +1572,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1565,136 +1601,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_011
-    name: "\uD4E8\uCC98 \uC194\uC800 M"
-    race: 0
-    align: 6
-    gender: 0
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 9766b8ec4aeb392489f2a0ef45698898, type: 3}
-    image:
-    - {fileID: 21300000, guid: 54e0ce5f7657edd4c86322721577344c, type: 3}
-    - {fileID: 21300000, guid: 0d08cb3a9af2b274aaec67b228e5a8dd, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: f1d990255c54e0c48877727edb135a2a, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 20
-      str: 8
-      mag: 11
-      intel: 13
-      vit: 13
-      agi: 11
-      luc: 6
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_097
-    name: "\uD2B8\uB80C\uD2B8"
-    race: 6
-    align: 6
-    gender: 0
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 617c5ca0f6875b642bdc52ea95070a30, type: 3}
-    image:
-    - {fileID: 21300000, guid: d69151cf8c4549c49841f8b92ad43e44, type: 3}
-    - {fileID: 21300000, guid: a0f7fb9c1b91d2e42a71ecfdbd5c38cf, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: b0e778cdbe623524e9b69ac56dd13c81, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 20
-      str: 13
-      mag: 8
-      intel: 11
-      vit: 11
-      agi: 11
-      luc: 10
-    resistances:
-      phys: 0
-      fire: 1
-      ice: 1
-      elec: 2
-      force: 0
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_030
-    name: "\uD4E8\uCC98 \uC194\uC800 F"
-    race: 0
-    align: 6
-    gender: 1
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: e9d986920934e3a4da6e70e75a6538be, type: 3}
-    image:
-    - {fileID: 21300000, guid: f8408adef51c8fe4ab665a9c200f78c2, type: 3}
-    - {fileID: 21300000, guid: 00094edfdb5409647baded27c90c8e06, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: f7121e9ea57232d4abccefef7ea1a684, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 20
-      str: 16
-      mag: 12
-      intel: 8
-      vit: 11
-      agi: 6
-      luc: 9
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_043
+    id: enemy_036
     name: "\uC6E8\uC5B4\uC6B8\uD504"
     race: 1
     align: 6
@@ -1709,6 +1616,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1737,31 +1645,32 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_016
-    name: "\uAE00\uB798\uB514\uC5D0\uC774\uD130"
+    id: enemy_037
+    name: "\uD4E8\uCC98 \uC194\uC800 M"
     race: 0
     align: 6
     gender: 0
     compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: bc039185e14771f469b90885d028e99a, type: 3}
+    compileAscii: {fileID: 4900000, guid: 9766b8ec4aeb392489f2a0ef45698898, type: 3}
     image:
-    - {fileID: 21300000, guid: 507e77e573cb15546ba5a1ef43b6c661, type: 3}
-    - {fileID: 21300000, guid: 3bf9bc08f178b76449fca47c2a271dd8, type: 3}
+    - {fileID: 21300000, guid: 54e0ce5f7657edd4c86322721577344c, type: 3}
+    - {fileID: 21300000, guid: 0d08cb3a9af2b274aaec67b228e5a8dd, type: 3}
     animInterval: 0.5
-    portrait: {fileID: 21300000, guid: f100f4dd68be29b4297ddd0564fca39a, type: 3}
+    portrait: {fileID: 21300000, guid: f1d990255c54e0c48877727edb135a2a, type: 3}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
-      level: 21
-      str: 11
-      mag: 13
-      intel: 14
-      vit: 18
+      level: 20
+      str: 8
+      mag: 11
+      intel: 13
+      vit: 13
       agi: 11
-      luc: 13
+      luc: 6
     resistances:
       phys: 0
       fire: 0
@@ -1780,31 +1689,76 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_066
-    name: "\uCF04\uD0C0\uC6B0\uB85C\uC2A4"
-    race: 1
+    id: enemy_038
+    name: "\uD2B8\uB80C\uD2B8"
+    race: 6
     align: 6
     gender: 0
     compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 0603dcec5b31a8b43a1902057d73ad8b, type: 3}
+    compileAscii: {fileID: 4900000, guid: 617c5ca0f6875b642bdc52ea95070a30, type: 3}
     image:
-    - {fileID: 21300000, guid: 3cf33d547069c8546b8a66ad843a7cce, type: 3}
-    - {fileID: 21300000, guid: 21f517858beefb341ad1c55721ae6f24, type: 3}
+    - {fileID: 21300000, guid: d69151cf8c4549c49841f8b92ad43e44, type: 3}
+    - {fileID: 21300000, guid: a0f7fb9c1b91d2e42a71ecfdbd5c38cf, type: 3}
     animInterval: 0.5
-    portrait: {fileID: 21300000, guid: d8439fde3a02a5047903919c17a95446, type: 3}
+    portrait: {fileID: 21300000, guid: b0e778cdbe623524e9b69ac56dd13c81, type: 3}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
-      level: 21
-      str: 10
-      mag: 6
+      level: 20
+      str: 13
+      mag: 8
+      intel: 11
+      vit: 11
+      agi: 11
+      luc: 10
+    resistances:
+      phys: 0
+      fire: 1
+      ice: 1
+      elec: 2
+      force: 0
+      psyche: 0
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_039
+    name: "\uD4E8\uCC98 \uC194\uC800 F"
+    race: 0
+    align: 6
+    gender: 1
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: e9d986920934e3a4da6e70e75a6538be, type: 3}
+    image:
+    - {fileID: 21300000, guid: f8408adef51c8fe4ab665a9c200f78c2, type: 3}
+    - {fileID: 21300000, guid: 00094edfdb5409647baded27c90c8e06, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: f7121e9ea57232d4abccefef7ea1a684, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 20
+      str: 16
+      mag: 12
       intel: 8
-      vit: 12
-      agi: 7
-      luc: 16
+      vit: 11
+      agi: 6
+      luc: 9
     resistances:
       phys: 0
       fire: 0
@@ -1823,7 +1777,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_064
+    id: enemy_040
     name: "\uC608\uD2F0"
     race: 1
     align: 6
@@ -1838,6 +1792,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1866,7 +1821,95 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_048
+    id: enemy_041
+    name: "\uAE00\uB798\uB514\uC5D0\uC774\uD130"
+    race: 0
+    align: 6
+    gender: 0
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: bc039185e14771f469b90885d028e99a, type: 3}
+    image:
+    - {fileID: 21300000, guid: 507e77e573cb15546ba5a1ef43b6c661, type: 3}
+    - {fileID: 21300000, guid: 3bf9bc08f178b76449fca47c2a271dd8, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: f100f4dd68be29b4297ddd0564fca39a, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 21
+      str: 11
+      mag: 13
+      intel: 14
+      vit: 18
+      agi: 11
+      luc: 13
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_042
+    name: "\uCF04\uD0C0\uC6B0\uB85C\uC2A4"
+    race: 1
+    align: 6
+    gender: 0
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: 0603dcec5b31a8b43a1902057d73ad8b, type: 3}
+    image:
+    - {fileID: 21300000, guid: 3cf33d547069c8546b8a66ad843a7cce, type: 3}
+    - {fileID: 21300000, guid: 21f517858beefb341ad1c55721ae6f24, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: d8439fde3a02a5047903919c17a95446, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 21
+      str: 10
+      mag: 6
+      intel: 8
+      vit: 12
+      agi: 7
+      luc: 16
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_043
     name: "\uCF08\uD53C"
     race: 1
     align: 6
@@ -1881,6 +1924,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1909,7 +1953,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_114
+    id: enemy_044
     name: "\uBC34\uC2DC"
     race: 8
     align: 6
@@ -1924,6 +1968,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1952,7 +1997,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_028
+    id: enemy_045
     name: "\uD788\uBBF8\uCF54"
     race: 0
     align: 6
@@ -1967,6 +2012,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -1995,7 +2041,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_041
+    id: enemy_046
     name: "\uCF54\uCE74\uD2B8\uB9AC\uC2A4"
     race: 1
     align: 6
@@ -2010,6 +2056,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2038,7 +2085,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_012
+    id: enemy_047
     name: "\uC564 \uBCF4\uB2C8"
     race: 0
     align: 6
@@ -2053,6 +2100,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2081,7 +2129,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_017
+    id: enemy_048
     name: "\uBA54\uB9AC \uB9AC\uB4DC"
     race: 0
     align: 6
@@ -2096,6 +2144,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2124,93 +2173,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_075
-    name: "\uD6CC\uB4DC\uB77C"
-    race: 2
-    align: 6
-    gender: 1
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: b06444f99b7e33f4a913b0b5d0f2e6e8, type: 3}
-    image:
-    - {fileID: 21300000, guid: 26f21fd3297e24b4da88df20971a5d19, type: 3}
-    - {fileID: 21300000, guid: 2ac61491afe37a846880ea85f9c9c83c, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: a09f182f20667e5439a23682084ccb86, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 23
-      str: 18
-      mag: 13
-      intel: 10
-      vit: 18
-      agi: 9
-      luc: 11
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_013
-    name: "\uB8CC\uC0B4\uD504\uB974"
-    race: 0
-    align: 6
-    gender: 0
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: acc66eb54420b3348919a9d12ff585b1, type: 3}
-    image:
-    - {fileID: 21300000, guid: 683a266754f90bd42b9da5f048be5cb2, type: 3}
-    - {fileID: 21300000, guid: 5e602c2ca8e64c843b9950e3665d7722, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: 883427eb0c0508c4d9c5d3130c46d858, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 23
-      str: 15
-      mag: 12
-      intel: 12
-      vit: 16
-      agi: 11
-      luc: 13
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_024
+    id: enemy_049
     name: "\uB8CC\uC0B4\uD39C"
     race: 0
     align: 6
@@ -2225,6 +2188,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2253,7 +2217,95 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_072
+    id: enemy_050
+    name: "\uD6CC\uB4DC\uB77C"
+    race: 2
+    align: 6
+    gender: 1
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: b06444f99b7e33f4a913b0b5d0f2e6e8, type: 3}
+    image:
+    - {fileID: 21300000, guid: 26f21fd3297e24b4da88df20971a5d19, type: 3}
+    - {fileID: 21300000, guid: 2ac61491afe37a846880ea85f9c9c83c, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: a09f182f20667e5439a23682084ccb86, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 23
+      str: 18
+      mag: 13
+      intel: 10
+      vit: 18
+      agi: 9
+      luc: 11
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_051
+    name: "\uB8CC\uC0B4\uD504\uB974"
+    race: 0
+    align: 6
+    gender: 0
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: acc66eb54420b3348919a9d12ff585b1, type: 3}
+    image:
+    - {fileID: 21300000, guid: 683a266754f90bd42b9da5f048be5cb2, type: 3}
+    - {fileID: 21300000, guid: 5e602c2ca8e64c843b9950e3665d7722, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 883427eb0c0508c4d9c5d3130c46d858, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 23
+      str: 15
+      mag: 12
+      intel: 12
+      vit: 16
+      agi: 11
+      luc: 13
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_052
     name: "\uD6CC\uB4DC\uB808\uCE7C"
     race: 2
     align: 6
@@ -2268,6 +2320,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2296,136 +2349,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_044
-    name: "\uC624\uC624\uAC00\uB9C8"
-    race: 1
-    align: 6
-    gender: 0
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: c140318dc7cc2d444a4f313d4b5257d0, type: 3}
-    image:
-    - {fileID: 21300000, guid: 615c61849bee2cc43a287abb5db19c03, type: 3}
-    - {fileID: 21300000, guid: c7dd30c501f919a4f9724cb27360289c, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: 4bf3a58c465e6db459fb612d60be444a, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 25
-      str: 7
-      mag: 17
-      intel: 11
-      vit: 20
-      agi: 8
-      luc: 13
-    resistances:
-      phys: 0
-      fire: 1
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 1
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_002
-    name: "\uBE4C\uD5EC\uB984 \uD154"
-    race: 0
-    align: 6
-    gender: 0
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 361d315baebc0244c86d84a9133449f3, type: 3}
-    image:
-    - {fileID: 21300000, guid: 2759d6091579de64bb817cc61c6c9204, type: 3}
-    - {fileID: 21300000, guid: b2ed450e1b58d1b46b9d2c666c501153, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: fe5598c40cf709f478adce963f55f151, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 25
-      str: 15
-      mag: 11
-      intel: 11
-      vit: 12
-      agi: 9
-      luc: 15
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_088
-    name: "\uC624\uC624\uBB34\uCE74\uB370"
-    race: 4
-    align: 6
-    gender: 0
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 748770c86c1bc8146975017c93fbbf5a, type: 3}
-    image:
-    - {fileID: 21300000, guid: 1e5d56448e39947489ada9a81553d8f3, type: 3}
-    - {fileID: 21300000, guid: 401be406f41782c4299ddfe95f3ff929, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: fdcd85ee8093c71499d28547a22b34ee, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 25
-      str: 16
-      mag: 10
-      intel: 20
-      vit: 9
-      agi: 14
-      luc: 9
-    resistances:
-      phys: 0
-      fire: 1
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 1
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_109
+    id: enemy_053
     name: "\uACE8\uB818"
     race: 7
     align: 6
@@ -2440,6 +2364,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2468,7 +2393,51 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_029
+    id: enemy_054
+    name: "\uC624\uC624\uBB34\uCE74\uB370"
+    race: 4
+    align: 6
+    gender: 0
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: 748770c86c1bc8146975017c93fbbf5a, type: 3}
+    image:
+    - {fileID: 21300000, guid: 1e5d56448e39947489ada9a81553d8f3, type: 3}
+    - {fileID: 21300000, guid: 401be406f41782c4299ddfe95f3ff929, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: fdcd85ee8093c71499d28547a22b34ee, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 25
+      str: 16
+      mag: 10
+      intel: 20
+      vit: 9
+      agi: 14
+      luc: 9
+    resistances:
+      phys: 0
+      fire: 1
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 1
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_055
     name: "\uBAA8\uCE58\uC988\uD0A4 \uCE58\uC694\uBA54"
     race: 0
     align: 6
@@ -2483,6 +2452,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2511,7 +2481,95 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_063
+    id: enemy_056
+    name: "\uC624\uC624\uAC00\uB9C8"
+    race: 1
+    align: 6
+    gender: 0
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: c140318dc7cc2d444a4f313d4b5257d0, type: 3}
+    image:
+    - {fileID: 21300000, guid: 615c61849bee2cc43a287abb5db19c03, type: 3}
+    - {fileID: 21300000, guid: c7dd30c501f919a4f9724cb27360289c, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 4bf3a58c465e6db459fb612d60be444a, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 25
+      str: 7
+      mag: 17
+      intel: 11
+      vit: 20
+      agi: 8
+      luc: 13
+    resistances:
+      phys: 0
+      fire: 1
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 1
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_057
+    name: "\uBE4C\uD5EC\uB984 \uD154"
+    race: 0
+    align: 6
+    gender: 0
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: 361d315baebc0244c86d84a9133449f3, type: 3}
+    image:
+    - {fileID: 21300000, guid: 2759d6091579de64bb817cc61c6c9204, type: 3}
+    - {fileID: 21300000, guid: b2ed450e1b58d1b46b9d2c666c501153, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: fe5598c40cf709f478adce963f55f151, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 25
+      str: 15
+      mag: 11
+      intel: 11
+      vit: 12
+      agi: 9
+      luc: 15
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_058
     name: "\uB4DC\uB798\uACE4\uD3EC\uD06C"
     race: 1
     align: 6
@@ -2526,6 +2584,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2554,7 +2613,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_020
+    id: enemy_059
     name: "\uC554\uC0B4\uC790"
     race: 0
     align: 6
@@ -2569,6 +2628,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2597,7 +2657,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_015
+    id: enemy_060
     name: "\uD6C4\uC6B0\uB9C8 \uCF54\uD0C0\uB85C\uC6B0"
     race: 0
     align: 6
@@ -2612,6 +2672,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2640,7 +2701,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_035
+    id: enemy_061
     name: "\uC544\uC2A4\uD14C\uB9AC\uC628"
     race: 0
     align: 6
@@ -2655,6 +2716,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2683,7 +2745,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_070
+    id: enemy_062
     name: "\uBBF8\uB178\uD0C0\uC6B0\uB974\uC2A4"
     race: 2
     align: 6
@@ -2698,6 +2760,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2726,7 +2789,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_115
+    id: enemy_063
     name: "\uCFE0\uAD6C\uCE20 \uB2CC\uC790"
     race: 8
     align: 6
@@ -2741,6 +2804,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2769,7 +2833,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_057
+    id: enemy_064
     name: "\uCF00\uB974\uBCA0\uB85C\uC2A4"
     race: 1
     align: 6
@@ -2784,6 +2848,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2812,7 +2877,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_053
+    id: enemy_065
     name: "\uADF8\uB9AC\uD3F0"
     race: 1
     align: 6
@@ -2827,6 +2892,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2855,7 +2921,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_042
+    id: enemy_066
     name: "\uD0A4\uBA54\uB77C"
     race: 1
     align: 6
@@ -2870,6 +2936,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2898,7 +2965,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_032
+    id: enemy_067
     name: "\uC190\uC0C1\uD5A5"
     race: 0
     align: 6
@@ -2913,6 +2980,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2941,7 +3009,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_059
+    id: enemy_068
     name: "\uB9CC\uD2F0\uCF54\uC5B4"
     race: 1
     align: 6
@@ -2956,6 +3024,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -2984,7 +3053,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_047
+    id: enemy_069
     name: "\uCE74\uB9C8\uC18C\uD2B8"
     race: 1
     align: 6
@@ -2999,6 +3068,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3027,7 +3097,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_080
+    id: enemy_070
     name: "\uC2A4\uD0AC\uB77C"
     race: 3
     align: 6
@@ -3042,6 +3112,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3070,7 +3141,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_092
+    id: enemy_071
     name: "\uB77C\uBBF8\uC544"
     race: 4
     align: 6
@@ -3085,6 +3156,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3113,7 +3185,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_069
+    id: enemy_072
     name: "\uC2AC\uB808\uC774\uD504\uB2C8\uB974"
     race: 1
     align: 6
@@ -3128,6 +3200,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3156,7 +3229,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_051
+    id: enemy_073
     name: "\uD06C\uB77C\uCF04"
     race: 1
     align: 6
@@ -3171,6 +3244,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3199,7 +3273,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_082
+    id: enemy_074
     name: "\uBC40\uD30C\uC774\uC5B4"
     race: 3
     align: 6
@@ -3214,6 +3288,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3242,7 +3317,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_074
+    id: enemy_075
     name: "\uB4C0\uB77C\uD55C"
     race: 2
     align: 6
@@ -3257,6 +3332,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3285,7 +3361,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_014
+    id: enemy_076
     name: "\uC2A4\uCE74\uD558\uD06C"
     race: 0
     align: 6
@@ -3300,6 +3376,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3343,6 +3420,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3371,7 +3449,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_026
+    id: enemy_078
     name: "\uBCF4\uB514\uB2E4\uB974\uB9C8"
     race: 0
     align: 6
@@ -3386,6 +3464,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3414,7 +3493,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_033
+    id: enemy_079
     name: "\uB4DC\uB798\uACE4 \uB098\uC774\uD2B8"
     race: 0
     align: 6
@@ -3429,6 +3508,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3457,7 +3537,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_023
+    id: enemy_080
     name: "\uD0C8\uB9AC\uC5D0\uC2E0"
     race: 0
     align: 6
@@ -3472,6 +3552,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3500,7 +3581,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_113
+    id: enemy_081
     name: "\uBA38\uBBF8"
     race: 8
     align: 6
@@ -3515,6 +3596,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3543,7 +3625,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_034
+    id: enemy_082
     name: "\uCE74\uD750\uBC14\uB4DC"
     race: 0
     align: 6
@@ -3558,6 +3640,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3586,7 +3669,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_008
+    id: enemy_083
     name: "\uC250\uB3C4\uC6B0\uBE14\uB808\uC774\uB4DC"
     race: 0
     align: 6
@@ -3601,6 +3684,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3629,7 +3713,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_073
+    id: enemy_084
     name: "\uBA54\uB450\uC0AC"
     race: 2
     align: 6
@@ -3644,6 +3728,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3672,136 +3757,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_019
-    name: "\uBCA8\uB85C\uB098"
-    race: 0
-    align: 6
-    gender: 1
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: be74e63ea00e9334e998ffb5c4c4c62d, type: 3}
-    image:
-    - {fileID: 21300000, guid: f9f8278ce85d63d43962f39278e7544c, type: 3}
-    - {fileID: 21300000, guid: df06c7a3c25eb1f4c822d59f6e934263, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: d0edeb075abd867408246ac72d4649b1, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 42
-      str: 16
-      mag: 27
-      intel: 23
-      vit: 28
-      agi: 18
-      luc: 11
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_021
-    name: "\uBE0C\uB9AC\uC9C0\uB4DC"
-    race: 0
-    align: 6
-    gender: 1
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: 861b5d2cc58b6d44fa4f0453c9f2548c, type: 3}
-    image:
-    - {fileID: 21300000, guid: c95cc82dd4981b541951416095860493, type: 3}
-    - {fileID: 21300000, guid: 47b45badc4a32e846942c0a6c9e62051, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: ffa2a62ce15957e479d5da90933fa698, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 42
-      str: 22
-      mag: 13
-      intel: 18
-      vit: 19
-      agi: 15
-      luc: 20
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 0
-      force: 0
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_103
-    name: "\uC9C4"
-    race: 7
-    align: 6
-    gender: 0
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: b0ea16719909dc946ba95e91635d97f1, type: 3}
-    image:
-    - {fileID: 21300000, guid: 404d0b550d2c97b41b4e991053626b2b, type: 3}
-    - {fileID: 21300000, guid: 45fb4890cc5244348bf87ec6c42e7774, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: 92907eb78078e3f47856d3b9bdce9824, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 42
-      str: 17
-      mag: 20
-      intel: 25
-      vit: 26
-      agi: 27
-      luc: 25
-    resistances:
-      phys: 0
-      fire: 0
-      ice: 0
-      elec: 1
-      force: 5
-      psyche: 0
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_036
+    id: enemy_085
     name: "\uBCA8\uB808\uB2E4"
     race: 0
     align: 6
@@ -3816,6 +3772,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3844,7 +3801,139 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_108
+    id: enemy_086
+    name: "\uC9C4"
+    race: 7
+    align: 6
+    gender: 0
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: b0ea16719909dc946ba95e91635d97f1, type: 3}
+    image:
+    - {fileID: 21300000, guid: 404d0b550d2c97b41b4e991053626b2b, type: 3}
+    - {fileID: 21300000, guid: 45fb4890cc5244348bf87ec6c42e7774, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 92907eb78078e3f47856d3b9bdce9824, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 42
+      str: 17
+      mag: 20
+      intel: 25
+      vit: 26
+      agi: 27
+      luc: 25
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 1
+      force: 5
+      psyche: 0
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_087
+    name: "\uBCA8\uB85C\uB098"
+    race: 0
+    align: 6
+    gender: 1
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: be74e63ea00e9334e998ffb5c4c4c62d, type: 3}
+    image:
+    - {fileID: 21300000, guid: f9f8278ce85d63d43962f39278e7544c, type: 3}
+    - {fileID: 21300000, guid: df06c7a3c25eb1f4c822d59f6e934263, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: d0edeb075abd867408246ac72d4649b1, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 42
+      str: 16
+      mag: 27
+      intel: 23
+      vit: 28
+      agi: 18
+      luc: 11
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_088
+    name: "\uBE0C\uB9AC\uC9C0\uB4DC"
+    race: 0
+    align: 6
+    gender: 1
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: 861b5d2cc58b6d44fa4f0453c9f2548c, type: 3}
+    image:
+    - {fileID: 21300000, guid: c95cc82dd4981b541951416095860493, type: 3}
+    - {fileID: 21300000, guid: 47b45badc4a32e846942c0a6c9e62051, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: ffa2a62ce15957e479d5da90933fa698, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 42
+      str: 22
+      mag: 13
+      intel: 18
+      vit: 19
+      agi: 15
+      luc: 20
+    resistances:
+      phys: 0
+      fire: 0
+      ice: 0
+      elec: 0
+      force: 0
+      psyche: 0
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
+  - isBoss: 0
+    id: enemy_089
     name: "\uC774\uD504\uB9AC\uD2B8"
     race: 7
     align: 6
@@ -3859,6 +3948,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3887,7 +3977,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_006
+    id: enemy_090
     name: "\uCF00\uB9AC\uB4DC\uC6EC"
     race: 0
     align: 6
@@ -3902,6 +3992,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3930,7 +4021,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_110
+    id: enemy_091
     name: "\uBC1C\uB85C\uADF8"
     race: 7
     align: 6
@@ -3945,6 +4036,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -3973,7 +4065,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_009
+    id: enemy_092
     name: "\uBA54\uB370\uC774\uC544"
     race: 0
     align: 6
@@ -3988,6 +4080,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4016,7 +4109,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_079
+    id: enemy_093
     name: "\uBCA8\uB9AC\uC54C"
     race: 3
     align: 6
@@ -4031,6 +4124,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4059,7 +4153,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_025
+    id: enemy_094
     name: "\uD0A4\uB974\uCF00"
     race: 0
     align: 6
@@ -4074,6 +4168,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4102,7 +4197,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_083
+    id: enemy_095
     name: "\uB4DC\uB77C\uD058\uB77C"
     race: 3
     align: 6
@@ -4117,6 +4212,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4145,7 +4241,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_084
+    id: enemy_096
     name: "\uBC14\uC54C"
     race: 3
     align: 6
@@ -4160,6 +4256,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4188,7 +4285,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_027
+    id: enemy_097
     name: "\uD5E4\uCE74\uD14C"
     race: 0
     align: 6
@@ -4203,6 +4300,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4231,7 +4329,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_089
+    id: enemy_098
     name: "\uB808\uBE44\uC544\uD0C4"
     race: 4
     align: 6
@@ -4246,6 +4344,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4274,7 +4373,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_046
+    id: enemy_099
     name: "\uBCA0\uD5E4\uBAA8\uC2A4"
     race: 1
     align: 6
@@ -4289,6 +4388,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4317,7 +4417,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_039
+    id: enemy_100
     name: "\uC9C0\uC988"
     race: 1
     align: 6
@@ -4332,6 +4432,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4360,7 +4461,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_085
+    id: enemy_101
     name: "\uB9B4\uB9AC\uC2A4"
     race: 3
     align: 5
@@ -4375,6 +4476,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4403,7 +4505,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_005
+    id: enemy_102
     name: "\uD074\uB9C1\uC870\uB974"
     race: 0
     align: 6
@@ -4418,6 +4520,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4446,7 +4549,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_055
+    id: enemy_103
     name: "\uC5D4\uD0A4\uB450"
     race: 1
     align: 6
@@ -4461,6 +4564,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4504,6 +4608,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4532,7 +4637,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_090
+    id: enemy_105
     name: "\uC694\uB974\uBB38\uAC04\uB4DC"
     race: 4
     align: 6
@@ -4547,6 +4652,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4575,7 +4681,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_018
+    id: enemy_106
     name: "\uCFE0\uD6CC\uB9B0"
     race: 0
     align: 6
@@ -4590,6 +4696,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4618,7 +4725,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_001
+    id: enemy_107
     name: "\uD540 \uB9C9 \uCFE8"
     race: 0
     align: 6
@@ -4633,6 +4740,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4661,7 +4769,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 1
-    id: enemy_091
+    id: enemy_108
     name: "\uACE8\uB4DC \uB4DC\uB798\uACE4"
     race: 4
     align: 6
@@ -4676,6 +4784,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4704,7 +4813,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_000
+    id: enemy_109
     name: "\uB864\uB791"
     race: 0
     align: 6
@@ -4719,6 +4828,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4747,7 +4857,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_101
+    id: enemy_110
     name: "\uC544\uB354\uC655"
     race: 6
     align: 6
@@ -4762,6 +4872,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4790,7 +4901,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_022
+    id: enemy_111
     name: "\uBC1C\uD0A4\uB9AC"
     race: 0
     align: 6
@@ -4805,6 +4916,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4833,7 +4945,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_007
+    id: enemy_112
     name: "\uC9C0\uD06C\uD504\uB9AC\uD2B8"
     race: 0
     align: 6
@@ -4848,6 +4960,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4875,8 +4988,52 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
+  - isBoss: 0
+    id: enemy_113
+    name: "\uD504\uB808\uC774\uC57C"
+    race: 0
+    align: 6
+    gender: 1
+    compileResultMsg: HELLO!
+    compileAscii: {fileID: 4900000, guid: ed63fdee5bd86eb43ba84b57280f2fe6, type: 3}
+    image:
+    - {fileID: 21300000, guid: afb4fc228b0ac54498fd9a82d38d89f2, type: 3}
+    - {fileID: 21300000, guid: 858353e629650304bb72afe563aff1a5, type: 3}
+    animInterval: 0.5
+    portrait: {fileID: 21300000, guid: 116227473791b4c44bdf29898de8dcfc, type: 3}
+    basicAttackVfxId: 0
+    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
+    skills: []
+    CondolenceText: 
+    preferredRow: 0
+    preferredCol: 1
+    stats:
+      level: 69
+      str: 25
+      mag: 32
+      intel: 35
+      vit: 25
+      agi: 21
+      luc: 35
+    resistances:
+      phys: 2
+      fire: 2
+      ice: 2
+      elec: 2
+      force: 2
+      psyche: 4
+    personality: 4
+    timeOfDay: 0
+    weather: 0
+    moonPhase: 0
+    choiceTone: 0
+    dropItemIds:
+    - item_000
+    - item_001
+    - item_002
+    - item_003
   - isBoss: 1
-    id: enemy_076
+    id: enemy_114
     name: "\uC2DC\uBC14"
     race: 2
     align: 6
@@ -4891,6 +5048,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
@@ -4919,50 +5077,7 @@ MonoBehaviour:
     - item_002
     - item_003
   - isBoss: 0
-    id: enemy_031
-    name: "\uD504\uB808\uC774\uC57C"
-    race: 0
-    align: 6
-    gender: 1
-    compileResultMsg: HELLO!
-    compileAscii: {fileID: 4900000, guid: ed63fdee5bd86eb43ba84b57280f2fe6, type: 3}
-    image:
-    - {fileID: 21300000, guid: afb4fc228b0ac54498fd9a82d38d89f2, type: 3}
-    - {fileID: 21300000, guid: 858353e629650304bb72afe563aff1a5, type: 3}
-    animInterval: 0.5
-    portrait: {fileID: 21300000, guid: 116227473791b4c44bdf29898de8dcfc, type: 3}
-    basicAttackVfxId: 0
-    aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
-    skills: []
-    preferredRow: 0
-    preferredCol: 1
-    stats:
-      level: 69
-      str: 25
-      mag: 32
-      intel: 35
-      vit: 25
-      agi: 21
-      luc: 35
-    resistances:
-      phys: 2
-      fire: 2
-      ice: 2
-      elec: 2
-      force: 2
-      psyche: 4
-    personality: 4
-    timeOfDay: 0
-    weather: 0
-    moonPhase: 0
-    choiceTone: 0
-    dropItemIds:
-    - item_000
-    - item_001
-    - item_002
-    - item_003
-  - isBoss: 0
-    id: enemy_040
+    id: enemy_115
     name: "\uC81C\uCC9C\uB300\uC131"
     race: 1
     align: 6
@@ -4977,6 +5092,7 @@ MonoBehaviour:
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
+    CondolenceText: 
     preferredRow: 0
     preferredCol: 1
     stats:
