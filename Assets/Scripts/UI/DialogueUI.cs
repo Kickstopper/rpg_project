@@ -105,7 +105,7 @@ namespace UI
 
         private void StartDialogueFlow()
         {
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
             currentLineIndex = 0;
             isDialogueActive = true;
             uiCanvas.SetActive(true);
@@ -470,7 +470,7 @@ namespace UI
         // 버튼을 클릭했을 때 호출됨
         void OnChoiceSelected(string nextTargetID)
         {
-            inputCooldown = 0.2f;
+            inputCooldown = 0.05f;
 
             // 선택지 UI 정리
             isWaitingForChoice = false;

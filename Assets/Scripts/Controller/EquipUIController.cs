@@ -132,7 +132,7 @@ namespace Controller
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
                 OpenItemList(equipSlots[currentSlotIndex].type);
-                inputCooldown = 0.2f;
+                inputCooldown = 0.05f;
             }
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
@@ -174,7 +174,7 @@ namespace Controller
                 btn.onClick.AddListener(() =>
                 {
                     OpenItemList(equipSlots[slotIndex].type);
-                    inputCooldown = 0.2f;
+                    inputCooldown = 0.05f;
                 });
 
                 EventTrigger trigger = btn.gameObject.GetComponent<EventTrigger>() ?? btn.gameObject.AddComponent<EventTrigger>();
@@ -433,7 +433,7 @@ namespace Controller
             CloseItemList();
             
             // 리스트 닫은 직후 쿨타임 설정 -> HandleSlotInput에서 다시 열리는 것 방지
-            inputCooldown = 0.2f; 
+            inputCooldown = 0.05f; 
             
             RefreshButtonText();
             UpdateStatDisplay();
@@ -445,7 +445,7 @@ namespace Controller
             itemListPanel.SetActive(false);
             
             // 닫을 때도 쿨타임을 주어 실수로 바로 다시 열거나 다른 조작 방지
-            inputCooldown = 0.2f; 
+            inputCooldown = 0.05f; 
             
             SelectSlot(currentSlotIndex); 
         }

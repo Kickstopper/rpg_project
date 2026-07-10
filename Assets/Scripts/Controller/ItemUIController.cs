@@ -342,7 +342,7 @@ namespace Controller
             }
 
             isSelectingTarget = true;
-            localCooldown = 0.2f;
+            localCooldown = 0.05f;
 
             if (descriptionText) descriptionText.text = "누구에게 아이템을 사용합니까?";
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
@@ -460,7 +460,7 @@ namespace Controller
             // 확인
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
             {
-                localCooldown = 0.2f;
+                localCooldown = 0.05f;
                 // 전체 대상 아이템이거나, 단일 대상일 때 타겟이 유효한 경우에만 실행
                 if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies || IsValidTarget(currentPartyIndex))
                 {
@@ -497,7 +497,7 @@ namespace Controller
         private void CancelTargetSelection()
         {
             isSelectingTarget = false;
-            localCooldown = 0.2f;
+            localCooldown = 0.05f;
 
             foreach (var pc in partyControllers) pc.ResetHighlightColor(); 
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);

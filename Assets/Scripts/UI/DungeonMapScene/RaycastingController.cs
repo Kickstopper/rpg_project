@@ -233,7 +233,7 @@ namespace Controller
             if (!_inputLocked && theme.moduleEnable && (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown()))
             {
                 ManagerRoot.GameState.ChangeState(GameState.PlayerMenu);
-                inputCooldown = 0.2f;
+                inputCooldown = 0.05f;
                 return;
             }
             
