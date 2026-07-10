@@ -130,9 +130,10 @@ namespace Helper
         // =======================================================
         // 스폰되는 몬스터의 수 결정
         // =======================================================
-        public static int DetermineSpawnCount()
+        public static int DetermineSpawnCount(int maxCount = 6)
         {
             int spawnCount = 1;
+            if (maxCount < 1) maxCount = spawnCount;
             float roll = Random.value;
 
             // 기획된 가중치 확률 적용
@@ -143,7 +144,7 @@ namespace Helper
             else if (roll < 0.97f) spawnCount = 5; // 7%
             else                   spawnCount = 6; // 3%
 
-            return spawnCount;
+            return Mathf.Min(spawnCount, maxCount);
         }
 
         // =======================================================

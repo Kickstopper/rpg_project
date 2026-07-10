@@ -77,13 +77,13 @@ namespace UI.DungeonMapScene
             
             ScreenTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
             ScreenTexture.filterMode = FilterMode.Point;
-
         }
 
-        public void LoadAssets(DungeonTheme theme, int texW, int texH, SpriteInfo[] spriteData)
+        public void LoadAssets(DungeonTheme theme, Sprite[] dynamicEnemySprites, int texW, int texH, SpriteInfo[] spriteData)
         {
             _wallTextures = theme.texture;
-            _enemySprite = theme.enemySprites;
+            
+            _enemySprite = dynamicEnemySprites;
 
             _objectSpriteDict = new Dictionary<int, Texture2D>();
             _flatObjectPixels = new Dictionary<int, Color32[]>();

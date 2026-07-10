@@ -189,13 +189,10 @@ namespace Controller
             if (monsterIds == null || monsterIds.Count == 0) return;
             
             // 가중치 적용 (낮은 수일수록 등장 확률 높음)
-            int spawnCount = BattleCalculator.DetermineSpawnCount();
-
             Dictionary<string, int> monsterList = new();
-            for (int i = 0; i < spawnCount; i++)
+            for (int i = 0; i < monsterIds.Count; i++)
             {
-                int randomIndex = Random.Range(0, monsterIds.Count);
-                string monsterId = monsterIds[randomIndex];
+                string monsterId = monsterIds[i];
                 if (monsterList.ContainsKey(monsterId)) ++monsterList[monsterId];
                 else monsterList.Add(monsterId, 1);
                 fieldController.SpawnMonster(monsterId);

@@ -15,6 +15,7 @@ namespace UI.WorldMapScene
 
         [Header("이 지역 몬스터 목록")]
         public List<string> regionMonsters;
+        public int maxEnemyCount = 3;
 
         private Vector3 lastPosition;
         private float accumulatedDistance = 0f;
@@ -22,7 +23,7 @@ namespace UI.WorldMapScene
         void Start()
         {
             if (encounterSystem != null)
-                encounterSystem.Initialize(regionMonsters);
+                encounterSystem.Initialize(regionMonsters, maxEnemyCount);
 
             if (playerTransform != null)
                 lastPosition = playerTransform.position;

@@ -30,6 +30,10 @@ public class MonsterDatabase : ScriptableObject
         public Sprite[] image;     // 이미지
         public float animInterval = 0.5f; // 애니메이션 프레임 간격
         public Sprite portrait;     // 초상화
+        public Sprite[] upImgs;       // 위로 이동 던전 심볼
+        public Sprite[] downImgs;     // 아래로 이동 던전 심볼
+        public Sprite[] leftImgs;     // 좌로 이동 던전 심볼
+        public Sprite[] rightImgs;    // 우로 이동 던전 심볼
         
         [Header("Battle")]
         public VfxID basicAttackVfxId;    // 기본 공격 이펙트 ID

@@ -10,6 +10,7 @@ using UI;
 using TMPro;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using Helper;
 
 namespace Controller
 {
@@ -88,6 +89,9 @@ namespace Controller
             public float moveInterval = 1.5f; // 몇 초마다 1칸씩 움직일지
             public float aggroRange = 5.0f;   // 플레이어 추적 시작 거리. 칸 수
             public float moveSpeed = 2.5f;    // 화면에서 시각적으로 움직이는 속도
+
+            // 이 심볼과 부딪혔을 때 싸우게 될 실제 몬스터 ID 목록
+            public List<string> encounterGroup; 
         }
 
         public class MapObject
@@ -102,6 +106,7 @@ namespace Controller
         
         private List<MapEnemy> _activeEnemies = new List<MapEnemy>(); // 심볼 인카운터 에너미 리스트
         private List<MapObject> _staticObjects = new List<MapObject>(); // 고정 오브젝트 리스트
+        private Dictionary<string, int> _monsterBaseTexMap = new Dictionary<string, int>(); // 몬스터 ID별로 텍스처 인덱스(baseTexIdx) 시작점을 저장
 
         private bool _canRender = true;
         private bool _inputLocked = false;
@@ -262,60 +267,6 @@ namespace Controller
             UpdateBackgroundUV();
         }
 
-        // 모드 전환 메서드
-        // private void ToggleMovementMode()
-        // {
-        //     if (_player.IsGridMove)
-        //     {
-        //         _player.IsGridMove = false;
-        //         Debug.Log("Switched to Free Move");
-        //     }
-        //     else
-        //     {
-        //         // 그리드 상태로 스냅핑
-        //         _player.SnapToGrid();
-        //         _player.IsGridMove = true;
-                
-        //         // 스냅 후 미니맵/아이콘 동기화
-        //         if (miniMap) miniMap.SnapToGrid(_player.LogicX, _player.LogicY, _player.DirectionIdx);
-        //         if (compassUI) compassUI.SetDirection(_player.DirectionIdx);
-        //         UpdateMapDiscovery(_player.LogicX, _player.LogicY);
-                
-        //         Debug.Log("Switched to Grid Move");
-        //     }
-        // }
-
-        // 자유 이동 입력 처리
-        // private void HandleFreeMoveInput()
-        // {
-        //     if (_inputLocked) return;
-
-        //     float moveSpeed = Time.deltaTime * 3.0f; // 속도 조절
-        //     float rotSpeed = Time.deltaTime * 2.0f;
-
-        //     // 점프
-        //     //if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(_player.JumpRoutine(0.6f, 20f, null));
-        //     // 스캔
-        //     if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
-
-        //     // 이동
-        //     if (Input.GetKey(KeyCode.W)) _player.MoveFree(moveSpeed);
-        //     if (Input.GetKey(KeyCode.S)) _player.MoveFree(-moveSpeed);
-
-        //     if (Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) 
-        //     {
-        //         _player.RotateFree(rotSpeed); // 왼쪽 회전
-        //     }
-        //     if (Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) 
-        //     {
-        //         _player.RotateFree(-rotSpeed); // 오른쪽 회전
-        //     }
-
-        //     // Free Move 시 미니맵 갱신 (즉시 갱신)
-        //     if (miniMap) miniMap.SetFreeDirection(_player.DirX, _player.DirY);
-        //     autoMapRenderer.UpdatePlayerIconFree(_player.PosX, _player.PosY, _player.DirX, _player.DirY);
-        // }
-
         // ================= Input & Logic =================
         private void HandleInput()
         {
@@ -376,21 +327,6 @@ namespace Controller
 
             if (_inputLocked) return;
             
-            // 올려보기 및 내려보기
-            // if (Input.GetKey(KeyCode.LeftShift) && !_player.IsMoving)
-            // {
-            //     if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
-            //     {
-            //         StartCoroutine(TransitionLookState(LookState.Up));
-            //         return;
-            //     }
-            //     if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-            //     {
-            //         StartCoroutine(TransitionLookState(LookState.Down));
-            //         return;
-            //     }
-            // }
-
             // 상호작용 (올려보기, 내려보기, 보물상자 열기 등)
             if (!_player.IsMoving && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)))
             {
@@ -827,14 +763,6 @@ namespace Controller
 
             yield return new WaitForSeconds(0.1f);
 
-            // // 통과를 위해 물리적 벽 속성 제거
-            // for (int face = 0; face < 4; face++)
-            // {
-            //     if (originalDoorFaces[face])
-            //         doorCell.wallTextureIDs[face] = -1;
-            // }
-            // doorCell.value = 0;
-
             // 코루틴이 파괴되기 전 시점에 실행할 복구 함수
             Action restoreDoorAction = () => {
                 // 문을 다시 원래의 닫힘(closedTexId) 상태와 벽 속성으로 복구
@@ -970,8 +898,9 @@ namespace Controller
 
             // 화면을 캡처
             Sprite bgSprite = CaptureCurrentDungeonView();
-            // 전투 개시 명령
-            ManagerRoot.GameState.StartEncounter(encounterSystem.MonsterCandidate, theme.fogColor, encType, bgSprite);
+            
+            // 스폰 시점에 미리 결정해둔 몬스터 리스트로 전투 개시
+            ManagerRoot.GameState.StartEncounter(enemy.encounterGroup, theme.fogColor, encType, bgSprite);
             
             // 전투가 끝나고 탐험 상태로 돌아올 때까지 대기
             yield return new WaitUntil(() => ManagerRoot.GameState.CurrentState == GameState.Exploration);
@@ -1129,15 +1058,6 @@ namespace Controller
                 Mathf.FloorToInt(o.y) == _player.LogicY && 
                 o.isActive);
             
-            // 만약 현재의 칸에 없다면 앞 칸을 확인
-            // if (targetObj == null)
-            // {
-            //     targetObj = _staticObjects.Find(o => 
-            //         Mathf.FloorToInt(o.x) == frontX && 
-            //         Mathf.FloorToInt(o.y) == frontY && 
-            //         o.isActive);
-            // }
-            
             if (targetObj != null)
             {
                 // 닫힌 보물상자 (Object ID: 0) 상호작용
@@ -1145,18 +1065,11 @@ namespace Controller
                 {
                     // 상태 및 텍스처 변경 (열린 상자의 ID인 1로 변경)
                     targetObj.texIdx = 1;
-                    
-                    // 열린 상자는 충돌하지 않음
-                    // targetObj.isSolid = false;
 
                     // 변경된 텍스처를 렌더러에 즉시 반영
                     UpdateSpriteData();
 
-                    // ManagerRoot.Sound.PlaySFX(SfxID.Open_Chest);
                     ShowSystemMessage("낡은 보물상자를 열었다.");
-
-                    // TODO: 획득한 아이템이 있을 경우, 인벤토리에 저장한다
-                    // ManagerRoot.Inventory.AddMoney(100);
                 }
                 else if (targetObj.texIdx == 1)
                 {
@@ -1180,7 +1093,6 @@ namespace Controller
             }
 
             Debug.Log("ACTION 버튼 클릭됨");
-            // TODO: 추후 상호작용(문 열기, NPC 대화, 전방의 아이템 조사 등) 로직 연결
         }
 
         // 입구 데이터 확인 메서드
@@ -1195,12 +1107,11 @@ namespace Controller
             EntranceData currentEntrance = _currentMap.GetEntranceAt(currentX, currentY);
             if (currentEntrance != null && currentEntrance.isWallEntrance)
             {
-                // triggerDirection 일치 여부, 플레이어가 정면으로 전진 중인지 체크
                 if (currentEntrance.triggerDirection == inputDir && inputDir == facingDir)
                     return currentEntrance;
             }
 
-            // 진입 시 방 바깥쪽 벽에 있는 입구인지 체크 (맵 범위를 벗어나지 않았을 때만 체크함)
+            // 진입 시 방 바깥쪽 벽에 있는 입구인지 체크
             if (targetX >= 0 && targetX < _currentMap.width && targetY >= 0 && targetY < _currentMap.height)
             {
                 EntranceData targetEntrance = _currentMap.GetEntranceAt(targetX, targetY);
@@ -1219,7 +1130,6 @@ namespace Controller
         {
             if (_player == null || _currentMap == null) return;
 
-            // 탐험 상태가 아닐 때는 무조건 숨김
             if (ManagerRoot.GameState != null && ManagerRoot.GameState.CurrentState != GameState.Exploration)
             {
                 HideRoomName();
@@ -1230,10 +1140,8 @@ namespace Controller
             int frontX = _player.LogicX + forwardVec.x;
             int frontY = _player.LogicY + forwardVec.y;
 
-            // 정면에 입구가 있는지 확인
             EntranceData frontEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, frontX, frontY, forwardVec);
 
-            // 상점 입구가 맞다면 텍스트 표시, 아니면 숨김
             if (frontEntrance != null && frontEntrance.type == EntranceType.Shop)
             {
                 var shopData = ShopManager.Instance.GetShopData(frontEntrance.destinationID);
@@ -1278,7 +1186,6 @@ namespace Controller
                     
                     fadeOverlay.alpha = t;
 
-                    // 이때 논리 좌표 변경됨
                     _player.SetDirectPosition(
                         Mathf.Lerp(startX, targetPos.x, t),
                         Mathf.Lerp(startY, targetPos.y, t),
@@ -1338,23 +1245,18 @@ namespace Controller
                     ManagerRoot.GameState.ShowShop(entrance.destinationID);
                 }
 
-                // 상점이 열려있는 동안 코루틴 대기
                 yield return new WaitUntil(() => ManagerRoot.GameState.CurrentState != GameState.Shop);
 
-                // 상점을 나설 때 180도 회전
                 int reverseDir = (_player.DirectionIdx + 2) % 4; 
                 
-                // 뒤집힌 방향을 기준으로 원래 위치의 오프셋을 다시 계산
                 Vector2 originalPos = _player.GetOffsetPosition(preEntranceLogicX, preEntranceLogicY, reverseDir);
                 _player.SetDirectPosition(originalPos.x, originalPos.y, reverseDir);
 
-                // 회전한 방향에 맞춰 나침반과 미니맵도 즉시 동기화
                 if (compassUI) compassUI.SetDirection(reverseDir);
                 if (miniMap) miniMap.SnapToGrid(preEntranceLogicX, preEntranceLogicY, reverseDir);
                 
                 UpdateMapDiscovery(preEntranceLogicX, preEntranceLogicY);
 
-                // 페이드인
                 if (fadeOverlay != null)
                 {
                     float elapsedFade = 0f;
@@ -1377,23 +1279,19 @@ namespace Controller
 
                 string currentTerminalID = entrance.destinationID;
                 
-                // 빠져나올 때 돌아갈 좌표 (처음 들어올 때는 들어오기 직전의 위치와 반대 방향으로 세팅)
                 int exitLogicX = preEntranceLogicX;
                 int exitLogicY = preEntranceLogicY;
                 int exitDir = (_player.DirectionIdx + 2) % 4; 
 
-                // 취소를 누를 때까지 터미널 안에서 무한 반복
                 while (true)
                 {
                     TerminalManager.Instance.UnlockTerminal(currentTerminalID);
                     TerminalUIManager.Instance.OpenTerminal(currentTerminalID);
 
-                    // 유저가 워프 목적지를 고르거나 취소할 때까지 대기
                     yield return new WaitUntil(() => TerminalUIManager.Instance.IsSelectionComplete);
 
                     if (TerminalUIManager.Instance.IsCanceled)
                     {
-                        // 취소 시 터미널에서 던전으로 빠져나옴
                         Vector2 originalPos = _player.GetOffsetPosition(exitLogicX, exitLogicY, exitDir);
                         _player.SetDirectPosition(originalPos.x, originalPos.y, exitDir);
 
@@ -1401,7 +1299,6 @@ namespace Controller
                         if (miniMap) miniMap.SnapToGrid(exitLogicX, exitLogicY, exitDir);
                         UpdateMapDiscovery(exitLogicX, exitLogicY);
 
-                        // 페이드 인 직전 바뀐 맵과 방향으로 화면 강제 갱신
                         _renderer.RenderFrame(_player, renderSettings);
 
                         if (ManagerRoot.GameState != null)
@@ -1420,13 +1317,10 @@ namespace Controller
                             fadeOverlay.alpha = 0f;
                             fadeOverlay.blocksRaycasts = false;
                         }
-
-                        // 코루틴 종료 및 탐험 시작
                         break; 
                     }
                     else
                     {
-                        // 다른 터미널로 워프
                         TerminalData dest = TerminalUIManager.Instance.SelectedTerminal;
 
                         EntranceData dynamicDest = new EntranceData
@@ -1437,7 +1331,6 @@ namespace Controller
                             targetDirection = dest.targetDir
                         };
 
-                        // 화면이 암전되어 있는 상태에서 새 맵 데이터 로드
                         if (ManagerRoot.Dungeon)
                         {
                             ManagerRoot.Dungeon.LoadDungeonFromJson(dynamicDest.destinationID);
@@ -1446,13 +1339,10 @@ namespace Controller
                         
                         yield return new WaitForSeconds(0.2f); // 렉 스파이크 대기
 
-                        // 워프가 끝났으므로 변수들을 도착한 새 터미널 기준으로 갱신
                         currentTerminalID = dest.terminalID;
                         exitLogicX = dest.targetX;
                         exitLogicY = dest.targetY;
                         exitDir = (int)dest.targetDir;
-
-                        // break 없이 루프의 처음으로 돌아감. 새 터미널 ID를 가지고 OpenTerminal()이 재실행되어 리프레시 효과 발생
                     }
                 }
             }
@@ -1466,13 +1356,11 @@ namespace Controller
                 {
                     ElevatorUIManager.Instance.OpenElevator(elvData, _currentMap.mapID);
 
-                    // 층 선택 및 엘리베이터 이동 연출 완료 대기
                     yield return new WaitUntil(() => ElevatorUIManager.Instance.IsSelectionComplete);
                     yield return new WaitUntil(() => ElevatorUIManager.Instance.IsAnimationFinished);
 
                     FloorData destFloor = ElevatorUIManager.Instance.SelectedFloor;
 
-                    // 같은 층에서 내릴 경우
                     if (destFloor.mapID == _currentMap.mapID)
                     {
                         int exitDir = (_player.DirectionIdx + 2) % 4; 
@@ -1481,7 +1369,6 @@ namespace Controller
                         if (miniMap) miniMap.SnapToGrid(preEntranceLogicX, preEntranceLogicY, exitDir);
                         if (compassUI) compassUI.SetDirection(exitDir);
 
-                        // 통괄 시퀀스 코루틴 하나로 모든 연출과 복구 해결!
                         yield return StartCoroutine(HandleElevatorExitSequence(elvData));
 
                         ManagerRoot.GameState.ChangeState(GameState.Exploration);
@@ -1489,7 +1376,6 @@ namespace Controller
                         yield break; 
                     }
                     
-                    // 다른 층으로 이동하여 내릴 경우 (새 맵 전환)
                     EntranceData dynamicDest = new EntranceData
                     {
                         destinationID = destFloor.mapID,
@@ -1504,9 +1390,8 @@ namespace Controller
                         LoadMapData(dynamicDest); 
                     }
                     
-                    yield return new WaitForSeconds(0.2f); // 렉 스파이크 대기
+                    yield return new WaitForSeconds(0.2f); 
 
-                    // 통괄 시퀀스 코루틴 하나로 모든 연출과 복구 해결!
                     yield return StartCoroutine(HandleElevatorExitSequence(elvData));
                 }
 
@@ -1539,9 +1424,7 @@ namespace Controller
 
         private IEnumerator TurnRoutine(int dirStep)
         {
-            // 현재 방향과 이동할 다음 방향을 미리 계산
             int currentDir = _player.DirectionIdx;
-            // (a % n + n) % n 은 음수 나머지 처리를 위한 공식.
             int nextDir = ((currentDir + dirStep) % 4 + 4) % 4;
 
             if (compassUI)
@@ -1552,31 +1435,23 @@ namespace Controller
 
             yield return StartCoroutine(_player.RotateGridRoutine(dirStep, turnDuration, null));
             
-            // 맵 갱신
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
-
-            // 회전 후 정면에 상점이 있는지 확인
             CheckFrontForShop();
         }
 
-        // 특정 절대 방향(0: 북, 1: 동, 2: 남, 3: 서)으로 회전
         private IEnumerator TurnToDirectionRoutine(int targetDir)
         {
             int currentDir = _player.DirectionIdx;
 
-            // 이미 목표 방향을 바라보고 있다면 즉시 종료
             if (currentDir == targetDir) yield break;
 
-            // 최단 회전 방향 계산 -1: 왼쪽, 1: 오른쪽, 2: 뒤로 돌기
             int dirStep = targetDir - currentDir;
 
-            // 회전 최적화: 시계 반대 방향(-3)은 시계 방향(+1)과 같고, 시계 방향(+3)은 시계 반대 방향(-1)과 같음
             if (dirStep == -3) dirStep = 1;
             else if (dirStep == 3) dirStep = -1;
 
             if (Mathf.Abs(dirStep) == 2)
             {
-                // 오른쪽으로 90도씩 두 번 회전
                 yield return StartCoroutine(TurnRoutine(1));
                 yield return StartCoroutine(TurnRoutine(1));
             }
@@ -1612,11 +1487,9 @@ namespace Controller
                 origDoorTex = doorCell.wallTextureIDs[doorFrontFace];
             }
 
-            // Logic 좌표계가 덮어써지기 전에, 도착점(복도)과 시작점(엘리베이터 안)의 물리적 위치를 미리 계산하여 저장
             Vector2 targetPos = _player.GetOffsetPosition(_player.LogicX, _player.LogicY, _player.DirectionIdx);
             Vector2 startPos = new Vector2(targetPos.x - (forward.x * 0.8f), targetPos.y - (forward.y * 0.8f));
             
-            // 카메라 물리적 위치 임시 변경 (이때 플레이어의 Logic 좌표가 엘리베이터로 바뀜)
             _player.SetDirectPosition(startPos.x, startPos.y, _player.DirectionIdx);
 
             _renderer.RenderFrame(_player, renderSettings);
@@ -1630,10 +1503,8 @@ namespace Controller
                 fadeOverlay.blocksRaycasts = false;
             }
 
-            // 내부 도어(UI) 오픈
             yield return StartCoroutine(ElevatorUIManager.Instance.OpenDoorsRoutine(elvData.doorType));
 
-            // 외부 도어(3D) 오픈
             DoorAnimConfig doorConfig = null;
             if (origDoorTex != -1 && theme != null && theme.doorAnimations != null)
             {
@@ -1666,14 +1537,11 @@ namespace Controller
 
             _renderer.RenderFrame(_player, renderSettings);
 
-            // 복도로 걸어나가기
             float stepOutTime = 0.6f;
             StartCoroutine(ElevatorUIManager.Instance.StepOutZoomRoutine(stepOutTime)); 
             
-            // 미리 계산해둔 startPos와 targetPos를 강제로 전달하여 전진.
             yield return StartCoroutine(StepOutOfElevatorRoutine(stepOutTime, startPos, targetPos));
 
-            // 문 닫기(복구)
             if (doorCell != null)
             {
                 doorCell.value = origDoorVal;
@@ -1687,7 +1555,6 @@ namespace Controller
             ElevatorUIManager.Instance.CloseElevator();
         }
 
-        // 내부에서 좌표를 다시 구하지 않고 외부에서 받아오도록 파라미터 변경
         private IEnumerator StepOutOfElevatorRoutine(float duration, Vector2 startPos, Vector2 targetPos)
         {
             float elapsed = 0f;
@@ -1708,7 +1575,6 @@ namespace Controller
                 yield return null;
             }
 
-            // 도착 후 강제 갱신으로 어긋난 Logic 좌표까지 복도 칸으로 복구.
             _player.SetDirectPosition(targetPos.x, targetPos.y, _player.DirectionIdx);
             _renderer.RenderFrame(_player, renderSettings);
         }
@@ -1725,10 +1591,33 @@ namespace Controller
 
             if (backgroundImage != null) backgroundImage.texture = theme.background;
             
-            // 시스템 초기화
-            _renderer.LoadAssets(theme, 64, 64, null);
+            // 이 맵에 등장할 수 있는 모든 몬스터의 애니메이션 프레임 사전 캐싱
+            _monsterBaseTexMap.Clear();
+            List<Sprite> dynamicEnemySprites = new List<Sprite>();
+            
+            if (theme.monsterList != null)
+            {
+                foreach (string monID in theme.monsterList)
+                {
+                    var entry = DatabaseManager.Instance.monsterDB.GetEntry(monID);
+                    if (entry != null && !_monsterBaseTexMap.ContainsKey(monID))
+                    {
+                        // 현재 카운트를 이 몬스터의 시작 인덱스로 저장
+                        _monsterBaseTexMap[monID] = dynamicEnemySprites.Count;
+                        
+                        // 0: 정면(Down), 1: 뒷면(Up), 2: 좌측(Left), 3: 우측(Right)
+                        AddSpriteFrames(dynamicEnemySprites, entry.downImgs);
+                        AddSpriteFrames(dynamicEnemySprites, entry.upImgs);
+                        AddSpriteFrames(dynamicEnemySprites, entry.leftImgs);
+                        AddSpriteFrames(dynamicEnemySprites, entry.rightImgs);
+                    }
+                }
+            }
+
+            _renderer.LoadAssets(theme, dynamicEnemySprites.ToArray(), 64, 64, null);
+
             // 테마에 설정된 인카운터 모드로 초기화
-            encounterSystem.Initialize(theme.monsterList, theme.encounterMode);
+            encounterSystem.Initialize(theme.monsterList, theme.maxEnemyCount, theme.encounterMode);
 
             int finalStartX = _currentMap.startX;
             int finalStartY = _currentMap.startY;
@@ -1736,36 +1625,18 @@ namespace Controller
 
             if (entryEntrance != null)
             {
-                // 케이스 1: 다른 던전 문을 통해 명시적으로 들어온 경우
                 finalStartDir = entryEntrance.targetDirection;
                 finalStartX = entryEntrance.targetX;
                 finalStartY = entryEntrance.targetY;
-            }
-            else
-            {
-                // 케이스 2: 월드맵 등에서 매개변수 없이(null) 새로 씬이 켜진 경우
-                // DungeonMapStateManager에 이 맵에 대한 세이브/마지막 위치 정보가 있는지 확인합니다.
-                if (ManagerRoot.DungeonMapState != null)
-                {
-                    // 만약 해당 데이터 매니저에 마지막 위치를 기억하는 전역 기능이 있다면 가져옵니다.
-                    // 예시: DungeonMapStateManager에 마지막 좌표를 반환하는 메서드가 있다고 가정할 때
-                    // var lastPos = ManagerRoot.DungeonMapState.GetLastPosition(_currentMap.mapID);
-                    // if (lastPos != null) { finalStartX = lastPos.x; finalStartY = lastPos.y; finalStartDir = (int)lastPos.dir; }
-                }
-                
-                // 만약 월드맵에서 던전으로 들어올 때 전용 시작 좌표를 DungeonManager에 세팅해 주었다면 그것을 사용합니다.
-                // 예시: ManagerRoot.Dungeon.reservedSpawnX 등이 구현되어 있다면 적용
             }
 
             if (ManagerRoot.DungeonEvent)
                 ManagerRoot.DungeonEvent.SetCurrentMapID(_currentMap.mapID);
             
-            // 최종 결정된 좌표로 플레이어를 완벽하게 배치합니다.
             _player.SetMapData(_currentMap, finalStartX, finalStartY, finalStartDir);
 
             RefreshAppVisible();
             
-            // 벽 애니메이션 초기화
             InitializeWallAnims(theme);
             _renderer.SetMapData(_currentMap, theme, _tileAnimStates);
             
@@ -1779,38 +1650,33 @@ namespace Controller
             SpawnStaticObjects(theme);
             
             monsterExist = theme.monsterList != null && theme.monsterList.Count > 0;
-            // 심볼 인카운터 모드일 때만 몬스터 스폰
             if (monsterExist && _maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random) 
             {
                 SpawnSymbolEnemies(_maxSpawnCount);
             }
             else
             {
-                // 몬스터가 없어도 고정 오브젝트를 렌더러로 보내야 하므로
                 UpdateSpriteData();
             }
         }
 
         private void UpdateRenderSettings(DungeonTheme theme)
         {
-            // 물리 플레이어에게 현재 테마의 통과 가능한 텍스처 목록 주입
             if (theme != null && theme.passableWallTexIDs != null)
             {
                 _player.SetIllusionTextures(theme.passableWallTexIDs);
             }
 
-            // 머티리얼의 일렁임 스위치 조작
             if (screenImage != null && screenImage.material != null)
             {
                 if (theme.isUnderwater)
                 {
-                    screenImage.material.SetFloat("_WaveAmount", 0.01f); // 디폴트 0.01
+                    screenImage.material.SetFloat("_WaveAmount", 0.01f); 
                     screenImage.material.SetFloat("_WaveSpeed", 1.0f);
                     screenImage.material.SetFloat("_WaveFrequency", 10.0f);
                 }
                 else
                 {
-                    // 일렁임 효과 끄기
                     screenImage.material.SetFloat("_WaveAmount", 0.0f);
                 }
             }
@@ -1818,28 +1684,23 @@ namespace Controller
             renderSettings.lightingIntensity = theme.lightingIntensity;
             renderSettings.fogColor = theme.fogColor;
 
-            // 생물체 효과
             renderSettings.useOrganicEffect = theme.useOrganicEffect;
             renderSettings.organicFreqX = theme.organicFreqX;
             renderSettings.organicSpeed = theme.organicSpeed;
             renderSettings.organicBreath = theme.organicBreath;
             renderSettings.organicAmplitude = theme.organicAmplitude;
 
-            // 실린더 효과
             renderSettings.useCylinderEffect = theme.useCylinderEffect;
             renderSettings.cylinderStrength = theme.cylinderStrength;
 
-            // 멜트 효과
             renderSettings.useMeltEffect = theme.useMeltEffect;
             renderSettings.meltEdgeBump = theme.meltEdgeBump;
             renderSettings.meltEdgeSpeed = theme.meltEdgeSpeed;
 
-            // 벽 왜곡 효과
             renderSettings.useWallDistortion = theme.useWallDistortion;
             renderSettings.distortionAmp = theme.distortionAmp;
             renderSettings.distortionFreq = theme.distortionFreq;
 
-            // 먼지 효과
             renderSettings.useDustEffect = theme.useDustEffect;
             renderSettings.dustParticleCount = theme.dustParticleCount;
             renderSettings.dustSwayAmplitude = theme.dustSwayAmplitude;
@@ -1849,7 +1710,6 @@ namespace Controller
             renderSettings.dustColor = theme.dustColor;
         }
 
-        // 모듈 UI의 표시 여부 결정
         private void RefreshAppVisible()
         {
             if (miniMap != null)
@@ -1880,7 +1740,6 @@ namespace Controller
             }
         }
 
-        // 플레이어 주변의 몬스터 거리를 감지하여 위험도 UI에 반영
         private void UpdateEncounterSensor()
         {
             if (_activeEnemies.Count == 0)
@@ -1900,10 +1759,7 @@ namespace Controller
                 }
             }
 
-            // 센서 최대 감지 거리 (8칸 안에 몬스터가 들어오면 반응 시작)
             float maxSensorRange = 8.0f; 
-            
-            // 거리가 0에 가까울수록 ratio는 1에 가까워짐
             float ratio = 1.0f - (minDistance / maxSensorRange);
             
             encounterSystem.UpdateSymbolDanger(ratio);
@@ -1913,19 +1769,15 @@ namespace Controller
         {
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
             
-            // 테마 설정에 따라 랜덤 인카운터가 활성화된 경우에만 걸음 수 연산
             if (theme != null && theme.encounterMode == EncounterMode.Random)
             {
                 encounterSystem.OnStepTaken();
             }
             
-            // 이벤트가 있는지 체크
             CheckCurrentTileEvent();
-            // 상점이 있는지 확인
             CheckFrontForShop();
         }
 
-        // 현재 서 있는 칸의 이벤트를 확인하고 발동
         private void CheckCurrentTileEvent()
         {
             if (ManagerRoot.DungeonEvent == null) return;
@@ -1964,7 +1816,6 @@ namespace Controller
         {
             if (theme == null || theme.wallAnimations == null) return;
 
-            // 바닥/천장 초기화
             _floorAnimState = null;
             _ceilAnimState = null;
             _currentFloorTexIdx = theme.floorTexIdx;
@@ -1975,15 +1826,12 @@ namespace Controller
             Dictionary<int, WallAnimConfig> animDict = new Dictionary<int, WallAnimConfig>();
             foreach (var cfg in theme.wallAnimations)
             {
-                // 배열에 텍스처가 없으면 건너뜀
                 if (cfg.frameTexIDs == null || cfg.frameTexIDs.Length == 0) continue;
 
-                // 기준 텍스처는 항상 0번 인덱스로 사용
                 int baseTex = cfg.frameTexIDs[0];
 
                 if (!animDict.ContainsKey(baseTex)) animDict.Add(baseTex, cfg);
 
-                // 바닥/천장 초기화 로직도 baseTex로 비교
                 if (baseTex == theme.floorTexIdx)
                 {
                     _floorAnimState = new TileAnimState { isAnimating = true, config = cfg, currentFrame = 0, timer = UnityEngine.Random.Range(cfg.minInterval, cfg.maxInterval) };
@@ -1993,7 +1841,6 @@ namespace Controller
                     _ceilAnimState = new TileAnimState { isAnimating = true, config = cfg, currentFrame = 0, timer = UnityEngine.Random.Range(cfg.minInterval, cfg.maxInterval) };
                 }
             }
-                
 
             if (animDict.Count == 0) return;
 
@@ -2027,13 +1874,11 @@ namespace Controller
             float dt = Time.deltaTime;
             bool globalTexChanged = false;
 
-            // 전역 바닥 애니메이션 업데이트
             if (_floorAnimState != null && _floorAnimState.isAnimating)
             {
                 _floorAnimState.timer -= dt;
                 if (_floorAnimState.timer <= 0)
                 {
-                    // 프레임 1 증가, 배열 길이를 넘어가면 0으로 순환
                     _floorAnimState.currentFrame = (_floorAnimState.currentFrame + 1) % _floorAnimState.config.frameTexIDs.Length;
                     _floorAnimState.timer = UnityEngine.Random.Range(_floorAnimState.config.minInterval, _floorAnimState.config.maxInterval);
                     _currentFloorTexIdx = _floorAnimState.config.frameTexIDs[_floorAnimState.currentFrame];
@@ -2041,7 +1886,6 @@ namespace Controller
                 }
             }
 
-            // 전역 천장 애니메이션 업데이트
             if (_ceilAnimState != null && _ceilAnimState.isAnimating)
             {
                 _ceilAnimState.timer -= dt;
@@ -2054,7 +1898,6 @@ namespace Controller
                 }
             }
 
-            // 텍스처 스왑이 일어났다면 렌더러에 즉시 반영
             if (globalTexChanged)
             {
                 _renderer.UpdateFloorCeilingTex(_currentFloorTexIdx, _currentCeilTexIdx);
@@ -2072,7 +1915,6 @@ namespace Controller
                         st.timer -= dt;
                         if (st.timer <= 0)
                         {
-                            // 프레임 순환
                             st.currentFrame = (st.currentFrame + 1) % st.config.frameTexIDs.Length;
                             st.timer = UnityEngine.Random.Range(st.config.minInterval, st.config.maxInterval);
                         }
@@ -2089,13 +1931,11 @@ namespace Controller
             float radius = 0f;
             _renderer.SetScanState(true, 0f);
 
-            // 속도 기반으로 도달 시간 계산
             float expandTime = renderSettings.maxScanDistance / renderSettings.scanSpeed;
             float returnTime = renderSettings.maxScanDistance / (renderSettings.scanSpeed * renderSettings.returnSpeedMultiplier);
 
             Sequence seq = DOTween.Sequence();
             
-            // 스캔 퍼짐
             seq.Append(DOTween.To(() => radius, x => { 
                 radius = x; 
                 _renderer.SetScanState(true, radius); 
@@ -2103,7 +1943,6 @@ namespace Controller
             
             seq.AppendInterval(renderSettings.scanWaitTime);
             
-            // 돌아옴
             seq.Append(DOTween.To(() => radius, x => { 
                 radius = x; 
                 _renderer.SetScanState(true, radius); 
@@ -2124,12 +1963,10 @@ namespace Controller
             backgroundImage.uvRect = uv;
         }
 
-        // 맵 데이터에 배치된 고정 오브젝트들을 씬에 스폰
         private void SpawnStaticObjects(DungeonTheme theme)
         {
             _staticObjects.Clear();
 
-            // 테마에서 오브젝트의 충돌 여부(isObstacle)를 찾기 위한 딕셔너리
             Dictionary<int, bool> objectSolidMap = new Dictionary<int, bool>();
             if (theme.objectSprites != null)
             {
@@ -2146,16 +1983,14 @@ namespace Controller
                     CellData cell = _currentMap.GetCell(x, y);
                     if (cell == null) continue;
 
-                    // 중앙 오브젝트 스폰
                     if (cell.centerObjectID != -1)
                         AddStaticObject(x + 0.5f, y + 0.5f, cell.centerObjectID, objectSolidMap);
 
-                    // 벽면 오브젝트 스폰 (벽 쪽으로 오프셋을 줌)
                     float offset = 0.49f;
-                    if (cell.faceObjectIDs[0] != -1) AddStaticObject(x + 0.5f, y + 0.5f + offset, cell.faceObjectIDs[0], objectSolidMap); // North
-                    if (cell.faceObjectIDs[1] != -1) AddStaticObject(x + 0.5f + offset, y + 0.5f, cell.faceObjectIDs[1], objectSolidMap); // East
-                    if (cell.faceObjectIDs[2] != -1) AddStaticObject(x + 0.5f, y + 0.5f - offset, cell.faceObjectIDs[2], objectSolidMap); // South
-                    if (cell.faceObjectIDs[3] != -1) AddStaticObject(x + 0.5f - offset, y + 0.5f, cell.faceObjectIDs[3], objectSolidMap); // West
+                    if (cell.faceObjectIDs[0] != -1) AddStaticObject(x + 0.5f, y + 0.5f + offset, cell.faceObjectIDs[0], objectSolidMap); 
+                    if (cell.faceObjectIDs[1] != -1) AddStaticObject(x + 0.5f + offset, y + 0.5f, cell.faceObjectIDs[1], objectSolidMap); 
+                    if (cell.faceObjectIDs[2] != -1) AddStaticObject(x + 0.5f, y + 0.5f - offset, cell.faceObjectIDs[2], objectSolidMap); 
+                    if (cell.faceObjectIDs[3] != -1) AddStaticObject(x + 0.5f - offset, y + 0.5f, cell.faceObjectIDs[3], objectSolidMap); 
                 }
             }
         }
@@ -2169,13 +2004,10 @@ namespace Controller
             });
         }
 
-        // 맵의 빈 공간에 적 심볼 생성
         private void SpawnSymbolEnemies(int count)
         {
             int spawned = 0;
             int maxAttempts = count * 50; 
-            
-            // 플레이어로부터 최소 몇 칸 떨어져서 스폰될지 결정
             float safeDistance = 3.0f; 
 
             while(spawned < count && maxAttempts > 0)
@@ -2185,23 +2017,41 @@ namespace Controller
                 int ry = UnityEngine.Random.Range(1, _currentMap.height - 1);
                 
                 CellData cell = _currentMap.GetCell(rx, ry);
-                
-                // 생성하려는 좌표와 현재 플레이어 위치 사이의 거리를 계산
                 float distToPlayer = Vector2.Distance(new Vector2(rx, ry), new Vector2(_player.LogicX, _player.LogicY));
                 
-                // 거리가 safeDistance 이상일 때만 스폰을 허용
                 if (cell != null && !cell.HasWall() && cell.value != -1 && distToPlayer >= safeDistance)
                 {
+                    List<string> generatedGroup = new List<string>();
+                    var candidates = encounterSystem.MonsterCandidate;
+                    if (candidates != null && candidates.Count > 0)
+                    {
+                        int numMonsters = BattleCalculator.DetermineSpawnCount(theme.maxEnemyCount);
+                        for (int i = 0; i < numMonsters; i++)
+                        {
+                            generatedGroup.Add(candidates[UnityEngine.Random.Range(0, candidates.Count)]);
+                        }
+                    }
+
+                    // 가장 레벨이 높은 몬스터를 대표 심볼로 지정
+                    string repMonsterID = GetHighestLevelMonster(generatedGroup);
+                    
+                    int baseTex = 0;
+                    if (!string.IsNullOrEmpty(repMonsterID) && _monsterBaseTexMap.ContainsKey(repMonsterID))
+                    {
+                        baseTex = _monsterBaseTexMap[repMonsterID];
+                    }
+
                     _activeEnemies.Add(new MapEnemy { 
                         x = rx + 0.5f, 
                         y = ry + 0.5f, 
                         targetX = rx + 0.5f, 
                         targetY = ry + 0.5f,
                         direction = UnityEngine.Random.Range(0, 4),
-                        baseTexIdx = 0,
-                        currentTexIdx = 0,
-                        moveInterval = UnityEngine.Random.Range(1.2f, 1.8f) 
-                    }); 
+                        baseTexIdx = baseTex,
+                        currentTexIdx = baseTex,
+                        moveInterval = UnityEngine.Random.Range(1.2f, 1.8f),
+                        encounterGroup = generatedGroup // 💡 결정된 정확한 파티 저장
+                    });
                     spawned++;
                 }
             }
@@ -2210,52 +2060,48 @@ namespace Controller
 
         private void UpdateEnemySprites()
         {
-            float animSpeed = 0.3f; // 1프레임당 지속 시간
             bool needsRenderUpdate = false;
 
             foreach (var enemy in _activeEnemies)
             {
                 if (!enemy.isAlive) continue;
 
-                // 걷기 애니메이션 타이머
                 if (enemy.isMoving)
                 {
+                    // 1칸 이동(1.0f 거리) 시 3프레임 애니메이션을 2회(6번 전환) 반복하도록 속도 계산
+                    // 이동에 걸리는 총 시간 = 1.0f / enemy.moveSpeed
+                    float dynamicAnimSpeed = (1.0f / enemy.moveSpeed) / 6.0f;
+
                     enemy.animTimer += Time.deltaTime;
-                    if (enemy.animTimer >= animSpeed)
+                    if (enemy.animTimer >= dynamicAnimSpeed)
                     {
-                        enemy.animTimer -= animSpeed;
-                        enemy.animFrame = (enemy.animFrame + 1) % 2;
+                        enemy.animTimer -= dynamicAnimSpeed;
+                        enemy.animFrame = (enemy.animFrame + 1) % 3;
                         needsRenderUpdate = true;
                     }
                 }
 
-                // 플레이어가 적을 바라보는 각도 계산
                 float dx = _player.PosX - enemy.x;
                 float dy = _player.PosY - enemy.y;
                 float angleToPlayer = Mathf.Atan2(dy, dx) * Mathf.Rad2Deg;
 
-                // 적이 현재 바라보고 있는 절대 각도 (0:N, 1:E, 2:S, 3:W)
                 float facingAngle = 0f;
-                if (enemy.direction == 0) facingAngle = 90f;  // North
-                if (enemy.direction == 1) facingAngle = 0f;   // East
-                if (enemy.direction == 2) facingAngle = -90f; // South
-                if (enemy.direction == 3) facingAngle = 180f; // West
+                if (enemy.direction == 0) facingAngle = 90f;  
+                if (enemy.direction == 1) facingAngle = 0f;   
+                if (enemy.direction == 2) facingAngle = -90f; 
+                if (enemy.direction == 3) facingAngle = 180f; 
 
-                // 두 각도의 차이를 계산하여 보이는 면 결정
                 float diff = Mathf.DeltaAngle(angleToPlayer, facingAngle);
 
-                int viewSide = 0; // 0: 정면, 1: 뒷면, 2: 우측면, 3: 좌측면
+                int viewSide = 0; 
+                if (diff >= -45f && diff <= 45f) viewSide = 0; 
+                else if (diff > 45f && diff <= 135f) viewSide = 3; 
+                else if (diff < -45f && diff >= -135f) viewSide = 2; 
+                else viewSide = 1; 
 
-                if (diff >= -45f && diff <= 45f) viewSide = 0; // 정면
-                else if (diff > 45f && diff <= 135f) viewSide = 3; // 우측면
-                else if (diff < -45f && diff >= -135f) viewSide = 2; // 좌측면
-                else viewSide = 1; // 뒷면
-
-                // 최종 텍스처 인덱스 도출 (방향 오프셋, 애니메이션 프레임)
-                int offset = (viewSide * 2) + enemy.animFrame;
+                int offset = (viewSide * 3) + enemy.animFrame;
                 int newTexIdx = enemy.baseTexIdx + offset;
 
-                // 텍스처가 바뀌었을 때만 렌더러 갱신 요청
                 if (enemy.currentTexIdx != newTexIdx)
                 {
                     enemy.currentTexIdx = newTexIdx;
@@ -2263,11 +2109,9 @@ namespace Controller
                 }
             }
 
-            // 변경 사항이 생겼을 때만 그래픽 데이터 갱신
             if (needsRenderUpdate) UpdateSpriteData();
         }
 
-        // 몬스터 충돌 시 서로를 바라보는 방향을 바탕으로 선공권을 계산
         private EncounterType DetermineEncounterAdvantage(MapEnemy enemy, bool playerInitiated)
         {
             int px = _player.LogicX;
@@ -2275,28 +2119,24 @@ namespace Controller
             int ex = Mathf.FloorToInt(enemy.x);
             int ey = Mathf.FloorToInt(enemy.y);
 
-            // 서로를 향하는 방향 벡터 도출 (0:N, 1:E, 2:S, 3:W)
             int dirToEnemy = (int)VectorToDirection(new Vector2Int(ex - px, ey - py));
             int dirToPlayer = (int)VectorToDirection(new Vector2Int(px - ex, py - ey));
 
-            // 플레이어는 적을 보고 있는가? / 적은 플레이어를 보고 있는가?
             bool playerFacesEnemy = (_player.DirectionIdx == dirToEnemy);
             bool enemyFacesPlayer = (enemy.direction == dirToPlayer);
 
             if (playerFacesEnemy && enemyFacesPlayer) 
-                return EncounterType.Normal; // 서로 정면 충돌
+                return EncounterType.Normal; 
 
             if (playerFacesEnemy && !enemyFacesPlayer) 
-                return EncounterType.Preemptive; // 플레이어가 적의 옆/뒤를 덮침
+                return EncounterType.Preemptive; 
 
             if (!playerFacesEnemy && enemyFacesPlayer) 
-                return EncounterType.Ambush; // 적이 플레이어의 옆/뒤를 덮침
+                return EncounterType.Ambush; 
 
-            // 둘 다 서로를 안 볼 때 (뒷걸음질로 서로 부딪힌 경우) 먼저 부딪힌 쪽이 유리하게 판정
             return EncounterType.Normal;
         }
 
-        // 몬스터의 이동 처리
         private void ProcessEnemyTurn(MapEnemy enemy)
         {
             int ex = Mathf.FloorToInt(enemy.targetX);
@@ -2307,19 +2147,16 @@ namespace Controller
             float dist = Vector2.Distance(new Vector2(ex, ey), new Vector2(px, py));
             Vector2Int moveDir = Vector2Int.zero;
 
-            // 거리에 따라 추적할지 배회할지 결정
             if (dist <= enemy.aggroRange && dist > 0)
                 moveDir = GetChaseDirection(ex, ey, px, py);
             else
                 moveDir = GetRandomWanderDirection(ex, ey);
 
-            // 이동할 방향이 정해졌다면 목표 좌표 갱신
             if (moveDir != Vector2Int.zero)
             {
                 int nextX = ex + moveDir.x;
                 int nextY = ey + moveDir.y;
 
-                // 몬스터가 플레이어의 자리로 이동하려 한다면 기습 발동
                 if (nextX == px && nextY == py)
                 {
                     enemy.direction = (int)VectorToDirection(moveDir);
@@ -2335,7 +2172,6 @@ namespace Controller
             }
         }
 
-        // 플레이어 쪽으로 다가가는 경로 계산
         private Vector2Int GetChaseDirection(int ex, int ey, int px, int py)
         {
             int dx = px - ex;
@@ -2343,7 +2179,6 @@ namespace Controller
 
             List<Vector2Int> preferredDirs = new List<Vector2Int>();
             
-            // X축 거리와 Y축 거리 중 더 먼 쪽을 먼저 좁히려고 시도
             if (Mathf.Abs(dx) > Mathf.Abs(dy))
             {
                 if (dx != 0) preferredDirs.Add(new Vector2Int((int)Mathf.Sign(dx), 0));
@@ -2359,11 +2194,9 @@ namespace Controller
             {
                 if (CanEnemyMove(ex, ey, dir)) return dir;
             }
-            // 모든 길이 막혔다면 제자리
             return Vector2Int.zero;
         }
 
-        // 4방향 중 무작위 한 곳으로 이동 시도
         private Vector2Int GetRandomWanderDirection(int ex, int ey)
         {
             Vector2Int[] dirs = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
@@ -2377,25 +2210,21 @@ namespace Controller
             return Vector2Int.zero;
         }
 
-        // 몬스터가 해당 칸으로 들어갈 수 있는지 검사
         private bool CanEnemyMove(int ex, int ey, Vector2Int dir)
         {
             int tx = ex + dir.x;
             int ty = ey + dir.y;
 
-            // 맵 범위 체크
             if (tx < 0 || tx >= _currentMap.width || ty < 0 || ty >= _currentMap.height) return false;
 
-            // 방향에 따른 벽면 충돌 체크
             int targetEnterFace = -1;
             int currentExitFace = -1;
 
-            if (dir.x > 0)      { targetEnterFace = 3; currentExitFace = 1; } // East 이동 (내동쪽(1)으로 나가서 상대서쪽(3)으로 진입)
-            else if (dir.x < 0) { targetEnterFace = 1; currentExitFace = 3; } // West 이동
-            else if (dir.y > 0) { targetEnterFace = 2; currentExitFace = 0; } // North 이동
-            else if (dir.y < 0) { targetEnterFace = 0; currentExitFace = 2; } // South 이동
+            if (dir.x > 0)      { targetEnterFace = 3; currentExitFace = 1; } 
+            else if (dir.x < 0) { targetEnterFace = 1; currentExitFace = 3; } 
+            else if (dir.y > 0) { targetEnterFace = 2; currentExitFace = 0; } 
+            else if (dir.y < 0) { targetEnterFace = 0; currentExitFace = 2; } 
 
-            // 현재 칸에서 해당 방향으로 나갈 수 있는지 내벽 검사
             CellData currentCell = _currentMap.GetCell(ex, ey);
             if (currentCell != null && currentCell.HasWall() && currentExitFace != -1)
             {
@@ -2403,21 +2232,17 @@ namespace Controller
                 if (texID != -1) return false;
             }
 
-            // 목표 칸이 void인지 먼저 검사
             CellData targetCell = _currentMap.GetCell(tx, ty);
             if (targetCell == null || targetCell.value == -1) return false;
 
-            // 목표 칸으로 해당 방향을 통해 들어갈 수 있는지 외벽 검사
             if (targetCell.HasWall() && targetEnterFace != -1)
             {
                 int texID = targetCell.wallTextureIDs[targetEnterFace];
                 if (texID != -1) return false;
             }
 
-            // 플레이어 위치일 경우, 겹치기 체크를 무시하고 돌진
             if (tx == _player.LogicX && ty == _player.LogicY) return true;
 
-            // 다른 살아있는 몬스터와 겹치기 방지
             foreach (var other in _activeEnemies)
             {
                 if (other.isAlive && Mathf.FloorToInt(other.targetX) == tx && Mathf.FloorToInt(other.targetY) == ty)
@@ -2427,22 +2252,18 @@ namespace Controller
             return true;
         }
 
-        // 몬스터 자동 리스폰 로직
         private void UpdateEnemySpawner()
         {
-            // 스폰 딜레이가 0 이하거나, 이미 최대치만큼 적이 있다면 타이머 정지
             if (_spawnDelay <= 0f || _activeEnemies.Count >= _maxSpawnCount)
             {
                 _currentSpawnTimer = 0f;
                 return;
             }
 
-            // 플레이어가 이동/탐험 중일 때만 시간이 흐름
             if (!_inputLocked)
             {
                 _currentSpawnTimer += Time.deltaTime;
                 
-                // 설정된 딜레이 시간이 지나면
                 if (_currentSpawnTimer >= _spawnDelay)
                 {
                     _currentSpawnTimer -= _spawnDelay;
@@ -2453,7 +2274,6 @@ namespace Controller
 
         private void UpdateEnemyAI()
         {
-            // 플레이어가 대화 중이거나 이동 중이거나 시스템 메시지 패널이 켜있을 때는 적들이 움직이지 않고 대기
             if (_inputLocked || _player.IsMoving || (systemMessagePanel != null && systemMessagePanel.activeSelf)) 
             {
                 return;
@@ -2465,7 +2285,6 @@ namespace Controller
             {
                 if (!enemy.isAlive) continue;
 
-                // 부드러운 이동
                 if (Mathf.Abs(enemy.x - enemy.targetX) > 0.01f || Mathf.Abs(enemy.y - enemy.targetY) > 0.01f)
                 {
                     enemy.x = Mathf.MoveTowards(enemy.x, enemy.targetX, enemy.moveSpeed * dt);
@@ -2477,14 +2296,12 @@ namespace Controller
                     enemy.x = enemy.targetX;
                     enemy.y = enemy.targetY;
                     enemy.isMoving = false;
-                    enemy.animFrame = 0; // 멈추면 대기 자세
+                    enemy.animFrame = 1; // 정지 이미지
                 }
 
-                // AI 행동 쿨타임 계산
                 enemy.moveTimer -= dt;
                 if (enemy.moveTimer <= 0f)
                 {
-                    // 타이머 리셋. 약간의 랜덤 엇박자를 주어 로봇처럼 동시에 움직이지 않게 함
                     enemy.moveTimer = enemy.moveInterval + UnityEngine.Random.Range(-0.2f, 0.2f);
                     ProcessEnemyTurn(enemy);
                 }
@@ -2515,13 +2332,12 @@ namespace Controller
                     spriteList.Add(new SpriteInfo { 
                         x = obj.x, 
                         y = obj.y, 
-                        texIdx = obj.texIdx, // DungeonTheme의 ObjectSpriteData.objectID와 일치
+                        texIdx = obj.texIdx, 
                         isEnemy = false
                     });
                 }
             }
 
-            // 통합된 리스트를 렌더러에 전달
             _renderer.UpdateSprites(spriteList.ToArray());
         }
 
@@ -2530,7 +2346,6 @@ namespace Controller
             _canRender = (newState == GameState.Exploration);
             if (!_canRender)
             {
-                // 탐험 상태가 아니면 텍스트를 숨김
                 HideSystemMessage();
                 HideRoomName();
                 return;
@@ -2538,12 +2353,9 @@ namespace Controller
             
             ManagerRoot.Sound.PlayBGM(ManagerRoot.Dungeon.GetDungeonTheme(_currentMap.themeName).bgmID);
             RefreshAppVisible();
-
-            // 탐험 상태로 돌아왔을 때 정면 체크 
             CheckFrontForShop();
         }
 
-        // 전투 돌입 시 호출하여 현재 던전 뷰를 캡처
         public Sprite CaptureCurrentDungeonView()
         {
             if (screenImage == null || screenImage.material == null || screenImage.material.mainTexture == null) return null;
@@ -2561,8 +2373,56 @@ namespace Controller
                 return null;
             }
 
-            // 복사된 텍스처를 Sprite로 변환하여 반환 (Pivot은 정중앙)
             return Sprite.Create(capturedTex, new Rect(0, 0, capturedTex.width, capturedTex.height), new Vector2(0.5f, 0.5f));
+        }
+
+        // 3프레임 이미지를 리스트에 합쳐줌
+        private void AddSpriteFrames(List<Sprite> list, Sprite[] frames)
+        {
+            // 방향당 3프레임 기준으로 리스트에 추가
+            if (frames != null && frames.Length > 0)
+            {
+                list.Add(frames[0]); // 1번 프레임
+                list.Add(frames.Length > 1 ? frames[1] : frames[0]); // 2번 프레임 (없으면 1번 복사)
+                list.Add(frames.Length > 2 ? frames[2] : (frames.Length > 1 ? frames[1] : frames[0])); // 3번 프레임 (없으면 이전 프레임 복사)
+            }
+            else
+            {
+                // 이미지가 아예 없을 경우 빈 공간 3개 추가
+                list.Add(null);
+                list.Add(null);
+                list.Add(null);
+            }
+        }
+
+        // 스폰된 그룹 중 가장 레벨이 높은 몬스터의 ID를 반환 (동률 시 랜덤)
+        private string GetHighestLevelMonster(List<string> group)
+        {
+            if (group == null || group.Count == 0) return null;
+
+            int highestLevel = -1;
+            List<string> candidates = new List<string>();
+
+            foreach (string id in group)
+            {
+                var entry = ManagerRoot.Database.monsterDB.GetEntry(id);
+                if (entry != null)
+                {
+                    if (entry.stats.level > highestLevel)
+                    {
+                        highestLevel = entry.stats.level;
+                        candidates.Clear();
+                        candidates.Add(id);
+                    }
+                    else if (entry.stats.level == highestLevel)
+                    {
+                        candidates.Add(id); 
+                    }
+                }
+            }
+
+            if (candidates.Count > 0) return candidates[UnityEngine.Random.Range(0, candidates.Count)];
+            return group[0];
         }
     }
 }

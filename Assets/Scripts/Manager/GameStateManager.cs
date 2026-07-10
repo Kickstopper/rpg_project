@@ -151,7 +151,6 @@ namespace Manager
             
             if (currentBattleManager != null)
             {
-                // BattleManager의 Initialize에도 capturedBg를 넘겨주도록 수정해야 합니다.
                 currentBattleManager.Initialize(monsterIds, fogColor, encType, capturedBg);
                 ChangeState(GameState.Battle);
             }

@@ -35,10 +35,12 @@ namespace UI.DungeonMapScene
         private int _lastDangerLevel = -1;
         public List<string> MonsterCandidate => monsters;
         private List<string> monsters;
+        private int maxEnemyCount = 6;
 
-        public void Initialize(List<string> monsterCandidate, EncounterMode mode = EncounterMode.Random)
+        public void Initialize(List<string> monsterCandidate, int maxEnemyCount = 6, EncounterMode mode = EncounterMode.Random)
         {
             monsters = monsterCandidate;
+            this.maxEnemyCount = maxEnemyCount;
             currentMode = mode;
 
             if (currentMode == EncounterMode.Random)
@@ -132,7 +134,17 @@ namespace UI.DungeonMapScene
             if (ManagerRoot.GameState && ManagerRoot.GameState.CurrentState != GameState.Battle &&
                 monsters != null && monsters.Count > 0)
             {
-                ManagerRoot.GameState.StartEncounter(monsters, Color.white);
+                // 전투 시스템에 후보군을 넘기지 않고, 여기서 정확한 출현 파티를 확정
+                int spawnCount = Helper.BattleCalculator.DetermineSpawnCount(maxEnemyCount);
+                List<string> monsterGroup = new List<string>();
+                
+                for (int i = 0; i < spawnCount; i++)
+                {
+                    monsterGroup.Add(monsters[Random.Range(0, monsters.Count)]);
+                }
+
+                // 확정된 몬스터 그룹을 전달
+                ManagerRoot.GameState.StartEncounter(monsterGroup, Color.white);
             }
             ResetSteps();
         }

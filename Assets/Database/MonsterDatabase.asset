@@ -26,6 +26,22 @@ MonoBehaviour:
     - {fileID: 21300000, guid: d116d6dabb0351141803fbdfa7691243, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: ba70daad4bf45ea46830d37f7b264630, type: 3}
+    upImgs:
+    - {fileID: 21300000, guid: 9f52319be3fdbe849a1d2edb7004c9ae, type: 3}
+    - {fileID: 21300000, guid: bc07f92dac8c0924bb13d80476e7397d, type: 3}
+    - {fileID: 21300000, guid: 2e8d77d0cddcff64ab2fec1a0930d62f, type: 3}
+    downImgs:
+    - {fileID: 21300000, guid: ff2fcae784a9e2f4b81e78e085137c46, type: 3}
+    - {fileID: 21300000, guid: bfd03a494021215439434d71e3bde202, type: 3}
+    - {fileID: 21300000, guid: e935603020d419a48a7ac8a2ed366658, type: 3}
+    leftImgs:
+    - {fileID: 21300000, guid: 1ff584ef51f40d74681865c843fd70d3, type: 3}
+    - {fileID: 21300000, guid: 13e990eaf9a794d46a3e98e9efc76a22, type: 3}
+    - {fileID: 21300000, guid: 96ff3d52fd7667f49b43c7eb9b683a58, type: 3}
+    rightImgs:
+    - {fileID: 21300000, guid: dff3de35f1451ce4095947c089fbaf4e, type: 3}
+    - {fileID: 21300000, guid: 99327e46eb508754fb5267359a8cf9c3, type: 3}
+    - {fileID: 21300000, guid: bb678dc75f598bb48bf577f38da3cbc0, type: 3}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -70,6 +86,22 @@ MonoBehaviour:
     - {fileID: 21300000, guid: b52ad20fa2c9b284eb7284e2f6ce0349, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 5fb3000edbe929247b5b2a19cdb7a60b, type: 3}
+    upImgs:
+    - {fileID: 21300000, guid: bb6f9cf7f15c82349a574c55da07535b, type: 3}
+    - {fileID: 21300000, guid: 5ce4b42bf518d3243a3baa851c6fede8, type: 3}
+    - {fileID: 21300000, guid: 46e0c904da5e3fe459595c6d15babe9b, type: 3}
+    downImgs:
+    - {fileID: 21300000, guid: b3521dd5abdabbb43a83fc713df012ac, type: 3}
+    - {fileID: 21300000, guid: b31ff672132806e4b809029d41204370, type: 3}
+    - {fileID: 21300000, guid: 4670ac6f0776dc3419eea9095c3eb039, type: 3}
+    leftImgs:
+    - {fileID: 21300000, guid: 890d6bdd36a4c8a47a32f3c506cef542, type: 3}
+    - {fileID: 21300000, guid: ae788a3b97667ca4491df683872e66ed, type: 3}
+    - {fileID: 21300000, guid: 626e16f803999f14695ce5a3878d6a08, type: 3}
+    rightImgs:
+    - {fileID: 21300000, guid: 779e369d21f41d44fb8c9f1d7cd684b9, type: 3}
+    - {fileID: 21300000, guid: 23bf5381185431a4bb9167f40fcc57d8, type: 3}
+    - {fileID: 21300000, guid: 69acc534ee7794d4698c6023d3c58216, type: 3}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -114,6 +146,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 3b98769ed484ecb4bb87ab652f9dbe06, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 3bb9fc9776ffcb843b5d1c1f856a23da, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -158,6 +194,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: d64d8900530ac644bbc34519a6bfcc11, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: c62b9e8f911b6ae4fb0943fd621c5708, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -202,6 +242,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: a7c1fee67fe42764db6560dcd20ad86a, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: dafd9dbfa65745b4ab52be17ac0493a8, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -246,6 +290,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 5e62e28fa3dfa12479053699883fc10a, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 122ed4a6d14fb854381d2b8708ff24e7, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -290,6 +338,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: bd8fa4facbf9af149810c8268806fcd8, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 0f44c515eb6dd764e9deb511a1e8c64e, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -334,6 +386,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 8af764ea8a1219e41960b248e2d9060b, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 7e4f1ed5b0776e24ea7055ad714f9042, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -378,6 +434,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 387be4f005e7e374b9fc97615aea5368, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: d5e2291bfef15e442a1697725da0c9a2, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -422,6 +482,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: d0bb8362b31371948bc45f032b0e5952, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 2765f69f3ab7c9d46b180ec766e93a41, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -466,6 +530,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: da8056011e5d3ce45b9928b9676f474f, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: bbaeb39406f4e3c4193c7f11bd32c95e, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -510,6 +578,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: c92c7b45086fc2346a550d45098bf366, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 979390d602ec485418dd71df6f9c80f6, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -554,6 +626,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 6f8e862f72c4bf049802688a995fffca, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: d902bb7441630684989f22a47aeeca08, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -598,6 +674,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: ff93238253109794daa4b7d6f12f8828, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 895c33a33d4cbc142bef203ac44c3885, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -642,6 +722,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 49c4901e52643a548b8a76047d9f1167, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: d1dc144f8761b1748b7704b16d9074fc, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -686,6 +770,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 34700ae79e2a93e4d8c5702d4cdee735, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 41684107ace90ce4eae5dedcf6f88f79, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -730,6 +818,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 31d9ff0749db3ca4e9ed2468e075962e, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 5bb8611d03b3a7e48838099ce87302f9, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -774,6 +866,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: f3354858b4d761a4d911d4ad5480a74c, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 168dc92fc8944b54ab07a9259dbcbed5, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -818,6 +914,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 7dd62b6b074ca5c4d9be282b4a387b3a, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: e38193519438fc94595269bdebd70501, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -862,6 +962,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 9e048949ae44f7242af6c4336f33b021, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: a1d19c3c8ac6aa747a2152aa41aaea1e, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -906,6 +1010,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 349519990aee1b94ca08e6d95936d239, type: 3}
     animInterval: 0.4
     portrait: {fileID: 21300000, guid: e42f415b18f54c34ba5d9eb44ceaf624, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -950,6 +1058,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: cdcd1492e4a82d443b457a1124cd4db2, type: 3}
     animInterval: 0.3
     portrait: {fileID: 21300000, guid: 6a0b31948fecb1249a855f2fd817e1ca, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -994,6 +1106,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 2282bfb3a619a814099d27722eb3335f, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: fe2ad7362e295294396b4fe2fbda1ab4, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1038,6 +1154,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: fdd56920fb8090d4287f6eda3e423f5a, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 9cb4c0e803810b34b9bb57847d2e5310, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1082,6 +1202,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 379a37dcb904f26428e6ba366ad8aeef, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 5cc27117e573a7c47b871c8821bd3710, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1126,6 +1250,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 84c2f6f60f9f0d544a2642544421cd9a, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: c0fdc6fe652088f42a754c28ac07718e, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1170,6 +1298,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 3da45bb2b6827ba459b558f3bbf8bcd5, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 401403ca2042199458929b90eb173d59, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1214,6 +1346,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 3bf5c8847e3a55442a6018c68760bea2, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: b96665f5a8df95044a72a10593cc5b56, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1258,6 +1394,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 66744e96b4bcc2241a3a844d8e7b48a6, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 563395c009afe1f4c8c82e91ac6f5e97, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1302,6 +1442,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 0dd2f2775b6dc0642860861adfaafc57, type: 3}
     animInterval: 0.1
     portrait: {fileID: 21300000, guid: e0f2f7674e2953649a920b296615f28a, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1346,6 +1490,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 202d30eb59d5deb4f9770f966dc5fa46, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 93d38c5c1b7f09540b4143b66a475cc5, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1390,6 +1538,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 91f4df95cc81c41458cbc40cb768c493, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 7db9e2ad26e8dd84a89771574dc51434, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1434,6 +1586,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: b151fa17bb8b90f408f08bfa7da150b7, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: d3d86ad2073684c4a948fd9077ef5747, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1481,6 +1637,10 @@ MonoBehaviour:
     - {fileID: -8069005410065325814, guid: d70179f40a68d1045a27979c6b0182e8, type: 3}
     animInterval: 0.2
     portrait: {fileID: 21300000, guid: ef5aef5b31e701c4190ba8ce444090ec, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1525,6 +1685,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 744050e23e7d42e49adc4b6ce22b428c, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: f63266a77fd2f0740af1a8e34dc38c6b, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1569,6 +1733,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: b49e2efcaff42a945b6b9034e525cd2b, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 74b7c959e1f8a5741b859235582444bd, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1613,6 +1781,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: e251220bfd5bdb54d982d5789aa80eb2, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 197d3f3ca51eac94da44538e0eaee8c5, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1657,6 +1829,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 0d08cb3a9af2b274aaec67b228e5a8dd, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: f1d990255c54e0c48877727edb135a2a, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1701,6 +1877,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: a0f7fb9c1b91d2e42a71ecfdbd5c38cf, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: b0e778cdbe623524e9b69ac56dd13c81, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1745,6 +1925,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 00094edfdb5409647baded27c90c8e06, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: f7121e9ea57232d4abccefef7ea1a684, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1789,6 +1973,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: b5e3fffb25fad2147b0c75ff68878285, type: 3}
     animInterval: 0.6
     portrait: {fileID: 21300000, guid: 386ae30f218559441afde19c66bd3ef2, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1833,6 +2021,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 3bf9bc08f178b76449fca47c2a271dd8, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: f100f4dd68be29b4297ddd0564fca39a, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1877,6 +2069,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 21f517858beefb341ad1c55721ae6f24, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: d8439fde3a02a5047903919c17a95446, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1921,6 +2117,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 770b7241375ccd745a3334c5655b6228, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 0d9e57eb7c0fea244a04f63f1dcb8798, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -1965,6 +2165,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: c87d21df704d8f7438f56f226358b5c4, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 640502a77d189434da254f2b2982b1ff, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2009,6 +2213,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 1518952ce60a17242a6f86ac56b618d8, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 7017a10c2d0a74145a2e1110f8d01bf6, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2053,6 +2261,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 46738ad3a89712c4e9d92f52a3ef32e1, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 5539aece0c6709b479451c727dd0d9ba, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2097,6 +2309,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 57ede66f5e825e94a98bee760f59516d, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: a4b42a28fdcd96d4b9918142f4d2248a, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2141,6 +2357,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 3d670677626d52d4c90dc305067f0d40, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 291e7a57b21d1654d9feea0e2bf79fbd, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2185,6 +2405,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 4d39ee549abb8414c84c7287a048202a, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 2bfa483cfd7dd1148a48e4ea852d9c32, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2229,6 +2453,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 2ac61491afe37a846880ea85f9c9c83c, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: a09f182f20667e5439a23682084ccb86, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2273,6 +2501,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 5e602c2ca8e64c843b9950e3665d7722, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 883427eb0c0508c4d9c5d3130c46d858, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2317,6 +2549,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 4a2e68e988336764c966111b316db0cf, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: b85ef64d533cd6b41aac5b5471489f7d, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2361,6 +2597,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: b9bb61eb4c4a5b44fa0c6ee28dea50ea, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 1c5d1db9815ed864e81fd6e4ddedd3f6, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2405,6 +2645,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 401be406f41782c4299ddfe95f3ff929, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: fdcd85ee8093c71499d28547a22b34ee, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2449,6 +2693,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 7fa8423b0fd000647bf0542760dd2d4d, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 9854cad3db1d8e64495fa73a44c5bad1, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2493,6 +2741,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: c7dd30c501f919a4f9724cb27360289c, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 4bf3a58c465e6db459fb612d60be444a, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2537,6 +2789,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: b2ed450e1b58d1b46b9d2c666c501153, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: fe5598c40cf709f478adce963f55f151, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2581,6 +2837,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 2ad75df192daacd488a3af8fbf9ea070, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 0bcad9ddfd263b34a892f7525ec08832, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2625,6 +2885,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: c49df7d0a07fdd3438cbc982412135dc, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 35a54bbcec77a0b4d80a9497139564cb, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2669,6 +2933,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 542fc9b7efd2f954985742e179bb7f1c, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 0ec481d6a5acc434897376985e1f68a7, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2713,6 +2981,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 431b26c43b0a68f489343801f51034d0, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 32c2538cb49a7184880b99d23a08aa2a, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2757,6 +3029,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 5919f9c43146101479012185c1bb860a, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: bf2883976a5148945b66a3ad31b2e633, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2801,6 +3077,10 @@ MonoBehaviour:
     - {fileID: 1750390061035014481, guid: 7b3b145e6638ed3438be0cecb1a81403, type: 3}
     animInterval: 0.5
     portrait: {fileID: -3915644702571324760, guid: da13c585de320734e96684b1961b001b, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2845,6 +3125,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: f82e2d08832228d4cbc3caa7841aa255, type: 3}
     animInterval: 0.1
     portrait: {fileID: 21300000, guid: b3cbf0db1456eae46b367f755a99e751, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2889,6 +3173,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: e8eb9a047dc953d478603b90a97cec55, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 5f60da9d929bd7e4c9af911f8de439c9, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2933,6 +3221,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 3672674c867baa24ba5529fd353dd388, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: f871065de651e0441b838a47829f99c1, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -2977,6 +3269,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 6355fb876b390e24ba9ac07589d6dc4e, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 3399b8a70a155c846b62988f7ae98855, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3021,6 +3317,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 66f86d07223dd84448dd069256b095ae, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: d0def003afa54da49a8db131048d9d2c, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3065,6 +3365,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: d114cd3521779fa4c8962648a68c9e6b, type: 3}
     animInterval: 0.1
     portrait: {fileID: 21300000, guid: 86c305fa8c0e9184784b420946d90141, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3109,6 +3413,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: fd6fd043e07140942b241ce374e6b42c, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 0660ba9881f04f1419d98e1698f3dcd7, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3153,6 +3461,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 79e5a3dcb156a4c4cadf8545d183db49, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: d50ef2937def14c438e3eecb849858de, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3197,6 +3509,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: af85c5ceb5035e942ac601f6acfe3577, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: a2dde3365770e1f438a7f95d09d2517f, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3241,6 +3557,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: ce926ba5142327a4ba05d80057ce8395, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: ff3c8c6495eef684d82d47d980020616, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3285,6 +3605,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 0b6ba58a18ea06448a00e97969eb8f39, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 6014e0ade23f885408b3c65cceec35f7, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3329,6 +3653,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: ae5706e87273be643b93694050f527a5, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 3b54a9bb73796874d9058a940845e0e6, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3373,6 +3701,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: d8687c1a18adcfa40885d54791590cb3, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 54766a70610d3d64185359c927c803ef, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3417,6 +3749,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 15a79737c71c3d745bb21ea624833c06, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 292ca403dabbae24c8e8842262887abc, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3461,6 +3797,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 5268fafb547b11b488823d7c2c1eccfc, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 16146f97043974f4b86a32bad8bc7d21, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3505,6 +3845,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 2115ec65407e4fb4890936358cc64784, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 26d271487d6e0874b96d6040650bd5d0, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3549,6 +3893,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 94524b3aba458364898a755eafe46de0, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 7db76e8c520c5f04f82f8c6c6a4cf8e7, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3593,6 +3941,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 829b94572d619874ca4f278d9e540d7d, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 9974a13227d5132428371616cc1051e0, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3637,6 +3989,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: c01fbb729ead47f4190fddd6181d2c4d, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: fe201ac0ebecf1b4186b79423758e1fa, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3681,6 +4037,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 3e2a6b42d6549c64da545cb9308f462c, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 34aed709f6dac8f44ac71b2f4b803c5d, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3725,6 +4085,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 8f396c33d8cab51499d3eca29366d9da, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 96a12a5d29092f04784d28e7e5ade836, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3769,6 +4133,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 82e9273d0cc991c4784e23a0c5f36865, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: ad66767da30e1f346a73f1febefbd469, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3813,6 +4181,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 45fb4890cc5244348bf87ec6c42e7774, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 92907eb78078e3f47856d3b9bdce9824, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3857,6 +4229,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: df06c7a3c25eb1f4c822d59f6e934263, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: d0edeb075abd867408246ac72d4649b1, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3901,6 +4277,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 47b45badc4a32e846942c0a6c9e62051, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: ffa2a62ce15957e479d5da90933fa698, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3945,6 +4325,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: bbd80b367ceae404e9d7be65b8d1df20, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 34a7a9664965e604da565462eb9c1966, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -3989,6 +4373,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 48b87af41f101bd49929d8f050afa137, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 1d0bebe075871294289c59e205f755e7, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4033,6 +4421,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 259e6984bb3c9f94e9c85c30d59f30f1, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 660bb63b2efbf684a9e6f7de80f0c8d2, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4077,6 +4469,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: fcae5e7102237be43b8e4904a05985e1, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 91c0bd49dd634f2408d854aeeaa453fe, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4121,6 +4517,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 47ece3daa9e9a704d8e4e7ddf1f2a447, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: dc2274c923f46a14383e111b10289f3e, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4165,6 +4565,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: e1fe9329a5c024c4faf1bc7216ba6229, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 15ccfa3a6015ebd4faa841b42c724003, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4209,6 +4613,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 780c0a1a8d117734ca209e1b6ff48d2a, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 9780c47c27d0d9341bf8240eb80fafcd, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4253,6 +4661,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 69e86954b3592e540a987210001cdea6, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 00f433749e15ba2499fa23346601b7f4, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4297,6 +4709,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 57102d929dd1c5740aaec360e918a1a4, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 02669b0480ada7f478d30ca335877dbd, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4341,6 +4757,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 047469c008998ab4b912c6fe363d59f3, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 63b0e90e57e624f4abd372b184ac2b3f, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4385,6 +4805,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: ceccc185022265d48908dab0fedd5c5a, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 26b1c4f76849e454698bd6f22460cd1b, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4429,6 +4853,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 9a6000654279fd441b5893166fd7ae1e, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: fd89c2c77c8453749a5fabe60ee57ae5, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4473,6 +4901,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 684897e46378f6e40bb553ac0f7f0cbc, type: 3}
     animInterval: 0.05
     portrait: {fileID: 21300000, guid: 87ff0755b65ae0247b571a35c3752f1a, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4517,6 +4949,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: e371a327348e3af42829857cc2d03ddd, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 1d45df13f021a364eb0ac038be3771b0, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4561,6 +4997,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 949698667a609424e8d03f0d052f4f6d, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 393c3f2ca06cd6543809306a285c6d0f, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4605,6 +5045,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 7a0ac165793661a4685e1f7c3ab3b97e, type: 3}
     animInterval: 0.05
     portrait: {fileID: 21300000, guid: 4b1e7651d2956c04e99211946179e870, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4649,6 +5093,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 13e958a9d86258b4f9ed3a528d4832c9, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 2bc550416202ed447b66d3022c2fe71f, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4693,6 +5141,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 8c15dda534b648c4a9a99930bdbf0da5, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 3c489e5d9a2a23a4197719523b6f5d76, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4737,6 +5189,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: db463cf06de271f4cb73994d6b0b215f, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: b4aa5fdce93453d4591ce2c33cfab96b, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4781,6 +5237,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: a95de4292e25f0944acba37de202b814, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 37afb142c17d39e47aca21149a639304, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4825,6 +5285,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: bc8b10f0d0d493b45b11e8d413c12edf, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: af6bf3f69b9bc194aa2d4801004dcdcc, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4869,6 +5333,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 29f1a47b82793d245a5bda41121e6680, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 783b9b5dbf7dd184fb0559b6e85c5aa1, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4913,6 +5381,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 4b3be45026816f341bd90aa6783958fa, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 27a39b46f617d194087842dbc54c0168, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -4957,6 +5429,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: eccf5943b9aea044cb0e0677cf660529, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: a432534ca45bb714c92b41bac9b69712, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -5001,6 +5477,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 858353e629650304bb72afe563aff1a5, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 116227473791b4c44bdf29898de8dcfc, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -5045,6 +5525,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: f4c362ad9f027f448a1a95926b490a1c, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 8d8b775fd7ba152419c34f7f515b8430, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -5089,6 +5573,10 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 8d73f8d1a1222d547bbf3949c8f2fc8e, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 9ff64bc7ec3b6754988de01c3c324c97, type: 3}
+    upImgs: []
+    downImgs: []
+    leftImgs: []
+    rightImgs: []
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []

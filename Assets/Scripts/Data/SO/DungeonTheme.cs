@@ -37,8 +37,12 @@ namespace Data
         [Header("Entry Effect")]
         public bool useWakeUpEffect = false;
 
-        [Header("Battle Encounter Mode")]
+        [Header("Battle Settings")]
+        public List<string> monsterList;     // 출현하는 몬스터의 ID 목록
+        public int maxEnemyCount = 2;        // 매 전투에 출현하는 적의 최대 수
         public EncounterMode encounterMode = EncounterMode.Symbol;
+        public int maxSpawnCount = 3;        // 심볼 인카운터 최대 스폰 수
+        public int spawnDelay = 5;           // 심볼 인카운터 스폰 간격
         
         public Texture2D background; // 던전 아래에 깔릴 스카이박스
         public Texture2D[] texture;
@@ -56,11 +60,7 @@ namespace Data
         [Header("Animations")]
         public List<WallAnimConfig> wallAnimations; // 테마별 애니메이션 설정
         
-        public Sprite[] enemySprites;
         public ObjectSpriteData[] objectSprites;
-
-        public int maxSpawnCount = 3;
-        public int spawnDelay = 5;
 
         [Header("Environment Options")]
         public Color fogColor = Color.black; // 심도 표현을 위한 안개의 색
@@ -68,7 +68,6 @@ namespace Data
         public bool useGridLighting = true;
         public BgmID bgmID;                  // 이 레벨에서 재생될 BGM
         public bool moduleEnable = true;     // 모듈을 사용할 수 있는지 여부
-        public List<string> monsterList;     // 출현하는 몬스터의 ID 목록
 
         [Header("Dust Effect")]
         public bool useDustEffect = false;
