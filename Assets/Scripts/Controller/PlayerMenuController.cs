@@ -46,7 +46,7 @@ namespace Controller
         public Transform[] partySlots; // 6개의 슬롯 (0~5)
         private PlayerController[] spawnedControllers = new PlayerController[6];
         private int currentPartySelectIndex = 0;
-        public Color charHighlightColor = Color.yellow; // 선택 시 하이라이트 색상
+        public Color charHighlightColor = Color.gold; // 선택 시 하이라이트 색상
 
         // 입력을 처리할 수 있는 상태인지 확인하는 프로퍼티. 시간 조건과 프레임 조건을 모두 만족해야 입력 가능
         public bool CanProcessInput => (Time.unscaledTime >= lastInputTime + inputDelay) && (Time.frameCount > lastInputFrame);

@@ -306,7 +306,7 @@ namespace Controller
             while (true)
             {
                 float time = Mathf.PingPong(Time.time * 5f, 1f); 
-                highlightImage.color = Color.Lerp(Color.clear, Color.yellow, time);
+                highlightImage.color = Color.Lerp(Color.clear, Color.gold, time);
                 yield return null;
             }
         }

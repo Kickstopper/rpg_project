@@ -216,8 +216,8 @@ namespace UI.Battle
         {
             currentSection = section;
             // 랜덤 영역이거나 스탯 영역일 때 STATS 타이틀 노란색 유지
-            if (statText != null) statText.color = (section == FocusSection.Stat || section == FocusSection.RandomStats) ? Color.yellow : Color.white;
-            if (skillText != null) skillText.color = (section == FocusSection.Skill) ? Color.yellow : Color.white;
+            if (statText != null) statText.color = (section == FocusSection.Stat || section == FocusSection.RandomStats) ? Color.gold : Color.white;
+            if (skillText != null) skillText.color = (section == FocusSection.Skill) ? Color.gold : Color.white;
 
             CanvasGroup skillGroup = skillContent.GetComponent<CanvasGroup>();
             if (skillGroup == null) skillGroup = skillContent.gameObject.AddComponent<CanvasGroup>();

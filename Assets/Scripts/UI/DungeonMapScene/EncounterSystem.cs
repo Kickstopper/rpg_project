@@ -24,7 +24,7 @@ namespace UI.DungeonMapScene
         
         [Header("Colors")]
         public Color32 safeColor = Color.green;
-        public Color32 warningColor = Color.yellow;
+        public Color32 warningColor = Color.gold;
         public Color32 dangerColor = Color.red;
 
         private int _stepsUntilNextBattle;

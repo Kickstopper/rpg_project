@@ -46,7 +46,7 @@ namespace UI
 
             // 하이라이트 시 텍스트 색상 변경 (예: 노란색)
             if (Data != null)
-                nameText.color = isHighlighted ? Color.yellow : Color.white;
+                nameText.color = isHighlighted ? Color.gold : Color.white;
         }
 
         // 마우스를 올렸을 때 하이라이트 이동

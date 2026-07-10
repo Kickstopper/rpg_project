@@ -12,7 +12,7 @@ namespace UI
 
         [Header("Color Settings")]
         public Color normalColor = Color.white;   // 평상시 색상
-        public Color selectedColor = Color.yellow; // 포커스 됐을 때 색상
+        public Color selectedColor = Color.gold; // 포커스 됐을 때 색상
 
         private Button button;
 

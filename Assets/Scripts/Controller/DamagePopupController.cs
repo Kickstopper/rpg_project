@@ -14,7 +14,7 @@ namespace Controller
 
         // 색상 설정 (기존 동일)
         public Color normalColor = Color.white;
-        public Color criticalColor = Color.yellow;
+        public Color criticalColor = Color.gold;
         public Color healColor = Color.green;
         public Color missColor = Color.gray;
 

@@ -27,7 +27,7 @@ namespace Controller
         private PlayerController[] partyControllers = new PlayerController[6];
 
         [Header("Highlight Colors")]
-        public Color targetHighlightColor = Color.yellow; 
+        public Color targetHighlightColor = Color.gold; 
         public Color disabledTextColor = Color.gray;   
         public Color enabledTextColor = Color.white;   
 

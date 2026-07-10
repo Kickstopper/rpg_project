@@ -33,7 +33,7 @@ namespace Controller
 
         [Header("Highlight Colors")]
         public Color casterHighlightColor = new Color(0.5f, 0.5f, 1f, 1f); 
-        public Color targetHighlightColor = Color.yellow;
+        public Color targetHighlightColor = Color.gold;
         public Color disabledTextColor = Color.gray;
         public Color enabledTextColor = Color.white;
 
