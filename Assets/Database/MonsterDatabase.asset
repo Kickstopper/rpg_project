@@ -1047,7 +1047,7 @@ MonoBehaviour:
     compileAscii: {fileID: 4900000, guid: 60f626e6dadf6604e8e726c57defcf7d, type: 3}
     image:
     - {fileID: 21300000, guid: 90de2290ca3695c4b8407c78f8b4bb21, type: 3}
-    - {fileID: 21300000, guid: 31d9ff0749db3ca4e9ed2468e075962e, type: 3}
+    - {fileID: 21300000, guid: 88cc7db37211d5e42abc15d19bcf1429, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 5bb8611d03b3a7e48838099ce87302f9, type: 3}
     fallDownImgs:
@@ -2136,7 +2136,7 @@ MonoBehaviour:
     image:
     - {fileID: 21300000, guid: 21f0de328186cd34b824c591ced8ffb1, type: 3}
     - {fileID: 21300000, guid: b251d145dea1b594fa518f99c0908c0b, type: 3}
-    - {fileID: 354719941803935356, guid: 80bb91cfde247724d8b330a4abc3fe59, type: 3}
+    - {fileID: 0}
     - {fileID: 2940145623987236097, guid: eeec33801b5bfe94c815dceddaccefac, type: 3}
     - {fileID: -8069005410065325814, guid: d70179f40a68d1045a27979c6b0182e8, type: 3}
     animInterval: 0.2
@@ -4042,10 +4042,10 @@ MonoBehaviour:
     compileResultMsg: HELLO!
     compileAscii: {fileID: 4900000, guid: 70e06fc47c725b84a9d0f03af70a0f5c, type: 3}
     image:
-    - {fileID: 4593729446998044006, guid: b74367dcc53b7e241aaa41c4056afb5c, type: 3}
-    - {fileID: 1750390061035014481, guid: 7b3b145e6638ed3438be0cecb1a81403, type: 3}
+    - {fileID: 21300000, guid: b74367dcc53b7e241aaa41c4056afb5c, type: 3}
+    - {fileID: 21300000, guid: 7b3b145e6638ed3438be0cecb1a81403, type: 3}
     animInterval: 0.5
-    portrait: {fileID: -3915644702571324760, guid: da13c585de320734e96684b1961b001b, type: 3}
+    portrait: {fileID: 21300000, guid: da13c585de320734e96684b1961b001b, type: 3}
     fallDownImgs:
     - {fileID: 1075254558, guid: 10c5ae7fb7210ab46a06eefc56e4537e, type: 3}
     - {fileID: 871300960, guid: 10c5ae7fb7210ab46a06eefc56e4537e, type: 3}
