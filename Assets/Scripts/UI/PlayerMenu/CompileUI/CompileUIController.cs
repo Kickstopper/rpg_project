@@ -15,6 +15,9 @@ namespace Controller
         public GameObject monsterPanelPrefab;
         public Transform monsterGridList;
         public GameObject monsterSelectPanel; // 리스트 화면
+        public SelectedMonsterIndicator firstMonster;
+        public SelectedMonsterIndicator secondMonster;
+        public SelectedMonsterIndicator resultMonster;
         public GameObject compilePanel;       // 연출 화면
         public MonsterCompileManager compileManager;
 
@@ -29,6 +32,22 @@ namespace Controller
 
         public void Initialize(PlayerMenuController controller)
         {
+            // 테스트를 위한 몬스터 추가
+            // var monA = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_001"));
+            // var monB = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_003")); 
+            // var monC = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_006")); 
+            // var monD = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_009")); 
+            // var monE = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_021")); 
+            // var monF = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_025")); 
+            // var monG = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_030")); 
+            // ManagerRoot.Party.AddMember(monA, true);
+            // ManagerRoot.Party.AddMember(monB, true);
+            // ManagerRoot.Party.AddMember(monC, true);
+            // ManagerRoot.Party.AddMember(monD, true);
+            // ManagerRoot.Party.AddMember(monE, true);
+            // ManagerRoot.Party.AddMember(monF, true);
+            // ManagerRoot.Party.AddMember(monG, true);
+
             this.menuController = controller;
 
             GridLayoutGroup gridLayout = monsterGridList.GetComponent<GridLayoutGroup>();
@@ -42,18 +61,20 @@ namespace Controller
                 else
                 {
                     Debug.LogWarning("[CompileUI] GridLayoutGroup의 Constraint가 'Fixed Column Count'가 아닙니다! 상/하 이동이 꼬일 수 있습니다.");
-                    columns = gridLayout.constraintCount > 0 ? gridLayout.constraintCount : 3; // 임시 예외 처리
+                    columns = gridLayout.constraintCount > 0 ? gridLayout.constraintCount : 4; // 임시 예외 처리
                 }
             }
             
             // 패널 및 상태 초기화
             compilePanel.SetActive(false);
             monsterSelectPanel.SetActive(true);
+            
             selectedMonsterIDs.Clear();
             currentFocusedIndex = 0;
             isEmptyState = false;
 
             RefreshMonsterGrid();
+            RefreshSelectedMonsterPanels();
         }
 
         private void RefreshMonsterGrid()
@@ -62,20 +83,6 @@ namespace Controller
             foreach (Transform child in monsterGridList) Destroy(child.gameObject);
             spawnedPanels.Clear();
 
-            // 테스트를 위한 몬스터 추가
-            // var monA = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_000"));
-            // var monB = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_001")); 
-            // var monC = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_002")); 
-            // var monD = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_003")); 
-            // var monE = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_004")); 
-            // var monF = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_005")); 
-            // ManagerRoot.Party.AddMember(monA, true);
-            // ManagerRoot.Party.AddMember(monB, true);
-            // ManagerRoot.Party.AddMember(monC, true);
-            // ManagerRoot.Party.AddMember(monD, true);
-            // ManagerRoot.Party.AddMember(monE, true);
-            // ManagerRoot.Party.AddMember(monF, true);
-            
             // 파티 리스트 불러오기
             var party  = ManagerRoot.Party.partyData;
             // "enemy_"로 시작하는 몬스터만 필터링하여 새 리스트 생성
@@ -215,6 +222,7 @@ namespace Controller
                 selectedMonsterIDs.Add(monsterID);
                 UpdateHighlight();
                 ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
+                RefreshSelectedMonsterPanels();
 
                 // 2마리가 모두 선택된 순간, 합체 결과를 미리 예측하여 중복 검사를 수행
                 if (selectedMonsterIDs.Count == 2)
@@ -227,6 +235,7 @@ namespace Controller
 
                     if (resultEntry != null)
                     {
+                        resultMonster.SetUI(new RuntimeCharacterData(MonsterConversionHelper.ToCharacterEntry(resultEntry)));
                         // partyData에 동일한 ID를 가진 몬스터가 존재하는지 검사
                         bool isAlreadyInParty  = ManagerRoot.Party.partyData.Exists(m => 
                             m != null && m.characterId == resultEntry.id);
@@ -247,7 +256,22 @@ namespace Controller
                 }
             }
         }
-
+        
+        private void RefreshSelectedMonsterPanels()
+        {
+            firstMonster.ResetUI();
+            secondMonster.ResetUI();
+            resultMonster.ResetUI();
+            if (selectedMonsterIDs.Count > 0)
+            {
+                for(var i =0; i <selectedMonsterIDs.Count; i++)
+                {
+                    RuntimeCharacterData data = ManagerRoot.Party.GetCharacterByID(selectedMonsterIDs[i]);
+                    if (i == 0) firstMonster.SetUI(data);
+                    if (i == 1) secondMonster.SetUI(data);
+                }
+            }
+        }
         private void UpdateHighlight()
         {
             EventSystem.current.SetSelectedGameObject(null); 
@@ -275,7 +299,8 @@ namespace Controller
                 monsterSelectPanel.SetActive(true);
                 selectedMonsterIDs.Clear();
                 RefreshMonsterGrid(); 
-                
+                RefreshSelectedMonsterPanels();
+
                 // 컷신 연출이 완전히 끝났을 때 입력을 다시 풀어줌
                 menuController.isInputLocked = false;
                 
@@ -293,6 +318,7 @@ namespace Controller
             {
                 selectedMonsterIDs.Clear();
                 UpdateHighlight(); // 하이라이트를 모두 기본색으로 되돌림.
+                RefreshSelectedMonsterPanels();
             }
         }
     }
