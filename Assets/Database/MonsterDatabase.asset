@@ -1263,7 +1263,7 @@ MonoBehaviour:
     - item_003
   - isBoss: 0
     id: enemy_019
-    name: "\uC704\uC800\uB4DC"
+    name: "\uC717\uCE58"
     race: 2
     align: 6
     gender: 1
@@ -3655,11 +3655,26 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 7fa8423b0fd000647bf0542760dd2d4d, type: 3}
     animInterval: 0.5
     portrait: {fileID: 21300000, guid: 9854cad3db1d8e64495fa73a44c5bad1, type: 3}
-    fallDownImgs: []
-    downImgs: []
-    leftImgs: []
-    rightImgs: []
-    upImgs: []
+    fallDownImgs:
+    - {fileID: 1516425622, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: -1458431958, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: 478151720, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    downImgs:
+    - {fileID: 1687366706, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: 71552565, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: 1283676272, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    leftImgs:
+    - {fileID: -1444706448, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: -651293146, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: -1698506112, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    rightImgs:
+    - {fileID: 683745521, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: 1483086378, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: 898929635, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    upImgs:
+    - {fileID: -6289117, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: -315023055, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
+    - {fileID: 918826322, guid: e06b9ea103bc39f44a65906431366f49, type: 3}
     basicAttackVfxId: 0
     aiProfile: {fileID: 11400000, guid: 5236657b57b6f774baf4ad682873c94a, type: 2}
     skills: []
@@ -6015,9 +6030,9 @@ MonoBehaviour:
       \uAC10\uB2F9\uD560 \uC900\uBE44\uB294 \uB418\uC5C8\uACA0\uC9C0."
     compileAscii: {fileID: 4900000, guid: aa356eb8bda4d414eb6896b822e7afce, type: 3}
     image:
+    - {fileID: 21300000, guid: 5ef8fb76f8ccd974c8451069912dc7bc, type: 3}
     - {fileID: 21300000, guid: 5e6a7359bef78274db8382a83b649bbb, type: 3}
-    - {fileID: 21300000, guid: 259e6984bb3c9f94e9c85c30d59f30f1, type: 3}
-    animInterval: 0.5
+    animInterval: 0.05
     portrait: {fileID: 21300000, guid: 660bb63b2efbf684a9e6f7de80f0c8d2, type: 3}
     fallDownImgs:
     - {fileID: 1912375146, guid: aad4408f7980cac4194a0f9f5c3ab028, type: 3}
