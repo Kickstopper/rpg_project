@@ -69,6 +69,7 @@ namespace Data
     {
         public string characterId; // DB에서 원본 데이터를 찾기 위한 ID (예: "char_warrior")
         public string name;
+        public string race;
         public string gender;
         public int level;
 

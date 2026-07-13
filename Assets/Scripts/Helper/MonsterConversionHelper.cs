@@ -16,6 +16,7 @@ namespace Helper
             // 기본 식별자 및 정보 매핑
             charEntry.id = monster.id;
             charEntry.name = monster.name;
+            charEntry.race = monster.race;
             charEntry.gender = monster.gender;
             charEntry.align = monster.align;
             

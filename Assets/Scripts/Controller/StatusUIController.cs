@@ -27,11 +27,11 @@ namespace Controller
         public TextMeshProUGUI resistForceText;
         public TextMeshProUGUI resistPsychText;
         
+        public TextMeshProUGUI raceText;
         public TextMeshProUGUI levelText;
         public TextMeshProUGUI expText;
         public TextMeshProUGUI nextExpText;
         public TextMeshProUGUI alignText;
-        public TextMeshProUGUI resonanceText;
 
         [Header("Vitals (Slider + Text)")]
         public Slider hpSlider;
@@ -171,6 +171,7 @@ namespace Controller
 
             // Header Info
             nameText.text = charData.name;
+            raceText.text = charData.race.ToString().ToUpper();
             levelText.text = charData.stats.level.ToString();
             expText.text = charData.currentExp.ToString();
             nextExpText.text = charData.GetRequiredExpForNextLevel().ToString(); 
@@ -203,26 +204,26 @@ namespace Controller
 
             // resonance 및 Skills (ScrollView 갱신)
             List<string> skills = new(charData.learnedSkills);
-            if (!string.IsNullOrEmpty(charData.resonanceId))
-            {
-                ResonanceData resonance = ManagerRoot.Database.GetResonance(charData.resonanceId);
-                if (resonance != null)
-                {
-                    hasResonance = true;
-                    resonanceUIController.Initialze(resonance);
-                    resonanceText.text = resonance.entityName;
-                    // List<SkillData> resonanceSkills = resonance.skills;
-                    // foreach(var skill in resonanceSkills)
-                    // {
-                    //     if (!skills.Contains(skill.id))
-                    //     {
-                    //         skills.Add(skill.id);
-                    //     }
-                    // }
-                }
-                else hasResonance = false;
-            }
-            else hasResonance = false;
+            // if (!string.IsNullOrEmpty(charData.resonanceId))
+            // {
+            //     ResonanceData resonance = ManagerRoot.Database.GetResonance(charData.resonanceId);
+            //     if (resonance != null)
+            //     {
+            //         hasResonance = true;
+            //         resonanceUIController.Initialze(resonance);
+            //         resonanceText.text = resonance.entityName;
+            //         // List<SkillData> resonanceSkills = resonance.skills;
+            //         // foreach(var skill in resonanceSkills)
+            //         // {
+            //         //     if (!skills.Contains(skill.id))
+            //         //     {
+            //         //         skills.Add(skill.id);
+            //         //     }
+            //         // }
+            //     }
+            //     else hasResonance = false;
+            // }
+            // else hasResonance = false;
             UpdateSkillList(skills);
         }
 

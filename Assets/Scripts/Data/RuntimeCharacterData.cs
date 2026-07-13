@@ -66,7 +66,7 @@ namespace Data
         {
             characterId = save.characterId;
             name = save.name;
-            
+            if (System.Enum.TryParse(save.race, out Race parsedRace)) race = parsedRace;
             if (System.Enum.TryParse(save.align, out Align parsedAlign)) align = parsedAlign;
             if (System.Enum.TryParse(save.row, out RowType parsedRow)) row = parsedRow;
             if (System.Enum.TryParse(save.column, out ColumnType parsedCol)) column = parsedCol;
@@ -94,6 +94,7 @@ namespace Data
         {
             characterId = entry.id;
             name = entry.name;
+            race = entry.race;
             gender = entry.gender;
             align = entry.align;
             resonanceId = entry.resonanceId;
@@ -126,6 +127,7 @@ namespace Data
 
             data.characterId = this.characterId;
             data.name = this.name;
+            data.race = this.race.ToString();
             data.gender = this.gender.ToString();
             data.isCommander = this.isCommander;
 

@@ -596,6 +596,7 @@ namespace Controller
         {
             compileUI.SetActive(false);
             currentState = MenuState.Main;
+            RefreshPartyUI(); // 합체 결과를 반영
             
             ResetInputTimer();
             UpdateSelection(currentBtnIndex); 
