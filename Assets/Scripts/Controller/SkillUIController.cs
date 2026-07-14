@@ -90,7 +90,6 @@ namespace Controller
         private void HandleCasterSelection()
         {
             bool moved = false;
-            // 💡 직관적인 1칸 이동 로직 유지
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) { if (currentCasterIndex % 3 > 0) { currentCasterIndex--; moved = true; } }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) { if (currentCasterIndex % 3 < 2) { currentCasterIndex++; moved = true; } }
             else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) { if (currentCasterIndex >= 3) { currentCasterIndex -= 3; moved = true; } }

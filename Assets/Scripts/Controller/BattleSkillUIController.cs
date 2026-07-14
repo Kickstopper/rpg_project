@@ -79,7 +79,7 @@ namespace Controller
             
             SwitchTab(currentTab);
         }
-
+        
         public void Show(List<string> skillIds, PlayerController actor)
         {
             if (skillIds == null || skillIds.Count == 0) return;
@@ -140,8 +140,40 @@ namespace Controller
                     CreateSkillSlot(data);
                 }
             }
+
+            LinkButtonNavigation();
+
             skillInfoView?.gameObject.SetActive(currentSlots.Count > 0);
             StartCoroutine(SelectFirstItem());
+        }
+
+        // 리스트 내의 버튼들을 이동 가능하게 엮어주는 함수
+        private void LinkButtonNavigation()
+        {
+            if (currentSlots == null || currentSlots.Count <= 1) return;
+
+            for (int i = 0; i < currentSlots.Count; i++)
+            {
+                Button currentBtn = currentSlots[i].GetComponent<Button>();
+                if (currentBtn == null) continue;
+
+                // 명시적 네비게이션 모드 설정
+                Navigation customNav = new Navigation();
+                customNav.mode = Navigation.Mode.Explicit;
+
+                // 위쪽 방향키를 누르면 이전 인덱스 버튼으로 (첫 번째면 마지막 버튼으로 순환)
+                int upIndex = (i == 0) ? currentSlots.Count - 1 : i - 1;
+                customNav.selectOnUp = currentSlots[upIndex].GetComponent<Button>();
+
+                // 아래쪽 방향키를 누르면 다음 인덱스 버튼으로 (마지막이면 첫 번째 버튼으로 순환)
+                int downIndex = (i == currentSlots.Count - 1) ? 0 : i + 1;
+                customNav.selectOnDown = currentSlots[downIndex].GetComponent<Button>();
+
+                customNav.selectOnLeft = null;
+                customNav.selectOnRight = null;
+
+                currentBtn.navigation = customNav;
+            }
         }
 
         void CreateSkillSlot(SkillData data)
@@ -185,17 +217,11 @@ namespace Controller
                 
             }
             
-            EventTrigger trigger = slotObj.GetComponent<EventTrigger>();
-            if (trigger == null) trigger = slotObj.AddComponent<EventTrigger>();
+            CommonListSlotTrigger trigger = slotObj.GetComponent<CommonListSlotTrigger>();
+            if (trigger == null) trigger = slotObj.AddComponent<CommonListSlotTrigger>();
 
-            // hover
-            EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-            enterEntry.callback.AddListener((eventData) => OnItemSelect(data));
-            trigger.triggers.Add(enterEntry);
-            // select
-            EventTrigger.Entry selectEntry = new EventTrigger.Entry { eventID = EventTriggerType.Select };
-            selectEntry.callback.AddListener((eventData) => OnItemSelect(data));
-            trigger.triggers.Add(selectEntry);
+            // 람다식으로 이벤트 연결
+            trigger.onSelectAction = () => OnItemSelect(data);
             
             currentSlots.Add(slotObj);
         }
