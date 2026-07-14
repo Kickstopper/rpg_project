@@ -167,7 +167,7 @@ namespace Controller
         }
 
         // 매 턴 시작 또는 종료 시 호출할 함수
-        public void TickStatusEffects()
+        public void TickStatusEffects(System.Action<int> onDotDamageTaken = null)
         {
             for (int i = activeEffects.Count - 1; i >= 0; i--)
             {
@@ -176,7 +176,7 @@ namespace Controller
                 // 지속 데미지 처리
                 if (effect.data.dotDamage > 0)
                 {
-                    // ApplyDamage 로직 호출 (HP 감소)
+                    onDotDamageTaken?.Invoke(effect.data.dotDamage);
                 }
 
                 // 해제 조건 체크

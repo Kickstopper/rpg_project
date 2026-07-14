@@ -436,14 +436,26 @@ namespace Controller
             // 난입 입력 감지
             if ((state == BattleState.Processing || state == BattleState.EnemyInput) && currentProcessingAction != null && !isInterrupted)
             {
-                bool isEnemyActing = currentProcessingAction.actor.GetComponent<MonsterController>() != null;
+                bool isPlayerActing = currentProcessingAction.actor.GetComponent<PlayerController>() != null;
 
-                // 부동소수점 오차 방지를 위해 0.99f로 검사
+                // 아군의 행동 중, 적의 게이지가 꽉 찼을 때 (적의 난입)
+                if (isPlayerActing && uiController.GetEnemyGaugeValue() >= 0.99f)
+                {
+                    if (isAutoMode) StartCoroutine(TriggerInterrupt(false)); // 오토 모드면 즉시 적 난입 실행
+                    else if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                    {
+                        StartCoroutine(TriggerInterrupt(false)); 
+                    }
+                }
+                
+                // 적의 행동 중, 아군의 게이지가 꽉 찼을 때 (아군의 난입)
+                bool isEnemyActing = currentProcessingAction.actor.GetComponent<MonsterController>() != null;
                 if (isEnemyActing && uiController.GetPartyGaugeValue() >= 0.99f)
                 {
-                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                    if (isAutoMode) StartCoroutine(TriggerInterrupt(true)); // 오토 모드면 AI가 즉시 난입
+                    else if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
                     {
-                        StartCoroutine(TriggerInterrupt(true)); // 아군이 적을 끊음
+                        StartCoroutine(TriggerInterrupt(true)); 
                     }
                 }
             }
@@ -523,7 +535,8 @@ namespace Controller
             yield return uiController.ShowFlashEffect();
             uiController.ShowLog(isPlayerInterrupting ? "PARTY INTERRUPT!!" : "ENEMY INTERRUPT!!");
             
-            yield return wait10;
+            // 오토 모드 시 가속되게 함
+            yield return isAutoMode ? new WaitForSeconds(0.3f) : wait10;
 
             // ActionQueue 완전히 비우기
             actionQueue.Clear();
@@ -738,7 +751,7 @@ namespace Controller
 
             // Item 조건
             bool canItem = (ManagerRoot.Inventory.GetAllItemIds().Count > 0);
-
+            Debug.Log("11111111111111111111111: " + canItem);
             // Gun 메뉴 조건
             bool canShoot = actor.CanShootGun() && actor.currentGunAmmo > 0;
             bool canReload = (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits);
@@ -1451,23 +1464,40 @@ namespace Controller
         void NextPlayerInput()
         {
             fieldController.ResetPlayerSlotHighlights();
+            PlayerController currentPlayer = null;
+            // 재귀 호출을 제거하고 while 루프를 통한 안전한 다음 캐릭터 탐색
+            while (true)
+            {
+                fieldController.currentPlayerIndex++;
+                
+                // 모든 아군의 턴 인덱스를 순회했다면 적의 턴으로 넘김
+                if (fieldController.currentPlayerIndex >= fieldController.activePlayers.Count) 
+                { 
+                    ProcessTurn(); 
+                    return; 
+                }
 
-            fieldController.currentPlayerIndex++;
-            if (fieldController.currentPlayerIndex >= fieldController.activePlayers.Count) { ProcessTurn(); return; }
+                currentPlayer = fieldController.GetCurrentCharacter();
+                
+                if (currentPlayer != null && currentPlayer.currentHp > 0)
+                {
+                    break; // 유효한 생존자를 찾았으므로 루프 탈출
+                }
+            }
 
-            PlayerController currentPlayer = fieldController.GetCurrentCharacter();
-            if (currentPlayer.currentHp <= 0) { NextPlayerInput(); return; }
+            PlayerController activePlayer = fieldController.GetCurrentCharacter();
 
             // 제약 조건 체크
-            RestrictionType restriction = currentPlayer.CheckActionRestriction();
+            RestrictionType restriction = activePlayer.CheckActionRestriction();
 
             if (restriction == RestrictionType.SkipTurn)
             {
-                uiController.ShowLog($"{currentPlayer.name.AttachParticle("은/는")} 움직일 수 없다!");
-                // 입력 없이 즉시 다음 턴으로 넘김
-                BattleAction skipAction = new BattleAction(currentPlayer.gameObject, currentPlayer.gameObject, ActionType.Next, 0);
+                uiController.ShowLog($"{activePlayer.name.AttachParticle("은/는")} 움직일 수 없다!");
+                BattleAction skipAction = new BattleAction(activePlayer.gameObject, activePlayer.gameObject, ActionType.Next, 0);
                 actionQueue.Add(skipAction);
-                NextPlayerInput();
+                
+                // 재귀 호출 대신 루프 바깥에서 다시 호출
+                NextPlayerInput(); 
                 return;
             }
             else if (restriction == RestrictionType.Confusion || restriction == RestrictionType.Charm)
@@ -2170,14 +2200,45 @@ namespace Controller
                 yield break; 
             }
 
-            if (state == BattleState.Processing) 
+            // 각 진영의 모든 행동이 끝난 직후 상태이상 틱 일괄 처리
+            if (state == BattleState.Processing) // 아군 페이즈 종료 시
             { 
+                foreach (var p in fieldController.activePlayers)
+                {
+                    if (p != null && p.currentHp > 0) 
+                    {
+                        // 도트 데미지가 발생하면 ApplyDamage를 호출
+                        p.TickStatusEffects((dotDmg) => 
+                        {
+                            ApplyDamage(p.gameObject, dotDmg, false);
+                        });
+                    }
+                }
+                
+                // 연출 동기화: 독 데미지 이펙트와 흔들림이 끝날 때까지 잠깐 대기
                 yield return wait05;
+
+                // 도트 데미지로 인해 누군가 사망했을 수 있으므로 게임 종료 재검사
+                if (CheckBattleEnd(out bool winAfterTick)) { StartCoroutine(EndBattleRoutine(winAfterTick)); yield break; }
+
                 yield return uiController.ShowPhaseIndicator(true);
                 ProcessEnemyTurn(); 
             }
-            else if (state == BattleState.EnemyInput)
+            else if (state == BattleState.EnemyInput) // 적군 페이즈 종료 시
             {
+                foreach (var m in fieldController.activeMonsters)
+                {
+                    if (m != null && m.currentHp > 0) 
+                    {
+                        m.TickStatusEffects((dotDmg) => 
+                        {
+                            ApplyDamage(m.gameObject, dotDmg, false);
+                        });
+                    }
+                }
+                
+                yield return wait05;
+
                 if (CheckBattleEnd(out bool win)) StartCoroutine(EndBattleRoutine(win));
                 else PreparePlayerTurn(); 
             }
@@ -2289,7 +2350,9 @@ namespace Controller
             foreach (var targetObj in targets)
             {
                 // 공격 계열 vs 보조 계열 분기 처리
-                bool isAttack = item.effectType == EffectType.Special_Atk || item.effectType == EffectType.Magic_Atk;
+                bool isAttack = item.effectType == EffectType.Special_Atk || 
+                item.effectType == EffectType.Magic_Atk || 
+                item.statusEffect != StatusEffect.None;
 
                 if (isAttack)
                 {
@@ -2299,7 +2362,7 @@ namespace Controller
                     
                     // 아이템의 고정 데미지(effectValue)를 그대로 줄지, 계산식을 탈지는 기획이 확정되면 수정하자
                     // 일단 ApplyDamage를 통해 피격 연출(OnDamageTaken)까지 연결함
-                    ApplyDamage(targetObj, item.effectValue, false);
+                    yield return ApplyDamage(targetObj, item.effectValue, false);
                 }
                 else
                 {
@@ -2369,8 +2432,10 @@ namespace Controller
 
             uiController.ShowLog($"{action.actor.name}의 스킬: {skill.dataName}");
 
-            bool isAttack = skill.effectType == EffectType.Special_Atk || skill.effectType == EffectType.Magic_Atk;
-
+            bool isAttack = skill.effectType == EffectType.Special_Atk || 
+                            skill.effectType == EffectType.Magic_Atk || 
+                            skill.statusEffect != StatusEffect.None;
+            
             if (!isAutoMode)
             {
                 string magType = isAttack ? "공격마법" : "보조마법";
@@ -2513,7 +2578,7 @@ namespace Controller
             int dmg = BattleCalculator.CalculateDamage(leaderEntity, targetEntity, action, isCrit, dmgMultiplier);
             dmg = Mathf.RoundToInt(dmg * (float)totalStr / leader.GetTotalStr()); 
             
-            ApplyDamage(target, dmg, isCrit);
+            yield return ApplyDamage(target, dmg, isCrit);
             
             yield return wait05;
 
@@ -3078,20 +3143,41 @@ namespace Controller
                 if (vfxID != VfxID.None) visualController.SpawnVFX(vfxID, GetCenterPosition(target));
                 yield return wait01;
             }
-            
-            ApplyDamage(target, damage, isCritical);
+
+            Coroutine damageRoutine = null;
+            if (!(damage == 0 && action.actionData != null && action.actionData.statusEffect != StatusEffect.None))
+            {
+                damageRoutine = ApplyDamage(target, damage, isCritical);
+            }
 
             // 치명타나 약점 공격으로 적이 방금 사망했는지 확인
             BattleEntity hitEntity = target.GetComponent<BattleEntity>();
+
+            // 타격 후, 적이 아직 살아있다면 상태 이상 판정을 시도
+            if (hitEntity != null && hitEntity.currentHp > 0)
+            {
+                // 스킬이나 아이템에 상태 이상 데이터가 있는지 확인
+                if (action.actionData != null && action.actionData.statusEffect != StatusEffect.None)
+                {
+                    // BattleCalculator의 상태 이상 판정 함수 호출
+                    BattleCalculator.ProcessSkillStatusEffect(attackerEntity, hitEntity, action.actionData);
+                }
+            }
             
             if (hitEntity != null && hitEntity.currentHp <= 0 && (hitEntity.currentHp + damage > 0))
             {
+                // 막타 적중 시 흔들림 연출과 동시에 슬로우 모션 및 줌인 발동
                 uiController.StopZoomCoroutine();
-
-                // 슬로우 모션 실행. 0.1배속(10% 속도)으로 0.4초 동안 유지
                 StartCoroutine(SlowMotionRoutine(0.1f, 0.4f));
-                // 카메라 줌은 내부적으로 SetUpdate(true)가 되어있어 혼자 빠르게 줌인됨
                 yield return StartCoroutine(uiController.UIZoomRoutine(target.transform, 1.3f, 0.2f, 0.5f, 0.3f));
+                
+                // 줌 연출이 끝난 후, 데미지 처리 코루틴이 남아있다면 마저 끝날 때까지 대기
+                if (damageRoutine != null) yield return damageRoutine;
+            }
+            else
+            {
+                // 막타가 아닐 경우, damageRoutine이 완전히 끝날 때까지만 대기
+                if (damageRoutine != null) yield return damageRoutine;
             }
         }
 
@@ -3101,36 +3187,31 @@ namespace Controller
             else uiController.AddEnemyGauge(amount);
         }
 
-        void ApplyDamage(GameObject target, int damage, bool isCritical)
+        Coroutine ApplyDamage(GameObject target, int damage, bool isCritical)
         {
-            if (target == null || !target.activeInHierarchy) return;
+            if (target == null || !target.activeInHierarchy) return null;
 
             var entity = target.GetComponent<BattleEntity>();
-            if (entity == null) return;
+            if (entity == null) return null;
 
-            // 몬스터인 경우에만 데미지 팝업 표시
+            // 몬스터 데미지 팝업
             if (entity is MonsterController)
             {
                 if (damagePopupPrefab != null && damagePopupContainer != null)
                 {
                     GameObject popupObj = Instantiate(damagePopupPrefab, damagePopupContainer);
-                    
                     popupObj.transform.position = target.transform.position; 
                     popupObj.transform.localPosition += new Vector3(0, 150f, 0); 
-                    
-                    // float randomX = Random.Range(-20f, 20f);
-                    // popupObj.transform.localPosition += new Vector3(randomX, 0, 0);
-
                     var popupScript = popupObj.GetComponent<DamagePopupController>();
-                    if (popupScript != null)
-                    {
-                        popupScript.Setup(damage, isCritical);
-                    }
+                    if (popupScript != null) popupScript.Setup(damage, isCritical);
                 }
             }
 
+            // 피격 흔들림 연출 즉시 시작
             entity.TriggerHitShake(isCritical); 
-            StartCoroutine(entity.OnDamageTaken(damage)); 
+            
+            // 코루틴을 실행함과 동시에 그 참조값을 리턴하여 호출부에서 대기할 수 있게 합니다.
+            return StartCoroutine(entity.OnDamageTaken(damage)); 
         }
 
         // 타격 시 일시적으로 시간을 느리게 만드는 슬로우 모션 코루틴

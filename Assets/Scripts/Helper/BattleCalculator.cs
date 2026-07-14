@@ -273,8 +273,35 @@ namespace Helper
                     return 1.0f;
             }
         }
+
+        // 상태 이상 적용
+        public static void ProcessSkillStatusEffect(BattleEntity attacker, BattleEntity defender, BaseRootData data)
+        {
+            // 스킬이나 아이템에 상태 이상 효과가 설정되어 있지 않다면 리턴
+            if (data == null || data.statusEffect == StatusEffect.None) return;
+
+            // LUC 스탯을 기반으로 한 상태 이상 회피/적중 보정치 계산
+            float lucDiff = (attacker.GetTotalLuc() - defender.GetTotalLuc()) * 0.01f;
+            
+            // 최종 성공 확률 = (기본 스킬 성공 확률 + 스탯 보정치) * 적의 상태이상 내성치
+            float finalChance = (data.statusEffectChance + lucDiff);
+
+            // 확률 판정
+            if (Random.value <= finalChance)
+            {
+                if (data is SkillData skillData && skillData.statusEffectData != null)
+                {
+                    defender.ApplyStatusEffect(skillData.statusEffectData);
+                }
+                else
+                {
+                    Debug.Log($"{defender.name}에게 {data.statusEffect} 부여 성공! (현재 데이터 매핑 필요)");
+                }
+            }
+        }
+
         public static bool IsAlignCompatible(Align a, Align b) { return a == b || a == Align.True_Neutral || b == Align.True_Neutral; }
         public static void GetPositionalModifiers(BattleFieldController.BattlePosition atkPos, BattleFieldController.BattlePosition defPos, WeaponType wType, out float damageMultiplier, out float evasionBonus) { damageMultiplier=1f; evasionBonus=0f; }
-        public static void ProcessSkillStatusEffect(BattleEntity attacker, BattleEntity defender, SkillData skill) { }
+
     }
 }

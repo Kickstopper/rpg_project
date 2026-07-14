@@ -33,7 +33,6 @@ namespace Data
         public float evaMultiplier = 1.0f;
         public float accMultiplier = 1.0f;
 
-        // [핵심 변경] bool 대신 Type과 Chance를 사용합니다.
         [Header("Action Restrictions")]
         public RestrictionType restrictionType = RestrictionType.None;
         
