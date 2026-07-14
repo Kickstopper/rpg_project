@@ -1,0 +1,48 @@
+name,id,Skill,Element,Type,Target,Power,Accuracy,MPCost,StatusEffect,statusEffectChance,TargetCondition,PassiveOrCondition,Description
+AGI,skl_000,Agi,Fire,Attack,Single_Enemy,40,95,4,None,0,,,적 1명에게 소량의 화염 속성 대미지를 준다.
+AGILAO,skl_001,Agilao,Fire,Attack,Single_Enemy,90,95,8,None,0,,,적 1명에게 중량의 화염 속성 대미지를 준다.
+AGIDYNE,skl_002,Agidyne,Fire,Attack,Single_Enemy,180,95,16,None,0,,,적 1명에게 대량의 화염 속성 대미지를 준다.
+MARAGI,skl_003,Maragi,Fire,Attack,All_Enemies,30,90,8,None,0,,,적 전체에게 소량의 화염 속성 대미지를 준다.
+MARAGION,skl_004,Maragion,Fire,Attack,All_Enemies,75,90,16,None,0,,,적 전체에게 중량의 화염 속성 대미지를 준다.
+MARAGIDYNE,skl_005,Maragidyne,Fire,Attack,All_Enemies,150,90,32,None,0,,,적 전체에게 대량의 화염 속성 대미지를 준다.
+BUFU,skl_006,Bufu,Ice,Attack,Single_Enemy,40,95,4,None,0,,,적 1명에게 소량의 빙결 속성 대미지를 준다.
+BUFULA,skl_007,Bufula,Ice,Attack,Single_Enemy,90,95,8,None,0,,,적 1명에게 중량의 빙결 속성 대미지를 준다.
+BUFUDYNE,skl_008,Bufudyne,Ice,Attack,Single_Enemy,180,95,16,None,0,,,적 1명에게 대량의 빙결 속성 대미지를 준다.
+MABUFU,skl_009,Mabufu,Ice,Attack,All_Enemies,30,90,8,None,0,,,적 전체에게 소량의 빙결 속성 대미지를 준다.
+MABUFULA,skl_010,Mabufula,Ice,Attack,All_Enemies,75,90,16,None,0,,,적 전체에게 중량의 빙결 속성 대미지를 준다.
+MABUFUDYNE,skl_011,Mabufudyne,Ice,Attack,All_Enemies,150,90,32,None,0,,,적 전체에게 대량의 빙결 속성 대미지를 준다.
+ZIO,skl_012,Zio,Elec,Attack,Single_Enemy,40,95,4,None,0,,,적 1명에게 소량의 전격 속성 대미지를 준다.
+ZIOGA,skl_013,Zioga,Elec,Attack,Single_Enemy,90,95,8,None,0,,,적 1명에게 중량의 전격 속성 대미지를 준다.
+ZIODYNE,skl_014,Ziodyne,Elec,Attack,Single_Enemy,180,95,16,None,0,,,적 1명에게 대량의 전격 속성 대미지를 준다.
+MAZIO,skl_015,Mazio,Elec,Attack,All_Enemies,30,90,8,None,0,,,적 전체에게 소량의 전격 속성 대미지를 준다.
+MAZIOGA,skl_016,Mazioga,Elec,Attack,All_Enemies,75,90,16,None,0,,,적 전체에게 중량의 전격 속성 대미지를 준다.
+MAZIODYNE,skl_017,Maziodyne,Elec,Attack,All_Enemies,150,90,32,None,0,,,적 전체에게 대량의 전격 속성 대미지를 준다.
+ZAN,skl_018,Zan,Force,Attack,Single_Enemy,40,95,4,None,0,,,적 1명에게 소량의 충격 속성 대미지를 준다.
+ZANMA,skl_019,Zanma,Force,Attack,Single_Enemy,90,95,8,None,0,,,적 1명에게 중량의 충격 속성 대미지를 준다.
+ZANDYNE,skl_020,Zandyne,Force,Attack,Single_Enemy,180,95,16,None,0,,,적 1명에게 대량의 충격 속성 대미지를 준다.
+MAZAN,skl_021,Mazan,Force,Attack,All_Enemies,30,90,8,None,0,,,적 전체에게 소량의 충격 속성 대미지를 준다.
+MAZANMA,skl_022,Mazanma,Force,Attack,All_Enemies,75,90,16,None,0,,,적 전체에게 중량의 충격 속성 대미지를 준다.
+MAZANDYNE,skl_023,Mazandyne,Force,Attack,All_Enemies,150,90,32,None,0,,,적 전체에게 대량의 충격 속성 대미지를 준다.
+DIA,skl_024,Dia,None,Recovery,One_Ally,50,100,4,None,0,,,아군 1명의 HP를 소량 회복한다.
+DIARAMA,skl_025,Diarama,None,Recovery,One_Ally,150,100,8,None,0,,,아군 1명의 HP를 중량 회복한다.
+DIARAHAN,skl_026,Diarahan,None,Recovery,One_Ally,9999,100,18,None,0,,,아군 1명의 HP를 완전히 회복한다.
+MEDIA,skl_027,Media,None,Recovery,All_Allies,40,100,10,None,0,,,아군 전체의 HP를 소량 회복한다.
+MEDIARAMA,skl_028,Mediarama,None,Recovery,All_Allies,120,100,20,None,0,,,아군 전체의 HP를 중량 회복한다.
+MEDIARAHAN,skl_029,Mediarahan,None,Recovery,All_Allies,9999,100,40,None,0,,,아군 전체의 HP를 완전히 회복한다.
+TARUKAJA,skl_030,Tarukaja,None,Assistance,All_Allies,1,100,12,None,0,,,아군 전체의 물리/마법 공격력을 상승시킨다.
+RAKUKAJA,skl_031,Rakukaja,None,Assistance,All_Allies,1,100,12,None,0,,,아군 전체의 물리/마법 방어력을 상승시킨다.
+TARUNDA,skl_032,Tarunda,None,Assistance,All_Enemies,-1,100,12,None,0,,,적 전체의 물리/마법 공격력을 하락시킨다.
+RAKUNDA,skl_033,Rakunda,None,Assistance,All_Enemies,-1,100,12,None,0,,,적 전체의 물리/마법 방어력을 하락시킨다.
+POISMA,skl_034,Poisma,Psyche,Debuff,Single_Enemy,0,95,4,Poison,45,,,적 1명을 독(Poison) 상태로 만든다.
+MAPOISMA,skl_035,Mapoisma,Psyche,Debuff,All_Enemies,0,90,10,Poison,30,,,적 전체를 독(Poison) 상태로 만든다.
+DORMINA,skl_036,Dormina,Psyche,Debuff,Single_Enemy,0,95,4,Sleep,50,,,적 1명을 수면(Sleep) 상태로 만든다.
+LULLABY,skl_037,Lullaby,Psyche,Debuff,All_Enemies,0,90,12,Sleep,35,,,적 전체를 수면(Sleep) 상태로 만든다.
+PULINPA,skl_038,Pulinpa,Psyche,Debuff,Single_Enemy,0,95,5,Confuse,45,,,적 1명을 혼란(Confuse) 상태로 만든다.
+TENTARAFOO,skl_039,Tentarafoo,Psyche,Debuff,All_Enemies,0,90,14,Confuse,30,,,적 전체를 혼란(Confuse) 상태로 만든다.
+MAKAJAM,skl_040,Makajam,Psyche,Debuff,Single_Enemy,0,95,5,Silence,50,,,적 1명을 침묵(Silence) 상태로 만들어 스킬을 봉쇄한다.
+MAKAJAMAON,skl_041,Makajamaon,Psyche,Debuff,All_Enemies,0,90,14,Silence,35,,,적 전체를 침묵(Silence) 상태로 만든다.
+MARINKARIN,skl_042,Marin Karin,Psyche,Debuff,Single_Enemy,0,90,6,Charm,40,,,적 1명을 매료(Charm) 상태로 만들어 아군을 돕게 한다.
+SHIBABOO,skl_043,Shibaboo,Psyche,Debuff,Single_Enemy,0,95,6,Bind,45,,,적 1명을 속박(Bind)하여 행동을 봉쇄한다.
+PARALYZE_EYE,skl_044,Paralyze Eye,Psyche,Debuff,Single_Enemy,0,95,6,Paralyze,45,,,적 1명을 마비(Paralyze) 상태로 만든다.
+EVIL_SMILE,skl_045,Evil Smile,Psyche,Debuff,All_Enemies,0,90,12,Fear,35,,,적 전체를 공포(Fear)에 질리게 만든다.
+PETRIFY_GLARE,skl_046,Petrify Glare,Psyche,Debuff,Single_Enemy,0,90,8,Petrify,30,,,적 1명을 석화(Petrify) 상태로 만든다.

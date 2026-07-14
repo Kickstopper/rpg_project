@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2509d072dc88eee4e99bc80b884fd02e, type: 3}
+  m_Name: MAKAJAM
+  m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
+  id: skl_040
+  dataName: MAKAJAM
+  description: "\uC801 1\uBA85\uC744 \uCE68\uBB35(Silence) \uC0C1\uD0DC\uB85C \uB9CC\uB4E4\uC5B4
+    \uC2A4\uD0AC\uC744 \uBD09\uC1C4\uD55C\uB2E4."
+  icon: {fileID: 0}
+  vfxId: 0
+  effectType: 0
+  effectValue: 0
+  element: 6
+  targetScope: 1
+  useType: 2
+  statusEffect: 0
+  statusEffectChance: 0.5
+  actionDelay: 0
+  useHpCost: 0
+  costValue: 5
+  statusEffectData: {fileID: 0}
+  effectRate: 0

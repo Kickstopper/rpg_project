@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2509d072dc88eee4e99bc80b884fd02e, type: 3}
+  m_Name: SHIBABOO
+  m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
+  id: skl_043
+  dataName: SHIBABOO
+  description: "\uC801 1\uBA85\uC744 \uC18D\uBC15(Bind)\uD558\uC5EC \uD589\uB3D9\uC744
+    \uBD09\uC1C4\uD55C\uB2E4."
+  icon: {fileID: 0}
+  vfxId: 0
+  effectType: 0
+  effectValue: 0
+  element: 6
+  targetScope: 1
+  useType: 2
+  statusEffect: 0
+  statusEffectChance: 0.45
+  actionDelay: 0
+  useHpCost: 0
+  costValue: 6
+  statusEffectData: {fileID: 0}
+  effectRate: 0

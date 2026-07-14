@@ -1,0 +1,439 @@
+name,id,Skill,Element,Type,Target,Power,Accuracy,MPCost,StatusEffect,statusEffectChance,TargetCondition,PassiveOrCondition,Description
+Slime,enemy_000,Acid Splash,Nature,Attack,Single_Enemy,28,95,3,Poison,25,,,산성 점액을 뿜는다.
+Slime,enemy_000,Divide,Holy,Recovery,Self,0,100,8,None,0,HP<=60%,Recover HP 40%,몸을 분열시켜 회복한다.
+Slime,enemy_000,Gel Body,None,Passive,Self,0,0,0,None,0,,Physical Damage -15%,점액질 육체
+Hedgehog,enemy_001,Needle Shot,Physical,Attack,Single_Enemy,35,95,3,Bleed,20,,,가시를 발사한다.
+Hedgehog,enemy_001,Roll Attack,Physical,Attack,Single_Enemy,42,90,5,None,0,,,몸을 말아 돌진한다.
+Hedgehog,enemy_001,Sharp Spines,None,Passive,Self,0,0,0,None,0,,Counter Damage +15%,가시에 찔린다.
+KillerBee,enemy_002,Poison Sting,Nature,Attack,Single_Enemy,38,95,4,Poison,35,,,독침 공격
+KillerBee,enemy_002,Buzz Assault,Wind,Attack,Single_Enemy,45,95,5,None,0,,,고속 비행 공격
+KillerBee,enemy_002,Hive Instinct,None,Passive,Self,0,0,0,None,0,,Accuracy +10%,군집 본능
+KillerFish,enemy_003,Bite,Physical,Attack,Single_Enemy,48,95,4,Bleed,25,,,날카로운 이빨
+KillerFish,enemy_003,Blood Frenzy,Holy,Buff,Self,0,100,5,None,0,Target has Bleed,ATK +2,피 냄새에 흥분한다.
+KillerFish,enemy_003,Aquatic Hunter,None,Passive,Self,0,0,0,None,0,,Damage +15% vs Bleeding Target,출혈한 적에게 강하다.
+Jellyfish,enemy_004,Paralyze Shock,Lightning,Attack,Single_Enemy,45,100,5,Paralyze,30,,,전기 충격
+Jellyfish,enemy_004,Toxic Pulse,Nature,Attack,All_Enemies,30,100,7,Poison,20,,,독성 파동
+Jellyfish,enemy_004,Soft Body,None,Passive,Self,0,0,0,None,0,,Lightning Resistance +30%,유연한 몸
+Worm,enemy_005,Burrow Bite,Physical,Attack,Single_Enemy,52,95,5,None,0,,,땅속에서 습격
+Worm,enemy_005,Earth Dive,Holy,Buff,Self,0,100,6,None,0,HP<=50%,Evasion +2,땅속으로 숨는다.
+Worm,enemy_005,Tunneler,None,Passive,Self,0,0,0,None,0,,Earth Resistance +30%,굴파기
+LandTurtle,enemy_006,Shell Bash,Physical,Attack,Single_Enemy,55,95,5,Stun,20,,,등껍질 박치기
+LandTurtle,enemy_006,Shell Guard,Holy,Buff,Self,0,100,6,None,0,First Turn,DEF +2,등껍질 방어
+LandTurtle,enemy_006,Heavy Shell,None,Passive,Self,0,0,0,None,0,,Physical Damage -20%,단단한 등껍질
+DevilPlant,enemy_007,Vine Whip,Nature,Attack,Single_Enemy,55,95,5,None,0,,,덩굴 채찍
+DevilPlant,enemy_007,Spore Cloud,Nature,Attack,All_Enemies,35,95,8,Poison,30,,,독 포자
+DevilPlant,enemy_007,Photosynthesis,None,Passive,Self,0,0,0,None,0,,Recover HP 3% each turn,광합성
+Imp,enemy_008,Fire Bolt,Fire,Attack,Single_Enemy,60,100,5,Burn,20,,,화염탄
+Imp,enemy_008,Mischief,Dark,Debuff,Single_Enemy,0,100,6,Confuse,25,,,장난
+Imp,enemy_008,Demon Blood,None,Passive,Self,0,0,0,None,0,,Fire Resistance +20%,악마의 피
+Goblin,enemy_009,Axe Swing,Physical,Attack,Single_Enemy,60,95,5,None,0,,,도끼 공격
+Goblin,enemy_009,War Cry,Holy,Buff,Self,0,100,6,None,0,First Turn,ATK +1,전투 함성
+Goblin,enemy_009,Cowardly,None,Passive,Self,0,0,0,None,0,,Evasion +10%,비겁한 생존술
+Merman,enemy_010,Water Spear,Ice,Attack,Single_Enemy,65,100,6,None,0,,,물창
+Merman,enemy_010,Tidal Wave,Ice,Attack,All_Enemies,40,95,8,None,0,EnemyCount>=2,,파도
+Merman,enemy_010,Water Affinity,None,Passive,Self,0,0,0,None,0,,Ice Damage +15%,수속성 친화
+Mandrake,enemy_011,Shriek,Dark,Attack,All_Enemies,40,100,8,Silence,35,,,괴성
+Mandrake,enemy_011,Root Bind,Nature,Debuff,Single_Enemy,0,95,6,Bind,35,,,뿌리 속박
+Mandrake,enemy_011,Plant Body,None,Passive,Self,0,0,0,None,0,,Poison Resistance +30%,식물형
+Mermaid,enemy_012,Water Arrow,Ice,Attack,Single_Enemy,70,100,6,None,0,,,물의 화살
+Mermaid,enemy_012,Healing Song,Holy,Recovery,All_Allies,0,100,10,None,0,AllyHP<=50%,Heal 30%,치유의 노래
+Mermaid,enemy_012,Siren Voice,None,Passive,Self,0,0,0,None,0,,Charm Success +10%,매혹의 목소리
+CreepingVine,enemy_013,Entangle,Nature,Debuff,Single_Enemy,0,95,6,Bind,40,,,덩굴 속박
+CreepingVine,enemy_013,Constrict,Nature,Attack,Single_Enemy,72,95,6,None,0,,,조르기
+CreepingVine,enemy_013,Regrowth,None,Passive,Self,0,0,0,None,0,,Recover HP 3% each turn,재생
+Clown,enemy_014,Knife Toss,Physical,Attack,Single_Enemy,75,100,6,None,0,,,단검 던지기
+Clown,enemy_014,Crazy Laugh,Dark,Debuff,All_Enemies,0,100,8,Confuse,30,,,광기의 웃음
+Clown,enemy_014,Showmanship,None,Passive,Self,0,0,0,None,0,,Critical +10%,공연 본능
+Rogue,enemy_015,Backstab,Dark,Attack,Single_Enemy,85,95,7,Critical,15,,,기습
+Rogue,enemy_015,Smoke Bomb,Dark,Debuff,All_Enemies,0,100,7,Blind,30,,,연막탄
+Rogue,enemy_015,Stealth,None,Passive,Self,0,0,0,None,0,,Evasion +15%,은신
+Orc,enemy_016,Power Smash,Physical,Attack,Single_Enemy,85,90,7,None,0,,,강타
+Orc,enemy_016,Berserk,Holy,Buff,Self,0,100,6,None,0,HP<=50%,ATK +2 DEF -1,광폭화
+Orc,enemy_016,Thick Skin,None,Passive,Self,0,0,0,None,0,,Physical Damage -10%,두꺼운 피부
+Zombie,enemy_017,Rotting Claw,Dark,Attack,Single_Enemy,80,95,6,Poison,20,,,부패한 손톱
+Zombie,enemy_017,Infect,Dark,Debuff,Single_Enemy,0,95,7,Poison,40,,,감염
+Zombie,enemy_017,Undead Flesh,None,Passive,Self,0,0,0,None,0,,Poison Immune,언데드
+Skeleton,enemy_018,Bone Slash,Physical,Attack,Single_Enemy,88,95,6,None,0,,,뼈 베기
+Skeleton,enemy_018,Bone Throw,Physical,Attack,Single_Enemy,75,100,5,None,0,,,뼈 던지기
+Skeleton,enemy_018,Bone Body,None,Passive,Self,0,0,0,None,0,,Critical Resistance +15%,뼈 몸
+Wizard,enemy_019,Fireball,Fire,Attack,Single_Enemy,90,100,8,Burn,20,,,화염구
+Wizard,enemy_019,Magic Shield,Holy,Buff,Self,0,100,8,None,0,First Turn,MDF +2,마법 방패
+Wizard,enemy_019,Magic Talent,None,Passive,Self,0,0,0,None,0,,MP Regen 3%,마도사의 재능
+Wererat,enemy_020,Rabid Bite,Physical,Attack,Single_Enemy,92,95,6,Poison,25,,,광견병 이빨
+Wererat,enemy_020,Dirty Trick,Dark,Debuff,Single_Enemy,0,100,6,Blind,25,,,비열한 공격
+Wererat,enemy_020,Disease Carrier,None,Passive,Self,0,0,0,None,0,,Poison Success +15%,질병 보균
+Gargoyle,enemy_021,Stone Claw,Physical,Attack,Single_Enemy,95,95,7,None,0,,,석조 발톱
+Gargoyle,enemy_021,Stone Skin,Holy,Buff,Self,0,100,7,None,0,HP<=50%,DEF +3,석화 피부
+Gargoyle,enemy_021,Living Statue,None,Passive,Self,0,0,0,None,0,,Physical Damage -20%,살아있는 석상
+Mimic,enemy_022,Surprise Bite,Physical,Attack,Single_Enemy,100,95,7,Bleed,25,,,기습 공격
+Mimic,enemy_022,Sticky Tongue,Nature,Debuff,Single_Enemy,0,95,6,Bind,30,,,끈적한 혀
+Mimic,enemy_022,Treasure Trap,None,Passive,Self,0,0,0,None,0,,Critical +10%,보물 함정
+Harpie,enemy_023,Wind Cutter,Wind,Attack,Single_Enemy,100,100,7,None,0,,,바람 칼날
+Harpie,enemy_023,Sonic Screech,Wind,Attack,All_Enemies,55,100,9,Silence,25,,,초음파
+Harpie,enemy_023,Flight,None,Passive,Self,0,0,0,None,0,,Evasion +15%,비행
+GrimReaper,enemy_024,Death Scythe,Dark,Attack,Single_Enemy,110,95,8,Fear,30,,,사신의 낫
+GrimReaper,enemy_024,Soul Harvest,Dark,Attack,Single_Enemy,90,100,9,HPDrain,50,HP<=50%,,영혼 흡수
+GrimReaper,enemy_024,Death Incarnate,None,Passive,Self,0,0,0,None,0,,Fear Success +20%,죽음의 화신
+Nekomata,enemy_025,Shadow Claw,Dark,Attack,Single_Enemy,78,95,6,Bleed,20,,,어둠의 발톱으로 벤다.
+Nekomata,enemy_025,Cat's Curse,Dark,Debuff,Single_Enemy,0,100,8,Confuse,30,,,불길한 저주를 건다.
+Nekomata,enemy_025,Nine Lives,None,Passive,Self,0,0,0,None,0,HP<=25%,Recover HP 30% (Once),아홉 목숨
+Guard,enemy_026,Shield Bash,Physical,Attack,Single_Enemy,70,95,5,Stun,20,,,방패로 가격한다.
+Guard,enemy_026,Cover,Holy,Buff,Self,0,100,6,None,0,First Turn,DEF +2,방어 태세
+Guard,enemy_026,Defensive Training,None,Passive,Self,0,0,0,None,0,,Physical Damage -20%,방어 훈련
+Drone,enemy_027,Pulse Shot,Lightning,Attack,Single_Enemy,72,100,5,None,0,,,펄스 탄환 발사
+Drone,enemy_027,Scan Target,Holy,Debuff,Single_Enemy,0,100,6,None,0,,DEF -1 EVA -1,목표 분석
+Drone,enemy_027,Auto Tracking,None,Passive,Self,0,0,0,None,0,,Accuracy +15%,자동 조준
+Dryad,enemy_028,Root Bind,Nature,Debuff,Single_Enemy,0,95,6,Bind,40,,,뿌리로 속박
+Dryad,enemy_028,Forest Blessing,Holy,Recovery,All_Allies,0,100,10,None,0,AllyHP<=60%,Heal 20%,숲의 축복
+Dryad,enemy_028,Nature's Grace,None,Passive,Self,0,0,0,None,0,,Recover HP 3% each turn,자연의 은총
+Sprite,enemy_029,Spark,Lightning,Attack,Single_Enemy,70,100,6,None,0,,,번개 요정의 일격
+Sprite,enemy_029,Fairy Dust,Nature,Debuff,All_Enemies,0,100,8,Sleep,30,,,요정의 가루
+Sprite,enemy_029,Fairy Wings,None,Passive,Self,0,0,0,None,0,,Evasion +15%,가벼운 날개
+Puck,enemy_030,Trick,Dark,Debuff,Single_Enemy,0,100,7,None,0,,Random Debuff,장난을 친다.
+Puck,enemy_030,Fairy Laugh,Wind,Attack,All_Enemies,45,100,8,Confuse,20,,,요정의 웃음
+Puck,enemy_030,Mischievous,None,Passive,Self,0,0,0,None,0,,Status Success +15%,장난꾸러기
+Robot EvilEye,enemy_031,Death Laser,Lightning,Attack,Single_Enemy,90,100,8,None,0,,,고출력 레이저
+Robot EvilEye,enemy_031,Lock-On,Holy,Buff,Self,0,100,5,None,0,First Turn,Accuracy +2,록온
+Robot EvilEye,enemy_031,Targeting System,None,Passive,Self,0,0,0,None,0,,Critical +10%,조준 시스템
+Will-O'-Wisp,enemy_032,Ghost Flame,Fire,Attack,Single_Enemy,75,100,6,Burn,30,,,푸른 불꽃
+Will-O'-Wisp,enemy_032,Soul Light,Dark,Attack,Single_Enemy,50,100,8,HPDrain,40,,,영혼을 흡수한다.
+Will-O'-Wisp,enemy_032,Floating,None,Passive,Self,0,0,0,None,0,,Wind Resistance +25%,부유
+Robot EvilWeapon,enemy_033,Gatling Fire,Physical,Attack,Single_Enemy,85,95,6,None,0,,,기관포 난사
+Robot EvilWeapon,enemy_033,Missile Burst,Fire,Attack,All_Enemies,50,95,10,None,0,EnemyCount>=2,,미사일 연사
+Robot EvilWeapon,enemy_033,Combat AI,None,Passive,Self,0,0,0,None,0,,Critical +15%,전투 AI
+Undine,enemy_034,Ice Lance,Ice,Attack,Single_Enemy,82,100,7,None,0,,,얼음 창
+Undine,enemy_034,Aqua Heal,Holy,Recovery,Ally,0,100,8,None,0,AllyHP<=50%,Heal 35%,치유의 물
+Undine,enemy_034,Water Veil,None,Passive,Self,0,0,0,None,0,,Fire Resistance +30%,물의 장막
+Salamander,enemy_035,Flame Breath,Fire,Attack,All_Enemies,55,95,10,Burn,25,EnemyCount>=2,,화염 숨결
+Salamander,enemy_035,Fire Claw,Fire,Attack,Single_Enemy,85,95,6,None,0,,,불꽃 발톱
+Salamander,enemy_035,Flame Body,None,Passive,Self,0,0,0,Burn,20,,Counter inflicts Burn,화염의 몸
+Werewolf,enemy_036,Moon Fang,Physical,Attack,Single_Enemy,95,95,7,Bleed,30,,,달빛 송곳니
+Werewolf,enemy_036,Howling,Holy,Buff,Self,0,100,6,None,0,First Turn,ATK +2,포효
+Werewolf,enemy_036,Beast Instinct,None,Passive,Self,0,0,0,None,0,,Critical +15%,야성
+FutureSoldier(M),enemy_037,Burst Fire,Physical,Attack,Single_Enemy,88,100,6,None,0,,,점사 사격
+FutureSoldier(M),enemy_037,Flash Grenade,Lightning,Debuff,All_Enemies,0,100,8,Blind,30,EnemyCount>=2,,섬광탄
+FutureSoldier(M),enemy_037,Tactical Training,None,Passive,Self,0,0,0,None,0,,Accuracy +10% Evasion +10%,전술 훈련
+Treant,enemy_038,Branch Slam,Nature,Attack,Single_Enemy,92,90,6,None,0,,,거대한 가지 공격
+Treant,enemy_038,Ancient Roots,Nature,Debuff,All_Enemies,0,95,9,Bind,35,EnemyCount>=2,,고대의 뿌리
+Treant,enemy_038,Ancient Bark,None,Passive,Self,0,0,0,None,0,,Physical Damage -25%,고목
+FutureSoldier(F),enemy_039,Plasma Rifle,Lightning,Attack,Single_Enemy,90,100,7,None,0,,,플라즈마 사격
+FutureSoldier(F),enemy_039,Combat Stim,Holy,Buff,Self,0,100,6,None,0,First Turn,AGI +2,전투 자극제
+FutureSoldier(F),enemy_039,Elite Soldier,None,Passive,Self,0,0,0,None,0,,Turn Speed +15%,엘리트 병사
+Yeti,enemy_040,Blizzard Punch,Ice,Attack,Single_Enemy,100,90,7,Freeze,20,,,빙설의 주먹
+Yeti,enemy_040,Snowstorm,Ice,Attack,All_Enemies,55,95,10,None,0,EnemyCount>=2,,눈보라
+Yeti,enemy_040,Cold Resistance,None,Passive,Self,0,0,0,None,0,,Ice Resistance +50%,혹한 적응
+Gladiator,enemy_041,Arena Slash,Physical,Attack,Single_Enemy,100,95,6,None,0,,,검투사의 일격
+Gladiator,enemy_041,Shield Counter,Holy,Buff,Self,0,100,6,None,0,HP<=60%,Counter +20%,반격 태세
+Gladiator,enemy_041,Veteran Fighter,None,Passive,Self,0,0,0,None,0,,Critical +15%,베테랑
+Centaur,enemy_042,Piercing Spear,Physical,Attack,Single_Enemy,95,100,6,None,0,,,관통 창
+Centaur,enemy_042,Charge,Physical,Attack,Single_Enemy,115,85,9,None,0,,,돌격
+Centaur,enemy_042,Cavalry Master,None,Passive,Self,0,0,0,None,0,,Turn Speed +10%,기마 전사
+Kelpie,enemy_043,Water Gallop,Ice,Attack,Single_Enemy,90,95,6,None,0,,,물의 돌진
+Kelpie,enemy_043,Drown,Ice,Debuff,Single_Enemy,0,100,8,Silence,30,,,익사의 저주
+Kelpie,enemy_043,River Spirit,None,Passive,Self,0,0,0,None,0,,Ice Damage +15%,강의 정령
+Banshee,enemy_044,Death Song,Dark,Attack,All_Enemies,65,100,10,Fear,30,EnemyCount>=2,,죽음의 노래
+Banshee,enemy_044,Wail,Dark,Debuff,All_Enemies,0,100,8,None,0,,DEF -2,비탄의 울음
+Banshee,enemy_044,Spirit Voice,None,Passive,Self,0,0,0,None,0,,Silence Immune,영혼의 목소리
+Himiko,enemy_045,Sacred Flame,Holy,Attack,Single_Enemy,105,100,8,None,0,,,신성한 불꽃
+Himiko,enemy_045,Divine Oracle,Holy,Buff,All_Allies,0,100,8,None,0,First Turn,ACC +1 EVA +1,신탁
+Himiko,enemy_045,Priestess,None,Passive,Self,0,0,0,None,0,,Recover MP 3% each turn,무녀
+Cockatrice,enemy_046,Petrify Peck,Physical,Attack,Single_Enemy,85,95,7,Petrify,20,,,석화의 부리
+Cockatrice,enemy_046,Wing Cutter,Wind,Attack,Single_Enemy,80,100,5,None,0,,,날개 베기
+Cockatrice,enemy_046,Evil Eyes,None,Passive,Self,0,0,0,None,0,,Petrify Success +15%,사안
+AnneBonny,enemy_047,Pirate Rush,Physical,Attack,Single_Enemy,100,95,7,None,0,,,해적 돌격
+AnneBonny,enemy_047,Pistol Shot,Physical,Attack,Single_Enemy,80,100,5,None,0,,,권총 사격
+AnneBonny,enemy_047,Pirate Spirit,None,Passive,Self,0,0,0,None,0,,Critical +15%,해적의 혼
+MaryRead,enemy_048,Cross Slash,Physical,Attack,Single_Enemy,102,95,7,None,0,,,십자 베기
+MaryRead,enemy_048,Quick Draw,Physical,Attack,Single_Enemy,72,100,5,None,0,First Turn,First Strike,속사
+MaryRead,enemy_048,Veteran Pirate,None,Passive,Self,0,0,0,None,0,,Evasion +10%,노련한 해적
+Ljosalfen,enemy_049,Holy Arrow,Holy,Attack,Single_Enemy,100,100,7,None,0,,,빛의 화살
+Ljosalfen,enemy_049,Blessing,Holy,Buff,All_Allies,0,100,8,None,0,First Turn,MAT +1 MDF +1,축복
+Ljosalfen,enemy_049,Light Spirit,None,Passive,Self,0,0,0,None,0,,Holy Damage +15% Dark Resistance +25%,빛의 요정
+Huldra,enemy_050,Forest Charm,Nature,Debuff,Single_Enemy,0,100,8,Charm,35,,,숲의 요정이 적을 유혹한다.
+Huldra,enemy_050,Thorn Whip,Nature,Attack,Single_Enemy,110,95,7,None,0,,,가시 덩굴 채찍
+Huldra,enemy_050,Enchanting Beauty,None,Passive,Self,0,0,0,None,0,,Charm Success +15%,매혹적인 아름다움
+Ljosalfr,enemy_051,Light Spear,Holy,Attack,Single_Enemy,108,100,7,None,0,,,빛의 창
+Ljosalfr,enemy_051,Radiant Blessing,Holy,Buff,All_Allies,0,100,8,None,0,First Turn,ACC +1 EVA +1,광휘의 축복
+Ljosalfr,enemy_051,Light Spirit,None,Passive,Self,0,0,0,None,0,,Holy Damage +20%,빛의 정령
+Huldrekall,enemy_052,Mountain Smash,Physical,Attack,Single_Enemy,118,90,7,None,0,,,거대한 주먹
+Huldrekall,enemy_052,Wild Roar,Dark,Debuff,All_Enemies,0,100,8,None,0,,ATK -1,야성의 포효
+Huldrekall,enemy_052,Mountain Body,None,Passive,Self,0,0,0,None,0,,Physical Damage -20%,산의 육체
+Golem,enemy_053,Stone Hammer,Physical,Attack,Single_Enemy,120,90,7,None,0,,,바위 망치
+Golem,enemy_053,Fortress,Holy,Buff,Self,0,100,8,None,0,HP<=70%,DEF +3,요새화
+Golem,enemy_053,Rock Body,None,Passive,Self,0,0,0,None,0,,Physical Damage -30%,암석 육체
+Oomukade,enemy_054,Venom Fang,Nature,Attack,Single_Enemy,110,95,6,Poison,40,,,맹독 이빨
+Oomukade,enemy_054,Thousand Legs,Physical,Attack,Single_Enemy,130,90,9,None,0,,,천족 난무
+Oomukade,enemy_054,Toxic Blood,None,Passive,Self,0,0,0,None,0,,Poison Immune,맹독 체질
+MochizukiChiyome,enemy_055,Shadow Kunai,Dark,Attack,Single_Enemy,115,100,6,None,0,,,그림자 쿠나이
+MochizukiChiyome,enemy_055,Poison Needle,Nature,Attack,Single_Enemy,80,100,6,Poison,40,,,독침
+MochizukiChiyome,enemy_055,Master Kunoichi,None,Passive,Self,0,0,0,None,0,,Critical +15%,쿠노이치의 달인
+Oogama,enemy_056,Swallow,Physical,Attack,Single_Enemy,125,90,8,HPDrain,30,,,먹어치운다.
+Oogama,enemy_056,Tongue Lash,Nature,Attack,Single_Enemy,95,100,6,Bind,30,,,긴 혀 공격
+Oogama,enemy_056,Amphibious,None,Passive,Self,0,0,0,None,0,,Ice Resistance +25%,양서류
+WilliamTell,enemy_057,Apple Shot,Physical,Attack,Single_Enemy,135,100,8,None,0,,Always Hit,사과를 꿰뚫는 명사수
+WilliamTell,enemy_057,Rapid Shot,Physical,Attack,Single_Enemy,90,100,5,None,0,,,연속 사격
+WilliamTell,enemy_057,Master Archer,None,Passive,Self,0,0,0,None,0,,Accuracy +20%,궁술의 달인
+Dragonfolk,enemy_058,Dragon Fang,Physical,Attack,Single_Enemy,125,95,7,None,0,,,용의 송곳니
+Dragonfolk,enemy_058,Dragon Breath,Fire,Attack,All_Enemies,80,95,10,Burn,20,EnemyCount>=2,,용의 숨결
+Dragonfolk,enemy_058,Dragon Blood,None,Passive,Self,0,0,0,None,0,,Fire Resistance +30%,용의 피
+Assassin,enemy_059,Assassinate,Dark,Attack,Single_Enemy,140,90,10,None,0,,Critical +20%,암살
+Assassin,enemy_059,Smoke Bomb,Dark,Debuff,All_Enemies,0,100,7,Blind,35,,,연막탄
+Assassin,enemy_059,Stealth,None,Passive,Self,0,0,0,None,0,,Evasion +15%,은신
+FuumaKotarou,enemy_060,Wind Shuriken,Wind,Attack,Single_Enemy,120,100,6,None,0,,,풍마 수리검
+FuumaKotarou,enemy_060,Shadow Step,Holy,Buff,Self,0,100,6,None,0,First Turn,EVA +2,그림자 이동
+FuumaKotarou,enemy_060,Ninja Master,None,Passive,Self,0,0,0,None,0,,Turn Speed +15%,닌자의 달인
+Asterion,enemy_061,Bull Charge,Physical,Attack,Single_Enemy,145,85,9,None,0,,,황소 돌진
+Asterion,enemy_061,Horn Crush,Physical,Attack,Single_Enemy,125,95,7,None,0,,,뿔 들이받기
+Asterion,enemy_061,Beast Strength,None,Passive,Self,0,0,0,None,0,,ATK +10%,야수의 힘
+Minotaur,enemy_062,Labyrinth Axe,Physical,Attack,Single_Enemy,150,90,9,None,0,,,미궁의 도끼
+Minotaur,enemy_062,Frenzy,Holy,Buff,Self,0,100,6,None,0,HP<=60%,ATK +2 DEF -1,광란
+Minotaur,enemy_062,Giant Body,None,Passive,Self,0,0,0,None,0,,Max HP +20%,거인의 육체
+KugutsuNinja,enemy_063,Puppet Blade,Dark,Attack,Single_Enemy,125,100,7,None,0,,,인형 검술
+KugutsuNinja,enemy_063,Wire Trap,Nature,Debuff,Single_Enemy,0,100,7,Bind,40,,,와이어 함정
+KugutsuNinja,enemy_063,Puppet Technique,None,Passive,Self,0,0,0,None,0,,Status Success +15%,괴뢰술
+Cerberus,enemy_064,Triple Bite,Physical,Attack,Single_Enemy,150,95,9,Bleed,30,,,세 개의 머리로 물어뜯는다.
+Cerberus,enemy_064,Hellfire,Fire,Attack,All_Enemies,90,100,12,Burn,25,EnemyCount>=2,,지옥불
+Cerberus,enemy_064,Guardian of Hades,None,Passive,Self,0,0,0,None,0,,Fire Resistance +50%,지옥의 문지기
+Griffin,enemy_065,Sky Dive,Wind,Attack,Single_Enemy,140,95,8,None,0,,,급강하
+Griffin,enemy_065,Razor Wing,Wind,Attack,All_Enemies,75,100,10,None,0,EnemyCount>=2,,날개 칼날
+Griffin,enemy_065,King of Skies,None,Passive,Self,0,0,0,None,0,,Evasion +15%,하늘의 왕
+Chimera,enemy_066,Chimera Breath,Fire,Attack,All_Enemies,95,95,12,Burn,30,EnemyCount>=2,,합성수의 숨결
+Chimera,enemy_066,Beast Rush,Physical,Attack,Single_Enemy,145,90,8,None,0,,,맹수 돌격
+Chimera,enemy_066,Hybrid Body,None,Passive,Self,0,0,0,None,0,,Fire Resistance +25%; Nature Resistance +25%,합성 생명체
+LadySun,enemy_067,Twin Blade Dance,Physical,Attack,Single_Enemy,145,95,8,None,0,,,쌍검 난무
+LadySun,enemy_067,Battle Command,Holy,Buff,All_Allies,0,100,9,None,0,First Turn,ATK +1 ACC +1,전장의 지휘
+LadySun,enemy_067,Warrior Princess,None,Passive,Self,0,0,0,None,0,,Critical +10%,무장의 공주
+Manticore,enemy_068,Venom Tail,Nature,Attack,Single_Enemy,120,95,7,Poison,40,,,독침 꼬리
+Manticore,enemy_068,Savage Pounce,Physical,Attack,Single_Enemy,150,90,9,None,0,,,맹수의 도약
+Manticore,enemy_068,Predator,None,Passive,Self,0,0,0,None,0,,Damage +15% vs HP<=50%,포식자
+Camazotz,enemy_069,Sonic Burst,Wind,Attack,All_Enemies,90,100,10,Silence,30,EnemyCount>=2,,초음파
+Camazotz,enemy_069,Blood Drain,Dark,Attack,Single_Enemy,100,100,8,HPDrain,50,,,흡혈
+Camazotz,enemy_069,Night Hunter,None,Passive,Self,0,0,0,None,0,,Dark Damage +20%,밤의 사냥꾼
+Scylla,enemy_070,Tentacle Crush,Water,Attack,Single_Enemy,150,90,9,None,0,,,촉수 강타
+Scylla,enemy_070,Whirlpool,Water,Attack,All_Enemies,85,95,10,Bind,20,EnemyCount>=2,,소용돌이
+Scylla,enemy_070,Sea Monster,None,Passive,Self,0,0,0,None,0,,Water Resistance +30%,바다 괴물
+Lamia,enemy_071,Venom Kiss,Nature,Attack,Single_Enemy,110,100,7,Poison,40,,,독의 입맞춤
+Lamia,enemy_071,Hypnosis,Dark,Debuff,Single_Enemy,0,100,8,Charm,30,,,최면
+Lamia,enemy_071,Serpent Blood,None,Passive,Self,0,0,0,None,0,,Poison Immune,뱀의 피
+Sleipnir,enemy_072,Divine Charge,Holy,Attack,Single_Enemy,155,95,9,None,0,,,신성한 돌격
+Sleipnir,enemy_072,Gallop,Holy,Buff,Self,0,100,6,None,0,First Turn,AGI +2,질주
+Sleipnir,enemy_072,Eight Legs,None,Passive,Self,0,0,0,None,0,,Turn Speed +20%,여덟 다리
+Kraken,enemy_073,Giant Tentacle,Water,Attack,Single_Enemy,160,90,9,None,0,,,거대한 촉수
+Kraken,enemy_073,Maelstrom,Water,Attack,All_Enemies,95,95,12,None,0,EnemyCount>=2,,대소용돌이
+Kraken,enemy_073,Deep Sea Giant,None,Passive,Self,0,0,0,None,0,,Water Damage +20%,심해의 지배자
+Vampire,enemy_074,Blood Drain,Dark,Attack,Single_Enemy,120,100,8,HPDrain,50,,,피를 흡수한다.
+Vampire,enemy_074,Night Terror,Dark,Debuff,All_Enemies,0,100,10,Fear,35,,,밤의 공포
+Vampire,enemy_074,Immortal Body,None,Passive,Self,0,0,0,None,0,,Recover HP 5% each turn,불사의 육체
+Dullahan,enemy_075,Headless Charge,Physical,Attack,Single_Enemy,165,90,10,None,0,,,머리 없는 기사의 돌격
+Dullahan,enemy_075,Cursed Blade,Dark,Attack,Single_Enemy,135,100,8,Fear,25,,,저주받은 검
+Dullahan,enemy_075,Undying Knight,None,Passive,Self,0,0,0,None,0,,Fear Resistance +50%,불사의 기사
+Scathach,enemy_076,Gae Buidhe,Physical,Attack,Single_Enemy,170,95,10,Bleed,30,,,황색 창
+Scathach,enemy_076,War Goddess,Holy,Buff,Self,0,100,8,None,0,First Turn,ATK +2 ACC +1,전쟁의 여신
+Scathach,enemy_076,Master Instructor,None,Passive,Self,0,0,0,None,0,,Critical +15%,영웅들의 스승
+Troll,enemy_077,Club Smash,Physical,Attack,Single_Enemy,175,90,10,None,0,,,곤봉 강타
+Troll,enemy_077,Regenerate,Holy,Recovery,Self,0,100,8,None,0,HP<=50%,Recover HP 35%,재생
+Troll,enemy_077,Thick Hide,None,Passive,Self,0,0,0,None,0,,Recover HP 3% each turn,질긴 피부
+Bodhidharma,enemy_078,Mind Wave,Holy,Attack,All_Enemies,95,100,10,None,0,,,정신 충격
+Bodhidharma,enemy_078,Meditation,Holy,Recovery,Self,0,100,8,None,0,MP<=40%,Recover MP 30%,명상
+Bodhidharma,enemy_078,Enlightenment,None,Passive,Self,0,0,0,None,0,,Holy Resistance +30%,깨달음
+DragonKnight,enemy_079,Dragon Slash,Physical,Attack,Single_Enemy,180,95,10,None,0,,,용기사의 검
+DragonKnight,enemy_079,Dragon Breath,Fire,Attack,All_Enemies,100,95,12,Burn,25,EnemyCount>=2,,용의 숨결
+DragonKnight,enemy_079,Dragon Armor,None,Passive,Self,0,0,0,None,0,,Fire Resistance +30%,용의 갑옷
+Taliesin,enemy_080,Bard Song,Holy,Buff,All_Allies,0,100,10,None,0,First Turn,MAT +2,음유시인의 노래
+Taliesin,enemy_080,Magic Verse,Holy,Attack,Single_Enemy,175,100,9,None,0,,,마법의 시
+Taliesin,enemy_080,Ancient Wisdom,None,Passive,Self,0,0,0,None,0,,MP Regen 5%,고대의 지혜
+Mummy,enemy_081,Curse Bandage,Dark,Attack,Single_Enemy,150,95,8,Bind,30,,,붕대 저주
+Mummy,enemy_081,Ancient Curse,Dark,Debuff,Single_Enemy,0,100,9,Poison,40,,,고대의 저주
+Mummy,enemy_081,Eternal Corpse,None,Passive,Self,0,0,0,None,0,,Poison Immune,영원한 미라
+Cathbad,enemy_082,Druid Staff,Holy,Attack,Single_Enemy,170,100,9,None,0,,,드루이드의 지팡이
+Cathbad,enemy_082,Prophecy,Holy,Buff,All_Allies,0,100,10,None,0,First Turn,ACC +2,예언
+Cathbad,enemy_082,Archdruid,None,Passive,Self,0,0,0,None,0,,Holy Damage +20%,대드루이드
+Shadowblade,enemy_083,Shadow Strike,Dark,Attack,Single_Enemy,185,100,10,Critical,20,,,그림자 일격
+Shadowblade,enemy_083,Dark Mist,Dark,Debuff,All_Enemies,0,100,10,Blind,35,,,암흑 장막
+Shadowblade,enemy_083,Living Shadow,None,Passive,Self,0,0,0,None,0,,Evasion +20%,살아있는 그림자
+Medusa,enemy_084,Petrifying Gaze,Dark,Debuff,Single_Enemy,0,100,10,Petrify,30,,,석화의 시선
+Medusa,enemy_084,Snake Hair,Nature,Attack,Single_Enemy,170,95,8,Poison,30,,,뱀 머리 공격
+Medusa,enemy_084,Gorgon Blood,None,Passive,Self,0,0,0,None,0,,Poison Resistance +50%,고르곤의 피
+Veleda,enemy_085,Sacred Ritual,Holy,Buff,All_Allies,0,100,10,None,0,First Turn,MDF +2,신성한 의식
+Veleda,enemy_085,Spirit Spear,Holy,Attack,Single_Enemy,180,100,9,None,0,,,정령의 창
+Veleda,enemy_085,Oracle,None,Passive,Self,0,0,0,None,0,,Status Resistance +20%,예언자
+Jinn,enemy_086,Desert Storm,Wind,Attack,All_Enemies,105,100,11,None,0,EnemyCount>=2,,모래폭풍
+Jinn,enemy_086,Wish Flame,Fire,Attack,Single_Enemy,180,100,9,Burn,25,,,소원의 불꽃
+Jinn,enemy_086,Wish Spirit,None,Passive,Self,0,0,0,None,0,,Fire Damage +20%,정령
+Bellona,enemy_087,War Spear,Physical,Attack,Single_Enemy,185,95,10,None,0,,,전쟁의 창
+Bellona,enemy_087,Battle Cry,Holy,Buff,All_Allies,0,100,10,None,0,First Turn,ATK +1 DEF +1,전쟁의 함성
+Bellona,enemy_087,Goddess of War,None,Passive,Self,0,0,0,None,0,,Critical +10%,전쟁의 여신
+Brigid,enemy_088,Holy Flame,Fire,Attack,Single_Enemy,185,100,9,Burn,30,,,성화
+Brigid,enemy_088,Blessing Fire,Holy,Recovery,All_Allies,0,100,12,None,0,AllyHP<=60%,Heal 35%,축복의 불
+Brigid,enemy_088,Eternal Flame,None,Passive,Self,0,0,0,None,0,,Burn Immune,영원의 불꽃
+Ifrit,enemy_089,Inferno,Fire,Attack,All_Enemies,115,95,13,Burn,40,EnemyCount>=2,,지옥불
+Ifrit,enemy_089,Flame Punch,Fire,Attack,Single_Enemy,190,95,9,None,0,,,화염 권
+Ifrit,enemy_089,Flame Soul,None,Passive,Self,0,0,0,None,0,,Fire Damage +25%,불의 정령
+Ceridwen,enemy_090,Cauldron Curse,Dark,Debuff,Single_Enemy,0,100,10,Confuse,35,,,마녀의 가마솥
+Ceridwen,enemy_090,Arcane Blast,Holy,Attack,Single_Enemy,190,100,10,None,0,,,마력 폭발
+Ceridwen,enemy_090,Witch Queen,None,Passive,Self,0,0,0,None,0,,MAT +15%,대마녀
+Balrog,enemy_091,Hell Axe,Fire,Attack,Single_Enemy,200,90,10,Burn,30,,,지옥 도끼
+Balrog,enemy_091,Demon Roar,Dark,Debuff,All_Enemies,0,100,10,Fear,30,,,악마의 포효
+Balrog,enemy_091,Demon Lord,None,Passive,Self,0,0,0,None,0,,Fire Resistance +40%,마계의 장군
+Medea,enemy_092,Dark Sorcery,Dark,Attack,Single_Enemy,195,100,10,None,0,,,흑마술
+Medea,enemy_092,Hex,Dark,Debuff,Single_Enemy,0,100,10,Confuse,35,,,저주
+Medea,enemy_092,Witchcraft,None,Passive,Self,0,0,0,None,0,,Dark Damage +20%,마녀의 지식
+Belial,enemy_093,Hellfire,Fire,Attack,All_Enemies,120,95,14,Burn,35,EnemyCount>=2,,지옥의 불꽃
+Belial,enemy_093,Dark Pact,Dark,Buff,Self,0,100,10,None,0,HP<=60%,MAT +2,암흑 계약
+Belial,enemy_093,Demon King,None,Passive,Self,0,0,0,None,0,,Dark Resistance +30%,악마왕
+Circe,enemy_094,Transform Curse,Dark,Debuff,Single_Enemy,0,100,10,Confuse,40,,,변이의 저주
+Circe,enemy_094,Magic Bolt,Holy,Attack,Single_Enemy,200,100,10,None,0,,,마법 화살
+Circe,enemy_094,Enchantress,None,Passive,Self,0,0,0,None,0,,Status Success +20%,마녀
+Dracula,enemy_095,Vampire Lord,Dark,Attack,Single_Enemy,210,100,11,HPDrain,60,,,흡혈
+Dracula,enemy_095,Nightmare,Dark,Debuff,All_Enemies,0,100,11,Fear,40,,,악몽
+Dracula,enemy_095,True Immortal,None,Passive,Self,0,0,0,None,0,,Recover HP 5% each turn,진조
+Baal,enemy_096,Thunderbolt,Lightning,Attack,All_Enemies,125,100,13,Paralyze,25,EnemyCount>=2,,천둥
+Baal,enemy_096,Storm King,Holy,Buff,Self,0,100,10,None,0,First Turn,MAT +2,폭풍의 왕
+Baal,enemy_096,Divine Thunder,None,Passive,Self,0,0,0,None,0,,Lightning Damage +25%,천둥의 신
+Hecate,enemy_097,Moon Curse,Dark,Debuff,All_Enemies,0,100,11,Silence,35,,,달의 저주
+Hecate,enemy_097,Moonlight,Holy,Attack,Single_Enemy,205,100,10,None,0,,,달빛
+Hecate,enemy_097,Triple Goddess,None,Passive,Self,0,0,0,None,0,,Dark Resistance +30%,삼위일체 여신
+Leviathan,enemy_098,Tidal Wave,Water,Attack,All_Enemies,130,95,14,None,0,EnemyCount>=2,,거대한 해일
+Leviathan,enemy_098,Abyss Bite,Water,Attack,Single_Enemy,210,95,10,None,0,,,심연의 이빨
+Leviathan,enemy_098,Sea King,None,Passive,Self,0,0,0,None,0,,Water Damage +25%,바다의 왕
+Behemoth,enemy_099,Earthquake,Earth,Attack,All_Enemies,135,90,14,Stun,20,EnemyCount>=2,,대지진
+Behemoth,enemy_099,Wild Charge,Physical,Attack,Single_Enemy,220,90,10,None,0,,,야수 돌격
+Behemoth,enemy_099,Primal Beast,None,Passive,Self,0,0,0,None,0,,Max HP +25%,태고의 야수
+Ziz,enemy_100,Hurricane Wing,Wind,Attack,All_Enemies,140,95,14,None,0,EnemyCount>=2,,폭풍을 일으키는 거대한 날갯짓
+Ziz,enemy_100,Heavenly Beak,Wind,Attack,Single_Enemy,220,95,10,None,0,,,신조의 부리
+Ziz,enemy_100,King of Birds,None,Passive,Self,0,0,0,None,0,,Wind Damage +25%,새들의 왕
+Lilith,enemy_101,Temptation,Dark,Debuff,Single_Enemy,0,100,10,Charm,45,,,치명적인 유혹
+Lilith,enemy_101,Dark Kiss,Dark,Attack,Single_Enemy,205,100,10,HPDrain,50,,,생명력을 흡수하는 입맞춤
+Lilith,enemy_101,Queen of Night,None,Passive,Self,0,0,0,None,0,,Charm Success +20% Dark Damage +20%,밤의 여왕
+Klingsor,enemy_102,Black Magic,Dark,Attack,Single_Enemy,220,100,11,None,0,,,사악한 흑마술
+Klingsor,enemy_102,Corruption,Dark,Debuff,All_Enemies,0,100,12,Confuse,30,EnemyCount>=2,,타락의 주문
+Klingsor,enemy_102,Evil Sage,None,Passive,Self,0,0,0,None,0,,MAT +15%,사악한 현자
+Enkidu,enemy_103,Chain of Earth,Nature,Attack,Single_Enemy,215,95,10,Bind,30,,,대지의 사슬
+Enkidu,enemy_103,Guardian Blow,Physical,Attack,Single_Enemy,225,90,10,None,0,,,수호자의 강타
+Enkidu,enemy_103,Heroic Spirit,None,Passive,Self,0,0,0,None,0,,Physical Damage -15%,영웅의 혼
+Atlas,enemy_104,Titan Crush,Physical,Attack,Single_Enemy,235,90,11,None,0,,,거인의 일격
+Atlas,enemy_104,Mountain Toss,Nature,Attack,All_Enemies,145,90,14,None,0,EnemyCount>=2,,거대한 바위를 던진다
+Atlas,enemy_104,Titan Body,None,Passive,Self,0,0,0,None,0,,Max HP +30%,티탄의 육체
+Jormungand,enemy_105,World Serpent,Nature,Attack,All_Enemies,150,95,15,Poison,35,EnemyCount>=2,,세계를 감싸는 독
+Jormungand,enemy_105,Doom Fang,Nature,Attack,Single_Enemy,235,95,11,Poison,40,,,종말의 송곳니
+Jormungand,enemy_105,Endless Coil,None,Passive,Self,0,0,0,None,0,,Nature Damage +20% Poison Immune,끝없는 몸
+Cuchulain,enemy_106,Gae Bolg,Physical,Attack,Single_Enemy,245,95,12,Bleed,40,,,필중의 마창
+Cuchulain,enemy_106,Battle Frenzy,Holy,Buff,Self,0,100,8,None,0,HP<=50%,ATK +2 Critical +10%,전투광
+Cuchulain,enemy_106,Hound of Ulster,None,Passive,Self,0,0,0,None,0,,Critical +15%,얼스터의 영웅
+FionnmacCumhaill,enemy_107,Mac an Luin,Physical,Attack,Single_Enemy,240,95,11,None,0,,,전설의 마검
+FionnmacCumhaill,enemy_107,Salmon Wisdom,Holy,Buff,Self,0,100,8,None,0,First Turn,MAT +2 MDF +2,지혜의 연어
+FionnmacCumhaill,enemy_107,Legendary Hero,None,Passive,Self,0,0,0,None,0,,Accuracy +15%,전설의 영웅
+GoldDragon,enemy_108,Golden Breath,Holy,Attack,All_Enemies,155,95,15,None,0,EnemyCount>=2,,황금의 숨결
+GoldDragon,enemy_108,Dragon Claw,Physical,Attack,Single_Enemy,250,95,11,None,0,,,용의 발톱
+GoldDragon,enemy_108,Golden Scales,None,Passive,Self,0,0,0,None,0,,Physical Damage -25% Holy Resistance +30%,황금 비늘
+Roland,enemy_109,Holy Durandal,Holy,Attack,Single_Enemy,245,100,11,None,0,,,뒤랑달의 일격
+Roland,enemy_109,Paladin Charge,Physical,Attack,Single_Enemy,230,95,10,None,0,,,성기사 돌격
+Roland,enemy_109,Paladin's Honor,None,Passive,Self,0,0,0,None,0,,Holy Damage +20%,기사도의 화신
+KingArthur,enemy_110,Excalibur,Holy,Attack,Single_Enemy,260,100,12,None,0,,,성검 엑스칼리버
+KingArthur,enemy_110,Round Table,Holy,Buff,All_Allies,0,100,12,None,0,First Turn,ATK +1 DEF +1 ACC +1,원탁의 결속
+KingArthur,enemy_110,King's Charisma,None,Passive,Self,0,0,0,None,0,,All Allies Damage +10%,왕의 카리스마
+Valkyrie,enemy_111,Divine Spear,Holy,Attack,Single_Enemy,245,100,11,None,0,,,신창
+Valkyrie,enemy_111,Judgement Wing,Wind,Attack,All_Enemies,150,100,14,None,0,EnemyCount>=2,,심판의 날개
+Valkyrie,enemy_111,Chooser of the Slain,None,Passive,Self,0,0,0,None,0,,Holy Damage +20% Turn Speed +10%,전사의 인도자
+Siegfried,enemy_112,Balmung,Physical,Attack,Single_Enemy,270,95,12,None,0,,,발뭉의 일격
+Siegfried,enemy_112,Dragon Slayer,Holy,Attack,Single_Enemy,290,100,15,None,0,Target=Dragon,Damage x1.5,용살자
+Siegfried,enemy_112,Hero's Body,None,Passive,Self,0,0,0,None,0,,Critical Resistance +30%,불사의 영웅
+Freyja,enemy_113,Brisingamen,Holy,Attack,All_Enemies,155,100,14,Charm,25,EnemyCount>=2,,여신의 빛
+Freyja,enemy_113,Goddess Blessing,Holy,Recovery,All_Allies,0,100,14,None,0,AllyHP<=50%,Heal 40%,여신의 축복
+Freyja,enemy_113,Goddess of Love,None,Passive,Self,0,0,0,None,0,,Charm Resistance +50% Holy Damage +15%,사랑과 풍요의 여신
+Siva,enemy_114,Tandava,Dark,Attack,All_Enemies,170,95,18,None,0,EnemyCount>=2,,우주의 파괴의 춤
+Siva,enemy_114,Third Eye,Holy,Attack,Single_Enemy,280,100,12,None,0,,Ignore DEF,제3의 눈
+Siva,enemy_114,Destroyer,None,Passive,Self,0,0,0,None,0,,All Damage +15%,파괴신
+QitianDasheng,enemy_115,Ruyi Jingu Bang,Physical,Attack,Single_Enemy,280,100,12,None,0,,,여의봉 강타
+QitianDasheng,enemy_115,72 Transformations,Holy,Buff,Self,0,100,10,None,0,HP<=60%,ATK +2 DEF +2 EVA +1,칠십이변
+QitianDasheng,enemy_115,Great Sage,None,Passive,Self,0,0,0,None,0,,Status Resistance +30% Critical +10%,제천대성
+Bellona,enemy_087,War Spear,Physical,Attack,Single_Enemy,185,95,10,None,0,,,전쟁의 창
+Bellona,enemy_087,Battle Cry,Holy,Buff,All_Allies,0,100,10,None,0,First Turn,ATK +1 DEF +1,전쟁의 함성
+Bellona,enemy_087,Goddess of War,None,Passive,Self,0,0,0,None,0,,Critical +10%,전쟁의 여신
+,,,,,,,,,,,,,
+Brigid,enemy_088,Holy Flame,Fire,Attack,Single_Enemy,185,100,9,Burn,30,,,성화
+Brigid,enemy_088,Blessing Fire,Holy,Recovery,All_Allies,0,100,12,None,0,AllyHP<=60%,Heal 35%,축복의 불
+Brigid,enemy_088,Eternal Flame,None,Passive,Self,0,0,0,None,0,,Burn Immune,영원의 불꽃
+,,,,,,,,,,,,,
+Ifrit,enemy_089,Inferno,Fire,Attack,All_Enemies,115,95,13,Burn,40,EnemyCount>=2,,지옥불
+Ifrit,enemy_089,Flame Punch,Fire,Attack,Single_Enemy,190,95,9,None,0,,,화염 권
+Ifrit,enemy_089,Flame Soul,None,Passive,Self,0,0,0,None,0,,Fire Damage +25%,불의 정령
+,,,,,,,,,,,,,
+Ceridwen,enemy_090,Cauldron Curse,Dark,Debuff,Single_Enemy,0,100,10,Confuse,35,,,마녀의 가마솥
+Ceridwen,enemy_090,Arcane Blast,Holy,Attack,Single_Enemy,190,100,10,None,0,,,마력 폭발
+Ceridwen,enemy_090,Witch Queen,None,Passive,Self,0,0,0,None,0,,MAT +15%,대마녀
+Balrog,enemy_091,Hell Axe,Fire,Attack,Single_Enemy,200,90,10,Burn,30,,,지옥 도끼
+Balrog,enemy_091,Demon Roar,Dark,Debuff,All_Enemies,0,100,10,Fear,30,,,악마의 포효
+Balrog,enemy_091,Demon Lord,None,Passive,Self,0,0,0,None,0,,Fire Resistance +40%,마계의 장군
+Medea,enemy_092,Dark Sorcery,Dark,Attack,Single_Enemy,195,100,10,None,0,,,흑마술
+Medea,enemy_092,Hex,Dark,Debuff,Single_Enemy,0,100,10,Confuse,35,,,저주
+Medea,enemy_092,Witchcraft,None,Passive,Self,0,0,0,None,0,,Dark Damage +20%,마녀의 지식
+Belial,enemy_093,Hellfire,Fire,Attack,All_Enemies,120,95,14,Burn,35,EnemyCount>=2,,지옥의 불꽃
+Belial,enemy_093,Dark Pact,Dark,Buff,Self,0,100,10,None,0,HP<=60%,MAT +2,암흑 계약
+Belial,enemy_093,Demon King,None,Passive,Self,0,0,0,None,0,,Dark Resistance +30%,악마왕
+Circe,enemy_094,Transform Curse,Dark,Debuff,Single_Enemy,0,100,10,Confuse,40,,,변이의 저주
+Circe,enemy_094,Magic Bolt,Holy,Attack,Single_Enemy,200,100,10,None,0,,,마법 화살
+Circe,enemy_094,Enchantress,None,Passive,Self,0,0,0,None,0,,Status Success +20%,마녀
+Dracula,enemy_095,Vampire Lord,Dark,Attack,Single_Enemy,210,100,11,HPDrain,60,,,흡혈
+Dracula,enemy_095,Nightmare,Dark,Debuff,All_Enemies,0,100,11,Fear,40,,,악몽
+Dracula,enemy_095,True Immortal,None,Passive,Self,0,0,0,None,0,,Recover HP 5% each turn,진조
+Baal,enemy_096,Thunderbolt,Lightning,Attack,All_Enemies,125,100,13,Paralyze,25,EnemyCount>=2,,천둥
+Baal,enemy_096,Storm King,Holy,Buff,Self,0,100,10,None,0,First Turn,MAT +2,폭풍의 왕
+Baal,enemy_096,Divine Thunder,None,Passive,Self,0,0,0,None,0,,Lightning Damage +25%,천둥의 신
+Hecate,enemy_097,Moon Curse,Dark,Debuff,All_Enemies,0,100,11,Silence,35,,,달의 저주
+Hecate,enemy_097,Moonlight,Holy,Attack,Single_Enemy,205,100,10,None,0,,,달빛
+Hecate,enemy_097,Triple Goddess,None,Passive,Self,0,0,0,None,0,,Dark Resistance +30%,삼위일체 여신
+Leviathan,enemy_098,Tidal Wave,Water,Attack,All_Enemies,130,95,14,None,0,EnemyCount>=2,,거대한 해일
+Leviathan,enemy_098,Abyss Bite,Water,Attack,Single_Enemy,210,95,10,None,0,,,심연의 이빨
+Leviathan,enemy_098,Sea King,None,Passive,Self,0,0,0,None,0,,Water Damage +25%,바다의 왕
+Behemoth,enemy_099,Earthquake,Earth,Attack,All_Enemies,135,90,14,Stun,20,EnemyCount>=2,,대지진
+Behemoth,enemy_099,Wild Charge,Physical,Attack,Single_Enemy,220,90,10,None,0,,,야수 돌격
+Behemoth,enemy_099,Primal Beast,None,Passive,Self,0,0,0,None,0,,Max HP +25%,태고의 야수
+Ziz,enemy_100,Hurricane Wing,Wind,Attack,All_Enemies,140,95,14,None,0,EnemyCount>=2,,폭풍을 일으키는 거대한 날갯짓
+Ziz,enemy_100,Heavenly Beak,Wind,Attack,Single_Enemy,220,95,10,None,0,,,신조의 부리
+Ziz,enemy_100,King of Birds,None,Passive,Self,0,0,0,None,0,,Wind Damage +25%,새들의 왕
+Lilith,enemy_101,Temptation,Dark,Debuff,Single_Enemy,0,100,10,Charm,45,,,치명적인 유혹
+Lilith,enemy_101,Dark Kiss,Dark,Attack,Single_Enemy,205,100,10,HPDrain,50,,,생명력을 흡수하는 입맞춤
+Lilith,enemy_101,Queen of Night,None,Passive,Self,0,0,0,None,0,,Charm Success +20% Dark Damage +20%,밤의 여왕
+Klingsor,enemy_102,Black Magic,Dark,Attack,Single_Enemy,220,100,11,None,0,,,사악한 흑마술
+Klingsor,enemy_102,Corruption,Dark,Debuff,All_Enemies,0,100,12,Confuse,30,EnemyCount>=2,,타락의 주문
+Klingsor,enemy_102,Evil Sage,None,Passive,Self,0,0,0,None,0,,MAT +15%,사악한 현자
+Enkidu,enemy_103,Chain of Earth,Nature,Attack,Single_Enemy,215,95,10,Bind,30,,,대지의 사슬
+Enkidu,enemy_103,Guardian Blow,Physical,Attack,Single_Enemy,225,90,10,None,0,,,수호자의 강타
+Enkidu,enemy_103,Heroic Spirit,None,Passive,Self,0,0,0,None,0,,Physical Damage -15%,영웅의 혼
+Atlas,enemy_104,Titan Crush,Physical,Attack,Single_Enemy,235,90,11,None,0,,,거인의 일격
+Atlas,enemy_104,Mountain Toss,Nature,Attack,All_Enemies,145,90,14,None,0,EnemyCount>=2,,거대한 바위를 던진다
+Atlas,enemy_104,Titan Body,None,Passive,Self,0,0,0,None,0,,Max HP +30%,티탄의 육체
+Jormungand,enemy_105,World Serpent,Nature,Attack,All_Enemies,150,95,15,Poison,35,EnemyCount>=2,,세계를 감싸는 독
+Jormungand,enemy_105,Doom Fang,Nature,Attack,Single_Enemy,235,95,11,Poison,40,,,종말의 송곳니
+Jormungand,enemy_105,Endless Coil,None,Passive,Self,0,0,0,None,0,,Nature Damage +20% Poison Immune,끝없는 몸
+Cuchulain,enemy_106,Gae Bolg,Physical,Attack,Single_Enemy,245,95,12,Bleed,40,,,필중의 마창
+Cuchulain,enemy_106,Battle Frenzy,Holy,Buff,Self,0,100,8,None,0,HP<=50%,ATK +2 Critical +10%,전투광
+Cuchulain,enemy_106,Hound of Ulster,None,Passive,Self,0,0,0,None,0,,Critical +15%,얼스터의 영웅
+FionnmacCumhaill,enemy_107,Mac an Luin,Physical,Attack,Single_Enemy,240,95,11,None,0,,,전설의 마검
+FionnmacCumhaill,enemy_107,Salmon Wisdom,Holy,Buff,Self,0,100,8,None,0,First Turn,MAT +2 MDF +2,지혜의 연어
+FionnmacCumhaill,enemy_107,Legendary Hero,None,Passive,Self,0,0,0,None,0,,Accuracy +15%,전설의 영웅
+GoldDragon,enemy_108,Golden Breath,Holy,Attack,All_Enemies,155,95,15,None,0,EnemyCount>=2,,황금의 숨결
+GoldDragon,enemy_108,Dragon Claw,Physical,Attack,Single_Enemy,250,95,11,None,0,,,용의 발톱
+GoldDragon,enemy_108,Golden Scales,None,Passive,Self,0,0,0,None,0,,Physical Damage -25% Holy Resistance +30%,황금 비늘
+Roland,enemy_109,Holy Durandal,Holy,Attack,Single_Enemy,245,100,11,None,0,,,뒤랑달의 일격
+Roland,enemy_109,Paladin Charge,Physical,Attack,Single_Enemy,230,95,10,None,0,,,성기사 돌격
+Roland,enemy_109,Paladin's Honor,None,Passive,Self,0,0,0,None,0,,Holy Damage +20%,기사도의 화신
+KingArthur,enemy_110,Excalibur,Holy,Attack,Single_Enemy,260,100,12,None,0,,,성검 엑스칼리버
+KingArthur,enemy_110,Round Table,Holy,Buff,All_Allies,0,100,12,None,0,First Turn,ATK +1 DEF +1 ACC +1,원탁의 결속
+KingArthur,enemy_110,King's Charisma,None,Passive,Self,0,0,0,None,0,,All Allies Damage +10%,왕의 카리스마
+Valkyrie,enemy_111,Divine Spear,Holy,Attack,Single_Enemy,245,100,11,None,0,,,신창
+Valkyrie,enemy_111,Judgement Wing,Wind,Attack,All_Enemies,150,100,14,None,0,EnemyCount>=2,,심판의 날개
+Valkyrie,enemy_111,Chooser of the Slain,None,Passive,Self,0,0,0,None,0,,Holy Damage +20% Turn Speed +10%,전사의 인도자
+Siegfried,enemy_112,Balmung,Physical,Attack,Single_Enemy,270,95,12,None,0,,,발뭉의 일격
+Siegfried,enemy_112,Dragon Slayer,Holy,Attack,Single_Enemy,290,100,15,None,0,Target=Dragon,Damage x1.5,용살자
+Siegfried,enemy_112,Hero's Body,None,Passive,Self,0,0,0,None,0,,Critical Resistance +30%,불사의 영웅
+Freyja,enemy_113,Brisingamen,Holy,Attack,All_Enemies,155,100,14,Charm,25,EnemyCount>=2,,여신의 빛
+Freyja,enemy_113,Goddess Blessing,Holy,Recovery,All_Allies,0,100,14,None,0,AllyHP<=50%,Heal 40%,여신의 축복
+Freyja,enemy_113,Goddess of Love,None,Passive,Self,0,0,0,None,0,,Charm Resistance +50% Holy Damage +15%,사랑과 풍요의 여신
+Siva,enemy_114,Tandava,Dark,Attack,All_Enemies,170,95,18,None,0,EnemyCount>=2,,우주의 파괴의 춤
+Siva,enemy_114,Third Eye,Holy,Attack,Single_Enemy,280,100,12,None,0,,Ignore DEF,제3의 눈
+Siva,enemy_114,Destroyer,None,Passive,Self,0,0,0,None,0,,All Damage +15%,파괴신
+QitianDasheng,enemy_115,Ruyi Jingu Bang,Physical,Attack,Single_Enemy,280,100,12,None,0,,,여의봉 강타
+QitianDasheng,enemy_115,72 Transformations,Holy,Buff,Self,0,100,10,None,0,HP<=60%,ATK +2 DEF +2 EVA +1,칠십이변
+QitianDasheng,enemy_115,Great Sage,None,Passive,Self,0,0,0,None,0,,Status Resistance +30% Critical +10%,제천대성
