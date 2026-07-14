@@ -34,13 +34,14 @@ namespace Manager
             if (Instance == null)
             {
                 Instance = this;
-                InitializeInventory();
             }
             else Destroy(gameObject);
         }
 
         void InitializeInventory()
         {
+            inventoryDict.Clear();
+            
             // 테스트용 아이템 지급
             foreach(var item in startingItems)
             {
@@ -161,7 +162,7 @@ namespace Manager
 
         public void ClearInventory()
         {
-            inventoryDict.Clear();
+            InitializeInventory();
             money = 0;
         }
     }
