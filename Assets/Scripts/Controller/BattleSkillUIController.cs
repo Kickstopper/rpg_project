@@ -220,7 +220,6 @@ namespace Controller
             CommonListSlotTrigger trigger = slotObj.GetComponent<CommonListSlotTrigger>();
             if (trigger == null) trigger = slotObj.AddComponent<CommonListSlotTrigger>();
 
-            // 람다식으로 이벤트 연결
             trigger.onSelectAction = () => OnItemSelect(data);
             
             currentSlots.Add(slotObj);

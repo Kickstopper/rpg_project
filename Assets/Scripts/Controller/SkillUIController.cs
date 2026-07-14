@@ -158,7 +158,7 @@ namespace Controller
                 menuController.ResetInputTimer();
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || GameInput.GetCancelDown())
             {
                 ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 currentState = SkillUIState.SelectSkill;
@@ -452,13 +452,11 @@ namespace Controller
                     btn.navigation = nav;
                 }
                 
-                // 마우스를 올렸을 때 포커스 및 설명창 갱신
-                EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
-                trigger.triggers.Clear();
+                CommonListSlotTrigger trigger = go.GetComponent<CommonListSlotTrigger>();
+                if (trigger == null) trigger = go.AddComponent<CommonListSlotTrigger>();
 
-                EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-                enterEntry.callback.AddListener((data) => {
-                    if (currentState == SkillUIState.SelectSkill && btn)
+                trigger.onSelectAction = () => {
+                    if (currentState == SkillUIState.SelectSkill && btn != null)
                     {
                         // 마우스가 올라간 스킬의 인덱스로 내부 변수 동기화
                         if (currentSkillIndex != itemIndex)
@@ -474,9 +472,13 @@ namespace Controller
                         if (skillInfo) skillInfo.ResetText();
                         EventSystem.current.SetSelectedGameObject(null);
                     }
-                });
-                trigger.triggers.Add(enterEntry);
+                };
             }
+        }
+
+        private void OnItemSelect(BaseEventData data)
+        {
+            
         }
 
         private void RefreshPartyList()

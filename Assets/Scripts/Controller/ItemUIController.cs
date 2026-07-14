@@ -141,11 +141,10 @@ namespace Controller
                     } 
 
                     // 마우스를 올렸을 때 포커스 및 설명창 갱신
-                    EventTrigger trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
-                    trigger.triggers.Clear();
+                    CommonListSlotTrigger trigger = go.GetComponent<CommonListSlotTrigger>();
+                    if (trigger == null) trigger = go.AddComponent<CommonListSlotTrigger>();
 
-                    EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-                    enterEntry.callback.AddListener((data) => {
+                    trigger.onSelectAction = () => {
                         // 타겟 선택 모드가 아닐 때만 아이템 포커스 이동
                         if (!isSelectingTarget && currentItemIndex != itemIndex)
                         {
@@ -153,8 +152,7 @@ namespace Controller
                             ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                             UpdateItemSelection(); // 포커스 이동 및 중앙 itemInfo 갱신
                         }
-                    });
-                    trigger.triggers.Add(enterEntry);
+                    };
                 }
             }
 
@@ -252,7 +250,7 @@ namespace Controller
 
         private void HandleItemNavigation()
         {
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || GameInput.GetCancelDown())
             {
                 menuController.CloseItemUI(); 
             }
@@ -474,7 +472,7 @@ namespace Controller
             }
 
             // 취소 키
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || GameInput.GetCancelDown())
             {
                 CancelTargetSelection();
             }
