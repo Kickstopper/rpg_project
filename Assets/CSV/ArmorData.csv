@@ -1,0 +1,13 @@
+id,dataName,description,price,slot,defense,evasionMod,bonusStr,bonusMag,bonusVit,bonusAgi,bonusLuc,resistPhysical,resistFire,resistIce,resistElec,resistForce,resistPsyche
+helm_000,HEADGEAR,가장 기본적인 머리 보호구.,500,Helmet,8,0,0,0,0,0,0,Normal,Normal,Normal,Normal,Normal,Normal
+helm_000,YATAGARASU_MASK,신성한 까마귀의 힘이 깃든 가면. 마력과 회피를 올려준다.,15000,Helmet,35,5,0,5,0,3,0,Normal,Normal,Normal,Normal,Normal,Normal
+body_000,SURVIVAL_VEST,질긴 가죽으로 만들어진 조끼.,1000,Body,15,0,0,0,0,0,0,Normal,Normal,Normal,Normal,Normal,Normal
+body_001,TETRA_JAMMER,특수 섬유로 제작되어 마법에 대한 저항력이 높다.,25000,Body,65,2,0,0,0,0,0,Normal,Resist,Resist,Resist,Resist,Normal
+body_002,ABSOLUTE_ZERO_BODYSUIT,극한의 냉기로 화염과 빙결을 모두 무효화하지만 지나치게 무거워 행동이 둔해진다.,120000,Body,105,-15,5,0,8,-10,0,Normal,Null,Null,Normal,Normal,Normal
+glov_000,LEATHER_GLOVE,손을 보호하는 평범한 장갑.,400,Gloves,5,0,0,0,0,0,0,Normal,Normal,Normal,Normal,Normal,Normal
+glov_001,POWER_GLOVE,착용자의 완력을 한계까지 끌어올리는 건틀릿.,18000,Gloves,25,0,8,0,2,0,0,Normal,Normal,Normal,Normal,Normal,Normal
+boot_000,COMBAT_BOOTS,활동성이 좋은 전투용 부츠.,600,Boots,6,2,0,0,0,0,0,Normal,Normal,Normal,Normal,Normal,Normal
+boot_001,HERMES_SHOES,바람처럼 빠른 속도를 낼 수 있는 날개 달린 신발.,32000,Boots,30,15,0,0,0,10,0,Normal,Normal,Normal,Normal,Resist,Normal
+acce_000,MUSCLE_RING,착용자의 물리적인 힘을 약간 올려준다.,3000,Accessory,0,0,3,0,0,0,0,Normal,Normal,Normal,Normal,Normal,Normal
+acce_001,FLAME_AMULET,화염 속성 공격에 대한 내성을 부여한다.,8000,Accessory,2,0,0,0,0,0,0,Normal,Resist,Normal,Normal,Normal,Normal
+acce_002,CHAKRA _RING,마력의 흐름을 원활하게 돕는 신비한 반지.,45000,Accessory,5,0,0,10,0,0,5,Normal,Normal,Normal,Normal,Normal,Normal

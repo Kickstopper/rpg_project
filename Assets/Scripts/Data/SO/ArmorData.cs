@@ -8,6 +8,7 @@ namespace Data
     [CreateAssetMenu(fileName = "New Armor", menuName = "RPG/Item/Armor")]
     public class ArmorData : BaseItemData
     {
+        public ArmorData() { itemCategory = ItemCategory.Armor; }
         [Header("Defense Only")]
         public ArmorSlot slot;
         public int defense;

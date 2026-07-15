@@ -1,0 +1,8 @@
+id,dataName,description,price,maxStackCount,element,statusEffect,statusEffectChance,damageBonus,hitRateBonus
+ammo_000,NORMAL_SHELLS,가장 구하기 쉬운 일반적인 권총탄.,50,99,Physical,None,0,5,0
+ammo_001,HOLLOW_POINT,명중 시 파열하여 큰 피해를 주는 탄환.,150,99,Physical,Bleed,15,15,0
+ammo_002,POISON_SHELLS,독을 바른 탄두를 사용하여 적을 중독시킨다.,200,99,Physical,Poison,35,10,5
+ammo_003,NERVE_SHELLS,적의 신경을 마비시켜 수면을 유발한다.,300,99,Psyche,Sleep,30,5,10
+ammo_004,CHARM_SHELLS,페로몬 가스가 담겨 적을 매료시킨다.,400,99,Psyche,Charm,25,0,15
+ammo_005,HOLY_SHELLS,신성한 기운이 담겨 사악한 적을 정화한다.,800,99,Physical,None,0,30,5
+ammo_006,PLASMA_SHELLS,고압 전류를 방출하는 최첨단 에너지 탄.,1200,99,Elec,Paralyze,20,45,10

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84edbd8d2af6f4942ae8c84ce29e41b8, type: 3}
+  m_Name: NORMAL_SHELLS
+  m_EditorClassIdentifier: Assembly-CSharp::Data.AmmoData
+  id: ammo_000
+  dataName: NORMAL_SHELLS
+  description: "\uAC00\uC7A5 \uAD6C\uD558\uAE30 \uC26C\uC6B4 \uC77C\uBC18\uC801\uC778
+    \uAD8C\uCD1D\uD0C4."
+  icon: {fileID: 0}
+  vfxId: 0
+  effectType: 0
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 0
+  statusEffect: 0
+  statusEffectChance: 0
+  actionDelay: 0
+  price: 50
+  isSellable: 1
+  maxStackCount: 99
+  itemCategory: 0
+  damageBonus: 5
+  hitRateBonus: 0

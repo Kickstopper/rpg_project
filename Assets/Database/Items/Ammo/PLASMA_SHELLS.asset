@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84edbd8d2af6f4942ae8c84ce29e41b8, type: 3}
+  m_Name: PLASMA_SHELLS
+  m_EditorClassIdentifier: Assembly-CSharp::Data.AmmoData
+  id: ammo_006
+  dataName: PLASMA_SHELLS
+  description: "\uACE0\uC555 \uC804\uB958\uB97C \uBC29\uCD9C\uD558\uB294 \uCD5C\uCCA8\uB2E8
+    \uC5D0\uB108\uC9C0 \uD0C4."
+  icon: {fileID: 0}
+  vfxId: 0
+  effectType: 0
+  effectValue: 0
+  element: 3
+  targetScope: 0
+  useType: 0
+  statusEffect: 11
+  statusEffectChance: 0.2
+  actionDelay: 0
+  price: 1200
+  isSellable: 1
+  maxStackCount: 99
+  itemCategory: 0
+  damageBonus: 45
+  hitRateBonus: 10

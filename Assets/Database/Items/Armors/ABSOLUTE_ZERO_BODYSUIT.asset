@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dd5a4dbfd0086f4a88f3ca2ab455f95, type: 3}
+  m_Name: ABSOLUTE_ZERO_BODYSUIT
+  m_EditorClassIdentifier: Assembly-CSharp::Data.ArmorData
+  id: body_002
+  dataName: ABSOLUTE_ZERO_BODYSUIT
+  description: "\uADF9\uD55C\uC758 \uB0C9\uAE30\uB85C \uD654\uC5FC\uACFC \uBE59\uACB0\uC744
+    \uBAA8\uB450 \uBB34\uD6A8\uD654\uD558\uC9C0\uB9CC \uC9C0\uB098\uCE58\uAC8C \uBB34\uAC70\uC6CC
+    \uD589\uB3D9\uC774 \uB454\uD574\uC9C4\uB2E4."
+  icon: {fileID: 0}
+  vfxId: 0
+  effectType: 0
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 0
+  statusEffect: 0
+  statusEffectChance: 0
+  actionDelay: 0
+  price: 120000
+  isSellable: 1
+  maxStackCount: 1
+  itemCategory: 1
+  slot: 1
+  defense: 105
+  evasionMod: -15
+  statBonus:
+    level: 0
+    str: 5
+    mag: 0
+    intel: 0
+    vit: 8
+    agi: -10
+    luc: 0
+  resistanceMod:
+    phys: 0
+    fire: 3
+    ice: 3
+    elec: 0
+    force: 0
+    psyche: 0

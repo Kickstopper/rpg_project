@@ -137,7 +137,7 @@ namespace Controller
                 ConsumableItemData data = ManagerRoot.Database.GetConsumable(id);
                 if (data == null) continue;
 
-                if (data.GetCategoryIndex() == currentTab)
+                if (data.GetCategoryTabIndex() == currentTab)
                 {
                     CreateItemSlot(data);
                 }

@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dd5a4dbfd0086f4a88f3ca2ab455f95, type: 3}
+  m_Name: MUSCLE_RING
+  m_EditorClassIdentifier: Assembly-CSharp::Data.ArmorData
+  id: acce_000
+  dataName: MUSCLE_RING
+  description: "\uCC29\uC6A9\uC790\uC758 \uBB3C\uB9AC\uC801\uC778 \uD798\uC744 \uC57D\uAC04
+    \uC62C\uB824\uC900\uB2E4."
+  icon: {fileID: 0}
+  vfxId: 0
+  effectType: 0
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 0
+  statusEffect: 0
+  statusEffectChance: 0
+  actionDelay: 0
+  price: 3000
+  isSellable: 1
+  maxStackCount: 1
+  itemCategory: 1
+  slot: 4
+  defense: 0
+  evasionMod: 0
+  statBonus:
+    level: 0
+    str: 3
+    mag: 0
+    intel: 0
+    vit: 0
+    agi: 0
+    luc: 0
+  resistanceMod:
+    phys: 0
+    fire: 0
+    ice: 0
+    elec: 0
+    force: 0
+    psyche: 0

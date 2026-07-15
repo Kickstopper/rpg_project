@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5d70a450204a3f4eb511088e2bcc8ad, type: 3}
+  m_Name: MEGIDO_FIRE
+  m_EditorClassIdentifier: Assembly-CSharp::Data.WeaponData
+  id: gun_004
+  dataName: MEGIDO_FIRE
+  description: "\uB9CC\uB2A5\uC758 \uD798\uC744 \uC3D8\uC544\uBCF4\uB0B4\uB294 \uAD81\uADF9\uC758
+    \uCD1D."
+  icon: {fileID: 0}
+  vfxId: 0
+  effectType: 0
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 0
+  statusEffect: 0
+  statusEffectChance: 0
+  actionDelay: 0
+  price: 150000
+  isSellable: 1
+  maxStackCount: 1
+  itemCategory: 0
+  type: 1
+  weaponCategory: 5
+  attackRange: 5
+  attackPower: 150
+  hitRateBonus: 20
+  minHits: 1
+  maxHits: 1

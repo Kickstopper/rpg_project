@@ -9,11 +9,10 @@ namespace Data
     {
         [Header("Weapon")]
         public WeaponType type; // 근접(Melee)인지 총(Gun)인지 설정
-        public WeaponCategory category;
+        public WeaponCategory weaponCategory;
         public TargetScope attackRange = TargetScope.Front_Single_Enemy; // 공격 범위
         public int attackPower;       
-        public int hitRateBonus;      
-        
+        public int hitRateBonus;
         [Header("Weapon Multi-Hit")]
         public int minHits = 1; // 최소 공격 횟수
         public int maxHits = 1; // 최대 공격 횟수 (1이면 단타, 10이면 최대 10연타)

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc6683f40131e8642beb6a3eeaae24ba, type: 3}
+  m_Name: AmmoDatabase
+  m_EditorClassIdentifier: 
+  items:
+  - {fileID: 11400000, guid: 7a0f3e5842b519e44b595ffd3dffde57, type: 2}
+  - {fileID: 11400000, guid: e333d22791aac7a48b29ec8398809695, type: 2}
+  - {fileID: 11400000, guid: 61f84acb6f482b8409d58ffbbb536ec5, type: 2}
+  - {fileID: 11400000, guid: 6819d45e00f6f8c4f8e4391e828bdd37, type: 2}
+  - {fileID: 11400000, guid: 11004ec57268e9a45b905da527924220, type: 2}
+  - {fileID: 11400000, guid: 5eaf6a370967805438fb81e6e38c919a, type: 2}
+  - {fileID: 11400000, guid: 031a455b8feed974d94646844b177f4b, type: 2}

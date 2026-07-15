@@ -437,7 +437,7 @@ namespace Controller
             var weaponData = ManagerRoot.Database.GetWeapon(equippedWeaponId);
 
             // 무기의 타입에 따라 이펙트 분기
-            switch (weaponData.category)
+            switch (weaponData.weaponCategory)
             {
                 case WeaponCategory.Cut:
                     return VfxID.Cut;
@@ -460,7 +460,7 @@ namespace Controller
         {
             if (currentGun == null || currentAmmo == null) return VfxID.Gun_Auto;
 
-            switch(currentGun.category)
+            switch(currentGun.weaponCategory)
             {
                 case WeaponCategory.Gun_Auto:
                     return VfxID.Gun_Auto;

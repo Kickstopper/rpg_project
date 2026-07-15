@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84edbd8d2af6f4942ae8c84ce29e41b8, type: 3}
+  m_Name: POISON_SHELLS
+  m_EditorClassIdentifier: Assembly-CSharp::Data.AmmoData
+  id: ammo_002
+  dataName: POISON_SHELLS
+  description: "\uB3C5\uC744 \uBC14\uB978 \uD0C4\uB450\uB97C \uC0AC\uC6A9\uD558\uC5EC
+    \uC801\uC744 \uC911\uB3C5\uC2DC\uD0A8\uB2E4."
+  icon: {fileID: 0}
+  vfxId: 0
+  effectType: 0
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 0
+  statusEffect: 10
+  statusEffectChance: 0.35
+  actionDelay: 0
+  price: 200
+  isSellable: 1
+  maxStackCount: 99
+  itemCategory: 0
+  damageBonus: 10
+  hitRateBonus: 5

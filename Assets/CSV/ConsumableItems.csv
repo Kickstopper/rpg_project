@@ -1,0 +1,15 @@
+id,dataName,description,effectType,effectValue,element,targetScope,useType,price,maxStackCount,category,statusEffect,statusEffectChance,actionDelay
+item_000,ITEM_MEDICINE,아군 1명의 HP를 50 회복한다.,Recover_HP,50,None,One_Ally,All,100,99,Etc,None,0,0
+item_001,ITEM_LIFE_STONE,아군 1명의 HP를 150 회복한다.,Recover_HP,150,None,One_Ally,All,300,99,Etc,None,0,0
+item_002,ITEM_BEAD,아군 1명의 HP를 완전히 회복한다.,Recover_HP,9999,None,One_Ally,All,1000,99,Etc,None,0,0
+item_003,ITEM_BEAD_CHAIN,아군 전체의 HP를 완전히 회복한다.,Recover_HP,9999,None,All_Allies,All,5000,99,Etc,None,0,0
+item_004,ITEM_REVIVAL_BEAD,전투불능의 아군 1명을 소량의 HP로 부활시킨다.,Revive_Empty,50,None,Dead_Ally,All,1500,99,Etc,None,0,0
+item_005,ITEM_BALM_OF_LIFE,전투불능의 아군 1명을 HP 최대 상태로 부활시킨다.,Revive_Fully,9999,None,Dead_Ally,All,4000,99,Etc,None,0,0
+item_006,ITEM_CHAKRA_DROP,아군 1명의 MP를 50 회복한다.,Recover_MP,50,None,One_Ally,All,1000,99,Etc,None,0,0
+item_007,ITEM_CHAKRA_POT,아군 1명의 MP를 완전히 회복한다.,Recover_MP,9999,None,One_Ally,All,5000,99,Etc,None,0,0
+item_008,ITEM_AMRITA_SODA,아군 1명의 상태이상을 치료한다.,Recover_Bad_Status,0,None,One_Ally,All,800,99,Etc,None,0,0
+item_009,ITEM_ATTACK_MIRROR,아군 1명에게 물리 1회 반사 효과를 부여한다.,Reflect_Phys,1,Physical,One_Ally,Battle,2000,99,Etc,None,0,0
+item_010,ITEM_MAGIC_MIRROR,아군 1명에게 마법 1회 반사 효과를 부여한다.,Reflect_Magic,1,None,One_Ally,Battle,2000,99,Etc,None,0,0
+item_011,ITEM_AGI_STONE,적 1명에게 화염 속성 소량 데미지를 준다.,Magic_Atk,40,Fire,Single_Enemy,Battle,300,99,Etc,None,0,0
+item_012,ITEM_MABUFU_STONE,적 전체에게 빙결 속성 소량 데미지를 준다.,Magic_Atk,35,Ice,All_Enemies,Battle,700,99,Etc,None,0,0
+item_013,ITEM_ZIONGA_STONE,적 1명에게 전격 속성 중량 데미지를 준다.,Magic_Atk,90,Elec,Single_Enemy,Battle,800,99,Etc,None,0,0

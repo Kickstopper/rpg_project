@@ -5,7 +5,7 @@ namespace Data
     public class ConsumableItemData : BaseItemData
     {
         // UI 분류를 위한 헬퍼 함수
-        public int GetCategoryIndex()
+        public int GetCategoryTabIndex()
         {
             // 0: Recover, 1: Buff, 2: Attack
             switch (effectType)

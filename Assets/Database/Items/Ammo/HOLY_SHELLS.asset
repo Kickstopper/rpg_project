@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84edbd8d2af6f4942ae8c84ce29e41b8, type: 3}
+  m_Name: HOLY_SHELLS
+  m_EditorClassIdentifier: Assembly-CSharp::Data.AmmoData
+  id: ammo_005
+  dataName: HOLY_SHELLS
+  description: "\uC2E0\uC131\uD55C \uAE30\uC6B4\uC774 \uB2F4\uACA8 \uC0AC\uC545\uD55C
+    \uC801\uC744 \uC815\uD654\uD55C\uB2E4."
+  icon: {fileID: 0}
+  vfxId: 0
+  effectType: 0
+  effectValue: 0
+  element: 0
+  targetScope: 0
+  useType: 0
+  statusEffect: 0
+  statusEffectChance: 0
+  actionDelay: 0
+  price: 800
+  isSellable: 1
+  maxStackCount: 99
+  itemCategory: 0
+  damageBonus: 30
+  hitRateBonus: 5

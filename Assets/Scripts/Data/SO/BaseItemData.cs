@@ -87,5 +87,9 @@ namespace Data
         [Header("Item Info")]
         public int price;              // 가격
         public bool isSellable = true; // 판매 가능 여부
+        public int sellPrice => price / 2; // 판매가는 정가의 절반
+        public bool isStackable => maxStackCount > 1; // 여러 개를 획득할 수 있는지
+        public int maxStackCount = 1;   // 최대 소지 개수
+        public ItemCategory itemCategory;
     }
 }

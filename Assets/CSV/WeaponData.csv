@@ -1,0 +1,12 @@
+id,dataName,description,price,element,statusEffect,statusEffectChance,type,weaponCategory,attackRange,attackPower,hitRateBonus,minHits,maxHits
+sword_000,SURVIVAL_KNIFE,군용으로 쓰이는 튼튼한 단검.,1000,Physical,None,0,Melee,Cut,Front_Single_Enemy,15,5,1,1
+sword_001,SPIKE_BAT,못이 박혀있는 흉악한 배트. 출혈을 일으킨다.,1500,Physical,Bleed,15,Melee,Hit,Front_Single_Enemy,28,0,1,1
+sword_002,MJOLNIR,뇌신의 힘이 깃든 전설의 망치.,45000,Elec,None,0,Melee,Hit,Front_Single_Enemy,180,-5,1,1
+sword_003,SAMURAI_SWORD,이름 없는 장인이 벼려낸 예리한 일본도.,12000,Physical,None,0,Melee,Slash,Front_Single_Enemy,85,10,1,1
+sword_004,KUSANAGI_SWORD,신화 속에 등장하는 신성한 명검.,80000,Physical,None,0,Melee,Slash,Front_Single_Enemy,220,15,1,1
+sword_005,MURAMASA,피를 부르는 저주받은 요도.,65000,Physical,Curse,25,Melee,Slash,Front_Single_Enemy,190,5,1,1
+gun_000,GLOCK-17,가볍고 신뢰성 높은 자동 권총.,2500,Physical,None,0,Gun,Gun_Shot,Single_Enemy,30,10,1,1
+gun_001,MP5,연사력이 뛰어난 특수부대용 기관단총.,6500,Physical,None,0,Gun,Gun_Auto,Random_Front_Enemy,15,5,2,4
+gun_002,SPAS-12,파괴적인 위력을 지닌 산탄총.,8000,Physical,None,0,Gun,Gun_Shot,Front_Enemies,45,-10,1,1
+gun_003,M134_MINIGUN,미니건. 압도적인 화력으로 적을 벌집으로 만든다.,120000,Physical,None,0,Gun,Gun_Auto,Random_Enemy,25,-5,4,8
+gun_004,MEGIDO_FIRE,만능의 힘을 쏘아보내는 궁극의 총.,150000,Physical,None,0,Gun,Gun_Shot,All_Enemies,150,20,1,1
