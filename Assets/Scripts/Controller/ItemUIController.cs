@@ -201,7 +201,7 @@ namespace Controller
                 {
                     currentPartyIndex = index;
                     ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
-                    UpdatePartyCursorVisuals();
+                    ResetCursorHighlight();
                 }
             });
             trigger.triggers.Add(enterEntry);
@@ -246,6 +246,15 @@ namespace Controller
                 HandlePartyNavigation();
             else
                 HandleItemNavigation();
+        }
+
+        void LateUpdate()
+        {
+            // 타겟 선택 모드이고, 선택된 아이템이 있을 때만 점멸 효과 작동
+            if (isSelectingTarget && selectedItemData != null)
+            {
+                HighlightTargets();
+            }
         }
 
         private void HandleItemNavigation()
@@ -373,40 +382,28 @@ namespace Controller
 
         private void ApplyTargetHighlight()
         {
-            // 초기 진입 시 커서 위치 설정 및 하이라이트
+            // 초기 진입 시 잔상 초기화
             foreach (var pc in partyControllers) pc.ResetHighlightColor();
 
             TargetScope scope = selectedItemData.targetScope;
             
-            // 부활 효과를 가진 아이템인지 판별
             bool isReviveItem = (selectedItemData.effectType == EffectType.Revive_Empty || 
                                  selectedItemData.effectType == EffectType.Revive_Fully);
 
-            // 전체 대상은 모두 하이라이트
+            // 전체 대상은 LateUpdate에서 일괄 점멸 처리되므로 리턴
             if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies)
             {
-                foreach (var pc in partyControllers) 
-                {
-                    if (pc.IsEmpty) continue;
-                    
-                    // 죽은 자 전체 대상
-                    if (scope == TargetScope.All_Dead_Allies && pc.currentHp > 0) continue;
-                    
-                    pc.SetHighlightColor(targetHighlightColor);
-                }
                 return;
             }
 
             // 단일 대상 (초기 커서 위치 계산)
             if (isReviveItem || scope == TargetScope.Dead_Ally)
             {
-                // 부활 아이템인 경우 무조건 죽은 첫 번째 아군에게 포커스
                 int deadIdx = GetFirstDeadMemberIndex();
                 currentPartyIndex = (deadIdx != -1) ? deadIdx : 0;
             }
             else if (scope == TargetScope.One_Ally)
             {
-                // 살아있는 첫 번째 아군
                 int validIdx = GetFirstValidMemberIndex();
                 currentPartyIndex = (validIdx != -1) ? validIdx : 0;
             }
@@ -414,11 +411,43 @@ namespace Controller
             {
                 currentPartyIndex = 0;
             }
-
-            // 현재 커서 위치 하이라이트
-            UpdatePartyCursorVisuals();
         }
 
+        // 하이라이트 전체 초기화 
+        private void ResetCursorHighlight()
+        {
+            foreach (var pc in partyControllers) pc.ResetHighlightColor();
+        }
+
+        
+        private void HighlightTargets()
+        {
+            TargetScope scope = selectedItemData.targetScope;
+            
+            Color blinkColor = Color.Lerp(Color.clear, targetHighlightColor, Mathf.PingPong(Time.unscaledTime * 5f, 1f));
+
+            if (scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies)
+            {
+                foreach (var pc in partyControllers) 
+                {
+                    if (pc.IsEmpty) continue;
+                    
+                    // 죽은 자 전체 대상일 때, 살아있는 파티원은 깜빡임 제외
+                    if (scope == TargetScope.All_Dead_Allies && pc.currentHp > 0) continue;
+                    
+                    pc.SetHighlightColor(blinkColor);
+                }
+            }
+            else 
+            {
+                // 단일 대상일 경우 커서가 위치한 슬롯만 깜빡임 처리
+                if (currentPartyIndex >= 0 && currentPartyIndex < 6)
+                {
+                    partyControllers[currentPartyIndex].SetHighlightColor(blinkColor);
+                }
+            }
+        }
+        
         // 3x2 그리드 네비게이션 적용
         private void HandlePartyNavigation()
         {
@@ -451,7 +480,7 @@ namespace Controller
                 if (moved)
                 {
                     ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
-                    UpdatePartyCursorVisuals();
+                    ResetCursorHighlight();
                 }
             }
 
@@ -475,20 +504,6 @@ namespace Controller
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || GameInput.GetCancelDown())
             {
                 CancelTargetSelection();
-            }
-        }
-
-        // 커서 위치만 업데이트하는 함수
-        private void UpdatePartyCursorVisuals()
-        {
-            // 전체 초기화
-            foreach (var pc in partyControllers) pc.ResetHighlightColor();
-
-            // 현재 커서 위치만 하이라이트 (유효성 검사는 실행 시 수행)
-            // 단, 빈 슬롯이라도 커서는 표시할 수 있어야 함 (SkillUI와 동일 동작)
-            if (currentPartyIndex >= 0 && currentPartyIndex < 6)
-            {
-                partyControllers[currentPartyIndex].SetHighlightColor(targetHighlightColor);
             }
         }
 

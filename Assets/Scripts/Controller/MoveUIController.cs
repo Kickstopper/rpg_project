@@ -17,8 +17,8 @@ namespace Controller
         public Transform[] formationSlots; 
         
         [Header("Highlight Settings")]
-        private Color selectTargetColor = new Color32(128, 0, 178, 255); 
-        private Color focusCursorColor = new Color32(0, 155, 155, 200);          
+        public Color selectTargetColor = new Color32(128, 0, 178, 255); 
+        public Color focusCursorColor = new Color32(0, 155, 155, 200);          
 
         private RuntimeCharacterData[] currentSlotData = new RuntimeCharacterData[6];
         private GameObject[] spawnedModels = new GameObject[6];
