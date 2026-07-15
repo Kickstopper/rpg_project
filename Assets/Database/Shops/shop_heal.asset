@@ -10,14 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2aff1049b94926438cd35a23e285b5a, type: 3}
-  m_Name: heal
+  m_Name: shop_heal
   m_EditorClassIdentifier: Assembly-CSharp::Data.ShopData
   shopID: heal
   bgmID: 31
   BackgroundImage: {fileID: 1729840402284382006, guid: 70217d3118aedad4480191e67cd27a80, type: 3}
   displayName: HEAL
   itemsForSale:
-  - {fileID: 11400000, guid: 330701932e9dbd0448ca37746a7cb001, type: 2}
-  - {fileID: 11400000, guid: 3b422622809c5ef4c95092658d5096c6, type: 2}
-  - {fileID: 11400000, guid: a23f7ea7c299a5945b397900589d048a, type: 2}
-  - {fileID: 11400000, guid: cf8d97a6cbc9c01429b49ddd34f634c2, type: 2}
+  - {fileID: 11400000, guid: bd2f2cacf7720df4aa89aa3cccf3527d, type: 2}
+  - {fileID: 11400000, guid: 027ed7c94df600c44bbe4a9a68efd456, type: 2}
+  - {fileID: 11400000, guid: 1bb709090cde65044bc5fb80dc29f748, type: 2}
+  - {fileID: 11400000, guid: 706bab1c94cebf14fb6742723e1bb2ca, type: 2}
+  - {fileID: 11400000, guid: d5c96fb2e13c61140b02d7d8f2c59305, type: 2}
+  - {fileID: 11400000, guid: 1c541520573dd9e499d9230fe84a1a6c, type: 2}

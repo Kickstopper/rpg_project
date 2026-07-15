@@ -1125,8 +1125,8 @@ namespace Controller
             return null;
         }
 
-        // 현재 바라보는 방향에 상점 입구가 있는지 확인하고 UI를 갱신
-        private void CheckFrontForShop()
+        // 현재 바라보는 방향의 입구에 이름이 있는지 확인하고 UI를 갱신
+        private void CheckFrontForEntranceName()
         {
             if (_player == null || _currentMap == null) return;
 
@@ -1142,10 +1142,17 @@ namespace Controller
 
             EntranceData frontEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, frontX, frontY, forwardVec);
 
-            if (frontEntrance != null && frontEntrance.type == EntranceType.Shop)
+            if (frontEntrance != null)
             {
-                var shopData = ShopManager.Instance.GetShopData(frontEntrance.destinationID);
-                if (shopData != null) ShowRoomName(shopData.displayName);
+                if (frontEntrance.type == EntranceType.Shop)
+                {
+                    var shopData = ShopManager.Instance.GetShopData(frontEntrance.destinationID);
+                    if (shopData != null) ShowRoomName(shopData.displayName);
+                }
+                else if (frontEntrance.type == EntranceType.Terminal)
+                {
+                    ShowRoomName("TERMINAL"); // 일단 무조건 TERMINAL
+                }
             }
             else
             {
@@ -1436,7 +1443,7 @@ namespace Controller
             yield return StartCoroutine(_player.RotateGridRoutine(dirStep, turnDuration, null));
             
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
-            CheckFrontForShop();
+            CheckFrontForEntranceName();
         }
 
         private IEnumerator TurnToDirectionRoutine(int targetDir)
@@ -1775,7 +1782,7 @@ namespace Controller
             }
             
             CheckCurrentTileEvent();
-            CheckFrontForShop();
+            CheckFrontForEntranceName();
         }
 
         private void CheckCurrentTileEvent()
@@ -2353,7 +2360,7 @@ namespace Controller
             
             ManagerRoot.Sound.PlayBGM(ManagerRoot.Dungeon.GetDungeonTheme(_currentMap.themeName).bgmID);
             RefreshAppVisible();
-            CheckFrontForShop();
+            CheckFrontForEntranceName();
         }
 
         public Sprite CaptureCurrentDungeonView()

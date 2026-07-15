@@ -2270,18 +2270,6 @@
             "targetX": 8,
             "targetY": 1,
             "targetDirection": 0
-        },
-        {
-            "type": 1,
-            "sourceX": 2,
-            "sourceY": 1,
-            "isWallEntrance": true,
-            "triggerDirection": 2,
-            "isWorldMap": false,
-            "destinationID": "NewDestination",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
         }
     ]
 }
