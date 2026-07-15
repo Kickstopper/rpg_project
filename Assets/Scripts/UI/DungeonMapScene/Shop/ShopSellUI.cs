@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Manager; 
+using Manager;
+using UnityEngine.EventSystems;
 
 namespace UI.Shop
 {
@@ -74,7 +75,7 @@ namespace UI.Shop
             PopulateList(currentFilteredItems);
             // 탭을 전환하면 포커스를 탭 영역(-1)으로 초기화
             ChangeHighlight(-1);
-            UpdateTabVisuals();
+            UpdateTabFocusIndicator();
         }
 
         private void OnTabClicked(int index)
@@ -112,7 +113,7 @@ namespace UI.Shop
 
         private void HandleInput()
         {
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Common.GameInput.GetCancelDown())
             {
                 CloseSellMode();
                 return;
@@ -141,7 +142,7 @@ namespace UI.Shop
                 if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
                 {
                     // 리스트 영역에 포커스가 있을 때 첫 아이템에서 위를 누르면 탭으로 포커스 이동
-                    if (currentHighlightIndex == 0) ChangeHighlight(-1); // 탭으로 복귀
+                    if (currentHighlightIndex == 0) ChangeTab(currentTabIndex); // 탭으로 복귀
                     else ChangeHighlight(currentHighlightIndex - 1);
                 }
                 else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
@@ -192,8 +193,8 @@ namespace UI.Shop
                 // 탭 포커스 시 UI 정리
                 highlightNameText.text = "";
                 highlightDescText.text = "";
-                possessionText.text = "0/99"; // 기본값
-                totalPriceText.text = "$0";
+                possessionText.text = "0/0";
+                totalPriceText.text = "0";
                 if (confirmButton != null) confirmButton.gameObject.SetActive(false);
             }
             else
@@ -207,9 +208,11 @@ namespace UI.Shop
                 currentMaxPossession = itemInfo.amount; // 소지 개수 저장
                 
                 UpdatePriceUI();
+                // AutoScrollRect가 변경을 감지하고 스크롤을 따라가도록 EventSystem에게 현재 선택된 UI를 알려줌.
+                EventSystem.current.SetSelectedGameObject(spawnedSlots[currentHighlightIndex].gameObject);
             }
 
-            UpdateTabVisuals();
+            UpdateTabFocusIndicator();
         }
 
         public void ChangeQuantity(int change)
@@ -229,12 +232,12 @@ namespace UI.Shop
         private void UpdatePriceUI()
         {
             if (currentHighlightIndex == -1) return;
-
-            int sellPrice = Mathf.FloorToInt(currentFilteredItems[currentHighlightIndex].baseData.price / 2f);
+            InventoryItem currentItem = currentFilteredItems[currentHighlightIndex];
+            int sellPrice = currentItem.baseData.sellPrice;
             int totalCost = sellPrice * currentSellQuantity;
             
             totalPriceText.text = $"${totalCost}";
-            possessionText.text = $"{currentMaxPossession}/99";
+            possessionText.text = $"{currentMaxPossession}/{currentItem.baseData.maxStackCount}";
 
             if (confirmButton != null)
             {
@@ -248,7 +251,8 @@ namespace UI.Shop
             if (currentHighlightIndex == -1 || currentSellQuantity <= 0) return;
 
             var invItem = currentFilteredItems[currentHighlightIndex];
-            int sellPrice = Mathf.FloorToInt(invItem.baseData.price / 2f);
+            
+            int sellPrice = invItem.baseData.sellPrice; 
             int totalEarned = sellPrice * currentSellQuantity;
 
             ManagerRoot.Inventory.RemoveItem(invItem.baseData.id, currentSellQuantity);
@@ -256,12 +260,37 @@ namespace UI.Shop
 
             Debug.Log($"{invItem.baseData.dataName} {currentSellQuantity}개 판매 완료. (+${totalEarned})");
 
-            // 판매 후, 해당 탭의 아이템 리스트를 다시 불러와 UI를 갱신. 아이템을 모두 팔아 0개가 됐을 때 리스트에서 제거되므로
-            ChangeTab(currentTabIndex); 
+            int remainAmount = ManagerRoot.Inventory.GetItemCount(invItem.baseData.id);
+            if (remainAmount <= 0)
+            {
+                // 0개가 되어 리스트에서 지워야 할 때만 새로고침을 수행
+                currentFilteredItems = ManagerRoot.Inventory.GetSellableItems((ItemCategory)currentTabIndex);
+                PopulateList(currentFilteredItems);
+
+                // 커서 위치 재조정
+                if (currentFilteredItems.Count == 0)
+                {
+                    // 더 이상 팔 아이템이 없다면 탭으로 포커스를 돌려보냄
+                    ChangeHighlight(-1); 
+                }
+                else
+                {
+                    // 아직 팔 아이템이 남았다면, 현재 인덱스를 유지하거나 맨 마지막 아이템을 가리키게 함.
+                    int newIndex = Mathf.Min(currentHighlightIndex, currentFilteredItems.Count - 1);
+                    ChangeHighlight(newIndex);
+                }
+            }
+            else
+            {
+                // 아직 아이템이 남아있다면 슬롯을 파괴하거나 생성하지 않고 정보만 갱신
+                currentMaxPossession = remainAmount;
+                ChangeHighlight(currentHighlightIndex); 
+            }
+
             UpdatePlayerMoneyUI();
         }
 
-        private void UpdateTabVisuals()
+        private void UpdateTabFocusIndicator()
         {
             for (int i = 0; i < tabFocusIndicators.Length; i++)
             {

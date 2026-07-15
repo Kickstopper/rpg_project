@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using TMPro;
 using UnityEngine.UI;
 using Data;
@@ -159,9 +160,12 @@ namespace UI.Shop
             highlightDescText.text = item.description;
 
             int possessedAmount = ManagerRoot.Inventory.GetItemCount(item.id);
-            possessionText.text = $"{possessedAmount}/99"; // 일단은 전부 99개가 최대
+            possessionText.text = $"{possessedAmount}/{item.maxStackCount}";
             
             UpdatePriceUI();
+
+            // AutoScrollRect가 변경을 감지하고 스크롤을 따라가도록 EventSystem에게 현재 선택된 UI를 알려줌.
+            EventSystem.current.SetSelectedGameObject(spawnedSlots[index].gameObject);
         }
 
         // 구매 개수 설정
@@ -170,7 +174,7 @@ namespace UI.Shop
             currentPurchaseQuantity += change;
 
             if (currentPurchaseQuantity < 0) currentPurchaseQuantity = 0;
-            if (currentPurchaseQuantity > 99) currentPurchaseQuantity = 99;
+            if (currentPurchaseQuantity > HighlightedItem.maxStackCount) currentPurchaseQuantity = HighlightedItem.maxStackCount;
 
             spawnedSlots[currentHighlightIndex].UpdateQuantityText(currentPurchaseQuantity);
             UpdatePriceUI();

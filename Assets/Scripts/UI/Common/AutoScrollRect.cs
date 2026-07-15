@@ -32,7 +32,15 @@ namespace UI.Common
             if (selected.transform.IsChildOf(contentPanel))
             {
                 lastSelected = selected;
-                ScrollToSelected(selected.GetComponent<RectTransform>());
+
+                Transform targetTransform = selected.transform;
+                // 선택된 UI가 화살표 버튼 등 하위 자식일 경우, contentPanel의 본체가 나올 때까지 부모 계층을 타고 올라감. ScrollRect 떨림 방지.
+                while (targetTransform.parent != null && targetTransform.parent != contentPanel)
+                {
+                    targetTransform = targetTransform.parent;
+                }
+                
+                ScrollToSelected(targetTransform.GetComponent<RectTransform>());
             }
         }
 
