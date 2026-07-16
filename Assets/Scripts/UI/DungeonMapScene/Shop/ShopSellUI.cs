@@ -57,7 +57,7 @@ namespace UI.Shop
             HandleInput();
         }
 
-        public void OpenSellMode()
+        public void Show()
         {
             sellUI.SetActive(true);
             currentTabIndex = 0; // 최초 탭은 WEAPON
@@ -115,7 +115,14 @@ namespace UI.Shop
         {
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Common.GameInput.GetCancelDown())
             {
-                CloseSellMode();
+                if (currentSellQuantity > 0)
+                {
+                    ChangeQuantity(-99); // 구매할 수 있는 최대치를 일시에 감소시켜 구매 확정 버튼을 감춤 
+                }
+                else 
+                {
+                    Close();
+                }
                 return;
             }
 
@@ -316,7 +323,7 @@ namespace UI.Shop
             spawnedSlots.Clear();
         }
 
-        public void CloseSellMode()
+        public void Close()
         {
             sellUI.SetActive(false);
         }

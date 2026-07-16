@@ -45,8 +45,7 @@ namespace UI.Shop
             HandleInput();
         }
 
-        // 던전 문 통과 시 호출될 진입점
-        public void OpenShop(string shopID)
+        public void Show(string shopID)
         {
             buyUI.SetActive(true);
             currentShopData = ShopManager.Instance.GetShopData(shopID);
@@ -101,7 +100,14 @@ namespace UI.Shop
         {
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
             {
-                CloseBuyMode();
+                if (currentPurchaseQuantity > 0)
+                {
+                    ChangeQuantity(-99); // 구매할 수 있는 최대치를 일시에 감소시켜 구매 확정 버튼을 감춤 
+                }
+                else 
+                {
+                    Close();
+                }
                 return;
             }
 
@@ -228,7 +234,7 @@ namespace UI.Shop
             spawnedSlots.Clear();
         }
 
-        public void CloseBuyMode()
+        public void Close()
         {
             buyUI.SetActive(false);
         }

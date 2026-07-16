@@ -28,7 +28,7 @@ namespace UI.Shop
         private int currentCharIndex = 0;
         private bool isEquipping = false;
 
-        public void OpenEquipMode()
+        public void Show()
         {
             EquipUIContainer.SetActive(true);
             isEquipping = false;
@@ -87,7 +87,7 @@ namespace UI.Shop
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
             {
-                CloseShopEquip();
+                Close();
             }
         }
 
@@ -129,7 +129,7 @@ namespace UI.Shop
             if (charButtons.Count > 0) SelectCharacter(currentCharIndex);
         }
 
-        public void CloseShopEquip()
+        public void Close()
         {
             EquipUIContainer.SetActive(false);
         }

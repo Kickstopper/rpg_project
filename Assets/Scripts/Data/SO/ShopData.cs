@@ -11,5 +11,15 @@ namespace Data
         public Sprite BackgroundImage;
         public string displayName;
         public List<BaseItemData> itemsForSale;
+        
+        [Header("상인 정보")]
+        public Sprite characterImage;
+        public string characterName;
+        public string startMessage;
+        public string endMessage;
+        public string buyMessage;
+        public string sellMessage;
+        public string equipMessage;
+        public string cancelMessage;
     }
 }
