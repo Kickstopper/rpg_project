@@ -48,6 +48,12 @@ namespace Controller
         void Start()
         {
             if (UI_Canvas) UI_Canvas.SetActive(false);
+            if (targetImage != null)
+            {
+                Color c = targetImage.color;
+                c.a = 0f;
+                targetImage.color = c;
+            }
 #if UNITY_ANDROID || UNITY_IOS
         // 모바일용으로 빌드할 경우 QUIT버튼 비활성화
         if (btnQuit != null && allMenuBtns != null && allMenuBtns.Contains(btnQuit))
@@ -165,7 +171,7 @@ namespace Controller
 
             // UI가 켜질 때 첫 번째 버튼을 선택
             currentBtnIndex = 0;
-            UpdateSelection(currentBtnIndex);
+            UpdateSelection(currentBtnIndex, false);
         }
 
         void HandleMenuNavigation(ref int currentIndex)
@@ -217,11 +223,11 @@ namespace Controller
             }
         }
 
-        void UpdateSelection(int index)
+        void UpdateSelection(int index, bool hasSfx = true)
         {
             if (allMenuBtns == null || allMenuBtns.Count == 0 || index < 0 || index >= allMenuBtns.Count) return;
             allMenuBtns[index].Select();
-            ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
+            if (hasSfx) ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
         }
 
         public void OnClick_NewGame()

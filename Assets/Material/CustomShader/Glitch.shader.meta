@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 0421a1d14467fe748ac92cbf0f4daaa5
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _MainTex: {instanceID: 0}
+  - _AlphaTex: {instanceID: 0}
+  - _GlitchMaskNoise: {instanceID: 0}
+  - _GlitchNoiseTexture: {fileID: 2800000, guid: d3f6b478ad476d74b8b02a03e4cc8c3d,
+      type: 3}
+  - _GlitchDistortionTexture: {fileID: 2800000, guid: d3f6b478ad476d74b8b02a03e4cc8c3d,
+      type: 3}
+  nonModifiableTextures: []
+  preprocessorOverride: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
