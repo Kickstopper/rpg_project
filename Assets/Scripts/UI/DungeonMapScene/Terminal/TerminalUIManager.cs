@@ -22,6 +22,7 @@ namespace UI
         public TextMeshProUGUI dungeonInfoText;
         public CanvasGroup digitalRain;
         public Image fadeOverlay;
+        public StarWarpController warp;
 
         [Header("UI References (Bottom Grid)")]
         public RectTransform buttonGridContainer;
@@ -69,8 +70,11 @@ namespace UI
             IsCanceled = false;
             SelectedTerminal = null;
             _isAnimating = true;
-
+            
             gameObject.SetActive(true);
+            
+            warp.gameObject.SetActive(false);
+
             digitalRain.alpha = 0f;
             List<TerminalData> availableList = TerminalManager.Instance.GetAvailableTerminals(currentTerminalID);
 
@@ -233,7 +237,7 @@ namespace UI
         private IEnumerator OutroSequenceRoutine(TerminalData selectedData)
         {
             _isAnimating = true;
-
+            
             // 1. 버튼들을 화면 밖으로 무작위로 날려버림
             float offScreenX = 3000f; 
             for (int i = 0; i < TOTAL_BUTTONS; i++)
@@ -257,6 +261,9 @@ namespace UI
             // 플레이어 전송 연출 시작
             if (characterImage != null && characterAscii != null && objectPool != null)
             {
+                warp.gameObject.SetActive(true);
+                warp.Reset();
+                
                 // 플레이어 원본 이미지 페이드 인
                 characterImage.gameObject.SetActive(true);
                 yield return StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 0.5f, Color.white));
@@ -273,14 +280,14 @@ namespace UI
                 yield return StartCoroutine(RevealAsciiRandomly(1.0f));
 
                 yield return wait05;
-
+                
                 // 아스키 아트 방사형 팽창 및 복귀
                 // 폭발(0.6초), 대기(0.5초), 복귀(0.5초), 크기 팽창(15배), 난수 파편화(30f)
                 yield return StartCoroutine(ExplodeAndReturnAsciiRoutine(0.6f, 0.5f, 0.5f, 15f, 30f));
 
                 // 데이터 전송 중인 느낌을 주기 위해 짧은 대기
                 yield return new WaitForSeconds(0.2f);
-
+                warp.gameObject.SetActive(false);
                 digitalRain.DOFade(1f, 1f);
 
                 // 아스키 아트 -> 원본 이미지로 재결합
@@ -462,6 +469,8 @@ namespace UI
                 // 글자들이 날아갈 때 회전할 각도 (±90도 이내)
                 targetRotations[i] = Random.Range(-90f, 90f);
             }
+
+            warp.PlayWarpAndCollapse();
 
             // 방사형 팽창 폭발 (Cubic Ease Out: 터질 때 빠르고 끝에서 느려짐)
             float elapsed = 0f;
