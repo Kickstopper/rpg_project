@@ -66,6 +66,7 @@ namespace UI
 
         public void OpenTerminal(string currentTerminalID)
         {
+            ManagerRoot.Sound.PlayBGM(Data.BgmID.Terminal);
             IsSelectionComplete = false;
             IsCanceled = false;
             SelectedTerminal = null;
@@ -251,8 +252,12 @@ namespace UI
                   .SetEase(Ease.InExpo);
             }
 
+            ManagerRoot.Sound.StopBGM();
+
             // 버튼이 날아가는 도중에 DigitalRain 페이드 인
             fadeOverlay.DOFade(1f, 0.5f).OnStart(()=>{fadeOverlay.color = new Color(0f, 0f, 0f, 0f);});
+            
+            ManagerRoot.Sound.PlaySFX(Data.SfxID.Computer, 0.5f);
             digitalRain.DOFade(1f, 0.5f).SetDelay(0.2f);
             
             // 비가 내리기 시작할 때까지 잠시 대기
@@ -273,26 +278,30 @@ namespace UI
                 yield return wait05;
 
                 digitalRain.DOFade(0f, 0.5f);
-
+                ManagerRoot.Sound.StopAllSFX(true);
+                ManagerRoot.Sound.PlaySFX(Data.SfxID.Warp_Start);
                 Color digitalTint = Color.cyan;
                 // 원본 이미지 -> 아스키 아트로 분해
                 StartCoroutine(FadeSpriteAlpha(characterImage, 1f, 0f, 1.0f, digitalTint));
                 yield return StartCoroutine(RevealAsciiRandomly(1.0f));
-
+                
                 yield return wait05;
                 
+                ManagerRoot.Sound.PlaySFX(Data.SfxID.Warp_End);
                 // 아스키 아트 방사형 팽창 및 복귀
                 // 폭발(0.6초), 대기(0.5초), 복귀(0.5초), 크기 팽창(15배), 난수 파편화(30f)
-                yield return StartCoroutine(ExplodeAndReturnAsciiRoutine(0.6f, 0.5f, 0.5f, 15f, 30f));
-
+                yield return StartCoroutine(ExplodeAndReturnAsciiRoutine(0.6f, 0.25f, 0.5f, 15f, 30f));
+                
                 // 데이터 전송 중인 느낌을 주기 위해 짧은 대기
                 yield return new WaitForSeconds(0.2f);
+
                 warp.gameObject.SetActive(false);
-                digitalRain.DOFade(1f, 1f);
+                ManagerRoot.Sound.PlaySFX(Data.SfxID.Computer, 0.25f);
+                digitalRain.DOFade(1f, 1.5f);
 
                 // 아스키 아트 -> 원본 이미지로 재결합
-                StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 1.0f, digitalTint));
-                yield return StartCoroutine(DissolveAsciiRandomly(1.0f));
+                StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 1.5f, digitalTint));
+                yield return StartCoroutine(DissolveAsciiRandomly(1.5f));
                 
                 // 다 쓴 노드 반환 및 초기화
                 objectPool.ReturnAllObjects(_activeAsciiNodes);
@@ -305,7 +314,7 @@ namespace UI
 
                 // 원본 이미지 페이드 아웃
                 yield return StartCoroutine(FadeSpriteAlpha(characterImage, 1f, 0f, 0.5f, digitalTint));
-
+                
                 characterImage.gameObject.SetActive(false);
             }
             else
@@ -317,7 +326,7 @@ namespace UI
             }
     
             yield return wait10;
-
+            ManagerRoot.Sound.StopAllSFX();
             // 선택 완료 처리 후 컨트롤러에 턴을 넘김
             SelectedTerminal = selectedData;
             IsCanceled = false;

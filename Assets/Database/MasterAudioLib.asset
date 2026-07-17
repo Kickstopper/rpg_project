@@ -43,6 +43,12 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 7f2852b16f833314d812bad6c7aac6f9, type: 3}
   - id: 20
     clip: {fileID: 8300000, guid: 99048bc68d58ab946b4d50ce85a1534b, type: 3}
+  - id: 21
+    clip: {fileID: 8300000, guid: e8bcea84eb4b1fa4ca68b294aa5d125e, type: 3}
+  - id: 22
+    clip: {fileID: 8300000, guid: 24b4673e93e7ffd4c82c21f702cc7118, type: 3}
+  - id: 23
+    clip: {fileID: 8300000, guid: b9da76422cf359143910527994a76657, type: 3}
   BgmList:
   - id: 35
     clip: {fileID: 8300000, guid: 24a732873a5fe734887967e6773f7824, type: 3}
@@ -61,7 +67,7 @@ MonoBehaviour:
   - id: 7
     clip: {fileID: 8300000, guid: 242d653ef983d0c44854e24ec6722193, type: 3}
   - id: 8
-    clip: {fileID: 8300000, guid: f67d037d5d0b6cd40983267496587e98, type: 3}
+    clip: {fileID: 8300000, guid: 550f4969cdf2ea04abc86f1839006048, type: 3}
   - id: 9
     clip: {fileID: 8300000, guid: 10033941433548d4786a31a351b3ed52, type: 3}
   - id: 10

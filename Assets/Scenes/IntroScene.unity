@@ -1429,6 +1429,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: '@Managers'
       objectReference: {fileID: 0}
+    - target: {fileID: 4567300787871133489, guid: 54f5b6f8f36090f46b89f79fb02da32f, type: 3}
+      propertyPath: allTerminals.Array.data[1].mapID
+      value: Cave_0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567300787871133489, guid: 54f5b6f8f36090f46b89f79fb02da32f, type: 3}
+      propertyPath: allTerminals.Array.data[1].targetX
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567300787871133489, guid: 54f5b6f8f36090f46b89f79fb02da32f, type: 3}
+      propertyPath: allTerminals.Array.data[1].targetY
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567300787871133489, guid: 54f5b6f8f36090f46b89f79fb02da32f, type: 3}
+      propertyPath: allTerminals.Array.data[1].description
+      value: "\uCD95\uCD95\uD574\uC694"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567300787871133489, guid: 54f5b6f8f36090f46b89f79fb02da32f, type: 3}
+      propertyPath: allTerminals.Array.data[1].displayName
+      value: "\uBB3C\uC5D0 \uC7A0\uAE34 \uB3C4\uC2DC"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4567300787871133489, guid: 54f5b6f8f36090f46b89f79fb02da32f, type: 3}
+      propertyPath: allTerminals.Array.data[1].floorNumber
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

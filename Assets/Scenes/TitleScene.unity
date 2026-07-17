@@ -1156,10 +1156,9 @@ MonoBehaviour:
   btnLoad: {fileID: 1941007095}
   btnNewGame: {fileID: 493481233}
   btnQuit: {fileID: 1853381201}
-  warp: {fileID: 1679534979}
   backgroundImages:
   - {fileID: 21300000, guid: 337da0f4665a8e84dab6248610cf2755, type: 3}
-  fadeDuration: 5
+  fadeDuration: 0.5
   displayDuration: 0.5
 --- !u!1 &1034886870
 GameObject:
@@ -1742,16 +1741,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StarWarpController
   starMaterial: {fileID: 2100000, guid: acd85fcc74cd02941a5a0594422c6f7e, type: 2}
-  starDensity: 70
-  idleSpeed: 4
-  idleStretch: 0.2
-  swaySpeed: 0.1
-  swayAmount: 0.2
   warpMaxSpeed: 0
   warpMaxStretch: 15
   collapseSpeed: -100
   accelerationTime: 1.5
   collapseTime: 0.2
+  starDensity: 70
+  returnTime: 1
+  idleSpeed: 4
+  idleStretch: 0.2
+  swaySpeed: 0.1
+  swayAmount: 0.2
 --- !u!1 &1769923579
 GameObject:
   m_ObjectHideFlags: 0
