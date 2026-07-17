@@ -56,6 +56,8 @@ namespace Data
         public string equippedGunId;
         public string equippedAmmoId;
 
+        public VfxID basicAttackVfxId;    // 기본 공격 이펙트 ID
+
         public List<string> equippedArmorIds = new();
         
         // 배운 스킬
@@ -71,7 +73,8 @@ namespace Data
             if (System.Enum.TryParse(save.row, out RowType parsedRow)) row = parsedRow;
             if (System.Enum.TryParse(save.column, out ColumnType parsedCol)) column = parsedCol;
             if (System.Enum.TryParse(save.gender, out Gender parsedGender)) gender = parsedGender;
-            
+            if (System.Enum.TryParse(save.basicAttackVfxID, out VfxID basicAtkVfx)) basicAttackVfxId = basicAtkVfx;
+
             resonanceId = save.resonanceId;
 
             stats = save.stats;
@@ -102,6 +105,7 @@ namespace Data
             resistances = entry.resistances;
             isCommander = entry.isCommander;
             isRegular = entry.isRegular;
+            basicAttackVfxId = entry.basicAttackVfxId;
 
             currentHp = maxHp = BattleCalculator.GetMaxHP(stats.level, stats.str, stats.vit);
             currentMp = maxMp = BattleCalculator.GetMaxMP(stats.level, stats.mag, stats.intel);
@@ -138,6 +142,7 @@ namespace Data
             data.gunId = this.equippedGunId;
             data.ammoId = this.equippedAmmoId;
             data.armorIds = this.equippedArmorIds;
+            data.basicAttackVfxID = this.basicAttackVfxId.ToString();
             
             data.maxHp = this.maxHp;
             data.maxMp = this.maxMp;

@@ -751,7 +751,7 @@ namespace Controller
 
             // Item 조건
             bool canItem = (ManagerRoot.Inventory.GetAllItemIds().Count > 0);
-            Debug.Log("11111111111111111111111: " + canItem);
+            
             // Gun 메뉴 조건
             bool canShoot = actor.CanShootGun() && actor.currentGunAmmo > 0;
             bool canReload = (actor.currentGun != null) && (actor.currentGunAmmo < actor.currentGun.maxHits);

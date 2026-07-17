@@ -32,22 +32,6 @@ namespace Controller
 
         public void Initialize(PlayerMenuController controller)
         {
-            // 테스트를 위한 몬스터 추가
-            // var monA = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_001"));
-            // var monB = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_003")); 
-            // var monC = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_006")); 
-            // var monD = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_009")); 
-            // var monE = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_021")); 
-            // var monF = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_025")); 
-            // var monG = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_030")); 
-            // ManagerRoot.Party.AddMember(monA, true);
-            // ManagerRoot.Party.AddMember(monB, true);
-            // ManagerRoot.Party.AddMember(monC, true);
-            // ManagerRoot.Party.AddMember(monD, true);
-            // ManagerRoot.Party.AddMember(monE, true);
-            // ManagerRoot.Party.AddMember(monF, true);
-            // ManagerRoot.Party.AddMember(monG, true);
-
             this.menuController = controller;
 
             GridLayoutGroup gridLayout = monsterGridList.GetComponent<GridLayoutGroup>();

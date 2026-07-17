@@ -47,6 +47,7 @@ namespace Helper
             charEntry.initialGunId = "";
             charEntry.initialAmmoId = "";
             charEntry.initialArmorIds = new List<string>();
+            charEntry.basicAttackVfxId = monster.basicAttackVfxId;
 
             // 경험치 테이블
             // 몬스터 전용 경험치 테이블이 있다면 여기서 할당

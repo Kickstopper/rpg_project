@@ -33,6 +33,8 @@ namespace Data
     public class DungeonTheme : ScriptableObject
     {
         public string dungeonID;
+        [Header("MUSIC")]
+        public BgmID bgmID;                  // 이 레벨에서 재생될 BGM
         
         [Header("Entry Effect")]
         public bool useWakeUpEffect = false;
@@ -66,7 +68,6 @@ namespace Data
         public Color fogColor = Color.black; // 심도 표현을 위한 안개의 색
         public float lightingIntensity = 3.5f;
         public bool useGridLighting = true;
-        public BgmID bgmID;                  // 이 레벨에서 재생될 BGM
         public bool moduleEnable = true;     // 모듈을 사용할 수 있는지 여부
 
         [Header("Dust Effect")]

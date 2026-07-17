@@ -95,6 +95,8 @@ namespace Data
         public string weaponId;
         public string gunId;
         public string ammoId;
+
+        public string basicAttackVfxID;
         public List<string> armorIds;
 
         // 배운 스킬

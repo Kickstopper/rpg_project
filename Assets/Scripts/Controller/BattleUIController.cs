@@ -8,6 +8,7 @@ using System;
 using UI;
 using System.Collections;
 using static Controller.BattleManager;
+using Manager;
 
 public class BattleUIController : MonoBehaviour
 {
@@ -549,6 +550,8 @@ public class BattleUIController : MonoBehaviour
 
     public IEnumerator ShowGameOverSequence(MonsterController killer, Action onComplete)
     {
+        ManagerRoot.Sound.StopBGM();
+        
         // 초기화 및 활성화
         gameOverPanel.SetActive(true);
         gameOverFadeOverlay.color = Color.black;
@@ -602,7 +605,7 @@ public class BattleUIController : MonoBehaviour
         }
 
         // 메시지 타이핑 애니메이션
-        string msg = "건방진 녀석. 날 이기려면 백 년은 멀었다."; 
+        string msg = "Once a loser, always a loser."; 
         if (killer != null && killer.sourceData != null && !string.IsNullOrEmpty(killer.sourceData.CondolenceText))
         {
             msg = killer.sourceData.CondolenceText;

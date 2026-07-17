@@ -431,29 +431,40 @@ namespace Controller
 
         public override VfxID GetBasicAttackVfx()
         {
+            if (sourceData.isMonster)
+            {
+                if (sourceData.basicAttackVfxId == VfxID.None)
+                    return VfxID.Hit;
+                
+                return sourceData.basicAttackVfxId;
+            }
+
             // 장비한 무기가 없을 경우 기본 맨손 타격 이펙트 반환
             if (equippedWeaponId == null) return VfxID.Hit;
 
             var weaponData = ManagerRoot.Database.GetWeapon(equippedWeaponId);
-
-            // 무기의 타입에 따라 이펙트 분기
-            switch (weaponData.weaponCategory)
+            if (weaponData != null)
             {
-                case WeaponCategory.Cut:
-                    return VfxID.Cut;
+                switch (weaponData.weaponCategory)
+                {
+                    case WeaponCategory.Cut:
+                        return VfxID.Cut;
 
-                case WeaponCategory.Slash:
-                    return VfxID.Slash;
+                    case WeaponCategory.Slash:
+                        return VfxID.Slash;
 
-                case WeaponCategory.Stab:
-                    return VfxID.Stab;
+                    case WeaponCategory.Stab:
+                        return VfxID.Stab;
 
-                case WeaponCategory.Claw:
-                    return VfxID.Slash;
+                    case WeaponCategory.Claw:
+                        return VfxID.Slash;
 
-                default:
-                    return VfxID.Hit;
+                    default:
+                        return VfxID.Hit;
+                }
             }
+
+            return VfxID.Hit;
         }
 
         public override VfxID GetGunAttackVfx()
