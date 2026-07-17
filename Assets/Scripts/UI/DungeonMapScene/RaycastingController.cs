@@ -1342,6 +1342,8 @@ namespace Controller
                         {
                             ManagerRoot.Dungeon.LoadDungeonFromJson(dynamicDest.destinationID);
                             LoadMapData(dynamicDest); 
+                            
+                            ManagerRoot.Sound.StopBGM(false);
                         }
                         
                         yield return new WaitForSeconds(0.2f); // 렉 스파이크 대기
@@ -2026,7 +2028,23 @@ namespace Controller
                 CellData cell = _currentMap.GetCell(rx, ry);
                 float distToPlayer = Vector2.Distance(new Vector2(rx, ry), new Vector2(_player.LogicX, _player.LogicY));
                 
-                if (cell != null && !cell.HasWall() && cell.value != -1 && distToPlayer >= safeDistance)
+                // 4면이 모두 꽉 막힌 벽(통과 불가)인지 검사합니다.
+                bool isEnclosed = true;
+                if (cell != null)
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        int tex = cell.wallTextureIDs[i];
+                        // 벽이 없거나(-1), 통과 가능한 환영의 벽이라면 갇힌 공간이 아님
+                        if (tex == -1 || (theme.passableWallTexIDs != null && theme.passableWallTexIDs.Contains(tex)))
+                        {
+                            isEnclosed = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (cell != null && !isEnclosed && cell.value != -1 && distToPlayer >= safeDistance)
                 {
                     List<string> generatedGroup = new List<string>();
                     var candidates = encounterSystem.MonsterCandidate;
@@ -2232,22 +2250,28 @@ namespace Controller
             else if (dir.y > 0) { targetEnterFace = 2; currentExitFace = 0; } 
             else if (dir.y < 0) { targetEnterFace = 0; currentExitFace = 2; } 
 
+            // 현재 칸에서 해당 방향으로 나갈 수 있는지 내벽 검사 (passableWall 예외 처리)
             CellData currentCell = _currentMap.GetCell(ex, ey);
-            if (currentCell != null && currentCell.HasWall() && currentExitFace != -1)
+            if (currentCell != null && currentExitFace != -1)
             {
                 int texID = currentCell.wallTextureIDs[currentExitFace];
-                if (texID != -1) return false;
+                if (texID != -1 && (theme.passableWallTexIDs == null || !theme.passableWallTexIDs.Contains(texID))) 
+                    return false;
             }
 
+            // 목표 칸이 void(-1)인지 먼저 검사
             CellData targetCell = _currentMap.GetCell(tx, ty);
             if (targetCell == null || targetCell.value == -1) return false;
 
-            if (targetCell.HasWall() && targetEnterFace != -1)
+            // 목표 칸으로 해당 방향을 통해 들어갈 수 있는지 외벽 검사 (passableWall 예외 처리)
+            if (targetEnterFace != -1)
             {
                 int texID = targetCell.wallTextureIDs[targetEnterFace];
-                if (texID != -1) return false;
+                if (texID != -1 && (theme.passableWallTexIDs == null || !theme.passableWallTexIDs.Contains(texID))) 
+                    return false;
             }
 
+            // 플레이어 위치일 경우, 겹치기 체크를 무시하고 돌진
             if (tx == _player.LogicX && ty == _player.LogicY) return true;
 
             foreach (var other in _activeEnemies)
