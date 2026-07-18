@@ -90,7 +90,7 @@ namespace Controller
 
         private void CheckSuspendSaveData()
         {
-            bool hasSuspend = SaveManager.Instance.HasSuspendData();
+            bool hasSuspend = ManagerRoot.Save.HasSuspendData();
 
             if (!hasSuspend)
             {
@@ -248,9 +248,9 @@ namespace Controller
 
         public void OnClick_Continue()
         {
-            if (SaveManager.Instance.HasSuspendData())
+            if (ManagerRoot.Save.HasSuspendData())
             {
-                SaveManager.Instance.LoadGame(SaveManager.SUSPEND_SLOT_INDEX);
+                ManagerRoot.Save.LoadGame(SaveManager.SUSPEND_SLOT_INDEX);
             }
         }
 

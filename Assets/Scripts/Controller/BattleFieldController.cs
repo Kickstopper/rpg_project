@@ -34,11 +34,16 @@ public class BattleFieldController : MonoBehaviour
     [Header("Highlight Colors")]
     private Color currentTargetColor = new Color32(128, 0, 178, 255);
     private Color moveSourceColor = Color.gray;   // 이동하려는 내 캐릭터 색상
-    
+
     // 렌더링 및 그리드 관리용 리스트 (Empty 포함, 총 6개 고정)
     [HideInInspector] public List<PlayerController> allSlotControllers = new();
     [HideInInspector] public List<BattleEntity> activePlayers = new(); 
     [HideInInspector] public List<BattleEntity> activeMonsters = new();
+
+    // 타겟팅 로직 변수
+    [HideInInspector] public List<BattleEntity> validTargets = new();
+    [HideInInspector] public int currentTargetIndex = 0;
+    [HideInInspector] public bool isGroupTargeting = false; // 전체 타겟팅 여부
         
     [Header("Slot Management")]
     // 몬스터들의 슬롯을 관리할 리스트 (0,1,2: 전열 / 0,1,2: 후열)
@@ -53,10 +58,6 @@ public class BattleFieldController : MonoBehaviour
     
     // 전투 로직용 리스트 (데이터가 있는 캐릭터만)
     [HideInInspector] public List<MonsterDatabase.MonsterEntry> encounterLog = new();
-
-    // 타겟팅 로직 변수
-    [HideInInspector] public List<BattleEntity> validTargets = new();
-    [HideInInspector] public int currentTargetIndex = 0;
 
     [HideInInspector]
     public struct BattlePosition
@@ -336,7 +337,19 @@ public class BattleFieldController : MonoBehaviour
     public void UpdateValidTargetsHighlight()
     {
         foreach (var monster in validTargets) monster.SetSelectionState(false);
-        if (validTargets.Count > 0) validTargets[currentTargetIndex].SetSelectionState(true);
+        
+        if (validTargets.Count > 0)
+        {
+            // 그룹 타겟팅이면 모두 켜고, 아니면 한 명만 켬
+            if (isGroupTargeting)
+            {
+                foreach (var target in validTargets) target.SetSelectionState(true);
+            }
+            else
+            {
+                validTargets[currentTargetIndex].SetSelectionState(true);
+            }
+        }
     }
 
     // 매개변수에 targetSlotTransform 추가 및 이름 명확히 변경
@@ -1087,6 +1100,7 @@ public class BattleFieldController : MonoBehaviour
 
     public void SetValidMonsterTargets()
     {
+        isGroupTargeting = false;
         validTargets.Clear();
         // 전열 몬스터만 필터링
         validTargets.Clear();
@@ -1100,12 +1114,46 @@ public class BattleFieldController : MonoBehaviour
     public void SetValidTargetsByTargetScope(TargetScope scope)
     {
         validTargets.Clear();
-        if (scope == TargetScope.Single_Enemy)
-            validTargets.AddRange(activeMonsters.Where(m => m != null && m.currentHp > 0));
-        else if (scope == TargetScope.One_Ally) 
-            validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp > 0));
-        else if (scope == TargetScope.Dead_Ally)
-            validTargets.AddRange(activePlayers.Where(p => p != null && p.currentHp <= 0));
+        // 타겟 스코프가 전체 범위인지 확인하고 플래그를 설정
+        isGroupTargeting = (scope == TargetScope.All_Enemies || scope == TargetScope.Front_Enemies || 
+                            scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies);
+
+        var livingMonsters = GetLivingMonsters();
+        var livingPlayers = GetLivingParty();
+
+        switch (scope)
+        {
+            case TargetScope.Single_Enemy:
+            case TargetScope.All_Enemies:
+            case TargetScope.Random_Enemy:
+                validTargets.AddRange(livingMonsters);
+                break;
+
+            case TargetScope.Front_Single_Enemy:
+            case TargetScope.Front_Enemies:
+            case TargetScope.Random_Front_Enemy:
+                // 전열 몬스터만 먼저 찾고, 전열이 텅 비었다면 후열 몬스터를 타겟으로
+                var frontMonsters = livingMonsters.Where(m => IsMonsterInFrontRow(m)).ToList();
+                if (frontMonsters.Count > 0) validTargets.AddRange(frontMonsters);
+                else validTargets.AddRange(livingMonsters); 
+                break;
+
+            case TargetScope.One_Ally:
+            case TargetScope.All_Allies:
+                validTargets.AddRange(livingPlayers);
+                break;
+
+            case TargetScope.Dead_Ally:
+            case TargetScope.All_Dead_Allies:
+                // 빈 슬롯이 아니면서 체력이 0 이하인 죽은 아군만 필터링
+                validTargets.AddRange(activePlayers.Where(p => p != null && !((PlayerController)p).IsEmpty && p.currentHp <= 0));
+                break;
+
+            case TargetScope.Self:
+                // 시전자 본인을 찾아 타겟 리스트에 넣음
+                validTargets.Add(GetCurrentCharacter());
+                break;
+        }
 
         SortValidTargets();
     }
@@ -1133,6 +1181,7 @@ public class BattleFieldController : MonoBehaviour
 
     public void SetValidTargets(List<BattleEntity> targets)
     {
+        isGroupTargeting = false;
         validTargets = targets;
         
         SortValidTargets();

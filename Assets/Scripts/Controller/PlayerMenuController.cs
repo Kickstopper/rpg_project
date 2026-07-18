@@ -772,8 +772,9 @@ namespace Controller
             switch (currentState)
             {
                 case MenuState.Suspend:
-                    SaveManager.Instance.SaveGame(SaveManager.SUSPEND_SLOT_INDEX);
+                    ManagerRoot.Save.SaveGame(SaveManager.SUSPEND_SLOT_INDEX);
                     ManagerRoot.GameState.ChangeState(GameState.None);
+                    ManagerRoot.Sound.StopBGM();
                     UnityEngine.SceneManagement.SceneManager.LoadScene(GameScene.TITLE_SCENE);
                     break;
 

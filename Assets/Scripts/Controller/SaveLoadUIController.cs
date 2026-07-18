@@ -57,7 +57,7 @@ namespace Controller
             for (int i = 0; i < slots.Count; i++)
             {
                 // SaveManager에게 해당 슬롯의 헤더 정보 요청
-                var data = SaveManager.Instance.GetSaveDataHeader(i);
+                var data = ManagerRoot.Save.GetSaveDataHeader(i);
                 slots[i].SetData(data);
             }
         }
@@ -69,7 +69,7 @@ namespace Controller
             {
                 // [저장 모드]
                 // 데이터가 있으면 덮어쓰기 경고 팝업을 띄우는 것이 좋음 (여기선 생략하고 즉시 저장)
-                SaveManager.Instance.SaveGame(index);
+                ManagerRoot.Save.SaveGame(index);
                 
                 // 저장 후 UI 갱신 (시간 등 업데이트)
                 RefreshAllSlots();
@@ -80,7 +80,7 @@ namespace Controller
                 // [로드 모드]
                 if (hasData)
                 {
-                    SaveManager.Instance.LoadGame(index);
+                    ManagerRoot.Save.LoadGame(index);
                     // 로드하면 씬이 바뀌므로 Close() 호출 불필요 (자동 파괴됨)
                     // 만약 DontDestroyOnLoad UI라면 Close() 호출
                 }
@@ -147,7 +147,7 @@ namespace Controller
         {
             // 현재 포커스된 슬롯의 데이터 유무 확인
             // (SaveSlotUI가 데이터를 들고 있지 않다면, 매니저에서 다시 확인)
-            var header = SaveManager.Instance.GetSaveDataHeader(currentFocusIndex);
+            var header = ManagerRoot.Save.GetSaveDataHeader(currentFocusIndex);
             bool hasData = (header != null);
 
             // 기존 OnSlotSelected 함수 재활용

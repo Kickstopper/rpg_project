@@ -68,8 +68,7 @@ namespace Controller
         private bool reserveAutoOff = false;
         
         // 각 캐릭터가 마지막으로 수행한 행동 타입 저장
-        private static Dictionary<int, (ActionType type, BaseRootData data, int targetIndex)> lastPlayerActions = new();
-
+        private static Dictionary<string, (ActionType type, BaseRootData data, int targetIndex)> lastPlayerActions = new();
         public BattleState state;
         private List<BattleAction> actionQueue = new(); // 이번 턴의 모든 행동
 
@@ -1226,19 +1225,7 @@ namespace Controller
                 return;
             }
 
-            if (scope == TargetScope.Single_Enemy || scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally || scope == TargetScope.Front_Single_Enemy)
-            {
-                // 이미 위에서 SetValidTargetsByTargetScope를 수행했으므로, 
-                // StartItemTargetSelection 내부의 중복 호출을 피하기 위해 로직을 조정할 수도 있습니다.
-                StartItemTargetSelection(scope); 
-            }
-            else
-            {
-                inputCooldown = 0.05f; 
-                // All_Allies, Self, Front_Enemies, All_Enemies 등은 대상 선택 없이 즉시 사용 예약
-                // 이때 target은 null로 전달되지만, 수정한 HandleItemAction이 scope를 보고 대상을 찾음
-                QueuePolymorphicAction(null); 
-            }
+            StartItemTargetSelection(scope);
         }
 
         // 범용 타겟팅 시작 함수
@@ -1282,25 +1269,6 @@ namespace Controller
         {
             yield return new WaitForSeconds(delay);
             uiController.HideLog();
-        }
-
-        void QueuePolymorphicAction(GameObject target)
-        {
-            PlayerController actor = fieldController.GetCurrentCharacter();
-            BattleAction action = new BattleAction(actor.gameObject, target, currentSelectedAction, actor.GetTotalAgi());
-            action.actionData = currentSelectedItem; 
-
-            // 즉시 실행되는 행동(All_Allies, Self 등)도 Auto 모드를 위해 저장
-            int tIndex = -1;
-            if (target != null && target.TryGetComponent(out PlayerController pc)) tIndex = pc.columnIndex;
-
-            if (lastPlayerActions.ContainsKey(fieldController.currentPlayerIndex))
-                lastPlayerActions[fieldController.currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, tIndex);
-            else
-                lastPlayerActions.Add(fieldController.currentPlayerIndex, (currentSelectedAction, currentSelectedItem, tIndex));
-
-            actionQueue.Add(action);
-            NextPlayerInput();
         }
 
         public void OnFightCommand_Guard()
@@ -1605,9 +1573,11 @@ namespace Controller
             int autoTargetIndex = -1;
 
             // 저장된 행동 불러오기
-            if (lastPlayerActions.ContainsKey(fieldController.currentPlayerIndex))
+            string actorID = actor.sourceData.characterId;
+
+            if (lastPlayerActions.ContainsKey(actorID))
             {
-                var info = lastPlayerActions[fieldController.currentPlayerIndex];
+                var info = lastPlayerActions[actorID];
                 actionType = info.type;
                 autoData = info.data; 
                 autoTargetIndex = info.targetIndex;
@@ -1632,17 +1602,21 @@ namespace Controller
 
             if (isAllyScope)
             {
-                // 아군 대상인 경우 무조건 저장된 타겟 사용
                 if (autoTargetIndex != -1)
                 {
                     PlayerController restoredTarget = fieldController.allSlotControllers[autoTargetIndex];
                     if (restoredTarget != null && !restoredTarget.IsEmpty)
                     {
-                        finalTarget = restoredTarget.gameObject;
+                        // 부활 스킬이면 시체를, 회복 스킬이면 살아있는 대상을 고르도록
+                        bool isRevive = autoData != null && (autoData.effectType == EffectType.Revive_Empty || autoData.effectType == EffectType.Revive_Fully);
+                        if ((isRevive && restoredTarget.currentHp <= 0) || (!isRevive && restoredTarget.currentHp > 0))
+                        {
+                            finalTarget = restoredTarget.gameObject;
+                        }
                     }
                 }
 
-                // 동료가 죽었거나 파티가 바뀌었다면 본인을 타겟으로 설정
+                // 지정된 동료가 죽었거나 조건에 안 맞으면 본인(또는 살아있는 다른 대상)으로 타겟 변경
                 if (finalTarget == null) finalTarget = actor.gameObject;
             }
             else
@@ -1859,22 +1833,32 @@ namespace Controller
             {
                 if (fieldController.validTargets.Count > fieldController.currentTargetIndex)
                 {
-                    var validTarget = fieldController.GetCurrentValidTarget();
-                    validTarget.SetSelectionState(false);
+                    // 그룹 타겟일 때는 모든 대상의 포커스를 끄고, 단일일 땐 하나만 끔
+                    if (fieldController.isGroupTargeting)
+                    {
+                        foreach (var t in fieldController.validTargets) t.SetSelectionState(false);
+                    }
+                    else
+                    {
+                        var validTarget = fieldController.GetCurrentValidTarget();
+                        validTarget.SetSelectionState(false);
+                    }
+
                     if (isCancel) 
                     {
-                        if (currentSelectedAction == ActionType.Union_Attack)
-                            CancelUnionSelection();
-                        else
-                            CancelTargetSelection();   
+                        if (currentSelectedAction == ActionType.Union_Attack) CancelUnionSelection();
+                        else CancelTargetSelection();   
                     }
                     else 
                     {
-                        OnTargetSelected(validTarget);
+                        // 그룹 타겟일 때는 첫 번째 타겟을 기준으로 확정 함수에 넘김
+                        OnTargetSelected(fieldController.GetCurrentValidTarget());
                     }
                 }
                 return;
             }
+
+            if (fieldController.isGroupTargeting) return;
 
             // 현재 타겟이 전열에 있는지 확인
             bool isCurrentInFront = fieldController.IsCurrentTargetInFront();
@@ -1936,6 +1920,8 @@ namespace Controller
         {
             if (isSelectingTarget)
             {
+                if (fieldController.isGroupTargeting) return;
+                
                 // 마우스를 올린 대상이 validTargets에 포함되어 있는지 확인
                 if (fieldController.validTargets.Contains(hoveredEntity))
                 {
@@ -1963,16 +1949,21 @@ namespace Controller
                 // 클릭한 대상이 유효한 타겟일 경우 확정
                 if (fieldController.validTargets.Contains(clickedEntity))
                 {
-                    // 마우스가 너무 빨리 움직여 호버가 씹혔을 경우를 대비해 포커스 강제 갱신
-                    fieldController.SetCurrentValidTargetIndex(clickedEntity);
-                    fieldController.UpdateValidTargetsHighlight();
+                    if (fieldController.isGroupTargeting)
+                    {
+                        foreach (var t in fieldController.validTargets) t.SetSelectionState(false);
+                    }
+                    else
+                    {
+                        // 마우스가 너무 빨리 움직여 호버가 씹혔을 경우를 대비해 포커스 강제 갱신
+                        fieldController.SetCurrentValidTargetIndex(clickedEntity);
+                        fieldController.UpdateValidTargetsHighlight();
 
-                    var validTarget = fieldController.GetCurrentValidTarget();
-                    validTarget.SetSelectionState(false);
+                        fieldController.GetCurrentValidTarget().SetSelectionState(false);
+                    }
                     
                     ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
-                    
-                    OnTargetSelected(validTarget); // 확정 처리
+                    OnTargetSelected(clickedEntity); // 확정 처리
                 }
                 else
                 {
@@ -2012,14 +2003,15 @@ namespace Controller
 
             PlayerController actor = fieldController.GetCurrentCharacter();
 
-            // 타겟 정보까지 함께 저장
+            // 타겟 정보까지 함께 저장.
+            string actorID = actor.sourceData.characterId; 
             int tIndex = -1;
             if (targetEntity is PlayerController targetPc) tIndex = targetPc.columnIndex;
 
-            if (lastPlayerActions.ContainsKey(fieldController.currentPlayerIndex))
-                lastPlayerActions[fieldController.currentPlayerIndex] = (currentSelectedAction, currentSelectedItem, tIndex);
+            if (lastPlayerActions.ContainsKey(actorID))
+                lastPlayerActions[actorID] = (currentSelectedAction, currentSelectedItem, tIndex);
             else
-                lastPlayerActions.Add(fieldController.currentPlayerIndex, (currentSelectedAction, currentSelectedItem, tIndex));
+                lastPlayerActions.Add(actorID, (currentSelectedAction, currentSelectedItem, tIndex));
             
             int finalSpeed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
             actor.nextTurnSpeedPenalty = 0;
@@ -2320,12 +2312,11 @@ namespace Controller
 
                     // 행동 기억을 일반 공격으로 업데이트. 현재 행동 중인 캐릭터의 인덱스를 찾아 딕셔너리를 갱신
                     PlayerController actorPc = action.actor.GetComponent<PlayerController>();
-                    int actorIndex = fieldController.allSlotControllers.IndexOf(actorPc);
-
-                    if (actorIndex != -1)
+                    string actorID = actorPc.sourceData.characterId;
+                    if (!string.IsNullOrEmpty(actorID))
                     {
                         // ActionType은 Attack으로, 데이터는 null로, 타겟은 초기화(-1)하여 저장
-                        lastPlayerActions[actorIndex] = (ActionType.Attack, null, -1);
+                        lastPlayerActions[actorID] = (ActionType.Attack, null, -1);
                     }
 
                     if (action.target == null || action.target.GetComponent<PlayerController>() != null)
@@ -2916,6 +2907,13 @@ namespace Controller
             for (int i = 0; i < autoHitCount; i++)
             {
                 if (isInterrupted) yield break; 
+
+                if (action.target == null || !IsAlive(action.target))
+                {
+                    GameObject newTarget = fieldController.FindNearestLivingTarget(action.actor);
+                    if (newTarget != null) action.target = newTarget;
+                    else break; // 더 이상 살아있는 적이 없으면 허공에 쏘지 않고 즉시 공격을 멈춤
+                }
 
                 List<GameObject> currentTargets = fieldController.GetTargetsByScope(scope, action.actor, action.target);
                 if (currentTargets.Count == 0) break; 
