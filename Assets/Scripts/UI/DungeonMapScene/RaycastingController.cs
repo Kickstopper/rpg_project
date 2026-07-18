@@ -1153,6 +1153,7 @@ namespace Controller
                 {
                     ShowRoomName("TERMINAL"); // 일단 무조건 TERMINAL
                 }
+                else HideRoomName();
             }
             else
             {
