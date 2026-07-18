@@ -90,6 +90,9 @@ namespace Controller
             public float aggroRange = 5.0f;   // 플레이어 추적 시작 거리. 칸 수
             public float moveSpeed = 2.5f;    // 화면에서 시각적으로 움직이는 속도
 
+            public bool isFallen = false;     // 현재 넘어져 있는지 여부
+            public float fallenTimer = 0f;    // 다시 일어나기까지 남은 시간
+            
             // 이 심볼과 부딪혔을 때 싸우게 될 실제 몬스터 ID 목록
             public List<string> encounterGroup; 
         }
@@ -786,7 +789,23 @@ namespace Controller
             MapEnemy encounteredEnemy = _activeEnemies.Find(e => Mathf.FloorToInt(e.x) == tx && Mathf.FloorToInt(e.y) == ty && e.isAlive);
             if (encounteredEnemy != null)
             {
+                // 넘어짐과 기습 판정
+                if (encounteredEnemy.isFallen)
+                {
+                    // 이미 넘어져 있는 몬스터 칸으로 진입 시, 밟고 지나가며 기습(Preemptive) 전투 발생
+                    StartCoroutine(FallenEncounterRoutine(encounteredEnemy, moveVec));
+                    return;
+                }
+
                 EncounterType encType = DetermineEncounterAdvantage(encounteredEnemy, true);
+                if (encType == EncounterType.Preemptive)
+                {
+                    // 적의 뒤/옆을 쳐서 선공권을 얻었을 경우, 즉시 전투하지 않고 넘어뜨림
+                    StartCoroutine(KnockDownEnemyRoutine(encounteredEnemy, moveVec));
+                    return;
+                }
+                
+                // 정면 충돌이나 적에게 기습당한 경우 즉시 전투
                 StartCoroutine(SymbolEncounterRoutine(encounteredEnemy, moveVec, encType));
                 return;
             }
@@ -905,6 +924,66 @@ namespace Controller
             // 전투가 끝나고 탐험 상태로 돌아올 때까지 대기
             yield return new WaitUntil(() => ManagerRoot.GameState.CurrentState == GameState.Exploration);
 
+            _inputLocked = false;
+        }
+
+        // 적을 넘어뜨리는 연출
+        private IEnumerator KnockDownEnemyRoutine(MapEnemy enemy, Vector2Int moveVec)
+        {
+            _inputLocked = true;
+
+            // 물리적으로 어긋나지 않도록 칸 중앙으로 강제 스냅 (아직 넘어지지 않음)
+            enemy.x = enemy.targetX;
+            enemy.y = enemy.targetY;
+            enemy.isMoving = false;
+            
+            // 타격받기 직전 서 있는(정지 프레임) 이미지로 고정
+            enemy.animFrame = 1; 
+
+            // 타격 소리와 함께 플레이어 충돌 연출 재생
+            ManagerRoot.Sound.PlaySFX(SfxID.Bump_Wall); 
+            yield return StartCoroutine(_player.BumpRoutine(moveVec)); // 충돌 애니메이션이 끝날 때까지 여기서 대기
+
+            // 부딪힌 직후에 넘어짐 상태로 진입하여 애니메이션 시작
+            enemy.isFallen = true;
+            enemy.fallenTimer = 3.0f; // 3초 대기
+            enemy.animFrame = 0;      // 0번 프레임부터 넘어지기 시작
+            enemy.animTimer = 0f;
+
+            if (_currentLookState != LookState.None)
+                yield return StartCoroutine(TransitionLookState(LookState.None));
+
+            _inputLocked = false;
+        }
+
+        // 넘어진 적을 밟고 전투 돌입 (무조건 Preemptive)
+        private IEnumerator FallenEncounterRoutine(MapEnemy enemy, Vector2Int moveVec)
+        {
+            _inputLocked = true;
+
+            int tx = _player.LogicX + moveVec.x;
+            int ty = _player.LogicY + moveVec.y;
+            float duration = _player.IsRunning ? moveDuration / 2f : moveDuration;
+
+            // 몬스터가 있는 칸 위로 전진하여 밟는 연출
+            if (miniMap) miniMap.TranslateToNewPosition(tx, ty, duration);
+            yield return StartCoroutine(_player.MoveGridRoutine(tx, ty, duration, null));
+
+            if (_currentLookState != LookState.None)
+                yield return StartCoroutine(TransitionLookState(LookState.None));
+            
+            // 밟힘과 동시에 심볼 삭제
+            enemy.isAlive = false;
+            _activeEnemies.Remove(enemy);
+            UpdateSpriteData(); 
+            yield return null;
+
+            Sprite bgSprite = CaptureCurrentDungeonView();
+            
+            // 선공 상태로 전투 시스템에 돌입 명령
+            ManagerRoot.GameState.StartEncounter(enemy.encounterGroup, theme.fogColor, EncounterType.Preemptive, bgSprite);
+            
+            yield return new WaitUntil(() => ManagerRoot.GameState.CurrentState == GameState.Exploration);
             _inputLocked = false;
         }
 
@@ -1620,6 +1699,7 @@ namespace Controller
                         AddSpriteFrames(dynamicEnemySprites, entry.upImgs);
                         AddSpriteFrames(dynamicEnemySprites, entry.leftImgs);
                         AddSpriteFrames(dynamicEnemySprites, entry.rightImgs);
+                        AddSpriteFrames(dynamicEnemySprites, entry.fallDownImgs);
                     }
                 }
             }
@@ -2092,6 +2172,36 @@ namespace Controller
             {
                 if (!enemy.isAlive) continue;
 
+                int offset;
+                int newTexIdx;
+                // 넘어진 상태일 때의 애니메이션 로직
+                if (enemy.isFallen)
+                {
+                    // 3프레임(0, 1, 2) 중 2에 도달하면 애니메이션 정지
+                    if (enemy.animFrame < 2)
+                    {
+                        float fallAnimSpeed = 0.15f; // 넘어지는 애니메이션의 1프레임당 속도
+                        enemy.animTimer += Time.deltaTime;
+                        if (enemy.animTimer >= fallAnimSpeed)
+                        {
+                            enemy.animTimer -= fallAnimSpeed;
+                            enemy.animFrame++;
+                            needsRenderUpdate = true;
+                        }
+                    }
+
+                    // 넘어짐 애니메이션은 12번째 인덱스부터 시작함
+                    offset = 12 + enemy.animFrame;
+                    newTexIdx = enemy.baseTexIdx + offset;
+
+                    if (enemy.currentTexIdx != newTexIdx)
+                    {
+                        enemy.currentTexIdx = newTexIdx;
+                        needsRenderUpdate = true;
+                    }
+                    continue; // 렌더링 방향 연산 무시
+                }
+
                 if (enemy.isMoving)
                 {
                     // 1칸 이동(1.0f 거리) 시 3프레임 애니메이션을 2회(6번 전환) 반복하도록 속도 계산
@@ -2125,8 +2235,8 @@ namespace Controller
                 else if (diff < -45f && diff >= -135f) viewSide = 2; 
                 else viewSide = 1; 
 
-                int offset = (viewSide * 3) + enemy.animFrame;
-                int newTexIdx = enemy.baseTexIdx + offset;
+                offset = (viewSide * 3) + enemy.animFrame;
+                newTexIdx = enemy.baseTexIdx + offset;
 
                 if (enemy.currentTexIdx != newTexIdx)
                 {
@@ -2316,6 +2426,19 @@ namespace Controller
             foreach (var enemy in _activeEnemies)
             {
                 if (!enemy.isAlive) continue;
+
+                // 넘어진 상태일 때의 대기 및 부활 로직
+                if (enemy.isFallen)
+                {
+                    enemy.fallenTimer -= dt;
+                    if (enemy.fallenTimer <= 0f)
+                    {
+                        // 3초가 지나면 다시 일어나서 기존 방향을 유지함
+                        enemy.isFallen = false;
+                        enemy.animFrame = 0; // 정상 서있는 프레임(0번)으로 복구
+                    }
+                    continue;
+                }
 
                 if (Mathf.Abs(enemy.x - enemy.targetX) > 0.01f || Mathf.Abs(enemy.y - enemy.targetY) > 0.01f)
                 {
