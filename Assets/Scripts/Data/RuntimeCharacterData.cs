@@ -80,6 +80,7 @@ namespace Data
             stats = save.stats;
             resistances = save.resistances;
             isCommander = save.isCommander;
+            isMonster = save.isMonster;
 
             currentHp = save.currentHp;
             currentMp = save.currentMp; 
@@ -105,6 +106,7 @@ namespace Data
             resistances = entry.resistances;
             isCommander = entry.isCommander;
             isRegular = entry.isRegular;
+            isMonster = entry.isMonster;
             basicAttackVfxId = entry.basicAttackVfxId;
 
             currentHp = maxHp = BattleCalculator.GetMaxHP(stats.level, stats.str, stats.vit);
@@ -134,6 +136,7 @@ namespace Data
             data.race = this.race.ToString();
             data.gender = this.gender.ToString();
             data.isCommander = this.isCommander;
+            data.isMonster = this.isMonster;
 
             data.resonanceId = this.resonanceId;
             data.align = this.align.ToString();

@@ -22,6 +22,7 @@ namespace Helper
             
             charEntry.isCommander = false; 
             charEntry.isRegular = false;
+            charEntry.isMonster = true;
 
             charEntry.stats = monster.stats; 
             charEntry.resistances = monster.resistances;

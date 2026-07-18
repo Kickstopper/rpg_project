@@ -186,13 +186,23 @@ namespace UI.Battle
 
             baseStats = currentTarget.sourceData.stats; 
             allocatedStats = new StatData(); 
-
-            if (portraitImage != null && currentTarget.sourceData != null)
+            if (portraitImage != null)
             {
-                var dbEntry = ManagerRoot.Database.charDB.GetEntry(currentTarget.sourceData.characterId);
-                if (dbEntry != null && dbEntry.portraitImage != null)
+                Sprite portrait = null;
+                if (!currentTarget.sourceData.isMonster)
                 {
-                    portraitImage.sprite = dbEntry.portraitImage;
+                    var chrEntry = ManagerRoot.Database.charDB.GetEntry(currentTarget.sourceData.characterId);
+                    if (chrEntry != null) portrait = chrEntry.portraitImage;
+                }
+                else
+                {
+                    var monEntry = ManagerRoot.Database.monsterDB.GetEntry(currentTarget.sourceData.characterId);
+                    if (monEntry != null) portrait = monEntry.portrait;
+                }
+                
+                if (portrait != null)
+                {
+                    portraitImage.sprite = portrait;
                     portraitImage.color = Color.white;
                 }
                 else portraitImage.color = Color.clear;

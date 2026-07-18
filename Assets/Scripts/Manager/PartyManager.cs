@@ -114,13 +114,13 @@ namespace Manager
             }
 
             // 테스트를 위한 몬스터 추가
-            // var monA = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_001"));
-            // var monB = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_003")); 
-            // var monC = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_006")); 
-            // var monD = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_009")); 
-            // var monE = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_021")); 
-            // var monF = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_025")); 
-            // var monG = MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_030")); 
+            // var monA = Helper.MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_001"));
+            // var monB = Helper.MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_003")); 
+            // var monC = Helper.MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_006")); 
+            // var monD = Helper.MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_009")); 
+            // var monE = Helper.MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_021")); 
+            // var monF = Helper.MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_025")); 
+            // var monG = Helper.MonsterConversionHelper.ToCharacterEntry(ManagerRoot.Database.monsterDB.GetEntry("enemy_030")); 
             // ManagerRoot.Party.AddMember(monA, true);
             // ManagerRoot.Party.AddMember(monB, true);
             // ManagerRoot.Party.AddMember(monC, true);

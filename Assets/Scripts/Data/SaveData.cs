@@ -77,6 +77,7 @@ namespace Data
         public ResistanceData resistances;
 
         public bool isCommander;
+        public bool isMonster;
 
         public string align;
 

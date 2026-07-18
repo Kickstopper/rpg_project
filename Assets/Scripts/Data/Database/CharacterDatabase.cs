@@ -20,6 +20,7 @@ namespace Data.Database
 
             public bool isCommander;
             public bool isRegular;
+            public bool isMonster;
             
             [Header("Visual")]
             public Sprite portraitImage;
