@@ -13,6 +13,7 @@ namespace UI.DungeonMapScene
         public float y;
         public int texIdx;
         public bool isEnemy;
+        public bool isFallen; // 몬스터가 넘어진 상태인지 렌더러에 알려주는 변수
     }
 
     public class RaycastRenderEngine
@@ -1145,6 +1146,22 @@ namespace UI.DungeonMapScene
                 int idOrIdx = _sprtData[idx].texIdx;
                 bool isEnemy = _sprtData[idx].isEnemy;
 
+                // 현재 그릴 스프라이트가 넘어진 몬스터인지 확인
+                bool isFallen = _sprtData[idx].isFallen; 
+
+                // 픽셀 루프를 돌기 전에, 깜빡임 비율을 미리 계산하여 CPU 부하를 없앰
+                float blend = 0f;
+                float invBlend = 1f;
+                byte blinkR = 255; byte blinkG = 255; byte blinkB = 255; // 깜빡일 색상
+
+                if (isFallen)
+                {
+                    // 시간(animTime)에 따라 0.0 ~ 1.0 사이를 오가는 사인파 생성 (16f는 깜빡임 속도)
+                    float blinkFactor = (Mathf.Sin(settings.animTime * 16f) + 1f) * 0.5f;
+                    blend = blinkFactor * 0.8f; // 최대 80% 까지만 색 혼합
+                    invBlend = 1f - blend;
+                }
+                
                 int texW = _texWidth; 
                 int texH = _texHeight;
 
@@ -1187,6 +1204,14 @@ namespace UI.DungeonMapScene
                             
                             if (col.a == 255) 
                             {
+                                // 넘어진 상태라면 미리 계산한 비율(blend)대로 색상을 고속 블렌딩
+                                if (isFallen)
+                                {
+                                    col.r = (byte)((col.r * invBlend) + (blinkR * blend));
+                                    col.g = (byte)((col.g * invBlend) + (blinkG * blend));
+                                    col.b = (byte)((col.b * invBlend) + (blinkB * blend));
+                                }
+
                                 if (lightScale <= 0) col = settings.fogColor; 
                                 else if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
                                 

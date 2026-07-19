@@ -2180,7 +2180,7 @@ namespace Controller
                     // 3프레임(0, 1, 2) 중 2에 도달하면 애니메이션 정지
                     if (enemy.animFrame < 2)
                     {
-                        float fallAnimSpeed = 0.15f; // 넘어지는 애니메이션의 1프레임당 속도
+                        float fallAnimSpeed = 0.075f; // 넘어지는 애니메이션의 1프레임당 속도
                         enemy.animTimer += Time.deltaTime;
                         if (enemy.animTimer >= fallAnimSpeed)
                         {
@@ -2475,7 +2475,8 @@ namespace Controller
                         x = enemy.x, 
                         y = enemy.y, 
                         texIdx = enemy.currentTexIdx,
-                        isEnemy = true
+                        isEnemy = true,
+                        isFallen = enemy.isFallen
                     });
                 }
             }
@@ -2488,7 +2489,8 @@ namespace Controller
                         x = obj.x, 
                         y = obj.y, 
                         texIdx = obj.texIdx, 
-                        isEnemy = false
+                        isEnemy = false,
+                        isFallen = false
                     });
                 }
             }
