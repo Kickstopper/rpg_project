@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Freeze
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: status_freeze
-  effectName: "\uBE59\uACB0"
+  effectName: FREEZE
   durationType: 0
   cureType: 0
-  maxTurns: 0
-  cureChancePerTurn: 0
+  maxTurns: 3
+  cureChancePerTurn: 0.5
   atkMultiplier: 1
   defMultiplier: 1
   evaMultiplier: 1
   accMultiplier: 1
-  canAct: 1
-  canUseMagic: 1
+  restrictionType: 1
+  restrictionChance: 0.35
   dotDamage: 0

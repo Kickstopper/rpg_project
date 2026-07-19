@@ -325,7 +325,7 @@ namespace Controller
                 Debug.Log($"{this.name}은(는) 상태이상으로 움직일 수 없다!");
                 return new BattleAction(this.gameObject, this.gameObject, UI.ActionType.Next, 0);
             }
-            else if (restriction == RestrictionType.Confusion || restriction == RestrictionType.Charm)
+            else if (restriction == RestrictionType.Panic || restriction == RestrictionType.Charm)
             {
                 Debug.Log($"{this.name}은(는) 혼란에 빠졌다!");
                 // 아군 적군 구분 없이 무작위 타겟을 골라 평타를 치는 액션 강제 반환

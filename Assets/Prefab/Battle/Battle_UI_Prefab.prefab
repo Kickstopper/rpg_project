@@ -3681,17 +3681,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ffbc632e4d22ce41bd05d4faac7e1c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleVisualController
-  vfxHitPrefab: {fileID: 0}
-  vfxCutPrefab: {fileID: 0}
-  vfxSlashPrefab: {fileID: 2210249593246853867, guid: 548998d3141f6324d878c6fc5313a4b0, type: 3}
-  vfxStabPrefab: {fileID: 0}
-  vfxClawbPrefab: {fileID: 0}
-  vfxGunAutoPrefab: {fileID: 0}
-  vfxGunShotPrefab: {fileID: 0}
-  vfxMagicPrefab: {fileID: 2210249593246853867, guid: 9c7ddd44fd966f64d89e6f5d6420225e, type: 3}
-  vfxGuardHitPrefab: {fileID: 2210249593246853867, guid: 784122ef305d9674aad81d832c7072b2, type: 3}
-  vfxReflectPrefab: {fileID: 2210249593246853867, guid: d61014098ddb89245a8a7489ce8d17a1, type: 3}
-  vfxAbsorbPrefab: {fileID: 2210249593246853867, guid: d61014098ddb89245a8a7489ce8d17a1, type: 3}
+  vfxHitPrefab: {fileID: 2210249593246853867, guid: b899421034ab27c43b383c11c58c8c86, type: 3}
+  vfxBlowPrefab: {fileID: 2210249593246853867, guid: 74358f5487566cf4e9e8f8b934332741, type: 3}
+  vfxTacklePrefab: {fileID: 2210249593246853867, guid: 784122ef305d9674aad81d832c7072b2, type: 3}
+  vfxCutPrefab: {fileID: 2210249593246853867, guid: 548998d3141f6324d878c6fc5313a4b0, type: 3}
+  vfxSlashPrefab: {fileID: 2210249593246853867, guid: 84371f5bbc6cb634297e88ddf93381ee, type: 3}
+  vfxStabPrefab: {fileID: 2210249593246853867, guid: d61014098ddb89245a8a7489ce8d17a1, type: 3}
+  vfxClawPrefab: {fileID: 2210249593246853867, guid: 66304d06128d2954ba7e68f53a0ba70a, type: 3}
+  vfxGunAutoPrefab: {fileID: 2210249593246853867, guid: 012cd213446017945822d92282d508a8, type: 3}
+  vfxGunShotPrefab: {fileID: 2210249593246853867, guid: d1a3684283dc2e34ca2913afcbbde076, type: 3}
+  vfxMagicFallbackPrefab: {fileID: 2210249593246853867, guid: 5420023b23603a6489365208f19db0e0, type: 3}
+  vfxMagicFirePrefab: {fileID: 2210249593246853867, guid: cf5cffbd86338c14395105b5c7233e08, type: 3}
+  vfxMagicIcePrefab: {fileID: 2210249593246853867, guid: 99b55e78d78b3aa4d95cf7eeb3f7291b, type: 3}
+  vfxMagicElecPrefab: {fileID: 2210249593246853867, guid: 9c7ddd44fd966f64d89e6f5d6420225e, type: 3}
+  vfxMagicForcePrefab: {fileID: 2210249593246853867, guid: 1eda207c3f8f30b4484d02418d96f6f1, type: 3}
+  vfxMagicHealPrefab: {fileID: 2210249593246853867, guid: 2023791f78bebf540b5597904202ff96, type: 3}
+  vfxMagicRevivePrefab: {fileID: 2210249593246853867, guid: 8ff598b746992ff4fafc2b5ad5bd5a4e, type: 3}
+  vfxMagicBuffPrefab: {fileID: 2210249593246853867, guid: 0a7305e474d42db419c4afae5e715c3d, type: 3}
+  vfxMagicDebuffPrefab: {fileID: 2210249593246853867, guid: 7ac12ddad5de37641a59a32aba080154, type: 3}
+  vfxMagicPoisonPrefab: {fileID: 2210249593246853867, guid: fe56eb29bae054842b010dafc62c5f59, type: 3}
+  vfxMagicCursePrefab: {fileID: 2210249593246853867, guid: 3f4e5fab3dcd3e146aac4f996bec0396, type: 3}
+  vfxMagicSilencePrefab: {fileID: 2210249593246853867, guid: b6c235b9552f29f4cb331381b2225054, type: 3}
+  vfxMagicParalyzePrefab: {fileID: 2210249593246853867, guid: 7bb7d9b69a248ba4787b426d11fdcc68, type: 3}
+  vfxMagicSleepPrefab: {fileID: 2210249593246853867, guid: ab650ae5e76e01d40a3f4810fa59b86b, type: 3}
+  vfxMagicCharmPrefab: {fileID: 2210249593246853867, guid: addc232ca014a0c489115c0aac5519c7, type: 3}
+  vfxMagicStonePrefab: {fileID: 2210249593246853867, guid: 8d6686e48a1e6b044a80db8a11c80e54, type: 3}
+  vfxGuardHitPrefab: {fileID: 2210249593246853867, guid: 5814c241d8b861041a6a1bc55c16ca48, type: 3}
+  vfxReflectPrefab: {fileID: 2210249593246853867, guid: d36e8b73daa368d45968669f4c438a7d, type: 3}
+  vfxAbsorbPrefab: {fileID: 2210249593246853867, guid: 623560577d3978740a44ea9aae24df4c, type: 3}
   vfxContainer: {fileID: 8238016265576625859}
 --- !u!1 &1106862988069777363
 GameObject:

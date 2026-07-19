@@ -1468,7 +1468,7 @@ namespace Controller
                 NextPlayerInput(); 
                 return;
             }
-            else if (restriction == RestrictionType.Confusion || restriction == RestrictionType.Charm)
+            else if (restriction == RestrictionType.Panic || restriction == RestrictionType.Charm)
             {
                 uiController.ShowLog($"{currentPlayer.name.AttachParticle("은/는")} 혼란에 빠졌다!");
                 // 플레이어 조작을 막고, 랜덤 타겟 자동 액션(Attack, Guard, Next)을 큐에 넣음.
@@ -2349,7 +2349,7 @@ namespace Controller
                 {
                     // 공격
                     ManagerRoot.Sound.PlaySFX(SfxID.Attack_Magic);
-                    visualController.SpawnVFX(VfxID.Magic, targetObj.transform.position);
+                    visualController.SpawnVFX(item.vfxId, targetObj.transform.position);
                     
                     // 아이템의 고정 데미지(effectValue)를 그대로 줄지, 계산식을 탈지는 기획이 확정되면 수정하자
                     // 일단 ApplyDamage를 통해 피격 연출(OnDamageTaken)까지 연결함
@@ -2366,7 +2366,7 @@ namespace Controller
                         if (success)
                         {
                             ManagerRoot.Sound.PlaySFX(SfxID.Attack_Magic); // TODO: 회복 사운드로 교체 필요
-                            visualController.SpawnVFX(VfxID.Magic, targetObj.transform.position); // TODO: 회복 이펙트로 교체 필요
+                            visualController.SpawnVFX(item.vfxId, targetObj.transform.position); 
                         }
                     }
                 }
@@ -2452,7 +2452,7 @@ namespace Controller
                         if (success)
                         {
                             ManagerRoot.Sound.PlaySFX(SfxID.Attack_Magic);
-                            visualController.SpawnVFX(VfxID.Magic, GetCenterPosition(targetObj));
+                            visualController.SpawnVFX(skill.vfxId, GetCenterPosition(targetObj));
                         }
                     }
                 }
@@ -3134,11 +3134,10 @@ namespace Controller
                     {
                         vfxID = action.actionData.vfxId;
                     }
-                    else vfxID = VfxID.Magic;
                 }
 
                 if (sfxId != SfxID.None) ManagerRoot.Sound.PlaySFX(sfxId);
-                if (vfxID != VfxID.None) visualController.SpawnVFX(vfxID, GetCenterPosition(target));
+                visualController.SpawnVFX(vfxID, GetCenterPosition(target));
                 yield return wait01;
             }
 

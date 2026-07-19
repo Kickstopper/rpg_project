@@ -8,8 +8,8 @@ namespace Data
         None,           // 제약 없음
         SkipTurn,       // 행동을 아예 넘김 (수면, 기절, 마비 등)
         Silence,        // 기본 공격/아이템은 가능하나, 스킬(마법) 불가
-        Confusion,      // 조작 불가 & 무작위 타겟 공격 (혼란)
-        Charm           // 조작 불가 & 아군을 공격하거나 적을 회복 (매료)
+        Panic,          // 조작 불가 & 무작위 타겟 공격 (혼란)
+        Charm,          // 조작 불가 & 아군을 공격하거나 적을 회복 (매료)
     }
 
     public enum EffectDurationType { BattleOnly, Persistent }

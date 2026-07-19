@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5907517404362654901}
   - component: {fileID: 4822102411084150749}
   m_Layer: 5
-  m_Name: Efct_tacle
+  m_Name: Efct_tackle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

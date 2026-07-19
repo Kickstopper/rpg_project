@@ -14,19 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
   id: skl_040
   dataName: MAKAJAM
-  description: "\uC801 1\uBA85\uC744 \uCE68\uBB35(Silence) \uC0C1\uD0DC\uB85C \uB9CC\uB4E4\uC5B4
+  description: "\uC801 1\uBA85\uC744 \uCE68\uBB35 \uC0C1\uD0DC\uB85C \uB9CC\uB4E4\uC5B4
     \uC2A4\uD0AC\uC744 \uBD09\uC1C4\uD55C\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
-  effectType: 0
+  vfxId: 21
+  effectType: 1
   effectValue: 0
   element: 6
   targetScope: 1
   useType: 2
-  statusEffect: 0
+  statusEffect: 8
   statusEffectChance: 0.5
   actionDelay: 0
   useHpCost: 0
   costValue: 5
-  statusEffectData: {fileID: 0}
-  effectRate: 0
+  statusEffectData: {fileID: 11400000, guid: 77b9cd22f9da69e42921cf7987a34330, type: 2}
+  effectRate: 0.5

@@ -16,7 +16,7 @@ MonoBehaviour:
   dataName: POISMA
   description: "\uC801 1\uBA85\uC744 \uB3C5(Poison) \uC0C1\uD0DC\uB85C \uB9CC\uB4E0\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
+  vfxId: 18
   effectType: 0
   effectValue: 0
   element: 6
@@ -27,5 +27,5 @@ MonoBehaviour:
   actionDelay: 0
   useHpCost: 0
   costValue: 4
-  statusEffectData: {fileID: 0}
-  effectRate: 0
+  statusEffectData: {fileID: 11400000, guid: 78daea0d08a3d3945a43e047262d3a16, type: 2}
+  effectRate: 0.45

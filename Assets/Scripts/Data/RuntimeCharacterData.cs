@@ -17,7 +17,8 @@ namespace Data
 
     public enum StatType { STR, MAG, INT, VIT, AGI, LUC }
 
-    public enum StatusEffect { None, Burn, Freeze, Shock, Dry, Wet, Confuse, Sleep, Blind, High, Poison, Paralyze, Curse }
+    public enum StatusEffect { None, Burn, Freeze, Shock, Panic, Poison, Paralyze, 
+                               Curse, Silence, Confuse, Sleep, Blind, Charm, Stone, }
     [System.Serializable]
     public class RuntimeCharacterData
     {

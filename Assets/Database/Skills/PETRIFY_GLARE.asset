@@ -14,18 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
   id: skl_046
   dataName: PETRIFY_GLARE
-  description: "\uC801 1\uBA85\uC744 \uC11D\uD654(Petrify) \uC0C1\uD0DC\uB85C \uB9CC\uB4E0\uB2E4."
+  description: "\uC801 1\uBA85\uC744 \uC11D\uD654 \uC0C1\uD0DC\uB85C \uB9CC\uB4E0\uB2E4."
   icon: {fileID: 0}
   vfxId: 0
-  effectType: 0
+  effectType: 1
   effectValue: 0
   element: 6
   targetScope: 1
   useType: 2
-  statusEffect: 0
+  statusEffect: 13
   statusEffectChance: 0.3
   actionDelay: 0
   useHpCost: 0
   costValue: 8
-  statusEffectData: {fileID: 0}
-  effectRate: 0
+  statusEffectData: {fileID: 11400000, guid: 1db0702f32a8e444e9af97857f7e8a58, type: 2}
+  effectRate: 0.3

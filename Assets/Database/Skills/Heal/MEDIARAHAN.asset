@@ -16,7 +16,7 @@ MonoBehaviour:
   dataName: MEDIARAHAN
   description: "\uC544\uAD70 \uC804\uCCB4\uC758 HP\uB97C \uC644\uC804\uD788 \uD68C\uBCF5\uD55C\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
+  vfxId: 14
   effectType: 14
   effectValue: 9999
   element: 0

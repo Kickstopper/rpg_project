@@ -17,16 +17,16 @@ MonoBehaviour:
   description: "\uC801 \uC804\uCCB4\uB97C \uC218\uBA74(Sleep) \uC0C1\uD0DC\uB85C
     \uB9CC\uB4E0\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
-  effectType: 0
+  vfxId: 25
+  effectType: 1
   effectValue: 0
   element: 6
   targetScope: 5
   useType: 2
-  statusEffect: 7
+  statusEffect: 10
   statusEffectChance: 0.35
   actionDelay: 0
   useHpCost: 0
   costValue: 12
-  statusEffectData: {fileID: 0}
-  effectRate: 0
+  statusEffectData: {fileID: 11400000, guid: b55e757e775cff94ea7744433821324c, type: 2}
+  effectRate: 0.35

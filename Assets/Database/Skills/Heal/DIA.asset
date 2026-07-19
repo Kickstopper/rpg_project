@@ -16,7 +16,7 @@ MonoBehaviour:
   dataName: DIA
   description: "\uC544\uAD70 1\uBA85\uC758 HP\uB97C \uC18C\uB7C9 \uD68C\uBCF5\uD55C\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
+  vfxId: 14
   effectType: 14
   effectValue: 50
   element: 0

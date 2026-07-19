@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfddf8673c460194d9cd0f6638dca743, type: 3}
-  m_Name: Confuse
+  m_Name: Stone
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
-  id: status_confuse
-  effectName: "\uD63C\uB780"
+  id: status_sleep
+  effectName: STONE
   durationType: 0
   cureType: 0
-  maxTurns: 0
-  cureChancePerTurn: 0
+  maxTurns: 3
+  cureChancePerTurn: 0.5
   atkMultiplier: 1
   defMultiplier: 1
   evaMultiplier: 1
   accMultiplier: 1
-  canAct: 1
-  canUseMagic: 1
+  restrictionType: 1
+  restrictionChance: 0.35
   dotDamage: 0

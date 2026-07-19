@@ -16,16 +16,16 @@ MonoBehaviour:
   dataName: PARALYZE_EYE
   description: "\uC801 1\uBA85\uC744 \uB9C8\uBE44(Paralyze) \uC0C1\uD0DC\uB85C \uB9CC\uB4E0\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
-  effectType: 0
+  vfxId: 20
+  effectType: 1
   effectValue: 0
   element: 6
   targetScope: 1
   useType: 2
-  statusEffect: 11
+  statusEffect: 6
   statusEffectChance: 0.45
   actionDelay: 0
   useHpCost: 0
   costValue: 6
-  statusEffectData: {fileID: 0}
-  effectRate: 0
+  statusEffectData: {fileID: 11400000, guid: 77b7813ffad700a499b7a55fb216c045, type: 2}
+  effectRate: 0.45

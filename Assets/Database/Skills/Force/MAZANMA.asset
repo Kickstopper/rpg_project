@@ -17,7 +17,7 @@ MonoBehaviour:
   description: "\uC801 \uC804\uCCB4\uC5D0\uAC8C \uC911\uB7C9\uC758 \uCDA9\uACA9 \uC18D\uC131
     \uB300\uBBF8\uC9C0\uB97C \uC900\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
+  vfxId: 13
   effectType: 1
   effectValue: 75
   element: 4

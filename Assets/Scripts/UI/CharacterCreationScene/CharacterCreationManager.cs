@@ -6,7 +6,6 @@ using Manager;
 using UnityEngine.UI;
 using Data;
 using Helper;
-using Unity.VisualScripting;
 
 namespace UI.CharacterCreationScene
 {

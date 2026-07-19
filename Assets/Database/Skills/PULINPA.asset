@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
   id: skl_038
   dataName: PULINPA
-  description: "\uC801 1\uBA85\uC744 \uD63C\uB780(Confuse) \uC0C1\uD0DC\uB85C \uB9CC\uB4E0\uB2E4."
+  description: "\uC801 1\uBA85\uC744 \uD63C\uB780 \uC0C1\uD0DC\uB85C \uB9CC\uB4E0\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
-  effectType: 0
+  vfxId: 27
+  effectType: 1
   effectValue: 0
   element: 6
   targetScope: 1
@@ -27,5 +27,5 @@ MonoBehaviour:
   actionDelay: 0
   useHpCost: 0
   costValue: 5
-  statusEffectData: {fileID: 0}
+  statusEffectData: {fileID: 11400000, guid: a5c6a6bd9f4a32b429b991740b6f8277, type: 2}
   effectRate: 0

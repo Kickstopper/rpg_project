@@ -14,19 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
   id: skl_045
   dataName: EVIL_SMILE
-  description: "\uC801 \uC804\uCCB4\uB97C \uACF5\uD3EC(Fear)\uC5D0 \uC9C8\uB9AC\uAC8C
-    \uB9CC\uB4E0\uB2E4."
+  description: "\uC801 \uC804\uCCB4\uB97C \uACF5\uD3EC\uC5D0 \uC9C8\uB9AC\uAC8C \uB9CC\uB4E0\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
-  effectType: 0
+  vfxId: 27
+  effectType: 1
   effectValue: 0
   element: 6
   targetScope: 5
   useType: 2
-  statusEffect: 0
+  statusEffect: 4
   statusEffectChance: 0.35
   actionDelay: 0
   useHpCost: 0
   costValue: 12
-  statusEffectData: {fileID: 0}
+  statusEffectData: {fileID: 11400000, guid: a5c6a6bd9f4a32b429b991740b6f8277, type: 2}
   effectRate: 0

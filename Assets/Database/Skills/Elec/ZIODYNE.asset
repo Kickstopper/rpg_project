@@ -17,16 +17,16 @@ MonoBehaviour:
   description: "\uC801 1\uBA85\uC5D0\uAC8C \uB300\uB7C9\uC758 \uC804\uACA9 \uC18D\uC131
     \uB300\uBBF8\uC9C0\uB97C \uC900\uB2E4."
   icon: {fileID: 0}
-  vfxId: 0
+  vfxId: 12
   effectType: 1
   effectValue: 180
   element: 3
   targetScope: 1
   useType: 2
-  statusEffect: 0
-  statusEffectChance: 0
+  statusEffect: 3
+  statusEffectChance: 0.1
   actionDelay: 0
   useHpCost: 0
   costValue: 16
-  statusEffectData: {fileID: 0}
-  effectRate: 0
+  statusEffectData: {fileID: 11400000, guid: 497d3d643f5b10a45bbd266e33f5ce08, type: 2}
+  effectRate: 0.1
