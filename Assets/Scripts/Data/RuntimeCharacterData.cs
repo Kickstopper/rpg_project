@@ -59,8 +59,11 @@ namespace Data
         public VfxID basicAttackVfxId;    // 기본 공격 이펙트 ID
 
         public List<string> equippedArmorIds = new();
+
+        // 이미 보상을 획득하여 완료 처리된 노드의 ID 목록 (이중 수령 방지용)
+        public List<string> claimedSkillNodes = new List<string>(); 
         
-        // 배운 스킬
+        // 습득한 스킬 목록
         public List<string> learnedSkills = new();
         public bool isCommander;
 

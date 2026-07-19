@@ -22,9 +22,11 @@ MonoBehaviour:
     exp: 0
     isCommander: 1
     isRegular: 1
+    isMonster: 0
     portraitImage: {fileID: 2579333744367217459, guid: 86e4fc281de2c254284c51a29bca43a3, type: 3}
     battlePortraitImg: {fileID: 21300000, guid: 10f457f2662bead40babb49ee64f4a74, type: 3}
     standingImage: {fileID: 0}
+    basicAttackVfxId: 0
     align: 5
     stats:
       level: 1
@@ -42,6 +44,7 @@ MonoBehaviour:
       force: 0
       psyche: 0
     initialSkills: []
+    skillTree: {fileID: 0}
     initialWeaponId: sword_000
     initialGunId: gun_000
     initialAmmoId: ammo_001
@@ -60,15 +63,17 @@ MonoBehaviour:
     exp: 0
     isCommander: 0
     isRegular: 1
+    isMonster: 0
     portraitImage: {fileID: 21300000, guid: f78113a154b16e5439720e662538b0a6, type: 3}
     battlePortraitImg: {fileID: 21300000, guid: 70e4b58033885144da08ffa653855d03, type: 3}
     standingImage: {fileID: 21300000, guid: ab1da786aad78994d90660fb6a6fd2e1, type: 3}
-    align: 1
+    basicAttackVfxId: 0
+    align: 2
     stats:
-      level: 1
+      level: 2
       str: 5
       mag: 5
-      intel: 5
+      intel: 6
       vit: 5
       agi: 5
       luc: 5
@@ -80,53 +85,9 @@ MonoBehaviour:
       force: 0
       psyche: 0
     initialSkills:
-    - {fileID: 11400000, guid: 4a1ca962973a6404cb37a72ca2e7eab2, type: 2}
-    - {fileID: 11400000, guid: 30c82fe10a5c2b24ea8946ef365599e2, type: 2}
-    - {fileID: 11400000, guid: 72527b81ca0658e4ea3c24e20cbe5b1f, type: 2}
-    - {fileID: 11400000, guid: 65259ee4f9aab604d9291d4cbb4df458, type: 2}
-    - {fileID: 11400000, guid: 3d5e180fcb0f3b2498dda88f1ebeef7e, type: 2}
-    - {fileID: 11400000, guid: 505da44a72309b8409dad7346b6da88e, type: 2}
-    - {fileID: 11400000, guid: 80ff0d7de3d5b2342a5ebc053622fe12, type: 2}
-    - {fileID: 11400000, guid: aabd962f43f9b614cbd759b70d49e2e2, type: 2}
-    - {fileID: 11400000, guid: 4310856e0a189334ab6604b17a381da8, type: 2}
-    - {fileID: 11400000, guid: 5eea20d0175a53449bdeee37914ca915, type: 2}
-    - {fileID: 11400000, guid: 8d71735e1a903454290d0874aa3c0e40, type: 2}
-    - {fileID: 11400000, guid: b1a79d592e1c88946a48929b2a0aeb29, type: 2}
-    - {fileID: 11400000, guid: d0be8b904367f8d45bb78d9a861bb567, type: 2}
-    - {fileID: 11400000, guid: 47f08e08f74cd364fa3d375cfbba27db, type: 2}
-    - {fileID: 11400000, guid: 221612a7bd09d0b428fbffe84163b883, type: 2}
-    - {fileID: 11400000, guid: 529746818cc707e4183ba2f7035a3198, type: 2}
-    - {fileID: 11400000, guid: f7ef752636e709f4f9bc7d660bd14e47, type: 2}
-    - {fileID: 11400000, guid: 11e2373b5d10bb2418f22eb281bf4e96, type: 2}
-    - {fileID: 11400000, guid: 060d9df24ee69a846af9d5924de0ea94, type: 2}
-    - {fileID: 11400000, guid: bc27c188a562d464bb469cf5abb7e9ae, type: 2}
-    - {fileID: 11400000, guid: 84a27ac6ccd25414496d402bcc5bb027, type: 2}
-    - {fileID: 11400000, guid: 9f634cce39c7ec74391099bf33d241d6, type: 2}
-    - {fileID: 11400000, guid: 250d867e370c99642a7afcdd94b6e4d8, type: 2}
-    - {fileID: 11400000, guid: be5482aa0bceb034da543d9a2574baa7, type: 2}
-    - {fileID: 11400000, guid: 55a004a29c7c7fd44af4c7f36a25e32c, type: 2}
-    - {fileID: 11400000, guid: 3e4140f5c189a9d4bb2908266e4ae788, type: 2}
-    - {fileID: 11400000, guid: f9cdfbc3f490120489fa12f48e53a4d1, type: 2}
-    - {fileID: 11400000, guid: 01276ddee80f26a4a89bf35966a99bcb, type: 2}
-    - {fileID: 11400000, guid: ff8facc300dfa3d41852deaa23416325, type: 2}
-    - {fileID: 11400000, guid: a64a4155e2c36774d9d9be7799fc241e, type: 2}
-    - {fileID: 11400000, guid: a7341d24d57752d4cbcf0dfeaf900ff8, type: 2}
-    - {fileID: 11400000, guid: 5caa8ce80f81cf3418874a5c761587ce, type: 2}
-    - {fileID: 11400000, guid: 85baf56dbc58574449d5e41a23092438, type: 2}
-    - {fileID: 11400000, guid: ca2b71b46fbbd5b458d045ca10a0a9a1, type: 2}
-    - {fileID: 11400000, guid: cfbe0dcd2c95d8f449db37eb865c79ae, type: 2}
-    - {fileID: 11400000, guid: 16c80d30386159f49a5229068e82c68f, type: 2}
-    - {fileID: 11400000, guid: 79b692fc45f25c748ae792957ab64de1, type: 2}
-    - {fileID: 11400000, guid: be5cba2949957604e813b84b7fced355, type: 2}
-    - {fileID: 11400000, guid: 2938aa9b786e93a469b85e789554cb2a, type: 2}
-    - {fileID: 11400000, guid: 980c94a75d65c6342aeea3bed7ce6e78, type: 2}
-    - {fileID: 11400000, guid: f43d6fceb7b4b6d4ea10c20083b0a8bc, type: 2}
-    - {fileID: 11400000, guid: e818ee9fdd51e5f43bc78fd8e251a601, type: 2}
-    - {fileID: 11400000, guid: 8697019e54d2683488bbc856d774d35e, type: 2}
-    - {fileID: 11400000, guid: ba08a13423ea80e45b3473ef7ea0cbaa, type: 2}
     - {fileID: 11400000, guid: 5f76552b4a0258f4b8fd42ee4eb82795, type: 2}
-    - {fileID: 11400000, guid: 295097c143ead8142ade87babf949ab9, type: 2}
-    - {fileID: 11400000, guid: 0490e689abfe4584185423607679e8d2, type: 2}
+    - {fileID: 11400000, guid: 80ff0d7de3d5b2342a5ebc053622fe12, type: 2}
+    skillTree: {fileID: 11400000, guid: 5e23fc6e8177c724b858874e969e5746, type: 2}
     initialWeaponId: sword_001
     initialGunId: gun_001
     initialAmmoId: ammo_001
@@ -145,9 +106,11 @@ MonoBehaviour:
     exp: 0
     isCommander: 0
     isRegular: 0
+    isMonster: 0
     portraitImage: {fileID: 0}
     battlePortraitImg: {fileID: 0}
     standingImage: {fileID: 21300000, guid: 5919f9c43146101479012185c1bb860a, type: 3}
+    basicAttackVfxId: 0
     align: 6
     stats:
       level: 0
@@ -165,6 +128,7 @@ MonoBehaviour:
       force: 0
       psyche: 0
     initialSkills: []
+    skillTree: {fileID: 0}
     initialWeaponId: sword_001
     initialGunId: gun_001
     initialAmmoId: ammo_001

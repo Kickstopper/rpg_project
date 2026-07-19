@@ -25,11 +25,13 @@ namespace UI.Battle
         public GameObject LeveUpUI;
         public Image portraitImage;
         public TextMeshProUGUI nameText;
-        public TextMeshProUGUI levelText;    
-        public TextMeshProUGUI hpText;       
-        public TextMeshProUGUI mpText;       
+        public TextMeshProUGUI levelText; 
+        public TextMeshProUGUI hpText; 
+        public TextMeshProUGUI mpText; 
         public TextMeshProUGUI nextExpText;  
-        public TextMeshProUGUI pointsText;   
+        public TextMeshProUGUI pointsText;
+        public TextMeshProUGUI skillTitleText;
+        public TextMeshProUGUI skillChanceText;
 
         [Header("Stat Rows")]
         public TextMeshProUGUI statText;
@@ -42,7 +44,7 @@ namespace UI.Battle
 
         [Header("Skill UI")]
         public TextMeshProUGUI skillText;
-        public Transform skillContent;      
+        public Transform skillContent;
         public GameObject skillSlotPrefab;
         public TextMeshProUGUI descriptionText;
 
@@ -64,12 +66,16 @@ namespace UI.Battle
 
         private enum StatType { STR, MAG, INT, VIT, AGI, LUC }
 
-        private enum FocusSection { RandomStats, Stat, Skill }
+        // 불필요한 Skill 단계를 제거했습니다.
+        private enum FocusSection { RandomStats, Stat, NewSkillSelect }
         private FocusSection currentSection = FocusSection.Stat;
+        
+        // 해금 조건을 만족한 스킬들을 순서대로 담아둘 큐
+        private Queue<SkillUnlockNode> pendingSkillNodes = new Queue<SkillUnlockNode>();
 
         // 방향키 롱 프레스 상태 처리를 위한 변수
         private float inputTimer = 0f;
-        private float inputDelay = 0.4f;      
+        private float inputDelay = 0.4f;
         private float inputRepeatRate = 0.1f; 
         private bool isKeyHeld = false;
 
@@ -209,7 +215,9 @@ namespace UI.Battle
             }
             nameText.text = currentTarget.entityName;
             levelText.text = $"LV {oldLevel} -> {currentTarget.sourceData.stats.level}";
-            
+            skillTitleText.text = "SKILLS";
+            skillChanceText.text = "";
+
             int nextExp = BattleCalculator.GetMaxExpForLevel(currentTarget.sourceData.stats.level);
             nextExpText.text = $"NEXT EXP {nextExp - currentTarget.sourceData.currentExp}";
 
@@ -225,15 +233,17 @@ namespace UI.Battle
         private void SetSectionFocus(FocusSection section)
         {
             currentSection = section;
-            // 랜덤 영역이거나 스탯 영역일 때 STATS 타이틀 노란색 유지
+            // 랜덤 영역이거나 스탯 영역일 때 STATS 타이틀 유지
             if (statText != null) statText.color = (section == FocusSection.Stat || section == FocusSection.RandomStats) ? Color.gold : Color.white;
-            if (skillText != null) skillText.color = (section == FocusSection.Skill) ? Color.gold : Color.white;
+            
+            // 스킬 영역은 보상 선택 모드(NewSkillSelect)일 때만 활성화
+            if (skillText != null) skillText.color = (section == FocusSection.NewSkillSelect) ? Color.gold : Color.white;
 
             CanvasGroup skillGroup = skillContent.GetComponent<CanvasGroup>();
             if (skillGroup == null) skillGroup = skillContent.gameObject.AddComponent<CanvasGroup>();
 
-            skillGroup.interactable = (section == FocusSection.Skill);
-            skillGroup.blocksRaycasts = (section == FocusSection.Skill);
+            skillGroup.interactable = (section == FocusSection.NewSkillSelect);
+            skillGroup.blocksRaycasts = (section == FocusSection.NewSkillSelect);
         }
 
         private void PopulateSkillList()
@@ -263,16 +273,14 @@ namespace UI.Battle
             EventTrigger trigger = go.GetComponent<EventTrigger>();
             if (trigger == null) trigger = go.AddComponent<EventTrigger>();
 
-            // 키보드로 선택
             EventTrigger.Entry selectEntry = new EventTrigger.Entry();
             selectEntry.eventID = EventTriggerType.Select;
             selectEntry.callback.AddListener((data) => { 
                 ShowDescription(description); 
-                ScrollToSlot(go.GetComponent<RectTransform>()); // 포커스된 슬롯으로 자동 스크롤
+                ScrollToSlot(go.GetComponent<RectTransform>()); 
             });
             trigger.triggers.Add(selectEntry);
 
-            // 마우스로 선택
             EventTrigger.Entry pointerEnterEntry = new EventTrigger.Entry();
             pointerEnterEntry.eventID = EventTriggerType.PointerEnter;
             pointerEnterEntry.callback.AddListener((data) => { 
@@ -281,7 +289,6 @@ namespace UI.Battle
             });
             trigger.triggers.Add(pointerEnterEntry);
 
-            // 포커스를 잃거나 마우스가 밖으로 나갔을 때
             EventTrigger.Entry deselectEntry = new EventTrigger.Entry();
             deselectEntry.eventID = EventTriggerType.Deselect;
             deselectEntry.callback.AddListener((data) => { ClearDescription(); });
@@ -307,11 +314,9 @@ namespace UI.Battle
             // 레이아웃의 크기와 위치 강제 업데이트
             Canvas.ForceUpdateCanvases();
 
-            // 타겟을 Viewport의 중앙에 위치시키기 위한 Content의 Y좌표 계산
             float targetY = Mathf.Abs(target.anchoredPosition.y);
             float newY = targetY - (scrollRect.viewport.rect.height / 2f);
 
-            // Content가 맨 위나 맨 아래를 벗어나지 않도록 최대 범위 제한
             float maxY = contentPanel.rect.height - scrollRect.viewport.rect.height;
             newY = Mathf.Clamp(newY, 0, maxY);
 
@@ -335,10 +340,8 @@ namespace UI.Battle
 
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
-            // 잔여 포인트가 0이 될 때까지 랜덤한 스탯에 1씩 분배
             while (availablePoints > 0)
             {
-                // 0~5는 STR부터 LUC까지 매칭
                 StatType randomStat = (StatType)Random.Range(0, 6);
                 AddAllocatedStat(randomStat, 1);
                 availablePoints--;
@@ -346,9 +349,11 @@ namespace UI.Battle
 
             RefreshUI();
 
-            // 분배 완료 후 스킬 섹션으로 포커스 이동
-            SetSectionFocus(FocusSection.Skill);
-            StartCoroutine(SelectFirstAvailableButton());
+            // 분배 완료 후 즉시 Confirm 버튼으로 포커스 이동
+            SetSectionFocus(FocusSection.Stat);
+            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(confirmButton.gameObject);
+            lastSelectedObject = confirmButton.gameObject;
         }
 
         private void ChangeStat(StatType type, int amount)
@@ -369,13 +374,7 @@ namespace UI.Battle
                 availablePoints += 1;
                 isChanged = true;
                 ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
-
-                if (currentSection == FocusSection.Skill)
-                {
-                    SetSectionFocus(FocusSection.Stat);
-                }
             }
-            // 값의 증감은 없지만, 좌/우 방향키 조작 시 하이라이트만 자연스럽게 이동시켜주는 처리
             else 
             {
                 if (currentSection == FocusSection.Stat)
@@ -394,19 +393,18 @@ namespace UI.Battle
             {
                 RefreshUI();
 
-                // 포인트가 0이 되면 스킬 섹션으로 포커스 이동
+                // 포인트가 0이 되면 즉시 Confirm 버튼으로 쫀득하게 이동
                 if (availablePoints == 0 && currentSection == FocusSection.Stat)
                 {
-                    SetSectionFocus(FocusSection.Skill);
-                    StartCoroutine(SelectFirstAvailableButton());
+                    EventSystem.current.SetSelectedGameObject(null);
+                    EventSystem.current.SetSelectedGameObject(confirmButton.gameObject);
+                    lastSelectedObject = confirmButton.gameObject;
                 }
                 else if (currentSection == FocusSection.Stat)
                 {
-                    // 변경된 스탯 방향(up/down)의 버튼으로 포커스 시각적 유지
                     StatUIRow row = GetStatRow(type);
                     Button targetBtn = (amount > 0) ? row.upButton : row.downButton;
 
-                    // 방금 누른 버튼이 비활성화(interactable=false) 상태가 되었다면 반대편 버튼을 강제 지정
                     if (!targetBtn.interactable)
                     {
                         targetBtn = (amount > 0) ? row.downButton : row.upButton;
@@ -538,74 +536,37 @@ namespace UI.Battle
                 if (downBtn != null)
                 {
                     Navigation nav = downBtn.navigation;
-                    nav.selectOnRight = null; // 수정됨
-                    nav.selectOnLeft = null;  // 수정됨
+                    nav.selectOnRight = null; 
+                    nav.selectOnLeft = null;  
                     downBtn.navigation = nav;
                 }
 
                 if (upBtn != null)
                 {
                     Navigation nav = upBtn.navigation;
-                    nav.selectOnLeft = null;  // 수정됨
-                    nav.selectOnRight = null; // 수정됨
+                    nav.selectOnLeft = null;  
+                    nav.selectOnRight = null; 
                     upBtn.navigation = nav;
                 }
             }
 
-            // 스킬 슬롯들의 세로 이동 강제
-            if (skillContent.childCount > 0)
-            {
-                for (int i = 0; i < skillContent.childCount; i++)
-                {
-                    Button skillBtn = skillContent.GetChild(i).GetComponent<Button>();
-                    if (skillBtn != null)
-                    {
-                        Navigation nav = skillBtn.navigation;
-                        nav.mode = Navigation.Mode.Explicit;
-                        
-                        // 맨 위 스킬에서 위를 누르면 스탯 영역(취소 버튼)으로 탈출하도록 연결
-                        Button upTarget;
-                        if (i == 0) 
-                        {
-                            upTarget = (activeDownBtns.Count > 0) ? activeDownBtns[activeDownBtns.Count - 1] : confirmButton;
-                        }
-                        else 
-                        {
-                            upTarget = skillContent.GetChild(i - 1).GetComponent<Button>();
-                        }
-
-                        Button downTarget = (i == skillContent.childCount - 1) ? skillContent.GetChild(0).GetComponent<Button>() : skillContent.GetChild(i + 1).GetComponent<Button>();
-
-                        nav.selectOnUp = upTarget;
-                        nav.selectOnDown = downTarget;
-                        nav.selectOnLeft = skillBtn;
-                        nav.selectOnRight = skillBtn;
-                        skillBtn.navigation = nav;
-                    }
-                }
-            }
+            // 스킬 슬롯 세로 이동 연결 블록을 완전히 제거했습니다.
             
             if (confirmButton.gameObject.activeInHierarchy && confirmButton.interactable)
             {
                 Navigation nav = confirmButton.navigation;
                 nav.mode = Navigation.Mode.Explicit;
 
-                // 확인 버튼에서 '위(Up)'를 눌렀을 때 이동할 목표 지정
+                // 스킬을 거치지 않고, 확인 버튼 위쪽은 무조건 스탯 내림 버튼으로 직접 연결됩니다.
                 Button upTarget = null;
-                if (skillContent.childCount > 0)
+                if (activeDownBtns.Count > 0)
                 {
-                    // 스킬이 있다면 마지막 스킬로 이동
-                    upTarget = skillContent.GetChild(skillContent.childCount - 1).GetComponent<Button>();
-                }
-                else if (activeDownBtns.Count > 0)
-                {
-                    // 스킬이 없다면, 방금 랜덤으로 분배되어 활성화된 스탯 내림 버튼 중 가장 아래쪽 버튼으로 이동
                     upTarget = activeDownBtns[activeDownBtns.Count - 1]; 
                 }
 
                 nav.selectOnLeft = confirmButton;
                 nav.selectOnRight = confirmButton;
-                nav.selectOnUp = (upTarget != null) ? upTarget : confirmButton;// 확인 버튼 갇힘 방지
+                nav.selectOnUp = (upTarget != null) ? upTarget : confirmButton;
                 nav.selectOnDown = confirmButton;
                 confirmButton.navigation = nav;
             }
@@ -615,18 +576,16 @@ namespace UI.Battle
                 Navigation randNav = randomButton.navigation;
                 randNav.mode = Navigation.Mode.Explicit;
 
-                // STR 라인의 가장 우선순위 높은 버튼을 아래 방향 타겟으로 지정
                 Button topUpBtn = (strRow.upButton.interactable && strRow.upButton.gameObject.activeInHierarchy) ? strRow.upButton : null;
                 Button topDownBtn = (strRow.downButton.interactable && strRow.downButton.gameObject.activeInHierarchy) ? strRow.downButton : null;
                 Button firstTarget = topUpBtn != null ? topUpBtn : topDownBtn;
 
                 randNav.selectOnDown = firstTarget;
-                randNav.selectOnUp = randomButton; // 맨 위이므로 위로 갈 곳이 없게 설정
+                randNav.selectOnUp = randomButton; 
                 randNav.selectOnLeft = randomButton;
                 randNav.selectOnRight = randomButton;
                 randomButton.navigation = randNav;
 
-                // STR 버튼 위쪽으로 RANDOM 버튼을 연결
                 if (topUpBtn != null)
                 {
                     Navigation upNav = topUpBtn.navigation;
@@ -670,6 +629,7 @@ namespace UI.Battle
             EventSystem.current.SetSelectedGameObject(null);
             yield return null;
             EventSystem.current.SetSelectedGameObject(null);
+            
             if (currentSection == FocusSection.RandomStats)
             {
                 if (randomButton != null && randomButton.interactable && randomButton.gameObject.activeInHierarchy)
@@ -684,7 +644,7 @@ namespace UI.Battle
             }
             else if (currentSection == FocusSection.Stat)
             {
-                // 스탯으로 돌아왔는데 가용 포인트가 0이면 취소 버튼 중 하나 선택
+                // 스탯 영역에서 가용 포인트가 0일 때의 포커스 복구 로직
                 if (availablePoints == 0)
                 {
                     if (strRow.downButton.interactable) strRow.downButton.Select();
@@ -699,45 +659,27 @@ namespace UI.Battle
                     strRow.upButton.Select();
                 }
             }
-            else if (currentSection == FocusSection.Skill)
-            {
-                // 스킬 섹션 진입 시 스킬이 있으면 스킬 선택, 없으면 Confirm 선택
-                if (skillContent.childCount > 0)
-                {
-                    var firstSkillBtn = skillContent.GetChild(0).GetComponent<Button>();
-                    if (firstSkillBtn != null) firstSkillBtn.Select();
-                }
-                else
-                {
-                    confirmButton.Select();
-                }
-            }
         }
 
         private void Update()
         {
             if (LeveUpUI != null && !LeveUpUI.activeSelf) return;
-            
-            // 생성 모드가 아닐 때만 전투 상태 체크
             if (!isCreationMode && ManagerRoot.GameState.CurrentState != GameState.Battle) return;
             
-            // 포커스 강제 유지 로직 (마우스 클릭 방어)
             if (EventSystem.current.currentSelectedGameObject != null)
             {
                 Selectable sel = EventSystem.current.currentSelectedGameObject.GetComponent<Selectable>();
                 if (sel != null && sel.interactable)
                 {
-                    // 포커스가 살아있다면 계속 기록해 둠
                     lastSelectedObject = EventSystem.current.currentSelectedGameObject;
                 }
             }
             else
             {
-                // 포커스가 날아갔다면, 강제로 이전 포커스 복구
                 if (lastSelectedObject != null && lastSelectedObject.activeInHierarchy)
                 {
                     Selectable sel = lastSelectedObject.GetComponent<Selectable>();
-                    if (sel != null && sel.interactable) // 비활성화된 버튼(RANDOM 등)은 복구하지 않음
+                    if (sel != null && sel.interactable) 
                     {
                         EventSystem.current.SetSelectedGameObject(lastSelectedObject);
                     }
@@ -747,50 +689,72 @@ namespace UI.Battle
             GameObject currentObj = EventSystem.current.currentSelectedGameObject;
             if (currentObj != null)
             {
-                // 현재 포커스된 오브젝트가 RANDOM 버튼일 경우
-                if (currentObj == randomButton.gameObject && currentSection != FocusSection.RandomStats)
+                // 스킬 선택 모드일 때는 포커스와 상태를 절대 방어
+                if (currentSection == FocusSection.NewSkillSelect)
                 {
-                    SetSectionFocus(FocusSection.RandomStats);
+                    // 마우스 클릭 등으로 스킬창 밖으로 포커스가 나갔다면 멱살 잡고 끌고 옴
+                    if (!currentObj.transform.IsChildOf(skillContent))
+                    {
+                        if (skillContent.childCount > 0)
+                        {
+                            var firstSkill = skillContent.GetChild(0).gameObject;
+                            EventSystem.current.SetSelectedGameObject(firstSkill);
+                            lastSelectedObject = firstSkill;
+                        }
+                    }
                 }
-                // 현재 포커스된 오브젝트가 스탯(STR~LUC) 중 하나일 경우
-                else if (GetFocusedStatType(currentObj).HasValue && currentSection != FocusSection.Stat)
+                else
                 {
-                    SetSectionFocus(FocusSection.Stat);
+                    // 스킬 선택 모드가 아닐 때만 자유로운 포커스 이동 허용
+                    if (currentObj == randomButton.gameObject && currentSection != FocusSection.RandomStats)
+                    {
+                        SetSectionFocus(FocusSection.RandomStats);
+                    }
+                    else if (GetFocusedStatType(currentObj).HasValue && currentSection != FocusSection.Stat)
+                    {
+                        SetSectionFocus(FocusSection.Stat);
+                    }
                 }
             }
 
-            // 스킬 리스트가 포커스 되어 있는 상태에서 취소 처리
+            // 스킬 선택 모드에서 스페이스/엔터 키 무조건 작동 보장
+            if (currentSection == FocusSection.NewSkillSelect)
+            {
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                {
+                    if (currentObj != null && currentObj.transform.IsChildOf(skillContent))
+                    {
+                        Button btn = currentObj.GetComponent<Button>();
+                        if (btn != null) 
+                        {
+                            btn.onClick.Invoke();
+                            return; // 중복 입력 방지
+                        }
+                    }
+                }
+            }
+
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
             {
-                GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
-
-                // 현재 포커스가 ConfirmButton에 있는 경우 스킬(있으면) 또는 스탯으로
-                if (currentSelected == confirmButton.gameObject)
+                if (currentSection == FocusSection.NewSkillSelect)
                 {
                     ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
-                    EventSystem.current.SetSelectedGameObject(null); 
-                    lastSelectedObject = null; // 복구 방지
-                    
-                    if (skillContent.childCount > 0) SetSectionFocus(FocusSection.Skill);
-                    else SetSectionFocus(FocusSection.Stat);
-                    
-                    StartCoroutine(SelectFirstAvailableButton());
                     return;
                 }
 
-                // 현재 포커스가 스킬 리스트 중 하나인 경우 스탯으로
-                if (currentSection == FocusSection.Skill)
+                GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
+
+                if (currentSelected == confirmButton.gameObject)
                 {
                     ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
-                    EventSystem.current.SetSelectedGameObject(null); 
-                    lastSelectedObject = null; // [핵심 추가] 강제 복구 방지
+                    EventSystem.current.SetSelectedGameObject(null);
+                    lastSelectedObject = null;
                     
                     SetSectionFocus(FocusSection.Stat);
                     StartCoroutine(SelectFirstAvailableButton());
                     return;
                 }
 
-                // 현재 포커스가 스탯 영역인 경 분배된 스탯 롤백 후 RANDOM으로
                 if (currentSection == FocusSection.Stat)
                 {
                     ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
@@ -798,33 +762,15 @@ namespace UI.Battle
                     int totalAllocated = allocatedStats.str + allocatedStats.mag + allocatedStats.intel + allocatedStats.vit + allocatedStats.agi + allocatedStats.luc;
                     if (totalAllocated > 0)
                     {
-                        UndoAllAllocatedStats(); // 할당된 스탯 롤백 및 UI 갱신
+                        UndoAllAllocatedStats();
                     }
 
-                    EventSystem.current.SetSelectedGameObject(null); 
+                    EventSystem.current.SetSelectedGameObject(null);
                     lastSelectedObject = null;
                     
                     SetSectionFocus(FocusSection.RandomStats);
                     StartCoroutine(SelectFirstAvailableButton());
                     return;
-                }
-            }
-
-            // ConfirmButton 표시 중일 때의 확인 키를 통한 진행 처리
-            if (currentSection == FocusSection.Skill && availablePoints == 0)
-            {
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-                {
-                    currentObj = EventSystem.current.currentSelectedGameObject;
-                    bool isSkillFocused = currentObj != null && currentObj.transform.IsChildOf(skillContent);
-                    bool isConfirmFocused = currentObj == confirmButton.gameObject;
-
-                    // 스킬 슬롯에 포커스 되어 있을 때 스페이스바를 누르면 강제로 confirmButton 클릭 처리
-                    if (isSkillFocused || isConfirmFocused)
-                    {
-                        confirmButton.onClick.Invoke();
-                        return;
-                    }
                 }
             }
 
@@ -841,20 +787,17 @@ namespace UI.Battle
                         StatType? focusedType = GetFocusedStatType(currentObj);
                         if (focusedType.HasValue)
                         {
-                            // 방향키 입력에 따라 -1 또는 +1 실행
                             if (isLeftPressed) ChangeStat(focusedType.Value, -1);
                             else if (isRightPressed) ChangeStat(focusedType.Value, 1);
                             
-                            // 좌/우 입력 후 상하 이동 타이머가 꼬이지 않도록 초기화
                             inputTimer = 0f;
                             isKeyHeld = false;
-                            return; 
+                            return;
                         }
                     }
                 }
             }
 
-            // 방향키 롱프레스 처리 로직
             bool isUpPressed = Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W);
             bool isDownPressed = Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S);
 
@@ -868,7 +811,7 @@ namespace UI.Battle
             if (!isKeyHeld)
             {
                 isKeyHeld = true;
-                inputTimer = inputDelay; 
+                inputTimer = inputDelay;
             }
             else
             {
@@ -876,7 +819,7 @@ namespace UI.Battle
 
                 if (inputTimer <= 0f)
                 {
-                    inputTimer = inputRepeatRate; 
+                    inputTimer = inputRepeatRate;
 
                     currentObj = EventSystem.current.currentSelectedGameObject;
                     if (currentObj != null)
@@ -902,8 +845,36 @@ namespace UI.Battle
         private void UndoAllAllocatedStats()
         {
             availablePoints += (allocatedStats.str + allocatedStats.mag + allocatedStats.intel + allocatedStats.vit + allocatedStats.agi + allocatedStats.luc);
-            allocatedStats = new StatData(); // 할당 스탯 데이터 초기화
+            allocatedStats = new StatData(); 
             RefreshUI();
+        }
+
+        private bool IsConditionMet(StatData stats, SkillUnlockNode node)
+        {
+            if (node == null) return false;
+
+            return stats.level >= node.reqLevel &&
+                   stats.str >= node.reqStr &&
+                   stats.mag >= node.reqMag &&
+                   stats.intel >= node.reqInt &&
+                   stats.vit >= node.reqVit &&
+                   stats.agi >= node.reqAgi &&
+                   stats.luc >= node.reqLuc;
+        }
+
+        private List<string> GetUnlearnedSkills(SkillUnlockNode node, PlayerController character)
+        {
+            List<string> unlearned = new List<string>();
+            if (node.rewardSkillChoices == null) return unlearned;
+
+            foreach (string skillId in node.rewardSkillChoices)
+            {
+                if (!character.learnedSkillIds.Contains(skillId))
+                {
+                    unlearned.Add(skillId);
+                }
+            }
+            return unlearned;
         }
 
         private void OnConfirmClicked()
@@ -912,7 +883,6 @@ namespace UI.Battle
 
             if (isCreationMode)
             {
-                // 생성 모드일 경우 델리게이트로 최종 할당된 스탯만 전달 후 UI 종료
                 StatData finalStats = new StatData
                 {
                     level = baseStats.level,
@@ -930,20 +900,160 @@ namespace UI.Battle
                 return;
             }
 
-            currentTarget.sourceData.stats.str += allocatedStats.str;
-            currentTarget.sourceData.stats.mag += allocatedStats.mag;
-            currentTarget.sourceData.stats.intel += allocatedStats.intel;
-            currentTarget.sourceData.stats.vit += allocatedStats.vit;
-            currentTarget.sourceData.stats.agi += allocatedStats.agi;
-            currentTarget.sourceData.stats.luc += allocatedStats.luc;
+            StatData newStats = new StatData {
+                level = currentTarget.sourceData.stats.level,
+                str = baseStats.str + allocatedStats.str,
+                mag = baseStats.mag + allocatedStats.mag,
+                intel = baseStats.intel + allocatedStats.intel,
+                vit = baseStats.vit + allocatedStats.vit,
+                agi = baseStats.agi + allocatedStats.agi,
+                luc = baseStats.luc + allocatedStats.luc
+            };
+
+            currentTarget.sourceData.stats.str = newStats.str;
+            currentTarget.sourceData.stats.mag = newStats.mag;
+            currentTarget.sourceData.stats.intel = newStats.intel;
+            currentTarget.sourceData.stats.vit = newStats.vit;
+            currentTarget.sourceData.stats.agi = newStats.agi;
+            currentTarget.sourceData.stats.luc = newStats.luc;
 
             currentTarget.maxHp = currentTarget.sourceData.maxHp = currentTarget.sourceData.stats.vit * 20;
             currentTarget.maxMp = currentTarget.sourceData.maxMp = currentTarget.sourceData.stats.mag * 30;
-            
             currentTarget.currentHp = currentTarget.sourceData.currentHp = currentTarget.maxHp;
             currentTarget.currentMp = currentTarget.sourceData.currentMp = currentTarget.maxMp;
 
-            ProcessNextCharacter();
+            pendingSkillNodes.Clear();
+
+            var charEntry = ManagerRoot.Database.charDB.GetEntry(currentTarget.sourceData.characterId);
+            if (charEntry != null && charEntry.skillTree != null)
+            {
+                foreach (var node in charEntry.skillTree.unlockNodes)
+                {
+                    bool isClaimed = currentTarget.sourceData.claimedSkillNodes.Contains(node.nodeId);
+                    
+                    if (!isClaimed && IsConditionMet(newStats, node))
+                    {
+                        List<string> availableSkills = GetUnlearnedSkills(node, currentTarget);
+
+                        if (availableSkills.Count > 0)
+                        {
+                            pendingSkillNodes.Enqueue(node);
+                        }
+                        else
+                        {
+                            currentTarget.sourceData.claimedSkillNodes.Add(node.nodeId);
+                        }
+                    }
+                }
+            }
+
+            if (pendingSkillNodes.Count > 0)
+            {
+                ShowNextSkillSelection();
+            }
+            else
+            {
+                ProcessNextCharacter();
+            }
+        }
+
+        private void ShowNextSkillSelection()
+        {
+            SetSectionFocus(FocusSection.NewSkillSelect);
+            
+            skillTitleText.text = "CHOOSE ONE";
+            skillChanceText.text = $"REMAINING: {pendingSkillNodes.Count}"; 
+            
+            // 확인 버튼을 끄기 전에 포커스를 날려 유니티가 스탯 버튼으로 포커스를 옮기는 것을 차단
+            EventSystem.current.SetSelectedGameObject(null);
+            lastSelectedObject = null;
+
+            confirmButton.gameObject.SetActive(false); 
+            
+            foreach (Transform child in skillContent) Destroy(child.gameObject);
+            ClearDescription();
+
+            SkillUnlockNode currentNode = pendingSkillNodes.Peek();
+            List<Button> choiceButtons = new List<Button>();
+
+            foreach (string skillId in currentNode.rewardSkillChoices)
+            {
+                var skillData = ManagerRoot.Database.GetSkill(skillId);
+                if (skillData != null && skillSlotPrefab != null)
+                {
+                    GameObject go = Instantiate(skillSlotPrefab, skillContent);
+                    var txt = go.GetComponentInChildren<TextMeshProUGUI>();
+                    if (txt != null) txt.text = skillData.dataName;
+
+                    Button btn = go.GetComponent<Button>();
+                    
+                    // 좌/우 방향키를 눌러도 자기 자신에게 머물게 하여 탈출 방지
+                    Navigation nav = btn.navigation;
+                    nav.mode = Navigation.Mode.Explicit;
+                    nav.selectOnLeft = btn;
+                    nav.selectOnRight = btn;
+                    btn.navigation = nav;
+
+                    choiceButtons.Add(btn);
+
+                    btn.onClick.AddListener(() => OnSkillChoiceClicked(skillId));
+                    AddSelectionEvent(go, skillData.description);
+                }
+            }
+
+            LinkVerticalNavigation(choiceButtons, null);
+            
+            if (choiceButtons.Count > 0)
+            {
+                StartCoroutine(FocusNewSkillDelayed(choiceButtons[0].gameObject));
+            }
+        }
+
+        private IEnumerator FocusNewSkillDelayed(GameObject target)
+        {
+            // UI 레이아웃이 완전히 구성될 때까지 2프레임 대기
+            yield return null;
+            EventSystem.current.SetSelectedGameObject(null);
+            yield return null;
+            
+            if (target != null && target.activeInHierarchy)
+            {
+                EventSystem.current.SetSelectedGameObject(target);
+                lastSelectedObject = target;
+                
+                // 하이라이트 강제 활성화
+                Selectable sel = target.GetComponent<Selectable>();
+                if (sel != null) sel.Select();
+            }
+        }
+
+        private void OnSkillChoiceClicked(string chosenSkillId)
+        {
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
+
+            SkillUnlockNode currentNode = pendingSkillNodes.Peek();
+
+            if (!currentTarget.learnedSkillIds.Contains(chosenSkillId))
+            {
+                currentTarget.learnedSkillIds.Add(chosenSkillId);
+                currentTarget.sourceData.learnedSkills.Add(chosenSkillId); 
+            }
+
+            if (!currentTarget.sourceData.claimedSkillNodes.Contains(currentNode.nodeId))
+            {
+                currentTarget.sourceData.claimedSkillNodes.Add(currentNode.nodeId);
+            }
+
+            pendingSkillNodes.Dequeue();
+
+            if (pendingSkillNodes.Count > 0)
+            {
+                ShowNextSkillSelection();
+            }
+            else
+            {
+                ProcessNextCharacter();
+            }
         }
     }
 }

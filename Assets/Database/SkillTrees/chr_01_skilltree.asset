@@ -1,0 +1,165 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b964b09ee8c0d746839647ccaf41e8f, type: 3}
+  m_Name: chr_01_skilltree
+  m_EditorClassIdentifier: Assembly-CSharp::Data.SkillTreeData
+  unlockNodes:
+  - nodeId: chr_01_lv_8
+    reqLevel: 7
+    reqStr: 5
+    reqMag: 5
+    reqInt: 7
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_027
+  - nodeId: chr_01_lv_14
+    reqLevel: 7
+    reqStr: 5
+    reqMag: 7
+    reqInt: 8
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_013
+    - skl_015
+  - nodeId: chr_01_lv_18
+    reqLevel: 18
+    reqStr: 5
+    reqMag: 8
+    reqInt: 8
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_042
+  - nodeId: chr_01_lv_23
+    reqLevel: 23
+    reqStr: 5
+    reqMag: 8
+    reqInt: 9
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_031
+  - nodeId: chr_01_lv_30
+    reqLevel: 30
+    reqStr: 5
+    reqMag: 9
+    reqInt: 10
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_030
+    - skl_033
+  - nodeId: chr_01_lv_37
+    reqLevel: 37
+    reqStr: 5
+    reqMag: 13
+    reqInt: 13
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_013
+    - skl_025
+  - nodeId: chr_01_lv_42
+    reqLevel: 42
+    reqStr: 5
+    reqMag: 15
+    reqInt: 15
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_015
+    - skl_032
+  - nodeId: chr_01_lv_50
+    reqLevel: 50
+    reqStr: 5
+    reqMag: 15
+    reqInt: 18
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_016
+    - skl_025
+  - nodeId: chr_01_lv_55
+    reqLevel: 55
+    reqStr: 5
+    reqMag: 16
+    reqInt: 19
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_028
+    - skl_033
+  - nodeId: chr_01_lv_61
+    reqLevel: 61
+    reqStr: 5
+    reqMag: 17
+    reqInt: 19
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_014
+    - skl_017
+  - nodeId: chr_01_lv_68
+    reqLevel: 68
+    reqStr: 5
+    reqMag: 18
+    reqInt: 20
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_014
+    - skl_028
+  - nodeId: chr_01_lv_74
+    reqLevel: 74
+    reqStr: 5
+    reqMag: 19
+    reqInt: 22
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_017
+    - skl_026
+  - nodeId: chr_01_lv_77
+    reqLevel: 77
+    reqStr: 5
+    reqMag: 21
+    reqInt: 23
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_017
+    - skl_030
+  - nodeId: chr_01_lv_80
+    reqLevel: 80
+    reqStr: 5
+    reqMag: 21
+    reqInt: 24
+    reqVit: 5
+    reqAgi: 5
+    reqLuc: 5
+    rewardSkillChoices:
+    - skl_029

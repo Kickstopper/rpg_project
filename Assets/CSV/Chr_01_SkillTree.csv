@@ -1,0 +1,15 @@
+TreeID,NodeID,ReqLevel,ReqSTR,ReqMAG,ReqINT,ReqVIT,ReqAGI,ReqLUC,RewardSkills
+chr_01_skilltree,chr_01_lv_8,8,5,5,7,5,5,5,skl_027
+chr_01_skilltree,chr_01_lv_14,14,5,7,8,5,5,5,skl_013|skl_015
+chr_01_skilltree,chr_01_lv_18,18,5,8,8,5,5,5,skl_042
+chr_01_skilltree,chr_01_lv_23,23,5,8,9,5,5,5,skl_031
+chr_01_skilltree,chr_01_lv_30,30,5,9,10,5,5,5,skl_030|skl_033
+chr_01_skilltree,chr_01_lv_37,37,5,13,13,5,5,5,skl_013|skl_025
+chr_01_skilltree,chr_01_lv_42,42,5,15,15,5,5,5,skl_015|skl_032
+chr_01_skilltree,chr_01_lv_50,50,5,15,18,5,5,5,skl_016|skl_025
+chr_01_skilltree,chr_01_lv_55,55,5,16,19,5,5,5,skl_028|skl_033
+chr_01_skilltree,chr_01_lv_61,61,5,17,19,5,5,5,skl_014|skl_017
+chr_01_skilltree,chr_01_lv_68,68,5,18,20,5,5,5,skl_014|skl_028
+chr_01_skilltree,chr_01_lv_74,74,5,19,22,5,5,5,skl_017|skl_026
+chr_01_skilltree,chr_01_lv_77,77,5,21,23,5,5,5,skl_017|skl_030
+chr_01_skilltree,chr_01_lv_80,80,5,21,24,5,5,5,skl_029
