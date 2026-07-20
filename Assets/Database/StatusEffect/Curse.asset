@@ -17,7 +17,7 @@ MonoBehaviour:
   durationType: 0
   cureType: 0
   maxTurns: 3
-  cureChancePerTurn: 0.5
+  cureChancePerTurn: 0
   atkMultiplier: 1
   defMultiplier: 1
   evaMultiplier: 1

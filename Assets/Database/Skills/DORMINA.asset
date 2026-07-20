@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
   id: skl_036
   dataName: DORMINA
-  description: "\uC801 1\uBA85\uC744 \uC218\uBA74 \uC0C1\uD0DC\uB85C \uB9CC\uB4E0\uB2E4."
+  description: "\uC801 1\uCCB4\uB97C \uC218\uBA74 \uC0C1\uD0DC\uB85C \uB9CC\uB4E0\uB2E4."
   icon: {fileID: 0}
   vfxId: 25
   effectType: 1

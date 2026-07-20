@@ -15,13 +15,13 @@ MonoBehaviour:
   id: 8
   effectName: SLEEP
   durationType: 0
-  cureType: 0
+  cureType: 2
   maxTurns: 3
-  cureChancePerTurn: 0.5
+  cureChancePerTurn: 0.25
   atkMultiplier: 1
   defMultiplier: 1
   evaMultiplier: 1
   accMultiplier: 1
   restrictionType: 1
-  restrictionChance: 0.35
+  restrictionChance: 1
   dotDamage: 0

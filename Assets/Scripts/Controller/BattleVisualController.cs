@@ -6,7 +6,7 @@ public enum VfxID
     Gun_Shot, Gun_Auto, 
     Fire, Ice, Elec, Force, 
     Heal, Revive, Buff, Debuff, 
-    Poison, Curse, Paralyze, Silence, Guard, Reflect, Absorb, Sleep, Stone, Panic, Charm,
+    Poison, Curse, Paralyze, Silence, Guard, Reflect, Absorb, Sleep, Stone, Panic, Charm, Lullaby,
 }
 
 public class BattleVisualController : MonoBehaviour
@@ -39,6 +39,7 @@ public class BattleVisualController : MonoBehaviour
     public GameObject vfxMagicSilencePrefab;
     public GameObject vfxMagicParalyzePrefab;
     public GameObject vfxMagicSleepPrefab;
+    public GameObject vfxMagicLullabyPrefab;
     public GameObject vfxMagicCharmPrefab;
     public GameObject vfxMagicStonePrefab;
     public GameObject vfxMagicPanicPrefab;
@@ -85,6 +86,7 @@ public class BattleVisualController : MonoBehaviour
             case VfxID.Stone: vfx = vfxMagicStonePrefab; break;
             case VfxID.Panic: vfx = vfxMagicPanicPrefab; break;
             case VfxID.Charm: vfx = vfxMagicCharmPrefab; break;
+            case VfxID.Lullaby: vfx = vfxMagicLullabyPrefab; break;
             
             case VfxID.Guard: vfx = vfxGuardHitPrefab; break;
             case VfxID.Reflect: vfx = vfxReflectPrefab; break;

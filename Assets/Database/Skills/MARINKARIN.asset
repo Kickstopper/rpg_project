@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
   id: skl_042
   dataName: MARINKARIN
-  description: "\uC801 1\uBA85\uC744 \uB9E4\uB8CC \uC0C1\uD0DC\uB85C \uB9CC\uB4E4\uC5B4
+  description: "\uC801 1\uCCB4\uB97C \uB9E4\uB8CC \uC0C1\uD0DC\uB85C \uB9CC\uB4E4\uC5B4
     \uC544\uAD70\uC744 \uB3D5\uAC8C \uD55C\uB2E4."
   icon: {fileID: 0}
   vfxId: 28
@@ -23,10 +23,8 @@ MonoBehaviour:
   element: 6
   targetScope: 1
   useType: 2
-  statusEffect: 12
+  statusEffectData: {fileID: 11400000, guid: 0bdb586806e79d040830f6e3fc3419e1, type: 2}
   statusEffectChance: 0.4
   actionDelay: 0
   useHpCost: 0
   costValue: 6
-  statusEffectData: {fileID: 11400000, guid: 0bdb586806e79d040830f6e3fc3419e1, type: 2}
-  effectRate: 0.4

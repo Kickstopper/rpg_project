@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 13
   effectName: PETRIFY
-  durationType: 0
+  durationType: 1
   cureType: 0
   maxTurns: 3
-  cureChancePerTurn: 0.5
+  cureChancePerTurn: 0
   atkMultiplier: 1
   defMultiplier: 1
   evaMultiplier: 1
   accMultiplier: 1
   restrictionType: 1
-  restrictionChance: 0.35
+  restrictionChance: 1
   dotDamage: 0

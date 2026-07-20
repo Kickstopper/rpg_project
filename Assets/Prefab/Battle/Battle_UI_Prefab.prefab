@@ -3704,8 +3704,10 @@ MonoBehaviour:
   vfxMagicSilencePrefab: {fileID: 2210249593246853867, guid: b6c235b9552f29f4cb331381b2225054, type: 3}
   vfxMagicParalyzePrefab: {fileID: 2210249593246853867, guid: 7bb7d9b69a248ba4787b426d11fdcc68, type: 3}
   vfxMagicSleepPrefab: {fileID: 2210249593246853867, guid: ab650ae5e76e01d40a3f4810fa59b86b, type: 3}
+  vfxMagicLullabyPrefab: {fileID: 2210249593246853867, guid: 2eedbb1e0490df6459b9e550e456998e, type: 3}
   vfxMagicCharmPrefab: {fileID: 2210249593246853867, guid: addc232ca014a0c489115c0aac5519c7, type: 3}
   vfxMagicStonePrefab: {fileID: 2210249593246853867, guid: 8d6686e48a1e6b044a80db8a11c80e54, type: 3}
+  vfxMagicPanicPrefab: {fileID: 2210249593246853867, guid: cfe2b47d636df72469b87bcdc9956f81, type: 3}
   vfxGuardHitPrefab: {fileID: 2210249593246853867, guid: 5814c241d8b861041a6a1bc55c16ca48, type: 3}
   vfxReflectPrefab: {fileID: 2210249593246853867, guid: d36e8b73daa368d45968669f4c438a7d, type: 3}
   vfxAbsorbPrefab: {fileID: 2210249593246853867, guid: 623560577d3978740a44ea9aae24df4c, type: 3}

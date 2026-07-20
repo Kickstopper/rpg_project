@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
   id: skl_043
   dataName: SHIBABOO
-  description: "\uC801 1\uBA85\uC744 \uC18D\uBC15\uD558\uC5EC \uD589\uB3D9\uC744
+  description: "\uC801 1\uCCB4\uB97C \uC18D\uBC15\uD558\uC5EC \uD589\uB3D9\uC744
     \uBD09\uC1C4\uD55C\uB2E4."
   icon: {fileID: 0}
   vfxId: 0
@@ -23,10 +23,8 @@ MonoBehaviour:
   element: 6
   targetScope: 1
   useType: 2
-  statusEffect: 11
+  statusEffectData: {fileID: 11400000, guid: 7fa3a88b869a0314d8b4ea0d366511dc, type: 2}
   statusEffectChance: 0.45
   actionDelay: 0
   useHpCost: 0
   costValue: 6
-  statusEffectData: {fileID: 11400000, guid: 7fa3a88b869a0314d8b4ea0d366511dc, type: 2}
-  effectRate: 0.45

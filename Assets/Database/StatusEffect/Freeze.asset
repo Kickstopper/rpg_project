@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 11
   effectName: FREEZE
   durationType: 0
-  cureType: 0
+  cureType: 2
   maxTurns: 3
   cureChancePerTurn: 0.5
   atkMultiplier: 1
@@ -23,5 +23,5 @@ MonoBehaviour:
   evaMultiplier: 1
   accMultiplier: 1
   restrictionType: 1
-  restrictionChance: 0.35
+  restrictionChance: 1
   dotDamage: 0

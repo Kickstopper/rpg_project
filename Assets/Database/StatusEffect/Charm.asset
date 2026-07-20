@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 12
   effectName: CHARM
   durationType: 0
-  cureType: 0
+  cureType: 2
   maxTurns: 3
   cureChancePerTurn: 0.5
   atkMultiplier: 1
