@@ -9,11 +9,6 @@ namespace Data
         public bool useHpCost; 
         public int costValue;
 
-        [Header("Effect Settings")]
-        public StatusEffectData statusEffectData;
-        [Range(0, 1f)]
-        public float effectRate;
-
         public int GetCategoryIndex()
         {
             // 0: Magic, 1: Recover, 2: Assistance, 3: Special

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfddf8673c460194d9cd0f6638dca743, type: 3}
   m_Name: Paralyze
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
-  id: status_paralyze
+  id: 9
   effectName: PARALYZE
   durationType: 1
   cureType: 0

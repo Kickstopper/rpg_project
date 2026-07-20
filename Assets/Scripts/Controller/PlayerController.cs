@@ -564,11 +564,6 @@ namespace Controller
             currentHp = healAmount;
         }
 
-        public void ApplyStatusEffect(StatusEffect effect)
-        {
-            if (sourceData != null) sourceData.statusEffect = effect;
-        }
-
         public void RefreshView()
         {
             UpdateUI(); 

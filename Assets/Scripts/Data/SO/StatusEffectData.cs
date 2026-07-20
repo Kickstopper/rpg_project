@@ -14,11 +14,15 @@ namespace Data
 
     public enum EffectDurationType { BattleOnly, Persistent }
     public enum EffectCureType { ExplicitOnly, TurnBased, ChancePerTurn }
+    public enum StatusEffectID 
+    { 
+        None, Burn, Poison, Bleed, Silence, Bind, Curse, Panic, Sleep, Paralyze, Stun, Freeze, Charm, Petrify
+    }
 
     [CreateAssetMenu(fileName = "New Status Effect", menuName = "Game Data/Status Effect")]
     public class StatusEffectData : ScriptableObject
     {
-        public string id;
+        public StatusEffectID id;
         public string effectName;
 
         [Header("Duration & Cure")]

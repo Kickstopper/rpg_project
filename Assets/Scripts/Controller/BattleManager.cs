@@ -2239,16 +2239,16 @@ namespace Controller
         int CalculateActionDelay(BattleAction action)
         {
             int baseDelay = 0;
-            switch (action.type)
-            {
-                case ActionType.Attack: baseDelay = 10; break;
-                case ActionType.Shoot:  baseDelay = 15; break;
-                case ActionType.Guard:  baseDelay = 0; break;
-                case ActionType.Move:   baseDelay = 5; break;
-                case ActionType.Item:   baseDelay = (action.actionData != null) ? action.actionData.actionDelay : 20; break;
-                case ActionType.Skill:  baseDelay = (action.actionData != null) ? action.actionData.actionDelay : 30; break;
-                case ActionType.Next:   baseDelay = -50; break;
-            }
+            // switch (action.type)
+            // {
+            //     case ActionType.Attack: baseDelay = 10; break;
+            //     case ActionType.Shoot:  baseDelay = 15; break;
+            //     case ActionType.Guard:  baseDelay = 0; break;
+            //     case ActionType.Move:   baseDelay = 5; break;
+            //     case ActionType.Item:   baseDelay = (action.actionData != null) ? action.actionData.actionDelay : 20; break;
+            //     case ActionType.Skill:  baseDelay = (action.actionData != null) ? action.actionData.actionDelay : 30; break;
+            //     case ActionType.Next:   baseDelay = -50; break;
+            // }
             return baseDelay;
         }
 
@@ -2343,7 +2343,7 @@ namespace Controller
                 // 공격 계열 vs 보조 계열 분기 처리
                 bool isAttack = item.effectType == EffectType.Special_Atk || 
                 item.effectType == EffectType.Magic_Atk || 
-                item.statusEffect != StatusEffect.None;
+                (item.statusEffectData != null && item.statusEffectData.restrictionType != RestrictionType.None);
 
                 if (isAttack)
                 {
@@ -2425,7 +2425,7 @@ namespace Controller
 
             bool isAttack = skill.effectType == EffectType.Special_Atk || 
                             skill.effectType == EffectType.Magic_Atk || 
-                            skill.statusEffect != StatusEffect.None;
+                            (skill.statusEffectData != null && skill.statusEffectData.restrictionType != RestrictionType.None);
             
             if (!isAutoMode)
             {
@@ -3142,7 +3142,7 @@ namespace Controller
             }
 
             Coroutine damageRoutine = null;
-            if (!(damage == 0 && action.actionData != null && action.actionData.statusEffect != StatusEffect.None))
+            if (!(damage == 0 && action.actionData != null && action.actionData.statusEffectData != null))
             {
                 damageRoutine = ApplyDamage(target, damage, isCritical);
             }
@@ -3153,8 +3153,7 @@ namespace Controller
             // 타격 후, 적이 아직 살아있다면 상태 이상 판정을 시도
             if (hitEntity != null && hitEntity.currentHp > 0)
             {
-                // 스킬이나 아이템에 상태 이상 데이터가 있는지 확인
-                if (action.actionData != null && action.actionData.statusEffect != StatusEffect.None)
+                if (action.actionData != null && action.actionData.statusEffectData != null)
                 {
                     // BattleCalculator의 상태 이상 판정 함수 호출
                     BattleCalculator.ProcessSkillStatusEffect(attackerEntity, hitEntity, action.actionData);
@@ -3311,9 +3310,30 @@ namespace Controller
             uiController.SetCmdPanelVisible(false);
             uiController.HideStateMessage();
 
-            // 파티원들의 버프/상태이상을 모두 제거
+            // 파티원들의 상태이상을 검사하여 필드 유지(Persistent)와 전투 전용(BattleOnly)을 분리
             List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
-            foreach (var p in allPlayers) if (p != null) p.ClearBattleOnlyEffects();
+            foreach (var p in allPlayers) 
+            {
+                if (p != null) 
+                {
+                    // 전투 중 걸려있던 효과들 중, 필드 유지형(Persistent)이 있는지 찾아 저장
+                    var persistentEffect = p.activeEffects.Find(e => e.data.durationType == EffectDurationType.Persistent);
+                    
+                    if (persistentEffect != null)
+                    {
+                        // 필드 유지형 상태이상 ID를 원본 데이터에 넘겨줌
+                        p.sourceData.persistentStatusId = persistentEffect.data.id;
+                    }
+                    else
+                    {
+                        // 없으면 비워줌
+                        p.sourceData.persistentStatusId = StatusEffectID.None;
+                    }
+
+                    // 전투 전용(BattleOnly) 버프/디버프는 전부 지움
+                    p.ClearBattleOnlyEffects(); 
+                }
+            }
 
             if (isWin)
             {

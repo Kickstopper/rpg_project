@@ -748,6 +748,7 @@ MonoBehaviour:
   skillDB: {fileID: 11400000, guid: 35a359d39da6e5a48ab617a4fbd2f4f0, type: 2}
   cosumableDB: {fileID: 11400000, guid: 80437589caeff4941b86f8487644af32, type: 2}
   spiritDB: {fileID: 11400000, guid: f63d6a6019dd7b646b75b3c4d5367abe, type: 2}
+  statusEffectDB: {fileID: 11400000, guid: 2b33de495811752498a1632cad4ec736, type: 2}
 --- !u!1 &5845013345225355303
 GameObject:
   m_ObjectHideFlags: 0

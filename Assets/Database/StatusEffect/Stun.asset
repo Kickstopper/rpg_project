@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfddf8673c460194d9cd0f6638dca743, type: 3}
-  m_Name: Stone
+  m_Name: Stun
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
-  id: status_sleep
-  effectName: STONE
+  id: 10
+  effectName: STUN
   durationType: 0
   cureType: 0
   maxTurns: 3

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Helper;
+using Manager;
 using UnityEngine;
 
 namespace Data
@@ -17,22 +18,19 @@ namespace Data
 
     public enum StatType { STR, MAG, INT, VIT, AGI, LUC }
 
-    public enum StatusEffect { None, Burn, Freeze, Shock, Panic, Poison, Paralyze, 
-                               Curse, Silence, Confuse, Sleep, Blind, Charm, Stone, }
     [System.Serializable]
     public class RuntimeCharacterData
     {
         // 원본 데이터 참조 (이름, 기본 스탯 등)
         public string characterId;
         public bool isRegular; // 전투에 참여하는 멤버인지 아닌지
+        public bool isCommander; // ITEM을 사용할 수 있고 죽었을 경우 게임 오버 되는 멤버인지
         public bool isMonster;
 
         public string name;
         public Race race;         // 인간
         public Gender gender;
         public Align align;
-
-        public StatusEffect statusEffect;
 
         public string resonanceId;
 
@@ -66,7 +64,17 @@ namespace Data
         
         // 습득한 스킬 목록
         public List<string> learnedSkills = new();
-        public bool isCommander;
+        
+        // 전투 외에서도 유지되는 상태이상의 ID     
+        public StatusEffectID persistentStatusId; 
+        // UI나 필드 로직에서 쉽게 데이터에 접근하기 위한 프로퍼티
+        public StatusEffectData CurrentStatusEffect
+        {
+            get {
+                if (persistentStatusId == StatusEffectID.None) return null;
+                return ManagerRoot.Database.GetStatusEffect(persistentStatusId); 
+            }
+        }
 
         public RuntimeCharacterData(CharacterSaveData save)
         {
@@ -77,8 +85,8 @@ namespace Data
             if (System.Enum.TryParse(save.row, out RowType parsedRow)) row = parsedRow;
             if (System.Enum.TryParse(save.column, out ColumnType parsedCol)) column = parsedCol;
             if (System.Enum.TryParse(save.gender, out Gender parsedGender)) gender = parsedGender;
-            if (System.Enum.TryParse(save.basicAttackVfxID, out VfxID basicAtkVfx)) basicAttackVfxId = basicAtkVfx;
-
+            if (System.Enum.TryParse(save.basicAttackVfxID, out VfxID parseBasicAtkVfx)) basicAttackVfxId = parseBasicAtkVfx;
+            if (System.Enum.TryParse(save.persistentStatusId, out StatusEffectID parseStatusEffectID)) persistentStatusId = parseStatusEffectID;
             resonanceId = save.resonanceId;
 
             stats = save.stats;
@@ -138,12 +146,12 @@ namespace Data
             data.characterId = this.characterId;
             data.name = this.name;
             data.race = this.race.ToString();
+            data.align = this.align.ToString();
             data.gender = this.gender.ToString();
             data.isCommander = this.isCommander;
             data.isMonster = this.isMonster;
 
             data.resonanceId = this.resonanceId;
-            data.align = this.align.ToString();
             
             data.weaponId = this.equippedWeaponId;
             data.gunId = this.equippedGunId;
@@ -160,6 +168,8 @@ namespace Data
             
             data.row = this.row.ToString();
             data.column = this.column.ToString();
+
+            data.persistentStatusId = this.persistentStatusId.ToString();
             
             data.resistances = this.resistances;
             data.stats = this.stats;
@@ -167,15 +177,6 @@ namespace Data
             
             return data;
         }
-
-        public int GetTotalAttack(){ return 0;}
-        public int GetHitRate(){ return 0;}
-        public int GetGunAttack(){ return 0;}
-        public int GetGunHitRate(){ return 0;}
-        public int GetTotalDefense(){ return 0;}
-        public int GetEvasion(){ return 0;}
-        public int GetMagicPower(){ return 0;}
-        public int GetMagicEffect() {return 0; }
 
         // UI나 전투 로직은 이 함수만 호출하면 됨
         public int GetRequiredExpForNextLevel() {

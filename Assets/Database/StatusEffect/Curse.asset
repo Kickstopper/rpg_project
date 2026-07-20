@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfddf8673c460194d9cd0f6638dca743, type: 3}
   m_Name: Curse
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
-  id: status_curse
+  id: 6
   effectName: CURSE
   durationType: 0
   cureType: 0

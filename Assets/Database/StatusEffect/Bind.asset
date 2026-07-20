@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfddf8673c460194d9cd0f6638dca743, type: 3}
   m_Name: Bind
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
-  id: status_bind
+  id: 5
   effectName: BIND
   durationType: 0
   cureType: 0

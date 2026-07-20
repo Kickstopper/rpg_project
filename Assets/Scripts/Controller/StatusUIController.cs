@@ -177,13 +177,14 @@ namespace Controller
             nextExpText.text = charData.GetRequiredExpForNextLevel().ToString(); 
             alignText.text = charData.align.ToString().ToUpper().Replace("_", " ");
 
-            if (charData.statusEffect != StatusEffect.None)
+            if (charData.CurrentStatusEffect != null)
             {
-                statusFxText.text = charData.statusEffect.ToString().ToUpper();
+                // 상태이상의 이름을 출력
+                statusFxText.text = charData.CurrentStatusEffect.effectName.ToUpper();
             }
             else
             {
-                statusFxText.text = string.Empty; 
+                statusFxText.text = string.Empty;
             }
 
             // Vitals (HP/MP)

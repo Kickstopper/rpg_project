@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a231030c170c9214cb56635fbac4e055, type: 3}
+  m_Name: StatusEffectDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectDatabase
+  db:
+  - {fileID: 11400000, guid: 7fa3a88b869a0314d8b4ea0d366511dc, type: 2}
+  - {fileID: 11400000, guid: 11e2fbf17f6552c428ac17d753ff6937, type: 2}
+  - {fileID: 11400000, guid: a0f2b441614a92d428780b07f1b57707, type: 2}
+  - {fileID: 11400000, guid: 0bdb586806e79d040830f6e3fc3419e1, type: 2}
+  - {fileID: 11400000, guid: 97a87387215e7434f97751fb95c2ef95, type: 2}
+  - {fileID: 11400000, guid: 27bbd01c1a7435b44be699cbe5637f75, type: 2}
+  - {fileID: 11400000, guid: a5c6a6bd9f4a32b429b991740b6f8277, type: 2}
+  - {fileID: 11400000, guid: 77b7813ffad700a499b7a55fb216c045, type: 2}
+  - {fileID: 11400000, guid: 1db0702f32a8e444e9af97857f7e8a58, type: 2}
+  - {fileID: 11400000, guid: 78daea0d08a3d3945a43e047262d3a16, type: 2}
+  - {fileID: 11400000, guid: 77b9cd22f9da69e42921cf7987a34330, type: 2}
+  - {fileID: 11400000, guid: b55e757e775cff94ea7744433821324c, type: 2}
+  - {fileID: 11400000, guid: 343c0550ed055f041bd6f7486d81cc50, type: 2}

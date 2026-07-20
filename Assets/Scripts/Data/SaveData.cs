@@ -72,16 +72,15 @@ namespace Data
         public string race;
         public string gender;
         public int level;
-
-        public StatData stats;
-        public ResistanceData resistances;
-
+        public string align;
         public bool isCommander;
         public bool isMonster;
 
-        public string align;
-
         public string resonanceId;
+        public string persistentStatusId; // 지속되는 상태 이상
+
+        public StatData stats;
+        public ResistanceData resistances;
 
         public string row;
         public string column;

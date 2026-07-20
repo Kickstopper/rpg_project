@@ -18,6 +18,8 @@ namespace Manager
         public ConsumableDatabase cosumableDB;
         public ResonanceDatabase spiritDB;
 
+        public StatusEffectDatabase statusEffectDB;
+
         void Awake()
         {
             if (Instance == null)
@@ -59,6 +61,8 @@ namespace Manager
 
             return null;
         }
+
+        public StatusEffectData GetStatusEffect(StatusEffectID id) => statusEffectDB.GetData(id);
         public WeaponData GetWeapon(string id) => weaponDB.GetItem(id);
         public AmmoData GetAmmo(string id) => ammoDB.GetItem(id);
         public ArmorData GetArmor(string id) => armorDB.GetItem(id);

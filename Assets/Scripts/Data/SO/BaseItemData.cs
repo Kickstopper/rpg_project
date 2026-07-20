@@ -71,10 +71,10 @@ namespace Data
         public TargetScope targetScope;
         public UseType useType;
 
+        public StatusEffectData statusEffectData;
         
-        [Header("Additional Effect")]
-        public StatusEffect statusEffect = StatusEffect.None;
-        public float statusEffectChance = 0f; 
+        [Tooltip("상태이상 부여 확률 (0~1)")]
+        [Range(0, 1f)] public float statusEffectChance = 0f;
 
         public int actionDelay = 0; // 사용했을 때의 딜레이 (행동 속도 지연)
     }
