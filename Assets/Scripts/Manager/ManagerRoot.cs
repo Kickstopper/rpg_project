@@ -11,6 +11,7 @@ namespace Manager
         [SerializeField] private GameSettingManager gameSettingManager;
         [SerializeField] private SoundManager soundManager;
         [SerializeField] private DatabaseManager databaseManager;
+        [SerializeField] private QuestManager questManager;
         [SerializeField] private DialogueManager dialogueManager;
         [SerializeField] private GameStateManager gameStateManager;
         [SerializeField] private DungeonManager dungeonManager;
@@ -29,6 +30,7 @@ namespace Manager
         public static GameSettingManager GameSetting => Instance.gameSettingManager;
         public static SoundManager Sound => Instance.soundManager;
         public static DatabaseManager Database => Instance.databaseManager;
+        public static QuestManager Quest => Instance.questManager;
         public static DialogueManager Dialogue => Instance.dialogueManager;
         public static GameStateManager GameState => Instance.gameStateManager;
         public static DungeonManager Dungeon => Instance.dungeonManager;
@@ -79,9 +81,13 @@ namespace Manager
 
         private void InitializeAllManagers()
         {
+
             if (soundManager == null) soundManager = GetComponentInChildren<SoundManager>();
             if (gameSettingManager == null) gameSettingManager = GetComponentInChildren<GameSettingManager>();
             if (databaseManager == null) databaseManager = GetComponentInChildren<DatabaseManager>();
+            if (questManager == null) questManager = GetComponentInChildren<QuestManager>();
+            questManager?.InitializeQuests(databaseManager.questDB.db);
+            
             if (dialogueManager == null) dialogueManager = GetComponentInChildren<DialogueManager>();
             if (gameStateManager == null) gameStateManager = GetComponentInChildren<GameStateManager>();
             if (dungeonManager == null) dungeonManager = GetComponentInChildren<DungeonManager>();
