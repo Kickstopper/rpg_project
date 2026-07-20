@@ -78,6 +78,9 @@ namespace Manager
             // 이벤트 플래그 저장
             data.eventFlags = ManagerRoot.Flag.GetSaveData();
 
+            // 퀘스트 달성 상태 저장
+            ManagerRoot.Quest.Save(data);
+
             // 대화 이벤트 발생 여부 저장
             data.completedDialogues = ManagerRoot.DungeonEvent.GetCompletedTriggers();
             
@@ -109,6 +112,9 @@ namespace Manager
             
             // 플래그 복구
             ManagerRoot.Flag.LoadFromSaveData(data.eventFlags);
+
+            // 퀘스트 달성 상태 복구
+            ManagerRoot.Quest.Load(data);
 
             // 대화 이벤트 발생 정보 복구
             ManagerRoot.DungeonEvent.ApplyCompletedTriggers(data.completedDialogues);

@@ -14,6 +14,7 @@ public class SceneUIProvider : MonoBehaviour
     public GameObject shopCanvas;
     public GameObject elevatorCanvas;
     public GameObject terminalCanvas;
+    public GameObject officeCanvas;
 
     // 인스펙터에서 연결하거나 Start에서 찾음
     public BattleManager BattletManager; 
@@ -41,7 +42,8 @@ public class SceneUIProvider : MonoBehaviour
                 shopCanvas,
                 shopUI,
                 terminalCanvas,
-                elevatorCanvas
+                elevatorCanvas,
+                officeCanvas
             );
         }
     }

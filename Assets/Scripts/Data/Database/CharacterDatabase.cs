@@ -52,7 +52,6 @@ namespace Data.Database
 
         }
 
-        [Header("캐릭터 이미지 등록")]
         public List<CharacterEntry> entries = new List<CharacterEntry>();
 
         // 검색 속도를 위해 Entry 자체를 저장하는 딕셔너리

@@ -2266,8 +2266,20 @@
             "isWallEntrance": true,
             "triggerDirection": 2,
             "isWorldMap": false,
-            "destinationID": "Terminal_Outporst",
+            "destinationID": "Terminal_Outpost",
             "targetX": 8,
+            "targetY": 1,
+            "targetDirection": 0
+        },
+        {
+            "type": 4,
+            "sourceX": 2,
+            "sourceY": 1,
+            "isWallEntrance": true,
+            "triggerDirection": 2,
+            "isWorldMap": false,
+            "destinationID": "Office_Outpost",
+            "targetX": 2,
             "targetY": 1,
             "targetDirection": 0
         }

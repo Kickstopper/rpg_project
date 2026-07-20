@@ -413,14 +413,14 @@ MonoBehaviour:
     floorNumber: 1
     description: "\uC804\uCD08\uAE30\uC9C0"
   - terminalID: Terminal_Bridge_0
-    displayName: "\uBE0C\uB9BF\uC9C0"
-    mapID: Bridge_0
-    targetX: 1
-    targetY: 7
+    displayName: "\uBB3C\uC5D0 \uC7A0\uAE34 \uB3C4\uC2DC"
+    mapID: Cave_0
+    targetX: 11
+    targetY: 11
     targetDir: 2
     destinationImage: {fileID: 0}
-    floorNumber: 2
-    description: FINALLY
+    floorNumber: 1
+    description: "\uCD95\uCD95\uD574\uC694"
 --- !u!1 &2951667405501977806
 GameObject:
   m_ObjectHideFlags: 0
@@ -560,6 +560,7 @@ Transform:
   - {fileID: 9134366549653561087}
   - {fileID: 1756170555702361820}
   - {fileID: 7013715907720635569}
+  - {fileID: 1625563179574084681}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7067830550753514190
@@ -577,6 +578,7 @@ MonoBehaviour:
   gameSettingManager: {fileID: 8281435452325725656}
   soundManager: {fileID: 2717211988120755381}
   databaseManager: {fileID: 2075085689983111132}
+  questManager: {fileID: 5721599946353716069}
   dialogueManager: {fileID: 7345439070190559585}
   gameStateManager: {fileID: 7288811446440896195}
   dungeonManager: {fileID: 413691896167842987}
@@ -692,6 +694,7 @@ MonoBehaviour:
   shopCanvas: {fileID: 0}
   elevatorCanvas: {fileID: 0}
   terminalCanvas: {fileID: 0}
+  officeCanvas: {fileID: 0}
   currentBattleManager: {fileID: 0}
   shopUIController: {fileID: 0}
   dialogueController: {fileID: 0}
@@ -748,6 +751,7 @@ MonoBehaviour:
   skillDB: {fileID: 11400000, guid: 35a359d39da6e5a48ab617a4fbd2f4f0, type: 2}
   cosumableDB: {fileID: 11400000, guid: 80437589caeff4941b86f8487644af32, type: 2}
   spiritDB: {fileID: 11400000, guid: f63d6a6019dd7b646b75b3c4d5367abe, type: 2}
+  questDB: {fileID: 11400000, guid: c71a97adbb4297e438c1abaa760dd0f6, type: 2}
   statusEffectDB: {fileID: 11400000, guid: 2b33de495811752498a1632cad4ec736, type: 2}
 --- !u!1 &5845013345225355303
 GameObject:
@@ -1025,3 +1029,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396977ba6f3796944b0977c702719dbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager.FlagManager
+--- !u!1 &9215509204305582323
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1625563179574084681}
+  - component: {fileID: 5721599946353716069}
+  m_Layer: 0
+  m_Name: QuestManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1625563179574084681
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9215509204305582323}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 545246018662277303}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5721599946353716069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9215509204305582323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60f089f195b60b842838e8a012bedf15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Manager.QuestManager

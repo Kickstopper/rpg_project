@@ -17,7 +17,7 @@ namespace Manager
         public SkillDatabase skillDB;
         public ConsumableDatabase cosumableDB;
         public ResonanceDatabase spiritDB;
-
+        public QuestDatabase questDB;
         public StatusEffectDatabase statusEffectDB;
 
         void Awake()
@@ -25,7 +25,6 @@ namespace Manager
             if (Instance == null)
             {
                 Instance = this;
-                
                 
                 // 게임 시작 시 딕셔너리 초기화
                 charDB.Initialize();
@@ -35,6 +34,7 @@ namespace Manager
                 armorDB.Initialize();
                 skillDB.Initialize();
                 spiritDB.Initialize();
+                questDB.Initialize();
             }
             else
             {

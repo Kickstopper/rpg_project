@@ -235,6 +235,7 @@ namespace Controller
             if (ManagerRoot.DungeonEvent != null) ManagerRoot.DungeonEvent.ResetAllEvents();
             if (InventoryManager.Instance != null) ManagerRoot.Inventory.ClearInventory();
             if (ManagerRoot.Flag != null) ManagerRoot.Flag.ClearFlag();
+            if (ManagerRoot.Quest != null) ManagerRoot.Quest.NewGame();
             if (ManagerRoot.Party != null) ManagerRoot.Party.Initialize();
             if (ManagerRoot.DungeonMapState != null) ManagerRoot.DungeonMapState.ClearAllMapData();
             if (ManagerRoot.Module != null) ManagerRoot.Module.Initialize();

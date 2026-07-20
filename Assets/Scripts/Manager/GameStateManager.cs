@@ -14,6 +14,7 @@ public enum GameState
     Shop,        // 상점
     Elevator,    // 엘레베이터
     Terminal,    // 터미널 (순간이동)
+    Office,      // 사무실
 }
 
 namespace Manager
@@ -30,6 +31,7 @@ namespace Manager
         public GameObject shopCanvas;        // 상점 UI
         public GameObject elevatorCanvas;    // 엘레베이터 UI
         public GameObject terminalCanvas;    // 터미널 UI
+        public GameObject officeCanvas;      // 사무실 UI
 
         public BattleManager currentBattleManager;
         public ShopModeSelectUI shopUIController;
@@ -72,26 +74,23 @@ namespace Manager
         private void RefreshUIState()
         {
             // 아직 UI가 연결되지 않았다면 무시
-            if (eventCanvas == null || explorationCanvas == null || BattleCanvas == null || menuCanvas == null || 
-                shopCanvas == null || terminalCanvas == null || elevatorCanvas == null) return;
+            if (eventCanvas == null || explorationCanvas == null || BattleCanvas == null || menuCanvas == null) return;
             
             // 모든 캔버스 일단 끄기
             eventCanvas.SetActive(false);
             explorationCanvas.SetActive(false);
             BattleCanvas.SetActive(false);
             menuCanvas.SetActive(false);
-            shopCanvas.SetActive(false);
-            elevatorCanvas.SetActive(false);
-            terminalCanvas.SetActive(false);
+
+            if (shopCanvas != null) shopCanvas.SetActive(false);
+            if (elevatorCanvas != null) elevatorCanvas.SetActive(false);
+            if (terminalCanvas != null) terminalCanvas.SetActive(false);
+            if (officeCanvas != null) officeCanvas.SetActive(false);
 
             switch (CurrentState)
             {
                 case GameState.Event:
                     eventCanvas.SetActive(true);
-                    break;
-
-                case GameState.Elevator:
-                    elevatorCanvas.SetActive(true);
                     break;
 
                 case GameState.Exploration:
@@ -109,12 +108,21 @@ namespace Manager
                 case GameState.PlayerMenu:
                     menuCanvas.SetActive(true);
                     break;
+
+                case GameState.Elevator:
+                    if (elevatorCanvas != null) elevatorCanvas.SetActive(true);
+                    break;
+
                 case GameState.Shop:
-                    shopCanvas.SetActive(true);
+                    if (shopCanvas != null) shopCanvas.SetActive(true);
                     break;
 
                 case GameState.Terminal:
-                    terminalCanvas.SetActive(true);
+                    if (terminalCanvas != null) terminalCanvas.SetActive(true);
+                    break;
+
+                case GameState.Office:
+                    if (officeCanvas != null) officeCanvas.SetActive(true);
                     break;
 
                 case GameState.None:
@@ -126,9 +134,9 @@ namespace Manager
         // UI 등록 시 컨트롤러도 함께 등록받음
         public void RegisterSceneComponents(GameObject explCanvas, GameObject eventCanvas, DialogueUI dialogUI, GameObject menuCanvas,
                                             GameObject battleCanvas, BattleManager battleManager, 
-                                            GameObject shopCanvas, ShopModeSelectUI shopController,
-                                            GameObject terminalCanvas,
-                                            GameObject elevatorCanvas)
+                                            GameObject shopCanvas, ShopModeSelectUI shopController = null,
+                                            GameObject terminalCanvas = null, GameObject elevatorCanvas = null, 
+                                            GameObject officeCanvas = null)
         {
             this.explorationCanvas = explCanvas;
             this.eventCanvas = eventCanvas;
@@ -136,10 +144,12 @@ namespace Manager
             this.menuCanvas = menuCanvas;
             this.BattleCanvas = battleCanvas;
             this.currentBattleManager = battleManager;
+            
             this.shopCanvas = shopCanvas;
             this.shopUIController = shopController;
             this.elevatorCanvas = elevatorCanvas;
             this.terminalCanvas = terminalCanvas;
+            this.officeCanvas = officeCanvas;
 
             RefreshUIState();
         }

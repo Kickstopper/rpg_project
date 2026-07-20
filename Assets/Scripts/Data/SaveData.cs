@@ -32,7 +32,6 @@ namespace Data
         // 플레이어 위치
         public int playerPosX;
         public int playerPosY;
-
         public Direction playerDirection;
 
         // 3D 던전
@@ -51,6 +50,10 @@ namespace Data
         public List<CharacterSaveData> partyMembers = new List<CharacterSaveData>();
         // 해금된(한 번이라도 영입한) 전체 동료 명부
         public List<CharacterSaveData> unlockedRoster = new List<CharacterSaveData>();
+
+        // 퀘스트 저장용 리스트
+        public List<string> completedQuestIDs = new List<string>();
+        public List<string> activeQuestIDs = new List<string>();
 
         // 이벤트 플래그
         public List<string> eventFlags = new List<string>();

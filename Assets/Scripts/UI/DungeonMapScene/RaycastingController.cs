@@ -1232,6 +1232,10 @@ namespace Controller
                 {
                     ShowRoomName("TERMINAL"); // 일단 무조건 TERMINAL
                 }
+                else if (frontEntrance.type == EntranceType.Office) 
+                {
+                    ShowRoomName("OFFICE"); // 일단 무조건 OFFICE
+                }
                 else HideRoomName();
             }
             else
@@ -1485,6 +1489,47 @@ namespace Controller
                 }
 
                 ManagerRoot.GameState.ChangeState(GameState.Exploration);
+            }
+            else if (entrance.type == EntranceType.Office)
+            {
+                if (ManagerRoot.GameState != null)
+                {
+                    ManagerRoot.GameState.ChangeState(GameState.Office);
+                    
+                    // 비활성화된 OfficeCanvas 하위의 OfficeUIController를 찾아 OpenOffice() 실행
+                    var officeUI = UnityEngine.Object.FindFirstObjectByType<UI.Office.OfficeUIController>(FindObjectsInactive.Include);
+                    if (officeUI != null) officeUI.OpenOffice();
+                }
+
+                // OfficeUIController의 OnExitClicked()가 실행되어 상태가 Exploration으로 돌아올 때까지 대기
+                yield return new WaitUntil(() => ManagerRoot.GameState.CurrentState != GameState.Office);
+
+                // 상점을 나설 때처럼 180도 회전
+                int reverseDir = (_player.DirectionIdx + 2) % 4; 
+                
+                Vector2 originalPos = _player.GetOffsetPosition(preEntranceLogicX, preEntranceLogicY, reverseDir);
+                _player.SetDirectPosition(originalPos.x, originalPos.y, reverseDir);
+
+                if (compassUI) compassUI.SetDirection(reverseDir);
+                if (miniMap) miniMap.SnapToGrid(preEntranceLogicX, preEntranceLogicY, reverseDir);
+                
+                UpdateMapDiscovery(preEntranceLogicX, preEntranceLogicY);
+
+                // 페이드 인 복귀
+                if (fadeOverlay != null)
+                {
+                    float elapsedFade = 0f;
+                    float fadeDuration = 0.5f;
+                    
+                    while (elapsedFade < fadeDuration)
+                    {
+                        elapsedFade += Time.deltaTime;
+                        fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsedFade / fadeDuration);
+                        yield return null;
+                    }
+                    fadeOverlay.alpha = 0f;
+                    fadeOverlay.blocksRaycasts = false;
+                }
             }
 
             _inputLocked = false;
