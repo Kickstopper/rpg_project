@@ -13,30 +13,30 @@ namespace UI
 
         void OnEnable()
         {
-            if (WeatherManager.Instance != null)
+            if (ManagerRoot.Weather != null)
             {
                 UpdateUI(); 
                 
-                WeatherManager.Instance.OnWeatherUpdated += UpdateUI; 
+                ManagerRoot.Weather.OnWeatherUpdated += UpdateUI; 
             }
         }
 
         private void OnDisable()
         {
-            if (WeatherManager.Instance != null)
+            if (ManagerRoot.Weather != null)
             {
-                WeatherManager.Instance.OnWeatherUpdated -= UpdateUI;
+                ManagerRoot.Weather.OnWeatherUpdated -= UpdateUI;
             }
         }
 
         private void UpdateUI()
         {
-            if (WeatherManager.Instance != null)
+            if (ManagerRoot.Weather != null)
             {
-                if (locationTxt) locationTxt.text = WeatherManager.Instance.CurrentCity;
-                if (weatherTxt) weatherTxt.text = WeatherManager.Instance.CurrentWeather;
-                if (temperTxt) temperTxt.text = $"{WeatherManager.Instance.CurrentTemp}°C";
-                if (timeTxt) timeTxt.text = WeatherManager.Instance.CurrentLocalTime.ToString("HH:mm");
+                if (locationTxt) locationTxt.text = ManagerRoot.Weather.CurrentCity;
+                if (weatherTxt) weatherTxt.text = ManagerRoot.Weather.CurrentWeather;
+                if (temperTxt) temperTxt.text = $"{ManagerRoot.Weather.CurrentTemp}°C";
+                if (timeTxt) timeTxt.text = ManagerRoot.Weather.CurrentLocalTime.ToString("HH:mm");
             }
             else
             {

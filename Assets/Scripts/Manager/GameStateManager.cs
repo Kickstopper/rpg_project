@@ -21,8 +21,6 @@ namespace Manager
 {
     public class GameStateManager : MonoBehaviour
     {
-        public static GameStateManager Instance;
-
         [Header("UI Groups")]
         public GameObject eventCanvas;       // 이벤트 UI
         public GameObject explorationCanvas; // 탐험용 UI
@@ -46,15 +44,7 @@ namespace Manager
 
         void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                ChangeState(GameState.Exploration);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            ChangeState(GameState.Exploration);
         }
 
         public void ChangeState(GameState newState)

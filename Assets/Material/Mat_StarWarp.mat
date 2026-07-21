@@ -41,18 +41,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _CustomTime: 23.763773
-    - _Density: 100
+    - _CustomTime: 6.5424023
+    - _Density: 70
     - _EnableExternalAlpha: 0
-    - _MasterAlpha: 0.18663049
+    - _MasterAlpha: 1
     - _Speed: 5
     - _StarSizeMax: 0.2
     - _StarSizeMin: 0.1
-    - _Stretch: 2.7994573
+    - _Stretch: 0.2
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _ViewOffset: {r: 0, g: 0, b: 0, a: 0}
+    - _ViewOffset: {r: 0.0146820545, g: -0.058288444, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

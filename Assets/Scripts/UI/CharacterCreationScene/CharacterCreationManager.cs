@@ -52,7 +52,7 @@ namespace UI.CharacterCreationScene
             switch (currentStep)
             {
                 case CreationStep.PlayerName:
-                    if (SoundManager.Instance != null)
+                    if (ManagerRoot.Sound != null)
                         ManagerRoot.Sound.PlayBGM(BgmID.LevelUp);
                     titleText.text = "당신의 이름을 입력하세요";
 
@@ -72,7 +72,7 @@ namespace UI.CharacterCreationScene
                     break;
 
                 case CreationStep.PlayerStats:
-                    if (SoundManager.Instance != null)
+                    if (ManagerRoot.Sound != null)
                         ManagerRoot.Sound.PlayBGM(BgmID.LevelUp);
                     nameInputPanel.SetActive(false);
                     levelUpPanel.SetActive(true);
@@ -83,7 +83,7 @@ namespace UI.CharacterCreationScene
                     break;
 
                 case CreationStep.PartnerStats:
-                    if (SoundManager.Instance != null)
+                    if (ManagerRoot.Sound != null)
                     {
                         ManagerRoot.Sound.StopBGM(false);
                         ManagerRoot.Sound.PlayBGM(BgmID.LevelUp);

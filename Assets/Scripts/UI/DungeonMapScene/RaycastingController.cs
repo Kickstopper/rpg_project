@@ -1376,7 +1376,7 @@ namespace Controller
 
                 while (true)
                 {
-                    TerminalManager.Instance.UnlockTerminal(currentTerminalID);
+                    ManagerRoot.Terminal.UnlockTerminal(currentTerminalID);
                     TerminalUIManager.Instance.OpenTerminal(currentTerminalID);
 
                     yield return new WaitUntil(() => TerminalUIManager.Instance.IsSelectionComplete);
@@ -1733,7 +1733,7 @@ namespace Controller
             {
                 foreach (string monID in theme.monsterList)
                 {
-                    var entry = DatabaseManager.Instance.monsterDB.GetEntry(monID);
+                    var entry = ManagerRoot.Database.monsterDB.GetEntry(monID);
                     if (entry != null && !_monsterBaseTexMap.ContainsKey(monID))
                     {
                         // 현재 카운트를 이 몬스터의 시작 인덱스로 저장

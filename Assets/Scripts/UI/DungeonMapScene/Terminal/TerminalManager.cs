@@ -21,22 +21,11 @@ namespace Manager
 
     public class TerminalManager : MonoBehaviour
     {
-        public static TerminalManager Instance { get; private set; }
-
         [Header("전체 터미널 DB")]
         public List<TerminalData> allTerminals = new List<TerminalData>();
 
         // 플레이어가 지금까지 방문해서 활성화시킨 터미널 ID 목록 (저장/불러오기 대상)
         private HashSet<string> _unlockedTerminals = new HashSet<string>();
-
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else Destroy(gameObject);
-        }
 
         // 터미널 방에 진입했을 때 호출하여 해금
         public void UnlockTerminal(string terminalID)

@@ -69,7 +69,7 @@ namespace UI
 
         public void Initialize(string eventID, Action<int> onComplete = null)
         {
-            currentEventLines = DialogueManager.Instance.GetEventData(eventID);
+            currentEventLines = ManagerRoot.Dialogue.GetEventData(eventID);
             if (currentEventLines == null || currentEventLines.Count == 0) return;
             
             OnDialogueFinished = onComplete; 

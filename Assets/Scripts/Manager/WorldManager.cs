@@ -6,7 +6,6 @@ namespace Manager
 {
     public class WorldManager : MonoBehaviour
     {
-        public static WorldManager Instance;
         public bool isLoadGame = false;
         public Vector3 loadedPosition;
 
@@ -21,16 +20,7 @@ namespace Manager
 
         private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                
-                InitializeRegionThemes();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            InitializeRegionThemes();
         }
 
         // 테마 리스트를 딕셔너리로 변환 (빠른 검색)

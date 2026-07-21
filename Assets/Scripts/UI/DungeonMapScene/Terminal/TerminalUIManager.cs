@@ -77,7 +77,7 @@ namespace UI
             warp.gameObject.SetActive(false);
 
             digitalRain.alpha = 0f;
-            List<TerminalData> availableList = TerminalManager.Instance.GetAvailableTerminals(currentTerminalID);
+            List<TerminalData> availableList = ManagerRoot.Terminal.GetAvailableTerminals(currentTerminalID);
 
             // 데이터 맵핑 (모자란 부분은 null로 채워 빈 슬롯 생성)
             for (int i = 0; i < TOTAL_BUTTONS; i++)

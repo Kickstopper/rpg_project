@@ -11,15 +11,6 @@ namespace Manager
         [Header("Reference Data")]
         public List<ShopData> shopDatas;
 
-        void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else Destroy(gameObject);
-        }
-
         public ShopData GetShopData(string shopID)
         {
             return shopDatas.Find(shop => shop.shopID == shopID);

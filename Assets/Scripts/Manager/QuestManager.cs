@@ -7,25 +7,11 @@ namespace Manager
 {
     public class QuestManager : MonoBehaviour
     {
-        public static QuestManager Instance;
-        
         private List<QuestData> allQuests = new List<QuestData>();
 
         // 퀘스트 상태를 메모리에서 관리하는 딕셔너리
         private Dictionary<string, bool> completedQuests = new Dictionary<string, bool>();
         private Dictionary<string, QuestProgress> activeQuests = new Dictionary<string, QuestProgress>();
-
-        void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
 
         // 게임 실행 시 CSV에서 읽어온 데이터를 주입
         public void InitializeQuests(List<QuestData> questDataList)

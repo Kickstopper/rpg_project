@@ -86,7 +86,7 @@ namespace Manager
             if (gameSettingManager == null) gameSettingManager = GetComponentInChildren<GameSettingManager>();
             if (databaseManager == null) databaseManager = GetComponentInChildren<DatabaseManager>();
             if (questManager == null) questManager = GetComponentInChildren<QuestManager>();
-            questManager?.InitializeQuests(databaseManager.questDB.db);
+            questManager.InitializeQuests(databaseManager.questDB.db);
             
             if (dialogueManager == null) dialogueManager = GetComponentInChildren<DialogueManager>();
             if (gameStateManager == null) gameStateManager = GetComponentInChildren<GameStateManager>();

@@ -53,7 +53,7 @@ namespace UI.IntroScene
 
         private void Start()
         {
-            if (SoundManager.Instance != null && bgmId != BgmID.None)
+            if (ManagerRoot.Sound != null && bgmId != BgmID.None)
             {
                 ManagerRoot.Sound.PlayBGM(bgmId, 1, false);
             }

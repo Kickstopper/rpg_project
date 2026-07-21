@@ -7,8 +7,6 @@ namespace Manager
 {
     public class DungeonMapStateManager : MonoBehaviour
     {
-        public static DungeonMapStateManager Instance;
-
         [Header("Current Session Data")]
         public string currentDungeonId; // 현재 맵 ID
         public int currentPx { get; private set; }    
@@ -17,15 +15,6 @@ namespace Manager
 
         // 모든 맵의 방문 상태를 관리하는 Dictionary. MapID가 Key
         private Dictionary<string, DungeonMapState> _mapStates = new Dictionary<string, DungeonMapState>();
-
-        void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else Destroy(gameObject);
-        }
 
         /// <summary>
         /// 플레이어의 위치 정보를 갱신.

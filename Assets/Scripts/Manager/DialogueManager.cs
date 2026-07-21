@@ -5,8 +5,6 @@ namespace Manager
 {
     public class DialogueManager : MonoBehaviour
     {
-        public static DialogueManager Instance;
-        
         [Header("Data Files")]
         public TextAsset negotiationCSV; // 인스펙터에서 할당
         public TextAsset eventScriptsCSV; // 인스펙터에서 할당
@@ -16,15 +14,7 @@ namespace Manager
 
         void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                LoadData();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            LoadData();
         }
 
         void LoadData()

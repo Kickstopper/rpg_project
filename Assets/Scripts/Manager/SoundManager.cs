@@ -8,7 +8,6 @@ namespace Manager
 {
     public class SoundManager : MonoBehaviour
     {
-        public static SoundManager Instance;
         [Header("Library")]
         [SerializeField] private AudioLibrary AudioLibrary;
         
@@ -29,18 +28,8 @@ namespace Manager
 
         private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                
-                InitializeSFXPool();
-                if (AudioLibrary != null)
-                    AudioLibrary.Initialize();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            InitializeSFXPool();
+            if (AudioLibrary != null) AudioLibrary.Initialize();
         }
 
         private void InitializeSFXPool()

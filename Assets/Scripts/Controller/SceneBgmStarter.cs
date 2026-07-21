@@ -12,7 +12,7 @@ namespace Controller
 
         void Start()
         {
-            if (SoundManager.Instance != null)
+            if (ManagerRoot.Sound != null)
             {
                 ManagerRoot.Sound.PlayBGM(bgmID, volume);
             }

@@ -6,17 +6,6 @@ namespace Manager
 {
     public class EffectManager : MonoBehaviour
     {
-        public static EffectManager Instance;
-
-        void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else Destroy(gameObject);
-        }
-
         /// <summary>
         /// 아이템/스킬의 효과를 데이터(Model)에 반영하고 UI 갱신을 요청합니다.
         /// </summary>

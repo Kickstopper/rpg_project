@@ -2059,7 +2059,7 @@ namespace Controller
 
             var sourceData = targetMonster.sourceData;
             
-            List<Dictionary<string, string>> negotiationLines = DialogueManager.Instance.GetNegotiationDialogues(sourceData);
+            List<Dictionary<string, string>> negotiationLines = ManagerRoot.Dialogue.GetNegotiationDialogues(sourceData);
 
             if (negotiationLines != null && negotiationLines.Count > 0)
             {
@@ -2361,7 +2361,7 @@ namespace Controller
                     var battleTarget = targetObj.GetComponent<IBattleTarget>();
                     if (battleTarget != null)
                     {
-                        bool success = EffectManager.Instance.ApplyEffect(battleTarget, item);
+                        bool success = ManagerRoot.Effect.ApplyEffect(battleTarget, item);
                         
                         if (success)
                         {
@@ -2447,7 +2447,7 @@ namespace Controller
                     var battleTarget = targetObj.GetComponent<IBattleTarget>();
                     if (battleTarget != null)
                     {
-                        bool success = EffectManager.Instance.ApplyEffect(battleTarget, skill);
+                        bool success = ManagerRoot.Effect.ApplyEffect(battleTarget, skill);
                         
                         if (success)
                         {

@@ -10,8 +10,6 @@ namespace Manager
 {
     public class ModuleManager : MonoBehaviour
     {
-        public static ModuleManager Instance;
-
         [Header("Configuration")]
         public int maxBlockSize = 10;
 
@@ -35,36 +33,28 @@ namespace Manager
         
         private void Awake()
         {
-            if (Instance == null)
+            _moduleLookup = new Dictionary<ModuleFeature, GameModuleData>();
+            foreach (var module in moduleDatabase)
             {
-                Instance = this;
-                
-                _moduleLookup = new Dictionary<ModuleFeature, GameModuleData>();
-                foreach (var module in moduleDatabase)
-                {
-                    if (!_moduleLookup.ContainsKey(module.feature))
-                        _moduleLookup.Add(module.feature, module);
-                }
-
-                expansionBoard = new ModuleFeature[gridWidth, gridHeight];
-
-                // 인스펙터에 설정된 초기 상태를 백업(Deep Copy)
-                _defaultMaxBlockSize = maxBlockSize;
-                _defaultOwnedModules = new List<ModuleFeature>(ownedModules);
-                
-                // PlacedModuleData는 참조형이므로 메모리 주소가 꼬이지 않게 new로 깊은 복사
-                _defaultMountedModules = new List<PlacedModuleData>();
-                foreach (var m in mountedModules)
-                {
-                    _defaultMountedModules.Add(new PlacedModuleData { feature = m.feature, x = m.x, y = m.y, rotation = m.rotation });
-                }
-
-                // 백업된 데이터를 바탕으로 초기 보드 세팅
-                Initialize();
-
-                
+                if (!_moduleLookup.ContainsKey(module.feature))
+                    _moduleLookup.Add(module.feature, module);
             }
-            else Destroy(gameObject);
+
+            expansionBoard = new ModuleFeature[gridWidth, gridHeight];
+
+            // 인스펙터에 설정된 초기 상태를 백업(Deep Copy)
+            _defaultMaxBlockSize = maxBlockSize;
+            _defaultOwnedModules = new List<ModuleFeature>(ownedModules);
+            
+            // PlacedModuleData는 참조형이므로 메모리 주소가 꼬이지 않게 new로 깊은 복사
+            _defaultMountedModules = new List<PlacedModuleData>();
+            foreach (var m in mountedModules)
+            {
+                _defaultMountedModules.Add(new PlacedModuleData { feature = m.feature, x = m.x, y = m.y, rotation = m.rotation });
+            }
+
+            // 백업된 데이터를 바탕으로 초기 보드 세팅
+            Initialize();
         }
 
         // New Game 버튼을 눌렀을 때 호출될 함수

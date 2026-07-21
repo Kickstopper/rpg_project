@@ -6,8 +6,6 @@ namespace Manager
 {
     public class DungeonManager : MonoBehaviour
     {
-        public static DungeonManager Instance;
-
         [Header("맵 데이터 리스트 (json)")]
         public List<TextAsset> mapJsonFiles; // 인스펙터에서 할당
         
@@ -36,16 +34,8 @@ namespace Manager
         public DungeonMapState CurrentDungeonState { get; private set; }
         private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                InitializeDungeonThemes();
-                InitializeMapAssets();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            InitializeDungeonThemes();
+            InitializeMapAssets();
         }
 
         // 던전 데이터 사전 초기화

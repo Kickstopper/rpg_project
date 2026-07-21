@@ -289,7 +289,7 @@ namespace Controller
                 {
                     if (pc.IsEmpty) continue;
                     
-                    if (EffectManager.Instance.ApplyEffect(pc, selectedSkillData))
+                    if (ManagerRoot.Effect.ApplyEffect(pc, selectedSkillData))
                     {
                         success = true;
                     }
@@ -297,7 +297,7 @@ namespace Controller
             }
             else if (scope == TargetScope.Self)
             {
-                if (EffectManager.Instance.ApplyEffect(currentCaster, selectedSkillData))
+                if (ManagerRoot.Effect.ApplyEffect(currentCaster, selectedSkillData))
                 {
                     success = true;
                 }
@@ -306,7 +306,7 @@ namespace Controller
             {
                 if (!partyControllers[currentTargetIndex].IsEmpty)
                 {
-                    if (EffectManager.Instance.ApplyEffect(partyControllers[currentTargetIndex], selectedSkillData))
+                    if (ManagerRoot.Effect.ApplyEffect(partyControllers[currentTargetIndex], selectedSkillData))
                     {
                         success = true;
                     }

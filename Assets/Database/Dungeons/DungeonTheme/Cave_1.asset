@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: Cave_1
   m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
   dungeonID: Cave_1
+  bgmID: 8
   useWakeUpEffect: 0
+  monsterList: []
+  maxEnemyCount: 2
   encounterMode: 1
+  maxSpawnCount: 3
+  spawnDelay: 5
   background: {fileID: 0}
   texture:
   - {fileID: 2800000, guid: ea3c7562c44281047aa28b21fd7706be, type: 3}
@@ -23,20 +28,16 @@ MonoBehaviour:
   - {fileID: 2800000, guid: e04341259aac88a4daa6b0c23517c82d, type: 3}
   - {fileID: 2800000, guid: 68575b7cb8d03694caea0f536954d17a, type: 3}
   - {fileID: 2800000, guid: add88eab5daa2b94f9d123e661500149, type: 3}
-  floorTexIdx: 4
   ceilingTexIdx: 3
+  floorTexIdx: 4
+  passableWallTexIDs: 
   doorAnimations: []
-  enemySprites: []
-  objectSprites: []
-  maxSpawnCount: 3
-  spawnDelay: 5
   wallAnimations: []
+  objectSprites: []
   fogColor: {r: 0.04970444, g: 0.052289385, b: 0.6754716, a: 1}
   lightingIntensity: 0.25
   useGridLighting: 0
-  bgmID: 7
   moduleEnable: 1
-  monsterList: []
   useDustEffect: 1
   dustParticleCount: 300
   dustSwayAmplitude: 0.01

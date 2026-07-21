@@ -7,8 +7,6 @@ namespace Manager
 {
     public class WeatherManager : MonoBehaviour
     {
-        public static WeatherManager Instance { get; private set; }
-
         public event Action OnWeatherUpdated;
 
         [Serializable]
@@ -47,19 +45,6 @@ namespace Manager
         public float CurrentTemp { get; private set; } = 0f;
         public DateTime CurrentLocalTime { get; private set; }
         private float updateInterval = 600f; // 10분
-
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-                return;
-            }
-        }
 
         private void Start()
         {

@@ -19,8 +19,6 @@ namespace Manager
 
     public class InventoryManager : MonoBehaviour
     {
-        public static InventoryManager Instance;
-
         // 아이템 ID와 수량을 저장하는 딕셔너리
         public Dictionary<string, int> inventoryDict = new Dictionary<string, int>();
 
@@ -29,23 +27,17 @@ namespace Manager
         
         private int money;
 
-        void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else Destroy(gameObject);
-        }
-
         void InitializeInventory()
         {
             inventoryDict.Clear();
             
             // 테스트용 아이템 지급
-            foreach(var item in startingItems)
+            if (startingItems != null)
             {
-                AddItem(item.id, 3); // 각 3개씩 지급
+                foreach(var item in startingItems)
+                {
+                    AddItem(item.id, 3); // 각 3개씩 지급
+                }
             }
         }
 

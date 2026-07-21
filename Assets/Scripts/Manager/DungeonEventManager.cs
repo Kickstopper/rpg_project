@@ -6,8 +6,6 @@ namespace Manager
 {
     public class DungeonEventManager : MonoBehaviour
     {
-        public static DungeonEventManager Instance;
-
         [Header("Data Files")]
         public TextAsset mapTriggerCSV; // 인스펙터에서 할당
 
@@ -17,17 +15,7 @@ namespace Manager
 
         void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                
-                
-                LoadTriggerData();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            LoadTriggerData();
         }
         
         public void SetCurrentMapID(string mapID)

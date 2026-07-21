@@ -57,7 +57,7 @@ namespace Controller
             if (isProgress || isTransitioning) return;
             if (Input.anyKeyDown)
             {
-                if (SoundManager.Instance != null)
+                if (ManagerRoot.Sound != null)
                 {
                     ManagerRoot.Sound.StopAllSFX(true, 1);
                     ManagerRoot.Sound.StopBGM();
@@ -115,7 +115,7 @@ namespace Controller
             if (isTransitioning) return;
             
             isTransitioning = true;
-            if (SoundManager.Instance != null)
+            if (ManagerRoot.Sound != null)
             {
                 ManagerRoot.Sound.StopAllSFX(true, 1);
                 ManagerRoot.Sound.StopBGM();

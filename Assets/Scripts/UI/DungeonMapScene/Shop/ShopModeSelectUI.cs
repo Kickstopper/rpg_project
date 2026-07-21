@@ -314,7 +314,7 @@ namespace UI.Shop
 
         private void CloseShop()
         {
-            if (SoundManager.Instance != null)
+            if (ManagerRoot.Sound != null)
             {
                 if (prevBgmID != BgmID.None)
                     ManagerRoot.Sound.PlayBGM(prevBgmID);

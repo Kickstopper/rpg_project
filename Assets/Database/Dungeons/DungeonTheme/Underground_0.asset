@@ -13,11 +13,17 @@ MonoBehaviour:
   m_Name: Underground_0
   m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
   dungeonID: Underground_0
+  bgmID: 7
   useWakeUpEffect: 0
-  encounterMode: 1
   monsterList:
-  - enemy_000
-  - enemy_001
+  - enemy_004
+  - enemy_005
+  - enemy_006
+  - enemy_007
+  maxEnemyCount: 2
+  encounterMode: 1
+  maxSpawnCount: 5
+  spawnDelay: 5
   background: {fileID: 0}
   texture:
   - {fileID: 2800000, guid: dc179bea276f2534eaeec81487282600, type: 3}
@@ -42,12 +48,9 @@ MonoBehaviour:
     animSpeed: 0.05
   wallAnimations: []
   objectSprites: []
-  maxSpawnCount: 5
-  spawnDelay: 5
   fogColor: {r: 0, g: 1, b: 0, a: 1}
   lightingIntensity: 0.55
   useGridLighting: 0
-  bgmID: 7
   moduleEnable: 1
   useDustEffect: 1
   dustParticleCount: 300

@@ -6,8 +6,6 @@ namespace Manager
 {
     public class DatabaseManager : MonoBehaviour
     {
-        public static DatabaseManager Instance;
-
         [Header("Databases")]
         public CharacterDatabase charDB;
         public MonsterDatabase monsterDB;
@@ -22,24 +20,15 @@ namespace Manager
 
         void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                
-                // 게임 시작 시 딕셔너리 초기화
-                charDB.Initialize();
-                monsterDB.Initialize();
-                weaponDB.Initialize();
-                ammoDB.Initialize();
-                armorDB.Initialize();
-                skillDB.Initialize();
-                spiritDB.Initialize();
-                questDB.Initialize();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            // 게임 시작 시 딕셔너리 초기화
+            charDB.Initialize();
+            monsterDB.Initialize();
+            weaponDB.Initialize();
+            ammoDB.Initialize();
+            armorDB.Initialize();
+            skillDB.Initialize();
+            spiritDB.Initialize();
+            questDB.Initialize();
         }
         
         // ID 하나로 모든 아이템 DB를 검색하여 반환하는 통합 함수

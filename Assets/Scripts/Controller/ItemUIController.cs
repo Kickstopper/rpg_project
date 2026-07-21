@@ -530,7 +530,7 @@ namespace Controller
             IBattleTarget battleTarget = targetPC;
 
             // EffectManager 호출 (데이터 수정 -> UI 갱신 자동 수행)
-            if (EffectManager.Instance.ApplyEffect(battleTarget, selectedItemData))
+            if (ManagerRoot.Effect.ApplyEffect(battleTarget, selectedItemData))
             {
                 // 아이템 소모 (인벤토리 반영)
                 ManagerRoot.Inventory.UseItem(selectedItemData.id);

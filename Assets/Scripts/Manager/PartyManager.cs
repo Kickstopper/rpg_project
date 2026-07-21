@@ -10,22 +10,11 @@ namespace Manager
     {
         public const int MAX_PARTY_SIZE = 6; // 파티 최대 인원 설정
 
-        public static PartyManager Instance;
-        
         // ID 목록 대신 실제 데이터 리스트 사용
         public List<RuntimeCharacterData> partyData = new List<RuntimeCharacterData>();
         
         // 한 번이라도 영입된 적 있는 모든 캐릭터의 원본 데이터를 보관하는 사전
         public Dictionary<string, RuntimeCharacterData> unlockedRoster = new Dictionary<string, RuntimeCharacterData>();
-
-        void Awake()
-        {
-            if (Instance == null) 
-            { 
-                Instance = this; 
-            }
-            else Destroy(gameObject);
-        }
 
         // 저장 시, SaveManager가 호출할 메서드
         public void SaveToData(SaveData data)

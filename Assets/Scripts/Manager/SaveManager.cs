@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.IO;
-using Controller;
 using Data;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
@@ -8,18 +7,7 @@ namespace Manager
 {
     public class SaveManager : MonoBehaviour
     {
-        public static SaveManager Instance;
-
         public const int SUSPEND_SLOT_INDEX = -1;
-
-        void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else Destroy(gameObject);
-        }
 
         // 슬롯 번호에 따른 파일명 분기
         private string GetSavePath(int slotIndex)
