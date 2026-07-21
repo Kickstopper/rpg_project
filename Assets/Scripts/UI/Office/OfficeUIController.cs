@@ -88,7 +88,7 @@ namespace UI.Office
                     ManagerRoot.Quest.CompleteQuest(q.QuestID); 
                     
                     // 용도 폐기된 Ready 플래그 제거 (선택 사항)
-                    ManagerRoot.Flag.AddFlag($"QuestReady_{q.QuestID}");
+                    ManagerRoot.Flag.SetFlag($"QuestReady_{q.QuestID}", false);
 
                     // TODO: 유저에게 보상 획득을 알리는 팝업 UI 표시
                     // 예: ManagerRoot.UI.ShowAlertPopup($"{q.QuestName} 완료! {q.Reward}G 획득!");

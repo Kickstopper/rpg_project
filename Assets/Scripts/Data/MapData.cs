@@ -37,6 +37,7 @@ namespace Data
         public int height;
         public string mapID;
         public string themeName; // JSON에서 불러올 테마 이름
+        public string LocationID; // 여러 맵이 공유하는 상위 지역의 ID. 퀘스트 등에서 참조
         
         public int startX; // 플레이어의 시작 좌표
         public int startY; // 플레이어의 시작 좌표

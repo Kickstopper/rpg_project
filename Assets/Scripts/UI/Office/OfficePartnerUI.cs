@@ -17,7 +17,7 @@ namespace UI.Office
         private List<PartnerSlotUI> spawnedSlots = new List<PartnerSlotUI>();
         private string currentPartnerID = "";
 
-        // [추가] 포커스 제어용 변수
+        // 포커스 제어용 변수
         private int currentSlotIndex = 0;
         private float inputCooldown = 0f;
 
@@ -106,10 +106,10 @@ namespace UI.Office
 
         void Update()
         {
-            // [추가] 쿨타임 감소 로직
+            // 쿨타임 감소 로직
             if (inputCooldown > 0) inputCooldown -= Time.deltaTime;
 
-            // [추가] 방향키 입력 처리
+            // 방향키 입력 처리
             if (spawnedSlots.Count > 0 && inputCooldown <= 0f)
             {
                 bool moved = false;

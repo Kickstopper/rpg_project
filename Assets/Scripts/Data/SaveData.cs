@@ -14,6 +14,7 @@ namespace Data
             this.count = count;
         }
     }
+    
     [Serializable]
     public class PlacedModuleData
     {
@@ -22,6 +23,16 @@ namespace Data
         public int y;
         public int rotation; // rotation값 * 90도로 회전함
     }
+    
+    [Serializable]
+    public class QuestProgress
+    {
+        public string questID;
+        // 몬스터ID를 Key로, 현재 토벌한 마릿수를 Value로 저장합니다.
+        public Dictionary<string, int> killCounts = new Dictionary<string, int>(); 
+        public bool isReadyToReport = false;
+    }
+    
     [Serializable]
     public class SaveData
     {
@@ -53,7 +64,7 @@ namespace Data
 
         // 퀘스트 저장용 리스트
         public List<string> completedQuestIDs = new List<string>();
-        public List<string> activeQuestIDs = new List<string>();
+        public List<QuestProgress> activeQuests = new List<QuestProgress>();
 
         // 이벤트 플래그
         public List<string> eventFlags = new List<string>();
