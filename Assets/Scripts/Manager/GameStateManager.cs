@@ -4,6 +4,7 @@ using System;
 using Controller;
 using UI.Shop;
 using UI;
+using UI.Battle;
 public enum GameState
 {
     None,

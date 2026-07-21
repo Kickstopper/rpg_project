@@ -7,6 +7,7 @@ using TMPro;
 using UI.Common;
 using UnityEngine.EventSystems;
 using System;
+using UI.Battle;
 
 namespace Controller
 {

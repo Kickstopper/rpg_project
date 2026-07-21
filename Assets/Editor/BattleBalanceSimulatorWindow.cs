@@ -1,10 +1,9 @@
 using UnityEngine;
 using UnityEditor;
-using Controller;
 using Helper;
-using Data;
 using System.Collections.Generic;
 using System.Linq;
+using UI.Battle;
 
 public class BattleBalanceSimulatorWindow : EditorWindow
 {

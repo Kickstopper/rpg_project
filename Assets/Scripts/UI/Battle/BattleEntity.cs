@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Controller
+namespace UI.Battle
 {
     [System.Serializable]
     public class ActiveEffect

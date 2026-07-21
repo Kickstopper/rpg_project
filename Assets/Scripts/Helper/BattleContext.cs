@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Controller;
+using UI.Battle;
 
 namespace Helper
 {

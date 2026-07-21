@@ -7,11 +7,11 @@ using UI.DungeonMapScene;
 using TMPro;
 using UnityEngine.EventSystems;
 using Data;
-using UI;
 using DG.Tweening;
 using Helper;
 using Manager;
-namespace Controller
+using Controller;
+namespace UI.Battle
 {
     public enum BattleState { Start, PlayerInput, EnemyInput, Processing, Won, Lost }
     public enum EncounterType { Normal, Preemptive, Ambush, Random }

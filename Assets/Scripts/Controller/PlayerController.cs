@@ -9,7 +9,7 @@ using DG.Tweening;
 using System.Linq;
 using Helper;
 
-namespace Controller
+namespace UI.Battle
 {
     public class PlayerController : BattleEntity, IBattleTarget
     {

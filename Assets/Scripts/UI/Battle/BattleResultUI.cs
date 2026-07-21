@@ -6,7 +6,7 @@ using Manager;
 using UnityEngine.EventSystems;
 using Data;
 
-namespace Controller
+namespace UI.Battle
 {
     public class BattleResultUI : MonoBehaviour
     {

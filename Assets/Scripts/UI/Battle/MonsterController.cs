@@ -7,7 +7,7 @@ using Manager;
 using Helper;
 using System.Linq;
 
-namespace Controller
+namespace UI.Battle
 {
     public class MonsterController : BattleEntity, IBattleTarget
     {

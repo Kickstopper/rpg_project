@@ -11,6 +11,7 @@ using TMPro;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
 using Helper;
+using UI.Battle;
 
 namespace Controller
 {

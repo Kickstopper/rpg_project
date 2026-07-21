@@ -1,9 +1,9 @@
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
-using Controller;
 using Helper;
 using UI.DungeonMapScene;
+using UI.Battle;
 
 namespace Data.AI
 {
@@ -58,5 +58,6 @@ namespace Data.AI
             int speed = self.sourceData.stats.agi + Random.Range(0, 5);
             return new BattleAction(self.gameObject, target.gameObject, UI.ActionType.Attack, speed);
         }
+        
     }
 }

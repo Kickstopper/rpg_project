@@ -5,7 +5,7 @@ using DG.Tweening;
 using Data;
 using Manager;
 using Helper;
-namespace Controller
+namespace UI.Battle
 {
     public class ResultMemberSlot : MonoBehaviour
     {

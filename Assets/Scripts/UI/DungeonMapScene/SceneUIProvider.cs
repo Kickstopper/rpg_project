@@ -3,6 +3,7 @@ using Manager;
 using Controller;
 using UI.Shop;
 using UI;
+using UI.Battle;
 
 public class SceneUIProvider : MonoBehaviour
 {

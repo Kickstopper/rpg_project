@@ -1,6 +1,6 @@
 using UnityEngine;
 using Data;
-using Controller;
+using UI.Battle;
 
 namespace Manager
 {

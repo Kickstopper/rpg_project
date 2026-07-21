@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Linq;
-using Controller;
 using Helper;
 using UI.DungeonMapScene;
+using UI.Battle;
 
 namespace Data.AI
 {
