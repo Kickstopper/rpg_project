@@ -50,6 +50,11 @@ namespace UI
         private CanvasGroup _containerCanvasGroup;
         private GridLayoutGroup _gridLayoutGroup;
         private GameObject _lastSelectedObject;
+
+        // 취소 시 현재 있는 층에서 내리기 위해 현재 층 데이터를 기억할 변수
+        private FloorData _currentFloorData;
+        private bool _hasCurrentFloor;
+
         private void Awake()
         {
             Instance = this;
@@ -92,6 +97,16 @@ namespace UI
             // 엘리베이터 UI가 켜져 있고 층 선택이 안 끝난 상태일 때만 작동
             if (gameObject.activeSelf && !IsSelectionComplete && EventSystem.current != null)
             {
+                // 취소 키를 누르면 현재 층을 선택하여 내림
+                if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
+                {
+                    if (_hasCurrentFloor)
+                    {
+                        SelectFloor(_currentFloorData);
+                        return;
+                    }
+                }
+
                 if (EventSystem.current.currentSelectedGameObject != null)
                 {
                     // 현재 어떤 버튼이 정상적으로 하이라이트 되어 있다면 그 버튼을 저장
@@ -99,7 +114,7 @@ namespace UI
                 }
                 else if (_lastSelectedObject != null && _lastSelectedObject.activeInHierarchy)
                 {
-                    // 만약 허공을 클릭해서 하이라이트가 풀려버렸다면 마우스를 떼는 즉시, 저장한 버튼에 강제로 다시 하이라이트를 넎는다
+                    // 만약 허공을 클릭해서 하이라이트가 풀려버렸다면 마우스를 떼는 즉시, 저장한 버튼에 강제로 다시 하이라이트를 넣는다
                     EventSystem.current.SetSelectedGameObject(_lastSelectedObject);
                 }
             }
@@ -132,11 +147,15 @@ namespace UI
             if (buttonContainer != null) buttonContainer.gameObject.SetActive(true);
 
             _currentFloorNum = 0;
+            _hasCurrentFloor = false;
+
             foreach (var f in elevatorData.floorData)
             {
                 if (f.mapID == currentMapID)
                 {
                     _currentFloorNum = f.floorNumber;
+                    _currentFloorData = f; // 취소 시 사용할 데이터를 캐싱
+                    _hasCurrentFloor = true;
                     break;
                 }
             }
