@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using Manager;
 using static UI.Battle.BattleManager;
+using Data;
 namespace UI.Battle
 {
     public class BattleUIController : MonoBehaviour
@@ -540,11 +541,13 @@ namespace UI.Battle
         }
 
         // 전투 종료 UI 표시
-        public void ShowResult(BattleReward reward, List<PlayerController> partyMembers, 
-                            Dictionary<PlayerController, (int oldLv, int oldExp, int oldMaxExp)> preBattleStates, 
-                            Action onCloseCallback)
+        public void ShowResult(BattleReward reward, 
+                               List<PlayerController> partyMembers, 
+                               Dictionary<PlayerController, (int oldLv, int oldExp, int oldMaxExp)> preBattleStates,
+                               List<QuestData> completedQuests, 
+                               Action onCloseCallback)
         {
-            resultUI.Show(reward, partyMembers, preBattleStates, onCloseCallback);
+            resultUI.Show(reward, partyMembers, preBattleStates, completedQuests, onCloseCallback);
         }
 
         public IEnumerator ShowGameOverSequence(MonsterController killer, Action onComplete)

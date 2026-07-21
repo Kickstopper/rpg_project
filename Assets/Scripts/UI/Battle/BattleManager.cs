@@ -3378,7 +3378,7 @@ namespace UI.Battle
 
                 // 결과 UI 표시
                 bool isResultClosed = false;
-                uiController.ShowResult(reward, allPlayers, preBattleStates, ()=> isResultClosed = true);
+                uiController.ShowResult(reward, allPlayers, preBattleStates, GetCompletedQuests(), ()=> isResultClosed = true);
 
                 yield return new WaitUntil(() => isResultClosed);
 
@@ -3422,6 +3422,33 @@ namespace UI.Battle
                 // 패배 시 게임 오버 연출 코루틴으로 연결
                 yield return StartCoroutine(ProcessGameOverRoutine());
             }
+        }
+
+        public List<QuestData> GetCompletedQuests()
+        {
+            // 이번 전투에서 죽인 몬스터의 ID 리스트 추출
+            List<string> killedMonsterIDs = new List<string>();
+            foreach(var monster in fieldController.activeMonsters)
+            {
+                if (monster.currentHp <= 0)
+                {
+                    MonsterController monsterCont = monster as MonsterController;
+                    if (monsterCont != null) killedMonsterIDs.Add(monsterCont.sourceData.id);
+                } 
+            }
+
+            // 현재 맵의 LocationID 취득
+            string currentLocationID = ManagerRoot.Dungeon.CurrentDungeonData.LocationID;
+
+            // 달성한 퀘스트 목록 취득
+            List<QuestData> completedQuests = ManagerRoot.Quest.ProcessBattleResult(currentLocationID, killedMonsterIDs);
+
+            if (completedQuests.Count > 0)
+            {
+                return completedQuests;
+            }
+
+            return null;
         }
 
         // 게임 오버 전용 코루틴

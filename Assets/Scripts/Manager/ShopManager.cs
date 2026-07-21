@@ -6,8 +6,6 @@ namespace Manager
 {
     public class ShopManager : MonoBehaviour
     {
-        public static ShopManager Instance;
-
         [Header("Reference Data")]
         public List<ShopData> shopDatas;
 

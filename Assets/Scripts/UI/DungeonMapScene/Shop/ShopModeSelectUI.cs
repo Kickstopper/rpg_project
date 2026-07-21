@@ -119,7 +119,7 @@ namespace UI.Shop
             dialogueText.text = "";
             nameText.text = "";
 
-            shopData = ShopManager.Instance.GetShopData(shopID);
+            shopData = ManagerRoot.Shop.GetShopData(shopID);
             if (shopData != null)
             {
                 if (titleText != null)

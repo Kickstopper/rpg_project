@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections; // [추가] IEnumerator(코루틴) 사용을 위해 추가
 using System.Collections.Generic;
 using Manager;
 using UnityEngine.EventSystems;
@@ -10,6 +11,9 @@ namespace UI.Battle
 {
     public class BattleResultUI : MonoBehaviour
     {
+        [Header("Quest Complete Notice")]
+        public QuestNoticePopupUI popupUI;
+
         [Header("Reward Info")]
         public TextMeshProUGUI moneyText;
         public TextMeshProUGUI totalExpText;
@@ -26,16 +30,20 @@ namespace UI.Battle
         public Button continueButton;
 
         private System.Action onClosed;
-        
         private bool isClosing = false;
+        
+        // [추가] 실행 중인 팝업 코루틴을 추적하여 안전하게 끄기 위한 변수
+        private Coroutine questPopupCoroutine; 
 
-        public void Show(BattleManager.BattleReward reward, List<PlayerController> partyMembers, 
-                        Dictionary<PlayerController, (int oldLv, int oldExp, int oldMaxExp)> preBattleStates, 
-                        System.Action onCloseCallback)
+        public void Show(BattleManager.BattleReward reward, 
+                         List<PlayerController> partyMembers, 
+                         Dictionary<PlayerController, (int oldLv, int oldExp, int oldMaxExp)> preBattleStates, 
+                         List<QuestData> completedQuests,
+                         System.Action onCloseCallback)
         {
             this.gameObject.SetActive(true);
             this.onClosed = onCloseCallback;
-            this.isClosing = false; // 초기화
+            this.isClosing = false; 
 
             // 텍스트 설정
             moneyText.text = $"{reward.totalMoney} G";
@@ -58,8 +66,8 @@ namespace UI.Battle
                 {
                     GameObject go = Instantiate(itemSlotPrefab, itemContainer);
                     var texts = go.GetComponentsInChildren<TextMeshProUGUI>();
-                    if(texts.Length > 0) texts[0].text = $"{itemData.dataName}"; // 이름
-                    if(texts.Length > 1) texts[1].text = $"x{kvp.Value}";        // 개수
+                    if(texts.Length > 0) texts[0].text = $"{itemData.dataName}"; 
+                    if(texts.Length > 1) texts[1].text = $"x{kvp.Value}";        
                 }
             }
 
@@ -78,16 +86,39 @@ namespace UI.Battle
                 }
             }
 
+            // [수정] 여러 개의 퀘스트가 있을 경우 코루틴을 통해 순차적으로 표시
+            if (completedQuests != null && completedQuests.Count > 0)
+            {
+                if (popupUI != null)
+                {
+                    questPopupCoroutine = StartCoroutine(ShowQuestPopupsSequentially(completedQuests));
+                }
+            }
+
             // 버튼 이벤트 연결
             continueButton.onClick.RemoveAllListeners();
             continueButton.onClick.AddListener(OnContinueClicked);
 
-            // UI가 켜질 때 'Continue' 버튼을 강제로 선택 상태로 만듦
-            // 이렇게 해야 마우스를 쓰지 않아도 스페이스바가 먹힘
             StartCoroutine(SelectButtonDelayed());
         }
 
-        // 버튼 선택 딜레이 (활성화 직후에는 선택이 안 될 수도 있어서 한 프레임 대기)
+        // [추가] 퀘스트 팝업 순차 표시 코루틴
+        private IEnumerator ShowQuestPopupsSequentially(List<QuestData> quests)
+        {
+            // 원하는 간격으로 시간을 조절할 수 있습니다 (현재 2.5초)
+            WaitForSeconds waitTime = new WaitForSeconds(2.5f);
+
+            foreach (var q in quests)
+            {
+                popupUI.Open(q);
+                // ManagerRoot.Sound.PlaySFX(SfxID.UI_Notification); // 갱신될 때마다 효과음 출력
+                yield return waitTime;
+            }
+
+            // 모든 퀘스트를 보여준 후 팝업을 닫고 싶다면 아래 주석을 해제하세요.
+            // popupUI.Close();
+        }
+
         System.Collections.IEnumerator SelectButtonDelayed()
         {
             yield return null;
@@ -110,6 +141,10 @@ namespace UI.Battle
         {
             if (isClosing) return;
             isClosing = true;
+
+            // [추가] 유저가 결과창을 빨리 닫을 경우, 돌고 있던 코루틴을 강제로 멈추고 팝업을 끕니다.
+            if (questPopupCoroutine != null) StopCoroutine(questPopupCoroutine);
+            if (popupUI != null) popupUI.Close();
 
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 

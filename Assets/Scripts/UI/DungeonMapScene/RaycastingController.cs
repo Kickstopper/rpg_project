@@ -346,8 +346,8 @@ namespace Controller
             } 
             if (Input.GetKeyDown(KeyCode.P))
             {
-                GameSettingManager.Instance.useAnaglyph = !GameSettingManager.Instance.useAnaglyph;
-                Debug.Log($"Anaglyph Mode: {GameSettingManager.Instance.useAnaglyph}");
+                ManagerRoot.GameSetting.useAnaglyph = !ManagerRoot.GameSetting.useAnaglyph;
+                Debug.Log($"Anaglyph Mode: {ManagerRoot.GameSetting.useAnaglyph}");
             }
 
             // 상하좌우 키 중 하나라도 눌리면 더블 탭 체크
@@ -1226,7 +1226,7 @@ namespace Controller
             {
                 if (frontEntrance.type == EntranceType.Shop)
                 {
-                    var shopData = ShopManager.Instance.GetShopData(frontEntrance.destinationID);
+                    var shopData = ManagerRoot.Shop.GetShopData(frontEntrance.destinationID);
                     if (shopData != null) ShowRoomName(shopData.displayName);
                 }
                 else if (frontEntrance.type == EntranceType.Terminal)

@@ -15,7 +15,11 @@ MonoBehaviour:
   QuestID: quest_006
   QuestName: "\uD018\uC2A4\uD2B86"
   QuestType: TYPE
-  TargetMonster: MONS
+  Targets:
+  - monsterID: enemy_000
+    requiredCount: 1
   Location: LOCA
+  LocationID: 
   Risk: 6
   Reward: 6000
+  Description: 

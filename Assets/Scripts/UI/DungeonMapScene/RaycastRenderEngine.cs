@@ -233,7 +233,7 @@ namespace UI.DungeonMapScene
             for (int i = 0; i < _depthBuffer.Length; i++) _depthBuffer[i] = 10000f;
             for (int i = 0; i < _zBuffer1D.Length; i++) _zBuffer1D[i] = 10000f;
 
-            if (GameSettingManager.Instance.useAnaglyph)
+            if (ManagerRoot.GameSetting.useAnaglyph)
             {
                 RenderStereo(player, settings);
             }

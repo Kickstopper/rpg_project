@@ -180,12 +180,17 @@ namespace Manager
             {
                 QuestData data = GetQuestData(questID);
                 QuestProgress progress = new QuestProgress { questID = questID };
-                
                 // 타겟 몬스터들의 킬 카운트를 0으로 세팅
-                foreach (var target in data.Targets) 
-                    progress.killCounts[target.monsterID] = 0;
+                if (data.Targets != null)
+                {
+                    foreach (var target in data.Targets)
+                    {
+                        progress.killCounts[target.monsterID] = 0;
+                    }
+                }
                 
                 activeQuests[questID] = progress;
+                Debug.Log($"[QuestManager] {questID} 수주 성공!");
             }
         }
 
@@ -206,8 +211,6 @@ namespace Manager
                 {
                     ManagerRoot.Flag.SetFlag($"QuestComplete_{questID}", true);
                 }
-                
-                Debug.Log($"[QuestManager] 퀘스트 완료: {questID}");
             }
         }
 
@@ -237,7 +240,7 @@ namespace Manager
         // 퀘스트 진행 중 여부 확인
         public bool IsQuestActive(string questID)
         {
-            return activeQuests.ContainsKey(questID) && activeQuests[questID].isReadyToReport;
+            return activeQuests.ContainsKey(questID);
         }
     }
 }

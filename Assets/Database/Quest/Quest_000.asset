@@ -13,9 +13,13 @@ MonoBehaviour:
   m_Name: Quest_000
   m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
   QuestID: quest_000
-  QuestName: "\uD018\uC2A4\uD2B80"
+  QuestName: "\uB79C\uB4DC\uD130\uD2C0 \uC18C\uD0D5\uC791\uC804"
   QuestType: TYPE
-  TargetMonster: MONS
+  Targets:
+  - monsterID: enemy_006
+    requiredCount: 4
   Location: LOCA
+  LocationID: underground
   Risk: 1
-  Reward: 1000
+  Reward: 50000
+  Description: "\uC26C\uC6B4\uB370 \uB3C8\uC744 \uB9CE\uC774 \uC900\uB2E4."

@@ -48,7 +48,7 @@ namespace UI.Shop
         public void Show(string shopID)
         {
             buyUI.SetActive(true);
-            currentShopData = ShopManager.Instance.GetShopData(shopID);
+            currentShopData = ManagerRoot.Shop.GetShopData(shopID);
             ClearContent();
             PopulateShop(currentShopData);
             

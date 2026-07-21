@@ -64,7 +64,7 @@ namespace UI.Battle
         // 매 프레임 옵션 변경 감지
         private void Update()
         {
-            bool currentGlobalState = GameSettingManager.Instance.useAnaglyph;
+            bool currentGlobalState = ManagerRoot.GameSetting.useAnaglyph;
             if (currentGlobalState != lastGlobalState)
             {
                 UpdateAnaglyphVisuals(false);
@@ -88,7 +88,7 @@ namespace UI.Battle
             }
 
             // 현재 글로벌 설정 가져오기
-            bool useEffect = GameSettingManager.Instance.useAnaglyph;
+            bool useEffect = ManagerRoot.GameSetting.useAnaglyph;
             
             // 상태 동기화
             lastGlobalState = useEffect;
