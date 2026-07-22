@@ -99,6 +99,7 @@ namespace Data
             maxHp = save.maxHp;
             maxMp = save.maxMp;
             currentExp = save.exp;
+            expTable = save.expTable;
 
             equippedWeaponId = save.weaponId;
             equippedGunId = save.gunId;
@@ -165,7 +166,7 @@ namespace Data
             data.currentMp = this.currentMp;
             
             data.exp = this.currentExp;
-            
+            data.expTable = this.expTable;
             data.row = this.row.ToString();
             data.column = this.column.ToString();
 

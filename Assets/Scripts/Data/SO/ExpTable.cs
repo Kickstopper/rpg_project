@@ -10,9 +10,6 @@ namespace Data
         public float baseExp = 100f;
         [Range(1f, 5f)] public float exponent = 2.2f;
 
-        // 혹은 AnimationCurve 사용
-        // public AnimationCurve curve;
-
         // 이 함수는 어디서든 이 에셋을 참조해서 호출 가능
         public int GetRequiredExp(int level)
         {
