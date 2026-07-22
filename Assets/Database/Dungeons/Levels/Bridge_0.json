@@ -3,6 +3,7 @@
     "height": 9,
     "mapID": "Bridge_0",
     "themeName": "Bridge_0",
+    "LocationID": "OUTPOST",
     "startX": 3,
     "startY": 9,
     "startDirection": 0,

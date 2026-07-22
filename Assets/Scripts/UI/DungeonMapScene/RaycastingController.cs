@@ -5,20 +5,19 @@ using UnityEngine;
 using UnityEngine.UI;
 using Manager;
 using Data;
-using UI.DungeonMapScene;
-using UI;
 using TMPro;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
 using Helper;
 using UI.Battle;
+using UI.Common;
 
-namespace Controller
+namespace UI.DungeonMapScene
 {
     public class RaycastingController : MonoBehaviour
     {
         [Header("Settings")]
-        public UI.DungeonMapScene.RenderSettings renderSettings;
+        public RenderSettings renderSettings;
         [Range(0.0f, 0.499f)] public float backwardOffset = 0.499f;
         public float fovScale = 1f;
         
@@ -27,6 +26,7 @@ namespace Controller
         public RawImage backgroundImage;
         public CompassUI compassUI;
         public WeatherUI weatherUI;
+        public CalendarUI calendarUI;
         public GridMap miniMap;
         public AutoMapRenderer autoMapRenderer;
         public GameObject autoMapContainer;
@@ -495,7 +495,10 @@ namespace Controller
 
             _player.BackwardOffset = this.backwardOffset;
             _currentLookState = LookState.None;
-
+            
+            // 윗 층으로 올라가 맵이 변경될 때 시간 경과
+            ManagerRoot.Time.AddStep(1);
+            
             if (entrance.isWorldMap)
             {
                 if (ManagerRoot.DungeonEvent)
@@ -602,6 +605,9 @@ namespace Controller
             // 맵을 로드하기 전에 오프셋과 시점 상태를 먼저 원상 복구
             _player.BackwardOffset = this.backwardOffset; 
             _currentLookState = LookState.None;
+
+            // 아래층으로 떨어져 맵이 변경될 때 시간 경과
+            ManagerRoot.Time.AddStep(1);
 
             if (entrance.isWorldMap)
             {
@@ -1294,6 +1300,9 @@ namespace Controller
             // 화면이 완전히 암전된 직후, 씬이나 맵이 변경되기 전에 콜백 실행
             onFadeOutComplete?.Invoke();
 
+            // 다른 공간으로 진입 시 1걸음 시간 경과
+            ManagerRoot.Time.AddStep(1);
+
             if (entrance.type == EntranceType.Map)
             {
                 if (ManagerRoot.DungeonEvent)
@@ -1904,6 +1913,9 @@ namespace Controller
         private void OnPlayerStep()
         {
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
+
+            // 1칸 이동 시 시간 경과
+            ManagerRoot.Time.AddStep(1);
             
             if (theme != null && theme.encounterMode == EncounterMode.Random)
             {

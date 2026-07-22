@@ -515,6 +515,7 @@ RectTransform:
   - {fileID: 2086873636}
   - {fileID: 77270346}
   - {fileID: 1608275067}
+  - {fileID: 8984515051043977898}
   - {fileID: 1607653409}
   - {fileID: 1310747631}
   - {fileID: 1028032712}
@@ -8625,6 +8626,7 @@ MonoBehaviour:
   backgroundImage: {fileID: 1919549474}
   compassUI: {fileID: 1351563562}
   weatherUI: {fileID: 6263026090008362}
+  calendarUI: {fileID: 8984515051043977899}
   miniMap: {fileID: 2086873637}
   autoMapRenderer: {fileID: 1471981309}
   autoMapContainer: {fileID: 581309548}
@@ -10726,6 +10728,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WeatherWidget
       objectReference: {fileID: 0}
+    - target: {fileID: 447535613976575659, guid: 747a182df5e665a4e9919ee38a13e0fb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4453260370207015217, guid: 747a182df5e665a4e9919ee38a13e0fb, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -11666,6 +11672,103 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1001 &2730086859057484434
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 128677749}
+    m_Modifications:
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 320
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 125
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 170
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -85
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8333743643070150012, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+      propertyPath: m_Name
+      value: CalendarWidget
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
 --- !u!4 &2798996791236265911
 Transform:
   m_ObjectHideFlags: 0
@@ -13410,6 +13513,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!224 &8984515051043977898 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5385904145053370703, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+  m_PrefabInstance: {fileID: 2730086859057484434}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8984515051043977899 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4352459383947916999, guid: 711c995db8545954cb4ee31ce540006d, type: 3}
+  m_PrefabInstance: {fileID: 2730086859057484434}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac8f14a2bb1fa054abb6512ba9ea656b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Dungeon.CalendarUI
 --- !u!224 &9054023419083970077
 RectTransform:
   m_ObjectHideFlags: 0

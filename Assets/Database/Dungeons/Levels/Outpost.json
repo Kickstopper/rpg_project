@@ -3,6 +3,7 @@
     "height": 11,
     "mapID": "Outpost",
     "themeName": "Outpost",
+    "LocationID": "OUTPOST",
     "startX": 5,
     "startY": 0,
     "startDirection": 0,
