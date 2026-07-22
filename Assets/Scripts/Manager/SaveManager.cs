@@ -3,6 +3,8 @@ using System.IO;
 using Data;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+
 namespace Manager
 {
     public class SaveManager : MonoBehaviour
@@ -21,8 +23,7 @@ namespace Manager
         }
 
         
-        // 저장 (Save)
-        
+        // 저장
         public void SaveGame(int slotIndex)
         {
             SaveData data = new SaveData();
@@ -35,6 +36,7 @@ namespace Manager
             data.playerPosX = ManagerRoot.DungeonMapState.currentPx;
             data.playerPosY = ManagerRoot.DungeonMapState.currentPy;
             data.playerDirection = ManagerRoot.DungeonMapState.currentDirection;
+            
             // 던전 탐색 상태 저장
             data.dungeonMapStates = ManagerRoot.DungeonMapState.GetAllMapStates();
 
@@ -69,6 +71,9 @@ namespace Manager
             // 퀘스트 달성 상태 저장
             ManagerRoot.Quest.Save(data);
 
+            // 게임 내의 시간 저장
+            ManagerRoot.Time.Save(data);
+
             // 대화 이벤트 발생 여부 저장
             data.completedDialogues = ManagerRoot.DungeonEvent.GetCompletedTriggers();
             
@@ -77,8 +82,7 @@ namespace Manager
             data.ownedModules = new List<ModuleFeature>(ManagerRoot.Module.ownedModules);
             data.mountedModules = new List<PlacedModuleData>(ManagerRoot.Module.GetMountedModules());
 
-            // 파일 쓰기
-            string json = JsonUtility.ToJson(data, true);
+            string json = JsonConvert.SerializeObject(data, Formatting.Indented); // Indented를 사용해 Json 파일이 줄바꿈되게 함
             File.WriteAllText(GetSavePath(slotIndex), json);
             
             Debug.Log($"[Slot {slotIndex}] 게임 저장 완료");
@@ -92,7 +96,8 @@ namespace Manager
             if (!File.Exists(path)) return;
 
             string json = File.ReadAllText(path);
-            SaveData data = JsonUtility.FromJson<SaveData>(json);
+            
+            SaveData data = JsonConvert.DeserializeObject<SaveData>(json);
 
             // 골드 및 인벤토리 복구
             ManagerRoot.Inventory.SetMoney(data.money);
@@ -104,6 +109,9 @@ namespace Manager
             // 퀘스트 달성 상태 복구
             ManagerRoot.Quest.Load(data);
 
+            // 게임 내의 시간 복구
+            ManagerRoot.Time.Load(data);
+            
             // 대화 이벤트 발생 정보 복구
             ManagerRoot.DungeonEvent.ApplyCompletedTriggers(data.completedDialogues);
 
@@ -164,7 +172,7 @@ namespace Manager
             try
             {
                 string json = File.ReadAllText(path);
-                return JsonUtility.FromJson<SaveData>(json);
+                return JsonConvert.DeserializeObject<SaveData>(json);
             }
             catch
             {
@@ -178,5 +186,4 @@ namespace Manager
             return File.Exists(GetSavePath(SUSPEND_SLOT_INDEX));
         }
     }
-    
 }

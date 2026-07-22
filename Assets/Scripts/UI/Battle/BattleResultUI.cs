@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections; // [추가] IEnumerator(코루틴) 사용을 위해 추가
+using System.Collections;
 using System.Collections.Generic;
 using Manager;
 using UnityEngine.EventSystems;
@@ -32,7 +32,7 @@ namespace UI.Battle
         private System.Action onClosed;
         private bool isClosing = false;
         
-        // [추가] 실행 중인 팝업 코루틴을 추적하여 안전하게 끄기 위한 변수
+        // 실행 중인 팝업 코루틴을 추적하여 안전하게 끄기 위한 변수
         private Coroutine questPopupCoroutine; 
 
         public void Show(BattleManager.BattleReward reward, 
@@ -86,7 +86,7 @@ namespace UI.Battle
                 }
             }
 
-            // [수정] 여러 개의 퀘스트가 있을 경우 코루틴을 통해 순차적으로 표시
+            // 여러 개의 퀘스트가 있을 경우 코루틴을 통해 순차적으로 표시
             if (completedQuests != null && completedQuests.Count > 0)
             {
                 if (popupUI != null)
@@ -102,7 +102,7 @@ namespace UI.Battle
             StartCoroutine(SelectButtonDelayed());
         }
 
-        // [추가] 퀘스트 팝업 순차 표시 코루틴
+        // 퀘스트 팝업 순차 표시 코루틴
         private IEnumerator ShowQuestPopupsSequentially(List<QuestData> quests)
         {
             // 원하는 간격으로 시간을 조절할 수 있습니다 (현재 2.5초)
@@ -142,7 +142,6 @@ namespace UI.Battle
             if (isClosing) return;
             isClosing = true;
 
-            // [추가] 유저가 결과창을 빨리 닫을 경우, 돌고 있던 코루틴을 강제로 멈추고 팝업을 끕니다.
             if (questPopupCoroutine != null) StopCoroutine(questPopupCoroutine);
             if (popupUI != null) popupUI.Close();
 

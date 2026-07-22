@@ -32,6 +32,16 @@ namespace Data
         public Dictionary<string, int> killCounts = new Dictionary<string, int>(); 
         public bool isReadyToReport = false;
     }
+
+    // 시간 진행도를 저장하기 위한 클래스
+    [Serializable]
+    public class TimeProgress
+    {
+        public int year = 1;
+        public int month = 1;
+        public int day = 1;
+        public int currentSteps = 0;
+    }
     
     [Serializable]
     public class SaveData
@@ -61,6 +71,9 @@ namespace Data
         public List<CharacterSaveData> partyMembers = new List<CharacterSaveData>();
         // 해금된(한 번이라도 영입한) 전체 동료 명부
         public List<CharacterSaveData> unlockedRoster = new List<CharacterSaveData>();
+
+        // 세이브 파일에 포함될 시간 데이터
+        public TimeProgress timeProgress = new TimeProgress();
 
         // 퀘스트 저장용 리스트
         public List<string> completedQuestIDs = new List<string>();

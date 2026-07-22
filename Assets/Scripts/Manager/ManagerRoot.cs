@@ -5,7 +5,21 @@ namespace Manager
     public class ManagerRoot : MonoBehaviour
     {
         private static ManagerRoot s_instance;
-        public static ManagerRoot Instance { get { Init(); return s_instance; } }
+        
+        // 앱이 종료 중인지 추적하는 플래그
+        private static bool s_isQuitting = false; 
+
+        public static ManagerRoot Instance 
+        { 
+            get 
+            { 
+                // 종료 중일 때는 유령 객체를 만들지 않고 즉시 null 반환
+                if (s_isQuitting) return null; 
+                
+                Init(); 
+                return s_instance; 
+            } 
+        }
 
         [Header("Child Managers")]
         [SerializeField] private GameSettingManager gameSettingManager;
@@ -25,27 +39,30 @@ namespace Manager
         [SerializeField] private PartyManager partyManager;
         [SerializeField] private SaveManager saveManager;
         [SerializeField] private ShopManager shopManager;
+        [SerializeField] private TimeManager timeManager;
         [SerializeField] private WeatherManager weatherManager;
         [SerializeField] private WorldManager worldManager;
-        public static GameSettingManager GameSetting => Instance.gameSettingManager;
-        public static SoundManager Sound => Instance.soundManager;
-        public static DatabaseManager Database => Instance.databaseManager;
-        public static QuestManager Quest => Instance.questManager;
-        public static DialogueManager Dialogue => Instance.dialogueManager;
-        public static GameStateManager GameState => Instance.gameStateManager;
-        public static DungeonManager Dungeon => Instance.dungeonManager;
-        public static DungeonMapStateManager DungeonMapState => Instance.dungeonMapStateManager;
-        public static DungeonEventManager DungeonEvent => Instance.dungeonEventManager;
-        public static TerminalManager Terminal => Instance.terminalManager;
-        public static EffectManager Effect => Instance.effectManager;
-        public static FlagManager Flag => Instance.flagManager;
-        public static InventoryManager Inventory => Instance.inventoryManager;
-        public static ModuleManager Module => Instance.moduleManager;
-        public static PartyManager Party => Instance.partyManager;
-        public static SaveManager Save => Instance.saveManager;
-        public static ShopManager Shop => Instance.shopManager;
-        public static WeatherManager Weather => Instance.weatherManager;
-        public static WorldManager World => Instance.worldManager;
+
+        public static GameSettingManager GameSetting => Instance?.gameSettingManager;
+        public static SoundManager Sound => Instance?.soundManager;
+        public static DatabaseManager Database => Instance?.databaseManager;
+        public static QuestManager Quest => Instance?.questManager;
+        public static DialogueManager Dialogue => Instance?.dialogueManager;
+        public static GameStateManager GameState => Instance?.gameStateManager;
+        public static DungeonManager Dungeon => Instance?.dungeonManager;
+        public static DungeonMapStateManager DungeonMapState => Instance?.dungeonMapStateManager;
+        public static DungeonEventManager DungeonEvent => Instance?.dungeonEventManager;
+        public static TerminalManager Terminal => Instance?.terminalManager;
+        public static EffectManager Effect => Instance?.effectManager;
+        public static FlagManager Flag => Instance?.flagManager;
+        public static InventoryManager Inventory => Instance?.inventoryManager;
+        public static ModuleManager Module => Instance?.moduleManager;
+        public static PartyManager Party => Instance?.partyManager;
+        public static SaveManager Save => Instance?.saveManager;
+        public static ShopManager Shop => Instance?.shopManager;
+        public static WeatherManager Weather => Instance?.weatherManager;
+        public static TimeManager Time => Instance?.timeManager;
+        public static WorldManager World => Instance?.worldManager;
 
         private void Awake()
         {
@@ -59,9 +76,25 @@ namespace Manager
             }
         }
 
+        // 강제 종료 시 플래그 켜기
+        private void OnApplicationQuit()
+        {
+            s_isQuitting = true;
+        }
+
+        // 매니저가 정상적으로 파괴될 때도 플래그 켜기
+        private void OnDestroy()
+        {
+            if (s_instance == this)
+            {
+                s_isQuitting = true;
+            }
+        }
+
         private static void Init()
         {
-            if (s_instance == null)
+            // 종료 중이 아닐 때만 재생성 시도
+            if (s_instance == null && !s_isQuitting)
             {
                 GameObject go = GameObject.Find("@Managers");
                 
@@ -81,13 +114,17 @@ namespace Manager
 
         private void InitializeAllManagers()
         {
-
             if (soundManager == null) soundManager = GetComponentInChildren<SoundManager>();
             if (gameSettingManager == null) gameSettingManager = GetComponentInChildren<GameSettingManager>();
             if (databaseManager == null) databaseManager = GetComponentInChildren<DatabaseManager>();
             if (questManager == null) questManager = GetComponentInChildren<QuestManager>();
-            questManager.InitializeQuests(databaseManager.questDB.db);
             
+            if (questManager != null && databaseManager != null && databaseManager.questDB != null)
+            {
+                questManager.InitializeQuests(databaseManager.questDB.db);
+            }
+            
+            if (timeManager == null) timeManager = GetComponentInChildren<TimeManager>();
             if (dialogueManager == null) dialogueManager = GetComponentInChildren<DialogueManager>();
             if (gameStateManager == null) gameStateManager = GetComponentInChildren<GameStateManager>();
             if (dungeonManager == null) dungeonManager = GetComponentInChildren<DungeonManager>();

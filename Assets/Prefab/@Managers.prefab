@@ -197,6 +197,52 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1c541520573dd9e499d9230fe84a1a6c, type: 2}
   - {fileID: 11400000, guid: 923a6b643070b4b47a4e28bcfaee76ae, type: 2}
   - {fileID: 11400000, guid: fda6623437a544e4bae27b42c3d7d5ec, type: 2}
+--- !u!1 &1617611742231207147
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2161072658197693512}
+  - component: {fileID: 2450754152227706877}
+  m_Layer: 0
+  m_Name: TimeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2161072658197693512
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1617611742231207147}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 545246018662277303}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2450754152227706877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1617611742231207147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38a9d5fc3f30a6845a068e7fa5c302cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Manager.TimeManager
+  stepsPerDay: 100
+  daysPerMonth: 30
 --- !u!1 &1716355942940699894
 GameObject:
   m_ObjectHideFlags: 0
@@ -561,6 +607,7 @@ Transform:
   - {fileID: 1756170555702361820}
   - {fileID: 7013715907720635569}
   - {fileID: 1625563179574084681}
+  - {fileID: 2161072658197693512}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7067830550753514190
@@ -592,6 +639,7 @@ MonoBehaviour:
   partyManager: {fileID: 4605073592105765919}
   saveManager: {fileID: 8319155127516932806}
   shopManager: {fileID: 7716105059068861244}
+  timeManager: {fileID: 2450754152227706877}
   weatherManager: {fileID: 2035458018758246169}
   worldManager: {fileID: 405637350890329743}
 --- !u!1 &4768890939789775564
