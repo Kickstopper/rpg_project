@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Data
 {
     public enum Personality { Polite, Aggressive, Sly, Foolish, Childish } // 공손, 공격적, 교활, 멍청, 유치
-    public enum Gender { Male, Female, Void }
+    public enum Gender { Male, Female, None }
     public enum Race { Human, Beast, Demihuman, Demon, Dragon, Machine, Plant, Spirit, Undead }
 
     public enum TimeOfDay { Morning, Day, Evening, Night }

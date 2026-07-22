@@ -6,6 +6,9 @@ namespace Manager
 {
     public class DatabaseManager : MonoBehaviour
     {
+        [Header("Global Settings")]
+        public ExpTable globalExpTable;
+
         [Header("Databases")]
         public CharacterDatabase charDB;
         public MonsterDatabase monsterDB;

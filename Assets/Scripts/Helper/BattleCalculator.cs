@@ -5,6 +5,7 @@ using Data;
 using UI;
 using UI.DungeonMapScene;
 using UI.Battle;
+using Manager;
 
 namespace Helper
 {
@@ -161,12 +162,13 @@ namespace Helper
             float partyAvgLv = (players.Count > 0) ? (float)players.Average(p => p.level) : 1;
             float partyAvgLuc = (players.Count > 0) ? (float)players.Average(p => p.GetTotalLuc()) : 1;
 
+            int baseExp = 50; 
             foreach (var entry in encounterLog)
             {
                 int monsterLv = entry.stats.level;
-                int baseExp = GetMaxExpForLevel(monsterLv);
-                int levelDiff = monsterLv - Mathf.RoundToInt(partyAvgLv);
                 
+                int levelDiff = monsterLv - Mathf.RoundToInt(partyAvgLv);
+
                 // 경험치 계산. 레벨 차이에 따른 보정이 들어감
                 int finalExp = baseExp;
                 if (levelDiff >= 4)
@@ -240,10 +242,14 @@ namespace Helper
         // =======================================================
         // [기타 헬퍼 및 내부 계산식]
         // =======================================================
-        public static int GetMaxExpForLevel(int level)
+        public static int GetMaxExpForLevel(int level, Race race = Race.Human, Gender gender = Gender.None)
         {
-            // 필요한 EXP 수식: ((LV^2) + (INT/2) + MAG)/8. 차후 수정하자
-            return Mathf.FloorToInt((level * level * 10f) + 15f); 
+            if (ManagerRoot.Database.globalExpTable != null)
+            {
+                return ManagerRoot.Database.globalExpTable.GetRequiredExp(level, race, gender);
+            }
+            
+            return 999999; 
         }
 
         public static int GetMaxHP(int level, int str, int vit)

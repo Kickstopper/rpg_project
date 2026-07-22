@@ -182,6 +182,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8368f5d7194da524ea08db33849b187e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseRentalFee: 1000
+  salaryPerPartner: 200
   startingItems:
   - {fileID: 11400000, guid: fa7dae80d7570c24da2f4a3519b5a43e, type: 2}
   - {fileID: 11400000, guid: bd2f2cacf7720df4aa89aa3cccf3527d, type: 2}
@@ -791,6 +793,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e7ce7389e3597745b0639acc3793425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  globalExpTable: {fileID: 11400000, guid: 0a109a7319f60bb47bb30d455147ed4f, type: 2}
   charDB: {fileID: 11400000, guid: 89d0e2e30bc8d6c40985b195be7ff30d, type: 2}
   monsterDB: {fileID: 11400000, guid: 5a02d40de261d314a98aeca05c430997, type: 2}
   weaponDB: {fileID: 11400000, guid: 8ef24aa697ac34a4e82023af7d00d17b, type: 2}

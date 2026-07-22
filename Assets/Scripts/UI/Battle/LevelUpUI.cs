@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
-using Controller;
 using Data;
 using Helper;
 using System.Collections;
@@ -97,7 +96,7 @@ namespace UI.Battle
             isCreationMode = true;
             LeveUpUI.SetActive(true);
             
-            var characterData  = ManagerRoot.Party.GetCharacterByID(characterID);
+            var characterData  = ManagerRoot.Database.charDB.GetEntry(characterID);
 
             this.onCreationFinished = onFinished;
             this.availablePoints = bonusPoints;
@@ -108,8 +107,8 @@ namespace UI.Battle
 
             // UI 텍스트 초기화
             nameText.text = characterData.name;
-            levelText.text = $"LV{characterData.stats.level}";
-            nextExpText.text = "";
+            levelText.text = $"LV.{characterData.stats.level}";
+
             if (portraitImage != null)
             {
                 var dbEntry = ManagerRoot.Database.charDB.GetEntry(characterID);
@@ -121,7 +120,7 @@ namespace UI.Battle
                 else portraitImage.color = Color.clear;
             }
             
-            int nextExp = BattleCalculator.GetMaxExpForLevel(baseStats.level);
+            int nextExp = BattleCalculator.GetMaxExpForLevel(baseStats.level, characterData.race, characterData.gender);
             nextExpText.text = $"NEXT EXP {nextExp}";
 
             // 스킬 리스트 비우기
@@ -192,6 +191,7 @@ namespace UI.Battle
 
             baseStats = currentTarget.sourceData.stats; 
             allocatedStats = new StatData(); 
+            
             if (portraitImage != null)
             {
                 Sprite portrait = null;
@@ -213,12 +213,18 @@ namespace UI.Battle
                 }
                 else portraitImage.color = Color.clear;
             }
+            
             nameText.text = currentTarget.entityName;
             levelText.text = $"LV {oldLevel} -> {currentTarget.sourceData.stats.level}";
             skillTitleText.text = "SKILLS";
             skillChanceText.text = "";
 
-            int nextExp = BattleCalculator.GetMaxExpForLevel(currentTarget.sourceData.stats.level);
+            // 레벨, 종족, 성별 전달
+            int nextExp = BattleCalculator.GetMaxExpForLevel(
+                currentTarget.sourceData.stats.level, 
+                currentTarget.sourceData.race, 
+                currentTarget.sourceData.gender
+            );
             nextExpText.text = $"NEXT EXP {nextExp - currentTarget.sourceData.currentExp}";
 
             PopulateSkillList();

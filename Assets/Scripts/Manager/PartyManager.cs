@@ -91,7 +91,6 @@ namespace Manager
                 if (entry != null)
                 {
                     RuntimeCharacterData newData = new RuntimeCharacterData(entry);
-                    newData.expTable = entry.expTable;
                     partyData.Add(newData);
                 }
                 else

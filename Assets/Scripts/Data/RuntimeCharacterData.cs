@@ -18,6 +18,17 @@ namespace Data
 
     public enum StatType { STR, MAG, INT, VIT, AGI, LUC }
 
+    public class PartyID 
+    { 
+        public const string CHARACTER_00 = "chr_00";
+        public const string CHARACTER_01 = "chr_01";
+        public const string CHARACTER_02 = "chr_02";
+        public const string CHARACTER_03 = "chr_03";
+        public const string CHARACTER_04 = "chr_04";
+        public const string CHARACTER_05 = "chr_05";
+        public const string CHARACTER_06 = "chr_06"; 
+    }
+
     [System.Serializable]
     public class RuntimeCharacterData
     {
@@ -43,9 +54,6 @@ namespace Data
         public int currentMp;
         public int maxMp;
         public int currentExp; // 현재 누적 경험치
-        
-        [System.NonSerialized] 
-        public ExpTable expTable;
         
         public RowType row;
         public ColumnType column;
@@ -99,7 +107,6 @@ namespace Data
             maxHp = save.maxHp;
             maxMp = save.maxMp;
             currentExp = save.exp;
-            expTable = save.expTable;
 
             equippedWeaponId = save.weaponId;
             equippedGunId = save.gunId;
@@ -126,7 +133,6 @@ namespace Data
             currentMp = maxMp = BattleCalculator.GetMaxMP(stats.level, stats.mag, stats.intel);
 
             currentExp = 0;
-            expTable = entry.expTable;
 
             row = RowType.Front;
             column = ColumnType.Center;
@@ -166,7 +172,6 @@ namespace Data
             data.currentMp = this.currentMp;
             
             data.exp = this.currentExp;
-            data.expTable = this.expTable;
             data.row = this.row.ToString();
             data.column = this.column.ToString();
 
@@ -180,24 +185,9 @@ namespace Data
         }
 
         // UI나 전투 로직은 이 함수만 호출하면 됨
-        public int GetRequiredExpForNextLevel() {
-            if (expTable != null) {
-                return expTable.GetRequiredExp(stats.level);
-            }
-            return 999999; // 안전장치
+        public int GetRequiredExpForNextLevel() 
+        {
+            return BattleCalculator.GetMaxExpForLevel(stats.level, race, gender);
         }
-
-        // 경험치 퍼센트 (UI용 헬퍼 함수)
-        public float GetExpPercent() {
-            int prevReq = (stats.level == 1) ? 0 : expTable.GetRequiredExp(stats.level - 1);
-            int nextReq = GetRequiredExpForNextLevel();
-            
-            // 분모가 0이 되는 것을 방지
-            if (nextReq - prevReq <= 0) return 0f;
-
-            return (float)(currentExp - prevReq) / (nextReq - prevReq);
-        }
-
-        public RuntimeCharacterData() { }
     }
 }

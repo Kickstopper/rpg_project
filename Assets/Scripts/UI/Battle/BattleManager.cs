@@ -23,7 +23,7 @@ namespace UI.Battle
         public BattleUIController uiController;
         public BattleFieldController fieldController;
         public BattleVisualController visualController; 
-        public UI.Battle.LevelUpUI levelUpUI;
+        public LevelUpUI levelUpUI;
         public Transform damagePopupContainer;
         public DialogueUI dialogueUI;
 
@@ -3337,7 +3337,7 @@ namespace UI.Battle
                     if (pc != null && pc.currentHp > 0) 
                     {
                         int oldLevel = pc.sourceData.stats.level;
-                        int maxExp = BattleCalculator.GetMaxExpForLevel(oldLevel); // Spirit의 영향이 없는 원본 데이터의 Level을 사용함
+                        int maxExp = BattleCalculator.GetMaxExpForLevel(oldLevel, pc.sourceData.race, pc.sourceData.gender);
                         preBattleStates.Add(pc, (oldLevel, pc.sourceData.currentExp, maxExp));
                     }
                 }

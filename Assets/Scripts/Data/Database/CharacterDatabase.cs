@@ -13,14 +13,10 @@ namespace Data.Database
             public Race race;
             public Gender gender;
 
-            public string resonanceId;
-
-            public ExpTable expTable;
-            public int exp;
-
             public bool isCommander;
             public bool isRegular;
             public bool isMonster;
+            public string resonanceId;
             
             [Header("Visual")]
             public Sprite portraitImage;

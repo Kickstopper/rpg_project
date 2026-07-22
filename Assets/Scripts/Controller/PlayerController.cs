@@ -13,9 +13,6 @@ namespace UI.Battle
 {
     public class PlayerController : BattleEntity, IBattleTarget
     {
-        [SerializeField]
-        private ExpTable expTable;
-
         [Header("UI Objects")]
         public Image bgImage;         // 배경의 사각형 이미지
         public Image portraitImage;
@@ -453,14 +450,15 @@ namespace UI.Battle
         }
 
         // 경험치 획득 및 데이터 갱신 로직
+        // 경험치 획득 및 데이터 갱신 로직
         public void ApplyExperience(int earnedExp)
         {
             sourceData.currentExp += earnedExp;
             
             while (true)
             {
-                int requiredExp = BattleCalculator.GetMaxExpForLevel(sourceData.stats.level);
-
+                int requiredExp = sourceData.GetRequiredExpForNextLevel(); 
+                
                 if (sourceData.currentExp >= requiredExp)
                 {
                     // 레벨 업!

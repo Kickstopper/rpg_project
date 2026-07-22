@@ -117,7 +117,6 @@ namespace Data
         public int currentMp;
         public int maxMp;
         public int exp;
-        public ExpTable expTable;
         
         // 장비 상태
         public string weaponId;
