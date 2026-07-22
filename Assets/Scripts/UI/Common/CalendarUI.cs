@@ -39,7 +39,7 @@ namespace UI.Common
             // 위치 정보 표시
             if (ManagerRoot.GameState.CurrentState == GameState.Exploration && ManagerRoot.Dungeon.CurrentDungeonData != null)
             {
-                locationText.text = ManagerRoot.Dungeon.CurrentDungeonData.LocationID;
+                locationText.text = ManagerRoot.Dungeon.CurrentDungeonData.locationID;
             }
             else
             {

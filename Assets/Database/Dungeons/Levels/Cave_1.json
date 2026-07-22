@@ -3,7 +3,7 @@
     "height": 14,
     "mapID": "Cave_1",
     "themeName": "Cave_1",
-    "LocationID": "CAVE",
+    "locationID": "CAVE",
     "startX": 4,
     "startY": 1,
     "startDirection": 3,

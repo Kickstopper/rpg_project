@@ -39,7 +39,8 @@ public class DungeonMapEditor : EditorWindow
     int inputStartY = 0;
     Direction inputStartDirection = Direction.North; 
 
-    string inputID;
+    string inputMapID;
+    string inputLocationID;
     DungeonTheme inputTheme;
 
     [MenuItem("Tools/Dungeon Map Editor")]
@@ -51,16 +52,17 @@ public class DungeonMapEditor : EditorWindow
     void OnEnable()
     {
         // 초기화 시 기본값 설정
-        if (mapData == null) InitializeMap(10, 10, "default", null, 0, 0, 0);
+        if (mapData == null) InitializeMap(10, 10, "MapId", "None (Location)", null, 0, 0, 0);
     }
 
     // 크기를 인자로 받아 초기화
-    void InitializeMap(int w, int h, string id, DungeonTheme theme, int startX, int startY, Direction startDir)
+    void InitializeMap(int w, int h, string mapId, string locationID, DungeonTheme theme, int startX, int startY, Direction startDir)
     {
         mapData = new MapData();
         mapData.width = w;
         mapData.height = h;
-        mapData.mapID = id;
+        mapData.mapID = mapId;
+        mapData.locationID = locationID;
         mapData.themeName = (theme != null) ? theme.name : "";
 
         // 시작 위치 및 방향 설정
@@ -81,7 +83,8 @@ public class DungeonMapEditor : EditorWindow
         // 에디터 입력값 동기화
         inputWidth = w;
         inputHeight = h;
-        inputID = id;
+        inputMapID = mapId;
+        inputLocationID = locationID;
         inputTheme = theme;
         
         // 플레이어 위치 입력값 동기화
@@ -90,7 +93,7 @@ public class DungeonMapEditor : EditorWindow
         inputStartDirection = startDir;
 
         UpdateVisualizer();
-        Debug.Log($"New Map Created: ID={id}, Size={w}x{h}, Theme={mapData.themeName}");
+        Debug.Log($"New Map Created: ID={mapId}, Size={w}x{h}, Theme={mapData.themeName}");
     }
 
 
@@ -98,42 +101,47 @@ public class DungeonMapEditor : EditorWindow
     {
         EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-        GUILayout.Label("ID:", GUILayout.Width(20));
+        GUILayout.Label("ID", GUILayout.Width(20));
 
-        // 현재 inputID가 배열의 몇 번째 인덱스인지 확인
-        int selectedIndex = Array.IndexOf(availableMapIDs, inputID);
+        // 현재 inputMapID가 배열의 몇 번째 인덱스인지 확인
+        int selectedIndex = Array.IndexOf(availableMapIDs, inputMapID);
 
         // Popup에 -1이 들어가면 자동으로 빈 칸을 표시함
         int newIndex = EditorGUILayout.Popup(selectedIndex, availableMapIDs, GUILayout.Width(100));
 
         if (newIndex >= 0 && newIndex != selectedIndex)
         {
-            inputID = availableMapIDs[newIndex];
+            inputMapID = availableMapIDs[newIndex];
             isInvalidIDLoaded = false;
         }
 
+        // 로케이션 ID 입력
+        GUILayout.Space(10);
+        GUILayout.Label("LocationID", GUILayout.Width(65));
+        inputLocationID = EditorGUILayout.TextField(inputLocationID, GUILayout.Width(100));
+
         // 시작 위치 및 방향 입력
         GUILayout.Space(10);
-        GUILayout.Label("Player Start:", EditorStyles.boldLabel, GUILayout.Width(80));
+        GUILayout.Label("Player Start", EditorStyles.boldLabel, GUILayout.Width(80));
 
         // Start X/Y
-        GUILayout.Label("X:", GUILayout.Width(15));
+        GUILayout.Label("X", GUILayout.Width(15));
         inputStartX = EditorGUILayout.IntField(inputStartX, GUILayout.Width(30));
-        GUILayout.Label("Y:", GUILayout.Width(15));
+        GUILayout.Label("Y", GUILayout.Width(15));
         inputStartY = EditorGUILayout.IntField(inputStartY, GUILayout.Width(30));
 
         // Start Direction (Enum 팝업 필드 사용)
-        GUILayout.Label("Dir:", GUILayout.Width(25));
+        GUILayout.Label("Dir", GUILayout.Width(25));
         inputStartDirection = (Direction)EditorGUILayout.EnumPopup(inputStartDirection, GUILayout.Width(60));
 
         // Width / Height 입력
-        GUILayout.Label("W:", GUILayout.Width(20));
+        GUILayout.Label("W", GUILayout.Width(20));
         inputWidth = EditorGUILayout.IntField(inputWidth, GUILayout.Width(30));
-        GUILayout.Label("H:", GUILayout.Width(20));
+        GUILayout.Label("H", GUILayout.Width(20));
         inputHeight = EditorGUILayout.IntField(inputHeight, GUILayout.Width(30));
 
         // DungeonTheme Object Field (드래그 앤 드롭 슬롯)
-        GUILayout.Label("Theme:", GUILayout.Width(45));
+        GUILayout.Label("Theme", GUILayout.Width(45));
         // typeof(DungeonTheme)를 사용하여 해당 타입의 에셋만 들어오게 함
         inputTheme = (DungeonTheme)EditorGUILayout.ObjectField(inputTheme, typeof(DungeonTheme), false, GUILayout.Width(150));
 
@@ -144,7 +152,7 @@ public class DungeonMapEditor : EditorWindow
                 "Current map data will be lost. Create new?", "Yes", "No"))
             {
                 // InitializeMap 호출 시 플레이어 위치/방향 인자 전달
-                InitializeMap(inputWidth, inputHeight, inputID, inputTheme, inputStartX, inputStartY, inputStartDirection);
+                InitializeMap(inputWidth, inputHeight, inputMapID, inputLocationID, inputTheme, inputStartX, inputStartY, inputStartDirection);
             }
         }
 
@@ -238,19 +246,20 @@ public class DungeonMapEditor : EditorWindow
             if (System.Array.IndexOf(availableMapIDs, mapData.mapID) == -1)
             {
                 Debug.LogWarning($"[DungeonEditor] 로드된 맵 ID '{mapData.mapID}'는 유효한 목록에 없습니다. 빈 칸으로 초기화됩니다.");
-                inputID = ""; // 배열에 없으면 빈 칸으로 덮어씀
+                inputMapID = ""; // 배열에 없으면 빈 칸으로 덮어씀
                 isInvalidIDLoaded = true;
             }
             else
             {
-                inputID = mapData.mapID; // 배열에 있으면 정상 동기화
+                inputMapID = mapData.mapID; // 배열에 있으면 정상 동기화
                 isInvalidIDLoaded = false;
             }
 
             // UI 값 동기화
             inputWidth = mapData.width;
             inputHeight = mapData.height;
-            inputID = mapData.mapID;
+            inputMapID = mapData.mapID;
+            inputLocationID = mapData.locationID;
 
             // 플레이어 위치 동기화
             inputStartX = mapData.startX;
@@ -309,7 +318,7 @@ public class DungeonMapEditor : EditorWindow
         string json = JsonUtility.ToJson(mapData, true);
 
         // 파일명으로 사용할 변수 설정 (ID가 없으면 기본값 사용)
-        string defaultFileName = string.IsNullOrEmpty(inputID) ? "dungeon_map" : inputID;
+        string defaultFileName = string.IsNullOrEmpty(inputMapID) ? "dungeon_map" : inputMapID;
 
         // SaveFilePanel의 세 번째 인자에 변수 전달
         string path = EditorUtility.SaveFilePanel("Save Map", "", defaultFileName, "json");
@@ -801,7 +810,8 @@ public class DungeonMapEditor : EditorWindow
     {
         if (mapData == null) return;
 
-        mapData.mapID = inputID;
+        mapData.mapID = inputMapID;
+        mapData.locationID = inputLocationID;
         mapData.themeName = (inputTheme != null) ? inputTheme.name : "";
         
         mapData.startX = inputStartX;

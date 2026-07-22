@@ -3,7 +3,7 @@
     "height": 5,
     "mapID": "Underground_0_0",
     "themeName": "Underground_0",
-    "LocationID": "UNDERGROUND",
+    "locationID": "UNDERGROUND",
     "startX": 0,
     "startY": 0,
     "startDirection": 0,

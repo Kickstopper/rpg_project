@@ -3,7 +3,7 @@
     "height": 5,
     "mapID": "Labyrinth_4",
     "themeName": "Labyrinth_0",
-    "LocationID": "LABYRINTH",
+    "locationID": "LABYRINTH",
     "startX": 0,
     "startY": 2,
     "startDirection": 0,

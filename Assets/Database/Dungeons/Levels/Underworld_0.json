@@ -3,7 +3,7 @@
     "height": 51,
     "mapID": "Underworld",
     "themeName": "Underworld",
-    "LocationID": "UNDERWORLD",
+    "locationID": "UNDERWORLD",
     "startX": 25,
     "startY": 0,
     "startDirection": 0,

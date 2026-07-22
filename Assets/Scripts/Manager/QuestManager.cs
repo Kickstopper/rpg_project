@@ -113,7 +113,7 @@ namespace Manager
         }
 
         // 전투 종료 후 킬 카운트 정산
-        public List<QuestData> ProcessBattleResult(string mapLocationID, List<string> killedMonsterIDs)
+        public List<QuestData> ProcessBattleResult(string maplocationID, List<string> killedMonsterIDs)
         {
             List<QuestData> newlyCompletedQuests = new List<QuestData>();
 
@@ -124,8 +124,8 @@ namespace Manager
 
                 QuestData data = GetQuestData(progress.questID);
                 
-                // 장소(LocationID)가 일치하는지 확인
-                if (data.LocationID != mapLocationID) continue; 
+                // 장소(locationID)가 일치하는지 확인
+                if (data.locationID != maplocationID) continue; 
 
                 bool isUpdated = false;
 

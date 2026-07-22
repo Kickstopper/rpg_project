@@ -3437,11 +3437,11 @@ namespace UI.Battle
                 } 
             }
 
-            // 현재 맵의 LocationID 취득
-            string currentLocationID = ManagerRoot.Dungeon.CurrentDungeonData.LocationID;
+            // 현재 맵의 locationID 취득
+            string currentlocationID = ManagerRoot.Dungeon.CurrentDungeonData.locationID;
 
             // 달성한 퀘스트 목록 취득
-            List<QuestData> completedQuests = ManagerRoot.Quest.ProcessBattleResult(currentLocationID, killedMonsterIDs);
+            List<QuestData> completedQuests = ManagerRoot.Quest.ProcessBattleResult(currentlocationID, killedMonsterIDs);
 
             if (completedQuests.Count > 0)
             {

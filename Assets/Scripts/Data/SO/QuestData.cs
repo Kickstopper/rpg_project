@@ -17,7 +17,7 @@ namespace Data
         public string QuestType;
         public List<QuestTarget> Targets = new List<QuestTarget>();
         public string Location;   // 지역의 이름
-        public string LocationID; // 실제 퀘스트가 진행될 맵들의 공통 ID
+        public string locationID; // 실제 퀘스트가 진행될 맵들의 공통 ID
         public int Risk;
         public int Reward;
         public string Description;
