@@ -339,41 +339,27 @@ namespace UI.Battle
             if (weapon != null) scope = weapon.attackRange;
             else if (actionType == ActionType.Shoot) return; 
 
-            if (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Single_Enemy)
+            // 유효한 타겟팅 리스트 세팅
+            fieldController.SetValidTargetsByTargetScope(scope);
+
+            if (fieldController.validTargets.Count == 0)
             {
-                var validTargets = fieldController.GetLivingMonsters();
-
-                if (scope == TargetScope.Front_Single_Enemy)
-                {
-                    validTargets = validTargets.Where(m => m.transform.parent.parent == fieldController.enemyFrontRowContainer).ToList();
-                    if (validTargets.Count == 0) validTargets = fieldController.GetLivingMonsters();
-                }
-                
-                if (validTargets.Count == 0) return;
-
-                fieldController.SetValidTargets(validTargets);
-                fieldController.currentTargetIndex = 0;
-                fieldController.UpdateValidTargetsHighlight();
-                
-                currentSelectedAction = actionType;
-                isSelectingTarget = true;
-                
-                uiController.SetCmdPanelVisible(false);
-                uiController.ShowLog("타겟 선택");
-                
-                inputCooldown = 0.05f;
+                uiController.ShowLog("타겟 없음!");
+                return;
             }
-            else
-            {
-                currentSelectedAction = actionType;
-                int speed = currentActor.GetTotalAgi() - currentActor.nextTurnSpeedPenalty;
-                currentActor.nextTurnSpeedPenalty = 0; 
 
-                BattleAction action = new BattleAction(currentActor.gameObject, null, actionType, speed);
-                actionQueue.Add(action);
-
-                NextPlayerInput();
-            }
+            // 무조건 타겟팅 모드로 진입
+            currentSelectedAction = actionType;
+            isSelectingTarget = true;
+            
+            fieldController.currentTargetIndex = 0;
+            fieldController.UpdateValidTargetsHighlight(); // 다수일 경우 전체 하이라이트가 켜짐
+            
+            uiController.SetCmdPanelVisible(false);
+            uiController.ShowLog("타겟 선택");
+            
+            inputCooldown = 0.05f;
+            EventSystem.current.SetSelectedGameObject(null); // 중복 입력 방지
         }
 
         void PreparePlayerTurn()
@@ -2363,7 +2349,7 @@ namespace UI.Battle
                     {
                         bool success = ManagerRoot.Effect.ApplyEffect(battleTarget, item);
                         
-                        if (success)
+                        //if (success)
                         {
                             ManagerRoot.Sound.PlaySFX(SfxID.Attack_Magic); // TODO: 회복 사운드로 교체 필요
                             visualController.SpawnVFX(item.vfxId, targetObj.transform.position); 
@@ -2449,7 +2435,7 @@ namespace UI.Battle
                     {
                         bool success = ManagerRoot.Effect.ApplyEffect(battleTarget, skill);
                         
-                        if (success)
+                        //if (success)
                         {
                             ManagerRoot.Sound.PlaySFX(SfxID.Attack_Magic);
                             visualController.SpawnVFX(skill.vfxId, GetCenterPosition(targetObj));
@@ -3437,11 +3423,11 @@ namespace UI.Battle
                 } 
             }
 
-            // 현재 맵의 locationID 취득
-            string currentlocationID = ManagerRoot.Dungeon.CurrentDungeonData.locationID;
+            // 현재 맵의 LocationID 취득
+            string currentLocationID = ManagerRoot.Dungeon.CurrentDungeonData.locationID;
 
             // 달성한 퀘스트 목록 취득
-            List<QuestData> completedQuests = ManagerRoot.Quest.ProcessBattleResult(currentlocationID, killedMonsterIDs);
+            List<QuestData> completedQuests = ManagerRoot.Quest.ProcessBattleResult(currentLocationID, killedMonsterIDs);
 
             if (completedQuests.Count > 0)
             {

@@ -243,37 +243,6 @@ namespace UI.Battle
             this.maxHp = BattleCalculator.GetMaxHP(level, GetTotalStr(), GetTotalVit());
             this.maxMp = BattleCalculator.GetMaxMP(level, GetTotalMag(), GetTotalInt());
         }
-        
-        // 회복 함수
-        public void Recover(int hpAmount, int mpAmount)
-        {
-            if (!IsAlive) return;
-            
-            if (hpAmount > 0)
-            {
-                currentHp = Mathf.Min(currentHp + hpAmount, maxHp);
-                // 회복 연출 (텍스트 등)
-                Debug.Log($"{entityName} HP {hpAmount} 회복");
-            }
-            if (mpAmount > 0)
-            {
-                currentMp = Mathf.Min(currentMp + mpAmount, maxMp);
-            }
-            UpdateUI();
-        }
-
-        // 부활 함수
-        public void Revive(int percent)
-        {
-            if (IsAlive) return;
-            
-            int healAmount = Mathf.FloorToInt(maxHp * (percent / 100f));
-            currentHp = healAmount;
-            
-            gameObject.SetActive(true); 
-            UpdateUI();
-            Debug.Log($"{entityName} 부활!");
-        }
 
         public void SetHighlightColor(Color color)
         {

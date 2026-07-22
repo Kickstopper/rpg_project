@@ -21,9 +21,9 @@ MonoBehaviour:
   effectType: 0
   effectValue: 0
   element: 3
-  targetScope: 0
+  targetScope: 1
   useType: 0
-  statusEffect: 11
+  statusEffectData: {fileID: 0}
   statusEffectChance: 0.2
   actionDelay: 0
   price: 1200
