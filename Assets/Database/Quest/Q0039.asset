@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0039
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0039
+  QuestName: "\uC2EC\uC5F0\uC758 \uC218\uD638\uC790"
+  QuestType: Main
+  Targets:
+  - monsterID: enemy_098
+    requiredCount: 1
+  Location: "\uBB3C\uC5D0 \uC7A0\uAE34 \uAC74\uBB3C"
+  locationID: RUIN
+  Risk: 6
+  Reward: 16000
+  Description: "\uAC70\uB300\uD55C \uC218\uB85C \uAE4A\uC740 \uACF3\uC5D0\uC11C \uB808\uBE44\uC544\uD0C4\uC774
+    \uAC01\uC131\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4. \uC644\uC804\uD788 \uC4F0\uB7EC\uB728\uB9B4
+    \uC218\uB294 \uC5C6\uB354\uB77C\uB3C4 \uD1F4\uAC01\uC2DC\uCF1C\uC57C \uD569\uB2C8\uB2E4."

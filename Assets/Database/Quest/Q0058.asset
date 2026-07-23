@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0058
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0058
+  QuestName: "\uB3C5\uC548\uAC1C\uC758 \uADFC\uC6D0"
+  QuestType: Sub
+  Targets:
+  - monsterID: enemy_007
+    requiredCount: 1
+  - monsterID: enemy_011
+    requiredCount: 1
+  Location: "\uB2AA\uC9C0\uB300"
+  locationID: BOG
+  Risk: 4
+  Reward: 6200
+  Description: "\uB3C5\uC131 \uD3EC\uC790\uB97C \uBC29\uCD9C\uD558\uB294 \uC2DD\uBB3C\uD615
+    \uBAAC\uC2A4\uD130\uB97C \uC81C\uAC70\uD558\uC5EC \uB3C5\uC548\uAC1C\uB97C \uC57D\uD654\uC2DC\uD0A4\uC2ED\uC2DC\uC624."

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0033
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0033
+  QuestName: "\uCE68\uC218 \uAC74\uBB3C \uC870\uC0AC"
+  QuestType: Repeat
+  Targets:
+  - monsterID: enemy_010
+    requiredCount: 1
+  Location: "\uBB3C\uC5D0 \uC7A0\uAE34 \uAC74\uBB3C"
+  locationID: RUIN
+  Risk: 2
+  Reward: 2600
+  Description: "\uCE68\uC218\uB41C \uAC74\uBB3C \uB0B4\uBD80\uB97C \uC218\uC0C9\uD558\uACE0
+    \uBA38\uB9E8 \uBB34\uB9AC\uB97C \uC81C\uAC70\uD558\uC2ED\uC2DC\uC624."

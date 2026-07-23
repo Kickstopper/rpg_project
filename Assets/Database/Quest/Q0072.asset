@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0072
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0072
+  QuestName: "\uD3D0\uAE30 \uACC4\uD68D 'NEXUS'"
+  QuestType: Main
+  Targets:
+  - monsterID: enemy_037
+    requiredCount: 1
+  - monsterID: enemy_039
+    requiredCount: 1
+  - monsterID: enemy_033
+    requiredCount: 1
+  Location: "\uD3D0\uAE30\uBB3C \uCC98\uB9AC\uC7A5"
+  locationID: WASTELAND
+  Risk: 7
+  Reward: 26000
+  Description: "\uCC98\uB9AC\uC7A5 \uCD5C\uC2EC\uBD80\uC5D0\uC11C 'NEXUS \uACC4\uD68D'\uC758
+    \uAE30\uB85D\uC774 \uBC1C\uACAC\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uC2E4\uD5D8 \uBCD1\uB825\uC744
+    \uACA9\uD30C\uD558\uACE0 \uBB3C\uC9C8 \uC804\uC1A1 \uC5F0\uAD6C\uC18C\uC758 \uC88C\uD45C\uB97C
+    \uD655\uBCF4\uD558\uC2ED\uC2DC\uC624."

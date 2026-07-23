@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0017
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0017
+  QuestName: "\uC624\uC5FC\uB41C \uBC30\uC218\uB85C"
+  QuestType: Repeat
+  Targets:
+  - monsterID: enemy_000
+    requiredCount: 1
+  Location: "\uD558\uC218\uB3C4"
+  locationID: SEWER
+  Risk: 1
+  Reward: 1300
+  Description: "\uBC30\uC218\uB85C\uB97C \uB9C9\uACE0 \uC788\uB294 \uC2AC\uB77C\uC784\uC744
+    \uC81C\uAC70\uD558\uC5EC \uBB3C\uC758 \uD750\uB984\uC744 \uBCF5\uAD6C\uD558\uC2ED\uC2DC\uC624."

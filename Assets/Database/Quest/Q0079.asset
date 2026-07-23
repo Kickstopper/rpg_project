@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0079
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0079
+  QuestName: "\uBC14\uC54C \uAC15\uB9BC"
+  QuestType: Main
+  Targets:
+  - monsterID: enemy_096
+    requiredCount: 1
+  Location: "\uBB3C\uC9C8 \uC804\uC1A1 \uC5F0\uAD6C\uC18C"
+  locationID: MT LABORATORY
+  Risk: 8
+  Reward: 32000
+  Description: "\uCC28\uC6D0 \uAC8C\uC774\uD2B8\uAC00 \uC644\uC804\uD788 \uC5F4\uB9AC\uBA70
+    \uBC14\uC54C\uC774 \uAC15\uB9BC\uD588\uC2B5\uB2C8\uB2E4. \uC5F0\uAD6C\uC18C \uBD95\uAD34
+    \uC804\uC5D0 \uC800\uC9C0\uD558\uC2ED\uC2DC\uC624."

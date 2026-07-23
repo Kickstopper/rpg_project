@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0080
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0080
+  QuestName: NEXUS CORE
+  QuestType: Main
+  Targets:
+  - monsterID: enemy_096
+    requiredCount: 1
+  - monsterID: enemy_114
+    requiredCount: 1
+  - monsterID: enemy_104
+    requiredCount: 1
+  Location: "\uBB3C\uC9C8 \uC804\uC1A1 \uC5F0\uAD6C\uC18C"
+  locationID: MT LABORATORY
+  Risk: 9
+  Reward: 50000
+  Description: "NEXUS CORE\uAC00 \uD3ED\uC8FC\uD558\uC5EC \uCC28\uC6D0\uC774 \uC735\uD569\uB418\uAE30
+    \uC2DC\uC791\uD588\uC2B5\uB2C8\uB2E4. \uB9C8\uC9C0\uB9C9 \uC804\uD22C\uB97C \uB05D\uB0B4\uACE0
+    \uC138\uACC4\uB97C \uAD6C\uD558\uC2ED\uC2DC\uC624."

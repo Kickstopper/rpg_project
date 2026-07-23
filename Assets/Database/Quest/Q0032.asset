@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0032
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0032
+  QuestName: "\uADE0\uC5F4\uC758 \uC2EC\uC7A5\uBD80"
+  QuestType: Main
+  Targets:
+  - monsterID: enemy_108
+    requiredCount: 1
+  - monsterID: enemy_064
+    requiredCount: 1
+  - monsterID: enemy_079
+    requiredCount: 1
+  Location: "\uB3D9\uAD74"
+  locationID: CAVE
+  Risk: 6
+  Reward: 18000
+  Description: "\uB3D9\uAD74 \uCD5C\uC2EC\uBD80\uC5D0\uC11C \uCC28\uC6D0 \uADE0\uC5F4\uC774
+    \uD655\uB300\uB418\uACE0 \uC788\uC2B5\uB2C8\uB2E4. \uB4DC\uB798\uACE4 \uB098\uC774\uD2B8\uB97C
+    \uC4F0\uB7EC\uB728\uB9AC\uACE0 \uADE0\uC5F4\uC758 \uD575\uC744 \uD655\uBCF4\uD558\uC2ED\uC2DC\uC624."

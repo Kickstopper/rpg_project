@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0057
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0057
+  QuestName: "\uB2AA\uAE38 \uD655\uBCF4"
+  QuestType: Repeat
+  Targets:
+  - monsterID: enemy_013
+    requiredCount: 1
+  Location: "\uB2AA\uC9C0\uB300"
+  locationID: BOG
+  Risk: 3
+  Reward: 4800
+  Description: "\uD0D0\uC0AC\uB300\uB97C \uC704\uD574 \uB2AA\uAE38\uC744 \uB9C9\uACE0
+    \uC788\uB294 \uD06C\uB9AC\uD551\uBC14\uC778\uC744 \uC81C\uAC70\uD558\uC2ED\uC2DC\uC624."

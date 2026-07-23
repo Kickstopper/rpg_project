@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0036
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0036
+  QuestName: "\uD638\uC218\uC758 \uB9DD\uB839"
+  QuestType: Sub
+  Targets:
+  - monsterID: enemy_043
+    requiredCount: 1
+  Location: "\uBB3C\uC5D0 \uC7A0\uAE34 \uAC74\uBB3C"
+  locationID: RUIN
+  Risk: 4
+  Reward: 6200
+  Description: "\uCE68\uC218\uB41C \uC8FC\uCC28\uC7A5\uC5D0\uC11C \uCF08\uD53C\uAC00
+    \uC0DD\uC874\uC790\uB97C \uC720\uC778\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4. \uAD6C\uC870
+    \uC791\uC804\uC744 \uC218\uD589\uD558\uC2ED\uC2DC\uC624."

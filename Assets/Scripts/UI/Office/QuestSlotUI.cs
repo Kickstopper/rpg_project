@@ -35,7 +35,7 @@ namespace UI.Office
 
         private void SetUI(string questName, int rank, int fee)
         {
-            riskText.text = $"RANK {rank}";
+            riskText.text = $"R{rank}";
             questNameText.text = questName;
             rewardText.text = fee.ToString();
         }

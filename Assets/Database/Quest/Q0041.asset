@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0041
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0041
+  QuestName: "\uC0AC\uB9C9 \uC218\uC1A1\uB85C \uD655\uBCF4"
+  QuestType: Repeat
+  Targets:
+  - monsterID: enemy_081
+    requiredCount: 1
+  Location: "\uC0AC\uB9C9"
+  locationID: BADLANDS
+  Risk: 3
+  Reward: 4200
+  Description: "\uC218\uC1A1\uB85C\uB97C \uBC30\uD68C\uD558\uB294 \uBA38\uBBF8\uB97C
+    \uC81C\uAC70\uD558\uC5EC \uBCF4\uAE09 \uCC28\uB7C9\uC758 \uD1B5\uD589\uC744 \uD655\uBCF4\uD558\uC2ED\uC2DC\uC624."

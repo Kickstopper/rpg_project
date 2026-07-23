@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0016
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0016
+  QuestName: "\uC9C0\uD558\uC758 \uBD09\uC778"
+  QuestType: Main
+  Targets:
+  - monsterID: enemy_024
+    requiredCount: 1
+  - monsterID: enemy_044
+    requiredCount: 1
+  - monsterID: enemy_018
+    requiredCount: 1
+  Location: "\uC9C0\uD558\uCCA0 \uC2B9\uAC15\uC7A5"
+  locationID: SUBWAY
+  Risk: 5
+  Reward: 12500
+  Description: "\uD3D0\uC120 \uAE4A\uC219\uD55C \uACF3\uC5D0\uC11C \uCC28\uC6D0 \uADE0\uC5F4\uC758
+    \uD754\uC801\uC774 \uBC1C\uACAC\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uC5B8\uB370\uB4DC\uB97C
+    \uC18C\uD0D5\uD558\uACE0 \uADE0\uC5F4\uC758 \uB2E8\uC11C\uB97C \uD655\uBCF4\uD558\uC2ED\uC2DC\uC624."

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0066
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0066
+  QuestName: "\uD3ED\uC8FC\uD55C \uD3D0\uAE30 \uB4DC\uB860"
+  QuestType: Repeat
+  Targets:
+  - monsterID: enemy_027
+    requiredCount: 1
+  - monsterID: enemy_026
+    requiredCount: 1
+  Location: "\uD3D0\uAE30\uBB3C \uCC98\uB9AC\uC7A5"
+  locationID: WASTELAND
+  Risk: 5
+  Reward: 7800
+  Description: "\uD3D0\uAE30 \uC608\uC815\uC774\uB358 \uC790\uB3D9 \uBCD1\uAE30\uB4E4\uC774
+    \uC7AC\uAC00\uB3D9\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uC2DC\uC2A4\uD15C\uC744 \uC815\uC9C0\uC2DC\uD0A4\uC2ED\uC2DC\uC624."

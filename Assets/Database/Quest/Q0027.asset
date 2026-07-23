@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0027
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0027
+  QuestName: "\uC6A9\uC778\uC758 \uD754\uC801"
+  QuestType: Sub
+  Targets:
+  - monsterID: enemy_058
+    requiredCount: 1
+  Location: "\uB3D9\uAD74"
+  locationID: CAVE
+  Risk: 3
+  Reward: 4800
+  Description: "\uB3D9\uAD74 \uAE4A\uC740 \uACF3\uC5D0\uC11C \uB4DC\uB798\uACE4\uD3EC\uD06C
+    \uBD80\uC871\uC774 \uBAA9\uACA9\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uC815\uCC30 \uD6C4
+    \uD544\uC694 \uC2DC \uAD50\uC804\uD558\uC2ED\uC2DC\uC624."

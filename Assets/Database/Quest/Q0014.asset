@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0014
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0014
+  QuestName: "\uD3D0\uC5ED \uC815\uD654 \uC791\uC804"
+  QuestType: Repeat
+  Targets:
+  - monsterID: enemy_017
+    requiredCount: 1
+  - monsterID: enemy_018
+    requiredCount: 1
+  - monsterID: enemy_020
+    requiredCount: 1
+  Location: "\uC9C0\uD558\uCCA0 \uC2B9\uAC15\uC7A5"
+  locationID: SUBWAY
+  Risk: 4
+  Reward: 5200
+  Description: "\uC644\uC804\uD788 \uBD09\uC1C4\uB41C \uD3D0\uC5ED\uC744 \uC815\uD654\uD558\uC5EC
+    \uC720\uC9C0\uBCF4\uC218\uD300\uC774 \uC9C4\uC785\uD560 \uC218 \uC788\uB3C4\uB85D
+    \uD558\uC2ED\uC2DC\uC624."

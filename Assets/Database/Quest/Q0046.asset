@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0046
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0046
+  QuestName: "\uACE0\uB300 \uC601\uC6C5\uC758 \uC2DC\uD5D8"
+  QuestType: Sub
+  Targets:
+  - monsterID: enemy_103
+    requiredCount: 1
+  Location: "\uC0AC\uB9C9"
+  locationID: BADLANDS
+  Risk: 5
+  Reward: 10500
+  Description: "\uC5D4\uD0A4\uB450\uAC00 \uCE68\uC785\uC790\uB97C \uC2DC\uD5D8\uD558\uACE0
+    \uC788\uC2B5\uB2C8\uB2E4. \uBC18\uB4DC\uC2DC \uCC98\uCE58\uD560 \uD544\uC694\uB294
+    \uC5C6\uC73C\uBA70 \uADF8\uC758 \uC2DC\uB828\uC744 \uADF9\uBCF5\uD558\uC2ED\uC2DC\uC624."

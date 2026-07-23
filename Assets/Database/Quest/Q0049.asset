@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0049
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0049
+  QuestName: "\uC232\uAE38 \uAC1C\uCC99"
+  QuestType: Repeat
+  Targets:
+  - monsterID: enemy_009
+    requiredCount: 1
+  - monsterID: enemy_023
+    requiredCount: 0
+  Location: "\uC232"
+  locationID: FOREST
+  Risk: 3
+  Reward: 4500
+  Description: "\uC232 \uC785\uAD6C\uB97C \uC810\uAC70\uD55C \uBAAC\uC2A4\uD130\uB97C
+    \uC81C\uAC70\uD558\uC5EC \uC870\uC0AC\uB300\uB97C \uC704\uD55C \uD1B5\uB85C\uB97C
+    \uD655\uBCF4\uD558\uC2ED\uC2DC\uC624."

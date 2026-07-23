@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0054
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0054
+  QuestName: "\uD558\uB298\uC758 \uD3EC\uC2DD\uC790"
+  QuestType: Sub
+  Targets:
+  - monsterID: enemy_065
+    requiredCount: 1
+  - monsterID: enemy_023
+    requiredCount: 0
+  Location: "\uC232"
+  locationID: FOREST
+  Risk: 5
+  Reward: 9800
+  Description: "\uADF8\uB9AC\uD3F0\uACFC \uD558\uD53C\uAC00 \uC0C1\uACF5\uC744 \uC7A5\uC545\uD558\uC5EC
+    \uBCF4\uAE09\uB85C\uAC00 \uB04A\uACBC\uC2B5\uB2C8\uB2E4. \uB465\uC9C0\uB97C \uC81C\uAC70\uD558\uC2ED\uC2DC\uC624."

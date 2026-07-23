@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0063
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0063
+  QuestName: "\uD0C0\uB77D\uD55C \uC131\uC5ED"
+  QuestType: Main
+  Targets:
+  - monsterID: enemy_101
+    requiredCount: 1
+  - monsterID: enemy_007
+    requiredCount: 1
+  - monsterID: enemy_013
+    requiredCount: 1
+  Location: "\uB2AA\uC9C0\uB300"
+  locationID: BOG
+  Risk: 6
+  Reward: 16500
+  Description: "\uC232\uC758 \uC131\uC5ED\uC774 \uB2AA\uC73C\uB85C \uCE68\uC2DD\uB418\uC5C8\uC2B5\uB2C8\uB2E4.
+    \uB9B4\uB9AC\uC2A4\uB97C \uC800\uC9C0\uD558\uACE0 \uC624\uC5FC\uC758 \uADFC\uC6D0\uC744
+    \uBD09\uC778\uD558\uC2ED\uC2DC\uC624."

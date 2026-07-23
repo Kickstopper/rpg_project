@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using Data;
+using Manager;
 
 namespace UI.Office
 {
@@ -11,6 +12,7 @@ namespace UI.Office
         public TextMeshProUGUI locationText;
         public TextMeshProUGUI rewardText;
         public TextMeshProUGUI targetInfoText;
+        public TextMeshProUGUI descriptionText;
         public TextMeshProUGUI statusText;
 
         // 선택된 퀘스트 데이터를 받아와 UI를 갱신합니다.
@@ -26,16 +28,21 @@ namespace UI.Office
             
             // 기본 정보
             questNameText.text = data.QuestName;
-            locationText.text = $"장소 : {data.Location} (LV.{data.Risk})";
+            locationText.text = $"장소 : {data.Location} R{data.Risk}";
             rewardText.text = $"보수 : {data.Reward} G";
 
             // 타겟 정보 문자열 조합
-            string targetStr = "<b>[토벌 목표]</b>\n";
+            string targetStr = "[토벌 목표]\n";
+            MonsterDatabase.MonsterEntry entry = null;
             if (data.Targets != null && data.Targets.Count > 0)
             {
                 foreach (var target in data.Targets)
                 {
-                    targetStr += $"- {target.monsterID} {target.requiredCount}마리\n";
+                    entry = ManagerRoot.Database.monsterDB.GetEntry(target.monsterID);
+                    if (entry != null)
+                    {
+                        targetStr += $"- {entry.name} {target.requiredCount}마리\n";
+                    }
                 }
             }
             else
@@ -44,18 +51,30 @@ namespace UI.Office
             }
             targetInfoText.text = targetStr;
 
-            // 상태 표시
-            if (isCompleted)
+            if (!string.IsNullOrEmpty(data.Description))
             {
-                statusText.text = "<color=#808080>완료된 의뢰</color>"; // 회색
-            }
-            else if (isActive)
-            {
-                statusText.text = "<color=#00BFFF>진행 중인 의뢰</color>"; // 하늘색
+                descriptionText.text = data.Description;
             }
             else
             {
-                statusText.text = "<color=#FFFFFF>수주 가능</color>"; // 흰색
+                descriptionText.text = string.Empty;
+            }
+            
+            // 상태 표시
+            if (isCompleted)
+            {
+                statusText.text = "완료";
+                statusText.color = Color.gold; // 회색
+            }
+            else if (isActive)
+            {
+                statusText.text = "진행 중";
+                statusText.color = Color.cyan; // 하늘색
+            }
+            else
+            {
+                statusText.text = "수주 가능";
+                statusText.color = Color.magenta; // 흰색
             }
         }
     }

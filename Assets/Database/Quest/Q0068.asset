@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0068
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0068
+  QuestName: "\uBCD1\uAE30 \uC7AC\uD65C\uC6A9 \uC870\uC9C1"
+  QuestType: Sub
+  Targets:
+  - monsterID: enemy_015
+    requiredCount: 1
+  - monsterID: enemy_059
+    requiredCount: 1
+  - monsterID: enemy_033
+    requiredCount: 1
+  Location: "\uD3D0\uAE30\uBB3C \uCC98\uB9AC\uC7A5"
+  locationID: WASTELAND
+  Risk: 5
+  Reward: 9800
+  Description: "\uBD88\uBC95 \uC870\uC9C1\uC774 \uD3D0\uAE30 \uBCD1\uAE30\uB97C \uD68C\uC218\uD558\uC5EC
+    \uC554\uC2DC\uC7A5\uC5D0 \uD310\uB9E4\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4. \uC870\uC9C1\uC744
+    \uC18C\uD0D5\uD558\uC2ED\uC2DC\uC624."

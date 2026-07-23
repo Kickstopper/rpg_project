@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0056
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0056
+  QuestName: "\uC138\uACC4\uC218\uC758 \uBFCC\uB9AC"
+  QuestType: Main
+  Targets:
+  - monsterID: enemy_089
+    requiredCount: 1
+  - monsterID: enemy_038
+    requiredCount: 1
+  - monsterID: enemy_028
+    requiredCount: 1
+  Location: "\uC232"
+  locationID: FOREST
+  Risk: 6
+  Reward: 20000
+  Description: "\uC138\uACC4\uC218\uC758 \uBFCC\uB9AC\uAE4C\uC9C0 \uCC28\uC6D0 \uADE0\uC5F4\uC774
+    \uCE68\uC2DD\uD588\uC2B5\uB2C8\uB2E4. \uBD88\uC758 \uC815\uB839 \uC774\uD504\uB9AC\uD2B8\uAC00
+    \uADE0\uC5F4\uC744 \uD655\uC7A5\uC2DC\uD0A4\uACE0 \uC788\uC2B5\uB2C8\uB2E4. \uADE0\uC5F4\uC744
+    \uBD09\uC778\uD558\uACE0 \uB2AA\uC9C0\uB300\uB85C \uC774\uC5B4\uC9C0\uB294 \uD1B5\uB85C\uB97C
+    \uD655\uBCF4\uD558\uC2ED\uC2DC\uC624."

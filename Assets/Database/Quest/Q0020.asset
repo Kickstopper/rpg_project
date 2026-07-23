@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
+  m_Name: Q0020
+  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  QuestID: Q0020
+  QuestName: "\uB3C5\uC131 \uB369\uAD74 \uC81C\uAC70"
+  QuestType: Sub
+  Targets:
+  - monsterID: enemy_007
+    requiredCount: 1
+  - monsterID: enemy_013
+    requiredCount: 1
+  Location: "\uD558\uC218\uB3C4"
+  locationID: SEWER
+  Risk: 3
+  Reward: 3600
+  Description: "\uBC30\uAD00\uC744 \uB4A4\uB36E\uC740 \uC2DD\uBB3C\uD615 \uBAAC\uC2A4\uD130\uB97C
+    \uC81C\uAC70\uD558\uC5EC \uC2DC\uC124\uC744 \uBCF5\uAD6C\uD558\uC2ED\uC2DC\uC624."
