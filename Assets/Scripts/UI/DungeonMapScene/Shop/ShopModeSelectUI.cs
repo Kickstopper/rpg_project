@@ -136,8 +136,13 @@ namespace UI.Shop
                 if (characterPortrait != null)
                 {
                     Sprite portrait = shopData.characterImage;
-                    characterPortrait.sprite = portrait;
-                    characterPortrait.color = portrait != null ? Color.white : Color.clear; 
+                    if (portrait != null)
+                    {
+                        characterPortrait.sprite = portrait;
+                        characterPortrait.color = Color.white;
+                        characterPortrait.SetNativeSize();
+                    }
+                    else characterPortrait.color = Color.clear; 
                 }
                 if (shopData.bgmID != BgmID.None)
                 {

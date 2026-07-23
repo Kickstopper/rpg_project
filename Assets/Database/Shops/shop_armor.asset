@@ -29,7 +29,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a5c82196da96c76419d2e134f3ad26cf, type: 2}
   - {fileID: 11400000, guid: 75811048e354b434b8b89040c8f5ddd3, type: 2}
   - {fileID: 11400000, guid: 6146472bb658f3d47afd114c6ae954f1, type: 2}
-  characterImage: {fileID: 0}
+  characterImage: {fileID: 21300000, guid: 4be3be4981d65d441b7f3760f840b9f4, type: 3}
+  characterName: 
   startMessage: "\uC5B4\uC11C\uC640. \uC88B\uC740 \uBB3C\uAC74\uC774 \uB9CE\uC544."
   endMessage: "\uC0B4\uC544\uC11C \uB2E4\uC2DC \uBCF4\uC790\uACE0."
   buyMessage: "\uBB34\uC5C7\uC744 \uC0AC\uC8FC\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"

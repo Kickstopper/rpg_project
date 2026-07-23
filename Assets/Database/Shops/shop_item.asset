@@ -31,7 +31,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1c541520573dd9e499d9230fe84a1a6c, type: 2}
   - {fileID: 11400000, guid: 923a6b643070b4b47a4e28bcfaee76ae, type: 2}
   - {fileID: 11400000, guid: fda6623437a544e4bae27b42c3d7d5ec, type: 2}
-  characterImage: {fileID: 0}
+  characterImage: {fileID: 21300000, guid: 9b8918117636ed140b8ad42c519e9f1e, type: 3}
+  characterName: 
   startMessage: "\uC5B4\uC11C\uC640. \uC88B\uC740 \uBB3C\uAC74\uC774 \uB9CE\uC544."
   endMessage: "\uC0B4\uC544\uC11C \uB2E4\uC2DC \uBCF4\uC790\uACE0."
   buyMessage: "\uBB34\uC5C7\uC744 \uC0AC\uC8FC\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
