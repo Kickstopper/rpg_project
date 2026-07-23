@@ -8,7 +8,7 @@ public class MonsterSpriteAssigner : EditorWindow
     private MonsterDatabase database;
     private DefaultAsset spriteFolder;
 
-    [MenuItem("Tools/Monster Sprite Assigner")]
+    [MenuItem("Tools/Image/Monster Sprite Assigner")]
     public static void ShowWindow()
     {
         GetWindow<MonsterSpriteAssigner>("Sprite Assigner");

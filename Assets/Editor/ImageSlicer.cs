@@ -7,7 +7,7 @@ public class ImageSlicer : EditorWindow
     private int columns = 4;
     private int rows = 2;
 
-    [MenuItem("Tools/Image Slicer")]
+    [MenuItem("Tools/Image/Image Slicer")]
     public static void ShowWindow()
     {
         GetWindow<ImageSlicer>("Image Slicer");

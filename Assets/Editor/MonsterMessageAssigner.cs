@@ -9,7 +9,7 @@ public class MonsterMessageAssigner : EditorWindow
     private MonsterDatabase database;
     private TextAsset csvFile;
 
-    [MenuItem("Tools/Monster Message Assigner")]
+    [MenuItem("Tools/CSV/Monster Message Assigner")]
     public static void ShowWindow()
     {
         GetWindow<MonsterMessageAssigner>("Message Assigner");

@@ -7,7 +7,7 @@ using Data;
 
 public class ArmorDataGenerator : EditorWindow
 {
-    [MenuItem("Tools/Generate Armor from CSV")]
+    [MenuItem("Tools/CSV/Generate Armor from CSV")]
     public static void GenerateArmor()
     {
         string path = EditorUtility.OpenFilePanel("Select ArmorData CSV", Application.dataPath, "csv");

@@ -11,7 +11,7 @@ public class FolderAtlasPacker : EditorWindow
     private int spriteWidth = 64;
     private int spriteHeight = 64;
 
-    [MenuItem("Tools/Folder Atlas Packer")]
+    [MenuItem("Tools/Image/Folder Atlas Packer")]
     public static void ShowWindow()
     {
         GetWindow<FolderAtlasPacker>("Atlas Packer");

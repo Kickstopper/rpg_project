@@ -13,7 +13,7 @@ public class PixelArtBatchConverter : EditorWindow
     [Range(2, 64)]
     public int colorSteps = 8; // 색상 단순화 단계 (작을수록 색상이 적어짐)
 
-    [MenuItem("Tools/Pixel Art Batch Converter")]
+    [MenuItem("Tools/Image/Pixel Art Batch Converter")]
     public static void ShowWindow()
     {
         GetWindow<PixelArtBatchConverter>("Pixel Art Converter");

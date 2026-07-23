@@ -15,7 +15,7 @@ public class PaletteSwapper : EditorWindow
     public PalleteFallbackMode fallbackMode = PalleteFallbackMode.Pallete_64_Colors;
     public string saveSuffix = "_paletted";
 
-    [MenuItem("Tools/Palette Swapper")]
+    [MenuItem("Tools/Image/Palette Swapper")]
     public static void ShowWindow()
     {
         GetWindow<PaletteSwapper>("Palette Swapper");

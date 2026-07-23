@@ -1,12 +1,10 @@
-using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
-using System; // Enum 파싱을 위해 추가
-
+using System;
 public class MonsterCSVImporter
 {
-    [MenuItem("Tools/Import Stats & Resistances From CSV")]
+    [MenuItem("Tools/CSV/Stats & Resistances From CSV")]
     public static void ImportStatsAndResistances()
     {
         string filePath = EditorUtility.OpenFilePanel("Select Monster Stats CSV", "", "csv");

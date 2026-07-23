@@ -10,7 +10,7 @@ public class SkillTreeCSVImporter : EditorWindow
     
     private string savePath = "Assets/Database/SkillTrees";
 
-    [MenuItem("Tools/Skill Tree CSV Importer")]
+    [MenuItem("Tools/CSV/Skill Tree CSV Importer")]
     public static void ShowWindow()
     {
         GetWindow<SkillTreeCSVImporter>("Skill Tree Importer");

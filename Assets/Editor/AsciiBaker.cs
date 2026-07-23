@@ -9,7 +9,7 @@ public class AsciiBaker : EditorWindow
     private Vector2Int targetResolution = new Vector2Int(64, 64);
     private string asciiChars = " .:-=+*#%@";
 
-    [MenuItem("Tools/ASCII Art Baker")]
+    [MenuItem("Tools/Image/ASCII Art Baker")]
     public static void ShowWindow() => GetWindow<AsciiBaker>("ASCII Baker");
 
     private void OnGUI()

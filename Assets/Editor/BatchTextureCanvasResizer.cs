@@ -9,7 +9,7 @@ public class BatchTextureCanvasResizer : EditorWindow
     private TextAnchor alignment = TextAnchor.LowerCenter;
     private bool overwriteOriginal = false;
 
-    [MenuItem("Tools/Batch Texture Canvas Resizer")]
+    [MenuItem("Tools/Image/Batch Texture Canvas Resizer")]
     public static void ShowWindow()
     {
         GetWindow<BatchTextureCanvasResizer>("Batch Resizer");
