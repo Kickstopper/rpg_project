@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
+  m_Name: CrimsonCastle
+  m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
+  dungeonID: DraculaCastle
+  bgmID: 7
+  useWakeUpEffect: 0
+  monsterList: []
+  maxEnemyCount: 4
+  encounterMode: 1
+  maxSpawnCount: 6
+  spawnDelay: 3
+  background: {fileID: 0}
+  texture:
+  - {fileID: 2800000, guid: 63b4f72d4ca0dd94780680e575feadb3, type: 3}
+  - {fileID: 2800000, guid: 208204c341ef82c4b9ea1321fcffc14e, type: 3}
+  - {fileID: 2800000, guid: 9aa35a9454920ca41862c6e5ff840d25, type: 3}
+  - {fileID: 2800000, guid: b94af04171a96fc44a029d960ecc9447, type: 3}
+  - {fileID: 2800000, guid: d85d45317e4030d4fa67d9bc7ee9ebcd, type: 3}
+  - {fileID: 2800000, guid: e17fc2706dbf8e84ab60397b78072694, type: 3}
+  - {fileID: 2800000, guid: a2454744916ad0d43b4501471b5baa8e, type: 3}
+  - {fileID: 2800000, guid: 7e3ae37ef43bce24691e05391ff0ba81, type: 3}
+  ceilingTexIdx: 5
+  floorTexIdx: 6
+  passableWallTexIDs: 
+  doorAnimations:
+  - closedTexId: 7
+    openFrameTexIds: 
+    animSpeed: 0
+  wallAnimations: []
+  objectSprites: []
+  fogColor: {r: 0.735849, g: 0.735849, b: 0.735849, a: 1}
+  lightingIntensity: 3.5
+  useGridLighting: 1
+  moduleEnable: 1
+  useDustEffect: 1
+  dustParticleCount: 100
+  dustSwayAmplitude: 0.01
+  dustMovesUp: 0
+  useDustTwinkle: 1
+  dustTwinkleSpeed: 10
+  dustColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  useOrganicEffect: 0
+  organicFreqX: 4
+  organicSpeed: 0.3
+  organicBreath: 0.35
+  organicAmplitude: 0.2
+  useMeltEffect: 0
+  meltEdgeBump: 1
+  meltEdgeSpeed: 0.3
+  useWallDistortion: 0
+  distortionFreq: 0.5
+  distortionAmp: 2
+  useCylinderEffect: 0
+  cylinderStrength: 3
+  isUnderwater: 0
+  stereoSeparation: 0.05
