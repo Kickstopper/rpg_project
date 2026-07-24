@@ -162,11 +162,11 @@ namespace Helper
             float partyAvgLv = (players.Count > 0) ? (float)players.Average(p => p.level) : 1;
             float partyAvgLuc = (players.Count > 0) ? (float)players.Average(p => p.GetTotalLuc()) : 1;
 
-            int baseExp = 50; 
             foreach (var entry in encounterLog)
             {
                 int monsterLv = entry.stats.level;
-                
+                // 몬스터 레벨 1당 20 EXP + 기본 10 EXP 부여
+                int baseExp = (monsterLv * 20) + 10;
                 int levelDiff = monsterLv - Mathf.RoundToInt(partyAvgLv);
 
                 // 경험치 계산. 레벨 차이에 따른 보정이 들어감
