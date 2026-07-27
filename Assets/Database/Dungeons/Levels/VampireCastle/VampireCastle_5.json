@@ -2607,24 +2607,24 @@
             "sourceX": 11,
             "sourceY": 3,
             "isWallEntrance": true,
-            "triggerDirection": 0,
+            "triggerDirection": 2,
             "isWorldMap": false,
             "destinationID": "VampireCastle_1",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
+            "targetX": 0,
+            "targetY": 2,
+            "targetDirection": 2
         },
         {
             "type": 0,
             "sourceX": 8,
             "sourceY": 8,
             "isWallEntrance": false,
-            "triggerDirection": 0,
+            "triggerDirection": 2,
             "isWorldMap": false,
-            "destinationID": "VampireCastle_4",
-            "targetX": 1,
-            "targetY": 1,
-            "targetDirection": 0
+            "destinationID": "VampireCastle_6",
+            "targetX": 2,
+            "targetY": 3,
+            "targetDirection": 2
         }
     ]
 }

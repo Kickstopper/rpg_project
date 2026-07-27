@@ -959,6 +959,13 @@ MonoBehaviour:
   - {fileID: 4900000, guid: e0f2f128f3056f844b674c6abdb5017e, type: 3}
   - {fileID: 4900000, guid: 994fa5a5b073e214e89a4c0a4a8cb414, type: 3}
   - {fileID: 4900000, guid: 0bc260b127c027d4baf5aa4b1d95a161, type: 3}
+  - {fileID: 4900000, guid: 4e543ce37c0f62c489a4d32535afdaeb, type: 3}
+  - {fileID: 4900000, guid: d1f793e6e5100dc44b4dded65f19feb9, type: 3}
+  - {fileID: 4900000, guid: c29354ab427865a449ba7cb65db95f66, type: 3}
+  - {fileID: 4900000, guid: 331b676131f0eca4390144db35cac5e6, type: 3}
+  - {fileID: 4900000, guid: ccc5db29513e6e84b83d2a35e518270f, type: 3}
+  - {fileID: 4900000, guid: 9d1484e6448341d4aaa4074036b6b402, type: 3}
+  - {fileID: 4900000, guid: ed0d90b308aa46448becff9cefa61370, type: 3}
   elevatorList:
   - id: elv_000
     minFloor: -1
@@ -987,6 +994,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6d8a5ce81fa7ccc4988cddb533815f5a, type: 2}
   - {fileID: 11400000, guid: d999ffa22388cc14bab22fc1531d4bf9, type: 2}
   - {fileID: 11400000, guid: ffb82835672074d49a78be4afe70cf0f, type: 2}
+  - {fileID: 11400000, guid: 4df07d0d52b4770478a5c159292777a2, type: 2}
 --- !u!1 &7116744041471697975
 GameObject:
   m_ObjectHideFlags: 0

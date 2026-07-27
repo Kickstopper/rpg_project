@@ -29,14 +29,16 @@ MonoBehaviour:
   - {fileID: 2800000, guid: d85d45317e4030d4fa67d9bc7ee9ebcd, type: 3}
   - {fileID: 2800000, guid: e17fc2706dbf8e84ab60397b78072694, type: 3}
   - {fileID: 2800000, guid: a2454744916ad0d43b4501471b5baa8e, type: 3}
+  - {fileID: 2800000, guid: 8c87cab0f8db7df4295c5f1144d46332, type: 3}
+  - {fileID: 2800000, guid: 0a8359ec91578d24c957c9d74626529a, type: 3}
   - {fileID: 2800000, guid: 7e3ae37ef43bce24691e05391ff0ba81, type: 3}
   ceilingTexIdx: 5
   floorTexIdx: 6
-  passableWallTexIDs: 
+  passableWallTexIDs: 09000000
   doorAnimations:
   - closedTexId: 7
-    openFrameTexIds: 
-    animSpeed: 0
+    openFrameTexIds: 08000000
+    animSpeed: 0.1
   wallAnimations: []
   objectSprites: []
   fogColor: {r: 0.735849, g: 0.735849, b: 0.735849, a: 1}
