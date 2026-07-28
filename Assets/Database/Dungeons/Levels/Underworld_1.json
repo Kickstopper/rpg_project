@@ -1473,7 +1473,6 @@
             "sourceX": 4,
             "sourceY": 0,
             "isWallEntrance": true,
-            "triggerDirection": 2,
             "isWorldMap": false,
             "destinationID": "base",
             "targetX": 4,

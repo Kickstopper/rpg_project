@@ -715,7 +715,7 @@
             "y": 3,
             "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 0,
                 4,
                 0
@@ -753,8 +753,8 @@
             "wallTextureIDs": [
                 -1,
                 -1,
-                -1,
-                -1
+                0,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -931,10 +931,10 @@
             "y": 4,
             "value": 0,
             "wallTextureIDs": [
-                0,
-                0,
                 -1,
-                0
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -949,10 +949,10 @@
             "y": 4,
             "value": 0,
             "wallTextureIDs": [
-                0,
-                0,
                 -1,
-                0
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -967,27 +967,9 @@
             "y": 4,
             "value": 0,
             "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ]
-        },
-        {
-            "x": 6,
-            "y": 4,
-            "value": 0,
-            "wallTextureIDs": [
                 0,
-                0,
-                0,
+                -1,
+                -1,
                 4
             ],
             "centerObjectID": -1,
@@ -999,6 +981,24 @@
             ]
         },
         {
+            "x": 6,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                4,
+                0,
+                0,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
             "x": 7,
             "y": 4,
             "value": 0,
@@ -1148,9 +1148,9 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                -1,
-                -1,
-                -1
+                4,
+                0,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -1365,7 +1365,7 @@
             "wallTextureIDs": [
                 0,
                 0,
-                4,
+                -1,
                 0
             ],
             "centerObjectID": -1,
@@ -2103,7 +2103,7 @@
             "wallTextureIDs": [
                 0,
                 -1,
-                4,
+                -1,
                 0
             ],
             "centerObjectID": -1,
@@ -2603,28 +2603,26 @@
     ],
     "entrances": [
         {
-            "type": 0,
-            "sourceX": 8,
-            "sourceY": 9,
-            "isWallEntrance": true,
-            "triggerDirection": 0,
-            "isWorldMap": false,
-            "destinationID": "Tower_1",
-            "targetX": 10,
-            "targetY": 9,
-            "targetDirection": 1
-        },
-        {
             "type": 2,
             "sourceX": 4,
             "sourceY": 3,
             "isWallEntrance": true,
-            "triggerDirection": 0,
             "isWorldMap": false,
             "destinationID": "NewDestination",
             "targetX": 1,
             "targetY": 1,
             "targetDirection": 0
+        },
+        {
+            "type": 0,
+            "sourceX": 9,
+            "sourceY": 9,
+            "isWallEntrance": true,
+            "isWorldMap": false,
+            "destinationID": "Tower_1",
+            "targetX": 10,
+            "targetY": 9,
+            "targetDirection": 1
         }
     ]
 }

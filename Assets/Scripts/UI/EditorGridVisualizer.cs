@@ -110,22 +110,6 @@ namespace UI
                 Gizmos.color = Color.white;
                 Gizmos.DrawWireSphere(center + Vector3.up * (wallHeight * 0.5f), cellSize * 0.35f);
 
-                // 트리거 방향 표시 (어느 쪽에서 부딪혀야 하는지 화살표)
-                // 트리거 방향이 North라면, 플레이어는 남쪽에서 북쪽으로 이동하며 부딪힘.
-                // 따라서 화살표는 남쪽 -> 북쪽(벽 중심)을 가리키게 그림.
-                
-                Vector3 dirVec = GetDirectionVector(entrance.triggerDirection);
-                Vector3 arrowEnd = center + Vector3.up * (wallHeight * 0.5f);
-                // 화살표 시작점 (벽 중심에서 반대 방향으로 약간 떨어진 곳)
-                Vector3 arrowStart = arrowEnd - (dirVec * cellSize * 0.6f);
-
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(arrowStart, arrowEnd);
-                
-                // 화살표 머리
-                Vector3 right = Quaternion.Euler(0, 90, 0) * dirVec;
-                Gizmos.DrawLine(arrowEnd, arrowEnd - dirVec * 0.2f + right * 0.1f);
-                Gizmos.DrawLine(arrowEnd, arrowEnd - dirVec * 0.2f - right * 0.1f);
             }
         }
 

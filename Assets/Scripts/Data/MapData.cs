@@ -96,7 +96,6 @@ namespace Data
         // true면 벽에 부딪혔을 때 발동, false면 해당 타일을 밟았을 때 발동
         public bool isWallEntrance; 
         // 입구 발동을 위한 진입 방향 (플레이어가 어느 방향으로 움직이다 벽을 쳤는가?)
-        public Direction triggerDirection;
 
         public bool isWorldMap;
         public string destinationID; // 도착 장소 ID (맵이면 맵 ID, 상점이면 상점 ID, 월드맵이면 regionId)

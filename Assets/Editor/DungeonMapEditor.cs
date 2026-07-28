@@ -714,9 +714,6 @@ public class DungeonMapEditor : EditorWindow
 
                     existingEntrance.isWallEntrance = EditorGUILayout.Toggle("Is Wall Entrance", existingEntrance.isWallEntrance);
                     
-                    // 트리거 방향 (플레이어가 어느 방향으로 진입해야 하는가)
-                    existingEntrance.triggerDirection = (Direction)EditorGUILayout.EnumPopup("Trigger Dir", existingEntrance.triggerDirection);
-
                     GUILayout.Space(5);
                     GUILayout.Label("Target Destination", EditorStyles.miniBoldLabel);
                     
@@ -753,7 +750,6 @@ public class DungeonMapEditor : EditorWindow
                             sourceX = selectedCell.x,
                             sourceY = selectedCell.y,
                             isWallEntrance = true,
-                            triggerDirection = Direction.North,
                             isWorldMap = false,
                             destinationID = "NewDestination",
                             targetX = 1,

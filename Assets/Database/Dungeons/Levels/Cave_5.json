@@ -393,7 +393,6 @@
             "sourceX": 1,
             "sourceY": 5,
             "isWallEntrance": false,
-            "triggerDirection": 0,
             "isWorldMap": false,
             "destinationID": "Cave_4",
             "targetX": 3,
