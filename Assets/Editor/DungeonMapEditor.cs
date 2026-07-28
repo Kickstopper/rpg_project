@@ -157,6 +157,36 @@ public class DungeonMapEditor : EditorWindow
             }
         }
 
+        // 절차적 미로 생성 버튼
+        if (GUILayout.Button("Gen Maze", EditorStyles.toolbarButton, GUILayout.Width(70)))
+        {
+            if (EditorUtility.DisplayDialog("Generate Maze", 
+                "현재 맵 데이터가 무작위 미로로 덮어씌워집니다. 진행하시겠습니까?", "Yes", "No"))
+            {
+                string themeName = (inputTheme != null) ? inputTheme.name : "";
+                
+                // Generator 폴더(네임스페이스)의 스크립트 호출하여 맵 데이터 생성
+                mapData = Generator.DungeonGenerator.GenerateWizardryMaze(
+                    inputWidth, inputHeight, inputMapID, themeName, 0, 0.05f); // 0.05f는 루프 생성 확률
+                
+                // 생성된 데이터를 에디터 입력 필드 UI와 동기화
+                mapData.locationID = inputLocationID;
+                inputStartX = mapData.startX;
+                inputStartY = mapData.startY;
+                inputStartDirection = mapData.startDirection;
+                inputWidth = mapData.width;
+                inputHeight = mapData.height;
+
+                selectedCells.Clear();
+                selectedCell = null;
+
+                UpdateVisualizer();
+                GUI.FocusControl(null); // 포커스 해제하여 UI 즉시 갱신
+                
+                Debug.Log($"[DungeonEditor] {inputWidth}x{inputHeight} 크기의 무작위 미로가 생성되었습니다!");
+            }
+        }
+
         GUILayout.FlexibleSpace();
 
         // Refresh 버튼
