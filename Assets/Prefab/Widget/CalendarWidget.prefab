@@ -452,8 +452,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 170, y: -85}
-  m_SizeDelta: {x: 320, y: 125}
+  m_AnchoredPosition: {x: 188, y: -74}
+  m_SizeDelta: {x: 350, y: 125}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &641670717100400171
 CanvasRenderer:
@@ -541,8 +541,6 @@ MonoBehaviour:
   expenseText: {fileID: 4888525397859913198}
   normalMoneyColor: {r: 1, g: 0.8431373, b: 0, a: 1}
   debtMoneyColor: {r: 1, g: 0.3, b: 0.3, a: 1}
-  baseRentalFee: 500
-  salaryPerPartner: 1000
 --- !u!1 &8645403354003241927
 GameObject:
   m_ObjectHideFlags: 0
