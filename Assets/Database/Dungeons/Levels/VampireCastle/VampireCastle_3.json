@@ -2,7 +2,7 @@
     "width": 11,
     "height": 3,
     "mapID": "VampireCastle_3",
-    "themeName": "VampireCastle",
+    "themeName": "DefaultTheme",
     "locationID": "vampire_castle",
     "startX": 5,
     "startY": 1,
@@ -211,10 +211,10 @@
             "y": 1,
             "value": 0,
             "wallTextureIDs": [
-                4,
-                9,
+                0,
                 3,
-                3
+                0,
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -229,9 +229,9 @@
             "y": 1,
             "value": 0,
             "wallTextureIDs": [
-                4,
-                9,
+                0,
                 3,
+                0,
                 -1
             ],
             "centerObjectID": -1,
@@ -249,7 +249,7 @@
             "wallTextureIDs": [
                 -1,
                 -1,
-                4,
+                0,
                 -1
             ],
             "centerObjectID": -1,
@@ -263,12 +263,12 @@
         {
             "x": 3,
             "y": 1,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 0,
-                3,
                 0,
-                4
+                0,
+                3
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -283,9 +283,9 @@
             "y": 1,
             "value": 0,
             "wallTextureIDs": [
-                3,
-                9,
-                4,
+                0,
+                -1,
+                0,
                 -1
             ],
             "centerObjectID": -1,
@@ -303,7 +303,7 @@
             "wallTextureIDs": [
                 -1,
                 -1,
-                4,
+                0,
                 -1
             ],
             "centerObjectID": -1,
@@ -319,10 +319,10 @@
             "y": 1,
             "value": 0,
             "wallTextureIDs": [
-                4,
-                -1,
-                3,
-                9
+                0,
+                0,
+                0,
+                3
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -335,12 +335,12 @@
         {
             "x": 7,
             "y": 1,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 0,
-                4,
+                3,
                 0,
-                4
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -356,8 +356,8 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                9,
-                3,
+                -1,
+                0,
                 -1
             ],
             "centerObjectID": -1,
@@ -373,10 +373,10 @@
             "y": 1,
             "value": 0,
             "wallTextureIDs": [
-                3,
-                4,
-                3,
-                -1
+                0,
+                0,
+                0,
+                3
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -447,7 +447,7 @@
             "wallTextureIDs": [
                 0,
                 0,
-                7,
+                4,
                 0
             ],
             "centerObjectID": -1,
@@ -501,7 +501,7 @@
             "wallTextureIDs": [
                 0,
                 0,
-                7,
+                4,
                 0
             ],
             "centerObjectID": -1,
@@ -555,7 +555,7 @@
             "wallTextureIDs": [
                 0,
                 0,
-                7,
+                4,
                 0
             ],
             "centerObjectID": -1,

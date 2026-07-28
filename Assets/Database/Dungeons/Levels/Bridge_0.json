@@ -31,9 +31,9 @@
             "y": 0,
             "value": 0,
             "wallTextureIDs": [
-                -1,
-                0,
                 2,
+                0,
+                0,
                 0
             ],
             "centerObjectID": -1,
@@ -505,13 +505,13 @@
             "isWorldMap": false,
             "destinationID": "Outpost",
             "targetX": 5,
-            "targetY": 10,
+            "targetY": 9,
             "targetDirection": 2
         },
         {
             "type": 2,
             "sourceX": 1,
-            "sourceY": 7,
+            "sourceY": 8,
             "isWallEntrance": true,
             "triggerDirection": 0,
             "isWorldMap": false,

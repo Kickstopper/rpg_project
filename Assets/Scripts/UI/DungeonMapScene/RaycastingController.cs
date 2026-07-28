@@ -878,26 +878,47 @@ namespace UI.DungeonMapScene
                 Direction facingDir = (Direction)_player.DirectionIdx;
                 bool isMovingForward = (inputDir == facingDir);
 
-                EntranceData validEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, tx, ty, moveVec);
-                
-                if (validEntrance != null)
+                // 앞 칸(tx, ty)의 입구 데이터를 가져옴
+                EntranceData validEntrance = CheckForEntrance(tx, ty);
+
+                // 최종 이동 및 충돌 연출 처리
+                if (walkable)
                 {
-                    if (doorConfig != null && hitCell != null)
-                        StartCoroutine(OpenDoorAndTransitionRoutine(hitCell, validEntrance, moveVec, doorConfig));
-                    else
-                        StartCoroutine(TransitionToOtherPlace(validEntrance, moveVec));
-                }
-                else
-                {
-                    if (doorConfig != null && hitCell != null && isMovingForward)
+                    // 앞으로 갈 수 있는데 앞 칸에 바닥형(isWallEntrance == false) 포탈이 있을 경우
+                    if (validEntrance != null && !validEntrance.isWallEntrance)
                     {
-                        StartCoroutine(OpenDoorAndMoveRoutine(hitCell, tx, ty, moveVec, doorConfig));
+                        // 해당 칸으로 미끄러져 들어가며 맵 전환 연출 실행
+                        StartCoroutine(TransitionToOtherPlace(validEntrance, moveVec));
                     }
                     else
                     {
-                        // 낭떠러지(-1), 진짜 꽉 막힌 벽(1), 혹은 맵의 끝을 만났을 경우 무조건 Bump!
-                        StartCoroutine(_player.BumpRoutine(moveVec));
-                        ManagerRoot.Sound.PlaySFX(SfxID.Bump_Wall);
+                        float duration = _player.IsRunning ? moveDuration / 2f : moveDuration;
+                        if (miniMap) miniMap.TranslateToNewPosition(tx, ty, duration);
+                        StartCoroutine(_player.MoveGridRoutine(tx, ty, duration, null));
+                    }
+                }
+                else
+                {
+                    // 벽에 막혔을 때 앞 칸에 벽형(isWallEntrance == true) 포탈이 있을 경우
+                    if (validEntrance != null && validEntrance.isWallEntrance)
+                    {
+                        if (doorConfig != null && hitCell != null)
+                            StartCoroutine(OpenDoorAndTransitionRoutine(hitCell, validEntrance, moveVec, doorConfig));
+                        else
+                            StartCoroutine(TransitionToOtherPlace(validEntrance, moveVec));
+                    }
+                    else
+                    {
+                        if (doorConfig != null && hitCell != null && isMovingForward)
+                        {
+                            StartCoroutine(OpenDoorAndMoveRoutine(hitCell, tx, ty, moveVec, doorConfig));
+                        }
+                        else
+                        {
+                            // 낭떠러지(-1), 진짜 꽉 막힌 벽(1), 혹은 맵의 끝을 만났을 경우 무조건 Bump!
+                            StartCoroutine(_player.BumpRoutine(moveVec));
+                            ManagerRoot.Sound.PlaySFX(SfxID.Bump_Wall);
+                        }
                     }
                 }
             }
@@ -1182,30 +1203,15 @@ namespace UI.DungeonMapScene
         }
 
         // 입구 데이터 확인 메서드
-        private EntranceData CheckForEntrance(int currentX, int currentY, int targetX, int targetY, Vector2Int moveDir)
+        private EntranceData CheckForEntrance(int targetX, int targetY)
         {
             if (_currentMap == null) return null;
 
-            Direction inputDir = VectorToDirection(moveDir);
-            Direction facingDir = (Direction)_player.DirectionIdx;
-
-            // 방 안쪽 벽에 있는 입구인지 체크
-            EntranceData currentEntrance = _currentMap.GetEntranceAt(currentX, currentY);
-            if (currentEntrance != null && currentEntrance.isWallEntrance)
-            {
-                if (currentEntrance.triggerDirection == inputDir && inputDir == facingDir)
-                    return currentEntrance;
-            }
-
-            // 진입 시 방 바깥쪽 벽에 있는 입구인지 체크
+            // 진입하려는 앞 칸의 좌표가 맵 범위 안인지 확인
             if (targetX >= 0 && targetX < _currentMap.width && targetY >= 0 && targetY < _currentMap.height)
             {
-                EntranceData targetEntrance = _currentMap.GetEntranceAt(targetX, targetY);
-                if (targetEntrance != null && targetEntrance.isWallEntrance)
-                {
-                    if (targetEntrance.triggerDirection == inputDir && inputDir == facingDir)
-                        return targetEntrance;
-                }
+                // 방향(triggerDirection) 검사를 생략하고, 앞 칸에 입구 데이터가 있다면 무조건 반환
+                return _currentMap.GetEntranceAt(targetX, targetY);
             }
 
             return null;
@@ -1226,9 +1232,12 @@ namespace UI.DungeonMapScene
             int frontX = _player.LogicX + forwardVec.x;
             int frontY = _player.LogicY + forwardVec.y;
 
-            EntranceData frontEntrance = CheckForEntrance(_player.LogicX, _player.LogicY, frontX, frontY, forwardVec);
+            // 💡 [수정] 파라미터 변경 대응 (앞 칸의 X, Y만 넘김)
+            EntranceData frontEntrance = CheckForEntrance(frontX, frontY);
 
-            if (frontEntrance != null)
+            // 💡 [수정] 벽형 포탈(isWallEntrance == true)일 때만 앞에서 이름을 보여주도록 제한
+            // (바닥형 포탈의 경우 밟기 전 허공에 이름이 뜨는 것을 방지)
+            if (frontEntrance != null && frontEntrance.isWallEntrance)
             {
                 if (frontEntrance.type == EntranceType.Shop)
                 {
@@ -1237,11 +1246,11 @@ namespace UI.DungeonMapScene
                 }
                 else if (frontEntrance.type == EntranceType.Terminal)
                 {
-                    ShowRoomName("TERMINAL"); // 일단 무조건 TERMINAL
+                    ShowRoomName("TERMINAL"); 
                 }
                 else if (frontEntrance.type == EntranceType.Office) 
                 {
-                    ShowRoomName("OFFICE"); // 일단 무조건 OFFICE
+                    ShowRoomName("OFFICE"); 
                 }
                 else HideRoomName();
             }

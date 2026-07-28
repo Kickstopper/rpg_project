@@ -2,7 +2,7 @@
     "width": 7,
     "height": 7,
     "mapID": "VampireCastle_0",
-    "themeName": "VampireCastle",
+    "themeName": "DefaultTheme",
     "locationID": "vampire_castle",
     "startX": 5,
     "startY": 3,
@@ -283,10 +283,10 @@
             "y": 2,
             "value": 0,
             "wallTextureIDs": [
-                0,
-                0,
-                0,
-                0
+                -1,
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -355,10 +355,10 @@
             "y": 2,
             "value": 0,
             "wallTextureIDs": [
-                0,
-                0,
-                0,
-                0
+                -1,
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -392,7 +392,7 @@
             "value": 0,
             "wallTextureIDs": [
                 0,
-                7,
+                4,
                 0,
                 0
             ],
@@ -502,7 +502,7 @@
                 0,
                 0,
                 0,
-                7
+                4
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -535,10 +535,10 @@
             "y": 4,
             "value": 0,
             "wallTextureIDs": [
-                0,
-                0,
-                0,
-                0
+                -1,
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -607,10 +607,10 @@
             "y": 4,
             "value": 0,
             "wallTextureIDs": [
-                0,
-                0,
-                0,
-                0
+                -1,
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [

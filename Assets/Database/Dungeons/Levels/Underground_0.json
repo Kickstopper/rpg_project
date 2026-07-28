@@ -1901,30 +1901,6 @@
     ],
     "entrances": [
         {
-            "type": 2,
-            "sourceX": 6,
-            "sourceY": 2,
-            "isWallEntrance": true,
-            "triggerDirection": 0,
-            "isWorldMap": false,
-            "destinationID": "elv_000",
-            "targetX": 1,
-            "targetY": 7,
-            "targetDirection": 2
-        },
-        {
-            "type": 0,
-            "sourceX": 6,
-            "sourceY": 13,
-            "isWallEntrance": true,
-            "triggerDirection": 2,
-            "isWorldMap": false,
-            "destinationID": "Underworld_0",
-            "targetX": 25,
-            "targetY": 0,
-            "targetDirection": 0
-        },
-        {
             "type": 0,
             "sourceX": 0,
             "sourceY": 12,
@@ -1946,6 +1922,30 @@
             "destinationID": "Underground_0_0",
             "targetX": 0,
             "targetY": 1,
+            "targetDirection": 0
+        },
+        {
+            "type": 2,
+            "sourceX": 6,
+            "sourceY": 3,
+            "isWallEntrance": true,
+            "triggerDirection": 0,
+            "isWorldMap": false,
+            "destinationID": "elv_000",
+            "targetX": 1,
+            "targetY": 7,
+            "targetDirection": 2
+        },
+        {
+            "type": 0,
+            "sourceX": 6,
+            "sourceY": 12,
+            "isWallEntrance": true,
+            "triggerDirection": 2,
+            "isWorldMap": false,
+            "destinationID": "Underworld_0",
+            "targetX": 25,
+            "targetY": 0,
             "targetDirection": 0
         }
     ]

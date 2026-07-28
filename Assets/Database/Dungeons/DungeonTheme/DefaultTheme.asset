@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
+  m_Name: DefaultTheme
+  m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
+  dungeonID: DefaultTheme
+  bgmID: 0
+  useWakeUpEffect: 0
+  monsterList: []
+  maxEnemyCount: 2
+  encounterMode: 1
+  maxSpawnCount: 3
+  spawnDelay: 5
+  background: {fileID: 0}
+  texture:
+  - {fileID: 2800000, guid: db7686f2a1eca1e4aaa904170b59d8d1, type: 3}
+  - {fileID: 2800000, guid: 0554a0c60ca5c46499f5cfc6614d5a1c, type: 3}
+  - {fileID: 2800000, guid: b95212534e552a54a86c2c1746b0d32f, type: 3}
+  - {fileID: 2800000, guid: a111bc28d7210fe4fac28b6f01a58467, type: 3}
+  - {fileID: 2800000, guid: 6f0465750d55ce1449ed368805ae06a9, type: 3}
+  - {fileID: 2800000, guid: 61d96c4d5b311de4899342dab9061505, type: 3}
+  - {fileID: 2800000, guid: 7a87d9e8b73f76644b22172530fd7554, type: 3}
+  - {fileID: 2800000, guid: 0a8359ec91578d24c957c9d74626529a, type: 3}
+  ceilingTexIdx: 1
+  floorTexIdx: 2
+  passableWallTexIDs: 03000000
+  doorAnimations:
+  - closedTexId: 4
+    openFrameTexIds: 050000000600000007000000
+    animSpeed: 0.1
+  wallAnimations: []
+  objectSprites: []
+  fogColor: {r: 1, g: 1, b: 1, a: 1}
+  lightingIntensity: 3.5
+  useGridLighting: 0
+  moduleEnable: 1
+  useDustEffect: 1
+  dustParticleCount: 300
+  dustSwayAmplitude: 0.01
+  dustMovesUp: 0
+  useDustTwinkle: 1
+  dustTwinkleSpeed: 10
+  dustColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  useOrganicEffect: 0
+  organicFreqX: 4
+  organicSpeed: 0.3
+  organicBreath: 0.35
+  organicAmplitude: 0.2
+  useMeltEffect: 0
+  meltEdgeBump: 1
+  meltEdgeSpeed: 0.3
+  useWallDistortion: 0
+  distortionFreq: 0.5
+  distortionAmp: 2
+  useCylinderEffect: 0
+  cylinderStrength: 3
+  isUnderwater: 0
+  stereoSeparation: 0.05

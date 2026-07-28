@@ -2,7 +2,7 @@
     "width": 10,
     "height": 4,
     "mapID": "VampireCastle_4",
-    "themeName": "VampireCastle",
+    "themeName": "DefaultTheme",
     "locationID": "vampire_castle",
     "startX": 0,
     "startY": 0,
@@ -717,7 +717,7 @@
             "wallTextureIDs": [
                 0,
                 0,
-                7,
+                4,
                 0
             ],
             "centerObjectID": -1,
