@@ -12,6 +12,7 @@ public class DungeonMapEditor : EditorWindow
     string[] availableMapIDs = new string[] { 
         "Outpost", "Bridge_0", 
         "Underground_0", "Underground_0_0", "Underground_1", "Underworld_0", "Underworld_1",
+        "Tower_0", "Tower_1", "Tower_2", "Tower_3", "Tower_4", "Tower_5", "Tower_6", 
         "Cave_0", "Cave_1", "Cave_2", "Cave_3", "Cave_4", "Cave_5", "Cave_6",
         "Labyrinth_0", "Labyrinth_1", "Labyrinth_2", "Labyrinth_3", "Labyrinth_4", "Labyrinth_5", 
         "VampireCastle_0","VampireCastle_1","VampireCastle_2","VampireCastle_3","VampireCastle_4","VampireCastle_5","VampireCastle_6","VampireCastle_7","VampireCastle_8","VampireCastle_9"
@@ -427,25 +428,75 @@ public class DungeonMapEditor : EditorWindow
                 }
 
                 // 벽 시각화
-                float wt = 3f; // 벽 두께
+                float defaultWt = 3f; // 꽉 막힌 벽 및 문의 두께
+                float passableWt = 1.5f; // 통과 가능한 환영의 벽 두께 (얇게)
 
                 for (int i = 0; i < 4; i++)
                 {
                     int texID = cell.wallTextureIDs[i];
                     if (texID != -1)
                     {
-                        // 현재 로드된 테마에 '통과 가능한 벽'으로 등록되어 있는지 검사
+                        // 통과 가능한 환영의 벽인지 검사
                         bool isPassable = (inputTheme != null && 
                                            inputTheme.passableWallTexIDs != null && 
                                            inputTheme.passableWallTexIDs.Contains(texID));
 
-                        // 꽉 막힌 벽은 기존의 불투명 빨간색, 통과 가능한 벽은 반투명한 시안 컬러
-                        Color wc = isPassable ? new Color(0f, 1f, 1f, 0.2f) : new Color(1f, 0.3f, 0.3f, 1f);
+                        // 텍스처 ID가 테마에 등록된 문(Door)인지 검사
+                        bool isDoor = false;
+                        if (inputTheme != null && inputTheme.doorAnimations != null)
+                        {
+                            foreach (var door in inputTheme.doorAnimations)
+                            {
+                                if (door.closedTexId == texID)
+                                {
+                                    isDoor = true;
+                                    break;
+                                }
+                            }
+                        }
 
-                        if (i == 0) EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, wt), wc); // 북쪽 (Top)
-                        else if (i == 1) EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y, wt, rect.height), wc); // 동쪽 (Right)
-                        else if (i == 2) EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - wt, rect.width, wt), wc); // 남쪽 (Bottom)
-                        else if (i == 3) EditorGUI.DrawRect(new Rect(rect.x, rect.y, wt, rect.height), wc); // 서쪽 (Left)
+                        // 상태에 따른 색상 및 두께 할당
+                        Color wc;
+                        float wt = defaultWt;
+
+                        if (isPassable)
+                        {
+                            wc = new Color(0f, 1f, 1f, 0.8f); // 환영의 벽: 시안색(Cyan)
+                            wt = passableWt;
+                        }
+                        else if (isDoor)
+                        {
+                            wc = new Color(0.2f, 0.9f, 0.2f, 1f); // 문(Door): 밝은 녹색(Green)
+                        }
+                        else
+                        {
+                            wc = new Color(1f, 0.3f, 0.3f, 1f); // 꽉 막힌 벽: 빨간색(Red)
+                        }
+
+                        // 렌더링
+                        if (isPassable)
+                        {
+                            // 통과 가능한 벽은 점선으로 렌더링
+                            int dashCount = 4;
+                            float dashStepX = rect.width / (dashCount * 2 - 1);
+                            float dashStepY = rect.height / (dashCount * 2 - 1);
+
+                            for (int d = 0; d < dashCount; d++)
+                            {
+                                if (i == 0) EditorGUI.DrawRect(new Rect(rect.x + d * dashStepX * 2, rect.y, dashStepX, wt), wc); // 북쪽 (Top)
+                                else if (i == 1) EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y + d * dashStepY * 2, wt, dashStepY), wc); // 동쪽 (Right)
+                                else if (i == 2) EditorGUI.DrawRect(new Rect(rect.x + d * dashStepX * 2, rect.yMax - wt, dashStepX, wt), wc); // 남쪽 (Bottom)
+                                else if (i == 3) EditorGUI.DrawRect(new Rect(rect.x, rect.y + d * dashStepY * 2, wt, dashStepY), wc); // 서쪽 (Left)
+                            }
+                        }
+                        else
+                        {
+                            // 일반 벽과 문은 굵은 실선으로 렌더링
+                            if (i == 0) EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, wt), wc); // 북쪽 (Top)
+                            else if (i == 1) EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y, wt, rect.height), wc); // 동쪽 (Right)
+                            else if (i == 2) EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - wt, rect.width, wt), wc); // 남쪽 (Bottom)
+                            else if (i == 3) EditorGUI.DrawRect(new Rect(rect.x, rect.y, wt, rect.height), wc); // 서쪽 (Left)
+                        }
                     }
                 }
                 
