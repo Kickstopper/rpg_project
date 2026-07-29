@@ -5,9 +5,12 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 using Manager;
+using Controller;
 
 namespace UI
 {
+    public enum TerminalState { MainMenu, WarpMode }
+
     public class TerminalUIManager : MonoBehaviour
     {
         public static TerminalUIManager Instance { get; private set; }
@@ -16,10 +19,21 @@ namespace UI
         public bool IsCanceled { get; private set; }
         public TerminalData SelectedTerminal { get; private set; }
 
+        // 메인 메뉴 관리를 위한 변수들
+        private TerminalState _currentState;
+        private int _mainMenuIndex = 0;
+        private string _currentTerminalID;
+
+        [Header("Main Menu Panel")]
+        public GameObject mainMenuPanel; // WARP, SAVE, LOAD 버튼들을 담고 있는 부모 컨테이너
+        [Tooltip("0: WARP, 1: SAVE, 2: LOAD 버튼 순서대로 할당")]
+        public RectTransform[] mainMenuButtons; 
+        public SaveLoadUIController saveLoadUI; // 인스펙터에서 씬의 SaveLoadUI를 드래그 앤 드롭
+
         [Header("UI References (Top)")]
         public Image destinationImage;
         public TextMeshProUGUI percentageText;
-        public TextMeshProUGUI dungeonInfoText;
+        public TextMeshProUGUI infoText;
         public CanvasGroup digitalRain;
         public Image fadeOverlay;
         public StarWarpController warp;
@@ -32,8 +46,8 @@ namespace UI
         [Header("ASCII Warp Effect")]
         public AsciiObjectPool objectPool;
         public RectTransform asciiCanvasRoot;
-        public Image characterImage;      // 연출에 사용할 플레이어(또는 전송) 이미지
-        public TextAsset characterAscii;  // 이미지에 대응하는 아스키 텍스트 파일
+        public Image characterImage;      
+        public TextAsset characterAscii;  
         public float gridSpacing = 16f;
         
         private List<GameObject> _activeAsciiNodes = new List<GameObject>();
@@ -56,7 +70,6 @@ namespace UI
         {
             if (Instance == null) Instance = this;
             
-            // 프리팹 초기화 세팅
             for (int i = 0; i < TOTAL_BUTTONS; i++)
             {
                 GameObject obj = Instantiate(terminalGridButtonPrefab, buttonGridContainer);
@@ -70,24 +83,97 @@ namespace UI
             IsSelectionComplete = false;
             IsCanceled = false;
             SelectedTerminal = null;
-            _isAnimating = true;
+            _isAnimating = false;
+
+            // 초기 상태를 메인 메뉴로 설정
+            _currentTerminalID = currentTerminalID;
+            _currentState = TerminalState.MainMenu;
+            _mainMenuIndex = 0;
             
             gameObject.SetActive(true);
-            
             warp.gameObject.SetActive(false);
-
             digitalRain.alpha = 0f;
-            List<TerminalData> availableList = ManagerRoot.Terminal.GetAvailableTerminals(currentTerminalID);
+            if (fadeOverlay != null) fadeOverlay.gameObject.SetActive(false);
 
-            // 데이터 맵핑 (모자란 부분은 null로 채워 빈 슬롯 생성)
-            for (int i = 0; i < TOTAL_BUTTONS; i++)
-            {
-                TerminalData data = i < availableList.Count ? availableList[i] : null;
-                _buttons[i].Initialize(i, data, this);
-            }
+            // 메인 메뉴 활성화, 워프 그리드 비활성화
+            if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
+            if (buttonGridContainer != null) buttonGridContainer.gameObject.SetActive(false);
 
-            StartCoroutine(IntroSequenceRoutine());
+            UpdateMainMenuHighlight();
+            UpdateTopPanelInfo(null);
         }
+
+        // =========================================================
+        // 메인 메뉴 관련 로직 시작
+        // =========================================================
+
+        private void UpdateMainMenuHighlight()
+        {
+            if (mainMenuButtons == null || mainMenuButtons.Length == 0) return;
+            for (int i = 0; i < mainMenuButtons.Length; i++)
+            {
+                Button btn = mainMenuButtons[i].GetComponent<Button>();
+                if (btn != null && (i == _mainMenuIndex)) btn.Select();
+            }
+        }
+
+        private void TryConfirmMainMenu()
+        {
+            if (_mainMenuIndex == 0) // WARP 선택
+            {
+                _currentState = TerminalState.WarpMode;
+                if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+                if (buttonGridContainer != null) buttonGridContainer.gameObject.SetActive(true);
+
+                _isAnimating = true;
+                List<TerminalData> availableList = ManagerRoot.Terminal.GetAvailableTerminals(_currentTerminalID);
+
+                for (int i = 0; i < TOTAL_BUTTONS; i++)
+                {
+                    TerminalData data = i < availableList.Count ? availableList[i] : null;
+                    _buttons[i].Initialize(i, data, this);
+                }
+
+                StartCoroutine(IntroSequenceRoutine());
+            }
+            else if (_mainMenuIndex == 1) // SAVE 선택
+            {
+                if (mainMenuPanel != null) mainMenuPanel.SetActive(false); 
+                if (saveLoadUI != null) saveLoadUI.Open(true);
+            }
+            else if (_mainMenuIndex == 2) // LOAD 선택
+            {
+                if (mainMenuPanel != null) mainMenuPanel.SetActive(false); 
+                if (saveLoadUI != null) saveLoadUI.Open(false);
+            }
+        }
+
+        // 마우스 클릭 이벤트 처리
+        public void OnMainMenuButtonClicked(int index)
+        {
+            // 애니메이션 중이거나, 현재 메인 메뉴 상태가 아니거나, Save/Load 창이 열려있다면 무시
+            if (_isAnimating || !gameObject.activeSelf || _currentState != TerminalState.MainMenu) return;
+            if (saveLoadUI != null && saveLoadUI.gameObject.activeSelf) return;
+
+            // 클릭한 버튼의 인덱스로 현재 선택 인덱스 동기화
+            _mainMenuIndex = index;
+            UpdateMainMenuHighlight();
+
+            // 스페이스/엔터 키를 누른 것과 동일하게 실행
+            TryConfirmMainMenu();
+        }
+
+        private void ReturnToMainMenu()
+        {
+            _currentState = TerminalState.MainMenu;
+            if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
+            if (buttonGridContainer != null) buttonGridContainer.gameObject.SetActive(false);
+            UpdateTopPanelInfo(null); // 상단 디스플레이 정보 초기화
+        }
+
+        // =========================================================
+        // 메인 메뉴 관련 로직 종료
+        // =========================================================
 
         private IEnumerator IntroSequenceRoutine()
         {
@@ -95,37 +181,31 @@ namespace UI
                 fadeOverlay.gameObject.SetActive(true);
             });
 
-            // 1. GridLayoutGroup을 켜서 자동으로 정렬하게 만듭니다.
             gridLayoutGroup.enabled = true;
             LayoutRebuilder.ForceRebuildLayoutImmediate(buttonGridContainer);
-            yield return null; // 한 프레임 대기하여 UI 갱신 보장
+            yield return null; 
 
-            // 2. 정렬된 최종 위치(목표 좌표)를 캐싱하고, GridLayoutGroup을 끕니다. (DOTween과 충돌 방지)
             for (int i = 0; i < TOTAL_BUTTONS; i++)
             {
                 _cachedButtonPositions[i] = _buttons[i].GetComponent<RectTransform>().anchoredPosition;
             }
             gridLayoutGroup.enabled = false;
 
-            // 3. 화면 밖 좌우로 날려보냅니다.
             float screenWidth = Screen.width;
             for (int i = 0; i < TOTAL_BUTTONS; i++)
             {
                 RectTransform rt = _buttons[i].GetComponent<RectTransform>();
-                float startX = (Random.value > 0.5f) ? -screenWidth : screenWidth; // 좌 or 우 랜덤
+                float startX = (Random.value > 0.5f) ? -screenWidth : screenWidth; 
                 rt.anchoredPosition = new Vector2(startX, _cachedButtonPositions[i].y);
                 
-                // DOTween으로 원래 자리로 복귀 (순서대로 약간씩 딜레이를 줌)
                 float delay = Random.Range(0f, 0.4f);
                 rt.DOAnchorPosX(_cachedButtonPositions[i].x, 0.5f)
                   .SetDelay(delay)
                   .SetEase(Ease.OutExpo);
             }
 
-            // 애니메이션이 다 끝날 때까지 대기
             yield return wait10;
 
-            // 5. 첫 번째 칸을 하이라이트 처리하며 조작 활성화
             _isAnimating = false;
             ChangeSelection(0);
         }
@@ -134,53 +214,89 @@ namespace UI
         {
             if (_isAnimating || !gameObject.activeSelf) return;
 
-            // 취소 (ESC / Tab)
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+            // SaveLoad UI가 열려있다면 Terminal의 입력 처리를 일시정지
+            if (saveLoadUI != null && saveLoadUI.gameObject.activeSelf) return;
+
+            if (_currentState == TerminalState.MainMenu)
             {
-                OnCancel();
-                return;
+                // SaveLoadUI가 닫히고 터미널로 복귀했을 때 메인 메뉴를 다시 켜줌
+                if (mainMenuPanel != null && !mainMenuPanel.activeSelf)
+                {
+                    mainMenuPanel.SetActive(true);
+                }
+
+                // 메인 메뉴 전용 입력 처리
+                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+                {
+                    OnCancel(); // 터미널 완전 종료
+                    return;
+                }
+
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                {
+                    TryConfirmMainMenu();
+                    return;
+                }
+
+                if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+                {
+                    _mainMenuIndex++;
+                    if (mainMenuButtons != null && _mainMenuIndex >= mainMenuButtons.Length) _mainMenuIndex = 0;
+                    UpdateMainMenuHighlight();
+                }
+                else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+                {
+                    _mainMenuIndex--;
+                    if (mainMenuButtons != null && _mainMenuIndex < 0) _mainMenuIndex = mainMenuButtons.Length - 1;
+                    UpdateMainMenuHighlight();
+                }
             }
-
-            // 확정 (Space / Enter)
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            else if (_currentState == TerminalState.WarpMode)
             {
-                TryConfirmSelection();
-                return;
-            }
+                // 기존 워프 메뉴 입력 처리
+                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+                {
+                    ReturnToMainMenu(); // ESC를 누르면 터미널 종료 대신 메인 메뉴로 복귀
+                    return;
+                }
 
-            // 방향키 조작 (WASD / Arrows)
-            int x = _currentIndex % GRID_WIDTH;
-            int y = _currentIndex / GRID_WIDTH;
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                {
+                    TryConfirmSelection();
+                    return;
+                }
 
-            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) x++;
-            else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) x--;
-            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) y++;
-            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) y--;
+                int x = _currentIndex % GRID_WIDTH;
+                int y = _currentIndex / GRID_WIDTH;
 
-            // 그리드 범위 제한
-            x = Mathf.Clamp(x, 0, GRID_WIDTH - 1);
-            y = Mathf.Clamp(y, 0, GRID_HEIGHT - 1);
+                if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) x++;
+                else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) x--;
+                else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) y++;
+                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) y--;
 
-            int newIndex = y * GRID_WIDTH + x;
-            if (newIndex != _currentIndex)
-            {
-                ChangeSelection(newIndex);
+                x = Mathf.Clamp(x, 0, GRID_WIDTH - 1);
+                y = Mathf.Clamp(y, 0, GRID_HEIGHT - 1);
+
+                int newIndex = y * GRID_WIDTH + x;
+                if (newIndex != _currentIndex)
+                {
+                    ChangeSelection(newIndex);
+                }
             }
         }
 
         public void OnButtonHovered(int index)
         {
-            if (_isAnimating || _currentIndex == index) return;
+            if (_isAnimating || _currentIndex == index || _currentState != TerminalState.WarpMode) return;
             ChangeSelection(index);
         }
 
         public void OnButtonClicked(int index)
         {
-            if (_isAnimating) return;
+            if (_isAnimating || _currentState != TerminalState.WarpMode) return;
 
             if (_currentIndex == index)
             {
-                // 재차 클릭 시 확정
                 TryConfirmSelection();
             }
             else
@@ -204,18 +320,30 @@ namespace UI
             {
                 if (data.destinationImage != null) destinationImage.sprite = data.destinationImage;
                 
-                percentageText.text = "100%"; // 예시. 혹은 data.syncRate 등으로 확장 가능
+                percentageText.text = "100%"; 
                 percentageText.color = Color.green;
 
-                dungeonInfoText.text = $"<size=120%>{data.displayName}</size>\n<color=#A0A0A0>Floor: {data.floorNumber}</color>\n\n{data.description}";
+                infoText.text = $"<size=120%>{data.displayName}</size>\n<color=#A0A0A0>Floor: {data.floorNumber}</color>\n\n{data.description}";
             }
             else
             {
-                // 빈 데이터일 경우 글리치/노이즈 연출 느낌
                 destinationImage.sprite = null; 
-                percentageText.text = "ERR";
-                percentageText.color = Color.red;
-                dungeonInfoText.text = "<color=red>CONNECTION FAILED</color>\nNo terminal signal detected at this coordinate.";
+                
+                if (_currentState == TerminalState.MainMenu)
+                {
+                    // 메인 메뉴 상태일 때의 환영 메시지
+                    percentageText.text = "SELECT SERVICE";
+                    percentageText.color = Color.cyan;
+                    
+                    infoText.text = "<size=120%>SYSTEM ONLINE</size>\n<color=#A0A0A0>Awaiting Input</color>\n\nPlease select a service to use.";
+                }
+                else
+                {
+                    // 워프 모드에서 빈 슬롯을 가리켰을 때의 에러 메시지
+                    percentageText.text = "ERR";
+                    percentageText.color = Color.red;
+                    infoText.text = "<color=red>CONNECTION FAILED</color>\nNo terminal signal detected at this coordinate.";
+                }
             }
         }
 
@@ -223,15 +351,9 @@ namespace UI
         {
             TerminalData selectedData = _buttons[_currentIndex].Data;
             
-            // 데이터가 있는 정상 터미널만 이동 가능
             if (selectedData != null)
             {
                 StartCoroutine(OutroSequenceRoutine(selectedData));
-            }
-            else
-            {
-                // 에러 사운드 출력
-                // ManagerRoot.Sound.PlaySFX(SfxID.Error);
             }
         }
 
@@ -239,7 +361,6 @@ namespace UI
         {
             _isAnimating = true;
             
-            // 1. 버튼들을 화면 밖으로 무작위로 날려버림
             float offScreenX = 3000f; 
             for (int i = 0; i < TOTAL_BUTTONS; i++)
             {
@@ -254,26 +375,21 @@ namespace UI
 
             ManagerRoot.Sound.StopBGM();
 
-            // 버튼이 날아가는 도중에 DigitalRain 페이드 인
             fadeOverlay.DOFade(1f, 0.5f).OnStart(()=>{fadeOverlay.color = new Color(0f, 0f, 0f, 0f);});
             
             ManagerRoot.Sound.PlaySFX(Data.SfxID.Computer, 0.5f);
             digitalRain.DOFade(1f, 0.5f).SetDelay(0.2f);
             
-            // 비가 내리기 시작할 때까지 잠시 대기
             yield return wait10;
 
-            // 플레이어 전송 연출 시작
             if (characterImage != null && characterAscii != null && objectPool != null)
             {
                 warp.gameObject.SetActive(true);
                 warp.Reset();
                 
-                // 플레이어 원본 이미지 페이드 인
                 characterImage.gameObject.SetActive(true);
                 yield return StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 0.5f, Color.white));
 
-                // 아스키 아트 노드 생성 (투명상태)
                 DrawAscii(characterAscii, 0f);
                 yield return wait05;
 
@@ -281,29 +397,23 @@ namespace UI
                 ManagerRoot.Sound.StopAllSFX(true);
                 ManagerRoot.Sound.PlaySFX(Data.SfxID.Warp_Start);
                 Color digitalTint = Color.cyan;
-                // 원본 이미지 -> 아스키 아트로 분해
                 StartCoroutine(FadeSpriteAlpha(characterImage, 1f, 0f, 1.0f, digitalTint));
                 yield return StartCoroutine(RevealAsciiRandomly(1.0f));
                 
                 yield return wait05;
                 
                 ManagerRoot.Sound.PlaySFX(Data.SfxID.Warp_End);
-                // 아스키 아트 방사형 팽창 및 복귀
-                // 폭발(0.6초), 대기(0.5초), 복귀(0.5초), 크기 팽창(15배), 난수 파편화(30f)
                 yield return StartCoroutine(ExplodeAndReturnAsciiRoutine(0.6f, 0.25f, 0.5f, 15f, 30f));
                 
-                // 데이터 전송 중인 느낌을 주기 위해 짧은 대기
                 yield return new WaitForSeconds(0.2f);
 
                 warp.gameObject.SetActive(false);
                 ManagerRoot.Sound.PlaySFX(Data.SfxID.Computer, 0.25f);
                 digitalRain.DOFade(1f, 1.5f);
 
-                // 아스키 아트 -> 원본 이미지로 재결합
                 StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 1.5f, digitalTint));
                 yield return StartCoroutine(DissolveAsciiRandomly(1.5f));
                 
-                // 다 쓴 노드 반환 및 초기화
                 objectPool.ReturnAllObjects(_activeAsciiNodes);
                 _activeAsciiNodes.Clear();
                 
@@ -312,7 +422,6 @@ namespace UI
                 fadeOverlay.DOFade(0f, 0.5f).OnStart(()=>{fadeOverlay.color = new Color(0f, 0f, 0f, 1f);});
                 digitalRain.DOFade(0f, 0.5f);
 
-                // 원본 이미지 페이드 아웃
                 yield return StartCoroutine(FadeSpriteAlpha(characterImage, 1f, 0f, 0.5f, digitalTint));
                 
                 characterImage.gameObject.SetActive(false);
@@ -321,13 +430,11 @@ namespace UI
             {
                 fadeOverlay.DOFade(0f, 0.5f).OnStart(()=>{fadeOverlay.color = new Color(0f, 0f, 0f, 1f);});
                 digitalRain.DOFade(0f, 0.5f);
-                // 아스키 세팅이 안 되어있을 경우를 대비한 안전 장치
                 yield return wait10;
             }
     
             yield return wait10;
             ManagerRoot.Sound.StopAllSFX();
-            // 선택 완료 처리 후 컨트롤러에 턴을 넘김
             SelectedTerminal = selectedData;
             IsCanceled = false;
             IsSelectionComplete = true;
@@ -377,21 +484,13 @@ namespace UI
             while (time < duration)
             {
                 time += Time.deltaTime;
-                
-                // 현재 프레임의 알파값 계산 (0 ~ 1)
                 float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, time / duration);
-                
-                // 알파값이 0에 가까울수록 tint 색상에, 1에 가까울수록 흰색(원본 색상)에 가까워짐
                 Color currentColor = Color.Lerp(tint, Color.white, currentAlpha);
-                
-                // 섞인 색상에 최종 알파값을 적용
                 currentColor.a = currentAlpha;
                 img.color = currentColor;
-                
                 yield return null;
             }
 
-            // 루프 종료 후 오차 없는 최종값 세팅
             Color finalColor = Color.Lerp(tint, Color.white, endAlpha);
             finalColor.a = endAlpha;
             img.color = finalColor;
@@ -465,23 +564,16 @@ namespace UI
                 rects[i] = _activeAsciiNodes[i].GetComponent<RectTransform>();
                 originalPositions[i] = rects[i].anchoredPosition;
 
-                // 중심점(0,0)을 기준으로 바깥쪽으로 밀어내는 벡터
                 Vector2 expandVec = originalPositions[i];
-                
-                // 완벽한 정중앙(0,0)에 있는 문자는 제자리에 멈추지 않도록 랜덤 방향 지정
                 if (expandVec == Vector2.zero) expandVec = Random.insideUnitCircle.normalized * 10f;
 
-                // 팽창 벡터 + 흩뿌려지는 랜덤 파편화(Jitter) 효과 추가
                 Vector2 randomJitter = Random.insideUnitCircle * Random.Range(0f, jitterAmount);
                 targetPositions[i] = (expandVec * expandMultiplier) + randomJitter;
-
-                // 글자들이 날아갈 때 회전할 각도 (±90도 이내)
                 targetRotations[i] = Random.Range(-90f, 90f);
             }
 
             warp.PlayWarpAndCollapse();
 
-            // 방사형 팽창 폭발 (Cubic Ease Out: 터질 때 빠르고 끝에서 느려짐)
             float elapsed = 0f;
             while (elapsed < explodeTime)
             {
@@ -492,16 +584,13 @@ namespace UI
                 for (int i = 0; i < count; i++)
                 {
                     rects[i].anchoredPosition = Vector2.Lerp(originalPositions[i], targetPositions[i], easeOut);
-                    // Z축으로 글자를 회전시켜 데이터가 깨지는 듯한 느낌 부여
                     rects[i].localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(0, targetRotations[i], easeOut));
                 }
                 yield return null;
             }
 
-            // 최대 팽창 상태(공중에 멈춘 파편들)에서 대기
             yield return new WaitForSeconds(waitTime);
 
-            // 원래 좌표와 회전으로 블랙홀처럼 빨려 들어감 (Cubic Ease In: 점점 가속)
             elapsed = 0f;
             while (elapsed < returnTime)
             {
@@ -517,7 +606,6 @@ namespace UI
                 yield return null;
             }
 
-            // 안전장치: 오차를 없애고 원래 위치/각도로 완벽한 초기화 보장
             for (int i = 0; i < count; i++)
             {
                 rects[i].anchoredPosition = originalPositions[i];
@@ -535,7 +623,6 @@ namespace UI
         {
             _isAnimating = true;
 
-            // 버튼들을 화면 밖으로 퇴장
             float offScreenX = 3000f; 
             for (int i = 0; i < TOTAL_BUTTONS; i++)
             {
@@ -549,10 +636,9 @@ namespace UI
             }
             
             fadeOverlay.DOFade(1, 0.5f).OnStart(()=>{fadeOverlay.color = new Color(0f, 0f, 0f, 0f);});            
-            // 애니메이션이 끝날 때까지 대기
+            
             yield return wait05;
 
-            // 취소 확정 및 UI 종료 (컨트롤러로 제어권 반환)
             fadeOverlay.color = Color.black;
             fadeOverlay.gameObject.SetActive(true);
 
