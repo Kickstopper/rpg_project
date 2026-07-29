@@ -798,6 +798,9 @@ public class DungeonMapEditor : EditorWindow
 
                     existingEntrance.isWallEntrance = EditorGUILayout.Toggle("Is Wall Entrance", existingEntrance.isWallEntrance);
                     
+                    // 계단 연출 타입 입력란
+                    existingEntrance.stairType = (StairType)EditorGUILayout.EnumPopup("Stair Transition", existingEntrance.stairType);
+                    
                     GUILayout.Space(5);
                     GUILayout.Label("Target Destination", EditorStyles.miniBoldLabel);
                     

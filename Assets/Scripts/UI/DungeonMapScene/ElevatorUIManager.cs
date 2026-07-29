@@ -205,7 +205,7 @@ namespace UI
                         }
                     }
 
-                    string floorName = floorNum > 0 ? $"{floorNum}F" : $"B{Mathf.Abs(floorNum)}";
+                    string floorName = floorNum > 0 ? $"{floorNum}" : $"B{Mathf.Abs(floorNum)}";
 
                     if (isFloorExist)
                     {

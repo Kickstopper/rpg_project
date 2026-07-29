@@ -28,6 +28,18 @@ namespace Data
         public int maxFloor; // 추가: 최고층 (예: 5)
         public ElevatorDoorType doorType = ElevatorDoorType.Split;
         public FloorData[] floorData;   // 이 엘리베이터에서 갈 수 있는 층 목록
+
+        public string GetDisplayName(string mapID)
+        {
+            if (floorData == null) return string.Empty;
+
+            foreach(var f in floorData)
+            {
+                if (f.mapID == mapID)
+                    return f.displayName;
+            }
+            return string.Empty;
+        }
     }
 
     [Serializable]
@@ -67,7 +79,7 @@ namespace Data
     public class CellData
     {
         public int x, y;
-        public int value = -1;
+        public int value = 0;
         public int[] wallTextureIDs = new int[4] { -1, -1, -1, -1 }; // up, right, down, left
 
         public int centerObjectID = -1;
@@ -86,6 +98,13 @@ namespace Data
         }
     }
 
+    public enum StairType
+    {
+        None,       // 일반 포탈 (바로 이동)
+        Upstairs,   // 올라가는 계단 연출
+        Downstairs  // 내려가는 계단 연출
+    }
+
     // 입구 정보를 담을 데이터 클래스
     [Serializable]
     public class EntranceData
@@ -99,7 +118,7 @@ namespace Data
         // true면 벽에 부딪혔을 때 발동, false면 해당 타일을 밟았을 때 발동
         public bool isWallEntrance; 
         // 입구 발동을 위한 진입 방향 (플레이어가 어느 방향으로 움직이다 벽을 쳤는가?)
-
+        public StairType stairType = StairType.None; // 계단 연출 타입 지정
         public bool isWorldMap;
         public string destinationID; // 도착 장소 ID (맵이면 맵 ID, 상점이면 상점 ID, 월드맵이면 regionId)
         
