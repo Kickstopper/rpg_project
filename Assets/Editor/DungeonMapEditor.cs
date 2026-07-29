@@ -12,7 +12,8 @@ public class DungeonMapEditor : EditorWindow
     string[] availableMapIDs = new string[] { 
         "Outpost", "Bridge_0", 
         "Underground_0", "Underground_0_0", "Underground_1", "Underworld_0", "Underworld_1",
-        "Tower_0", "Tower_1", "Tower_2", "Tower_3", "Tower_4", "Tower_5", "Tower_6", 
+        "Tower_0", "Tower_1", "Tower_2", "Tower_3", "Tower_4", "Tower_5", "Tower_6", "Tower_7", 
+        "Tower_8", "Tower_9", "Tower_10", "Tower_11", 
         "Cave_0", "Cave_1", "Cave_2", "Cave_3", "Cave_4", "Cave_5", "Cave_6",
         "Labyrinth_0", "Labyrinth_1", "Labyrinth_2", "Labyrinth_3", "Labyrinth_4", "Labyrinth_5", 
         "VampireCastle_0","VampireCastle_1","VampireCastle_2","VampireCastle_3","VampireCastle_4","VampireCastle_5","VampireCastle_6","VampireCastle_7","VampireCastle_8","VampireCastle_9"
@@ -43,6 +44,7 @@ public class DungeonMapEditor : EditorWindow
     string inputMapID;
     string inputLocationID;
     DungeonTheme inputTheme;
+    bool inputHasCeil = true;
 
     [MenuItem("Tools/Dungeon Map Editor")]
     public static void ShowWindow()
@@ -57,7 +59,7 @@ public class DungeonMapEditor : EditorWindow
     }
 
     // 크기를 인자로 받아 초기화
-    void InitializeMap(int w, int h, string mapId, string locationID, DungeonTheme theme, int startX, int startY, Direction startDir)
+    void InitializeMap(int w, int h, string mapId, string locationID, DungeonTheme theme, int startX, int startY, Direction startDir, bool hasCeil = true)
     {
         mapData = new MapData();
         mapData.width = w;
@@ -65,6 +67,7 @@ public class DungeonMapEditor : EditorWindow
         mapData.mapID = mapId;
         mapData.locationID = locationID;
         mapData.themeName = (theme != null) ? theme.name : "";
+        mapData.hasCeil = hasCeil;
 
         // 시작 위치 및 방향 설정
         mapData.startX = startX;
@@ -92,7 +95,7 @@ public class DungeonMapEditor : EditorWindow
         inputStartX = startX;
         inputStartY = startY;
         inputStartDirection = startDir;
-
+        inputHasCeil = hasCeil;
         UpdateVisualizer();
         Debug.Log($"New Map Created: ID={mapId}, Size={w}x{h}, Theme={mapData.themeName}");
     }
@@ -141,6 +144,11 @@ public class DungeonMapEditor : EditorWindow
         GUILayout.Label("H", GUILayout.Width(20));
         inputHeight = EditorGUILayout.IntField(inputHeight, GUILayout.Width(30));
 
+        // 천장 토글 UI
+        GUILayout.Space(5);
+        GUILayout.Label("Ceil", GUILayout.Width(25));
+        inputHasCeil = EditorGUILayout.Toggle(inputHasCeil, GUILayout.Width(15));
+
         // DungeonTheme Object Field (드래그 앤 드롭 슬롯)
         GUILayout.Label("Theme", GUILayout.Width(45));
         // typeof(DungeonTheme)를 사용하여 해당 타입의 에셋만 들어오게 함
@@ -153,10 +161,10 @@ public class DungeonMapEditor : EditorWindow
                 "Current map data will be lost. Create new?", "Yes", "No"))
             {
                 // InitializeMap 호출 시 플레이어 위치/방향 인자 전달
-                InitializeMap(inputWidth, inputHeight, inputMapID, inputLocationID, inputTheme, inputStartX, inputStartY, inputStartDirection);
+                InitializeMap(inputWidth, inputHeight, inputMapID, inputLocationID, inputTheme, 
+                              inputStartX, inputStartY, inputStartDirection, inputHasCeil);
             }
         }
-
         // 절차적 미로 생성 버튼
         if (GUILayout.Button("Gen Maze", EditorStyles.toolbarButton, GUILayout.Width(70)))
         {
@@ -296,6 +304,7 @@ public class DungeonMapEditor : EditorWindow
             inputStartX = mapData.startX;
             inputStartY = mapData.startY;
             inputStartDirection = mapData.startDirection;
+            inputHasCeil = mapData.hasCeil;
 
             // 저장된 테마 이름으로 프로젝트에서 Theme 파일을 찾아 연결 시도
             if (!string.IsNullOrEmpty(mapData.themeName))
@@ -542,6 +551,24 @@ public class DungeonMapEditor : EditorWindow
                     GUI.Label(centerObjRect, cell.centerObjectID.ToString(), style);
                 }
 
+                // 이벤트(보스, NPC 등) 배치 시각화
+                if (!string.IsNullOrEmpty(cell.eventID))
+                {
+                    // 1회성은 보라색 'E', 반복성은 시안색 'R'로 마크를 다르게 표시합니다.
+                    Rect eventRect = new Rect(rect.xMax - 12f, rect.y + 2f, 10f, 10f);
+                    Color markColor = cell.isEventRepeatable ? Color.cyan : Color.magenta;
+                    string markText = cell.isEventRepeatable ? "R" : "E";
+
+                    EditorGUI.DrawRect(eventRect, markColor);
+                    
+                    GUIStyle evStyle = new GUIStyle(EditorStyles.miniLabel);
+                    evStyle.alignment = TextAnchor.MiddleCenter;
+                    evStyle.normal.textColor = cell.isEventRepeatable ? Color.black : Color.white; // 시안색 배경엔 검은 글씨
+                    evStyle.fontSize = 8;
+                    evStyle.padding = new RectOffset(0,0,0,0);
+                    GUI.Label(eventRect, markText, evStyle);
+                }
+
                 // 벽면 오브젝트 시각화
                 float dotSize = 6f;
                 Color dotColor = new Color(1f, 0.9f, 0f); // 진노랑
@@ -619,7 +646,17 @@ public class DungeonMapEditor : EditorWindow
             GUILayout.Space(10);
             GUILayout.Label("Batch Static Objects", EditorStyles.miniBoldLabel);
             DrawBatchCenterObjectField();
-            
+
+            // 다중 셀에 동일한 이벤트를 일괄 적용할 때 사용
+            GUILayout.Space(5);
+            GUILayout.Label("Batch Events", EditorStyles.miniBoldLabel);
+            DrawBatchEventField();
+            DrawBatchEventRepeatableField(); // 다중 셀 반복 여부 일괄 적용
+
+            // 다중 셀 시점 강제 전환 일괄 적용 UI
+            DrawBatchUseForceDirField();
+            DrawBatchEvForceDirField();
+
             GUILayout.Space(5);
             GUILayout.Label("Batch Face Objects", EditorStyles.miniBoldLabel);
             
@@ -711,7 +748,24 @@ public class DungeonMapEditor : EditorWindow
 
                 // 중앙 오브젝트
                 selectedCell.centerObjectID = EditorGUILayout.IntField("Center Obj ID", selectedCell.centerObjectID);
+
+                // 이벤트 ID와 반복 여부 토글을 함께 표시
+                GUILayout.Space(10);
+                GUILayout.Label("Event Settings", EditorStyles.boldLabel);
+                selectedCell.eventID = EditorGUILayout.TextField("Event ID", selectedCell.eventID);
                 
+                // 이벤트 ID가 있을 때만 반복 여부 토글을 보여주어 깔끔하게 유지
+                if (!string.IsNullOrEmpty(selectedCell.eventID))
+                {
+                    selectedCell.isEventRepeatable = EditorGUILayout.Toggle("Is Repeatable", selectedCell.isEventRepeatable);
+                    // 시점 강제 전환 UI
+                    selectedCell.useForceDir = EditorGUILayout.Toggle("Use Force Dir", selectedCell.useForceDir);
+                    if (selectedCell.useForceDir)
+                    {
+                        selectedCell.evForceDir = (Direction)EditorGUILayout.EnumPopup("Force Direction", selectedCell.evForceDir);
+                    }
+                }
+
                 GUILayout.Space(5);
                 GUILayout.Label("Face Objects (Wall Decor)", EditorStyles.miniBoldLabel);
 
@@ -805,6 +859,82 @@ public class DungeonMapEditor : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
+    // 이벤트 일괄 적용 헬퍼 함수
+    void DrawBatchEventField()
+    {
+        string firstVal = selectedCells[0].eventID;
+        bool isMixed = false;
+        foreach (var c in selectedCells)
+            if (c.eventID != firstVal) { isMixed = true; break; }
+
+        EditorGUI.showMixedValue = isMixed;
+        EditorGUI.BeginChangeCheck();
+        string newVal = EditorGUILayout.TextField("Event ID", isMixed ? "" : firstVal);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.eventID = newVal;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
+    }
+
+    // 이벤트 반복 여부 플래그 일괄 적용 헬퍼 함수
+    void DrawBatchEventRepeatableField()
+    {
+        bool firstVal = selectedCells[0].isEventRepeatable;
+        bool isMixed = false;
+        foreach (var c in selectedCells)
+            if (c.isEventRepeatable != firstVal) { isMixed = true; break; }
+
+        EditorGUI.showMixedValue = isMixed;
+        EditorGUI.BeginChangeCheck();
+        bool newVal = EditorGUILayout.Toggle("Is Repeatable", isMixed ? false : firstVal);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.isEventRepeatable = newVal;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
+    }
+
+    // 방향 강제 여부 일괄 적용 헬퍼
+    void DrawBatchUseForceDirField()
+    {
+        bool firstVal = selectedCells[0].useForceDir;
+        bool isMixed = false;
+        foreach (var c in selectedCells)
+            if (c.useForceDir != firstVal) { isMixed = true; break; }
+
+        EditorGUI.showMixedValue = isMixed;
+        EditorGUI.BeginChangeCheck();
+        bool newVal = EditorGUILayout.Toggle("Use Force Dir", isMixed ? false : firstVal);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.useForceDir = newVal;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
+    }
+
+    // 강제할 방향 일괄 적용 헬퍼
+    void DrawBatchEvForceDirField()
+    {
+        Direction firstVal = selectedCells[0].evForceDir;
+        bool isMixed = false;
+        foreach (var c in selectedCells)
+            if (c.evForceDir != firstVal) { isMixed = true; break; }
+
+        EditorGUI.showMixedValue = isMixed;
+        EditorGUI.BeginChangeCheck();
+        Direction newVal = (Direction)EditorGUILayout.EnumPopup("Force Direction", isMixed ? Direction.North : firstVal);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.evForceDir = newVal;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
+    }
+
     // 중앙 고정 오브젝트 일괄 적용 헬퍼
     void DrawBatchCenterObjectField()
     {
@@ -890,10 +1020,10 @@ public class DungeonMapEditor : EditorWindow
         mapData.mapID = inputMapID;
         mapData.locationID = inputLocationID;
         mapData.themeName = (inputTheme != null) ? inputTheme.name : "";
+        mapData.hasCeil = inputHasCeil;
         
         mapData.startX = inputStartX;
         mapData.startY = inputStartY;
         mapData.startDirection = inputStartDirection;
     }
 }
-

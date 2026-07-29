@@ -6,141 +6,76 @@ namespace Manager
 {
     public class DungeonEventManager : MonoBehaviour
     {
-        [Header("Data Files")]
-        public TextAsset mapTriggerCSV; // 인스펙터에서 할당
+        // 완료된 1회성 이벤트의 고유 키("MapID_X_Y_EventID")를 담아두는 해시세트
+        private HashSet<string> completedEvents = new HashSet<string>();
 
-        private Dictionary<string, List<EventTriggerData>> triggerMap = new Dictionary<string, List<EventTriggerData>>();
+        private string currentMapID = string.Empty;
 
-        private string currentMapID = string.Empty; // 현재 층 ID
-
-        void Awake()
-        {
-            LoadTriggerData();
-        }
-        
         public void SetCurrentMapID(string mapID)
         {
             currentMapID = mapID;
         }
 
-        void LoadTriggerData()
-        {
-            var rawData = CSVReader.Read(mapTriggerCSV);
-
-            foreach (var row in rawData)
-            {
-                string mapID = row["MapID"];
-                string x = row["X"];
-                string y = row["Y"];
-                string key = $"{mapID}_{x}_{y}";
-
-                bool repeatable = row.ContainsKey("Repeatable") && row["Repeatable"].ToUpper() == "TRUE";
-                string eventID = row.ContainsKey("EventID") ? row["EventID"] : "";
-
-                int forceDir = -1;
-                if (row.ContainsKey("ForceDir") && int.TryParse(row["ForceDir"], out int parsedDir))
-                {
-                    forceDir = parsedDir;
-                }
-
-                EventTriggerData newData = new EventTriggerData(eventID, repeatable, forceDir);
-
-                if (!triggerMap.ContainsKey(key)) 
-                    triggerMap[key] = new List<EventTriggerData>();
-
-                triggerMap[key].Add(newData);
-            }
-        }
-
         public (string eventID, int forceDir) CheckEvent(int x, int y)
         {
-            string key = $"{currentMapID}_{x}_{y}";
+            // 던전 데이터가 로드되어 있지 않으면 무시
+            if (ManagerRoot.Dungeon == null || ManagerRoot.Dungeon.CurrentDungeonData == null)
+                return (null, -1);
 
-            if (triggerMap.ContainsKey(key))
+            // 현재 밟은 좌표의 셀 데이터를 직접 가져옴
+            CellData cell = ManagerRoot.Dungeon.CurrentDungeonData.GetCell(x, y);
+            
+            // 타일에 이벤트 ID가 할당되어 있지 않으면 무시
+            if (cell == null || string.IsNullOrEmpty(cell.eventID))
+                return (null, -1);
+
+            string eventID = cell.eventID;
+            string uniqueKey = $"{currentMapID}_{x}_{y}_{eventID}";
+
+            // 1회성 이벤트인데 이미 예전에 완료(저장)된 기록이 있다면 스킵
+            if (!cell.isEventRepeatable && completedEvents.Contains(uniqueKey))
             {
-                List<EventTriggerData> eventsAtLocation = triggerMap[key];
-
-                foreach (EventTriggerData trigger in eventsAtLocation)
-                {
-                    // 이미 완료된 1회성 이벤트는 무시하고 다음 이벤트로 넘김
-                    if (!trigger.Repeatable && trigger.IsCompleted)
-                    {
-                        continue;
-                    }
-
-                    // 실행 조건을 만족하는 첫 번째 이벤트를 완료 처리함
-                    trigger.IsCompleted = true;
-                    
-                    return (trigger.EventID, trigger.ForceDir);
-                }
+                return (null, -1);
             }
 
-            return (null, -1); 
+            // 이벤트가 실행될 것이므로, 1회성(보스 등)이라면 완료 목록에 즉시 추가
+            if (!cell.isEventRepeatable)
+            {
+                completedEvents.Add(uniqueKey);
+            }
+
+            // 강제 시점 전환이 켜져있다면 해당 방향(int)을, 아니라면 -1 반환
+            int forceDir = cell.useForceDir ? (int)cell.evForceDir : -1;
+            
+            return (eventID, forceDir);
         }
 
-        // New Game을 시작할 때 모든 이벤트의 진행 상태를 초기화합니다.
+        // New Game을 시작할 때 모든 이벤트의 진행 상태를 초기화
         public void ResetAllEvents()
         {
-            foreach (List<EventTriggerData> eventList in triggerMap.Values)
-            {
-                foreach (EventTriggerData trigger in eventList)
-                {
-                    trigger.IsCompleted = false;
-                }
-            }
-            
+            completedEvents.Clear();
             Debug.Log("[DungeonEventManager] 모든 1회성 이벤트 플래그가 초기화되었습니다.");
         }
 
         // 현재 맵에서 완료된 1회성 이벤트들의 고유 키 목록을 반환 (세이브용)
         public List<string> GetCompletedTriggers()
         {
-            List<string> completedList = new List<string>();
-
-            // triggerMap의 Key는 "MapID_X_Y" 형태
-            foreach (var kvp in triggerMap)
-            {
-                foreach (EventTriggerData trigger in kvp.Value)
-                {
-                    // 반복 가능하지 않은 1회성 이벤트 중, 이미 완료된 것만 저장
-                    if (!trigger.Repeatable && trigger.IsCompleted)
-                    {
-                        // 고유 식별자 생성: "MapID_X_Y_EventID"
-                        string uniqueKey = $"{kvp.Key}_{trigger.EventID}";
-                        completedList.Add(uniqueKey);
-                    }
-                }
-            }
-            
-            return completedList;
+            return new List<string>(completedEvents);
         }
 
         // 세이브 데이터로부터 이벤트 완료 상태를 복구 (로드용)
         public void ApplyCompletedTriggers(List<string> savedCompletedList)
         {
-            // 혹시 모를 찌꺼기 데이터를 막기 위해 일단 전부 초기화
-            ResetAllEvents();
+            completedEvents.Clear();
 
-            // 세이브 데이터가 비어있다면 여기서 종료
             if (savedCompletedList == null || savedCompletedList.Count == 0) return;
 
-            // 맵 데이터를 순회하며 저장된 기록이 있는지 확인 후 상태 복구
-            foreach (var kvp in triggerMap)
+            foreach (string key in savedCompletedList)
             {
-                foreach (EventTriggerData trigger in kvp.Value)
-                {
-                    string uniqueKey = $"{kvp.Key}_{trigger.EventID}";
-                    
-                    // 세이브 파일 리스트에 이 고유 키가 존재한다면 완료 처리
-                    if (savedCompletedList.Contains(uniqueKey))
-                    {
-                        trigger.IsCompleted = true;
-                    }
-                }
+                completedEvents.Add(key);
             }
 
-            Debug.Log($"[DungeonEventManager] {savedCompletedList.Count}개의 완료된 이벤트를 로드했습니다.");
+            Debug.Log($"[DungeonEventManager] {completedEvents.Count}개의 완료된 이벤트를 로드했습니다.");
         }
-
     }
 }

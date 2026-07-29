@@ -38,7 +38,7 @@ namespace Data
         public string mapID;
         public string themeName; // JSON에서 불러올 테마 이름
         public string locationID; // 여러 맵이 공유하는 상위 지역의 ID. 퀘스트 등에서 참조
-        
+        public bool hasCeil = true;
         public int startX; // 플레이어의 시작 좌표
         public int startY; // 플레이어의 시작 좌표
         public Direction startDirection;
@@ -72,7 +72,10 @@ namespace Data
 
         public int centerObjectID = -1;
         public int[] faceObjectIDs = new int[4] { -1, -1, -1, -1 }; // North, East, South, West
-        
+        public string eventID = "";
+        public bool isEventRepeatable = false;
+        public bool useForceDir = false; 
+        public Direction evForceDir = Direction.North;
         public bool HasWall()
         {
             foreach(var i in wallTextureIDs)

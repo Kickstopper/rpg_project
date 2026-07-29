@@ -1,20 +1,20 @@
 {
-    "width": 3,
+    "width": 5,
     "height": 5,
-    "mapID": "Tower_4",
+    "mapID": "Tower_10",
     "themeName": "DefaultTheme",
     "locationID": "Tower",
     "hasCeil": true,
-    "startX": 0,
-    "startY": 8,
-    "startDirection": 1,
+    "startX": 3,
+    "startY": 1,
+    "startDirection": 0,
     "cells": [
         {
             "x": 0,
             "y": 0,
             "value": 0,
             "wallTextureIDs": [
-                4,
+                -1,
                 -1,
                 0,
                 0
@@ -35,7 +35,7 @@
                 -1,
                 -1,
                 0,
-                -1
+                4
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -50,7 +50,43 @@
             "y": 0,
             "value": 0,
             "wallTextureIDs": [
-                4,
+                -1,
+                -1,
+                0,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 0,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                -1,
+                0,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 0,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
                 0,
                 0,
                 -1
@@ -105,8 +141,44 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
-                0,
                 -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 1,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                4,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 1,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                4,
                 -1
             ],
             "centerObjectID": -1,
@@ -141,6 +213,24 @@
             "value": 0,
             "wallTextureIDs": [
                 -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 2,
+            "y": 2,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
                 -1,
                 -1,
                 -1
@@ -154,7 +244,25 @@
             ]
         },
         {
-            "x": 2,
+            "x": 3,
+            "y": 2,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                0
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
             "y": 2,
             "value": 0,
             "wallTextureIDs": [
@@ -176,9 +284,9 @@
             "y": 3,
             "value": 0,
             "wallTextureIDs": [
-                0,
-                0,
-                4,
+                -1,
+                -1,
+                -1,
                 0
             ],
             "centerObjectID": -1,
@@ -194,10 +302,10 @@
             "y": 3,
             "value": 0,
             "wallTextureIDs": [
+                0,
                 -1,
                 -1,
-                -1,
-                -1
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -213,9 +321,45 @@
             "value": 0,
             "wallTextureIDs": [
                 0,
+                -1,
                 0,
-                4,
-                0
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 3,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                0,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 3,
+            "value": 0,
+            "wallTextureIDs": [
+                -1,
+                0,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -228,12 +372,12 @@
         {
             "x": 0,
             "y": 4,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
+                0,
                 -1,
                 -1,
-                -1,
-                -1
+                0
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -249,9 +393,9 @@
             "value": 0,
             "wallTextureIDs": [
                 0,
-                0,
-                4,
-                0
+                -1,
+                -1,
+                -1
             ],
             "centerObjectID": -1,
             "faceObjectIDs": [
@@ -264,10 +408,46 @@
         {
             "x": 2,
             "y": 4,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
+                0,
                 -1,
                 -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 3,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                -1,
+                -1
+            ],
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ]
+        },
+        {
+            "x": 4,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                0,
                 -1,
                 -1
             ],
@@ -287,20 +467,20 @@
             "sourceY": 1,
             "isWallEntrance": true,
             "isWorldMap": false,
-            "destinationID": "NewDestination",
+            "destinationID": "",
             "targetX": 1,
             "targetY": 1,
             "targetDirection": 0
         },
         {
             "type": 0,
-            "sourceX": 1,
-            "sourceY": 3,
+            "sourceX": 2,
+            "sourceY": 2,
             "isWallEntrance": true,
             "isWorldMap": false,
-            "destinationID": "Tower_5",
-            "targetX": 2,
-            "targetY": 6,
+            "destinationID": "Tower_11",
+            "targetX": 1,
+            "targetY": 1,
             "targetDirection": 0
         }
     ]

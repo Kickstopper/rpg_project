@@ -4,6 +4,7 @@
     "mapID": "Tower_1",
     "themeName": "DefaultTheme",
     "locationID": "Tower",
+    "hasCeil": true,
     "startX": 0,
     "startY": 8,
     "startDirection": 1,

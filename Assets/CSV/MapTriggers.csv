@@ -1,3 +1,0 @@
-MapID,X,Y,EventID,Repeatable,ForceDir,Description
-Outpost,5,0,OUTPOST_1,FALSE,,파트너의 주의 (최초 1회만)
-Outpost,5,10,OUTPOST_2,FALSE,0,NPC의 주의 (최초 1회만)

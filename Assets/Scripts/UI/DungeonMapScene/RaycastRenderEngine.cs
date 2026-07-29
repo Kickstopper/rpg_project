@@ -896,6 +896,9 @@ namespace UI.DungeonMapScene
             for (int y = 0; y < _screenHeight; y++)
             {
                 bool isFloor = y < horizon;
+                // 맵 데이터에 천장이 없으면 천장(isFloor == false) 부분은 픽셀 렌더링을 생략
+                if (!isFloor && !_worldMap.hasCeil) continue;
+                
                 if (!isFloor && _ceilTexIdx == -1 && !_isScanning) continue;
 
                 float p = isFloor ? (horizon - y) : (y - horizon);
