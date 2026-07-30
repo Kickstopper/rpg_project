@@ -403,6 +403,7 @@ namespace UI.DungeonMapScene
         private IEnumerator JumpUpRoutine(EntranceData entrance)
         {
             HideSystemMessage();
+            HideRoomName();
 
             _isLookTransitioning = true;
             _inputLocked = true;
@@ -488,6 +489,8 @@ namespace UI.DungeonMapScene
 
                 _inputLocked = false;
                 _isLookTransitioning = false;
+
+                CheckFrontForEntranceName();
             }
         }
 
@@ -1115,6 +1118,9 @@ namespace UI.DungeonMapScene
         private IEnumerator TransitionToOtherPlace(EntranceData entrance, Vector2Int moveDir, Action onFadeOutComplete = null)
         {
             _inputLocked = true; 
+
+            HideRoomName();
+
             int preEntranceLogicX = _player.LogicX;
             int preEntranceLogicY = _player.LogicY;
 
@@ -1197,6 +1203,9 @@ namespace UI.DungeonMapScene
                             transitionManager.fadeOverlay.blocksRaycasts = false;
                         }
                     }
+
+                    // 일반 맵/계단 로드가 끝나고 화면이 밝아진 후, 새로운 방향 기준으로 UI를 재검사
+                    CheckFrontForEntranceName();
                 } 
             }
             else if (entrance.type == EntranceType.Shop)
@@ -1649,7 +1658,7 @@ namespace UI.DungeonMapScene
         {
             if (miniMap != null)
             {
-                miniMap.Initialize(_currentMap, theme.passableWallTexIDs);
+                miniMap.Initialize(_currentMap, theme.passableWallTexIDs, theme.doorAnimations);
                 miniMap.gameObject.SetActive(theme.moduleEnable && ManagerRoot.Module.IsMounted(ModuleFeature.LocalRadar));
                 if (miniMap.gameObject.activeSelf) miniMap.SnapToGrid(_player.LogicX, _player.LogicY, _player.DirectionIdx);
             }
