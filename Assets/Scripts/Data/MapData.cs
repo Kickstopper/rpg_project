@@ -84,8 +84,12 @@ namespace Data
 
         public int centerObjectID = -1;
         public int[] faceObjectIDs = new int[4] { -1, -1, -1, -1 }; // North, East, South, West
+        
         public string eventID = "";
         public bool isEventRepeatable = false;
+        public string requiredFlag = ""; 
+        public bool requiredFlagState = true; // 플래그가 True일 때 이벤트 발동
+
         public bool useForceDir = false; 
         public Direction evForceDir = Direction.North;
         public bool HasWall()

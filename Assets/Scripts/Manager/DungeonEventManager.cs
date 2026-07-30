@@ -29,6 +29,19 @@ namespace Manager
             if (cell == null || string.IsNullOrEmpty(cell.eventID))
                 return (null, -1);
 
+            // 플래그 조건 검사
+            if (!string.IsNullOrEmpty(cell.requiredFlag))
+            {
+                // FlagManager의 CheckFlag를 호출하여 true/false 여부를 받음
+                bool currentFlagState = ManagerRoot.Flag.CheckFlag(cell.requiredFlag); 
+                
+                // 에디터에서 설정한 요구 상태(requiredFlagState)와 현재 상태가 다르면 이벤트 취소
+                if (currentFlagState != cell.requiredFlagState)
+                {
+                    return (null, -1);
+                }
+            }
+            
             string eventID = cell.eventID;
             string uniqueKey = $"{currentMapID}_{x}_{y}_{eventID}";
 

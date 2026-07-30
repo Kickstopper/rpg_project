@@ -757,6 +757,15 @@ public class DungeonMapEditor : EditorWindow
                 // 이벤트 ID가 있을 때만 반복 여부 토글을 보여주어 깔끔하게 유지
                 if (!string.IsNullOrEmpty(selectedCell.eventID))
                 {
+                    // 플래그 조건 UI
+                    selectedCell.requiredFlag = EditorGUILayout.TextField("Required Flag", selectedCell.requiredFlag);
+
+                    if (!string.IsNullOrEmpty(selectedCell.requiredFlag))
+                    {
+                        selectedCell.requiredFlagState = EditorGUILayout.Toggle("Required State (T/F)", selectedCell.requiredFlagState);
+                    }
+
+                    GUILayout.Space(5);
                     selectedCell.isEventRepeatable = EditorGUILayout.Toggle("Is Repeatable", selectedCell.isEventRepeatable);
                     // 시점 강제 전환 UI
                     selectedCell.useForceDir = EditorGUILayout.Toggle("Use Force Dir", selectedCell.useForceDir);
