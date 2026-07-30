@@ -4,6 +4,7 @@
     "mapID": "VampireCastle_6",
     "themeName": "DefaultTheme",
     "locationID": "vampire_castle",
+    "hasCeil": true,
     "startX": 2,
     "startY": 3,
     "startDirection": 1,
@@ -24,7 +25,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -42,7 +47,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -60,7 +69,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 3,
@@ -78,7 +91,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 4,
@@ -96,7 +113,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -114,7 +135,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -132,7 +157,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -150,7 +179,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 3,
@@ -168,7 +201,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 4,
@@ -186,7 +223,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -204,7 +245,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -222,7 +267,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -240,7 +289,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 3,
@@ -258,7 +311,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 4,
@@ -276,7 +333,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -294,7 +355,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -312,7 +377,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -330,7 +399,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 3,
@@ -348,7 +421,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 4,
@@ -366,7 +443,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         }
     ],
     "entrances": [
@@ -375,7 +456,7 @@
             "sourceX": 1,
             "sourceY": 0,
             "isWallEntrance": false,
-            "triggerDirection": 2,
+            "stairType": 0,
             "isWorldMap": false,
             "destinationID": "VampireCastle_4",
             "targetX": 6,
@@ -387,7 +468,7 @@
             "sourceX": 1,
             "sourceY": 3,
             "isWallEntrance": false,
-            "triggerDirection": 3,
+            "stairType": 0,
             "isWorldMap": false,
             "destinationID": "VampireCastle_5",
             "targetX": 8,

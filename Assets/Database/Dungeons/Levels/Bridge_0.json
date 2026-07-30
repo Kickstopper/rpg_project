@@ -4,6 +4,7 @@
     "mapID": "Bridge_0",
     "themeName": "Bridge_0",
     "locationID": "OUTPOST",
+    "hasCeil": true,
     "startX": 3,
     "startY": 9,
     "startDirection": 0,
@@ -24,12 +25,16 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
             "y": 0,
-            "value": 0,
+            "value": 11,
             "wallTextureIDs": [
                 2,
                 0,
@@ -42,7 +47,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -60,7 +69,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -78,7 +91,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -96,7 +113,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -114,7 +135,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -132,7 +157,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -150,7 +179,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -168,7 +201,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -186,7 +223,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -204,7 +245,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -222,7 +267,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -240,7 +289,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -258,7 +311,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -276,7 +333,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -294,7 +355,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -312,7 +377,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -330,7 +399,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -348,7 +421,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -366,7 +443,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -384,7 +465,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -402,7 +487,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
@@ -420,7 +509,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -438,7 +531,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 0,
@@ -456,12 +553,16 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 1,
             "y": 8,
-            "value": 0,
+            "value": 10,
             "wallTextureIDs": [
                 0,
                 0,
@@ -474,7 +575,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         },
         {
             "x": 2,
@@ -492,7 +597,11 @@
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "useForceDir": false,
+            "evForceDir": 0
         }
     ],
     "entrances": [
@@ -501,6 +610,7 @@
             "sourceX": 1,
             "sourceY": 0,
             "isWallEntrance": true,
+            "stairType": 0,
             "isWorldMap": false,
             "destinationID": "Outpost",
             "targetX": 5,
@@ -512,6 +622,7 @@
             "sourceX": 1,
             "sourceY": 8,
             "isWallEntrance": true,
+            "stairType": 0,
             "isWorldMap": false,
             "destinationID": "elv_000",
             "targetX": 6,

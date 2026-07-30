@@ -606,7 +606,7 @@
         {
             "x": 2,
             "y": 5,
-            "value": -1,
+            "value": 11,
             "wallTextureIDs": [
                 4,
                 -1,

@@ -892,7 +892,7 @@
         {
             "x": 4,
             "y": 3,
-            "value": 0,
+            "value": 10,
             "wallTextureIDs": [
                 4,
                 0,
@@ -2124,7 +2124,7 @@
         {
             "x": 0,
             "y": 8,
-            "value": 0,
+            "value": 11,
             "wallTextureIDs": [
                 0,
                 4,
@@ -2160,7 +2160,7 @@
                 -1,
                 -1
             ],
-            "eventID": "",
+            "eventID": "TOWER_0",
             "isEventRepeatable": false,
             "useForceDir": false,
             "evForceDir": 0
@@ -2586,7 +2586,7 @@
         {
             "x": 9,
             "y": 9,
-            "value": 0,
+            "value": 9,
             "wallTextureIDs": [
                 0,
                 0,

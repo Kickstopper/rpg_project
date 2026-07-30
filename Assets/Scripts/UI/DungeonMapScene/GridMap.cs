@@ -36,18 +36,20 @@ namespace UI.DungeonMapScene
         private int wallWidth = 11;
 
         private HashSet<int> illusionTextures;
+        private HashSet<int> doorTextures = new HashSet<int>();
 
-        public void Initialize(MapData mapData, List<int> illusions)
+        public void Initialize(MapData mapData, List<int> illusions, List<DoorAnimConfig> doors)
         {
             ClearMap();
 
             if (illusions != null)
-            {
                 illusionTextures = new HashSet<int>(illusions);
-            }
             else
-            {
                 illusionTextures = new HashSet<int>();
+
+            if (doors != null)
+            {
+                foreach(var door in doors) doorTextures.Add(door.closedTexId);
             }
 
             _map = mapData;
@@ -92,6 +94,7 @@ namespace UI.DungeonMapScene
             transform.DOKill();
 
             illusionTextures = null;
+            doorTextures.Clear();
 
             if (_mapParent != null) _mapParent.DOKill();
             if (_arrowImg != null) _arrowImg.rectTransform.DOKill();
@@ -235,7 +238,7 @@ namespace UI.DungeonMapScene
                         cellData = _map.GetCell(mapX, mapY); 
                     }
 
-                    _gridCellDict[r * mapSize + c].UpdateWallState(cellData, illusionTextures);
+                    _gridCellDict[r * mapSize + c].UpdateWallState(cellData, illusionTextures, doorTextures);
                 }
             }
         }

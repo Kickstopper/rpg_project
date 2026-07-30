@@ -56,7 +56,7 @@
         {
             "x": 2,
             "y": 0,
-            "value": 0,
+            "value": 8,
             "wallTextureIDs": [
                 4,
                 0,
@@ -452,7 +452,7 @@
     ],
     "entrances": [
         {
-            "type": 2,
+            "type": 0,
             "sourceX": 2,
             "sourceY": 0,
             "isWallEntrance": true,

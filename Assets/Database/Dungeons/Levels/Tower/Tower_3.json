@@ -892,7 +892,7 @@
         {
             "x": 4,
             "y": 3,
-            "value": 0,
+            "value": 10,
             "wallTextureIDs": [
                 4,
                 0,
