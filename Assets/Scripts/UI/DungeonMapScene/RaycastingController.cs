@@ -497,7 +497,7 @@ namespace UI.DungeonMapScene
         private IEnumerator JumpDownRoutine(EntranceData entrance, Vector2Int moveDir)
         {
             HideSystemMessage();
-
+            HideRoomName();
             _isLookTransitioning = true;
             _inputLocked = true;
 
