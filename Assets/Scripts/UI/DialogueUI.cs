@@ -523,89 +523,140 @@ namespace UI
 
         private bool CheckCondition(string conditionData)
         {
-            // 조건이 비어있으면 검사 없이 무조건 통과 (선택지 표시)
+            // 조건이 비어있으면 검사 없이 무조건 통과
             if (string.IsNullOrEmpty(conditionData)) return true;
 
-            string[] parts = conditionData.Trim().Split(':');
-            if (parts.Length == 0) return true;
+            // 여러 조건을 ';'로 구분하여 모두 만족하는지(AND) 검사
+            string[] conditions = conditionData.Split(';');
 
-            string command = parts[0].ToUpper();
-
-            switch (command)
+            foreach (string cond in conditions)
             {
-                case "HASITEM":
-                    // parts[0]="HasItem", parts[1]="Gold_100"
-                    if (parts.Length >= 2)
-                    {
-                        string itemID = parts[1];
-                        Debug.Log($"[Condition] 아이템 소지 여부 확인: {itemID}");
-                        return ManagerRoot.Inventory.HasItem(itemID);
-                    }
-                    break;
-                    
-                case "FLAG":
-                    // 특정 퀘스트나 이벤트 플래그 확인 (예: "Flag:passed_guard")
-                    if (parts.Length >= 2)
-                    {
-                        string flagName = parts[1];
-                        return ManagerRoot.Flag.CheckFlag(flagName);
-                    }
-                    break;
-            }
-
-            return false; // 조건을 만족하지 못하면 false 반환 -> 버튼 생성 안 됨
-        }
-
-        private void ExecuteAction(string actionData)
-        {
-            if (string.IsNullOrEmpty(actionData)) return;
-
-            string[] actions = actionData.Split(';'); 
-
-            foreach (string act in actions)
-            {
-                string[] parts = act.Trim().Split(':'); 
-                if (parts.Length == 0) continue;
+                string[] parts = cond.Trim().Split(':');
+                if (parts.Length == 0 || string.IsNullOrEmpty(parts[0])) continue;
 
                 string command = parts[0].ToUpper();
 
                 switch (command)
                 {
-                    case "TONE":
-                        // 교섭 선택 시 (예: "TONE:Logical")
-                        if (currentMonster != null && Enum.TryParse<ChoiceTone>(parts[1], true, out ChoiceTone tone))
-                        {
-                            MoodDelta delta = NegotiationCalculator.CalculateMoodChange(tone, currentMonster, new EnvironmentState());
-                            
-                            currentMonster.CurrentAnger += delta.addedAnger;
-                            currentMonster.CurrentJoy += delta.addedJoy;
-                            currentMonster.CurrentInterest += delta.addedInterest;
-                            
-                            Debug.Log($"[교섭 액션] {tone} 선택 -> 분노:{currentMonster.CurrentAnger}, 기쁨:{currentMonster.CurrentJoy}, 흥미:{currentMonster.CurrentInterest}");
-                        }
-                        break;
-
-                    case "ADD_MOOD":
-                        // TODO: 강제 감정치 조절 (예: "ADD_MOOD:-50", "ADD_JOY:30", "ADD_ANGER:50")
-                        break;
-
-                    case "REMOVE":
+                    case "HASITEM":
                         if (parts.Length >= 2)
                         {
                             string itemID = parts[1];
-                            // TODO: 돈과 인벤토리 아이템 차감 로직 연동
-                            ManagerRoot.Inventory.RemoveItem(itemID, 1);
-                            Debug.Log($"[Action] 아이템 차감: {itemID}");
+                            if (itemID.StartsWith("Gold_"))
+                            {
+                                if (int.TryParse(itemID.Substring(5), out int reqGold))
+                                {
+                                    // 플레이어의 소지금이 요구 골드보다 크거나 같아야 함
+                                    if (ManagerRoot.Inventory.GetMoney() < reqGold) return false;
+                                }
+                            }
+                            else
+                            {
+                                // 필요시 parts[2]를 이용해 요구 수량을 파싱 (예: HASITEM:Potion:3)
+                                if (!ManagerRoot.Inventory.HasItem(itemID)) return false;
+                            }
                         }
                         break;
-
-                    case "BATTLE":
-                        // TODO: 전투 재개
-                        Debug.Log("[Action] 전투 개시 트리거 발생!");
+                        
+                    case "FLAG":
+                        if (parts.Length >= 2)
+                        {
+                            string flagName = parts[1];
+                            if (!ManagerRoot.Flag.CheckFlag(flagName)) return false;
+                        }
                         break;
                 }
             }
+
+            return true;
         }
+
+        private void ExecuteAction(string actionData)
+{
+    if (string.IsNullOrEmpty(actionData)) return;
+
+    string[] actions = actionData.Split(';'); 
+
+    foreach (string act in actions)
+    {
+        string[] parts = act.Trim().Split(':'); 
+        if (parts.Length == 0 || string.IsNullOrEmpty(parts[0])) continue;
+
+        string command = parts[0].ToUpper();
+
+        switch (command)
+        {
+            case "TONE":
+                if (parts.Length >= 2 && currentMonster != null)
+                {
+                    if (Enum.TryParse<ChoiceTone>(parts[1], true, out ChoiceTone tone))
+                    {
+                        MoodDelta delta = NegotiationCalculator.CalculateMoodChange(tone, currentMonster, new EnvironmentState());
+                        
+                        currentMonster.CurrentAnger += delta.addedAnger;
+                        currentMonster.CurrentJoy += delta.addedJoy;
+                        currentMonster.CurrentInterest += delta.addedInterest;
+                        
+                        Debug.Log($"[교섭 액션] {tone} 선택 -> 분노:{currentMonster.CurrentAnger}, 기쁨:{currentMonster.CurrentJoy}, 흥미:{currentMonster.CurrentInterest}");
+                    }
+                }
+                break;
+
+            case "ADD_MOOD":
+                // TODO: 강제 감정치 조절 (예: "ADD_MOOD:-50", "ADD_JOY:30", "ADD_ANGER:50")
+                break;
+
+            case "REMOVE":
+                if (parts.Length >= 2)
+                {
+                    string itemID = parts[1];
+                    if (!string.IsNullOrEmpty(itemID))
+                    {
+                        if (itemID.StartsWith("Gold_"))
+                        {
+                            if (int.TryParse(itemID.Substring(5), out int gold))
+                            {
+                                ManagerRoot.Inventory.SubMoney(gold);
+                                Debug.Log($"[Action] MONEY 차감: {gold}");
+                            }
+                        }
+                        else
+                        {
+                            // REMOVE:Potion:3 -> 3개 삭제, 없으면 1개
+                            int removeCount = 1;
+                            if (parts.Length >= 3 && int.TryParse(parts[2], out int parsedCount))
+                            {
+                                removeCount = parsedCount;
+                            }
+
+                            ManagerRoot.Inventory.RemoveItem(itemID, removeCount);
+                            Debug.Log($"[Action] 아이템 차감: {itemID} x {removeCount}");
+                        }
+                    }
+                }
+                break;
+
+            case "SET_FLAG":
+                if (parts.Length >= 3)
+                {
+                    string flagID = parts[1].Trim();
+                    bool state = parts[2].Trim().ToLower() == "true"; 
+                    
+                    if(!string.IsNullOrEmpty(flagID))
+                    {
+                        ManagerRoot.Flag.SetFlag(flagID, state);
+                        Debug.Log($"[Action] 플래그 설정: {flagID} -> {state}");
+                    }
+                }
+                break;
+
+            case "BATTLE":
+                // TODO: 전투 재개
+                Debug.Log("[Action] 전투 개시 트리거 발생!");
+                break;
+        }
+    }
+}
 
         // 유저가 타이핑이 끝난 후 클릭했을 때 실행되는 함수
         void AdvanceLine()
