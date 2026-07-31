@@ -609,6 +609,7 @@ Transform:
   - {fileID: 7013715907720635569}
   - {fileID: 1625563179574084681}
   - {fileID: 2161072658197693512}
+  - {fileID: 6086266142155964047}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7067830550753514190
@@ -643,6 +644,66 @@ MonoBehaviour:
   timeManager: {fileID: 2450754152227706877}
   weatherManager: {fileID: 2035458018758246169}
   worldManager: {fileID: 405637350890329743}
+  fieldMapManager: {fileID: 2698755566062984489}
+--- !u!1 &4344090992620081364
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6086266142155964047}
+  - component: {fileID: 2698755566062984489}
+  m_Layer: 0
+  m_Name: FieldMapManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6086266142155964047
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4344090992620081364}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 545246018662277303}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2698755566062984489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4344090992620081364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 185c611afc5be1740b9e07084999fbb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Manager.FieldMapManager
+  allDestinations:
+  - mapID: Outpost
+    displayName: "\uBCF8\uBD80"
+    distance: 30
+    timeHours: 1
+    targetX: 5
+    targetY: 1
+    targetDir: 0
+  - mapID: Tower_0
+    displayName: "\uD0C0\uC6CC"
+    distance: 30
+    timeHours: 1
+    targetX: 1
+    targetY: 8
+    targetDir: 1
 --- !u!1 &4768890939789775564
 GameObject:
   m_ObjectHideFlags: 0
@@ -744,6 +805,7 @@ MonoBehaviour:
   elevatorCanvas: {fileID: 0}
   terminalCanvas: {fileID: 0}
   officeCanvas: {fileID: 0}
+  fieldMapUI: {fileID: 0}
   currentBattleManager: {fileID: 0}
   shopUIController: {fileID: 0}
   dialogueController: {fileID: 0}

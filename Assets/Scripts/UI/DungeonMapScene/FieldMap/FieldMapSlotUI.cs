@@ -2,10 +2,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Data;
+using UnityEngine.EventSystems;
 
 namespace UI
 {
-    public class FieldMapSlotUI : MonoBehaviour
+    public class FieldMapSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler
     {
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI infoText; // 거리 및 소요 시간 표시용
@@ -33,11 +34,16 @@ namespace UI
         public void SetFocus(bool isFocused)
         {
             backgroundImage.color = isFocused ? highlightColor : normalColor;
-            transform.localScale = isFocused ? Vector3.one * 1.05f : Vector3.one;
         }
 
-        // 마우스 오버 및 클릭 이벤트 연동 (인스펙터의 EventTrigger 활용 권장)
-        public void OnPointerEnter() => _manager.OnSlotHovered(_index);
-        public void OnPointerClick() => _manager.OnSlotClicked(_index);
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            _manager.OnSlotHovered(_index);
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            _manager.OnSlotClicked(_index);
+        }
     }
 }

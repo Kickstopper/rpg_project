@@ -165,12 +165,39 @@ namespace UI.DungeonMapScene
             _inputLocked = true;
             yield return new WaitForSeconds(0.1f);
 
-            yield return transitionManager.fadeOverlay.DOFade(0f, 1f).WaitForCompletion();
+            // 통합 코루틴 호출 (최초 진입이므로 1초 동안 천천히)
+            yield return StartCoroutine(RestoreViewAndCheckEventRoutine(1f));
+        }
 
-            transitionManager.fadeOverlay.blocksRaycasts = false;
+        // 맵 이동 및 로드가 끝난 직후 화면을 밝히고 이벤트를 검사하는 통합 코루틴
+        private IEnumerator RestoreViewAndCheckEventRoutine(float fadeDuration = 0.5f)
+        {
+            // 탐험 상태 보장
+            if (ManagerRoot.GameState != null) 
+                ManagerRoot.GameState.ChangeState(GameState.Exploration);
+
+            // 화면이 까맣게 덮여있다면 지정된 시간 동안 부드럽게 페이드 인
+            if (transitionManager != null && transitionManager.fadeOverlay != null && transitionManager.fadeOverlay.alpha > 0f)
+            {
+                float startAlpha = transitionManager.fadeOverlay.alpha;
+                float elapsed = 0f;
+                while (elapsed < fadeDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    transitionManager.fadeOverlay.alpha = Mathf.Lerp(startAlpha, 0f, elapsed / fadeDuration);
+                    yield return null;
+                }
+                transitionManager.fadeOverlay.alpha = 0f;
+                transitionManager.fadeOverlay.blocksRaycasts = false;
+            }
+
+            // UI 텍스트 갱신 및 맵 이동 직후 발밑에 이벤트가 있는지 검사
+            CheckFrontForEntranceName();
+            CheckCurrentTileEvent(); 
+
+            // 조작 잠금 해제
             _inputLocked = false;
-
-            CheckCurrentTileEvent();
+            _isLookTransitioning = false;
         }
 
         private IEnumerator WakeUpFadeInRoutine()
@@ -474,23 +501,7 @@ namespace UI.DungeonMapScene
                 
                 StartCoroutine(LandingImpactRoutine(10f));
 
-                if (transitionManager != null && transitionManager.fadeOverlay != null)
-                {
-                    float fadeElapsed = 0f;
-                    while (fadeElapsed < 0.5f)
-                    {
-                        fadeElapsed += Time.deltaTime;
-                        transitionManager.fadeOverlay.alpha = 1f - (fadeElapsed / 0.5f);
-                        yield return null;
-                    }
-                    transitionManager.fadeOverlay.alpha = 0f;
-                    transitionManager.fadeOverlay.blocksRaycasts = false;
-                }
-
-                _inputLocked = false;
-                _isLookTransitioning = false;
-
-                CheckFrontForEntranceName();
+                yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
             }
         }
 
@@ -567,21 +578,7 @@ namespace UI.DungeonMapScene
 
                 StartCoroutine(LandingImpactRoutine(150f));
 
-                if (transitionManager != null && transitionManager.fadeOverlay != null)
-                {
-                    float fadeElapsed = 0f;
-                    while (fadeElapsed < 0.5f)
-                    {
-                        fadeElapsed += Time.deltaTime;
-                        transitionManager.fadeOverlay.alpha = 1f - (fadeElapsed / 0.5f);
-                        yield return null;
-                    }
-                    transitionManager.fadeOverlay.alpha = 0f;
-                    transitionManager.fadeOverlay.blocksRaycasts = false;
-                }
-
-                _inputLocked = false;
-                _isLookTransitioning = false;
+                yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
             }
         }
 
@@ -1189,19 +1186,7 @@ namespace UI.DungeonMapScene
                         LoadMapData(entrance); 
                         yield return null; 
 
-                        if (transitionManager != null && transitionManager.fadeOverlay != null)
-                        {
-                            float elapsed = 0f;
-                            float duration = 0.5f;
-                            while (elapsed < duration)
-                            {
-                                elapsed += Time.deltaTime;
-                                transitionManager.fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsed / duration);
-                                yield return null;
-                            }
-                            transitionManager.fadeOverlay.alpha = 0f;
-                            transitionManager.fadeOverlay.blocksRaycasts = false;
-                        }
+                        yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
                     }
 
                     // 일반 맵/계단 로드가 끝나고 화면이 밝아진 후, 새로운 방향 기준으로 UI를 재검사
@@ -1221,19 +1206,7 @@ namespace UI.DungeonMapScene
                 if (miniMap) miniMap.SnapToGrid(preEntranceLogicX, preEntranceLogicY, reverseDir);
                 UpdateMapDiscovery(preEntranceLogicX, preEntranceLogicY);
 
-                if (transitionManager != null && transitionManager.fadeOverlay != null)
-                {
-                    float elapsedFade = 0f;
-                    float fadeDuration = 0.5f;
-                    while (elapsedFade < fadeDuration)
-                    {
-                        elapsedFade += Time.deltaTime;
-                        transitionManager.fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsedFade / fadeDuration);
-                        yield return null;
-                    }
-                    transitionManager.fadeOverlay.alpha = 0f;
-                    transitionManager.fadeOverlay.blocksRaycasts = false;
-                }
+                yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
             }
             else if (entrance.type == EntranceType.Terminal)
             {
@@ -1262,21 +1235,8 @@ namespace UI.DungeonMapScene
 
                         _renderer.RenderFrame(_player, renderSettings);
 
-                        if (ManagerRoot.GameState != null) ManagerRoot.GameState.ChangeState(GameState.Exploration);
-
-                        if (transitionManager != null && transitionManager.fadeOverlay != null)
-                        {
-                            float elapsedFade = 0f;
-                            float fadeDuration = 0.5f;
-                            while (elapsedFade < fadeDuration)
-                            {
-                                elapsedFade += Time.deltaTime;
-                                transitionManager.fadeOverlay.alpha = 1f - Mathf.Clamp01(elapsedFade / fadeDuration);
-                                yield return null;
-                            }
-                            transitionManager.fadeOverlay.alpha = 0f;
-                            transitionManager.fadeOverlay.blocksRaycasts = false;
-                        }
+                        yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
+                        
                         break; 
                     }
                     else
@@ -1327,9 +1287,7 @@ namespace UI.DungeonMapScene
                         if (compassUI) compassUI.SetDirection(exitDir);
 
                         yield return StartCoroutine(HandleElevatorExitSequence(elvData));
-
-                        ManagerRoot.GameState.ChangeState(GameState.Exploration);
-                        _inputLocked = false;
+                        yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0f));
                         yield break; 
                     }
                     
@@ -1349,9 +1307,64 @@ namespace UI.DungeonMapScene
                     
                     yield return new WaitForSeconds(0.2f); 
                     yield return StartCoroutine(HandleElevatorExitSequence(elvData));
+                    yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0f));
                 }
 
                 ManagerRoot.GameState.ChangeState(GameState.Exploration);
+            }
+            else if (entrance.type == EntranceType.FieldMap)
+            {
+                if (ManagerRoot.GameState != null) ManagerRoot.GameState.ChangeState(GameState.FieldMap);
+
+                // UI 열기
+                FieldMapUIManager.Instance.OpenFieldMap(entrance.destinationID);
+
+                // 유저가 선택을 마칠 때까지 대기
+                yield return new WaitUntil(() => FieldMapUIManager.Instance.IsSelectionComplete);
+
+                if (FieldMapUIManager.Instance.IsCanceled)
+                {
+                    // [취소 시] 상점/터미널과 동일하게 180도 회전하여 복귀
+                    int reverseDir = (_player.DirectionIdx + 2) % 4; 
+                    Vector2 originalPos = _player.GetOffsetPosition(preEntranceLogicX, preEntranceLogicY, reverseDir);
+                    _player.SetDirectPosition(originalPos.x, originalPos.y, reverseDir);
+
+                    if (compassUI) compassUI.SetDirection(reverseDir);
+                    if (miniMap) miniMap.SnapToGrid(preEntranceLogicX, preEntranceLogicY, reverseDir);
+                    UpdateMapDiscovery(preEntranceLogicX, preEntranceLogicY);
+                }
+                else
+                {
+                    // [이동 확정 시]
+                    FieldMapDestData dest = FieldMapUIManager.Instance.SelectedDestination;
+
+                    if (transitionManager != null)
+                    {
+                        yield return StartCoroutine(FieldMapUIManager.Instance.ExecuteRoadTransitionRoutine(dest.distance, dest.timeHours, () => 
+                        {
+                            // 인게임 시간(시간 단위) 추가 
+                            // ManagerRoot.Time.AddHours(dest.timeHours); 
+                            
+                            // 새로운 맵 로드 
+                            EntranceData dynamicDest = new EntranceData
+                            {
+                                destinationID = dest.mapID,
+                                targetX = dest.targetX,
+                                targetY = dest.targetY,
+                                targetDirection = dest.targetDir
+                            };
+
+                            if (ManagerRoot.Dungeon)
+                            {
+                                ManagerRoot.Dungeon.LoadDungeonFromJson(dynamicDest.destinationID);
+                                LoadMapData(dynamicDest); 
+                                ManagerRoot.Sound.StopBGM(false);
+                            }
+                        }));
+                    }
+                }
+
+                yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
             }
             else if (entrance.type == EntranceType.Office)
             {

@@ -42,6 +42,7 @@ namespace Manager
         [SerializeField] private TimeManager timeManager;
         [SerializeField] private WeatherManager weatherManager;
         [SerializeField] private WorldManager worldManager;
+        [SerializeField] private FieldMapManager fieldMapManager;
 
         public static GameSettingManager GameSetting => Instance?.gameSettingManager;
         public static SoundManager Sound => Instance?.soundManager;
@@ -63,7 +64,7 @@ namespace Manager
         public static WeatherManager Weather => Instance?.weatherManager;
         public static TimeManager Time => Instance?.timeManager;
         public static WorldManager World => Instance?.worldManager;
-
+        public static FieldMapManager FieldMap => Instance?.fieldMapManager;
         private void Awake()
         {
             if (s_instance == null)
@@ -118,12 +119,10 @@ namespace Manager
             if (gameSettingManager == null) gameSettingManager = GetComponentInChildren<GameSettingManager>();
             if (databaseManager == null) databaseManager = GetComponentInChildren<DatabaseManager>();
             if (questManager == null) questManager = GetComponentInChildren<QuestManager>();
-            
             if (questManager != null && databaseManager != null && databaseManager.questDB != null)
             {
                 questManager.InitializeQuests(databaseManager.questDB.db);
             }
-            
             if (timeManager == null) timeManager = GetComponentInChildren<TimeManager>();
             if (dialogueManager == null) dialogueManager = GetComponentInChildren<DialogueManager>();
             if (gameStateManager == null) gameStateManager = GetComponentInChildren<GameStateManager>();
@@ -140,6 +139,7 @@ namespace Manager
             if (shopManager == null) shopManager = GetComponentInChildren<ShopManager>();
             if (weatherManager == null) weatherManager = GetComponentInChildren<WeatherManager>();
             if (worldManager == null) worldManager = GetComponentInChildren<WorldManager>();
+            if (fieldMapManager == null) fieldMapManager = GetComponentInChildren<FieldMapManager>();
         }
     }
 }

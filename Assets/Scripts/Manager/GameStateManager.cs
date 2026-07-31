@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using Controller;
 using UI.Shop;
 using UI;
 using UI.Battle;
@@ -16,6 +15,7 @@ public enum GameState
     Elevator,    // 엘레베이터
     Terminal,    // 터미널 (순간이동)
     Office,      // 사무실
+    FieldMap,    // 필드맵
 }
 
 namespace Manager
@@ -31,6 +31,7 @@ namespace Manager
         public GameObject elevatorCanvas;    // 엘레베이터 UI
         public GameObject terminalCanvas;    // 터미널 UI
         public GameObject officeCanvas;      // 사무실 UI
+        public GameObject fieldMapUI;        // 필드맵 UI
 
         public BattleManager currentBattleManager;
         public ShopModeSelectUI shopUIController;
@@ -77,6 +78,7 @@ namespace Manager
             if (elevatorCanvas != null) elevatorCanvas.SetActive(false);
             if (terminalCanvas != null) terminalCanvas.SetActive(false);
             if (officeCanvas != null) officeCanvas.SetActive(false);
+            if (fieldMapUI != null) fieldMapUI.SetActive(false);
 
             switch (CurrentState)
             {
@@ -115,6 +117,10 @@ namespace Manager
                 case GameState.Office:
                     if (officeCanvas != null) officeCanvas.SetActive(true);
                     break;
+                
+                case GameState.FieldMap:
+                    if (fieldMapUI != null) fieldMapUI.SetActive(true);
+                    break;
 
                 case GameState.None:
                 default:
@@ -127,7 +133,7 @@ namespace Manager
                                             GameObject battleCanvas, BattleManager battleManager, 
                                             GameObject shopCanvas, ShopModeSelectUI shopController = null,
                                             GameObject terminalCanvas = null, GameObject elevatorCanvas = null, 
-                                            GameObject officeCanvas = null)
+                                            GameObject officeCanvas = null, GameObject fieldMapUI = null)
         {
             this.explorationCanvas = explCanvas;
             this.eventCanvas = eventCanvas;
@@ -141,7 +147,7 @@ namespace Manager
             this.elevatorCanvas = elevatorCanvas;
             this.terminalCanvas = terminalCanvas;
             this.officeCanvas = officeCanvas;
-
+            this.fieldMapUI = fieldMapUI;
             RefreshUIState();
         }
 
