@@ -4,8 +4,22 @@ using UnityEngine;
 namespace Data
 {
     public enum Direction { North, East, South, West }
-    public enum EntranceType { Map, Shop, Elevator, Terminal, Office } // 다른 맵으로의 이동과 상점으로의 이동
+    public enum EntranceType { Map, Shop, Elevator, Terminal, Office, FieldMap } // 다른 맵으로의 이동과 상점으로의 이동
     public enum ElevatorDoorType { Split, SlideLeft, SlideUp }
+
+    // 지역 이동 목적지 데이터 구조
+    [Serializable]
+    public class FieldMapDestData
+    {
+        public string mapID;           // 대상 맵 ID
+        public string displayName;     // UI에 표시될 지역 이름
+        public float distance;         // 거리 (km)
+        public int timeHours;          // 소요 게임 시간 (시간 단위)
+        
+        public int targetX;
+        public int targetY;
+        public Direction targetDir;
+    }
     
     [Serializable]
     public struct FloorData 
