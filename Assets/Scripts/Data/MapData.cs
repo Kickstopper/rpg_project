@@ -14,13 +14,35 @@ namespace Data
         public string mapID;           // 대상 맵 ID
         public string displayName;     // UI에 표시될 지역 이름
         public float distance;         // 거리 (km)
-        public int timeHours;          // 소요 게임 시간 (시간 단위)
+        public float timeHours;          // 소요 게임 시간 (시간 단위)
         
         public int targetX;
         public int targetY;
         public Direction targetDir;
     }
     
+    [Serializable]
+    public class RouteData
+    {
+        public string fromMapID;      // 출발지 맵 ID
+        public string toMapID;        // 도착지 맵 ID
+        
+        public float distance;        // 이동 거리
+        public float timeHours;         // 소요 시간
+    }
+
+    [Serializable]
+    public class MapNodeData
+    {
+        public string mapID;          // 맵 ID (Key)
+        public string displayName;    // 화면에 표시될 이름
+        
+        [Header("Default Spawn Info")]
+        public int spawnX;
+        public int spawnY;
+        public Direction spawnDir;
+    }
+
     [Serializable]
     public struct FloorData 
     {

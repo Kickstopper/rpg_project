@@ -689,21 +689,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 185c611afc5be1740b9e07084999fbb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager.FieldMapManager
-  allDestinations:
+  allMapNodes:
   - mapID: Outpost
     displayName: "\uBCF8\uBD80"
-    distance: 30
-    timeHours: 1
-    targetX: 5
-    targetY: 1
-    targetDir: 0
+    spawnX: 5
+    spawnY: 1
+    spawnDir: 0
   - mapID: Tower_0
     displayName: "\uD0C0\uC6CC"
-    distance: 30
-    timeHours: 1
-    targetX: 1
-    targetY: 8
-    targetDir: 1
+    spawnX: 1
+    spawnY: 8
+    spawnDir: 1
+  allRoutes:
+  - fromMapID: Outpost
+    toMapID: Tower_0
+    distance: 32
+    timeHours: 0.32
+  - fromMapID: Tower_0
+    toMapID: Outpost
+    distance: 32
+    timeHours: 0.32
 --- !u!1 &4768890939789775564
 GameObject:
   m_ObjectHideFlags: 0

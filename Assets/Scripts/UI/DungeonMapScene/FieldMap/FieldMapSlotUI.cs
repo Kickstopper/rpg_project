@@ -27,7 +27,7 @@ namespace UI
             if (data != null)
             {
                 nameText.text = data.displayName;
-                infoText.text = $"거리: {data.distance}km / 소요: {data.timeHours}시간";
+                infoText.text = $"{data.distance} km / {data.timeHours} hour";
             }
         }
 
