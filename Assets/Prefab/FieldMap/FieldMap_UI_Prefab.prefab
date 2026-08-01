@@ -54,6 +54,41 @@ MonoBehaviour:
   eveningColor: {r: 1, g: 0.6, b: 0.4, a: 1}
   nightColor: {r: 0.2, g: 0.2, b: 0.4, a: 1}
   smoothTransition: 1
+--- !u!1 &569954162472349015
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7174940882595678144}
+  m_Layer: 0
+  m_Name: PropContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7174940882595678144
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 569954162472349015}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3665999515837904348}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &707707618844045371
 GameObject:
   m_ObjectHideFlags: 0
@@ -379,6 +414,64 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!1 &2232808470692435255
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8418022113561605280}
+  - component: {fileID: 1847575810558502036}
+  m_Layer: 0
+  m_Name: Pseudo3DPropsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &8418022113561605280
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2232808470692435255}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3665999515837904348}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1847575810558502036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2232808470692435255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98a9fda1cf9818c4ca46648f3d50e412, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Pseudo3DPropsManager
+  roadScroller: {fileID: 6278994566757761357}
+  container: {fileID: 7174940882595678144}
+  propPrefab: {fileID: 4993056593599306026, guid: 597afedee9bec90459770a932ac13c22, type: 3}
+  approachSpeed: 5
+  spawnZ: 10
+  cullZ: 0.5
+  spacingZ: 2
+  baseScale: 1.5
+  yOffset: 10
+  horizonY: 0.5
 --- !u!1 &2869252818824803535
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,9 +532,6 @@ MonoBehaviour:
   distanceText: {fileID: 6158858501972799400}
   timeText: {fileID: 7588305359103887919}
   roadTransitionRealTime: 10
-  maxCurveAmount: 0.5
-  curveDurationRange: {x: 0.5, y: 1.5}
-  curveDelayRange: {x: 1, y: 2.5}
   cityLayers:
   - image: {fileID: 5883592850703033557}
     sensitivity: 0.05
@@ -932,10 +1022,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5929632753638604901}
+  - {fileID: 8418022113561605280}
   - {fileID: 1041405563874247348}
   - {fileID: 5541360167576574549}
   - {fileID: 4717875053458447942}
   - {fileID: 3572976362687151733}
+  - {fileID: 7174940882595678144}
   - {fileID: 609956441239918156}
   m_Father: {fileID: 5258403552592211038}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
