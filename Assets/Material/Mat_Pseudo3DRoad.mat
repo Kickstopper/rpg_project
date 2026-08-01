@@ -44,7 +44,7 @@ Material:
     - _ColorMask: 15
     - _CurveAmount: 0
     - _EnableExternalAlpha: 0
-    - _HorizonY: 1
+    - _HorizonY: 0.5
     - _RoadWidthScale: 1.5
     - _ScrollOffset: 0
     - _Stencil: 0
@@ -55,8 +55,10 @@ Material:
     - _TilingY: 2
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.7508, g: 0.6864, b: 0.6932, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _SideColor: {r: 0, g: 0, b: 0, a: 0}
+    - _SkyBottomColor: {r: 0.6796, g: 0.6152, b: 0.5576, a: 1}
+    - _SkyTopColor: {r: 0.2754, g: 0.40420002, b: 0.5508, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
