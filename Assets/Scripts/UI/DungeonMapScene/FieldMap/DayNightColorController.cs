@@ -1,10 +1,11 @@
 using UnityEngine;
 using Manager;
+using UnityEngine.UI;
 
 public class DayNightColorController : MonoBehaviour
 {
-    [Tooltip("색상을 바꿀 대상을 연결해주세요. (SpriteRenderer, Camera 등)")]
-    public SpriteRenderer targetRenderer; 
+    [Tooltip("색상을 바꿀 대상을 연결해주세요.")]
+    public Image TargetImage; 
 
     [Header("Time Palettes (4등분)")]
     public Color morningColor = new Color(1f, 0.9f, 0.7f); // 아침: 06시~12시
@@ -44,9 +45,9 @@ public class DayNightColorController : MonoBehaviour
         // 현재 시간에 맞는 색상 계산
         Color targetColor = GetColorForHour(currentHour);
 
-        if (targetRenderer != null)
+        if (TargetImage != null)
         {
-            targetRenderer.color = targetColor;
+            TargetImage.color = targetColor;
         }
     }
 

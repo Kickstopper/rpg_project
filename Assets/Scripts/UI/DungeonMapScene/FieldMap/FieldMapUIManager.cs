@@ -74,18 +74,24 @@ namespace UI
 
         [Header("Time Palettes (4등분)")]
         // 각 시간대별 cityTint 기본값 추가
-        public TimePalette morningPalette = new TimePalette { 
-            skyTop = new Color(0.4f, 0.6f, 0.8f), skyBottom = new Color(1f, 0.9f, 0.7f), 
-            roadTint = new Color(1f, 0.9f, 0.8f), cityTint = new Color(0.9f, 0.8f, 0.7f) };
-        public TimePalette dayPalette = new TimePalette { 
-            skyTop = new Color(0.1f, 0.4f, 0.8f), skyBottom = new Color(0.6f, 0.8f, 0.9f), 
-            roadTint = Color.white, cityTint = Color.white };
-        public TimePalette eveningPalette = new TimePalette { 
-            skyTop = new Color(0.2f, 0.1f, 0.4f), skyBottom = new Color(0.8f, 0.3f, 0.1f), 
-            roadTint = new Color(0.8f, 0.5f, 0.5f), cityTint = new Color(0.7f, 0.5f, 0.4f) };
-        public TimePalette nightPalette = new TimePalette { 
-            skyTop = new Color(0.05f, 0.05f, 0.1f), skyBottom = new Color(0.1f, 0.1f, 0.3f), 
-            roadTint = new Color(0.3f, 0.3f, 0.5f), cityTint = new Color(0.2f, 0.2f, 0.3f) };
+        private TimePalette morningPalette = new TimePalette { 
+            skyTop = new Color(0.2f, 0.8f, 0.9f), skyBottom = new Color(1.0f, 0.4f, 0.5f), 
+            roadTint = new Color(1.0f, 0.7f, 0.8f), cityTint = new Color(0.8f, 0.5f, 0.7f) };
+            
+        // 낮: 대비가 강한 사이버 네온 데이 (딥 블루 -> 쨍한 형광 민트/시안)
+        private TimePalette dayPalette = new TimePalette { 
+            skyTop = new Color(0.1f, 0.1f, 0.7f), skyBottom = new Color(0.0f, 0.9f, 0.8f), 
+            roadTint = new Color(0.8f, 0.9f, 1.0f), cityTint = new Color(0.3f, 0.7f, 0.9f) };
+            
+        // 저녁: 클래식 아웃런(OutRun) 선셋 (어두운 보라색 -> 강렬한 핫핑크/마젠타)
+        private TimePalette eveningPalette = new TimePalette { 
+            skyTop = new Color(0.2f, 0.0f, 0.4f), skyBottom = new Color(1.0f, 0.0f, 0.6f), 
+            roadTint = new Color(1.0f, 0.3f, 0.7f), cityTint = new Color(0.6f, 0.1f, 0.5f) };
+            
+        // 밤: 사이버펑크 네온 나이트 (칠흑 같은 밤하늘 -> 지평선에서 뿜어져 나오는 형광 시안)
+        private TimePalette nightPalette = new TimePalette { 
+            skyTop = new Color(0.02f, 0.0f, 0.08f), skyBottom = new Color(0.0f, 0.8f, 0.8f), 
+            roadTint = new Color(0.2f, 0.6f, 0.7f), cityTint = new Color(0.1f, 0.2f, 0.4f) };
 
         private FieldMapState _currentState;
         private List<FieldMapSlotUI> _slots = new List<FieldMapSlotUI>();
