@@ -118,6 +118,8 @@ namespace UI.DungeonMapScene
         [HideInInspector]
         public bool isUIHoldingMovement = false; // 가상 컨트롤러에서 누르고 있는지 여부
         
+        private Coroutine _systemMessageCoroutine; // 시스템 메시지 패널 끄기용
+
         void Awake()
         {
             _renderer = new RaycastRenderEngine();
@@ -882,15 +884,39 @@ namespace UI.DungeonMapScene
             _inputLocked = false;
         }
 
-        private void ShowSystemMessage(string message)
+        private void ShowSystemMessage(string message, float duration = 0f)
         {
             if (systemMessagePanel != null) systemMessagePanel.SetActive(true);
             if (systemMessageText != null) systemMessageText.text = message;
+
+            if (_systemMessageCoroutine != null)
+            {
+                StopCoroutine(_systemMessageCoroutine);
+                _systemMessageCoroutine = null;
+            }
+
+            if (duration > 0f)
+            {
+                _systemMessageCoroutine = StartCoroutine(HideSystemMessageRoutine(duration));
+            }
+        }
+
+        private IEnumerator HideSystemMessageRoutine(float duration)
+        {
+            Debug.Log("DURATION " + duration);
+            yield return new WaitForSeconds(duration);
+            HideSystemMessage();
         }
 
         private void HideSystemMessage()
         {
             if (systemMessagePanel != null) systemMessagePanel.SetActive(false);
+
+            if (_systemMessageCoroutine != null)
+            {
+                StopCoroutine(_systemMessageCoroutine);
+                _systemMessageCoroutine = null;
+            }
         }
 
         private void ShowRoomName(string message)
@@ -927,10 +953,11 @@ namespace UI.DungeonMapScene
         public void UI_Action()
         {
             if (_inputLocked || _player.IsMoving || _isLookTransitioning) return;
-
+            CellData currentCell = null;
+            // 위 쳐다보기 처리
             if (_currentLookState == LookState.Up)
             {
-                CellData currentCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
+                currentCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
                 if (currentCell != null && currentCell.value == 1)
                 {
                     EntranceData ceilingEntrance = _currentMap.GetEntranceAt(_player.LogicX, _player.LogicY);
@@ -943,6 +970,7 @@ namespace UI.DungeonMapScene
                 StartCoroutine(TransitionLookState(LookState.None));
                 return;
             }
+            // 아래 쳐다보기 처리
             else if (_currentLookState == LookState.Down)
             {
                 Vector2Int fwd = _player.GetForwardVector();
@@ -963,6 +991,7 @@ namespace UI.DungeonMapScene
                 return;
             }
 
+            // 현재 서 있는 칸 천장 구멍 체크
             CellData myCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
             if (myCell != null && myCell.value == 1)
             {
@@ -970,30 +999,136 @@ namespace UI.DungeonMapScene
                 return;
             }
 
+            // 플레이어가 정확히 어느 셀의 어느 면(Face)을 바라보고 있는지 계산
             Vector2Int forward = _player.GetForwardVector();
             int frontX = _player.LogicX + forward.x;
             int frontY = _player.LogicY + forward.y;
 
-            MapObject targetObj = _staticObjects.Find(o => 
-                Mathf.FloorToInt(o.x) == _player.LogicX && 
-                Mathf.FloorToInt(o.y) == _player.LogicY && 
-                o.isActive);
-            
-            if (targetObj != null)
+            int targetEnterFace = -1;
+            int currentExitFace = -1;
+
+            if (forward.x > 0)      { targetEnterFace = 3; currentExitFace = 1; }
+            else if (forward.x < 0) { targetEnterFace = 1; currentExitFace = 3; }
+            else if (forward.y > 0) { targetEnterFace = 2; currentExitFace = 0; }
+            else if (forward.y < 0) { targetEnterFace = 0; currentExitFace = 2; }
+
+            currentCell = _currentMap.GetCell(_player.LogicX, _player.LogicY);
+            CellData frontCell = _currentMap.GetCell(frontX, frontY);
+
+            CellData hitCell = null;
+            int hitFace = -1;
+            bool isWallInteraction = false;
+
+            // 시야를 가로막는 벽이 있는지 우선 검사 (현재 셀의 출구 벽 OR 앞 셀의 입구 벽)
+            if (currentCell != null && currentExitFace != -1 && currentCell.wallTextureIDs[currentExitFace] != -1)
             {
-                if (targetObj.texIdx == 0)
+                hitCell = currentCell;
+                hitFace = currentExitFace;
+                isWallInteraction = true;
+            }
+            else if (frontCell != null && targetEnterFace != -1 && frontCell.wallTextureIDs[targetEnterFace] != -1)
+            {
+                hitCell = frontCell;
+                hitFace = targetEnterFace;
+                isWallInteraction = true;
+            }
+
+            // 벽이 가로막고 있지 않다면, 앞 칸의 중앙 고정 오브젝트(보물상자 등) 검사
+            MapObject targetCenterObj = null;
+            if (!isWallInteraction)
+            {
+                targetCenterObj = _staticObjects.Find(o => 
+                    Mathf.FloorToInt(o.x) == frontX && 
+                    Mathf.FloorToInt(o.y) == frontY && 
+                    o.isActive);
+                
+                if (targetCenterObj != null && targetCenterObj.texIdx != -1)
                 {
-                    targetObj.texIdx = 1;
-                    UpdateSpriteData();
-                    ShowSystemMessage("낡은 보물상자를 열었다.");
+                    hitCell = frontCell;
                 }
-                else if (targetObj.texIdx == 1) ShowSystemMessage("안은 텅 비어있다...");
-                else ShowSystemMessage("아무 반응이 없다.");
+            }
+
+            // 상호작용 실행 (벽이든 오브젝트든 hitCell의 데이터를 기반으로 작동)
+            if (hitCell != null && hitCell.canInteract)
+            {
+                // 상호작용 대상 텍스처(Target)가 지정되어 있다면 눈앞의 텍스처와 일치하는지 검사
+                if (hitCell.interactTargetTexID != -1)
+                {
+                    if (isWallInteraction && hitCell.wallTextureIDs[hitFace] != hitCell.interactTargetTexID)
+                    {
+                        //ShowSystemMessage("아무 반응이 없다.", 3f);
+                        return;
+                    }
+                    else if (targetCenterObj != null && targetCenterObj.texIdx != hitCell.interactTargetTexID)
+                    {
+                        //ShowSystemMessage("아무 반응이 없다.", 3f);
+                        return;
+                    }
+                }
+
+                // 선행 조건 검사
+                if (!string.IsNullOrEmpty(hitCell.interactReqFlag))
+                {
+                    if (ManagerRoot.Flag.CheckFlag(hitCell.interactReqFlag) != hitCell.interactReqFlagState)
+                    {
+                        ShowSystemMessage("지금은 건드릴 필요가 없을 것 같다.", 3f);
+                        return;
+                    }
+                }
+
+                // 이미 완료되었는지 검사
+                if (!string.IsNullOrEmpty(hitCell.interactSetFlag) && 
+                    ManagerRoot.Flag.CheckFlag(hitCell.interactSetFlag) == hitCell.interactSetFlagState)
+                {
+                    ShowSystemMessage("더 이상 반응이 없다.", 3f);
+                    return;
+                }
+
+                // 시각적 변화 (텍스처 교체 분기)
+                if (hitCell.interactChangeObjectID != -1)
+                {
+                    if (isWallInteraction)
+                    {
+                        // 벽 스위치 조작: 플레이어가 정확히 바라보고 있는 벽면의 텍스처만 변경
+                        hitCell.wallTextureIDs[hitFace] = hitCell.interactChangeObjectID;
+                    }
+                    else if (targetCenterObj != null)
+                    {
+                        // 보물상자 조작: 중앙 오브젝트 텍스처 변경
+                        targetCenterObj.texIdx = hitCell.interactChangeObjectID;
+                        UpdateSpriteData();
+                    }
+                }
+
+                // 플래그 영구 저장
+                if (!string.IsNullOrEmpty(hitCell.interactSetFlag))
+                {
+                    ManagerRoot.Flag.SetFlag(hitCell.interactSetFlag, hitCell.interactSetFlagState);
+                }
+
+                // 이벤트(아이템 획득, 대화 등) 실행
+                if (!string.IsNullOrEmpty(hitCell.interactEventID))
+                {
+                    _inputLocked = true;
+                    StartCoroutine(ShowDialog(hitCell.interactEventID, -1));
+                }
+                else
+                {
+                    ShowSystemMessage(hitCell.interactSystemMessage, 3f);
+                }
                 return;
             }
 
-            CellData frontCell = _currentMap.GetCell(frontX, frontY);
-            if (frontCell != null && frontCell.value == -1)
+            // 상호작용 대상(canInteract == false)이 아니면 안내 메시지 출력
+            if (isWallInteraction || targetCenterObj != null)
+            {
+                //ShowSystemMessage("아무 반응이 없다.", 3f);
+                return;
+            }
+
+            // 앞 칸 바닥 구멍 체크
+            CellData frontCellCheck = _currentMap.GetCell(frontX, frontY);
+            if (frontCellCheck != null && frontCellCheck.value == -1)
             {
                 StartCoroutine(TransitionLookState(LookState.Down));
                 return;
@@ -1605,6 +1740,10 @@ namespace UI.DungeonMapScene
             _player.SetMapData(_currentMap, finalStartX, finalStartY, finalStartDir);
 
             RefreshAppVisible();
+
+            // 렌더러에 맵을 넘기기 전, 플래그를 검사하여 벽면 스위치 텍스처 복원
+            ApplySavedWallStates();
+
             InitializeWallAnims(theme);
             _renderer.SetMapData(_currentMap, theme, _tileAnimStates);
             
@@ -1905,9 +2044,27 @@ namespace UI.DungeonMapScene
                     CellData cell = _currentMap.GetCell(x, y);
                     if (cell == null) continue;
 
-                    if (cell.centerObjectID != -1) AddStaticObject(x + 0.5f, y + 0.5f, cell.centerObjectID, objectSolidMap);
+                    // 중앙 오브젝트 스폰 시, 이미 완료된 상호작용이라면 변경된 텍스처로 스폰
+                    if (cell.centerObjectID != -1)
+                    {
+                        int spawnObjID = cell.centerObjectID;
 
-                    float offset = 0.49f;
+                        if (cell.canInteract && !string.IsNullOrEmpty(cell.interactSetFlag))
+                        {
+                            // 플래그가 설정되어 있다면 (예: 이미 상자를 열었다면)
+                            if (ManagerRoot.Flag.CheckFlag(cell.interactSetFlag) == cell.interactSetFlagState)
+                            {
+                                if (cell.interactChangeObjectID != -1)
+                                {
+                                    spawnObjID = cell.interactChangeObjectID;
+                                }
+                            }
+                        }
+                        
+                        AddStaticObject(x + 0.5f, y + 0.5f, spawnObjID, objectSolidMap);
+                    }
+
+                    float offset = 0.499f;
                     if (cell.faceObjectIDs[0] != -1) AddStaticObject(x + 0.5f, y + 0.5f + offset, cell.faceObjectIDs[0], objectSolidMap); 
                     if (cell.faceObjectIDs[1] != -1) AddStaticObject(x + 0.5f + offset, y + 0.5f, cell.faceObjectIDs[1], objectSolidMap); 
                     if (cell.faceObjectIDs[2] != -1) AddStaticObject(x + 0.5f, y + 0.5f - offset, cell.faceObjectIDs[2], objectSolidMap); 
@@ -1923,6 +2080,46 @@ namespace UI.DungeonMapScene
                 x = x, y = y, texIdx = id, isSolid = isSolid, isActive = true,
                 objectId = $"Obj_{id}_{x}_{y}"
             });
+        }
+
+        private void ApplySavedWallStates()
+        {
+            if (_currentMap == null) return;
+
+            for (int x = 0; x < _currentMap.width; x++)
+            {
+                for (int y = 0; y < _currentMap.height; y++)
+                {
+                    CellData cell = _currentMap.GetCell(x, y);
+                    if (cell != null && cell.canInteract && !string.IsNullOrEmpty(cell.interactSetFlag))
+                    {
+                        if (ManagerRoot.Flag.CheckFlag(cell.interactSetFlag) == cell.interactSetFlagState && 
+                            cell.interactChangeObjectID != -1 && 
+                            cell.centerObjectID == -1)
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                // Target 텍스처가 지정되어 있다면, 해당 텍스처만 정확히 골라내어 복원
+                                if (cell.interactTargetTexID != -1)
+                                {
+                                    if (cell.wallTextureIDs[i] == cell.interactTargetTexID) 
+                                    {
+                                        cell.wallTextureIDs[i] = cell.interactChangeObjectID;
+                                    }
+                                }
+                                else
+                                {
+                                    // Target이 없다면 예전처럼 뚫려있지 않은 임의의 벽을 복원
+                                    if (cell.wallTextureIDs[i] != -1 && cell.wallTextureIDs[i] != 0) 
+                                    {
+                                        cell.wallTextureIDs[i] = cell.interactChangeObjectID;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void SpawnSymbolEnemies(int count)

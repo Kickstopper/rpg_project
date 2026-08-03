@@ -128,6 +128,22 @@ namespace Data
 
         public bool useForceDir = false; 
         public Direction evForceDir = Direction.North;
+
+        [Header("Object Interaction")]
+        public bool canInteract = false;               // 상호작용 가능 여부
+        
+        // 조건 및 상태 저장 플래그
+        public string interactReqFlag = "";            // 이 상호작용을 위해 필요한 선행 플래그
+        public bool interactReqFlagState = true; 
+        public string interactSetFlag = "";            // 상호작용 완료 시 켤/끌 플래그 (영구 저장용)
+        public bool interactSetFlagState = true;   
+        
+        // 시각적 변화 및 이벤트
+        public int interactTargetTexID = -1;           // 상호작용의 대상이 되는 특정 텍스처 ID (-1이면 제한 없음)
+        public int interactChangeObjectID = -1;        // 상호작용 후 변경될 텍스처 ID (-1이면 유지)
+        public string interactEventID = "";            // 아이템 획득, 맵 전환 등을 처리할 실제 이벤트 ID
+        public string interactSystemMessage = "조사했다."; // 연결된 이벤트가 없을 때 출력할 기본 텍스트
+        
         public bool HasWall()
         {
             foreach(var i in wallTextureIDs)

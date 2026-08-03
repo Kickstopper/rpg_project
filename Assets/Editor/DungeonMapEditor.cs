@@ -606,8 +606,6 @@ public class DungeonMapEditor : EditorWindow
     void DrawInspectorView()
     {
         EditorGUILayout.BeginVertical(GUILayout.Width(position.width * 0.3f));
-        GUILayout.Label("Cell Inspector", EditorStyles.boldLabel);
-
         if (selectedCells.Count > 1)
         {
             // ── 다중 선택 일괄 편집 UI ──
@@ -646,6 +644,10 @@ public class DungeonMapEditor : EditorWindow
             GUILayout.Space(10);
             GUILayout.Label("Batch Static Objects", EditorStyles.miniBoldLabel);
             DrawBatchCenterObjectField();
+
+            GUILayout.Space(10);
+            GUILayout.Label("Batch Interaction Settings", EditorStyles.miniBoldLabel);
+            DrawBatchInteractionFields();
 
             // 다중 셀에 동일한 이벤트를 일괄 적용할 때 사용
             GUILayout.Space(5);
@@ -693,13 +695,8 @@ public class DungeonMapEditor : EditorWindow
         }
         else if (selectedCells.Count == 1)
         {
-            EditorGUILayout.BeginVertical(GUILayout.Width(position.width * 0.3f));
-            GUILayout.Label("Cell Inspector", EditorStyles.boldLabel);
-
             if (selectedCell != null)
             {
-                GUILayout.Label($"Selected: ({selectedCell.x}, {selectedCell.y})");
-                
                 GUILayout.Space(10);
                 GUILayout.Label("Wall Textures (ID)", EditorStyles.miniBoldLabel);
                 
@@ -742,13 +739,6 @@ public class DungeonMapEditor : EditorWindow
                 GUILayout.Space(10);
                 selectedCell.value = EditorGUILayout.IntField("Value", selectedCell.value);
 
-                // 고정 오브젝트 설정
-                GUILayout.Space(15);
-                GUILayout.Label("Static Object Settings", EditorStyles.boldLabel);
-
-                // 중앙 오브젝트
-                selectedCell.centerObjectID = EditorGUILayout.IntField("Center Obj ID", selectedCell.centerObjectID);
-
                 // 이벤트 ID와 반복 여부 토글을 함께 표시
                 GUILayout.Space(10);
                 GUILayout.Label("Event Settings", EditorStyles.boldLabel);
@@ -774,15 +764,6 @@ public class DungeonMapEditor : EditorWindow
                         selectedCell.evForceDir = (Direction)EditorGUILayout.EnumPopup("Force Direction", selectedCell.evForceDir);
                     }
                 }
-
-                GUILayout.Space(5);
-                GUILayout.Label("Face Objects (Wall Decor)", EditorStyles.miniBoldLabel);
-
-                // 4방향 면 오브젝트 입력 필드
-                selectedCell.faceObjectIDs[0] = EditorGUILayout.IntField("↑ Face Obj (N)", selectedCell.faceObjectIDs[0]);
-                selectedCell.faceObjectIDs[1] = EditorGUILayout.IntField("→ Face Obj (E)", selectedCell.faceObjectIDs[1]);
-                selectedCell.faceObjectIDs[2] = EditorGUILayout.IntField("↓ Face Obj (S)", selectedCell.faceObjectIDs[2]);
-                selectedCell.faceObjectIDs[3] = EditorGUILayout.IntField("← Face Obj (W)", selectedCell.faceObjectIDs[3]);
 
                 GUILayout.Space(20);
 
@@ -856,12 +837,78 @@ public class DungeonMapEditor : EditorWindow
                         GUI.changed = true;
                     }
                 }
+
+                // 고정 오브젝트 설정
+                GUILayout.Space(15);
+                GUILayout.Label("Static Object Settings", EditorStyles.boldLabel);
+
+                // 중앙 오브젝트
+                selectedCell.centerObjectID = EditorGUILayout.IntField("Center Obj ID", selectedCell.centerObjectID);
+
+
+                GUILayout.Space(5);
+                GUILayout.Label("Face Objects (Wall Decor)", EditorStyles.miniBoldLabel);
+
+                // 4방향 면 오브젝트 입력 필드
+                selectedCell.faceObjectIDs[0] = EditorGUILayout.IntField("↑ Face Obj (N)", selectedCell.faceObjectIDs[0]);
+                selectedCell.faceObjectIDs[1] = EditorGUILayout.IntField("→ Face Obj (E)", selectedCell.faceObjectIDs[1]);
+                selectedCell.faceObjectIDs[2] = EditorGUILayout.IntField("↓ Face Obj (S)", selectedCell.faceObjectIDs[2]);
+                selectedCell.faceObjectIDs[3] = EditorGUILayout.IntField("← Face Obj (W)", selectedCell.faceObjectIDs[3]);
+
+                // 맵 오브젝트 상호작용(Interaction) 설정 UI
+                GUILayout.Space(15);
+                GUILayout.Label("Object Interaction Settings", EditorStyles.boldLabel);
+                
+                // 토글 스위치: 상호작용 가능 여부
+                selectedCell.canInteract = EditorGUILayout.Toggle("Can Interact", selectedCell.canInteract);
+                
+                // canInteract가 True일 때만 세부 설정 창을 펼쳐서 에디터 공간을 깔끔하게 유지합니다.
+                if (selectedCell.canInteract)
+                {
+                    EditorGUILayout.BeginVertical("box");
+                    
+                    // 1. 발동 조건 (선행 플래그)
+                    GUILayout.Label("[ Condition ]", EditorStyles.boldLabel);
+                    selectedCell.interactReqFlag = EditorGUILayout.TextField("Required Flag", selectedCell.interactReqFlag);
+                    if (!string.IsNullOrEmpty(selectedCell.interactReqFlag))
+                    {
+                        selectedCell.interactReqFlagState = EditorGUILayout.Toggle("  ↳ Required State", selectedCell.interactReqFlagState);
+                    }
+                    
+                    EditorGUILayout.Space();
+                    
+                    // 2. 결과 및 상태 영구 저장
+                    GUILayout.Label("[ Result / Save State ]", EditorStyles.boldLabel);
+                    selectedCell.interactSetFlag = EditorGUILayout.TextField("Set Flag (Save)", selectedCell.interactSetFlag);
+                    if (!string.IsNullOrEmpty(selectedCell.interactSetFlag))
+                    {
+                        selectedCell.interactSetFlagState = EditorGUILayout.Toggle("  ↳ Target State", selectedCell.interactSetFlagState);
+                    }
+                    
+                    EditorGUILayout.Space();
+                    
+                    // 3. 시각적 변화 및 실행될 이벤트
+                    GUILayout.Label("[ Visual & Event ]", EditorStyles.boldLabel);
+                    // 변경 전(Target) 텍스처 입력 필드 추가
+                    selectedCell.interactTargetTexID = EditorGUILayout.IntField("Target Object ID", selectedCell.interactTargetTexID);
+                    selectedCell.interactChangeObjectID = EditorGUILayout.IntField("Change Object ID", selectedCell.interactChangeObjectID);
+                    
+                    EditorGUILayout.Space();
+                    selectedCell.interactEventID = EditorGUILayout.TextField("Trigger Event ID", selectedCell.interactEventID);
+                    
+                    // 이벤트 ID가 비어있을 때만 단순 시스템 메시지 입력창을 보여줍니다.
+                    if (string.IsNullOrEmpty(selectedCell.interactEventID))
+                    {
+                        selectedCell.interactSystemMessage = EditorGUILayout.TextField("Fallback Message", selectedCell.interactSystemMessage);
+                    }
+                    
+                    EditorGUILayout.EndVertical();
+                }
             }
             else
             {
                 GUILayout.Label("Select a cell to edit.");
             }
-            EditorGUILayout.EndVertical();
         }
         else
         {
@@ -869,6 +916,82 @@ public class DungeonMapEditor : EditorWindow
         }
 
         EditorGUILayout.EndVertical();
+    }
+
+    // 상호작용 설정 일괄 적용 헬퍼
+    void DrawBatchInteractionFields()
+    {
+        // 1. Can Interact 일괄 토글
+        bool firstCanInteract = selectedCells[0].canInteract;
+        bool isMixedInteract = false;
+        foreach (var c in selectedCells)
+            if (c.canInteract != firstCanInteract) { isMixedInteract = true; break; }
+
+        EditorGUI.showMixedValue = isMixedInteract;
+        EditorGUI.BeginChangeCheck();
+        bool newCanInteract = EditorGUILayout.Toggle("Can Interact", isMixedInteract ? false : firstCanInteract);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.canInteract = newCanInteract;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
+
+        // 일괄 적용된 상태가 모두 True일 때만 세부 설정 노출
+        if (!isMixedInteract && newCanInteract)
+        {
+            EditorGUILayout.BeginVertical("box");
+            
+            // Target Object ID 일괄 적용
+            int firstTargetID = selectedCells[0].interactTargetTexID;
+            bool isMixedTargetID = false;
+            foreach (var c in selectedCells)
+                if (c.interactTargetTexID != firstTargetID) { isMixedTargetID = true; break; }
+            
+            EditorGUI.showMixedValue = isMixedTargetID;
+            EditorGUI.BeginChangeCheck();
+            int newTargetID = EditorGUILayout.IntField("Target Object ID", isMixedTargetID ? -1 : firstTargetID);
+            if (EditorGUI.EndChangeCheck())
+            {
+                foreach (var c in selectedCells) c.interactTargetTexID = newTargetID;
+                GUI.changed = true;
+            }
+            EditorGUI.showMixedValue = false;
+
+            // Change Object ID 일괄 적용
+            int firstChangeID = selectedCells[0].interactChangeObjectID;
+            bool isMixedChangeID = false;
+            foreach (var c in selectedCells)
+                if (c.interactChangeObjectID != firstChangeID) { isMixedChangeID = true; break; }
+                
+            EditorGUI.showMixedValue = isMixedChangeID;
+            EditorGUI.BeginChangeCheck();
+            int newChangeID = EditorGUILayout.IntField("Change Object ID", isMixedChangeID ? -1 : firstChangeID);
+            if (EditorGUI.EndChangeCheck())
+            {
+                foreach (var c in selectedCells) c.interactChangeObjectID = newChangeID;
+                GUI.changed = true;
+            }
+            EditorGUI.showMixedValue = false;
+
+            // Fallback Message 일괄 적용
+            string firstMsg = selectedCells[0].interactSystemMessage;
+            bool isMixedMsg = false;
+            foreach (var c in selectedCells)
+                if (c.interactSystemMessage != firstMsg) { isMixedMsg = true; break; }
+            
+            EditorGUI.showMixedValue = isMixedMsg;
+            EditorGUI.BeginChangeCheck();
+            string newMsg = EditorGUILayout.TextField("Fallback Message", isMixedMsg ? "" : firstMsg);
+            if (EditorGUI.EndChangeCheck())
+            {
+                foreach (var c in selectedCells) c.interactSystemMessage = newMsg;
+                GUI.changed = true;
+            }
+            EditorGUI.showMixedValue = false;
+
+            EditorGUILayout.EndVertical();
+        }
     }
 
     // 이벤트 일괄 적용 헬퍼 함수
