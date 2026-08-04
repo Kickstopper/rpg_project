@@ -6,19 +6,20 @@ Shader "UI/Pseudo3DRoad"
         _Color ("Road Tint", Color) = (1,1,1,1)
         
         _CurveAmount ("Curve Amount", Float) = 0
+        _HillAmount ("Hill Amount", Float) = 0 
         _ScrollOffset ("Scroll Offset", Float) = 0
 
         _RoadWidthScale ("Road Base Width", Float) = 1.0
         _TilingY ("Z-Depth Tiling", Float) = 2.0
         _HorizonY ("Horizon Height (0~1)", Range(0.1, 1.0)) = 1.0
         
-        // 지평선 기준 위로 얼마나 올라가야 그라데이션(Top Color)이 시작될지 정하는 오프셋
-        _SkyGradientOffset ("Sky Gradient Offset (0~1)", Range(0.0, 1.0)) = 0.0
-
+        _SkyGradientOffset ("Sky Gradient Offset (0~1)", Range(0.0, 1.0)) = 0.15
         _SkyTopColor ("Sky Top Color", Color) = (0.1, 0.2, 0.5, 1)
         _SkyBottomColor ("Sky Bottom Color", Color) = (0.8, 0.4, 0.2, 1)
 
-        // UI Masking
+        // 하늘을 투명하게 뚫는 토글
+        [Toggle] _TransparentSky ("Transparent Sky", Float) = 0
+
         _StencilComp ("Stencil Comparison", Float) = 8
         _Stencil ("Stencil ID", Float) = 0
         _StencilOp ("Stencil Operation", Float) = 0
@@ -47,8 +48,7 @@ Shader "UI/Pseudo3DRoad"
             sampler2D _MainTex;
             fixed4 _Color, _SkyTopColor, _SkyBottomColor;
             
-            // 변수 선언부에 새로 추가한 오프셋 변수 포함
-            float _CurveAmount, _ScrollOffset, _RoadWidthScale, _TilingY, _HorizonY, _SkyGradientOffset;
+            float _CurveAmount, _HillAmount, _ScrollOffset, _RoadWidthScale, _TilingY, _HorizonY, _SkyGradientOffset, _TransparentSky;
 
             v2f vert(appdata_t v)
             {
@@ -62,28 +62,28 @@ Shader "UI/Pseudo3DRoad"
             fixed4 frag(v2f IN) : SV_Target
             {
                 float y = IN.texcoord.y;
+                float hillOffset = (y * y) * _HillAmount;
+                float adjustedY = y - hillOffset;
 
-                // 그라데이션이 시작되는 실제 Y 좌표 = 지평선 높이 + 추가 오프셋
                 float gradientStart = _HorizonY + _SkyGradientOffset;
-                
-                // y좌표가 gradientStart부터 화면 끝(1.0) 사이일 때만 0.0 ~ 1.0 비율로 섞이도록 계산
-                // max(..., 0.0001)은 Division by Zero 방지용
-                float skyProgress = clamp((y - gradientStart) / max(1.0 - gradientStart, 0.0001), 0.0, 1.0);
-                
+                float skyProgress = clamp((adjustedY - gradientStart) / max(1.0 - gradientStart, 0.0001), 0.0, 1.0);
                 fixed4 bgColor = lerp(_SkyBottomColor, _SkyTopColor, skyProgress);
 
-                if (y >= _HorizonY) return bgColor;
+                // 지평선 위(하늘) 영역일 때, 토글이 켜져 있으면 알파(투명도)를 0으로 반환
+                if (adjustedY >= _HorizonY) 
+                {
+                    return fixed4(bgColor.rgb, _TransparentSky > 0.5 ? 0.0 : 1.0);
+                }
 
-                float depth = max((_HorizonY - y) / _HorizonY, 0.001);
+                float depth = max((_HorizonY - adjustedY) / _HorizonY, 0.001);
                 float z = 1.0 / depth;
                 float currentWidth = depth * _RoadWidthScale;
-                float curve = (y * y) * _CurveAmount;
+                float curve = (adjustedY * adjustedY) * _CurveAmount;
 
                 float2 finalUV;
                 finalUV.x = (IN.texcoord.x - 0.5 - curve) / currentWidth + 0.5;
                 finalUV.y = z * _TilingY + _ScrollOffset;
 
-                // 도로 양옆 빈 공간에도 배경색을 칠함
                 if (finalUV.x < 0.0 || finalUV.x > 1.0)
                 {
                     return bgColor;

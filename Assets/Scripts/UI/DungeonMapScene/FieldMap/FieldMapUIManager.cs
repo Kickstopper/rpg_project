@@ -16,13 +16,16 @@ namespace UI
     [System.Serializable]
     public class ParallaxLayer
     {
-        [Tooltip("Wrap Mode가 Repeat인 RawImage를 연결하세요.")]
         public RawImage image;
-        [Tooltip("커브 시 스크롤되는 감도 (먼 배경일수록 작게, 가까울수록 크게 설정)")]
         public float sensitivity;
+        public float autoScrollSpeed = 0f;
         
-        [HideInInspector] 
-        public float currentUvOffset = 0f;
+        public float targetScale = 1.2f;
+        public float targetYOffset = 15f;
+        
+        [HideInInspector] public float currentUvOffset = 0f;
+        [HideInInspector] public float initialY = 0f; 
+        [HideInInspector] public bool isInitialized = false;
     }
 
     public class FieldMapUIManager : MonoBehaviour
@@ -30,6 +33,8 @@ namespace UI
         public bool IsSelectionComplete { get; private set; }
         public bool IsCanceled { get; private set; }
         public FieldMapDestData SelectedDestination { get; private set; }
+
+        public float CurrentSimulatedHour { get; private set; } // 가로등 매니저 등에서 현재 애니메이션 시간을 읽을 수 있도록
 
         [Header("List UI")]
         public GameObject listContainer;
@@ -45,21 +50,25 @@ namespace UI
         public Color buttonNormalColor = new Color(0.5f, 0.5f, 0.5f, 1f);
         public Color buttonHighlightColor = new Color(0.2f, 0.6f, 1f, 1f);
 
-        [Header("Road Transition UI (Pseudo 3D)")]
+        [Header("Road Transition UI")]
         public CanvasGroup fadeOverlay;
         public GameObject roadContainer; 
         public Pseudo3DRoad roadScroller; 
+        public Pseudo3DRoad skyScroller; 
+        
         public Slider progressBar;
         public TextMeshProUGUI distanceText;
         public TextMeshProUGUI timeText;
-        public float roadTransitionRealTime = 10.0f;
+        public float roadTransitionRealTime = 3.0f;
         
-        [Header("Road Curve Settings")]
-        private float maxCurveAmount = 1f; 
-        private Vector2 curveDurationRange = new Vector2(2f, 2.5f);
-        private Vector2 curveDelayRange = new Vector2(4f, 7f);
+        [Header("Road Curve & Hill Settings")]
+        public float maxCurveAmount = 0.5f; 
+        public float maxHillAmount = 0.4f; 
+        public Vector2 curveDurationRange = new Vector2(0.5f, 1.5f);
+        public Vector2 curveDelayRange = new Vector2(1.0f, 2.5f);
 
         [Header("City Skyline Settings (Parallax)")]
+        public float cityVerticalMultiplier = 150f; 
         public ParallaxLayer[] cityLayers;
 
         [System.Serializable]
@@ -68,30 +77,22 @@ namespace UI
             public Color skyTop;
             public Color skyBottom;
             public Color roadTint;
-            // 도시 배경(Parallax 이미지)에 적용할 색상 추가
             public Color cityTint; 
         }
 
-        [Header("Time Palettes (4등분)")]
-        // 각 시간대별 cityTint 기본값 추가
-        private TimePalette morningPalette = new TimePalette { 
+        [Header("Time Palettes (Cyberpunk Edition)")]
+        public TimePalette morningPalette = new TimePalette { 
             skyTop = new Color(0.2f, 0.8f, 0.9f), skyBottom = new Color(1.0f, 0.4f, 0.5f), 
             roadTint = new Color(1.0f, 0.7f, 0.8f), cityTint = new Color(0.8f, 0.5f, 0.7f) };
-            
-        // 낮: 대비가 강한 사이버 네온 데이 (딥 블루 -> 쨍한 형광 민트/시안)
-        private TimePalette dayPalette = new TimePalette { 
+        public TimePalette dayPalette = new TimePalette { 
             skyTop = new Color(0.1f, 0.1f, 0.7f), skyBottom = new Color(0.0f, 0.9f, 0.8f), 
             roadTint = new Color(0.8f, 0.9f, 1.0f), cityTint = new Color(0.3f, 0.7f, 0.9f) };
-            
-        // 저녁: 클래식 아웃런(OutRun) 선셋 (어두운 보라색 -> 강렬한 핫핑크/마젠타)
-        private TimePalette eveningPalette = new TimePalette { 
+        public TimePalette eveningPalette = new TimePalette { 
             skyTop = new Color(0.2f, 0.0f, 0.4f), skyBottom = new Color(1.0f, 0.0f, 0.6f), 
             roadTint = new Color(1.0f, 0.3f, 0.7f), cityTint = new Color(0.6f, 0.1f, 0.5f) };
-            
-        // 밤: 사이버펑크 네온 나이트 (칠흑 같은 밤하늘 -> 지평선에서 뿜어져 나오는 형광 시안)
-        private TimePalette nightPalette = new TimePalette { 
+        public TimePalette nightPalette = new TimePalette { 
             skyTop = new Color(0.02f, 0.0f, 0.08f), skyBottom = new Color(0.0f, 0.8f, 0.8f), 
-            roadTint = new Color(0.2f, 0.6f, 0.7f), cityTint = new Color(0.1f, 0.2f, 0.4f) };
+            roadTint = new Color(0.2f, 0.6f, 0.7f), cityTint = new Color(0.1f, 0.2f, 0.4f) }; 
 
         private FieldMapState _currentState;
         private List<FieldMapSlotUI> _slots = new List<FieldMapSlotUI>();
@@ -100,7 +101,12 @@ namespace UI
         
         private Sequence _curveSequence; 
         private float _currentCurve = 0f;
+        private Sequence _hillSequence;
+        private float _currentHill = 0f;
         private bool _skipRequested = false;
+        
+        private float _transitionProgress = 0f;
+        private List<Material> _roadMaterials = new List<Material>();
 
         public static FieldMapUIManager Instance { get; private set; }
         
@@ -115,18 +121,15 @@ namespace UI
             {
                 yesButton.onClick.RemoveAllListeners();
                 yesButton.onClick.AddListener(OnPopupYesClicked);
-                
                 EventTrigger trigger = yesButton.gameObject.AddComponent<EventTrigger>();
                 EventTrigger.Entry entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
                 entry.callback.AddListener((data) => { _isPopupYesSelected = true; UpdatePopupHighlight(); });
                 trigger.triggers.Add(entry);
             }
-
             if (noButton != null)
             {
                 noButton.onClick.RemoveAllListeners();
                 noButton.onClick.AddListener(OnPopupNoClicked);
-
                 EventTrigger trigger = noButton.gameObject.AddComponent<EventTrigger>();
                 EventTrigger.Entry entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
                 entry.callback.AddListener((data) => { _isPopupYesSelected = false; UpdatePopupHighlight(); });
@@ -134,63 +137,36 @@ namespace UI
             }
         }
 
-        public void OpenFieldMap(string sourceMapID)
-        {
-            IsSelectionComplete = false;
-            IsCanceled = false;
-            SelectedDestination = null;
+        public void OpenFieldMap(string sourceMapID) 
+        { 
+            IsSelectionComplete = false; 
+            IsCanceled = false; 
+            SelectedDestination = null; 
+            gameObject.SetActive(true); 
             
-            gameObject.SetActive(true);
+            if (fadeOverlay != null) { fadeOverlay.alpha = 0f; fadeOverlay.blocksRaycasts = false; } 
+            if (roadContainer != null) roadContainer.SetActive(false); 
             
-            if (fadeOverlay != null)
-            {
-                fadeOverlay.alpha = 0f;
-                fadeOverlay.blocksRaycasts = false;
-            }
-            if (roadContainer != null) roadContainer.SetActive(false);
-            
-            List<FieldMapDestData> availableDestinations = ManagerRoot.FieldMap.GetAvailableDestinations(sourceMapID);
-
-            PopulateList(availableDestinations);
-            SetState(FieldMapState.ListMode);
+            List<FieldMapDestData> availableDestinations = ManagerRoot.FieldMap.GetAvailableDestinations(sourceMapID); 
+            PopulateList(availableDestinations); 
+            SetState(FieldMapState.ListMode); 
         }
 
-        private void SetState(FieldMapState state)
-        {
-            _currentState = state;
-            if (state == FieldMapState.ListMode)
-            {
-                listContainer.SetActive(true);
-                popupContainer.SetActive(false);
-                UpdateListHighlight();
-            }
-            else if (state == FieldMapState.PopupMode)
-            {
-                listContainer.SetActive(true); 
-                popupContainer.SetActive(true);
-                _isPopupYesSelected = true;
-                UpdatePopupHighlight();
-
-                FieldMapDestData dest = _slots[_currentIndex].Data;
-                popupMessageText.text = $"<color=#00FFFF>{dest.displayName}</color>(으)로 이동하시겠습니까?\n(소요 시간: {dest.timeHours}시간)";
-            }
-            else if (state == FieldMapState.TransitionMode)
-            {
-                listContainer.SetActive(false);
-                popupContainer.SetActive(false);
-            }
+        private void SetState(FieldMapState state) 
+        { 
+            _currentState = state; 
+            if (state == FieldMapState.ListMode) { listContainer.SetActive(true); popupContainer.SetActive(false); UpdateListHighlight(); } 
+            else if (state == FieldMapState.PopupMode) { listContainer.SetActive(true); popupContainer.SetActive(true); _isPopupYesSelected = true; UpdatePopupHighlight(); FieldMapDestData dest = _slots[_currentIndex].Data; popupMessageText.text = $"<color=#00FFFF>{dest.displayName}</color>(으)로 이동하시겠습니까?\n(소요 시간: {dest.timeHours}시간)"; } 
+            else if (state == FieldMapState.TransitionMode) { listContainer.SetActive(false); popupContainer.SetActive(false); } 
         }
 
-        private void Update()
+        private void Update() 
         {
             if (!gameObject.activeSelf) return;
 
             if (_currentState == FieldMapState.TransitionMode)
             {
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
-                {
-                    _skipRequested = true;
-                }
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0)) _skipRequested = true;
 
                 if (roadScroller != null && roadScroller.isMoving && cityLayers != null)
                 {
@@ -199,11 +175,15 @@ namespace UI
                         var layer = cityLayers[i];
                         if (layer.image != null)
                         {
-                            layer.currentUvOffset = (layer.currentUvOffset + _currentCurve * layer.sensitivity * Time.deltaTime) % 1f;
-                            
-                            Rect uvRect = layer.image.uvRect;
-                            uvRect.x = layer.currentUvOffset;
-                            layer.image.uvRect = uvRect;
+                            float totalScroll = (layer.autoScrollSpeed + (_currentCurve * layer.sensitivity)) * Time.deltaTime;
+                            layer.currentUvOffset = (layer.currentUvOffset + totalScroll) % 1f;
+                            Rect uvRect = layer.image.uvRect; uvRect.x = layer.currentUvOffset; layer.image.uvRect = uvRect;
+                            float currentScale = Mathf.Lerp(1f, layer.targetScale, _transitionProgress);
+                            layer.image.rectTransform.localScale = new Vector3(currentScale, currentScale, 1f);
+                            float approachYOffset = Mathf.Lerp(0f, layer.targetYOffset, _transitionProgress);
+                            Vector2 pos = layer.image.rectTransform.anchoredPosition;
+                            pos.y = layer.initialY + approachYOffset - (_currentHill * layer.sensitivity * cityVerticalMultiplier);
+                            layer.image.rectTransform.anchoredPosition = pos;
                         }
                     }
                 }
@@ -212,238 +192,76 @@ namespace UI
 
             if (_currentState == FieldMapState.ListMode)
             {
-                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
-                {
-                    OnCancel();
-                    return;
-                }
-
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-                {
-                    TrySelectDestination();
-                    return;
-                }
-
-                if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) ChangeListSelection(1);
+                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1)) OnCancel();
+                else if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) TrySelectDestination();
+                else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) ChangeListSelection(1);
                 else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) ChangeListSelection(-1);
             }
             else if (_currentState == FieldMapState.PopupMode)
             {
-                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
-                {
-                    SetState(FieldMapState.ListMode);
-                    return;
-                }
-
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
-                {
-                    ConfirmPopup();
-                    return;
-                }
-
-                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || 
-                    Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-                {
-                    _isPopupYesSelected = !_isPopupYesSelected;
-                    UpdatePopupHighlight();
-                }
+                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1)) SetState(FieldMapState.ListMode);
+                else if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) ConfirmPopup();
+                else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+                { _isPopupYesSelected = !_isPopupYesSelected; UpdatePopupHighlight(); }
             }
         }
 
-        private void PopulateList(List<FieldMapDestData> dataList)
+        private void PopulateList(List<FieldMapDestData> dataList) { foreach (var slot in _slots) Destroy(slot.gameObject); _slots.Clear(); for (int i = 0; i < dataList.Count; i++) { GameObject go = Instantiate(slotPrefab, contentPanel); FieldMapSlotUI slot = go.GetComponent<FieldMapSlotUI>(); slot.Initialize(i, dataList[i], this); _slots.Add(slot); } _currentIndex = 0; }
+        private void ChangeListSelection(int direction) { if (_slots.Count == 0) return; _currentIndex = Mathf.Clamp(_currentIndex + direction, 0, _slots.Count - 1); UpdateListHighlight(); }
+        private void UpdateListHighlight() { for (int i = 0; i < _slots.Count; i++) _slots[i].SetFocus(i == _currentIndex); }
+        public void OnSlotHovered(int index) { if (_currentState != FieldMapState.ListMode) return; _currentIndex = index; UpdateListHighlight(); }
+        public void OnSlotClicked(int index) { if (_currentState != FieldMapState.ListMode) return; _currentIndex = index; UpdateListHighlight(); TrySelectDestination(); }
+        private void TrySelectDestination() { if (_slots.Count > 0 && _slots[_currentIndex].Data != null) { ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor); SetState(FieldMapState.PopupMode); } }
+        private void UpdatePopupHighlight() { if (yesButton.targetGraphic != null) yesButton.targetGraphic.color = _isPopupYesSelected ? buttonHighlightColor : buttonNormalColor; if (noButton.targetGraphic != null) noButton.targetGraphic.color = !_isPopupYesSelected ? buttonHighlightColor : buttonNormalColor; }
+        public void OnPopupYesClicked() { if (_currentState != FieldMapState.PopupMode) return; _isPopupYesSelected = true; ConfirmPopup(); }
+        public void OnPopupNoClicked() { if (_currentState != FieldMapState.PopupMode) return; _isPopupYesSelected = false; ConfirmPopup(); }
+        private void ConfirmPopup() { if (_isPopupYesSelected) { SelectedDestination = _slots[_currentIndex].Data; IsCanceled = false; IsSelectionComplete = true; SetState(FieldMapState.TransitionMode); } else { SetState(FieldMapState.ListMode); } }
+        public void OnCancel() { SelectedDestination = null; IsCanceled = true; IsSelectionComplete = true; gameObject.SetActive(false); }
+
+        private TimePalette GetPaletteForHour(float hour) { hour = hour % 24f; if (hour >= 6f && hour < 12f) return LerpPalette(morningPalette, dayPalette, (hour - 6f) / 6f); else if (hour >= 12f && hour < 17f) return LerpPalette(dayPalette, eveningPalette, (hour - 12f) / 5f); else if (hour >= 17f && hour < 20f) return LerpPalette(eveningPalette, nightPalette, (hour - 17f) / 3f); else { if (hour >= 20f) return LerpPalette(nightPalette, morningPalette, (hour - 20f) / 10f); else return LerpPalette(nightPalette, morningPalette, (hour + 4f) / 10f); } }
+        private TimePalette LerpPalette(TimePalette a, TimePalette b, float t) { return new TimePalette { skyTop = Color.Lerp(a.skyTop, b.skyTop, t), skyBottom = Color.Lerp(a.skyBottom, b.skyBottom, t), roadTint = Color.Lerp(a.roadTint, b.roadTint, t), cityTint = Color.Lerp(a.cityTint, b.cityTint, t) }; }
+
+        private void SetMatFloat(string prop, float value) { foreach (var m in _roadMaterials) if (m != null) m.SetFloat(prop, value); }
+        private void SetMatColor(string prop, Color value) { foreach (var m in _roadMaterials) if (m != null) m.SetColor(prop, value); }
+
+        private void StartRandomCurveRoutine()
         {
-            foreach (var slot in _slots) Destroy(slot.gameObject);
-            _slots.Clear();
-
-            for (int i = 0; i < dataList.Count; i++)
-            {
-                GameObject go = Instantiate(slotPrefab, contentPanel);
-                FieldMapSlotUI slot = go.GetComponent<FieldMapSlotUI>();
-                slot.Initialize(i, dataList[i], this);
-                _slots.Add(slot);
-            }
-            _currentIndex = 0;
-        }
-
-        private void ChangeListSelection(int direction)
-        {
-            if (_slots.Count == 0) return;
-            _currentIndex = Mathf.Clamp(_currentIndex + direction, 0, _slots.Count - 1);
-            UpdateListHighlight();
-        }
-
-        private void UpdateListHighlight()
-        {
-            for (int i = 0; i < _slots.Count; i++) _slots[i].SetFocus(i == _currentIndex);
-        }
-
-        public void OnSlotHovered(int index)
-        {
-            if (_currentState != FieldMapState.ListMode) return;
-            _currentIndex = index;
-            UpdateListHighlight();
-        }
-
-        public void OnSlotClicked(int index)
-        {
-            if (_currentState != FieldMapState.ListMode) return;
-            _currentIndex = index;
-            UpdateListHighlight();
-            TrySelectDestination();
-        }
-
-        private void TrySelectDestination()
-        {
-            if (_slots.Count > 0 && _slots[_currentIndex].Data != null)
-            {
-                ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
-                SetState(FieldMapState.PopupMode);
-            }
-        }
-
-        private void UpdatePopupHighlight()
-        {
-            if (yesButton.targetGraphic != null)
-            {
-                yesButton.targetGraphic.color = _isPopupYesSelected ? buttonHighlightColor : buttonNormalColor;
-            }
-            if (noButton.targetGraphic != null)
-            {
-                noButton.targetGraphic.color = !_isPopupYesSelected ? buttonHighlightColor : buttonNormalColor;
-            }
-        }
-
-        public void OnPopupYesClicked()
-        {
-            if (_currentState != FieldMapState.PopupMode) return; 
-
-            _isPopupYesSelected = true;
-            ConfirmPopup();
-        }
-
-        public void OnPopupNoClicked()
-        {
-            if (_currentState != FieldMapState.PopupMode) return; 
-
-            _isPopupYesSelected = false;
-            ConfirmPopup();
-        }
-
-        private void ConfirmPopup()
-        {
-            if (_isPopupYesSelected)
-            {
-                SelectedDestination = _slots[_currentIndex].Data;
-                IsCanceled = false;
-                IsSelectionComplete = true;
-
-                SetState(FieldMapState.TransitionMode); 
-            }
-            else
-            {
-                SetState(FieldMapState.ListMode); 
-            }
-        }
-
-        public void OnCancel()
-        {
-            SelectedDestination = null;
-            IsCanceled = true;
-            IsSelectionComplete = true;
-            gameObject.SetActive(false); 
-        }
-
-        private TimePalette GetPaletteForHour(float hour)
-        {
-            hour = hour % 24f; 
-
-            if (hour >= 6f && hour < 12f)
-            {
-                float t = (hour - 6f) / (12f - 6f);
-                return LerpPalette(morningPalette, dayPalette, t);
-            }
-            else if (hour >= 12f && hour < 17f)
-            {
-                float t = (hour - 12f) / (17f - 12f);
-                return LerpPalette(dayPalette, eveningPalette, t);
-            }
-            else if (hour >= 17f && hour < 20f)
-            {
-                float t = (hour - 17f) / (20f - 17f);
-                return LerpPalette(eveningPalette, nightPalette, t);
-            }
-            else 
-            {
-                if (hour >= 20f)
-                {
-                    float t = (hour - 20f) / 10f; 
-                    return LerpPalette(nightPalette, morningPalette, t);
-                }
-                else
-                {
-                    float t = (hour + 4f) / 10f; 
-                    return LerpPalette(nightPalette, morningPalette, t);
-                }
-            }
-        }
-
-        private TimePalette LerpPalette(TimePalette a, TimePalette b, float t)
-        {
-            return new TimePalette
-            {
-                skyTop = Color.Lerp(a.skyTop, b.skyTop, t),
-                skyBottom = Color.Lerp(a.skyBottom, b.skyBottom, t),
-                roadTint = Color.Lerp(a.roadTint, b.roadTint, t),
-                cityTint = Color.Lerp(a.cityTint, b.cityTint, t)
-            };
-        }
-
-        private void StartRandomCurveRoutine(Material roadMat)
-        {
-            if (_curveSequence != null && _curveSequence.IsActive())
-            {
-                _curveSequence.Kill();
-            }
-
+            if (_curveSequence != null && _curveSequence.IsActive()) _curveSequence.Kill();
             _curveSequence = DOTween.Sequence();
-
             float targetCurve = 0f;
-            if (UnityEngine.Random.value > 0.25f)
-            {
-                targetCurve = UnityEngine.Random.Range(-maxCurveAmount, maxCurveAmount);
-            }
-            
+            if (UnityEngine.Random.value > 0.25f) targetCurve = UnityEngine.Random.Range(-maxCurveAmount, maxCurveAmount);
             float duration = UnityEngine.Random.Range(curveDurationRange.x, curveDurationRange.y);
             float delay = UnityEngine.Random.Range(curveDelayRange.x, curveDelayRange.y);
-
-            _curveSequence.Append(DOTween.To(() => _currentCurve, x => 
-            {
-                _currentCurve = x;
-                roadMat.SetFloat("_CurveAmount", _currentCurve);
-            }, targetCurve, duration).SetEase(Ease.InOutSine));
-            
+            _curveSequence.Append(DOTween.To(() => _currentCurve, x => { _currentCurve = x; SetMatFloat("_CurveAmount", _currentCurve); }, targetCurve, duration).SetEase(Ease.InOutSine));
             _curveSequence.AppendInterval(delay);
-
-            _curveSequence.OnComplete(() => StartRandomCurveRoutine(roadMat));
+            _curveSequence.OnComplete(() => StartRandomCurveRoutine());
         }
 
-        private void StopCurveRoutine(Material roadMat, float duration)
+        private void StartRandomHillRoutine()
         {
-            if (_curveSequence != null && _curveSequence.IsActive())
-            {
-                _curveSequence.Kill();
-            }
+            if (_hillSequence != null && _hillSequence.IsActive()) _hillSequence.Kill();
+            _hillSequence = DOTween.Sequence();
+            float targetHill = 0f;
+            if (UnityEngine.Random.value > 0.35f) targetHill = UnityEngine.Random.Range(-maxHillAmount, maxHillAmount);
+            float duration = UnityEngine.Random.Range(curveDurationRange.x, curveDurationRange.y) * 1.2f;
+            float delay = UnityEngine.Random.Range(curveDelayRange.x, curveDelayRange.y);
+            _hillSequence.Append(DOTween.To(() => _currentHill, x => { _currentHill = x; SetMatFloat("_HillAmount", _currentHill); }, targetHill, duration).SetEase(Ease.InOutSine));
+            _hillSequence.AppendInterval(delay);
+            _hillSequence.OnComplete(() => StartRandomHillRoutine());
+        }
 
-            DOTween.To(() => _currentCurve, x => 
-            {
-                _currentCurve = x;
-                roadMat.SetFloat("_CurveAmount", _currentCurve);
-            }, 0f, duration).SetEase(Ease.OutSine);
+        private void StopMotionRoutines()
+        {
+            if (_curveSequence != null && _curveSequence.IsActive()) _curveSequence.Kill();
+            if (_hillSequence != null && _hillSequence.IsActive()) _hillSequence.Kill();
+            DOTween.To(() => _currentCurve, x => { _currentCurve = x; SetMatFloat("_CurveAmount", _currentCurve); }, 0f, 0.5f).SetEase(Ease.OutSine);
+            DOTween.To(() => _currentHill, x => { _currentHill = x; SetMatFloat("_HillAmount", _currentHill); }, 0f, 0.5f).SetEase(Ease.OutSine);
         }
 
         public IEnumerator ExecuteRoadTransitionRoutine(float totalDistance, float totalGameHours, Action onMapLoadAction)
         {
             _skipRequested = false;
+            _transitionProgress = 0f; 
 
             fadeOverlay.gameObject.SetActive(true);
             fadeOverlay.blocksRaycasts = true;
@@ -452,21 +270,28 @@ namespace UI
 
             float startHour = ((float)ManagerRoot.Time.CurrentSteps / ManagerRoot.Time.stepsPerDay) * 24f;
             float endHour = startHour + totalGameHours;
+            
+            // 시뮬레이션 시간 초기화
+            CurrentSimulatedHour = startHour;
 
             TimePalette startPalette = GetPaletteForHour(startHour);
             TimePalette targetPalette = GetPaletteForHour(endHour);
 
             roadContainer.SetActive(true);
-            Material roadMat = roadScroller.GetComponent<RawImage>().material;
 
-            roadMat.SetColor("_SkyTopColor", startPalette.skyTop);
-            roadMat.SetColor("_SkyBottomColor", startPalette.skyBottom);
-            roadMat.SetColor("_Color", startPalette.roadTint);
+            _roadMaterials.Clear();
+            if (roadScroller != null) _roadMaterials.Add(roadScroller.GetComponent<RawImage>().material);
+            if (skyScroller != null) _roadMaterials.Add(skyScroller.GetComponent<RawImage>().material);
+
+            SetMatColor("_SkyTopColor", startPalette.skyTop);
+            SetMatColor("_SkyBottomColor", startPalette.skyBottom);
+            SetMatColor("_Color", startPalette.roadTint);
             
             _currentCurve = 0f;
-            roadMat.SetFloat("_CurveAmount", 0f);
+            _currentHill = 0f;
+            SetMatFloat("_CurveAmount", 0f);
+            SetMatFloat("_HillAmount", 0f);
 
-            // Parallax 도시 이미지의 위치 초기화 및 현재 출발 시간의 색상(cityTint) 적용
             if (cityLayers != null)
             {
                 for (int i = 0; i < cityLayers.Length; i++)
@@ -474,52 +299,58 @@ namespace UI
                     if (cityLayers[i].image != null)
                     {
                         cityLayers[i].currentUvOffset = 0f;
-                        Rect uvRect = cityLayers[i].image.uvRect;
-                        uvRect.x = 0f;
-                        cityLayers[i].image.uvRect = uvRect;
-                        
-                        // 현재 출발 시간대의 도시 색상 강제 초기화
+                        if (!cityLayers[i].isInitialized)
+                        {
+                            cityLayers[i].initialY = cityLayers[i].image.rectTransform.anchoredPosition.y;
+                            cityLayers[i].isInitialized = true;
+                        }
+
+                        Rect uvRect = cityLayers[i].image.uvRect; uvRect.x = 0f; cityLayers[i].image.uvRect = uvRect;
+                        cityLayers[i].image.rectTransform.localScale = Vector3.one;
+                        Vector2 pos = cityLayers[i].image.rectTransform.anchoredPosition; 
+                        pos.y = cityLayers[i].initialY;
+                        cityLayers[i].image.rectTransform.anchoredPosition = pos;
                         cityLayers[i].image.color = startPalette.cityTint;
                     }
                 }
             }
 
             roadScroller.isMoving = true;
+            if (skyScroller != null) skyScroller.isMoving = true; 
+            
             progressBar.value = 0f;
             distanceText.text = $"0.0 km / {totalDistance:F1} km";
-            timeText.text = "Elapsed Time: 0.0 hour";
+            timeText.text = "경과 시간: 0.0 시간";
 
             yield return fadeOverlay.DOFade(0f, 0.3f).WaitForCompletion();
 
-            StartRandomCurveRoutine(roadMat);
+            StartRandomCurveRoutine();
+            StartRandomHillRoutine();
 
-            roadMat.DOColor(targetPalette.skyTop, "_SkyTopColor", roadTransitionRealTime).SetEase(Ease.InOutSine);
-            roadMat.DOColor(targetPalette.skyBottom, "_SkyBottomColor", roadTransitionRealTime).SetEase(Ease.InOutSine);
-            roadMat.DOColor(targetPalette.roadTint, "_Color", roadTransitionRealTime).SetEase(Ease.InOutSine);
+            foreach (var mat in _roadMaterials)
+            {
+                mat.DOColor(targetPalette.skyTop, "_SkyTopColor", roadTransitionRealTime).SetEase(Ease.InOutSine);
+                mat.DOColor(targetPalette.skyBottom, "_SkyBottomColor", roadTransitionRealTime).SetEase(Ease.InOutSine);
+                mat.DOColor(targetPalette.roadTint, "_Color", roadTransitionRealTime).SetEase(Ease.InOutSine);
+            }
 
-            // 3장의 도시 배경 역시 도착 시간에 맞춰 색상이 서서히 바뀌도록 애니메이션 추가
             if (cityLayers != null)
             {
                 for (int i = 0; i < cityLayers.Length; i++)
-                {
-                    if (cityLayers[i].image != null)
-                    {
-                        cityLayers[i].image.DOColor(targetPalette.cityTint, roadTransitionRealTime).SetEase(Ease.InOutSine);
-                    }
-                }
+                    if (cityLayers[i].image != null) cityLayers[i].image.DOColor(targetPalette.cityTint, roadTransitionRealTime).SetEase(Ease.InOutSine);
             }
 
-            float progressValue = 0f;
-            Tween progressTween = DOTween.To(() => progressValue, x => 
+            Tween progressTween = DOTween.To(() => _transitionProgress, x => 
             {
-                progressValue = x;
-                progressBar.value = progressValue;
+                _transitionProgress = x; 
+                progressBar.value = _transitionProgress;
                 
-                float currentDist = Mathf.Lerp(0, totalDistance, progressValue);
-                float currentHours = Mathf.Lerp(0, totalGameHours, progressValue);
+                float currentHours = Mathf.Lerp(0, totalGameHours, _transitionProgress);
+                // 가상 시뮬레이션 시간 업데이트 (가로등 불빛 제어용)
+                CurrentSimulatedHour = startHour + currentHours;
                 
-                distanceText.text = $"{currentDist:F1} km / {totalDistance:F1} km";
-                timeText.text = $"Elapsed Time: {currentHours:F1} hour";
+                distanceText.text = $"{Mathf.Lerp(0, totalDistance, _transitionProgress):F1} km / {totalDistance:F1} km";
+                timeText.text = $"경과 시간: {currentHours:F1} 시간";
             }, 1f, roadTransitionRealTime).SetEase(Ease.InOutSine);
 
             while (progressTween.IsActive() && !progressTween.IsComplete())
@@ -527,9 +358,11 @@ namespace UI
                 if (_skipRequested)
                 {
                     progressTween.Kill();
-                    roadMat.DOKill(); 
+                    foreach (var mat in _roadMaterials) mat.DOKill(); 
                     
-                    // 스킵 시 도시 이미지의 애니메이션도 정지하고 도착 시간의 색상으로 갱신
+                    _transitionProgress = 1f; 
+                    CurrentSimulatedHour = endHour; // 스킵 시 가상 시간도 즉시 목적지 시간으로 점프
+                    
                     if (cityLayers != null)
                     {
                         for (int i = 0; i < cityLayers.Length; i++)
@@ -538,6 +371,10 @@ namespace UI
                             {
                                 cityLayers[i].image.DOKill();
                                 cityLayers[i].image.color = targetPalette.cityTint;
+                                cityLayers[i].image.rectTransform.localScale = new Vector3(cityLayers[i].targetScale, cityLayers[i].targetScale, 1f);
+                                Vector2 pos = cityLayers[i].image.rectTransform.anchoredPosition;
+                                pos.y = cityLayers[i].initialY + cityLayers[i].targetYOffset;
+                                cityLayers[i].image.rectTransform.anchoredPosition = pos;
                             }
                         }
                     }
@@ -550,11 +387,10 @@ namespace UI
                 yield return null; 
             }
 
-            float stopDuration = 3f;
-            StopCurveRoutine(roadMat, stopDuration);
+            StopMotionRoutines();
 
             float pauseTimer = 0f;
-            while (pauseTimer < stopDuration)
+            while (pauseTimer < 0.5f)
             {
                 if (_skipRequested) break;
                 pauseTimer += Time.deltaTime;
@@ -564,12 +400,11 @@ namespace UI
             yield return fadeOverlay.DOFade(1f, 0.3f).WaitForCompletion();
             
             roadScroller.isMoving = false;
+            if (skyScroller != null) skyScroller.isMoving = false;
             roadContainer.SetActive(false);
 
             float stepsPerHour = (float)ManagerRoot.Time.stepsPerDay / 24f;
-            int stepsToAdvance = Mathf.RoundToInt(totalGameHours * stepsPerHour);
-            ManagerRoot.Time.AddStep(stepsToAdvance);
-
+            ManagerRoot.Time.AddStep(Mathf.RoundToInt(totalGameHours * stepsPerHour));
             onMapLoadAction?.Invoke();
 
             yield return fadeOverlay.DOFade(0f, 0.3f).WaitForCompletion();

@@ -9,14 +9,14 @@ namespace UI
         class PropItem
         {
             public RectTransform rect;
-            public Image img;
+            public Image baseImg;  
+            public Image glowImg;  
             public float currentZ; 
         }
 
         [Header("References")]
         public Pseudo3DRoad roadScroller;
         public RectTransform container;
-        [Tooltip("좌/우 가로등이 모두 그려진 통짜 UI Image 프리팹")]
         public GameObject propPrefab; 
 
         [Header("Spawning & Speed")]
@@ -26,28 +26,22 @@ namespace UI
         public float spacingZ = 2.0f;
         
         [Header("Position & Visuals")]
-        public float baseScale = 14f;
+        public float baseScale = 2.5f;
         public float yOffset = 0f; 
 
         [Header("Shader Sync")]
-        public float horizonY = 0.5f;
+        public float horizonY = 1.0f;
 
         private List<PropItem> _activeProps = new List<PropItem>();
         private Queue<PropItem> _propPool = new Queue<PropItem>();
-        
         private RawImage _roadImage;
         private float _distanceTraveled = 0f;
 
         private void OnEnable()
         {
             _distanceTraveled = 0f;
-            
-            if (roadScroller != null)
-            {
-                _roadImage = roadScroller.GetComponent<RawImage>();
-            }
+            if (roadScroller != null) _roadImage = roadScroller.GetComponent<RawImage>();
 
-            // 시작할 때 미리 가로등 깔아두기
             float initialZ = cullZ;
             while (initialZ <= spawnZ)
             {
@@ -59,7 +53,6 @@ namespace UI
         private void Update()
         {
             if (roadScroller == null || !roadScroller.isMoving || _roadImage == null) return;
-
             Material currentMat = _roadImage.material;
             if (currentMat == null) return;
 
@@ -73,11 +66,27 @@ namespace UI
             }
 
             float currentCurve = currentMat.GetFloat("_CurveAmount");
+            float currentHill = currentMat.GetFloat("_HillAmount");
             Color roadTint = currentMat.GetColor("_Color");
             Color skyBottom = currentMat.GetColor("_SkyBottomColor");
 
             float width = container.rect.width;
             float height = container.rect.height;
+
+            // 시간 계산
+            float currentHour = FieldMapUIManager.Instance.CurrentSimulatedHour % 24f;
+            if (currentHour < 0) currentHour += 24f;
+            
+            // 19시 ~ 04시 사이버펑크 네온 제어 로직
+            float glowAlpha = 0f;
+            if (currentHour >= 18f && currentHour < 19f) 
+                glowAlpha = currentHour - 18f; // 18시~19시: 스르륵 예열되며 켜짐
+            else if (currentHour >= 19f || currentHour < 3f) 
+                glowAlpha = 1f; // 19시~06시: 100% 밝기로 밤새 켜짐
+            else if (currentHour >= 3f && currentHour < 4f) 
+                glowAlpha = 1f - (currentHour - 4f); // 06시~07시: 아침이 되며 스르륵 꺼짐
+            else 
+                glowAlpha = 0f; // 04시~18시 (낮): 완전히 꺼짐
 
             for (int i = _activeProps.Count - 1; i >= 0; i--)
             {
@@ -93,11 +102,19 @@ namespace UI
                 }
 
                 float depth = 1f / prop.currentZ; 
-                float yNorm = horizonY * (1f - depth); 
-                float scale = depth * baseScale; 
+                float adjustedY = horizonY * (1f - depth); 
                 
-                // 실시간 커브 적용
-                float curveOffset = (yNorm * yNorm) * currentCurve;
+                float yNorm;
+                if (Mathf.Abs(currentHill) < 0.001f) yNorm = adjustedY;
+                else
+                {
+                    float discriminant = 1f - 4f * currentHill * adjustedY;
+                    if (discriminant < 0f) yNorm = adjustedY; 
+                    else yNorm = (1f - Mathf.Sqrt(discriminant)) / (2f * currentHill);
+                }
+
+                float scale = depth * baseScale; 
+                float curveOffset = (adjustedY * adjustedY) * currentCurve;
                 
                 prop.rect.anchoredPosition = new Vector2(
                     curveOffset * width, 
@@ -105,7 +122,30 @@ namespace UI
                 );
                 
                 prop.rect.localScale = new Vector3(scale, scale, 1f);
-                prop.img.color = Color.Lerp(skyBottom, roadTint, depth);
+                
+                if (prop.baseImg != null)
+                {
+                    prop.baseImg.color = Color.Lerp(skyBottom, roadTint, depth);
+                }
+
+                // 낮에는 네온 이미지를 끔
+                if (prop.glowImg != null)
+                {
+                    if (glowAlpha <= 0.01f)
+                    {
+                        if (prop.glowImg.gameObject.activeSelf)
+                            prop.glowImg.gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        if (!prop.glowImg.gameObject.activeSelf)
+                            prop.glowImg.gameObject.SetActive(true);
+
+                        Color glowColor = prop.glowImg.color;
+                        glowColor.a = glowAlpha * depth; 
+                        prop.glowImg.color = glowColor;
+                    }
+                }
             }
         }
 
@@ -120,10 +160,13 @@ namespace UI
             else
             {
                 GameObject go = Instantiate(propPrefab, container);
+                Transform glowT = go.transform.Find("GlowImage");
+
                 prop = new PropItem
                 {
                     rect = go.GetComponent<RectTransform>(),
-                    img = go.GetComponent<Image>()
+                    baseImg = go.GetComponent<Image>(),
+                    glowImg = glowT != null ? glowT.GetComponent<Image>() : null
                 };
                 
                 prop.rect.anchorMin = new Vector2(0.5f, 0f);
