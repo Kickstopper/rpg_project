@@ -20,7 +20,7 @@ namespace Controller
         public float typeSpeed = 0.01f;
         public float lineDelay = 0.1f;
         public string cursorChar = "_";
-        public float cursorBlinkRate = 0.5f;
+        public float cursorBlinkRate = 0.25f;
         public float fadeDuration = 1.5f; // 페이드 효과 지속 시간
         public float skipFadeDuration = 0.3f;
 
@@ -82,7 +82,7 @@ namespace Controller
         IEnumerator RunSequence()
         {
             isProgress = true;
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(1f);
             
             foreach (var line in bootSequence)
             {
@@ -139,7 +139,7 @@ namespace Controller
             }
             if (terminalCanvasGroup != null) terminalCanvasGroup.alpha = 0f;
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
 
             if (charCreationManager != null)
             {
