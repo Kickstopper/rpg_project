@@ -73,20 +73,14 @@ namespace UI
             float width = container.rect.width;
             float height = container.rect.height;
 
-            // 시간 계산
             float currentHour = FieldMapUIManager.Instance.CurrentSimulatedHour % 24f;
             if (currentHour < 0) currentHour += 24f;
             
-            // 19시 ~ 04시 사이버펑크 네온 제어 로직
             float glowAlpha = 0f;
-            if (currentHour >= 18f && currentHour < 19f) 
-                glowAlpha = currentHour - 18f; // 18시~19시: 스르륵 예열되며 켜짐
-            else if (currentHour >= 19f || currentHour < 3f) 
-                glowAlpha = 1f; // 19시~06시: 100% 밝기로 밤새 켜짐
-            else if (currentHour >= 3f && currentHour < 4f) 
-                glowAlpha = 1f - (currentHour - 4f); // 06시~07시: 아침이 되며 스르륵 꺼짐
-            else 
-                glowAlpha = 0f; // 04시~18시 (낮): 완전히 꺼짐
+            if (currentHour >= 18f && currentHour < 19f) glowAlpha = currentHour - 18f; 
+            else if (currentHour >= 19f || currentHour < 6f) glowAlpha = 1f; 
+            else if (currentHour >= 6f && currentHour < 7f) glowAlpha = 1f - (currentHour - 6f); 
+            else glowAlpha = 0f; 
 
             for (int i = _activeProps.Count - 1; i >= 0; i--)
             {
@@ -105,12 +99,23 @@ namespace UI
                 float adjustedY = horizonY * (1f - depth); 
                 
                 float yNorm;
-                if (Mathf.Abs(currentHill) < 0.001f) yNorm = adjustedY;
+                if (Mathf.Abs(currentHill) < 0.001f) 
+                {
+                    yNorm = adjustedY;
+                }
                 else
                 {
                     float discriminant = 1f - 4f * currentHill * adjustedY;
-                    if (discriminant < 0f) yNorm = adjustedY; 
-                    else yNorm = (1f - Mathf.Sqrt(discriminant)) / (2f * currentHill);
+                    
+                    if (discriminant < 0f) 
+                    {
+                        // 극단적인 내리막길로 가로등이 사각지대에 가려진 경우 화면 위로 숨김
+                        yNorm = 2.0f; 
+                    }
+                    else 
+                    {
+                        yNorm = (1f - Mathf.Sqrt(discriminant)) / (2f * currentHill);
+                    }
                 }
 
                 float scale = depth * baseScale; 
@@ -128,7 +133,6 @@ namespace UI
                     prop.baseImg.color = Color.Lerp(skyBottom, roadTint, depth);
                 }
 
-                // 낮에는 네온 이미지를 끔
                 if (prop.glowImg != null)
                 {
                     if (glowAlpha <= 0.01f)
