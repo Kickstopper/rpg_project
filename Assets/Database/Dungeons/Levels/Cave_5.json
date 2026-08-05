@@ -2,8 +2,9 @@
     "width": 3,
     "height": 7,
     "mapID": "Cave_5",
-    "themeID": "Cave_1",
+    "themeID": "",
     "locationID": "CAVE",
+    "hasCeil": true,
     "startX": 1,
     "startY": 0,
     "startDirection": 3,
@@ -18,13 +19,30 @@
                 0,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 1,
@@ -36,13 +54,30 @@
                 0,
                 -1
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 2,
@@ -54,13 +89,30 @@
                 0,
                 -1
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 0,
@@ -72,13 +124,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 1,
@@ -90,13 +159,30 @@
                 -1,
                 -1
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 2,
@@ -108,13 +194,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 0,
@@ -126,13 +229,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 1,
@@ -144,13 +264,30 @@
                 -1,
                 -1
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 2,
@@ -162,13 +299,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 0,
@@ -180,13 +334,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 1,
@@ -198,13 +369,30 @@
                 -1,
                 -1
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 2,
@@ -216,13 +404,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 0,
@@ -234,13 +439,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 1,
@@ -252,13 +474,30 @@
                 -1,
                 -1
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 2,
@@ -270,13 +509,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 0,
@@ -288,13 +544,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 1,
@@ -306,13 +579,30 @@
                 0,
                 -1
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 2,
@@ -324,13 +614,30 @@
                 -1,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 0,
@@ -342,13 +649,30 @@
                 -1,
                 -1
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 1,
@@ -360,13 +684,30 @@
                 0,
                 0
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         },
         {
             "x": 2,
@@ -378,13 +719,30 @@
                 -1,
                 -1
             ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
             "centerObjectID": -1,
             "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
                 -1
-            ]
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
         }
     ],
     "entrances": [
@@ -393,11 +751,18 @@
             "sourceX": 1,
             "sourceY": 5,
             "isWallEntrance": false,
+            "stairType": 0,
             "isWorldMap": false,
             "destinationID": "Cave_4",
             "targetX": 3,
             "targetY": 0,
-            "targetDirection": 0
+            "targetDirection": 0,
+            "randomMapThemeID": "",
+            "randomMapWidth": 11,
+            "randomMapHeight": 11,
+            "randomMapMaxCount": 5,
+            "randomMapRepeatCount": 5,
+            "finalDestinationID": ""
         }
     ]
 }

@@ -171,7 +171,7 @@ public class DungeonMapEditor : EditorWindow
             if (EditorUtility.DisplayDialog("Generate Maze", 
                 "현재 맵 데이터가 무작위 미로로 덮어씌워집니다. 진행하시겠습니까?", "Yes", "No"))
             {
-                string themeID = (inputTheme != null) ? inputTheme.name : "";
+                string themeID = (inputTheme != null) ? inputTheme.themeID : "";
                 
                 // Generator 폴더(네임스페이스)의 스크립트 호출하여 맵 데이터 생성
                 mapData = Generator.DungeonGenerator.GenerateWizardryMaze(
