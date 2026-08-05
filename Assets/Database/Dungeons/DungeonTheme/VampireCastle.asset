@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
   m_Name: VampireCastle
   m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
-  dungeonID: VampireCastle
+  themeID: VampireCastle
   bgmID: 7
   useWakeUpEffect: 0
   monsterList: []

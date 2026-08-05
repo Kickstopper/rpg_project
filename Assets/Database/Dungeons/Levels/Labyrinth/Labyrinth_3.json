@@ -1,13 +1,13 @@
 {
-    "width": 11,
-    "height": 3,
-    "mapID": "VampireCastle_2",
-    "themeID": "VampireCastle",
-    "locationID": "vampire_castle",
+    "width": 5,
+    "height": 5,
+    "mapID": "Labyrinth_3",
+    "themeID": "Labyrinth",
+    "locationID": "LABYRINTH",
     "hasCeil": true,
-    "startX": 9,
-    "startY": 5,
-    "startDirection": 3,
+    "startX": 0,
+    "startY": 2,
+    "startDirection": 0,
     "cells": [
         {
             "x": 0,
@@ -16,8 +16,8 @@
             "wallTextureIDs": [
                 -1,
                 -1,
-                -1,
-                -1
+                0,
+                0
             ],
             "floorTexIdx": -1,
             "ceilTexIdx": -1,
@@ -49,9 +49,9 @@
             "y": 0,
             "value": -1,
             "wallTextureIDs": [
+                0,
                 -1,
-                -1,
-                -1,
+                0,
                 -1
             ],
             "floorTexIdx": -1,
@@ -82,12 +82,12 @@
         {
             "x": 2,
             "y": 0,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
-                4,
                 0,
+                -1,
                 0,
-                0
+                -1
             ],
             "floorTexIdx": -1,
             "ceilTexIdx": -1,
@@ -119,9 +119,9 @@
             "y": 0,
             "value": -1,
             "wallTextureIDs": [
+                0,
                 -1,
-                -1,
-                -1,
+                0,
                 -1
             ],
             "floorTexIdx": -1,
@@ -155,218 +155,8 @@
             "value": -1,
             "wallTextureIDs": [
                 -1,
-                -1,
-                -1,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 5,
-            "y": 0,
-            "value": 0,
-            "wallTextureIDs": [
-                4,
                 0,
                 0,
-                0
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 6,
-            "y": 0,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 7,
-            "y": 0,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 8,
-            "y": 0,
-            "value": 0,
-            "wallTextureIDs": [
-                4,
-                0,
-                0,
-                0
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 9,
-            "y": 0,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 10,
-            "y": 0,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
                 -1
             ],
             "floorTexIdx": -1,
@@ -397,11 +187,11 @@
         {
             "x": 0,
             "y": 1,
-            "value": 0,
+            "value": -1,
             "wallTextureIDs": [
                 0,
-                3,
                 0,
+                -1,
                 0
             ],
             "floorTexIdx": -1,
@@ -434,9 +224,9 @@
             "y": 1,
             "value": 0,
             "wallTextureIDs": [
-                0,
                 -1,
-                0,
+                -1,
+                -1,
                 -1
             ],
             "floorTexIdx": -1,
@@ -469,7 +259,7 @@
             "y": 1,
             "value": 0,
             "wallTextureIDs": [
-                0,
+                -1,
                 -1,
                 -1,
                 -1
@@ -502,12 +292,12 @@
         {
             "x": 3,
             "y": 1,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
-                0,
-                0,
-                0,
-                0
+                -1,
+                -1,
+                -1,
+                -1
             ],
             "floorTexIdx": -1,
             "ceilTexIdx": -1,
@@ -537,116 +327,11 @@
         {
             "x": 4,
             "y": 1,
-            "value": 0,
-            "wallTextureIDs": [
-                0,
-                -1,
-                0,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 5,
-            "y": 1,
-            "value": 0,
-            "wallTextureIDs": [
-                0,
-                -1,
-                -1,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 6,
-            "y": 1,
-            "value": 0,
-            "wallTextureIDs": [
-                0,
-                -1,
-                0,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 7,
-            "y": 1,
             "value": -1,
             "wallTextureIDs": [
+                -1,
                 0,
-                0,
-                0,
+                -1,
                 0
             ],
             "floorTexIdx": -1,
@@ -675,83 +360,13 @@
             "interactSystemMessage": "조사했다."
         },
         {
-            "x": 8,
-            "y": 1,
+            "x": 0,
+            "y": 2,
             "value": 0,
             "wallTextureIDs": [
-                0,
-                -1,
-                -1,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
                 -1,
                 -1,
                 -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 9,
-            "y": 1,
-            "value": 0,
-            "wallTextureIDs": [
-                0,
-                -1,
-                0,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
-            "x": 10,
-            "y": 1,
-            "value": 0,
-            "wallTextureIDs": [
-                0,
-                0,
-                0,
                 3
             ],
             "floorTexIdx": -1,
@@ -780,44 +395,9 @@
             "interactSystemMessage": "조사했다."
         },
         {
-            "x": 0,
-            "y": 2,
-            "value": -1,
-            "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "floorTexIdx": -1,
-            "ceilTexIdx": -1,
-            "centerObjectID": -1,
-            "faceObjectIDs": [
-                -1,
-                -1,
-                -1,
-                -1
-            ],
-            "eventID": "",
-            "isEventRepeatable": false,
-            "requiredFlag": "",
-            "requiredFlagState": true,
-            "useForceDir": false,
-            "evForceDir": 0,
-            "canInteract": false,
-            "interactReqFlag": "",
-            "interactReqFlagState": true,
-            "interactSetFlag": "",
-            "interactSetFlagState": true,
-            "interactTargetTexID": -1,
-            "interactChangeObjectID": -1,
-            "interactEventID": "",
-            "interactSystemMessage": "조사했다."
-        },
-        {
             "x": 1,
             "y": 2,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -854,10 +434,10 @@
             "y": 2,
             "value": -1,
             "wallTextureIDs": [
-                -1,
-                -1,
-                -1,
-                -1
+                0,
+                0,
+                0,
+                0
             ],
             "floorTexIdx": -1,
             "ceilTexIdx": -1,
@@ -887,7 +467,7 @@
         {
             "x": 3,
             "y": 2,
-            "value": -1,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -925,8 +505,78 @@
             "value": -1,
             "wallTextureIDs": [
                 -1,
+                0,
+                -1,
+                0
+            ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
+            "centerObjectID": -1,
+            "faceObjectIDs": [
                 -1,
                 -1,
+                -1,
+                -1
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
+        },
+        {
+            "x": 0,
+            "y": 3,
+            "value": -1,
+            "wallTextureIDs": [
+                3,
+                -1,
+                0,
+                0
+            ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
+        },
+        {
+            "x": 1,
+            "y": 3,
+            "value": -1,
+            "wallTextureIDs": [
+                0,
+                0,
+                0,
                 -1
             ],
             "floorTexIdx": -1,
@@ -955,9 +605,9 @@
             "interactSystemMessage": "조사했다."
         },
         {
-            "x": 5,
-            "y": 2,
-            "value": -1,
+            "x": 2,
+            "y": 3,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -990,9 +640,9 @@
             "interactSystemMessage": "조사했다."
         },
         {
-            "x": 6,
-            "y": 2,
-            "value": -1,
+            "x": 3,
+            "y": 3,
+            "value": 0,
             "wallTextureIDs": [
                 -1,
                 -1,
@@ -1025,11 +675,81 @@
             "interactSystemMessage": "조사했다."
         },
         {
-            "x": 7,
-            "y": 2,
+            "x": 4,
+            "y": 3,
             "value": -1,
             "wallTextureIDs": [
                 -1,
+                0,
+                -1,
+                0
+            ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
+        },
+        {
+            "x": 0,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
+                -1,
+                -1,
+                0
+            ],
+            "floorTexIdx": -1,
+            "ceilTexIdx": -1,
+            "centerObjectID": -1,
+            "faceObjectIDs": [
+                -1,
+                -1,
+                -1,
+                -1
+            ],
+            "eventID": "",
+            "isEventRepeatable": false,
+            "requiredFlag": "",
+            "requiredFlagState": true,
+            "useForceDir": false,
+            "evForceDir": 0,
+            "canInteract": false,
+            "interactReqFlag": "",
+            "interactReqFlagState": true,
+            "interactSetFlag": "",
+            "interactSetFlagState": true,
+            "interactTargetTexID": -1,
+            "interactChangeObjectID": -1,
+            "interactEventID": "",
+            "interactSystemMessage": "조사했다."
+        },
+        {
+            "x": 1,
+            "y": 4,
+            "value": 0,
+            "wallTextureIDs": [
+                0,
                 -1,
                 -1,
                 -1
@@ -1060,11 +780,11 @@
             "interactSystemMessage": "조사했다."
         },
         {
-            "x": 8,
-            "y": 2,
-            "value": -1,
+            "x": 2,
+            "y": 4,
+            "value": 0,
             "wallTextureIDs": [
-                -1,
+                0,
                 -1,
                 -1,
                 -1
@@ -1095,14 +815,14 @@
             "interactSystemMessage": "조사했다."
         },
         {
-            "x": 9,
-            "y": 2,
+            "x": 3,
+            "y": 4,
             "value": -1,
             "wallTextureIDs": [
+                0,
                 -1,
-                -1,
-                -1,
-                -1
+                0,
+                0
             ],
             "floorTexIdx": -1,
             "ceilTexIdx": -1,
@@ -1130,12 +850,12 @@
             "interactSystemMessage": "조사했다."
         },
         {
-            "x": 10,
-            "y": 2,
+            "x": 4,
+            "y": 4,
             "value": -1,
             "wallTextureIDs": [
-                -1,
-                -1,
+                0,
+                0,
                 -1,
                 -1
             ],
@@ -1168,15 +888,15 @@
     "entrances": [
         {
             "type": 0,
-            "sourceX": 2,
-            "sourceY": 0,
+            "sourceX": 0,
+            "sourceY": 4,
             "isWallEntrance": true,
             "stairType": 0,
             "isWorldMap": false,
-            "destinationID": "VampireCastle_1",
-            "targetX": 2,
-            "targetY": 9,
-            "targetDirection": 2,
+            "destinationID": "Labyrinth_5",
+            "targetX": 1,
+            "targetY": 1,
+            "targetDirection": 0,
             "randomMapThemeID": "",
             "randomMapWidth": 11,
             "randomMapHeight": 11,
@@ -1186,33 +906,15 @@
         },
         {
             "type": 0,
-            "sourceX": 5,
-            "sourceY": 0,
+            "sourceX": 0,
+            "sourceY": 2,
             "isWallEntrance": true,
             "stairType": 0,
             "isWorldMap": false,
-            "destinationID": "VampireCastle_1",
-            "targetX": 5,
-            "targetY": 9,
-            "targetDirection": 2,
-            "randomMapThemeID": "",
-            "randomMapWidth": 11,
-            "randomMapHeight": 11,
-            "randomMapMaxCount": 5,
-            "randomMapRepeatCount": 5,
-            "finalDestinationID": ""
-        },
-        {
-            "type": 0,
-            "sourceX": 8,
-            "sourceY": 0,
-            "isWallEntrance": true,
-            "stairType": 0,
-            "isWorldMap": false,
-            "destinationID": "VampireCastle_1",
-            "targetX": 8,
-            "targetY": 9,
-            "targetDirection": 2,
+            "destinationID": "Labyrinth_1",
+            "targetX": 6,
+            "targetY": 3,
+            "targetDirection": 0,
             "randomMapThemeID": "",
             "randomMapWidth": 11,
             "randomMapHeight": 11,

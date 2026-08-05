@@ -10,43 +10,73 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b1697284a3ce914ab73e33f6f5efebf, type: 3}
-  m_Name: Building
+  m_Name: PoliceStation
   m_EditorClassIdentifier: 
-  themeID: Building
+  themeID: PoliceStation
   bgmID: 13
   useWakeUpEffect: 0
   monsterList:
   - 000
+  - 001
+  - 003
+  - 004
+  - 005
+  - 006
+  - 007
+  - 008
+  - 009
+  - 010
+  - 011
+  - 012
+  - 013
+  - 014
+  - 015
+  - 016
+  - 017
+  - 018
+  - 019
+  - 020
+  - 021
+  - 022
+  - 023
+  - 024
+  - 025
+  - 026
+  - 027
+  - 028
+  - 029
+  - 030
+  - 031
   maxEnemyCount: 2
   encounterMode: 1
   maxSpawnCount: 3
   spawnDelay: 5
-  background: {fileID: 2800000, guid: 5005efcc13ea09d48b4c0454fdd2abee, type: 3}
+  background: {fileID: 0}
   texture:
-  - {fileID: 2800000, guid: 71284589d32556142aa457c17366b265, type: 3}
-  - {fileID: 2800000, guid: e915d57aabc5fcd4da5452265b2961df, type: 3}
-  - {fileID: 2800000, guid: 126b3999da7842c4b8d251391575ca1a, type: 3}
-  - {fileID: 2800000, guid: 7019bda81fdcdb943ac2f82a35dd4b0e, type: 3}
-  - {fileID: 2800000, guid: 16de071c12c3fbb49900c1ffcecb25fe, type: 3}
-  ceilingTexIdx: -1
-  floorTexIdx: 3
+  - {fileID: 2800000, guid: ff60a8cff87d7254999c1cc56af0960f, type: 3}
+  - {fileID: 2800000, guid: ff60a8cff87d7254999c1cc56af0960f, type: 3}
+  - {fileID: 2800000, guid: ff60a8cff87d7254999c1cc56af0960f, type: 3}
+  - {fileID: 2800000, guid: 62f50738d34f71e43b7c445b8e3fe4e0, type: 3}
+  - {fileID: 2800000, guid: 04df67fd356004645846970f3b68a8b1, type: 3}
+  ceilingTexIdx: 3
+  floorTexIdx: 4
   passableWallTexIDs: 
   doorAnimations: []
   wallAnimations: []
   objectSprites: []
-  fogColor: {r: 0.5396226, g: 0.5396226, b: 0.5396226, a: 1}
+  fogColor: {r: 0.43190408, g: 0, b: 0.5698112, a: 1}
   lightingIntensity: 3.5
-  useGridLighting: 1
+  useGridLighting: 0
   moduleEnable: 1
-  useDustEffect: 0
+  useDustEffect: 1
   dustParticleCount: 300
   dustSwayAmplitude: 0.15
-  dustMovesUp: 0
+  dustMovesUp: 1
   useDustTwinkle: 1
-  dustTwinkleSpeed: 10
+  dustTwinkleSpeed: 30
   dustColor:
     serializedVersion: 2
-    rgba: 4290040540
+    rgba: 4291756287
   useOrganicEffect: 0
   organicFreqX: 4
   organicSpeed: 0.3

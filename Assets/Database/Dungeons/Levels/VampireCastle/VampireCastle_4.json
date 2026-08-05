@@ -2,7 +2,7 @@
     "width": 10,
     "height": 4,
     "mapID": "VampireCastle_4",
-    "themeID": "",
+    "themeID": "VampireCastle",
     "locationID": "vampire_castle",
     "hasCeil": true,
     "startX": 0,
