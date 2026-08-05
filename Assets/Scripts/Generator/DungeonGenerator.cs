@@ -12,10 +12,10 @@ namespace Generator
         /// <param name="width">맵 가로 크기 (홀수 권장, 예: 21)</param>
         /// <param name="height">맵 세로 크기 (홀수 권장, 예: 21)</param>
         /// <param name="mapID">부여할 맵 ID</param>
-        /// <param name="themeName">적용할 던전 테마 이름</param>
+        /// <param name="themeID">적용할 던전 테마 ID</param>
         /// <param name="wallTexId">벽으로 칠할 기본 텍스처 ID (일반적으로 0)</param>
         /// <param name="loopChance">막힌 벽을 뚫어 루프를 만들 확률 (0.0 ~ 1.0)</param>
-        public static MapData GenerateWizardryMaze(int width, int height, string mapID, string themeName, int wallTexId = 0, float loopChance = 0.05f)
+        public static MapData GenerateWizardryMaze(int width, int height, string mapID, string themeID, int wallTexId = 0, float loopChance = 0.05f)
         {
             // 미로 생성 알고리즘 특성상 가로세로 크기는 무조건 홀수여야 함
             if (width % 2 == 0) width++;
@@ -161,7 +161,7 @@ namespace Generator
                 width = width,
                 height = height,
                 mapID = mapID,
-                themeName = themeName,
+                themeID = themeID,
                 startX = finalStartPos.x,
                 startY = finalStartPos.y,
                 startDirection = finalStartDir,

@@ -2,7 +2,7 @@
     "width": 5,
     "height": 7,
     "mapID": "Tower_5",
-    "themeName": "DefaultTheme",
+    "themeID": "DefaultTheme",
     "locationID": "Tower",
     "hasCeil": false,
     "startX": 2,

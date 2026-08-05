@@ -66,7 +66,7 @@ public class DungeonMapEditor : EditorWindow
         mapData.height = h;
         mapData.mapID = mapId;
         mapData.locationID = locationID;
-        mapData.themeName = (theme != null) ? theme.name : "";
+        mapData.themeID = (theme != null) ? theme.themeID : "";
         mapData.hasCeil = hasCeil;
 
         // 시작 위치 및 방향 설정
@@ -97,7 +97,7 @@ public class DungeonMapEditor : EditorWindow
         inputStartDirection = startDir;
         inputHasCeil = hasCeil;
         UpdateVisualizer();
-        Debug.Log($"New Map Created: ID={mapId}, Size={w}x{h}, Theme={mapData.themeName}");
+        Debug.Log($"New Map Created: ID={mapId}, Size={w}x{h}, Theme={mapData.themeID}");
     }
 
 
@@ -171,11 +171,11 @@ public class DungeonMapEditor : EditorWindow
             if (EditorUtility.DisplayDialog("Generate Maze", 
                 "현재 맵 데이터가 무작위 미로로 덮어씌워집니다. 진행하시겠습니까?", "Yes", "No"))
             {
-                string themeName = (inputTheme != null) ? inputTheme.name : "";
+                string themeID = (inputTheme != null) ? inputTheme.name : "";
                 
                 // Generator 폴더(네임스페이스)의 스크립트 호출하여 맵 데이터 생성
                 mapData = Generator.DungeonGenerator.GenerateWizardryMaze(
-                    inputWidth, inputHeight, inputMapID, themeName, 0, 0.05f); // 0.05f는 루프 생성 확률
+                    inputWidth, inputHeight, inputMapID, themeID, 0, 0.05f); // 0.05f는 루프 생성 확률
                 
                 // 생성된 데이터를 에디터 입력 필드 UI와 동기화
                 mapData.locationID = inputLocationID;
@@ -220,7 +220,7 @@ public class DungeonMapEditor : EditorWindow
         if (!string.IsNullOrEmpty(currentFilePath))
         {
             EditorGUILayout.HelpBox(
-                $"Current Map: ID [{mapData.mapID}] / Theme [{mapData.themeName}]\n" +
+                $"Current Map: ID [{mapData.mapID}] / Theme [{mapData.themeID}]\n" +
                 $"File: {currentFilePath}",
                 MessageType.Info);
         }
@@ -307,13 +307,13 @@ public class DungeonMapEditor : EditorWindow
             inputHasCeil = mapData.hasCeil;
 
             // 저장된 테마 이름으로 프로젝트에서 Theme 파일을 찾아 연결 시도
-            if (!string.IsNullOrEmpty(mapData.themeName))
+            if (!string.IsNullOrEmpty(mapData.themeID))
             {
                 // Resources 폴더를 사용한다면
-                // inputTheme = Resources.Load<DungeonTheme>(mapData.themeName);
+                // inputTheme = Resources.Load<DungeonTheme>(mapData.themeID);
 
                 // 에디터 전용. AssetDatabase 검색
-                string[] guids = AssetDatabase.FindAssets($"t:DungeonTheme {mapData.themeName}");
+                string[] guids = AssetDatabase.FindAssets($"t:DungeonTheme {mapData.themeID}");
                 if (guids.Length > 0)
                 {
                     string assetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
@@ -322,7 +322,7 @@ public class DungeonMapEditor : EditorWindow
                 else
                 {
                     inputTheme = null;
-                    Debug.LogWarning($"Theme '{mapData.themeName}' not found in project.");
+                    Debug.LogWarning($"Theme '{mapData.themeID}' not found in project.");
                 }
             }
             else
@@ -786,6 +786,46 @@ public class DungeonMapEditor : EditorWindow
                     // 입구의 타입 (다른 던전맵으로의 입구인가 상점으로의 입구인가)
                     existingEntrance.type = (EntranceType)EditorGUILayout.EnumPopup("Entrance Type", existingEntrance.type);
 
+                    // 타입에 따른 인스펙터 분기 처리
+                    if (existingEntrance.type == EntranceType.RandomMaze)
+                    {
+                        GUILayout.Space(5);
+                        GUILayout.Label("Random Maze Parameters", EditorStyles.miniBoldLabel);
+                        
+                        EditorGUILayout.BeginHorizontal();
+                        existingEntrance.randomMapWidth = EditorGUILayout.IntField("Width", existingEntrance.randomMapWidth);
+                        existingEntrance.randomMapHeight = EditorGUILayout.IntField("Height", existingEntrance.randomMapHeight);
+                        EditorGUILayout.EndHorizontal();
+                        
+                        // Max Count와 Repeat Count를 함께 표시
+                        EditorGUILayout.BeginHorizontal();
+                        existingEntrance.randomMapMaxCount = EditorGUILayout.IntField("Total Floors", existingEntrance.randomMapMaxCount);
+                        existingEntrance.randomMapRepeatCount = EditorGUILayout.IntField("Remaining", existingEntrance.randomMapRepeatCount);
+                        EditorGUILayout.EndHorizontal();
+                        
+                        existingEntrance.randomMapThemeID = EditorGUILayout.TextField("ThemeID (Opt.)", existingEntrance.randomMapThemeID);
+                        existingEntrance.finalDestinationID = EditorGUILayout.TextField("Final Dest ID", existingEntrance.finalDestinationID);
+                    }
+                    else if (existingEntrance.type == EntranceType.Map || existingEntrance.type == EntranceType.FieldMap)
+                    {
+                        // 기존 Map 이동 설정 UI
+                        existingEntrance.isWallEntrance = EditorGUILayout.Toggle("Is Wall Entrance", existingEntrance.isWallEntrance);
+                        existingEntrance.stairType = (StairType)EditorGUILayout.EnumPopup("Stair Transition", existingEntrance.stairType);
+                        
+                        GUILayout.Space(5);
+                        GUILayout.Label("Target Destination", EditorStyles.miniBoldLabel);
+                        
+                        existingEntrance.isWorldMap = EditorGUILayout.Toggle("Is World Map", existingEntrance.isWorldMap);
+                        existingEntrance.destinationID = EditorGUILayout.TextField("Destination ID", existingEntrance.destinationID);
+                        
+                        EditorGUILayout.BeginHorizontal();
+                        existingEntrance.targetX = EditorGUILayout.IntField("X", existingEntrance.targetX);
+                        existingEntrance.targetY = EditorGUILayout.IntField("Y", existingEntrance.targetY);
+                        EditorGUILayout.EndHorizontal();
+
+                        existingEntrance.targetDirection = (Direction)EditorGUILayout.EnumPopup("Face Dir", existingEntrance.targetDirection);
+                    }
+
                     existingEntrance.isWallEntrance = EditorGUILayout.Toggle("Is Wall Entrance", existingEntrance.isWallEntrance);
                     
                     // 계단 연출 타입 입력란
@@ -1154,7 +1194,7 @@ public class DungeonMapEditor : EditorWindow
 
         mapData.mapID = inputMapID;
         mapData.locationID = inputLocationID;
-        mapData.themeName = (inputTheme != null) ? inputTheme.name : "";
+        mapData.themeID = (inputTheme != null) ? inputTheme.themeID : "";
         mapData.hasCeil = inputHasCeil;
         
         mapData.startX = inputStartX;

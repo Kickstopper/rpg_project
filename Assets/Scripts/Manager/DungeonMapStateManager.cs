@@ -62,6 +62,45 @@ namespace Manager
             }
         }
 
+        /// <summary>
+        /// 특정 맵 ID의 상태가 존재하는지 빠르게 확인
+        /// </summary>
+        public bool HasState(string mapID)
+        {
+            return _mapStates.ContainsKey(mapID);
+        }
+
+        /// <summary>
+        /// 새로운 맵 상태를 즉시 생성하여 딕셔너리에 등록
+        /// (랜덤 맵 생성 시 호출)
+        /// </summary>
+        public void CreateNewState(string mapID, int width, int height)
+        {
+            DungeonMapState newState = new DungeonMapState(width, height, mapID);
+            RegisterDungeonMapState(newState);
+        }
+
+        /// <summary>
+        /// 특정 접두사(Prefix)로 시작하는 맵 ID의 데이터를 모두 삭제
+        /// (랜덤 미로 초기화 시 메모리/세이브 용량 확보용)
+        /// </summary>
+        public void ClearStatesByPrefix(string prefix)
+        {
+            if (string.IsNullOrEmpty(prefix)) return;
+
+            // Dictionary에서 해당 접두사로 시작하는 Key들을 찾아 일괄 삭제
+            var keysToRemove = _mapStates.Keys.Where(k => k.StartsWith(prefix)).ToList();
+            foreach (var key in keysToRemove)
+            {
+                _mapStates.Remove(key);
+            }
+
+            if (keysToRemove.Count > 0)
+            {
+                Debug.Log($"[DungeonMapStateManager] '{prefix}'로 시작하는 {keysToRemove.Count}개의 임시 맵 데이터가 삭제되었습니다.");
+            }
+        }
+
         
         // 저장 및 불러오기 지원 (Save/Load Support)
         

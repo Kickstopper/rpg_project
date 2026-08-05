@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Data
 {
     public enum Direction { North, East, South, West }
-    public enum EntranceType { Map, Shop, Elevator, Terminal, Office, FieldMap } // 다른 맵으로의 이동과 상점으로의 이동
+    public enum EntranceType { Map, Shop, Elevator, Terminal, Office, FieldMap, RandomMaze } // 던전맵, 상점, 엘리베이터, 터미널, 오피스, 필드맵, 랜덤생성던전맵
     public enum ElevatorDoorType { Split, SlideLeft, SlideUp }
 
     // 지역 이동 목적지 데이터 구조
@@ -84,7 +84,7 @@ namespace Data
         public int width;
         public int height;
         public string mapID;
-        public string themeName; // JSON에서 불러올 테마 이름
+        public string themeID; // JSON에서 불러올 테마의 ID
         public string locationID; // 여러 맵이 공유하는 상위 지역의 ID. 퀘스트 등에서 참조
         public bool hasCeil = true;
         public int startX; // 플레이어의 시작 좌표
@@ -178,9 +178,17 @@ namespace Data
         public bool isWorldMap;
         public string destinationID; // 도착 장소 ID (맵이면 맵 ID, 상점이면 상점 ID, 월드맵이면 regionId)
         
-        public int targetX;          // 이동 후 스폰될 X
-        public int targetY;          // 이동 후 스폰될 Y
-        
+        public int targetX = -1;          // 이동 후 스폰될 X
+        public int targetY = -1;          // 이동 후 스폰될 Y
         public Direction targetDirection; // 이동 후 바라볼 방향 (DungeonMapScene만 사용)
+
+        // Random Maze(절차적 랜덤 맵) 전용 파라미터
+        [Header("Random Maze Settings")]
+        public string randomMapThemeID = "";
+        public int randomMapWidth = 11;
+        public int randomMapHeight = 11;
+        public int randomMapMaxCount = 5;    // 고정된 전체 층수 (찌꺼기 데이터 검사 및 UI 참조용)
+        public int randomMapRepeatCount = 5; // 차감되는 남은 층수 (0이 되면 최종 목적지로)
+        public string finalDestinationID = ""; // 돌파 후 귀환할 맵 ID
     }
 }

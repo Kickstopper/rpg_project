@@ -2,7 +2,7 @@
     "width": 5,
     "height": 4,
     "mapID": "Cave_4",
-    "themeName": "Cave_1",
+    "themeID": "Cave_1",
     "locationID": "CAVE",
     "startX": 1,
     "startY": 0,

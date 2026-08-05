@@ -2,7 +2,7 @@
     "width": 7,
     "height": 15,
     "mapID": "Underground_0",
-    "themeName": "Underground_0",
+    "themeID": "Underground_0",
     "locationID": "UNDERGROUND",
     "hasCeil": true,
     "startX": 6,

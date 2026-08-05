@@ -2,7 +2,7 @@
     "width": 11,
     "height": 3,
     "mapID": "VampireCastle_3",
-    "themeName": "DefaultTheme",
+    "themeID": "DefaultTheme",
     "locationID": "vampire_castle",
     "hasCeil": true,
     "startX": 5,

@@ -55,9 +55,38 @@ namespace Manager
             dungeonThemes = new Dictionary<string, DungeonTheme>();
             foreach (var theme in allDungeonThemes)
             {
-                if (!dungeonThemes.ContainsKey(theme.dungeonID))
-                    dungeonThemes.Add(theme.dungeonID, theme);
+                if (!dungeonThemes.ContainsKey(theme.themeID))
+                    dungeonThemes.Add(theme.themeID, theme);
             }
+        }
+
+        // JSON 파일을 읽지 않고, 코드에서 생성된 MapData를 메모리에 직접 로드
+        public void LoadDynamicDungeon(MapData dynamicMapData)
+        {
+            if (dynamicMapData == null)
+            {
+                Debug.LogError("[DungeonManager] 전달된 다이내믹 맵 데이터가 Null입니다.");
+                return;
+            }
+
+            // 현재 던전 데이터를 동적 생성된 데이터로 덮어쓰기
+            CurrentDungeonData = dynamicMapData;
+
+            // 던전 진행 상태 동기화
+            if (ManagerRoot.DungeonMapState != null)
+            {
+                // 이미 생성된 MapState가 있는지 확인
+                if (!ManagerRoot.DungeonMapState.HasState(dynamicMapData.mapID))
+                {
+                    // 없다면 랜덤 맵의 ID와 크기에 맞추어 새로운 MapState를 등록
+                    ManagerRoot.DungeonMapState.CreateNewState(dynamicMapData.mapID, dynamicMapData.width, dynamicMapData.height);
+                }
+                
+                // 현재 상태를 방금 생성한 랜덤 MapState로 연결
+                CurrentDungeonState = ManagerRoot.DungeonMapState.GetMapState(dynamicMapData.mapID);
+            }
+
+            Debug.Log($"[DungeonManager] 다이내믹 맵 로드 완료: {dynamicMapData.mapID} ({dynamicMapData.width}x{dynamicMapData.height})");
         }
 
         public void LoadDungeonFromJson(string fileName)
@@ -107,23 +136,23 @@ namespace Manager
                 ManagerRoot.DungeonMapState.RegisterDungeonMapState(CurrentDungeonState);
             }
             
-            Debug.Log($"레벨 로드 완료: ID {data.mapID}, Theme {data.themeName}");
+            Debug.Log($"레벨 로드 완료: ID {data.mapID}, Theme {data.themeID}");
         }
 
         public DungeonTheme GetCurrentDungeonTheme()
         {
-            if (CurrentDungeonData == null || string.IsNullOrEmpty(CurrentDungeonData.themeName)) return null;
-            return GetDungeonTheme(CurrentDungeonData.themeName);
+            if (CurrentDungeonData == null || string.IsNullOrEmpty(CurrentDungeonData.themeID)) return null;
+            return GetDungeonTheme(CurrentDungeonData.themeID);
         }
 
         // 던전 테마 가져오기
-        public DungeonTheme GetDungeonTheme(string dungeonID)
+        public DungeonTheme GetDungeonTheme(string themeID)
         {
-            if (dungeonThemes.TryGetValue(dungeonID, out DungeonTheme theme))
+            if (dungeonThemes.TryGetValue(themeID, out DungeonTheme theme))
             {
                 return theme;
             }
-            Debug.LogWarning($"테마를 찾을 수 없습니다: {dungeonID}, 기본 테마를 반환합니다.");
+            Debug.LogWarning($"테마를 찾을 수 없습니다: {themeID}, 기본 테마를 반환합니다.");
             return allDungeonThemes.Count > 0 ? allDungeonThemes[0] : null;
         }
 

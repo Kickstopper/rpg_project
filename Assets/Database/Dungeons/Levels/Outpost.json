@@ -2,7 +2,7 @@
     "width": 11,
     "height": 11,
     "mapID": "Outpost",
-    "themeName": "Outpost",
+    "themeID": "Outpost",
     "locationID": "OUTPOST",
     "hasCeil": true,
     "startX": 5,

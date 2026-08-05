@@ -32,7 +32,7 @@ namespace Data
     [CreateAssetMenu(fileName = "NewTheme", menuName = "Dungeon/DungeonTheme")]
     public class DungeonTheme : ScriptableObject
     {
-        public string dungeonID;
+        public string themeID;
         [Header("MUSIC")]
         public BgmID bgmID;                  // 이 레벨에서 재생될 BGM
         

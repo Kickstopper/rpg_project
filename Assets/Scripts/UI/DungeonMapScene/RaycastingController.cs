@@ -1328,6 +1328,43 @@ namespace UI.DungeonMapScene
                     CheckFrontForEntranceName();
                 } 
             }
+            else if (entrance.type == EntranceType.RandomMaze)
+            {
+                // 기존의 RandomZone 관련 미니맵 데이터를 모두 지움
+                if (ManagerRoot.DungeonMapState != null && entrance.randomMapRepeatCount == entrance.randomMapMaxCount)
+                {
+                    ManagerRoot.DungeonMapState.ClearStatesByPrefix("RandomZone_");
+                }
+
+                // 현재 몇 번째 층인지 계산용
+                string tempFloorID = $"RandomZone_F{entrance.randomMapRepeatCount}";
+                
+                string appliedThemeID = string.IsNullOrEmpty(entrance.randomMapThemeID) 
+                                          ? _currentMap.themeID 
+                                          : entrance.randomMapThemeID;
+
+                // 기존 제너레이터 호출하여 맵 데이터 실시간 생성
+                MapData randomMap = Generator.DungeonGenerator.GenerateWizardryMaze(
+                    entrance.randomMapWidth, 
+                    entrance.randomMapHeight, 
+                    tempFloorID, 
+                    _currentMap.themeID, 
+                    0, 
+                    0.05f
+                );
+
+                // 출구(계단/포탈) 데이터 주입 메서드 호출
+                InjectExitToRandomMap(randomMap, entrance);
+
+                // ManagerRoot.Dungeon에 동적 로드. JSON 파일 로드 아님
+                if (ManagerRoot.Dungeon != null)
+                {
+                    ManagerRoot.Dungeon.LoadDynamicDungeon(randomMap);
+                    LoadMapData(); // RaycastingController에 갱신
+                }
+
+                yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
+            }
             else if (entrance.type == EntranceType.Shop)
             {
                 if (ManagerRoot.GameState != null) ManagerRoot.GameState.ShowShop(entrance.destinationID);
@@ -1695,7 +1732,7 @@ namespace UI.DungeonMapScene
         private void LoadMapData(EntranceData entryEntrance = null)
         {
             _currentMap = ManagerRoot.Dungeon.CurrentDungeonData;
-            theme = ManagerRoot.Dungeon.GetDungeonTheme(_currentMap.themeName);
+            theme = ManagerRoot.Dungeon.GetDungeonTheme(_currentMap.themeID);
             
             ManagerRoot.Sound.PlayBGM(theme.bgmID);
             UpdateRenderSettings(theme);
@@ -1731,9 +1768,12 @@ namespace UI.DungeonMapScene
 
             if (entryEntrance != null)
             {
-                finalStartDir = entryEntrance.targetDirection;
-                finalStartX = entryEntrance.targetX;
-                finalStartY = entryEntrance.targetY;
+                if (entryEntrance.targetX != -1 && entryEntrance.targetY != -1)
+                {
+                    finalStartX = entryEntrance.targetX;
+                    finalStartY = entryEntrance.targetY;
+                    finalStartDir = entryEntrance.targetDirection;
+                }
             }
 
             if (ManagerRoot.DungeonEvent) ManagerRoot.DungeonEvent.SetCurrentMapID(_currentMap.mapID);
@@ -2488,7 +2528,7 @@ namespace UI.DungeonMapScene
                 return;
             }
             
-            ManagerRoot.Sound.PlayBGM(ManagerRoot.Dungeon.GetDungeonTheme(_currentMap.themeName).bgmID);
+            ManagerRoot.Sound.PlayBGM(ManagerRoot.Dungeon.GetDungeonTheme(_currentMap.themeID).bgmID);
             RefreshAppVisible();
             CheckFrontForEntranceName();
         }
@@ -2552,6 +2592,75 @@ namespace UI.DungeonMapScene
 
             if (candidates.Count > 0) return candidates[UnityEngine.Random.Range(0, candidates.Count)];
             return group[0];
+        }
+
+        // 랜덤 생성된 맵에서 플레이어 시작 위치와 먼 곳을 찾아 다음 층을 위한 출구를 심어주는 로직
+        private void InjectExitToRandomMap(MapData generatedMap, EntranceData currentEntrance)
+        {
+            if (generatedMap.entrances == null) 
+                generatedMap.entrances = new List<EntranceData>();
+
+            int exitX = 1;
+            int exitY = 1;
+            float maxDist = 0f;
+
+            // 시작점(startX, startY)에서 가장 멀리 있는 빈 공간(value == 0)을 찾습니다.
+            for (int x = 1; x < generatedMap.width - 1; x++)
+            {
+                for (int y = 1; y < generatedMap.height - 1; y++)
+                {
+                    CellData cell = generatedMap.GetCell(x, y);
+                    if (cell != null && cell.value == 0)
+                    {
+                        float dist = Vector2.Distance(new Vector2(generatedMap.startX, generatedMap.startY), new Vector2(x, y));
+                        if (dist > maxDist)
+                        {
+                            maxDist = dist;
+                            exitX = x;
+                            exitY = y;
+                        }
+                    }
+                }
+            }
+
+            // 남은 횟수에 따라 다음 층도 랜덤 맵일지, 최종 목적지일지 결정
+            EntranceData nextExit = new EntranceData();
+            nextExit.sourceX = exitX;
+            nextExit.sourceY = exitY;
+            nextExit.isWallEntrance = true;
+            nextExit.stairType = StairType.Downstairs; // 계단 내려가는 연출 사용
+
+            if (currentEntrance.randomMapRepeatCount > 1)
+            {
+                // 아직 층이 남았다면 다시 랜덤 미로로
+                nextExit.type = EntranceType.RandomMaze;
+                nextExit.randomMapWidth = currentEntrance.randomMapWidth;
+                nextExit.randomMapHeight = currentEntrance.randomMapHeight;
+                
+                // MaxCount는 원본 그대로 인계하고, RepeatCount만 1 차감합니다.
+                nextExit.randomMapMaxCount = currentEntrance.randomMapMaxCount; 
+                nextExit.randomMapRepeatCount = currentEntrance.randomMapRepeatCount - 1; 
+                nextExit.randomMapThemeID = currentEntrance.randomMapThemeID;
+                nextExit.finalDestinationID = currentEntrance.finalDestinationID;
+                nextExit.targetX = -1;
+                nextExit.targetY = -1;
+            }
+            else
+            {
+                // 마지막 층이라면 설정된 최종 목적지(일반 맵)으로 귀환
+                nextExit.type = EntranceType.Map;
+                nextExit.destinationID = currentEntrance.finalDestinationID;
+                
+                // 귀환할 맵의 기본 시작 좌표와 방향을 따르도록 -1 할당
+                nextExit.targetX = -1; 
+                nextExit.targetY = -1;
+            }
+
+            generatedMap.entrances.Add(nextExit);
+            
+            // 시각적으로 바닥에 구멍 텍스처를 뚫어주거나, 특정 벽을 DOOR 텍스처로 설정 (일단 구멍)
+            CellData exitCell = generatedMap.GetCell(exitX, exitY);
+            if (exitCell != null) exitCell.value = -1; // 바닥에 구멍 표시
         }
     }
 }
