@@ -80,19 +80,12 @@ namespace UI
             public Color cityTint; 
         }
 
-        [Header("Time Palettes (Cyberpunk Edition)")]
-        public TimePalette morningPalette = new TimePalette { 
-            skyTop = new Color(0.2f, 0.8f, 0.9f), skyBottom = new Color(1.0f, 0.4f, 0.5f), 
-            roadTint = new Color(1.0f, 0.7f, 0.8f), cityTint = new Color(0.8f, 0.5f, 0.7f) };
-        public TimePalette dayPalette = new TimePalette { 
-            skyTop = new Color(0.1f, 0.1f, 0.7f), skyBottom = new Color(0.0f, 0.9f, 0.8f), 
-            roadTint = new Color(0.8f, 0.9f, 1.0f), cityTint = new Color(0.3f, 0.7f, 0.9f) };
-        public TimePalette eveningPalette = new TimePalette { 
-            skyTop = new Color(0.2f, 0.0f, 0.4f), skyBottom = new Color(1.0f, 0.0f, 0.6f), 
-            roadTint = new Color(1.0f, 0.3f, 0.7f), cityTint = new Color(0.6f, 0.1f, 0.5f) };
-        public TimePalette nightPalette = new TimePalette { 
-            skyTop = new Color(0.02f, 0.0f, 0.08f), skyBottom = new Color(0.0f, 0.8f, 0.8f), 
-            roadTint = new Color(0.2f, 0.6f, 0.7f), cityTint = new Color(0.1f, 0.2f, 0.4f) }; 
+        [Header("Time Palettes (Vivid Cyberpunk Edition)")]
+        [Tooltip("인스펙터에서의 컬러 참고용")]
+        public TimePalette morningPalette;
+        public TimePalette dayPalette;
+        public TimePalette eveningPalette;
+        public TimePalette nightPalette;
 
         private FieldMapState _currentState;
         private List<FieldMapSlotUI> _slots = new List<FieldMapSlotUI>();
@@ -110,9 +103,39 @@ namespace UI
 
         public static FieldMapUIManager Instance { get; private set; }
         
-        void Awake()
+        private void Awake()
         {
             if (Instance == null) Instance = this;
+            ApplyHardcodedPalettes(); // 런타임에서도 혹시 모를 수정을 방지
+        }
+
+        private void OnValidate()
+        {
+            ApplyHardcodedPalettes();
+        }
+        
+        // 하드코딩된 색상 데이터를 덮어씌우는 함수
+        private void ApplyHardcodedPalettes()
+        {
+            morningPalette = new TimePalette { 
+                skyTop = new Color(0.3f, 0.0f, 0.8f), skyBottom = new Color(1.0f, 0.3f, 0.0f), 
+                roadTint = new Color(1.0f, 0.2f, 0.4f), cityTint = new Color(0.4f, 0.0f, 0.2f) 
+            };
+            
+            dayPalette = new TimePalette { 
+                skyTop = new Color(0.0f, 0.2f, 1.0f), skyBottom = new Color(0.0f, 1.0f, 1.0f), 
+                roadTint = new Color(0.0f, 0.6f, 1.0f), cityTint = new Color(0.0f, 0.2f, 0.6f) 
+            };
+            
+            eveningPalette = new TimePalette { 
+                skyTop = new Color(0.2f, 0.0f, 0.5f), skyBottom = new Color(1.0f, 0.0f, 0.8f), 
+                roadTint = new Color(1.0f, 0.0f, 1.0f), cityTint = new Color(0.3f, 0.0f, 0.5f) 
+            };
+            
+            nightPalette = new TimePalette { 
+                skyTop = new Color(0.02f, 0.0f, 0.05f), skyBottom = new Color(0.0f, 1.0f, 0.5f), 
+                roadTint = new Color(0.4f, 0.0f, 1.0f), cityTint = new Color(0.0f, 0.1f, 0.2f) 
+            };
         }
 
         private void Start()

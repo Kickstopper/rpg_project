@@ -17,7 +17,10 @@ Shader "UI/Pseudo3DRoad"
         _SkyTopColor ("Sky Top Color", Color) = (0.1, 0.2, 0.5, 1)
         _SkyBottomColor ("Sky Bottom Color", Color) = (0.8, 0.4, 0.2, 1)
 
-        // 하늘을 투명하게 뚫는 토글
+        // 레트로 하늘 효과 설정
+        _SkyBands ("Sky Color Bands (Stripes)", Range(2, 64)) = 8
+        _DitherStrength ("Dither Strength", Range(0.0, 2.0)) = 1.0
+
         [Toggle] _TransparentSky ("Transparent Sky", Float) = 0
 
         _StencilComp ("Stencil Comparison", Float) = 8
@@ -47,8 +50,8 @@ Shader "UI/Pseudo3DRoad"
 
             sampler2D _MainTex;
             fixed4 _Color, _SkyTopColor, _SkyBottomColor;
-            
             float _CurveAmount, _HillAmount, _ScrollOffset, _RoadWidthScale, _TilingY, _HorizonY, _SkyGradientOffset, _TransparentSky;
+            float _SkyBands, _DitherStrength;
 
             v2f vert(appdata_t v)
             {
@@ -65,11 +68,26 @@ Shader "UI/Pseudo3DRoad"
                 float hillOffset = (y * y) * _HillAmount;
                 float adjustedY = y - hillOffset;
 
+                // 부드러운 진행도(0.0 ~ 1.0) 계산
                 float gradientStart = _HorizonY + _SkyGradientOffset;
                 float skyProgress = clamp((adjustedY - gradientStart) / max(1.0 - gradientStart, 0.0001), 0.0, 1.0);
-                fixed4 bgColor = lerp(_SkyBottomColor, _SkyTopColor, skyProgress);
+                
+                // 화면 픽셀 좌표를 이용한 클래식 2x2 Bayer 디더링 패턴 생성
+                // 모니터의 실제 픽셀 단위로 체크무늬 패턴을 만듦
+                float xFmod = fmod(IN.vertex.x, 2.0);
+                float yFmod = fmod(IN.vertex.y, 2.0);
+                float dither = (xFmod * 0.5 + yFmod * 0.25) - 0.375;
+                
+                // 진행도에 디더링 노이즈 섞기
+                float ditheredProgress = skyProgress + (dither * _DitherStrength * (2.0 / _SkyBands));
 
-                // 지평선 위(하늘) 영역일 때, 토글이 켜져 있으면 알파(투명도)를 0으로 반환
+                // 연속적인 값을 지정한 스트라이프 층(예: 8단계)으로 강제로 쪼개어 계단 현상을 만듦
+                float bandedProgress = floor(ditheredProgress * _SkyBands) / max(1.0, _SkyBands - 1.0);
+                bandedProgress = saturate(bandedProgress);
+
+                // 계단 현상이 적용된 값으로 최종 색상 섞기
+                fixed4 bgColor = lerp(_SkyBottomColor, _SkyTopColor, bandedProgress);
+
                 if (adjustedY >= _HorizonY) 
                 {
                     return fixed4(bgColor.rgb, _TransparentSky > 0.5 ? 0.0 : 1.0);
