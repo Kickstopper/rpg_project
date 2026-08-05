@@ -173,8 +173,8 @@ public class DungeonMapEditor : EditorWindow
             {
                 string themeID = (inputTheme != null) ? inputTheme.themeID : "";
                 
-                // Generator 폴더(네임스페이스)의 스크립트 호출하여 맵 데이터 생성
-                mapData = Generator.DungeonGenerator.GenerateWizardryMaze(
+                // DungeonGenerator의 스크립트 호출하여 맵 데이터 생성
+                mapData = Generator.DungeonGenerator.GenerateRandomMaze(
                     inputWidth, inputHeight, inputMapID, themeID, 0, 0.05f); // 0.05f는 루프 생성 확률
                 
                 // 생성된 데이터를 에디터 입력 필드 UI와 동기화

@@ -7,7 +7,7 @@ namespace Generator
     public static class DungeonGenerator
     {
         /// <summary>
-        /// 위저드리 스타일의 미로형 던전을 절차적으로 생성함
+        /// 랜덤한 미로형 던전을 절차적으로 생성함
         /// </summary>
         /// <param name="width">맵 가로 크기 (홀수 권장, 예: 21)</param>
         /// <param name="height">맵 세로 크기 (홀수 권장, 예: 21)</param>
@@ -15,7 +15,7 @@ namespace Generator
         /// <param name="themeID">적용할 던전 테마 ID</param>
         /// <param name="wallTexId">벽으로 칠할 기본 텍스처 ID (일반적으로 0)</param>
         /// <param name="loopChance">막힌 벽을 뚫어 루프를 만들 확률 (0.0 ~ 1.0)</param>
-        public static MapData GenerateWizardryMaze(int width, int height, string mapID, string themeID, int wallTexId = 0, float loopChance = 0.05f)
+        public static MapData GenerateRandomMaze(int width, int height, string mapID, string themeID, int wallTexId = 0, float loopChance = 0.05f)
         {
             // 미로 생성 알고리즘 특성상 가로세로 크기는 무조건 홀수여야 함
             if (width % 2 == 0) width++;
@@ -75,7 +75,7 @@ namespace Generator
                 }
             }
 
-            // 루프 생성: 정통 미로는 갈림길이 만나지 않으므로, 일부 벽을 무작위로 뚫어 위저드리 느낌을 줌
+            // 루프 생성: 정통 미로는 갈림길이 만나지 않으므로, 일부 벽을 무작위로 뚫어 고전적 DRPG 느낌을 줌
             for (int x = 1; x < width - 1; x++)
             {
                 for (int y = 1; y < height - 1; y++)

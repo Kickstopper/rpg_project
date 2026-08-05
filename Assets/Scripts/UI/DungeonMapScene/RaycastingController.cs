@@ -1343,7 +1343,7 @@ namespace UI.DungeonMapScene
                                           : entrance.randomMapThemeID;
 
                 // 기존 제너레이터 호출하여 맵 데이터 실시간 생성
-                MapData randomMap = Generator.DungeonGenerator.GenerateWizardryMaze(
+                MapData randomMap = Generator.DungeonGenerator.GenerateRandomMaze(
                     entrance.randomMapWidth, 
                     entrance.randomMapHeight, 
                     tempFloorID, 
