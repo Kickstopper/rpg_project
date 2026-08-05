@@ -39,6 +39,9 @@ public class StarWarpController : MonoBehaviour
 
     void Start()
     {
+        if (starMaterial != null)
+            starMaterial = Instantiate(starMaterial); // 머티리얼 복제
+
         //starDensity = Shader.PropertyToID("_Density");
         starMaterial.SetFloat("_Density", starDensity);
 
@@ -48,6 +51,12 @@ public class StarWarpController : MonoBehaviour
         masterAlphaId = Shader.PropertyToID("_MasterAlpha");
 
         SetTitleIdleMode();
+    }
+
+    void OnDestroy()
+    {
+        if (starMaterial != null)
+            Destroy(starMaterial); // 복제했던 머티리얼 메모리 해제
     }
 
     void Update()
