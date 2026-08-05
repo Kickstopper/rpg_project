@@ -130,7 +130,7 @@ namespace UI.IntroScene
                     }
 
                     cutsceneText.maxVisibleCharacters = i;
-                    yield return new WaitForSeconds(data.lineDelay); 
+                    yield return YieldCache.WaitForSeconds(data.lineDelay); 
                 }
 
                 // 2단계 스킵 감지. 대기 시간 중

@@ -60,9 +60,6 @@ namespace UI
         private List<TerminalGridButton> _buttons = new List<TerminalGridButton>();
         private Vector2[] _cachedButtonPositions = new Vector2[TOTAL_BUTTONS];
 
-        private WaitForSeconds wait05 = new WaitForSeconds(0.5f);
-        private WaitForSeconds wait10 = new WaitForSeconds(1f);
-        
         private int _currentIndex = 0;
         private bool _isAnimating = false;
 
@@ -204,7 +201,7 @@ namespace UI
                   .SetEase(Ease.OutExpo);
             }
 
-            yield return wait10;
+            yield return YieldCache.WaitForSeconds(1f);
 
             _isAnimating = false;
             ChangeSelection(0);
@@ -380,7 +377,7 @@ namespace UI
             ManagerRoot.Sound.PlaySFX(Data.SfxID.Computer, 0.5f);
             digitalRain.DOFade(1f, 0.5f).SetDelay(0.2f);
             
-            yield return wait10;
+            yield return YieldCache.WaitForSeconds(1f);
 
             if (characterImage != null && characterAscii != null && objectPool != null)
             {
@@ -391,7 +388,7 @@ namespace UI
                 yield return StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 0.5f, Color.white));
 
                 DrawAscii(characterAscii, 0f);
-                yield return wait05;
+                yield return YieldCache.WaitForSeconds(0.5f);
 
                 digitalRain.DOFade(0f, 0.5f);
                 ManagerRoot.Sound.StopAllSFX(true);
@@ -400,12 +397,12 @@ namespace UI
                 StartCoroutine(FadeSpriteAlpha(characterImage, 1f, 0f, 1.0f, digitalTint));
                 yield return StartCoroutine(RevealAsciiRandomly(1.0f));
                 
-                yield return wait05;
+                yield return YieldCache.WaitForSeconds(0.5f);
                 
                 ManagerRoot.Sound.PlaySFX(Data.SfxID.Warp_End);
                 yield return StartCoroutine(ExplodeAndReturnAsciiRoutine(0.6f, 0.25f, 0.5f, 15f, 30f));
                 
-                yield return new WaitForSeconds(0.2f);
+                yield return YieldCache.WaitForSeconds(0.2f);
 
                 warp.gameObject.SetActive(false);
                 ManagerRoot.Sound.PlaySFX(Data.SfxID.Computer, 0.25f);
@@ -417,7 +414,7 @@ namespace UI
                 objectPool.ReturnAllObjects(_activeAsciiNodes);
                 _activeAsciiNodes.Clear();
                 
-                yield return wait05;
+                yield return YieldCache.WaitForSeconds(0.5f);
 
                 fadeOverlay.DOFade(0f, 0.5f).OnStart(()=>{fadeOverlay.color = new Color(0f, 0f, 0f, 1f);});
                 digitalRain.DOFade(0f, 0.5f);
@@ -430,10 +427,10 @@ namespace UI
             {
                 fadeOverlay.DOFade(0f, 0.5f).OnStart(()=>{fadeOverlay.color = new Color(0f, 0f, 0f, 1f);});
                 digitalRain.DOFade(0f, 0.5f);
-                yield return wait10;
+                yield return YieldCache.WaitForSeconds(1f);
             }
     
-            yield return wait10;
+            yield return YieldCache.WaitForSeconds(1f);
             ManagerRoot.Sound.StopAllSFX();
             SelectedTerminal = selectedData;
             IsCanceled = false;
@@ -589,7 +586,7 @@ namespace UI
                 yield return null;
             }
 
-            yield return new WaitForSeconds(waitTime);
+            yield return YieldCache.WaitForSeconds(waitTime);
 
             elapsed = 0f;
             while (elapsed < returnTime)
@@ -637,7 +634,7 @@ namespace UI
             
             fadeOverlay.DOFade(1, 0.5f).OnStart(()=>{fadeOverlay.color = new Color(0f, 0f, 0f, 0f);});            
             
-            yield return wait05;
+            yield return YieldCache.WaitForSeconds(0.5f);
 
             fadeOverlay.color = Color.black;
             fadeOverlay.gameObject.SetActive(true);

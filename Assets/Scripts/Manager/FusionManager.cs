@@ -113,32 +113,32 @@ namespace Manager
         IEnumerator ProcessFusionSequence()
         {
 
-            yield return new WaitForSeconds(2f);
+            yield return YieldCache.WaitForSeconds(2f);
             PlayFusionParticles();
             // 두 몬스터 페이드 아웃
             StartCoroutine(DissolveSprite(leftMonster, 1.5f)); 
             StartCoroutine(DissolveSprite(rightMonster, 1.5f));
 
             // 파티클이 중앙으로 모이는 시간만큼 대기
-            yield return new WaitForSeconds(particleDuration);
+            yield return YieldCache.WaitForSeconds(particleDuration);
             
             // 화면 화이트 아웃 (Flash)
             ManagerRoot.Sound.PlaySFX(Data.SfxID.Explosion);
             yield return StartCoroutine(FadeImage(flashPanel, 0, 1, 0.2f)); // 빠르게 하얗게
             StopFusionParticles();
-            yield return new WaitForSeconds(0.5f);
+            yield return YieldCache.WaitForSeconds(0.5f);
             StartCoroutine(FadeImage(flashPanel, 1, 0, 2f));
             
             resultMonster.gameObject.SetActive(true);
             StartCoroutine(DissolveSprite(resultMonster, 2.0f, true));
-            yield return new WaitForSeconds(0.5f);
+            yield return YieldCache.WaitForSeconds(0.5f);
             //centerParticles.Clear();
             centerParticles.Play();
             messageText.transform.parent.gameObject.SetActive(true);
             
             
 
-            yield return new WaitForSeconds(3f);
+            yield return YieldCache.WaitForSeconds(3f);
 
             // 메시지 출력 (타자기 효과)
             yield return StartCoroutine(TypeWriterEffect(resultMessage));
@@ -253,7 +253,7 @@ namespace Manager
                 }
                 // -------------------------
 
-                yield return new WaitForSeconds(typingSpeed);
+                yield return YieldCache.WaitForSeconds(typingSpeed);
             }
         }
     }

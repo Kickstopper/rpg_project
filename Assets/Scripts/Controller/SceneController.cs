@@ -146,7 +146,7 @@ namespace Controller
                 yield return targetImage.DOFade(1f, fadeDuration).WaitForCompletion();
 
                 // 대기
-                yield return new WaitForSeconds(displayDuration);
+                yield return YieldCache.WaitForSeconds(displayDuration);
 
                 // 첫 번째 이미지가 완전히 켜진 후 UI를 띄움
                 if (!isEnable)

@@ -104,11 +104,6 @@ namespace UI.Battle
             weather = Weather.Clear 
         };
         
-        // 자주 쓰는 딜레이 캐싱
-        private WaitForSeconds wait01 = new WaitForSeconds(0.1f);
-        private WaitForSeconds wait05 = new WaitForSeconds(0.5f);
-        private WaitForSeconds wait10 = new WaitForSeconds(1f);
-
         public struct BattleReward
         {
             public int totalExp;      // 파티가 획득한 총 경험치
@@ -290,7 +285,7 @@ namespace UI.Battle
                 : fieldController.GetMonsterEntry(monsterList.First().Key)?.name.AttachParticle("이/가");
 
             uiController.ShowStateMessage($"{monsterName} {monsterCount}체 출현!");
-            yield return wait10;
+            yield return YieldCache.WaitForSeconds(1f);
             
             uiController.HideStateMessage();
 
@@ -310,7 +305,7 @@ namespace UI.Battle
                 case EncounterType.Preemptive:
                     uiController.ShowStateMessage("PLAYER ADVANTAGE");
                     ManagerRoot.Sound.PlaySFX(SfxID.Attack_Critical); // 임시
-                    yield return new WaitForSeconds(1f);
+                    yield return YieldCache.WaitForSeconds(1f);
                     uiController.HideStateMessage();
                     PreparePlayerTurn();
                     break;
@@ -521,7 +516,7 @@ namespace UI.Battle
             uiController.ShowLog(isPlayerInterrupting ? "PARTY INTERRUPT!!" : "ENEMY INTERRUPT!!");
             
             // 오토 모드 시 가속되게 함
-            yield return isAutoMode ? new WaitForSeconds(0.3f) : wait10;
+            yield return isAutoMode ? YieldCache.WaitForSeconds(0.3f) : YieldCache.WaitForSeconds(1f);
 
             // ActionQueue 완전히 비우기
             actionQueue.Clear();
@@ -1253,7 +1248,7 @@ namespace UI.Battle
 
         IEnumerator HideLogAfterDelay(float delay)
         {
-            yield return new WaitForSeconds(delay);
+            yield return YieldCache.WaitForSeconds(delay);
             uiController.HideLog();
         }
 
@@ -1790,13 +1785,13 @@ namespace UI.Battle
             uiController.SetTargetCursorVisible(false);
             uiController.ShowLog("도망이다!");
 
-            yield return wait10;
+            yield return YieldCache.WaitForSeconds(1f);
 
             if (BattleCalculator.CalculateEscapeSuccess(fieldController.activePlayers, fieldController.activeMonsters, currentEscapeAttempts, guaranteedEscapeAttempts))
             {
                 fieldController.SetEnemyVisualsActive(false);
                 uiController.ShowMessage("휴~ 도망쳤다.");
-                yield return wait10;
+                yield return YieldCache.WaitForSeconds(1f);
 
                 fieldController.ClearMonsterField(); // 전장 몬스터 지우기
                 uiController.ShowBattleEndAnimation(()=>{ ManagerRoot.GameState.ChangeState(GameState.Exploration); });
@@ -1804,7 +1799,7 @@ namespace UI.Battle
             else
             {
                 uiController.ShowMessage("칙쇼!! 잡혀버렸다!");
-                yield return wait10;
+                yield return YieldCache.WaitForSeconds(1f);
                 uiController.HideMessage();
                 actionQueue.Clear(); 
                 ProcessTurn();
@@ -2194,7 +2189,7 @@ namespace UI.Battle
                 }
                 
                 // 연출 동기화: 독 데미지 이펙트와 흔들림이 끝날 때까지 잠깐 대기
-                yield return wait05;
+                yield return YieldCache.WaitForSeconds(0.5f);
 
                 // 도트 데미지로 인해 누군가 사망했을 수 있으므로 게임 종료 재검사
                 if (CheckBattleEnd(out bool winAfterTick)) { StartCoroutine(EndBattleRoutine(winAfterTick)); yield break; }
@@ -2215,7 +2210,7 @@ namespace UI.Battle
                     }
                 }
                 
-                yield return wait05;
+                yield return YieldCache.WaitForSeconds(0.5f);
 
                 if (CheckBattleEnd(out bool win)) StartCoroutine(EndBattleRoutine(win));
                 else PreparePlayerTurn(); 
@@ -2278,10 +2273,10 @@ namespace UI.Battle
                     bool isParty = action.actor.GetComponent<PlayerController>() != null;
                     AddGauge(isParty, 0.1f);
                     // 별도의 애니메이션 없이 대기
-                    yield return wait05; 
+                    yield return YieldCache.WaitForSeconds(0.5f); 
                     break;
             }
-            yield return wait01;
+            yield return YieldCache.WaitForSeconds(0.1f);
             uiController.HideLog();
         }
 
@@ -2294,7 +2289,7 @@ namespace UI.Battle
                 if (!ManagerRoot.Inventory.UseItem(consumable.id))
                 {
                     uiController.ShowLog($"{item.name} 부족! 일반 공격으로 대체");
-                    yield return wait10;
+                    yield return YieldCache.WaitForSeconds(1f);
 
                     // 행동 기억을 일반 공격으로 업데이트. 현재 행동 중인 캐릭터의 인덱스를 찾아 딕셔너리를 갱신
                     PlayerController actorPc = action.actor.GetComponent<PlayerController>();
@@ -2358,7 +2353,7 @@ namespace UI.Battle
                 }
             }
             
-            yield return wait05;
+            yield return YieldCache.WaitForSeconds(0.5f);
         }
 
         IEnumerator HandleSkillAction(BattleAction action)
@@ -2384,7 +2379,7 @@ namespace UI.Battle
                 // 부활 스킬인데 대상이 이미 살아있거나 없다면 취소
                 if (action.target == null || IsAlive(action.target))
                 {
-                    yield return wait05;
+                    yield return YieldCache.WaitForSeconds(0.5f);
                     yield break;
                 }
             }
@@ -2444,7 +2439,7 @@ namespace UI.Battle
                 }
             }
             
-            yield return wait05;
+            yield return YieldCache.WaitForSeconds(0.5f);
             if (!isAutoMode) uiController.HideStateMessage();
         }
 
@@ -2452,7 +2447,7 @@ namespace UI.Battle
         {
             SetGuardState(action.actor, true);
             uiController.ShowLog($"{action.actor.name.AttachParticle("은/는")} 방어히거 있다...");
-            yield return wait05;
+            yield return YieldCache.WaitForSeconds(0.5f);
             uiController.HideLog();
         }
 
@@ -2465,7 +2460,7 @@ namespace UI.Battle
                 {
                     uiController.ShowLog("유효 타겟 없음!");
                     currentUnionParticipants.Clear(); 
-                    yield return wait05;
+                    yield return YieldCache.WaitForSeconds(0.5f);
                     yield break;
                 }
             }
@@ -2557,7 +2552,7 @@ namespace UI.Battle
             
             yield return ApplyDamage(target, dmg, isCrit);
             
-            yield return wait05;
+            yield return YieldCache.WaitForSeconds(0.5f);
 
             // 복귀 (원래 자리로)
             Sequence returnSeq = DOTween.Sequence();
@@ -2610,7 +2605,7 @@ namespace UI.Battle
             }
             yield return seq.WaitForCompletion();
             
-            yield return wait05;
+            yield return YieldCache.WaitForSeconds(0.5f);
             uiController.HideLog();
         }
 
@@ -2620,13 +2615,13 @@ namespace UI.Battle
             var leader = action.actor.GetComponent<PlayerController>();
             int index = leader.columnIndex;
             leader.SetMessage("안되겠다! 롤링 발칸이다!");
-            yield return wait10;
+            yield return YieldCache.WaitForSeconds(1f);
             foreach(PlayerController pc in fieldController.activePlayers)
             {
                 if (pc.columnIndex == index) pc.SetMessage(string.Empty);
                 else pc.SetMessage("알았어! OK!!");
             }
-            yield return wait10;
+            yield return YieldCache.WaitForSeconds(1f);
             
             fieldController.ResetCharacterMessage();
             
@@ -2685,7 +2680,7 @@ namespace UI.Battle
             
             currentUnionParticipants.Clear();
             uiController.HideMessage();
-            yield return wait05;
+            yield return YieldCache.WaitForSeconds(0.5f);
         }
 
         // 무지개 색상 효과 코루틴
@@ -2754,7 +2749,7 @@ namespace UI.Battle
                 
                 ShowCharacterMessage(actor, string.Empty);
             }
-            yield return wait05;
+            yield return YieldCache.WaitForSeconds(0.5f);
         }
 
         IEnumerator HandleAttackAction(BattleAction action)
@@ -2806,7 +2801,7 @@ namespace UI.Battle
                     ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel); 
 
                     // 메시지를 읽을 시간을 주고 턴 종료 (공격 애니메이션 실행 X)
-                    yield return wait10; 
+                    yield return YieldCache.WaitForSeconds(1f); 
                     ShowCharacterMessage(pc, string.Empty);
                     yield break; 
                 }
@@ -2825,7 +2820,7 @@ namespace UI.Battle
                 uiController.ShowStateMessage($"{action.actor.name}{atkStr}");
             }
             
-            yield return wait10;
+            yield return YieldCache.WaitForSeconds(1f);
             
             pc?.SetMessage(string.Empty);
             
@@ -2876,7 +2871,7 @@ namespace UI.Battle
                 }
                 ShowCharacterMessage(pc, string.Empty);
                 uiController.HideQTESlider();
-                if (currentHits > 0) yield return wait01;
+                if (currentHits > 0) yield return YieldCache.WaitForSeconds(0.1f);
             }
             
             int autoHitCount = 0;
@@ -2909,7 +2904,7 @@ namespace UI.Battle
                     yield return StartCoroutine(ProcessSingleHit(action, target));
                 }
                 hitsPerformed++; // 실제 발사 수 증가
-                yield return wait01;
+                yield return YieldCache.WaitForSeconds(0.1f);
                 if (scope == TargetScope.Front_Enemies || scope == TargetScope.All_Enemies) break;
             }
 
@@ -2927,7 +2922,7 @@ namespace UI.Battle
             else
                 yield return action.actor.transform.DOLocalMove(originalPos, 0.15f).SetEase(Ease.OutQuad).WaitForCompletion();
 
-            yield return wait01;
+            yield return YieldCache.WaitForSeconds(0.1f);
         }
 
         IEnumerator ProcessSingleHit(BattleAction action, GameObject target)
@@ -2963,7 +2958,7 @@ namespace UI.Battle
                 if (targetEntity is PlayerController pc)
                 {
                     pc.SetMessage("어림없지!");
-                    yield return wait05;
+                    yield return YieldCache.WaitForSeconds(0.5f);
                     pc.SetMessage(string.Empty);
                 } 
                 yield break; 
@@ -3015,7 +3010,7 @@ namespace UI.Battle
                 if (targetEntity is PlayerController pc)
                 {
                     pc.SetMessage("반사다!");
-                    yield return wait05;
+                    yield return YieldCache.WaitForSeconds(0.5f);
                     pc.SetMessage(string.Empty);
                 } 
                 yield break; // 데미지를 무효화하고 즉시 루프 종료
@@ -3042,7 +3037,7 @@ namespace UI.Battle
                 {
                     // 기존의 pc.Recover 함수 대신 통일된 프로퍼티 조작 사용
                     pc.SetMessage("흡수해주마!");
-                    yield return wait05;
+                    yield return YieldCache.WaitForSeconds(0.5f);
                     pc.SetMessage(string.Empty);
                 } 
                 yield break; // 데미지를 무효화하고 즉시 루프 종료
@@ -3064,7 +3059,7 @@ namespace UI.Battle
                         ApplyDamage(defender.gameObject, splitDamage, false);
                         visualController.SpawnVFX(VfxID.Guard, GetCenterPosition(defender.gameObject));
                     }
-                    yield return wait01;
+                    yield return YieldCache.WaitForSeconds(0.1f);
                     
                     foreach(var defender in defenders) defender.SetMessage(string.Empty);
                     yield break; 
@@ -3095,7 +3090,7 @@ namespace UI.Battle
                     pc.SetMessage("윽!");
                 }
                 visualController.SpawnVFX(VfxID.Guard, GetCenterPosition(target));
-                yield return wait01;
+                yield return YieldCache.WaitForSeconds(0.1f);
                 
                 if (defender) defender.SetMessage(string.Empty);
             }
@@ -3124,7 +3119,7 @@ namespace UI.Battle
 
                 if (sfxId != SfxID.None) ManagerRoot.Sound.PlaySFX(sfxId);
                 visualController.SpawnVFX(vfxID, GetCenterPosition(target));
-                yield return wait01;
+                yield return YieldCache.WaitForSeconds(0.1f);
             }
 
             Coroutine damageRoutine = null;
@@ -3286,7 +3281,7 @@ namespace UI.Battle
             if (targetChar != null) seq.Join(targetChar.transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.OutQuad));
             
             yield return seq.WaitForCompletion();
-            yield return wait05; 
+            yield return YieldCache.WaitForSeconds(0.5f); 
             uiController.HideMessage();
         }
 

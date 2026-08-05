@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-namespace Utilities
+namespace Helper
 {
     public static class DungeonMapHelper
     {
@@ -15,7 +15,7 @@ namespace Utilities
                 throw new ArgumentOutOfRangeException("Start or end point is out of bounds.");
             }
 
-            if (map[start.x, start.y] > (int)Grid.CORRIDOR || map[end.x, end.y] > (int)Grid.CORRIDOR) {
+            if (map[start.x, start.y] > (int)Utilities.Grid.CORRIDOR || map[end.x, end.y] > (int)Utilities.Grid.CORRIDOR) {
                 return new List<(int x, int y)>(); // 이동 불가
             }
 
@@ -75,7 +75,7 @@ namespace Utilities
 
         private static bool IsMovePossible(int x, int y, int row, int col, int[,] map)
         {
-            return IsInBounds((x, y), row, col) && map[x, y] <= (int)Grid.CORRIDOR;
+            return IsInBounds((x, y), row, col) && map[x, y] <= (int)Utilities.Grid.CORRIDOR;
         }
 
         /**
@@ -114,7 +114,7 @@ namespace Utilities
             for (int i = 0; i < map.GetLength(0); i++) {
                 for (int j = 0; j < map.GetLength(1); j++) {
                     int grid = map[i, j];
-                    line += grid == (int)Grid.WALL ? wall : (grid == (int)Grid.CORRIDOR ? corridor : (grid == (int)Grid.EXIT ? end : start));
+                    line += grid == (int)Utilities.Grid.WALL ? wall : (grid == (int)Utilities.Grid.CORRIDOR ? corridor : (grid == (int)Utilities.Grid.EXIT ? end : start));
                 }
                 line += "\n";
             }

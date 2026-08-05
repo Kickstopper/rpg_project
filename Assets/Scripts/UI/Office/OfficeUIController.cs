@@ -97,7 +97,7 @@ namespace UI.Office
                     Debug.Log($"[Office] {q.QuestName} 보상 지급 완료: {q.Reward}G");
                     
                     // 팝업 없이 텍스트로만 처리한다면 약간의 딜레이
-                    yield return new WaitForSeconds(0.5f); 
+                    yield return YieldCache.WaitForSeconds(0.5f); 
                 }
 
                 // 보상 지급이 끝나면 자연스럽게 메인 메뉴 표시
@@ -180,7 +180,7 @@ namespace UI.Office
             {
                 dialogueText.maxVisibleCharacters = i + 1;
                 if (typingSound != null) ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
-                yield return new WaitForSeconds(typingSpeed);
+                yield return YieldCache.WaitForSeconds(typingSpeed);
             }
             CompleteTypingImmediately();
         }
@@ -195,7 +195,7 @@ namespace UI.Office
 
         private IEnumerator WaitAndExecuteCallback()
         {
-            yield return new WaitForSeconds(0.2f);
+            yield return YieldCache.WaitForSeconds(0.2f);
             if (onDialogueComplete != null)
             {
                 System.Action tempAction = onDialogueComplete;

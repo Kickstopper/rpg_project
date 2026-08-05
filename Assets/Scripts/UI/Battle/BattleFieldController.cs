@@ -67,8 +67,6 @@ namespace UI.Battle
             public int columnIndex; // 0:왼쪽, 1:가운데, 2:오른쪽
         }
 
-        private WaitForSeconds wait10 = new WaitForSeconds(1f);
-
         public void InitializeSlots()
         {
             activePlayers.Clear();
@@ -453,7 +451,7 @@ namespace UI.Battle
             SetEnemyVisualsActive(true);
             LayoutRebuilder.ForceRebuildLayoutImmediate(enemyFrontRowContainer as RectTransform);
             LayoutRebuilder.ForceRebuildLayoutImmediate(playerFrontRowContainer as RectTransform);
-            yield return wait10;
+            yield return YieldCache.WaitForSeconds(1f);
         }
 
         public IEnumerator ProcessEnemyRowShift()

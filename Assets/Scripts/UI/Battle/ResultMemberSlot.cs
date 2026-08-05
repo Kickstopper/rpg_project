@@ -41,7 +41,7 @@ namespace UI.Battle
             int currentSimMaxExp = startMaxExp;
             int remainingEarnedExp = earnedExp;
 
-            yield return new WaitForSeconds(0.5f);
+            yield return YieldCache.WaitForSeconds(0.5f);
 
             while (remainingEarnedExp > 0)
             {
@@ -68,7 +68,7 @@ namespace UI.Battle
                     
                     currentSimMaxExp = BattleCalculator.GetMaxExpForLevel(currentSimLevel, pc.sourceData.race, pc.sourceData.gender); 
                     
-                    yield return new WaitForSeconds(0.2f);
+                    yield return YieldCache.WaitForSeconds(0.2f);
                 }
             }
 

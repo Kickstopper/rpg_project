@@ -38,17 +38,17 @@ namespace UI
         {
             // 생성 후 자동으로 루프 상태
             vfx.SendEvent("create");
-            yield return new WaitForSeconds(timeToHit);
+            yield return YieldCache.WaitForSeconds(timeToHit);
 
             // 피격
             vfx.SendEvent("hit");
-            yield return new WaitForSeconds(timeToEnd);
+            yield return YieldCache.WaitForSeconds(timeToEnd);
 
             // 파티클이 사라지는 연출
             vfx.SendEvent("end");
             
             // 파티클이 화면에서 완전히 사라질 때까지 대기
-            yield return new WaitForSeconds(timeToDestroy);
+            yield return YieldCache.WaitForSeconds(timeToDestroy);
 
             vfx.SendEvent("stop");
             Destroy(gameObject);

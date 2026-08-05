@@ -484,7 +484,7 @@ namespace UI.Battle
             if (portraitImage && portraitImage.sprite)
             {
                 portraitImage.color = new Color(1f, 0f, 0f, 0.1f);
-                yield return new WaitForSeconds(0.1f);
+                yield return YieldCache.WaitForSeconds(0.1f);
                 // 사망 시 초상화를 어둡게, 살아있으면 원래 색으로
                 portraitImage.color = currentHp <= 0 ? new Color(0.5f, 0.5f, 0.5f, 0.1f) : new Color(1f, 1f, 1f, 0.1f);
             }

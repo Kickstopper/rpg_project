@@ -35,7 +35,7 @@ namespace UI.DungeonMapScene
             stairGraphic.gameObject.SetActive(true);
             yield return fadeOverlay.DOFade(0f, 0.3f).WaitForCompletion();
             
-            yield return new WaitForSeconds(1f);
+            yield return YieldCache.WaitForSeconds(1f);
 
             yield return fadeOverlay.DOFade(1f, 0.3f).WaitForCompletion();
             stairGraphic.gameObject.SetActive(false);

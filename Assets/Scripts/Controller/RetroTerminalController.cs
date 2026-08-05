@@ -82,13 +82,13 @@ namespace Controller
         IEnumerator RunSequence()
         {
             isProgress = true;
-            yield return new WaitForSeconds(1f);
+            yield return YieldCache.WaitForSeconds(1f);
             
             foreach (var line in bootSequence)
             {
                 if (!isProgress) yield break; // 스킵되었으면 중단
 
-                yield return new WaitForSeconds(line.preDelay);
+                yield return YieldCache.WaitForSeconds(line.preDelay);
 
                 if (line.isMemoryCheck)
                 {
@@ -100,7 +100,7 @@ namespace Controller
                 }
 
                 sb.AppendLine();
-                yield return new WaitForSeconds(lineDelay);
+                yield return YieldCache.WaitForSeconds(lineDelay);
             }
 
             // 모든 텍스트 출력이 끝났으면 자연스럽게 전환
@@ -139,7 +139,7 @@ namespace Controller
             }
             if (terminalCanvasGroup != null) terminalCanvasGroup.alpha = 0f;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return YieldCache.WaitForSeconds(0.1f);
 
             if (charCreationManager != null)
             {
@@ -226,10 +226,10 @@ namespace Controller
                 {
                     // 대기 상태일 때만 깜빡임
                     terminalText.text = sb.ToString() + cursorChar;
-                    yield return new WaitForSeconds(cursorBlinkRate);
+                    yield return YieldCache.WaitForSeconds(cursorBlinkRate);
                     
                     terminalText.text = sb.ToString() + invisibleCursor;
-                    yield return new WaitForSeconds(cursorBlinkRate);
+                    yield return YieldCache.WaitForSeconds(cursorBlinkRate);
                 }
             }
         }

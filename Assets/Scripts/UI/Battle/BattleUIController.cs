@@ -513,7 +513,7 @@ namespace UI.Battle
             // 원상 복구
             Sequence zoomOutSeq = DOTween.Sequence().SetUpdate(true);
             // 슬로우 모션 연출 유지 시간. 정확한 시간을 대기하도록 Realtime 함수를 사용
-            if (holdTime > 0) yield return new WaitForSecondsRealtime(holdTime);
+            if (holdTime > 0) yield return YieldCache.WaitForSeconds(holdTime);
 
             zoomOutSeq.Join(monsterContainer.DOLocalMove(defaultMonsterPos, zoomOutTime).SetEase(Ease.InOutQuad));
             zoomOutSeq.Join(monsterContainer.DOScale(defaultMonsterScale, zoomOutTime).SetEase(Ease.InOutQuad));
@@ -637,7 +637,7 @@ namespace UI.Battle
             
             // animInterval이 0이거나 너무 작을 경우 엔진의 무한루프를 방지하기 위한 최소값 세팅
             float interval = Mathf.Max(0.05f, data.animInterval); 
-            WaitForSeconds wait = new WaitForSeconds(interval);
+            WaitForSeconds wait = YieldCache.WaitForSeconds(interval);
 
             // 게임 오버 패널과 이미지가 켜져 있는 동안만 반복 작동하도록
             while (gameOverPanel.activeSelf && gameOverMonsterImage.gameObject.activeSelf)

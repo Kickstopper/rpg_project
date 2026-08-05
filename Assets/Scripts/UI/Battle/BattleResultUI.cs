@@ -106,7 +106,7 @@ namespace UI.Battle
         private IEnumerator ShowQuestPopupsSequentially(List<QuestData> quests)
         {
             // 원하는 간격으로 시간을 조절할 수 있습니다 (현재 2.5초)
-            WaitForSeconds waitTime = new WaitForSeconds(2.5f);
+            WaitForSeconds waitTime = YieldCache.WaitForSeconds(2.5f);
 
             foreach (var q in quests)
             {

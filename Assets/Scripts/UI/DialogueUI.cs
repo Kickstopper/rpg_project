@@ -273,7 +273,7 @@ namespace UI
                     audioSource.PlayOneShot(typingSound);
                 }
                 counter++;
-                yield return new WaitForSeconds(typingSpeed);
+                yield return YieldCache.WaitForSeconds(typingSpeed);
             }
 
             contentText.maxVisibleCharacters = totalChars;

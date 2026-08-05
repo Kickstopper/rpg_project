@@ -165,7 +165,7 @@ namespace UI.DungeonMapScene
             if (transitionManager == null || transitionManager.fadeOverlay == null) yield break;
 
             _inputLocked = true;
-            yield return new WaitForSeconds(0.1f);
+            yield return YieldCache.WaitForSeconds(0.1f);
 
             // 통합 코루틴 호출 (최초 진입이므로 1초 동안 천천히)
             yield return StartCoroutine(RestoreViewAndCheckEventRoutine(1f));
@@ -210,7 +210,7 @@ namespace UI.DungeonMapScene
             transitionManager.fadeOverlay.alpha = 1f;
             transitionManager.fadeOverlay.blocksRaycasts = true;
 
-            yield return new WaitForSeconds(1f);
+            yield return YieldCache.WaitForSeconds(1f);
 
             Sequence seq = DOTween.Sequence();
             seq.Append(transitionManager.fadeOverlay.DOFade(0.4f, 2f).SetEase(Ease.InOutSine));
@@ -497,7 +497,7 @@ namespace UI.DungeonMapScene
                 ManagerRoot.Dungeon.LoadDungeonFromJson(entrance.destinationID);
                 LoadMapData(entrance);
                 
-                yield return new WaitForSeconds(0.1f);
+                yield return YieldCache.WaitForSeconds(0.1f);
                 if (theme.isUnderwater) ManagerRoot.Sound.PlaySFX(SfxID.Spash);
                 else ManagerRoot.Sound.PlaySFX(SfxID.Fall);
                 
@@ -573,7 +573,7 @@ namespace UI.DungeonMapScene
                 ManagerRoot.Dungeon.LoadDungeonFromJson(entrance.destinationID);
                 LoadMapData(entrance);
                 
-                yield return new WaitForSeconds(0.1f);
+                yield return YieldCache.WaitForSeconds(0.1f);
 
                 if (theme.isUnderwater) ManagerRoot.Sound.PlaySFX(SfxID.Spash);
                 else ManagerRoot.Sound.PlaySFX(SfxID.Fall);
@@ -619,7 +619,7 @@ namespace UI.DungeonMapScene
                     {
                         if (originalDoorFaces[face]) doorCell.wallTextureIDs[face] = doorConfig.openFrameTexIds[i];
                     }
-                    yield return new WaitForSeconds(doorConfig.animSpeed); 
+                    yield return YieldCache.WaitForSeconds(doorConfig.animSpeed); 
                 }
             }
 
@@ -657,11 +657,11 @@ namespace UI.DungeonMapScene
                     {
                         if (originalDoorFaces[face]) doorCell.wallTextureIDs[face] = doorConfig.openFrameTexIds[i];
                     }
-                    yield return new WaitForSeconds(doorConfig.animSpeed); 
+                    yield return YieldCache.WaitForSeconds(doorConfig.animSpeed); 
                 }
             }
 
-            yield return new WaitForSeconds(0.1f);
+            yield return YieldCache.WaitForSeconds(0.1f);
 
             Action restoreDoorAction = () => {
                 doorCell.value = originalValue;  
@@ -904,7 +904,7 @@ namespace UI.DungeonMapScene
         private IEnumerator HideSystemMessageRoutine(float duration)
         {
             Debug.Log("DURATION " + duration);
-            yield return new WaitForSeconds(duration);
+            yield return YieldCache.WaitForSeconds(duration);
             HideSystemMessage();
         }
 
@@ -1283,7 +1283,7 @@ namespace UI.DungeonMapScene
                 transitionManager.fadeOverlay.alpha = 1f;
             }
 
-            yield return new WaitForSeconds(0.2f);
+            yield return YieldCache.WaitForSeconds(0.2f);
             
             onFadeOutComplete?.Invoke();
             ManagerRoot.Time.AddStep(1);
@@ -1391,7 +1391,7 @@ namespace UI.DungeonMapScene
                             LoadMapData(dynamicDest); 
                             ManagerRoot.Sound.StopBGM(false);
                         }
-                        yield return new WaitForSeconds(0.2f); 
+                        yield return YieldCache.WaitForSeconds(0.2f); 
 
                         currentTerminalID = dest.terminalID;
                         exitLogicX = dest.targetX;
@@ -1440,7 +1440,7 @@ namespace UI.DungeonMapScene
                         LoadMapData(dynamicDest); 
                     }
                     
-                    yield return new WaitForSeconds(0.2f); 
+                    yield return YieldCache.WaitForSeconds(0.2f); 
                     yield return StartCoroutine(HandleElevatorExitSequence(elvData));
                     yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0f));
                 }
@@ -1642,7 +1642,7 @@ namespace UI.DungeonMapScene
                 {
                     doorCell.wallTextureIDs[doorFrontFace] = doorConfig.openFrameTexIds[i];
                     _renderer.RenderFrame(_player, renderSettings); 
-                    yield return new WaitForSeconds(doorConfig.animSpeed);
+                    yield return YieldCache.WaitForSeconds(doorConfig.animSpeed);
                 }
             }
 

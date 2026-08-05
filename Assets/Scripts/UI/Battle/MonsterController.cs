@@ -229,7 +229,7 @@ namespace UI.Battle
         private IEnumerator AnimateSprite(Sprite[] frames, float interval)
         {
             int currentFrame = 0;
-            WaitForSeconds waitTime = new WaitForSeconds(interval); // 캐싱
+            WaitForSeconds waitTime = YieldCache.WaitForSeconds(interval);
 
             while (true)
             {
@@ -352,7 +352,7 @@ namespace UI.Battle
             {
                 preferredImage.color = Color.red; 
                 Vector3 originalPos = transform.localPosition;
-                yield return new WaitForSeconds(0.1f); 
+                yield return YieldCache.WaitForSeconds(0.1f); 
                 
                 transform.localPosition = originalPos;
                 preferredImage.color = originalColor;

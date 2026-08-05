@@ -63,7 +63,7 @@ namespace UI.Battle
                     uiImage.SetNativeSize();
                 }
                 
-                yield return new WaitForSeconds(frames[i].duration);
+                yield return YieldCache.WaitForSeconds(frames[i].duration);
             }
 
             Destroy(gameObject);

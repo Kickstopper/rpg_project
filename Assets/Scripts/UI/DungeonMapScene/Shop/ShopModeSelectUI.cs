@@ -208,7 +208,7 @@ namespace UI.Shop
                 {
                     ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
                 }
-                yield return new WaitForSeconds(typingSpeed);
+                yield return YieldCache.WaitForSeconds(typingSpeed);
             }
 
             CompleteTypingImmediately();
@@ -227,7 +227,7 @@ namespace UI.Shop
 
         private IEnumerator WaitAndExecuteCallback()
         {
-            yield return new WaitForSeconds(0.2f);
+            yield return YieldCache.WaitForSeconds(0.2f);
             
             // 등록된 액션이 있다면 실행하고 비움
             if (onDialogueComplete != null)

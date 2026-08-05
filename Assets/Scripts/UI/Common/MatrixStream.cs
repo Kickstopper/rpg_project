@@ -110,7 +110,7 @@ public class MatrixStream : MonoBehaviour
 
             _textComponent.text = GetStylizedString();
 
-            yield return new WaitForSeconds(Random.Range(0.03f, 0.08f));
+            yield return YieldCache.WaitForSeconds(Random.Range(0.03f, 0.08f));
         }
     }
 
