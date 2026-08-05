@@ -340,7 +340,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3033774bcf45dcd458b67bb977fbbfa6, type: 2}
   - {fileID: 11400000, guid: 484d98ce6299154429972dd7943e8054, type: 2}
   - {fileID: 11400000, guid: fcedda8f1ebfed94eb8db02addf7d512, type: 2}
-  - {fileID: 11400000, guid: 56f2cae6d85bce846a3f635b2013062f, type: 2}
   ownedModules: 04000000030000000100000002000000
   mountedModules:
   - feature: 4
@@ -642,7 +641,6 @@ MonoBehaviour:
   saveManager: {fileID: 8319155127516932806}
   shopManager: {fileID: 7716105059068861244}
   timeManager: {fileID: 2450754152227706877}
-  weatherManager: {fileID: 2035458018758246169}
   worldManager: {fileID: 405637350890329743}
   fieldMapManager: {fileID: 2698755566062984489}
 --- !u!1 &4344090992620081364

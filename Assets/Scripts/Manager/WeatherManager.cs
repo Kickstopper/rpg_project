@@ -44,17 +44,17 @@ namespace Manager
         public string CurrentWeather { get; private set; } = "SYSTEM ERROR";
         public float CurrentTemp { get; private set; } = 0f;
         public DateTime CurrentLocalTime { get; private set; }
-        private float updateInterval = 600f; // 10분
-
-        private void Start()
-        {
-            InvokeRepeating(nameof(UpdateWeatherProcess), 0f, updateInterval);
-        }
-
-        private void UpdateWeatherProcess()
-        {
-            StartCoroutine(GetLocationAndWeather());
-        }
+        //private float updateInterval = 600f; // 10분
+        //
+        // private void Start()
+        // {
+        //     InvokeRepeating(nameof(UpdateWeatherProcess), 0f, updateInterval);
+        // }
+        //
+        // private void UpdateWeatherProcess()
+        // {
+        //     StartCoroutine(GetLocationAndWeather());
+        // }
 
         // IP 기반으로 현재 위치 파악
         private IEnumerator GetLocationAndWeather()

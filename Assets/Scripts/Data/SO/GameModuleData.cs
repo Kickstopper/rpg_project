@@ -12,7 +12,6 @@ namespace Data
         GyroCompass,      // 자이로 나침반
         GeoScanner,       // 지형 스캐너
         KillSwitch,       // 킬 스위치 (즉시 처형)
-        WeatherWidget,    // 기상 관측 모듈
         Calendar,         // 달력
     }
 

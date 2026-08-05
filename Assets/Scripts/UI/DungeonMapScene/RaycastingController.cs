@@ -25,7 +25,6 @@ namespace UI.DungeonMapScene
         public RawImage screenImage;
         public RawImage backgroundImage;
         public CompassUI compassUI;
-        public WeatherUI weatherUI;
         public CalendarUI calendarUI;
         public GridMap miniMap;
         public AutoMapRenderer autoMapRenderer;
@@ -1865,7 +1864,6 @@ namespace UI.DungeonMapScene
                 autoMapRenderer.DrawFullMap(_currentMap, ManagerRoot.Dungeon.CurrentDungeonState);
             }
             if (encounterSystem != null) encounterSystem.SetVisible(theme.moduleEnable && ManagerRoot.Module.IsMounted(ModuleFeature.MobSensor));
-            if (weatherUI != null) weatherUI.gameObject.SetActive(theme.moduleEnable && ManagerRoot.Module.IsMounted(ModuleFeature.WeatherWidget));
         }
 
         private void UpdateEncounterSensor()

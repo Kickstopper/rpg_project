@@ -8,7 +8,6 @@ namespace UI.WorldMapScene
         [Header("UI 연결")]
         public GameObject menuPanel;
         public GameObject encounterSlider;
-        public GameObject weatherWidget;
 
         void Update()
         {
@@ -28,15 +27,12 @@ namespace UI.WorldMapScene
 
         private void RefreshModules()
         {
-            if (weatherWidget)
-                weatherWidget.SetActive(ManagerRoot.Module.IsMounted(Data.ModuleFeature.WeatherWidget));
             if (encounterSlider)
                 encounterSlider.SetActive(ManagerRoot.Module.IsMounted(Data.ModuleFeature.MobSensor));
         }
 
         private void HideModules()
         {
-            if (weatherWidget) weatherWidget.SetActive(false);
             if (encounterSlider) encounterSlider.SetActive(false);
         }
 

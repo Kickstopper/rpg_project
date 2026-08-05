@@ -40,7 +40,6 @@ namespace Manager
         [SerializeField] private SaveManager saveManager;
         [SerializeField] private ShopManager shopManager;
         [SerializeField] private TimeManager timeManager;
-        [SerializeField] private WeatherManager weatherManager;
         [SerializeField] private WorldManager worldManager;
         [SerializeField] private FieldMapManager fieldMapManager;
 
@@ -61,7 +60,6 @@ namespace Manager
         public static PartyManager Party => Instance?.partyManager;
         public static SaveManager Save => Instance?.saveManager;
         public static ShopManager Shop => Instance?.shopManager;
-        public static WeatherManager Weather => Instance?.weatherManager;
         public static TimeManager Time => Instance?.timeManager;
         public static WorldManager World => Instance?.worldManager;
         public static FieldMapManager FieldMap => Instance?.fieldMapManager;
@@ -137,7 +135,6 @@ namespace Manager
             if (partyManager == null) partyManager = GetComponentInChildren<PartyManager>();
             if (saveManager == null) saveManager = GetComponentInChildren<SaveManager>();
             if (shopManager == null) shopManager = GetComponentInChildren<ShopManager>();
-            if (weatherManager == null) weatherManager = GetComponentInChildren<WeatherManager>();
             if (worldManager == null) worldManager = GetComponentInChildren<WorldManager>();
             if (fieldMapManager == null) fieldMapManager = GetComponentInChildren<FieldMapManager>();
         }
