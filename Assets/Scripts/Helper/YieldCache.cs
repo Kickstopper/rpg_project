@@ -9,7 +9,7 @@ public static class YieldCache
     {
         if (!_waitForSeconds.TryGetValue(seconds, out var wfs))
         {
-            _waitForSeconds.Add(seconds, wfs = YieldCache.WaitForSeconds(seconds));
+            _waitForSeconds.Add(seconds, wfs = new WaitForSeconds(seconds));
         }
         return wfs;
     }

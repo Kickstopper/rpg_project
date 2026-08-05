@@ -117,7 +117,9 @@ namespace Data
         public int x, y;
         public int value = 0;
         public int[] wallTextureIDs = new int[4] { -1, -1, -1, -1 }; // up, right, down, left
-
+        public int floorTexIdx = -1; // -1이면 DungeonTheme의 floorTexIdx를 따름
+        public int ceilTexIdx = -1;  // -1이면 DungeonTheme의 ceilTexIdx를 따름
+        
         public int centerObjectID = -1;
         public int[] faceObjectIDs = new int[4] { -1, -1, -1, -1 }; // North, East, South, West
         

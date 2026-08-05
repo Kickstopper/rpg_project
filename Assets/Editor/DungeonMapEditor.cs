@@ -621,6 +621,12 @@ public class DungeonMapEditor : EditorWindow
             DrawBatchWallField("↓ Tex (S)", 2);
             DrawBatchWallField("← Tex (W)", 3);
 
+            GUILayout.Space(10);
+            GUILayout.Label("Floor & Ceiling Textures", EditorStyles.miniBoldLabel);
+            
+            selectedCell.floorTexIdx = EditorGUILayout.IntField("Floor Tex ID", selectedCell.floorTexIdx);
+            selectedCell.ceilTexIdx = EditorGUILayout.IntField("Ceil Tex ID", selectedCell.ceilTexIdx);
+
             GUILayout.Space(5);
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Open All (-1)", EditorStyles.miniButtonLeft))
@@ -735,6 +741,11 @@ public class DungeonMapEditor : EditorWindow
                 }
                 
                 EditorGUILayout.EndHorizontal();
+                
+                GUILayout.Space(10);
+                GUILayout.Label("Batch Floor & Ceil Textures", EditorStyles.miniBoldLabel);
+                DrawBatchFloorTexField();
+                DrawBatchCeilTexField();
 
                 GUILayout.Space(10);
                 selectedCell.value = EditorGUILayout.IntField("Value", selectedCell.value);
@@ -956,6 +967,42 @@ public class DungeonMapEditor : EditorWindow
         }
 
         EditorGUILayout.EndVertical();
+    }
+
+    void DrawBatchFloorTexField()
+    {
+        int firstVal = selectedCells[0].floorTexIdx;
+        bool isMixed = false;
+        foreach (var c in selectedCells)
+            if (c.floorTexIdx != firstVal) { isMixed = true; break; }
+
+        EditorGUI.showMixedValue = isMixed;
+        EditorGUI.BeginChangeCheck();
+        int newVal = EditorGUILayout.IntField("Floor Tex ID", isMixed ? -1 : firstVal);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.floorTexIdx = newVal;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
+    }
+
+    void DrawBatchCeilTexField()
+    {
+        int firstVal = selectedCells[0].ceilTexIdx;
+        bool isMixed = false;
+        foreach (var c in selectedCells)
+            if (c.ceilTexIdx != firstVal) { isMixed = true; break; }
+
+        EditorGUI.showMixedValue = isMixed;
+        EditorGUI.BeginChangeCheck();
+        int newVal = EditorGUILayout.IntField("Ceil Tex ID", isMixed ? -1 : firstVal);
+        if (EditorGUI.EndChangeCheck())
+        {
+            foreach (var c in selectedCells) c.ceilTexIdx = newVal;
+            GUI.changed = true;
+        }
+        EditorGUI.showMixedValue = false;
     }
 
     // 상호작용 설정 일괄 적용 헬퍼

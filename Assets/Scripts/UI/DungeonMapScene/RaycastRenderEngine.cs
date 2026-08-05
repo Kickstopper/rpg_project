@@ -898,8 +898,9 @@ namespace UI.DungeonMapScene
                 bool isFloor = y < horizon;
                 // 맵 데이터에 천장이 없으면 천장(isFloor == false) 부분은 픽셀 렌더링을 생략
                 if (!isFloor && !_worldMap.hasCeil) continue;
-                
-                if (!isFloor && _ceilTexIdx == -1 && !_isScanning) continue;
+
+                // _ceilTexIdx == -1 이더라도 개별 셀에 천장이 있을 수 있으므로 가로줄 전체 스킵 최적화 코드를 비활성화
+                // if (!isFloor && _ceilTexIdx == -1 && !_isScanning) continue;
 
                 float p = isFloor ? (horizon - y) : (y - horizon);
                 if (p <= 0.1f) p = 0.1f;
@@ -968,9 +969,26 @@ namespace UI.DungeonMapScene
                     }
                     else
                     {
+                        // 현재 셀의 바닥/천장 텍스처를 우선하고 -1이면 fallback 텍스처 사용
+                        int activeTexIdx = isFloor ? _floorTexIdx : _ceilTexIdx;
+                        
+                        if (cell != null)
+                        {
+                            if (isFloor && cell.floorTexIdx != -1) activeTexIdx = cell.floorTexIdx;
+                            if (!isFloor && cell.ceilTexIdx != -1) activeTexIdx = cell.ceilTexIdx;
+                        }
+
+                        // Fallback까지 거쳤는데도 최종 인덱스가 -1이라면, 픽셀 렌더링을 스킵
+                        if (activeTexIdx == -1)
+                        {
+                            floorX += stepX;
+                            floorY += stepY;
+                            continue;
+                        }
+
                         int cx = (int)(_texWidth * (floorX - cellX)) & (_texWidth - 1);
                         int cy = (int)(_texHeight * (floorY - cellY)) & (_texHeight - 1);
-                        col = GetWallPixelFast(texIdx, cx, cy);
+                        col = GetWallPixelFast(activeTexIdx, cx, cy);
                             
                         if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
                     }
