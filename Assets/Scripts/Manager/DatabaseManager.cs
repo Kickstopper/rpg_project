@@ -12,6 +12,7 @@ namespace Manager
         [Header("Databases")]
         public CharacterDatabase charDB;
         public MonsterDatabase monsterDB;
+        public NpcDatabase npcDB;
         public WeaponDatabase weaponDB;
         public AmmoDatabase ammoDB;
         public ArmorDatabase armorDB;
@@ -26,6 +27,7 @@ namespace Manager
             // 게임 시작 시 딕셔너리 초기화
             charDB.Initialize();
             monsterDB.Initialize();
+            npcDB.Initialize();
             weaponDB.Initialize();
             ammoDB.Initialize();
             armorDB.Initialize();
