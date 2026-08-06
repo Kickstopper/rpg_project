@@ -8,6 +8,8 @@ using DG.Tweening;
 using Manager;
 using Data;
 using UnityEngine.EventSystems;
+using UnityEditor;
+using Helper;
 
 namespace UI
 {
@@ -35,6 +37,8 @@ namespace UI
         public FieldMapDestData SelectedDestination { get; private set; }
 
         public float CurrentSimulatedHour { get; private set; } // 가로등 매니저 등에서 현재 애니메이션 시간을 읽을 수 있도록
+
+        public Image backgroundPanel;
 
         [Header("List UI")]
         public GameObject listContainer;
@@ -176,11 +180,29 @@ namespace UI
         }
 
         private void SetState(FieldMapState state) 
-        { 
-            _currentState = state; 
-            if (state == FieldMapState.ListMode) { listContainer.SetActive(true); popupContainer.SetActive(false); UpdateListHighlight(); } 
-            else if (state == FieldMapState.PopupMode) { listContainer.SetActive(true); popupContainer.SetActive(true); _isPopupYesSelected = true; UpdatePopupHighlight(); FieldMapDestData dest = _slots[_currentIndex].Data; popupMessageText.text = $"<color=#00FFFF>{dest.displayName}</color>(으)로 이동하시겠습니까?\n(소요 시간: {dest.timeHours}시간)"; } 
-            else if (state == FieldMapState.TransitionMode) { listContainer.SetActive(false); popupContainer.SetActive(false); } 
+        {
+            _currentState = state;
+
+            if (state == FieldMapState.ListMode) {
+                listContainer.SetActive(true); 
+                popupContainer.SetActive(false); 
+                UpdateListHighlight(); 
+            } 
+            else if (state == FieldMapState.PopupMode) { 
+                listContainer.SetActive(true);
+                popupContainer.SetActive(true);
+                _isPopupYesSelected = true;
+                UpdatePopupHighlight(); 
+                FieldMapDestData dest = _slots[_currentIndex].Data; 
+                string josa = string.IsNullOrEmpty(dest.displayName) ? "" : dest.displayName.GetParticle("으로/로");
+                popupMessageText.text = $"<color=#00FFFF>{dest.displayName}</color>{josa} 이동하시겠습니까?\n(소요 시간: {dest.timeHours}시간)"; 
+            } 
+            else if (state == FieldMapState.TransitionMode) 
+            {
+                backgroundPanel.color = Color.black;
+                listContainer.SetActive(false);
+                popupContainer.SetActive(false); 
+            } 
         }
 
         private void Update() 
@@ -231,7 +253,29 @@ namespace UI
 
         private void PopulateList(List<FieldMapDestData> dataList) { foreach (var slot in _slots) Destroy(slot.gameObject); _slots.Clear(); for (int i = 0; i < dataList.Count; i++) { GameObject go = Instantiate(slotPrefab, contentPanel); FieldMapSlotUI slot = go.GetComponent<FieldMapSlotUI>(); slot.Initialize(i, dataList[i], this); _slots.Add(slot); } _currentIndex = 0; }
         private void ChangeListSelection(int direction) { if (_slots.Count == 0) return; _currentIndex = Mathf.Clamp(_currentIndex + direction, 0, _slots.Count - 1); UpdateListHighlight(); }
-        private void UpdateListHighlight() { for (int i = 0; i < _slots.Count; i++) _slots[i].SetFocus(i == _currentIndex); }
+        private void UpdateListHighlight() 
+        {
+            for (int i = 0; i < _slots.Count; i++) _slots[i].SetFocus(i == _currentIndex);
+
+            if (_slots.Count > 0 && _currentIndex >= 0 && _currentIndex < _slots.Count)
+            {
+                FieldMapDestData dest = _slots[_currentIndex].Data;
+                if (dest != null)
+                {
+                    MapNodeData data = ManagerRoot.FieldMap.GetNodeData(dest.mapID);
+                    if (data != null && data.backgroundImage != null)
+                    {
+                        backgroundPanel.sprite = data.backgroundImage;
+                        backgroundPanel.color = Color.dimGray;
+                    }
+                    else
+                    {
+                        backgroundPanel.color = Color.black;
+                    }
+                }
+                
+            } 
+        }
         public void OnSlotHovered(int index) { if (_currentState != FieldMapState.ListMode) return; _currentIndex = index; UpdateListHighlight(); }
         public void OnSlotClicked(int index) { if (_currentState != FieldMapState.ListMode) return; _currentIndex = index; UpdateListHighlight(); TrySelectDestination(); }
         private void TrySelectDestination() { if (_slots.Count > 0 && _slots[_currentIndex].Data != null) { ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor); SetState(FieldMapState.PopupMode); } }
@@ -343,7 +387,7 @@ namespace UI
             
             progressBar.value = 0f;
             distanceText.text = $"0.0 km / {totalDistance:F1} km";
-            timeText.text = "경과 시간: 0.0 시간";
+            timeText.text = "ELAPSED TIME 0.0H";
 
             yield return fadeOverlay.DOFade(0f, 0.3f).WaitForCompletion();
 
@@ -373,7 +417,7 @@ namespace UI
                 CurrentSimulatedHour = startHour + currentHours;
                 
                 distanceText.text = $"{Mathf.Lerp(0, totalDistance, _transitionProgress):F1} km / {totalDistance:F1} km";
-                timeText.text = $"경과 시간: {currentHours:F1} 시간";
+                timeText.text = $"ELAPSED TIME {currentHours:F1}H";
             }, 1f, roadTransitionRealTime).SetEase(Ease.InOutSine);
 
             while (progressTween.IsActive() && !progressTween.IsComplete())
@@ -404,7 +448,7 @@ namespace UI
                     
                     progressBar.value = 1f;
                     distanceText.text = $"{totalDistance:F1} km / {totalDistance:F1} km";
-                    timeText.text = $"Elapsed Time: {totalGameHours:F1} hour";
+                    timeText.text = $"ELAPSED TIME {totalGameHours:F1}H";
                     break; 
                 }
                 yield return null; 

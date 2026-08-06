@@ -688,25 +688,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager.FieldMapManager
   allMapNodes:
-  - mapID: Outpost
-    displayName: "\uBCF8\uBD80"
+  - backgroundImage: {fileID: 21300000, guid: 6e3cd055e87ed8442a22f89cb66a3e28, type: 3}
+    mapID: Outpost
+    displayName: "\uC804\uCD08\uAE30\uC9C0"
     spawnX: 5
     spawnY: 1
     spawnDir: 0
-  - mapID: Tower_0
+  - backgroundImage: {fileID: 21300000, guid: 97cd2af103891644fba945efb64df40f, type: 3}
+    mapID: Tower_0
     displayName: "\uD0C0\uC6CC"
     spawnX: 1
     spawnY: 8
     spawnDir: 1
+  - backgroundImage: {fileID: 21300000, guid: 8dc444e05c9206c4d890b60f3e729f17, type: 3}
+    mapID: Cave_0
+    displayName: "\uB3D9\uAD74"
+    spawnX: 10
+    spawnY: 5
+    spawnDir: 2
   allRoutes:
   - fromMapID: Outpost
     toMapID: Tower_0
     distance: 32
     timeHours: 0.32
+  - fromMapID: Outpost
+    toMapID: Cave_0
+    distance: 140
+    timeHours: 1.4
   - fromMapID: Tower_0
     toMapID: Outpost
     distance: 32
     timeHours: 0.32
+  - fromMapID: Tower_0
+    toMapID: Cave_0
+    distance: 200
+    timeHours: 2
+  - fromMapID: Cave_0
+    toMapID: Outpost
+    distance: 140
+    timeHours: 1.4
+  - fromMapID: Cave_0
+    toMapID: Tower_0
+    distance: 200
+    timeHours: 2
 --- !u!1 &4768890939789775564
 GameObject:
   m_ObjectHideFlags: 0

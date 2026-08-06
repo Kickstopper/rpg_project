@@ -2,7 +2,7 @@
     "width": 12,
     "height": 12,
     "mapID": "Cave_0",
-    "themeID": "Cave_Underwater",
+    "themeID": "Cave",
     "locationID": "CAVE",
     "hasCeil": true,
     "startX": 10,

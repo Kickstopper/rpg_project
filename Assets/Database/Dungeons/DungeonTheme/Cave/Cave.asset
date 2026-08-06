@@ -25,10 +25,10 @@ MonoBehaviour:
   spawnDelay: 5
   background: {fileID: 0}
   texture:
-  - {fileID: 2800000, guid: aee36f78e13c70f43a48dd4e619baae9, type: 3}
-  - {fileID: 2800000, guid: 460bc6938b65cf74788ea963fe829cf8, type: 3}
-  - {fileID: 2800000, guid: 05ed83bfe20175c4ca4ca43fdd09df55, type: 3}
-  - {fileID: 2800000, guid: 5e1e4745d01d70c47b3ce6288c15ec7c, type: 3}
+  - {fileID: 2800000, guid: 6c788618d5cb15043be398e9c6cd8dc8, type: 3}
+  - {fileID: 2800000, guid: fdd35ed1feda34541b94cacb43bbb0d7, type: 3}
+  - {fileID: 2800000, guid: 62565b3f2f75a3343a5a5ec9d963b286, type: 3}
+  - {fileID: 2800000, guid: 6c788618d5cb15043be398e9c6cd8dc8, type: 3}
   - {fileID: 2800000, guid: 62565b3f2f75a3343a5a5ec9d963b286, type: 3}
   - {fileID: 2800000, guid: add88eab5daa2b94f9d123e661500149, type: 3}
   - {fileID: 2800000, guid: 21f7af638a86d1045bffb62586e3e6af, type: 3}

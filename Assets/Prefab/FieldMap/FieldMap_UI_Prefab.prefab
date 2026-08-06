@@ -284,7 +284,7 @@ RectTransform:
   m_Father: {fileID: 8175537079285493438}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -465,14 +465,14 @@ MonoBehaviour:
   roadScroller: {fileID: 6278994566757761357}
   container: {fileID: 2670908776100671273}
   particlePrefab: {fileID: 5924824932967350023, guid: 8bc728b81d4c59d4cb0226e7e261cc41, type: 3}
-  maxParticles: 40
-  baseSpeed: 12
+  maxParticles: 15
+  baseSpeed: 16
   spawnZ: 10
   cullZ: 0.2
-  baseScale: 0.5
-  horizonY: 1
-  particleColor: {r: 0, g: 1, b: 1, a: 0.8}
-  isWarpLineMode: 1
+  baseScale: 0.4
+  horizonY: 0.5
+  particleColor: {r: 1, g: 1, b: 1, a: 0.5019608}
+  isWarpLineMode: 0
   warpStretchFactor: 4
 --- !u!1 &2232808470692435255
 GameObject:
@@ -576,6 +576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6856d7e22552f464abe5661ec02a01db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.FieldMapUIManager
+  backgroundPanel: {fileID: 6721738788642925570}
   listContainer: {fileID: 6344745517699470149}
   contentPanel: {fileID: 7408790235988930025}
   slotPrefab: {fileID: 6498024025553331127, guid: 1b0bca9f7200ea54da1dae87f5804325, type: 3}
@@ -847,15 +848,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -7471844387039988470, guid: 97cd2af103891644fba945efb64df40f, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1424,9 +1425,9 @@ RectTransform:
   m_Father: {fileID: 3072135454398850305}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -17, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &4783251862596727869
 CanvasRenderer:
@@ -2440,7 +2441,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1449060994142448227
 Transform:
   m_ObjectHideFlags: 0

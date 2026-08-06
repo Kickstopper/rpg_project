@@ -34,6 +34,7 @@ namespace Data
     [Serializable]
     public class MapNodeData
     {
+        public Sprite backgroundImage;
         public string mapID;          // 맵 ID (Key)
         public string displayName;    // 화면에 표시될 이름
         

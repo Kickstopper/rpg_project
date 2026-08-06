@@ -23,6 +23,12 @@ namespace Manager
             }
         }
 
+        public MapNodeData GetNodeData(string mapID)
+        {
+            if (_mapNodeDict.ContainsKey(mapID)) return _mapNodeDict[mapID];
+            return null;
+        }
+
         // 현재 이동 가능한(해금된) 목적지 목록만 UI용으로 반환
         public List<FieldMapDestData> GetAvailableDestinations(string currentMapID)
         {

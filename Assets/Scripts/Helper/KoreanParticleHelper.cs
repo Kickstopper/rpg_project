@@ -10,7 +10,12 @@ namespace Helper
 
         public static string AttachParticle(this string word, string particleFormat)
         {
-            if (string.IsNullOrEmpty(word)) return word;
+            return word + GetParticle(word, particleFormat);
+        }
+
+        public static string GetParticle(this string word, string particleFormat)
+        {
+            if (string.IsNullOrEmpty(word)) return string.Empty;
 
             char lastChar = word[word.Length - 1];
 
@@ -18,7 +23,7 @@ namespace Helper
             if (lastChar < HANGUL_BASE || lastChar > HANGUL_END)
             {
                 // 한글이 아니라면 (영어, 숫자 등) 기본적으로 앞의 조사를 붙이거나 원래 문자열 반환
-                return word + particleFormat.Split('/')[0];
+                return particleFormat.Split('/')[0];
             }
 
             // 종성 인덱스 계산 (0이면 받침 없음, 1 이상이면 받침 있음)
@@ -29,7 +34,7 @@ namespace Helper
             bool isRieul = jongseongIndex == 8;
 
             string[] particles = particleFormat.Split('/');
-            if (particles.Length != 2) return word + particleFormat; // 포맷이 잘못된 경우 그대로 반환
+            if (particles.Length != 2) return particleFormat; // 포맷이 잘못된 경우 그대로 반환
 
             string particle = "";
 
@@ -43,7 +48,7 @@ namespace Helper
                 particle = hasJongseong ? particles[0] : particles[1];
             }
 
-            return word + particle;
+            return particle;
         }
     }
 }
