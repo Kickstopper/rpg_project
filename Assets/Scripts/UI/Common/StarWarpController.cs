@@ -1,8 +1,11 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class StarWarpController : MonoBehaviour
 {
+    public RawImage targetImage;
+
     [Header("Material Settings")]
     public Material starMaterial;
 
@@ -40,8 +43,11 @@ public class StarWarpController : MonoBehaviour
     void Start()
     {
         if (starMaterial != null)
+        {
             starMaterial = Instantiate(starMaterial); // 머티리얼 복제
-
+            if (targetImage != null) targetImage.material = starMaterial;
+        }
+        
         //starDensity = Shader.PropertyToID("_Density");
         starMaterial.SetFloat("_Density", starDensity);
 
