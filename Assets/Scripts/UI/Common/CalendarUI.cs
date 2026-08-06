@@ -16,12 +16,10 @@ namespace UI.Common
         public Color normalMoneyColor = Color.gold;
         public Color debtMoneyColor = new Color(1f, 0.3f, 0.3f); // 경고색
 
-        // [삭제됨] baseRentalFee, salaryPerPartner 변수 삭제
-
         private void Start()
         {
             if (ManagerRoot.Time != null) ManagerRoot.Time.OnTimeUpdated += UpdateUI;
-            if (ManagerRoot.Inventory != null) ManagerRoot.Inventory.OnMoneyChanged += UpdateUI;
+            if (ManagerRoot.Inventory != null) ManagerRoot.Finance.OnMoneyChanged += UpdateUI;
 
             UpdateUI();
         }
@@ -29,7 +27,7 @@ namespace UI.Common
         private void OnDestroy()
         {
             if (ManagerRoot.Time != null) ManagerRoot.Time.OnTimeUpdated -= UpdateUI;
-            if (ManagerRoot.Inventory != null) ManagerRoot.Inventory.OnMoneyChanged -= UpdateUI;
+            if (ManagerRoot.Inventory != null) ManagerRoot.Finance.OnMoneyChanged -= UpdateUI;
         }
 
         public void UpdateUI()
@@ -52,13 +50,13 @@ namespace UI.Common
             dateText.text = $"{monthStr}.{dayStr}";
 
             // 현재 소지금 표시 및 부채 확인
-            int currentMoney = ManagerRoot.Inventory.GetMoney();
+            int currentMoney = ManagerRoot.Finance.CurrentMoney;
             moneyText.text = $"{currentMoney:N0}"; 
             moneyText.color = (currentMoney < 0) ? debtMoneyColor : normalMoneyColor;
 
             // 지출금 표시
-            int expectedExpense = ManagerRoot.Inventory.CalculateMonthlyExpense();
-            expenseText.text = $"-{expectedExpense:N0}";
+            int totalExpense = ManagerRoot.Finance.GetMonthlyTotalExpense();
+            expenseText.text = $"-{totalExpense:N0}";
         }
     }
 }

@@ -59,7 +59,7 @@ namespace Manager
             }
             
             // 인벤토리 & 골드 저장
-            data.money = ManagerRoot.Inventory.GetMoney();
+            data.money = ManagerRoot.Finance.CurrentMoney;
             data.inventory = ManagerRoot.Inventory.GetSaveData(); 
 
             // 파티와 로스터 정보 저장
@@ -100,7 +100,7 @@ namespace Manager
             SaveData data = JsonConvert.DeserializeObject<SaveData>(json);
 
             // 골드 및 인벤토리 복구
-            ManagerRoot.Inventory.SetMoney(data.money);
+            ManagerRoot.Finance.SetMoney(data.money);
             ManagerRoot.Inventory.LoadFromSaveData(data.inventory);
             
             // 플래그 복구

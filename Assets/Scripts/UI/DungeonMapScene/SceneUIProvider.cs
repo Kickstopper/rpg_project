@@ -17,6 +17,7 @@ public class SceneUIProvider : MonoBehaviour
     public GameObject terminalCanvas;
     public GameObject officeCanvas;
     public GameObject fieldMapUI;
+    public GameObject settlementUI;
 
     // 인스펙터에서 연결하거나 Start에서 찾음
     public BattleManager BattletManager; 
@@ -46,7 +47,8 @@ public class SceneUIProvider : MonoBehaviour
                 terminalCanvas,
                 elevatorCanvas,
                 officeCanvas,
-                fieldMapUI
+                fieldMapUI,
+                settlementUI
             );
         }
     }

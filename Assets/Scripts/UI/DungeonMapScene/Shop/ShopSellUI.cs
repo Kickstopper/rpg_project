@@ -263,7 +263,7 @@ namespace UI.Shop
             int totalEarned = sellPrice * currentSellQuantity;
 
             ManagerRoot.Inventory.RemoveItem(invItem.baseData.id, currentSellQuantity);
-            ManagerRoot.Inventory.AddMoney(totalEarned);
+            ManagerRoot.Finance.AddMoney(totalEarned);
 
             Debug.Log($"{invItem.baseData.dataName} {currentSellQuantity}개 판매 완료. (+${totalEarned})");
 
@@ -311,7 +311,7 @@ namespace UI.Shop
 
         private void UpdatePlayerMoneyUI()
         {
-            moneyText.text = $"${ManagerRoot.Inventory.GetMoney()}";
+            moneyText.text = $"${ManagerRoot.Finance.CurrentMoney}";
         }
 
         private void ClearContent()

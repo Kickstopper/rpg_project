@@ -569,7 +569,7 @@ namespace UI.Battle
                     }
                 }
             }
-            ManagerRoot.Inventory.AddMoney(reward.totalMoney);
+            ManagerRoot.Finance.AddMoney(reward.totalMoney);
             foreach(var itemId in reward.dropItems) ManagerRoot.Inventory.AddItem(itemId, 1);
             
             ManagerRoot.Sound.PlaySFX(SfxID.Attack_Sword); // 타격음 한번 재생
@@ -3387,7 +3387,7 @@ namespace UI.Battle
                     }
                 }
                 
-                ManagerRoot.Inventory.AddMoney(reward.totalMoney);
+                ManagerRoot.Finance.AddMoney(reward.totalMoney);
                 foreach(var itemId in reward.dropItems) ManagerRoot.Inventory.AddItem(itemId, 1);
 
                 // 결과 UI 표시
@@ -3483,7 +3483,6 @@ namespace UI.Battle
 
             // 메시지가 모두 출력된 후 아무 키나 누르기를 대기
             yield return new WaitUntil(() => Input.anyKeyDown);
-
             UnityEngine.SceneManagement.SceneManager.LoadScene("TitleScene");
         }
 

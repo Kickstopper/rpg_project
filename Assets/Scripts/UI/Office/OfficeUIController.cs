@@ -82,7 +82,7 @@ namespace UI.Office
                 foreach (var q in readyQuests)
                 {
                     // 보상 지급
-                    ManagerRoot.Inventory.AddMoney(q.Reward);
+                    ManagerRoot.Finance.AddMoney(q.Reward);
                     
                     // 퀘스트 완료 처리 (이 안에서 QuestComplete 플래그도 켜짐)
                     ManagerRoot.Quest.CompleteQuest(q.QuestID); 

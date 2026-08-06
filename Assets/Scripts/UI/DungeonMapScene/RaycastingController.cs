@@ -119,8 +119,24 @@ namespace UI.DungeonMapScene
         
         private Coroutine _systemMessageCoroutine; // 시스템 메시지 패널 끄기용
 
+        public static RaycastingController Instance { get; private set; }
+
+        // 외부(정산 UI 등)에서 접근할 현재 상태 getter
+        public bool IsMoving => _player != null && _player.IsMoving; 
+        public bool IsTransitioning { get; private set; }
+
         void Awake()
         {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             _renderer = new RaycastRenderEngine();
             // illusion ID 리스트는 필요 시 Inspector나 DungeonManager에서 가져옴
             _player = new DungeonPlayer(this, fovScale, backwardOffset, new List<int>()); 
@@ -433,6 +449,7 @@ namespace UI.DungeonMapScene
             HideSystemMessage();
             HideRoomName();
 
+            IsTransitioning = true;
             _isLookTransitioning = true;
             _inputLocked = true;
 
@@ -504,12 +521,15 @@ namespace UI.DungeonMapScene
 
                 yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
             }
+
+            IsTransitioning = false;
         }
 
         private IEnumerator JumpDownRoutine(EntranceData entrance, Vector2Int moveDir)
         {
             HideSystemMessage();
             HideRoomName();
+            IsTransitioning = true;
             _isLookTransitioning = true;
             _inputLocked = true;
 
@@ -581,6 +601,8 @@ namespace UI.DungeonMapScene
 
                 yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
             }
+            
+            IsTransitioning = false;
         }
 
         private IEnumerator LandingImpactRoutine(float magnitude, float duration = 0.6f)
@@ -1248,8 +1270,8 @@ namespace UI.DungeonMapScene
 
         private IEnumerator TransitionToOtherPlace(EntranceData entrance, Vector2Int moveDir, Action onFadeOutComplete = null)
         {
+            IsTransitioning = true;
             _inputLocked = true; 
-
             HideRoomName();
 
             int preEntranceLogicX = _player.LogicX;
@@ -1508,7 +1530,7 @@ namespace UI.DungeonMapScene
                 {
                     // [이동 확정 시]
                     FieldMapDestData dest = FieldMapUIManager.Instance.SelectedDestination;
-
+                    
                     if (transitionManager != null)
                     {
                         yield return StartCoroutine(FieldMapUIManager.Instance.ExecuteRoadTransitionRoutine(dest.distance, dest.timeHours, () => 
@@ -1571,6 +1593,7 @@ namespace UI.DungeonMapScene
                 }
             }
 
+            IsTransitioning = false;
             _inputLocked = false;
         }
 

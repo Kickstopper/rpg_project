@@ -199,14 +199,14 @@ namespace UI.Shop
         // 구매 확정 로직
         private void OnConfirmButtonClicked()
         {
-            int PlayerMoney = ManagerRoot.Inventory.GetMoney();
+            int PlayerMoney = ManagerRoot.Finance.CurrentMoney;
             int totalCost = HighlightedItem.price * currentPurchaseQuantity;
             
             if(PlayerMoney >= totalCost)
             {
                 ManagerRoot.Inventory.AddItem(HighlightedItem.id, currentPurchaseQuantity);
                 int currentMoney = PlayerMoney - totalCost;
-                ManagerRoot.Inventory.SetMoney(currentMoney);
+                ManagerRoot.Finance.SetMoney(currentMoney);
                 Debug.Log($"{HighlightedItem.dataName} {currentPurchaseQuantity}개 구매 완료!");
 
             }
@@ -222,7 +222,7 @@ namespace UI.Shop
 
         private void UpdatePlayerMoneyUI()
         {
-            moneyText.text = $"${ManagerRoot.Inventory.GetMoney()}";
+            moneyText.text = $"${ManagerRoot.Finance.CurrentMoney}";
         }
 
         private void ClearContent()

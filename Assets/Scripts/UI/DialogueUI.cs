@@ -578,7 +578,7 @@ namespace UI
                                 if (int.TryParse(itemID.Substring(5), out int reqGold))
                                 {
                                     // 플레이어의 소지금이 요구 골드보다 크거나 같아야 함
-                                    if (ManagerRoot.Inventory.GetMoney() < reqGold) return false;
+                                    if (ManagerRoot.Finance.CurrentMoney < reqGold) return false;
                                 }
                             }
                             else
@@ -647,7 +647,7 @@ namespace UI
                                 {
                                     if (int.TryParse(itemID.Substring(5), out int gold))
                                     {
-                                        ManagerRoot.Inventory.SubMoney(gold);
+                                        ManagerRoot.Finance.SubMoney(gold);
                                         Debug.Log($"[Action] MONEY 차감: {gold}");
                                     }
                                 }
@@ -764,7 +764,7 @@ namespace UI
                         else if (int.TryParse(item, out int gold)) 
                         {
                             // 골드 요구
-                            if (ManagerRoot.Inventory.GetMoney() >= gold) ManagerRoot.Inventory.SubMoney(gold);
+                            if (ManagerRoot.Finance.CurrentMoney >= gold) ManagerRoot.Finance.SubMoney(gold);
                             else { negotiationResult = NegotiationResult.MONSTER_TURN; nextTargetID = "INSUFFICIENT_ITEM"; }
                         }
                         else if (ManagerRoot.Inventory.HasItem(item)) 

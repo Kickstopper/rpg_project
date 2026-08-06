@@ -19,22 +19,11 @@ namespace Manager
 
     public class InventoryManager : MonoBehaviour
     {
-        // 소지금
-        private int money = 0;
-
         // 아이템 ID와 수량을 저장하는 딕셔너리
         public Dictionary<string, int> inventoryDict = new Dictionary<string, int>();
 
-        [Header("Economy Settings")]
-        [Tooltip("매월 고정적으로 나가는 기기 렌탈비")]
-        public int baseRentalFee = 1000;
-        [Tooltip("고용인(파트너)의 급여 PER LEVEL")]
-        public int salaryPerPartner = 200;
-
         // (편의용) 전투 테스트를 위한 시작 아이템 리스트
         public List<ConsumableItemData> startingItems;
-
-        public event System.Action OnMoneyChanged;
 
         // 보유 중인 모든 아이템 ID 반환
         public List<string> GetAllItemIds() => inventoryDict.Keys.ToList();
@@ -42,8 +31,6 @@ namespace Manager
         public bool HasItem(string id) => inventoryDict.ContainsKey(id) && inventoryDict[id] > 0;
 
         public int GetItemCount(string id) => inventoryDict.ContainsKey(id) ? inventoryDict[id] : 0;
-
-        public int GetMoney() => this.money;
 
         void InitializeInventory()
         {
@@ -115,19 +102,6 @@ namespace Manager
             return list;
         }
         
-        public void AddMoney(int money)
-        {
-            this.money += money;
-            OnMoneyChanged?.Invoke();
-        }
-
-        public void SubMoney(int money)
-        {
-            this.money -= money;
-            if (this.money < 0) this.money = 0;
-            OnMoneyChanged?.Invoke();
-        }
-
         public void AddItem(string id, int amount = 1)
         {
             if (inventoryDict.ContainsKey(id)) inventoryDict[id] += amount;
@@ -161,39 +135,9 @@ namespace Manager
             return false;
         }
 
-        public void SetMoney(int money)
-        {
-            this.money = money;
-            OnMoneyChanged?.Invoke();
-        } 
-        
         public void ClearInventory()
         {
             InitializeInventory();
-            money = 0;
-            OnMoneyChanged?.Invoke();
-        }
-
-        // 매달 청구될 총 지출 예상 금액을 계산하여 반환
-        public int CalculateMonthlyExpense()
-        {
-            int totalExpense = baseRentalFee;
-
-            if (ManagerRoot.Party != null && ManagerRoot.Party.partyData != null)
-            {
-                int payForPartners = 0;
-                
-                // 플레이어(커맨더)를 제외한 순수 고용인(파트너)의 수만 계산
-                foreach (var member in ManagerRoot.Party.partyData)
-                {
-                    if (member.isCommander || member.isMonster || !member.isRegular) continue;
-                    payForPartners += (member.stats.level * salaryPerPartner);
-                }
-                
-                totalExpense += payForPartners;
-            }
-
-            return totalExpense;
         }
     }
 }

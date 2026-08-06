@@ -47,6 +47,7 @@ namespace Controller
 
         void Start()
         {
+            if (ManagerRoot.GameState != null) ManagerRoot.GameState.ChangeState(GameState.None);
             if (UI_Canvas) UI_Canvas.SetActive(false);
             if (targetImage != null)
             {
@@ -234,6 +235,7 @@ namespace Controller
         {
             if (ManagerRoot.DungeonEvent != null) ManagerRoot.DungeonEvent.ResetAllEvents();
             if (ManagerRoot.Inventory != null) ManagerRoot.Inventory.ClearInventory();
+            if (ManagerRoot.Finance != null) ManagerRoot.Finance.Reset();
             if (ManagerRoot.Flag != null) ManagerRoot.Flag.ClearAll();
             if (ManagerRoot.Quest != null) ManagerRoot.Quest.NewGame();
             if (ManagerRoot.Party != null) ManagerRoot.Party.Initialize();

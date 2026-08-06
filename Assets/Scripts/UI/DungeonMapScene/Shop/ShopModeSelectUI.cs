@@ -240,7 +240,7 @@ namespace UI.Shop
 
         private void UpdateTextUI()
         {
-            if (moneyText != null) moneyText.text = $"${ManagerRoot.Inventory.GetMoney()}";
+            if (moneyText != null) moneyText.text = $"${ManagerRoot.Finance.CurrentMoney}";
             if (totalPriceText != null) totalPriceText.text = "-";
             if (possessionText != null) possessionText.text = "-";
         }

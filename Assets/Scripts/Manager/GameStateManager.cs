@@ -16,6 +16,7 @@ public enum GameState
     Terminal,    // 터미널 (순간이동)
     Office,      // 사무실
     FieldMap,    // 필드맵
+    Settlement,  // 월말 정산
 }
 
 namespace Manager
@@ -32,7 +33,7 @@ namespace Manager
         public GameObject terminalCanvas;    // 터미널 UI
         public GameObject officeCanvas;      // 사무실 UI
         public GameObject fieldMapUI;        // 필드맵 UI
-
+        public GameObject settlementUI;      // 월말정산 UI
         public BattleManager currentBattleManager;
         public ShopModeSelectUI shopUIController;
         public DialogueUI dialogueController;
@@ -46,7 +47,7 @@ namespace Manager
 
         void Awake()
         {
-            ChangeState(GameState.Exploration);
+            ChangeState(GameState.None);
         }
 
         public void ChangeState(GameState newState)
@@ -79,6 +80,7 @@ namespace Manager
             if (terminalCanvas != null) terminalCanvas.SetActive(false);
             if (officeCanvas != null) officeCanvas.SetActive(false);
             if (fieldMapUI != null) fieldMapUI.SetActive(false);
+            if (settlementUI != null) settlementUI.SetActive(false);
 
             switch (CurrentState)
             {
@@ -122,6 +124,10 @@ namespace Manager
                     if (fieldMapUI != null) fieldMapUI.SetActive(true);
                     break;
 
+                case GameState.Settlement:
+                    if (settlementUI != null) settlementUI.SetActive(true);
+                    break;
+
                 case GameState.None:
                 default:
                     break;
@@ -133,7 +139,7 @@ namespace Manager
                                             GameObject battleCanvas, BattleManager battleManager, 
                                             GameObject shopCanvas, ShopModeSelectUI shopController = null,
                                             GameObject terminalCanvas = null, GameObject elevatorCanvas = null, 
-                                            GameObject officeCanvas = null, GameObject fieldMapUI = null)
+                                            GameObject officeCanvas = null, GameObject fieldMapUI = null, GameObject settlementUI = null)
         {
             this.explorationCanvas = explCanvas;
             this.eventCanvas = eventCanvas;
@@ -148,6 +154,7 @@ namespace Manager
             this.terminalCanvas = terminalCanvas;
             this.officeCanvas = officeCanvas;
             this.fieldMapUI = fieldMapUI;
+            this.settlementUI = settlementUI;
             RefreshUIState();
         }
 
@@ -167,12 +174,25 @@ namespace Manager
             }
         }
 
-        public void StartEventDialogue(string eventID)
+        public void StartEventDialogue(string eventID, Action<int> customCallback = null)
         {
             if (dialogueController != null)
             {
                 ChangeState(GameState.Event);
-                dialogueController.Initialize(eventID, (result)=> ChangeState(GameState.Exploration));
+                
+                dialogueController.Initialize(eventID, (result) => 
+                {
+                    if (customCallback != null)
+                    {
+                        // 월말 정산 UI로부터 넘겨 받은 커스텀 콜백이 있다면 실행
+                        customCallback(result);
+                    }
+                    else
+                    {
+                        // 콜백이 없다면 탐험으로 복귀
+                        ChangeState(GameState.Exploration);
+                    }
+                });
             }
             else
             {

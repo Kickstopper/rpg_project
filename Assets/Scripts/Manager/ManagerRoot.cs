@@ -35,6 +35,7 @@ namespace Manager
         [SerializeField] private EffectManager effectManager;
         [SerializeField] private FlagManager flagManager;
         [SerializeField] private InventoryManager inventoryManager;
+        [SerializeField] private FinanceManager financeManager;
         [SerializeField] private ModuleManager moduleManager;
         [SerializeField] private PartyManager partyManager;
         [SerializeField] private SaveManager saveManager;
@@ -56,6 +57,7 @@ namespace Manager
         public static EffectManager Effect => Instance?.effectManager;
         public static FlagManager Flag => Instance?.flagManager;
         public static InventoryManager Inventory => Instance?.inventoryManager;
+        public static FinanceManager Finance => Instance?.financeManager;
         public static ModuleManager Module => Instance?.moduleManager;
         public static PartyManager Party => Instance?.partyManager;
         public static SaveManager Save => Instance?.saveManager;
@@ -131,6 +133,7 @@ namespace Manager
             if (effectManager == null) effectManager = GetComponentInChildren<EffectManager>();
             if (flagManager == null) flagManager = GetComponentInChildren<FlagManager>();
             if (inventoryManager == null) inventoryManager = GetComponentInChildren<InventoryManager>();
+            if (financeManager == null) financeManager = GetComponentInChildren<FinanceManager>();
             if (moduleManager == null) moduleManager = GetComponentInChildren<ModuleManager>();
             if (partyManager == null) partyManager = GetComponentInChildren<PartyManager>();
             if (saveManager == null) saveManager = GetComponentInChildren<SaveManager>();
