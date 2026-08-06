@@ -21,8 +21,6 @@ namespace UI
         public GameObject choiceButtonPrefab;    // 선택지 프리팹
 
         [Header("Settings")]
-        public CharacterDatabase characterDB;     // inspector에서 설정
-        public MonsterDatabase monsterDB;
         public float typingSpeed = 0.05f;        // 글자당 시간 (작을수록 빠름)
         public AudioClip typingSound;            // 타이핑 효과음
         private AudioSource audioSource;
@@ -52,9 +50,10 @@ namespace UI
 
         private float inputCooldown = 0f;
 
-        public event Action<int> OnDialogueFinished;
-        public event Action<string> OnChoiceMade;
-        private NegotiationResult negotiationResult = NegotiationResult.PLAYER_TURN; // 교섭 종료 뒤의
+        private event Action<int> onDialogueFinished;
+        private event Action<string> onChoiceMade;
+        private Func<string, int, bool> onResourceDemanded; // 교섭 중 몬스터의 요구 발생
+        private NegotiationResult negotiationResult = NegotiationResult.PLAYER_TURN; // 반환될 교섭 결과
 
         void Awake()
         {
@@ -72,29 +71,30 @@ namespace UI
             currentEventLines = ManagerRoot.Dialogue.GetEventData(eventID);
             if (currentEventLines == null || currentEventLines.Count == 0) return;
             
-            OnDialogueFinished = onComplete; 
+            onDialogueFinished = onComplete; 
             
             StartDialogueFlow();
         }
 
-        public void StartNegotiation(List<Dictionary<string, string>> lines, MonsterController monster, Action<int> onNegotiationEnded)
+        public void StartNegotiation(
+            List<Dictionary<string, string>> lines, MonsterController monster, 
+            Action<int> onNegotiationEnded, Func<string, int, bool> onResourceDemandCallback = null)
         {
             negotiationResult = NegotiationResult.PLAYER_TURN;
             currentEventLines = lines;
             currentMonster = monster;
 
-            // 교섭 시작 시 몬스터 감정 수치 초기화
-            currentMonster.CurrentAnger = 0;
-            currentMonster.CurrentJoy = 0;
-            currentMonster.CurrentInterest = 0;
-
-            OnDialogueFinished = onNegotiationEnded;
+            onDialogueFinished = onNegotiationEnded;
+            onResourceDemanded = onResourceDemandCallback;
+    
             // 첫 시작 라인을 찾아서 인덱스를 설정
             currentLineIndex = 0;
             for (int i = 0; i < lines.Count; i++)
             {
                 if (lines[i].ContainsKey("Situation") && lines[i]["Situation"] == "Intro")
                 {
+                    // TODO: 여기서 몬스터의 현재 누적된 감정(Anger, Interest 등)을 체크하여
+                    // 대화를 원천 거부하는 Intro 라인으로 분기
                     currentLineIndex = i;
                     break;
                 }
@@ -119,7 +119,7 @@ namespace UI
             choiceContainer.SetActive(false);
             
             // BattleManager가 알아서 다음 턴을 이어감
-            OnDialogueFinished?.Invoke((int)negotiationResult);
+            onDialogueFinished?.Invoke((int)negotiationResult);
         }
 
         void ShowCurrentLine()
@@ -172,30 +172,59 @@ namespace UI
             string name = lineData.ContainsKey("Name") ? lineData["Name"] : "";
             float pitch = 1f;
             string characterId = lineData.ContainsKey("CharacterID") ? lineData["CharacterID"] : "";
+
+            // 이미지를 세팅할 임시 변수들
+            Sprite targetPortrait = null;
+            Sprite targetStanding = null;
+
             if (!string.IsNullOrEmpty(characterId))
             {
-                var entry = characterDB.GetEntry(characterId);
-                if (entry != null)
+                var chrDB = ManagerRoot.Database.charDB;
+                var npcDB = ManagerRoot.Database.npcDB;
+                var monDB = ManagerRoot.Database.monsterDB;
+                
+                // 1순위: NPC DB 검색
+                var npcEntry = npcDB != null ? npcDB.GetEntry(characterId) : null;
+                if (npcEntry != null)
                 {
-                    pitch = GetMedianPitch(entry.gender);
-                    SetImage(entry);
+                    pitch = GetMedianPitch(npcEntry.gender);
+                    targetPortrait = npcEntry.portraitImage;
+                    targetStanding = npcEntry.standingImage;
+                    if (string.IsNullOrEmpty(name)) name = npcEntry.name;
                 }
+                else
+                {
+                    // 2순위: Character DB 검색
+                    var charEntry = chrDB != null ? chrDB.GetEntry(characterId) : null;
+                    if (charEntry != null)
+                    {
+                        pitch = GetMedianPitch(charEntry.gender);
+                        targetPortrait = charEntry.portraitImage;
+                        targetStanding = charEntry.standingImage;
+                        
+                        if (string.IsNullOrEmpty(name))
+                        {
+                            var pData = ManagerRoot.Party.GetCharacterByID(characterId);
+                            name = pData != null ? pData.name : charEntry.name;
+                        }
+                    }
+                    else
+                    {
+                        // 3순위: Monster DB 검색 (교섭 시 몬스터 초상화 띄우기 위함)
+                        var monEntry = monDB != null ? monDB.GetEntry(characterId) : null;
+                        if (monEntry != null)
+                        {
+                            pitch = GetMedianPitch(monEntry.gender); // MonsterDB에 Gender가 있다면 사용
+                            targetPortrait = monEntry.portrait;
+                            targetStanding = monEntry.image[0];
+                            if (string.IsNullOrEmpty(name)) name = monEntry.name;
+                        }
+                    }
+                }
+            }
 
-                // CSV의 값을 우선하여 표시
-                if (string.IsNullOrEmpty(name))
-                {
-                    var chrData  = ManagerRoot.Party.GetCharacterByID(characterId);
-                    if (chrData != null)
-                        name = chrData.name;
-                    else if (entry != null)
-                        name = entry.name;
-                }
-            }
-            else
-            {
-                portraitImageUI.enabled = false;
-                standingImageUI.enabled = false;
-            }
+            // 최종적으로 찾은 이미지를 UI에 적용
+            SetImage(targetPortrait, targetStanding);
 
             nameText.text = name;
 
@@ -217,16 +246,18 @@ namespace UI
             CharacterDatabase.CharacterEntry entry = null;
             bool isMonster = false; // 몬스터 여부를 판별
 
+            var chrDB = ManagerRoot.Database.charDB;
+            var monDB = ManagerRoot.Database.monsterDB;
             // Character Database에서 먼저 검색
-            if (characterDB != null && characterDB.GetEntry(charId) != null)
+            if (chrDB != null && chrDB.GetEntry(charId) != null)
             {
-                entry = characterDB.GetEntry(charId);
+                entry = chrDB.GetEntry(charId);
                 isMonster = false;
             }
             // 없다면 Monster Database에서 검색
-            else if (monsterDB != null && monsterDB.GetEntry(charId) != null)
+            else if (monDB != null && monDB.GetEntry(charId) != null)
             {
-                var monsterEntry = monsterDB.GetEntry(charId);
+                var monsterEntry = monDB.GetEntry(charId);
                 entry = monsterEntry.ToCharacterEntry();
                 isMonster = true;
             }
@@ -294,11 +325,11 @@ namespace UI
             return 1f;
         }
 
-        void SetImage(CharacterDatabase.CharacterEntry entry)
+        void SetImage(Sprite portrait, Sprite standing)
         {
-            if (entry.portraitImage != null)
+            if (portrait != null)
             {
-                portraitImageUI.sprite = entry.portraitImage;
+                portraitImageUI.sprite = portrait;
                 portraitImageUI.SetNativeSize();
                 portraitImageUI.enabled = true;
             }
@@ -307,9 +338,9 @@ namespace UI
                 portraitImageUI.enabled = false;
             }
 
-            if (entry.standingImage != null)
+            if (standing != null)
             {
-                standingImageUI.sprite = entry.standingImage;
+                standingImageUI.sprite = standing;
                 standingImageUI.SetNativeSize();
                 standingImageUI.enabled = true;
             }
@@ -478,9 +509,9 @@ namespace UI
             EventSystem.current.SetSelectedGameObject(null); // 포커스 해제
 
             // 교섭용 콜백이 연결되어 있다면, 값을 쏴주고 즉시 종료
-            if (OnChoiceMade != null)
+            if (onChoiceMade != null)
             {
-                OnChoiceMade.Invoke(nextTargetID);
+                onChoiceMade.Invoke(nextTargetID);
                 EndDialogue();
                 return;
             }
@@ -572,91 +603,91 @@ namespace UI
         }
 
         private void ExecuteAction(string actionData)
-{
-    if (string.IsNullOrEmpty(actionData)) return;
-
-    string[] actions = actionData.Split(';'); 
-
-    foreach (string act in actions)
-    {
-        string[] parts = act.Trim().Split(':'); 
-        if (parts.Length == 0 || string.IsNullOrEmpty(parts[0])) continue;
-
-        string command = parts[0].ToUpper();
-
-        switch (command)
         {
-            case "TONE":
-                if (parts.Length >= 2 && currentMonster != null)
-                {
-                    if (Enum.TryParse<ChoiceTone>(parts[1], true, out ChoiceTone tone))
-                    {
-                        MoodDelta delta = NegotiationCalculator.CalculateMoodChange(tone, currentMonster, new EnvironmentState());
-                        
-                        currentMonster.CurrentAnger += delta.addedAnger;
-                        currentMonster.CurrentJoy += delta.addedJoy;
-                        currentMonster.CurrentInterest += delta.addedInterest;
-                        
-                        Debug.Log($"[교섭 액션] {tone} 선택 -> 분노:{currentMonster.CurrentAnger}, 기쁨:{currentMonster.CurrentJoy}, 흥미:{currentMonster.CurrentInterest}");
-                    }
-                }
-                break;
+            if (string.IsNullOrEmpty(actionData)) return;
 
-            case "ADD_MOOD":
-                // TODO: 강제 감정치 조절 (예: "ADD_MOOD:-50", "ADD_JOY:30", "ADD_ANGER:50")
-                break;
+            string[] actions = actionData.Split(';'); 
 
-            case "REMOVE":
-                if (parts.Length >= 2)
+            foreach (string act in actions)
+            {
+                string[] parts = act.Trim().Split(':'); 
+                if (parts.Length == 0 || string.IsNullOrEmpty(parts[0])) continue;
+
+                string command = parts[0].ToUpper();
+
+                switch (command)
                 {
-                    string itemID = parts[1];
-                    if (!string.IsNullOrEmpty(itemID))
-                    {
-                        if (itemID.StartsWith("Gold_"))
+                    case "TONE":
+                        if (parts.Length >= 2 && currentMonster != null)
                         {
-                            if (int.TryParse(itemID.Substring(5), out int gold))
+                            if (Enum.TryParse<ChoiceTone>(parts[1], true, out ChoiceTone tone))
                             {
-                                ManagerRoot.Inventory.SubMoney(gold);
-                                Debug.Log($"[Action] MONEY 차감: {gold}");
+                                MoodDelta delta = NegotiationCalculator.CalculateMoodChange(tone, currentMonster, new EnvironmentState());
+                                
+                                currentMonster.CurrentAnger += delta.addedAnger;
+                                currentMonster.CurrentJoy += delta.addedJoy;
+                                currentMonster.CurrentInterest += delta.addedInterest;
+                                
+                                Debug.Log($"[교섭 액션] {tone} 선택 -> 분노:{currentMonster.CurrentAnger}, 기쁨:{currentMonster.CurrentJoy}, 흥미:{currentMonster.CurrentInterest}");
                             }
                         }
-                        else
+                        break;
+
+                    case "ADD_MOOD":
+                        // TODO: 강제 감정치 조절 (예: "ADD_MOOD:-50", "ADD_JOY:30", "ADD_ANGER:50")
+                        break;
+
+                    case "REMOVE":
+                        if (parts.Length >= 2)
                         {
-                            // REMOVE:Potion:3 -> 3개 삭제, 없으면 1개
-                            int removeCount = 1;
-                            if (parts.Length >= 3 && int.TryParse(parts[2], out int parsedCount))
+                            string itemID = parts[1];
+                            if (!string.IsNullOrEmpty(itemID))
                             {
-                                removeCount = parsedCount;
+                                if (itemID.StartsWith("Gold_"))
+                                {
+                                    if (int.TryParse(itemID.Substring(5), out int gold))
+                                    {
+                                        ManagerRoot.Inventory.SubMoney(gold);
+                                        Debug.Log($"[Action] MONEY 차감: {gold}");
+                                    }
+                                }
+                                else
+                                {
+                                    // REMOVE:Potion:3 -> 3개 삭제, 없으면 1개
+                                    int removeCount = 1;
+                                    if (parts.Length >= 3 && int.TryParse(parts[2], out int parsedCount))
+                                    {
+                                        removeCount = parsedCount;
+                                    }
+
+                                    ManagerRoot.Inventory.RemoveItem(itemID, removeCount);
+                                    Debug.Log($"[Action] 아이템 차감: {itemID} x {removeCount}");
+                                }
                             }
-
-                            ManagerRoot.Inventory.RemoveItem(itemID, removeCount);
-                            Debug.Log($"[Action] 아이템 차감: {itemID} x {removeCount}");
                         }
-                    }
-                }
-                break;
+                        break;
 
-            case "SET_FLAG":
-                if (parts.Length >= 3)
-                {
-                    string flagID = parts[1].Trim();
-                    bool state = parts[2].Trim().ToLower() == "true"; 
-                    
-                    if(!string.IsNullOrEmpty(flagID))
-                    {
-                        ManagerRoot.Flag.SetFlag(flagID, state);
-                        Debug.Log($"[Action] 플래그 설정: {flagID} -> {state}");
-                    }
-                }
-                break;
+                    case "SET_FLAG":
+                        if (parts.Length >= 3)
+                        {
+                            string flagID = parts[1].Trim();
+                            bool state = parts[2].Trim().ToLower() == "true"; 
+                            
+                            if(!string.IsNullOrEmpty(flagID))
+                            {
+                                ManagerRoot.Flag.SetFlag(flagID, state);
+                                Debug.Log($"[Action] 플래그 설정: {flagID} -> {state}");
+                            }
+                        }
+                        break;
 
-            case "BATTLE":
-                // TODO: 전투 재개
-                Debug.Log("[Action] 전투 개시 트리거 발생!");
-                break;
+                    case "BATTLE":
+                        // TODO: 전투 재개
+                        Debug.Log("[Action] 전투 개시 트리거 발생!");
+                        break;
+                }
+            }
         }
-    }
-}
 
         // 유저가 타이핑이 끝난 후 클릭했을 때 실행되는 함수
         void AdvanceLine()
@@ -700,19 +731,45 @@ namespace UI
                 // 몬스터의 아이템 요구
                 else if (param == "GIVE")
                 {
-                    nextTargetID = "NEGO_START";
+                    nextTargetID = "NEGO_START"; // 기본적으로 다음 대화로 이어짐
                     if (choice == "ACCEPT")
                     {
-                        if (int.TryParse(item, out int gold))
+                        if (item.StartsWith("HP_")) 
                         {
-                            int currentGold = ManagerRoot.Inventory.GetMoney();
-                            if (currentGold >= gold)
-                            {
-                                ManagerRoot.Inventory.SubMoney(gold);
+                            // HP 요구 (예: GIVE:ACCEPT:HP_50)
+                            int amount = int.Parse(item.Substring(3));
+                            
+                            // BattleManager에 HP 차감 요청
+                            bool success = onResourceDemanded != null && onResourceDemanded.Invoke("HP", amount);
+                            
+                            if (!success) 
+                            { 
+                                negotiationResult = NegotiationResult.MONSTER_TURN; 
+                                nextTargetID = "FAIL"; 
                             }
                         }
-                        else if (ManagerRoot.Inventory.HasItem(item))
+                        else if (item.StartsWith("MP_")) 
                         {
+                            // MP 요구 (예: GIVE:ACCEPT:MP_20)
+                            int amount = int.Parse(item.Substring(3));
+                            
+                            bool success = onResourceDemanded != null && onResourceDemanded.Invoke("MP", amount);
+                            
+                            if (!success) 
+                            { 
+                                negotiationResult = NegotiationResult.MONSTER_TURN; 
+                                nextTargetID = "FAIL"; 
+                            }
+                        }
+                        else if (int.TryParse(item, out int gold)) 
+                        {
+                            // 골드 요구
+                            if (ManagerRoot.Inventory.GetMoney() >= gold) ManagerRoot.Inventory.SubMoney(gold);
+                            else { negotiationResult = NegotiationResult.MONSTER_TURN; nextTargetID = "INSUFFICIENT_ITEM"; }
+                        }
+                        else if (ManagerRoot.Inventory.HasItem(item)) 
+                        {
+                            // 아이템 요구
                             ManagerRoot.Inventory.RemoveItem(item, 1);
                         }
                         else

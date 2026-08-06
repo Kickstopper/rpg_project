@@ -2036,15 +2036,13 @@ namespace UI.Battle
             uiController.SetCmdPanelVisible(false);
             fieldController.SetPartyVisible(false);
 
-            targetMonster.CurrentAnger = 0; targetMonster.CurrentJoy = 0; targetMonster.CurrentInterest = 0;
-
             var sourceData = targetMonster.sourceData;
             
             List<Dictionary<string, string>> negotiationLines = ManagerRoot.Dialogue.GetNegotiationDialogues(sourceData);
 
             if (negotiationLines != null && negotiationLines.Count > 0)
             {
-                dialogueUI.StartNegotiation(negotiationLines, targetMonster, OnNegotiationEnded); 
+                dialogueUI.StartNegotiation(negotiationLines, targetMonster, OnNegotiationEnded, HandleResourceDemand);
             }
             else
             {
@@ -2058,6 +2056,40 @@ namespace UI.Battle
                 dialogueUI.StartNegotiation(fallbackLines, targetMonster, OnNegotiationEnded);
             }
         }
+
+        // 몬스터 요구 처리 메서드
+        private bool HandleResourceDemand(string resourceType, int amount)
+        {
+            // 교섭을 시도한 현재 주인공 캐릭터 가져오기
+            PlayerController pc = fieldController.GetCurrentCharacter();
+            if (pc == null) return false;
+
+            if (resourceType == "HP")
+            {
+                // HP를 내어줄 때 죽으면 안 되므로, 남은 체력이 요구량보다 커야 함
+                if (pc.currentHp > amount)
+                {
+                    // 피격 이펙트 및 사운드 재생
+                    ManagerRoot.Sound.PlaySFX(SfxID.Attack_Sword);
+                    ApplyDamage(pc.gameObject, amount, false);
+                    
+                    return true;
+                }
+            }
+            else if (resourceType == "MP")
+            {
+                if (pc.currentMp >= amount)
+                {
+                    pc.ApplyMpChange(-amount);
+                    // TODO: 마력 흡수 이펙트 및 사운드 재생
+                    ApplyDamage(pc.gameObject, 0, false); // 대미지 없이 피격 효과와 UI 업데이트만 사용
+                    return true;
+                }
+            }
+
+            // 조건 미달 (체력/마력이 부족함)
+            return false;
+        }
         
         // 대화가 종료되었을 때 선택지 결과(Tone)를 판정
         private void OnNegotiationEnded(int result)
@@ -2069,6 +2101,7 @@ namespace UI.Battle
             if (result == (int)NegotiationResult.BATTLE_END)
             {
                 // 전투 없이 상황 종료
+                StartCoroutine(EndBattleRoutine(true));
             }
             else if (result == (int)NegotiationResult.PLAYER_TURN)
             {
