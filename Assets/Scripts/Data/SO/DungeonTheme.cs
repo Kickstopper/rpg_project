@@ -32,6 +32,7 @@ namespace Data
     [CreateAssetMenu(fileName = "NewTheme", menuName = "Dungeon/DungeonTheme")]
     public class DungeonTheme : ScriptableObject
     {
+        [Tooltip("파일명과 반드시 일치해야 DungeonMapEditor에서 json을 로드할 때 자동으로 연결됨")]
         public string themeID;
         [Header("MUSIC")]
         public BgmID bgmID;                  // 이 레벨에서 재생될 BGM
