@@ -16,7 +16,7 @@ namespace UI.Common
         public Color normalMoneyColor = Color.gold;
         public Color debtMoneyColor = new Color(1f, 0.3f, 0.3f); // 경고색
 
-        private void Start()
+        void Start()
         {
             if (ManagerRoot.Time != null) ManagerRoot.Time.OnTimeUpdated += UpdateUI;
             if (ManagerRoot.Inventory != null) ManagerRoot.Finance.OnMoneyChanged += UpdateUI;
@@ -24,10 +24,15 @@ namespace UI.Common
             UpdateUI();
         }
 
-        private void OnDestroy()
+        void OnDestroy()
         {
             if (ManagerRoot.Time != null) ManagerRoot.Time.OnTimeUpdated -= UpdateUI;
             if (ManagerRoot.Inventory != null) ManagerRoot.Finance.OnMoneyChanged -= UpdateUI;
+        }
+        
+        void OnEnable()
+        {
+            UpdateUI();
         }
 
         public void UpdateUI()
