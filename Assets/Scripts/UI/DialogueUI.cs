@@ -295,6 +295,13 @@ namespace UI
         IEnumerator TypeText(string lineType, float medianPitch = 1f)
         {
             isTyping = true;
+
+            // 이미지 페이드 인 코루틴이 실행 중이라면, 완료될 때까지 대기
+            if (imageFadeCoroutine != null)
+            {
+                yield return new WaitUntil(() => imageFadeCoroutine == null);
+            }
+
             contentText.ForceMeshUpdate(); 
             int totalChars = contentText.textInfo.characterCount;
             int counter = 0;
