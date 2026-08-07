@@ -22,6 +22,7 @@ namespace UI
 
         [Header("Settings")]
         public float typingSpeed = 0.05f;        // 글자당 시간 (작을수록 빠름)
+        public float imageFadeSpeed = 0.3f;
         public AudioClip typingSound;            // 타이핑 효과음
         private AudioSource audioSource;
 
@@ -44,6 +45,8 @@ namespace UI
         private bool isTyping = false;
         private Coroutine typingCoroutine;
         private bool isWaitingForChoice = false;
+        private Coroutine imageFadeCoroutine;
+        private string lastCharacterId = ""; // 이전 화자의 ID를 저장
 
         private List<Button> activeChoiceButtons = new List<Button>();
         private int currentChoiceIndex = 0;
@@ -105,6 +108,7 @@ namespace UI
 
         private void StartDialogueFlow()
         {
+            lastCharacterId = "";
             inputCooldown = 0.05f;
             currentLineIndex = 0;
             isDialogueActive = true;
@@ -224,7 +228,7 @@ namespace UI
             }
 
             // 최종적으로 찾은 이미지를 UI에 적용
-            SetImage(targetPortrait, targetStanding);
+            SetImage(targetPortrait, targetStanding, characterId);
 
             nameText.text = name;
 
@@ -325,29 +329,97 @@ namespace UI
             return 1f;
         }
 
-        void SetImage(Sprite portrait, Sprite standing)
+        void SetImage(Sprite portrait, Sprite standing, string charId)
         {
+            // 이전 대사와 화자가 같고, 누군가(ID) 지정되어 있다면 연출을 생략
+            if (charId == lastCharacterId && !string.IsNullOrEmpty(charId))
+            {
+                // 연출은 생략하더라도 스킵 등으로 인해 이미지가 안 켜진 상태일 수 있으므로 확실히 켜줌
+                if (portrait != null)
+                {
+                    portraitImageUI.sprite = portrait;
+                    portraitImageUI.SetNativeSize();
+                    portraitImageUI.enabled = true;
+                    portraitImageUI.color = Color.white;
+                }
+                if (standing != null)
+                {
+                    standingImageUI.sprite = standing;
+                    standingImageUI.SetNativeSize();
+                    standingImageUI.enabled = true;
+                    standingImageUI.color = Color.white;
+                }
+                return;
+            }
+
+            // 화자가 변경되었으므로 ID를 갱신
+            lastCharacterId = charId;
+
+            // 기존에 실행 중인 이미지 연출이 있다면 중지
+            if (imageFadeCoroutine != null)
+            {
+                StopCoroutine(imageFadeCoroutine);
+                imageFadeCoroutine = null;
+            }
+
+            // 새로운 화자의 코루틴 연출 시작
+            imageFadeCoroutine = StartCoroutine(ImageFadeRoutine(portrait, standing));
+        }
+
+        IEnumerator ImageFadeRoutine(Sprite portrait, Sprite standing)
+        {
+            // 초상화는 스탠딩이 뜰 때까지 일단 숨김
             if (portrait != null)
             {
                 portraitImageUI.sprite = portrait;
                 portraitImageUI.SetNativeSize();
-                portraitImageUI.enabled = true;
+                portraitImageUI.color = Color.white; 
+                portraitImageUI.enabled = false; // 대기 상태
             }
             else
             {
                 portraitImageUI.enabled = false;
             }
 
+            // 스탠딩 이미지 서서히 나타나는 애니메이션
             if (standing != null)
             {
                 standingImageUI.sprite = standing;
                 standingImageUI.SetNativeSize();
                 standingImageUI.enabled = true;
+                
+                // 시작: 검은색 반투명
+                Color startColor = new Color(0f, 0f, 0f, 0.9f);
+                // 끝: 원래 색
+                Color endColor = new Color(1f, 1f, 1f, 1f); 
+                
+                standingImageUI.color = startColor;
+
+                float elapsed = 0f;
+                while (elapsed < imageFadeSpeed)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = elapsed / imageFadeSpeed;
+                    
+                    // 색상과 투명도를 보간
+                    standingImageUI.color = Color.Lerp(startColor, endColor, t);
+                    yield return null;
+                }
+                
+                standingImageUI.color = endColor; 
             }
             else
             {
-                standingImageUI.enabled = false; 
+                standingImageUI.enabled = false;
             }
+
+            // 스탠딩 이미지가 완전히 나타난 후(또는 스탠딩이 없을 때), 초상화 표시
+            if (portrait != null)
+            {
+                portraitImageUI.enabled = true;
+            }
+
+            imageFadeCoroutine = null; // 연출 완료
         }
 
         void Update()
@@ -430,6 +502,23 @@ namespace UI
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
             contentText.maxVisibleCharacters = int.MaxValue;
             isTyping = false;
+
+            // 대사를 스킵하면 이미지 연출도 즉시 완료 상태로 강제 전환
+            if (imageFadeCoroutine != null)
+            {
+                StopCoroutine(imageFadeCoroutine);
+                imageFadeCoroutine = null;
+                
+                if (standingImageUI.sprite != null && standingImageUI.enabled)
+                {
+                    standingImageUI.color = new Color(1f, 1f, 1f, 1f); // 스탠딩 즉시 불투명/원래색
+                }
+                
+                if (portraitImageUI.sprite != null && !portraitImageUI.enabled)
+                {
+                    portraitImageUI.enabled = true; // 초상화 즉시 표시
+                }
+            }
 
             // 스킵했을 때도 CHOICE라면 선택지를 띄워야 함
             var lineData = currentEventLines[currentLineIndex];

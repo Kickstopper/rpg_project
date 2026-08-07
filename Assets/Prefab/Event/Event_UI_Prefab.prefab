@@ -50,9 +50,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   choiceContainer: {fileID: 2677833861554354253}
   choiceButtonPrefab: {fileID: 4233283787199395685, guid: 130f35968c2fbed42832da8de4c8ab71, type: 3}
-  characterDB: {fileID: 11400000, guid: 89d0e2e30bc8d6c40985b195be7ff30d, type: 2}
-  monsterDB: {fileID: 11400000, guid: 5a02d40de261d314a98aeca05c430997, type: 2}
   typingSpeed: 0.05
+  imageFadeSpeed: 0.3
   typingSound: {fileID: 8300000, guid: 1e32dfd682842a84e878385091e385de, type: 3}
   uiCanvas: {fileID: 2439952145935944111}
   portraitImageUI: {fileID: 8107967876598392529}
@@ -228,7 +227,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1640189565828687937
 RectTransform:
   m_ObjectHideFlags: 0
@@ -260,7 +259,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 1
   m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -270,7 +269,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 100
+  m_SortingOrder: 200
   m_TargetDisplay: 0
 --- !u!114 &3901630161524289040
 MonoBehaviour:
@@ -622,6 +621,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 20
   m_lineSpacingMax: 0
@@ -758,6 +758,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
