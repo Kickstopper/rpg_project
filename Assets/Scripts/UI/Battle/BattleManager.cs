@@ -23,6 +23,7 @@ namespace UI.Battle
         public BattleUIController uiController;
         public BattleFieldController fieldController;
         public BattleVisualController visualController; 
+        public KillBillEffectManager killBillEffectManager;
         public LevelUpUI levelUpUI;
         public Transform damagePopupContainer;
         public DialogueUI dialogueUI;
@@ -3169,19 +3170,28 @@ namespace UI.Battle
             {
                 if (action.actionData != null && action.actionData.statusEffectData != null)
                 {
-                    // BattleCalculator의 상태 이상 판정 함수 호출
                     BattleCalculator.ProcessSkillStatusEffect(attackerEntity, hitEntity, action.actionData);
                 }
             }
             
             if (hitEntity != null && hitEntity.currentHp <= 0 && (hitEntity.currentHp + damage > 0))
             {
-                // 막타 적중 시 흔들림 연출과 동시에 슬로우 모션 및 줌인 발동
                 uiController.StopZoomCoroutine();
-                StartCoroutine(SlowMotionRoutine(0.1f, 0.4f));
-                yield return StartCoroutine(uiController.UIZoomRoutine(target.transform, 1.3f, 0.2f, 0.5f, 0.3f));
+
+                // 아군의 공격(isPlayerActor)으로 몬스터가 죽었을 때
+                if (isPlayerActor && hitEntity is MonsterController && killBillEffectManager != null)
+                {
+                    // 킬 빌 연출 코루틴을 실행 
+                    yield return StartCoroutine(killBillEffectManager.PlayKillBillDeathRoutine(target));
+                }
+                // 적군이 아군을 쓰러뜨렸을 때
+                else
+                {
+                    StartCoroutine(SlowMotionRoutine(0.1f, 0.4f));
+                    yield return StartCoroutine(uiController.UIZoomRoutine(target.transform, 1.3f, 0.2f, 0.5f, 0.3f));
+                }
                 
-                // 줌 연출이 끝난 후, 데미지 처리 코루틴이 남아있다면 마저 끝날 때까지 대기
+                // 연출이 끝난 후, 데미지 처리 코루틴이 남아있다면 마저 끝날 때까지 대기
                 if (damageRoutine != null) yield return damageRoutine;
             }
             else

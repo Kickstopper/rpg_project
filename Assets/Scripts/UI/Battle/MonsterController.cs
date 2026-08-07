@@ -355,7 +355,13 @@ namespace UI.Battle
                 yield return YieldCache.WaitForSeconds(0.1f); 
                 
                 transform.localPosition = originalPos;
-                preferredImage.color = originalColor;
+
+                // 죽지 않고 살아남았을 때만 원래 색으로 복구
+                // 죽었을 때는 킬 빌 연출의 '검은색'이 유지되도록 함.
+                if (currentHp > 0)
+                {
+                    preferredImage.color = originalColor;
+                }
             }
 
             if (currentHp <= 0) Die();
@@ -391,6 +397,17 @@ namespace UI.Battle
         void Die()
         {
             Debug.Log($"{sourceData.name} 사망");
+
+            // 몬스터를 즉시 비활성화하면 외부 연출(킬 빌, 파티클 등)이 증발하므로 주석 처리
+            // gameObject.SetActive(false);
+            StartCoroutine(DelayedHideRoutine());
+        }
+
+        // 지연 비활성화 코루틴
+        private IEnumerator DelayedHideRoutine()
+        {
+            // 킬 빌 연출(약 1.5초)보다 조금 더 길게 대기하여 연출 도중 끊기지 않게 함
+            yield return YieldCache.WaitForSeconds(2.0f);
             gameObject.SetActive(false);
         }
     }

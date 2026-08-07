@@ -85,7 +85,7 @@ namespace UI.Battle
 
         // 공통 코루틴 참조
         protected Coroutine highlightCoroutine;
-        protected Color originalColor; 
+        public Color originalColor { get; protected set; }
 
         [Header("Buff/Debuff Stacks (-4 ~ +4)")]
         public int buffPhysAtk = 0;
