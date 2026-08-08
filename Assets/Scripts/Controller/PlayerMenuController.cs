@@ -11,7 +11,7 @@ namespace Controller
 {
     public class PlayerMenuController : MonoBehaviour
     {
-        private enum MenuState { Main, Status, Skill, Item, Move, Equip, Module, 
+        private enum MenuState { Main, Status, Skill, Item, Move, Equip, Squad, Module, 
                                 Compile, System, Suspend, SelectEquipChar, SelectStatusChar }        
         private MenuState currentState;
         public List<Button> allMenuBtns;
@@ -27,6 +27,7 @@ namespace Controller
         public GameObject equipUI;
         public GameObject moduleUI;
         public GameObject compileUI;
+        public GameObject squadUI;
         public GameObject playerPrefab;
         
         [Header("Background")]
@@ -455,12 +456,32 @@ namespace Controller
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
         }
 
-        public void OnClick_Spirit()
+        public void OnClick_Squad()
         {
-            // currentState = MenuState.Spirit;
-            // UpdatePopupMessage();
-            // ResetInputTimer();
-            Debug.Log("SPIRIT 미구현");
+            currentState = MenuState.Squad;
+            squadUI.SetActive(true);
+
+            SquadUIController squadController = squadUI.GetComponentInChildren<SquadUIController>();
+            if (squadController != null)
+                squadController.Initialize(this);
+
+            EventSystem.current.SetSelectedGameObject(null);
+            UpdatePopupMessage();
+            ResetInputTimer();
+            ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
+        }
+
+        // SquadUIController에서 취소키를 누를 때 호출
+        public void CloseSquadUI()
+        {
+            squadUI.SetActive(false);
+            currentState = MenuState.Main;
+            
+            // 스쿼드 화면에서 파티 대열 정보가 바뀌었으므로 메인 슬롯도 갱신
+            RefreshPartyUI();
+
+            ResetInputTimer();
+            UpdateSelection(currentBtnIndex); 
         }
 
         public void OnClick_Compile()
@@ -529,6 +550,8 @@ namespace Controller
             if (itemUI != null && itemUI.activeInHierarchy) return true;
             if (equipUI != null && equipUI.activeInHierarchy) return true;
             if (moduleUI != null && moduleUI.activeInHierarchy) return true;
+            if (compileUI != null && compileUI.activeInHierarchy) return true;
+            if (squadUI != null && squadUI.activeInHierarchy) return true; 
             return false;
         }
 

@@ -1991,7 +1991,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_030
     name: "\uD37D"
-    race: 0
+    race: 2
     align: 6
     gender: 0
     compileResultMsg: "\uD0A5\uD0A5! \uC7A5\uB09C\uB3C4 \uC88B\uC9C0\uB9CC, \uC2F8\uC6C0\uB3C4

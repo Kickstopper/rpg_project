@@ -104,6 +104,7 @@ namespace Data
             resistances = save.resistances;
             isCommander = save.isCommander;
             isMonster = save.isMonster;
+            isRegular = save.isRegular;
 
             currentHp = save.currentHp;
             currentMp = save.currentMp; 
@@ -161,6 +162,7 @@ namespace Data
             data.gender = this.gender.ToString();
             data.isCommander = this.isCommander;
             data.isMonster = this.isMonster;
+            data.isRegular = this.isRegular;
             data.workedDays = this.workedDays;
 
             data.resonanceId = this.resonanceId;

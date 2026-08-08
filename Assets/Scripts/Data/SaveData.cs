@@ -103,6 +103,7 @@ namespace Data
         public string align;
         public bool isCommander;
         public bool isMonster;
+        public bool isRegular;
 
         public string resonanceId;
         public string persistentStatusId; // 지속되는 상태 이상
