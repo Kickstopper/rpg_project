@@ -99,6 +99,7 @@ namespace Data
         public string race;
         public string gender;
         public int level;
+        public int workedDays;
         public string align;
         public bool isCommander;
         public bool isMonster;

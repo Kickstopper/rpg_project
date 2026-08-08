@@ -49,7 +49,18 @@ namespace Manager
             return expense;
         }
 
-        // 매달 청구될 파트너의 급여를 계산하여 반환
+        // 오피스에서 새로운 파트너 고용 시 요구되는 10일 치 착수금 계산
+        public int GetHiringAdvancePayment(int partnerLevel)
+        {
+            // 기본 한 달 급여 계산
+            int fullMonthlySalary = partnerLevel * SalaryPerPartner;
+            
+            // 30일 중 10일 치 (1/3) 계산 후 반올림
+            float advanceRatio = 10f / 30f; 
+            return Mathf.RoundToInt(fullMonthlySalary * advanceRatio);
+        }
+
+        // 월말 정산 시 청구될 파트너의 일할 계산된 급여 반환
         public int GetMonthlyPayForPartners()
         {
             int monthlyPay = 0;
@@ -58,11 +69,18 @@ namespace Manager
             {
                 int payForPartners = 0;
                 
-                // 플레이어(커맨더)를 제외한 순수 고용인(파트너)의 수만 계산
                 foreach (var member in ManagerRoot.Party.partyData)
                 {
                     if (member.isCommander || member.isMonster || !member.isRegular) continue;
-                    payForPartners += (member.stats.level * SalaryPerPartner);
+                    
+                    // 해당 파트너의 100% 월급
+                    int fullSalary = (member.stats.level * SalaryPerPartner);
+                    
+                    // 실제 일한 날짜 비율 (근무일 / 한 달 일수 30일)
+                    float workRatio = (float)member.workedDays / 30f;
+                    
+                    // 비율을 곱해서 합산
+                    payForPartners += Mathf.RoundToInt(fullSalary * workRatio);
                 }
                 
                 monthlyPay += payForPartners;

@@ -34,6 +34,7 @@ namespace Data
     {
         // 원본 데이터 참조 (이름, 기본 스탯 등)
         public string characterId;
+        public int workedDays;
         public bool isRegular; // 전투에 참여하는 멤버인지 아닌지
         public bool isCommander; // ITEM을 사용할 수 있고 죽었을 경우 게임 오버 되는 멤버인지
         public bool isMonster;
@@ -88,6 +89,8 @@ namespace Data
         {
             characterId = save.characterId;
             name = save.name;
+            workedDays = save.workedDays;
+            
             if (System.Enum.TryParse(save.race, out Race parsedRace)) race = parsedRace;
             if (System.Enum.TryParse(save.align, out Align parsedAlign)) align = parsedAlign;
             if (System.Enum.TryParse(save.row, out RowType parsedRow)) row = parsedRow;
@@ -118,6 +121,7 @@ namespace Data
         {
             characterId = entry.id;
             name = entry.name;
+            workedDays = 0;
             race = entry.race;
             gender = entry.gender;
             align = entry.align;
@@ -157,6 +161,7 @@ namespace Data
             data.gender = this.gender.ToString();
             data.isCommander = this.isCommander;
             data.isMonster = this.isMonster;
+            data.workedDays = this.workedDays;
 
             data.resonanceId = this.resonanceId;
             
