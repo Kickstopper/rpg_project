@@ -37,6 +37,7 @@ namespace Controller
         public List<BootLine> bootSequence;
 
         private StringBuilder sb = new StringBuilder();
+        private bool isStarted = false;
         private bool isProgress = false;
         private bool isType = false;
         private bool isTransitioning = false; // 이미 전환 중인지 체크
@@ -48,13 +49,12 @@ namespace Controller
             terminalText.text = "";
             // 초기 투명도 설정
             if (terminalCanvasGroup != null) terminalCanvasGroup.alpha = 1f;
-            StartCoroutine(BlinkCursor());
-            StartCoroutine(RunSequence());
+            
         }
 
         void Update()
         {
-            if (isProgress || isTransitioning) return;
+            if (!isStarted || isProgress || isTransitioning) return;
             if (Input.anyKeyDown)
             {
                 if (ManagerRoot.Sound != null)
@@ -64,6 +64,13 @@ namespace Controller
                 }
                 StartTransitionSequence();
             }
+        }
+
+        public void StartAnimation()
+        {
+            isStarted = true;
+            StartCoroutine(BlinkCursor());
+            StartCoroutine(RunSequence());
         }
 
         // 스킵 기능을 처리하는 코루틴

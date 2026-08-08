@@ -9,7 +9,7 @@ using Helper;
 
 namespace UI.CharacterCreationScene
 {
-    public enum CreationStep { PlayerName, PartnerName, PlayerStats, PartnerStats, Done }
+    public enum CreationStep { Ready, PlayerName, PartnerName, PlayerStats, PartnerStats, Done }
 
     public class CharacterCreationManager : MonoBehaviour
     {
@@ -30,9 +30,8 @@ namespace UI.CharacterCreationScene
 
         public TextMeshProUGUI titleText;
         public TMP_InputField nameInputField;
-        
 
-        private CreationStep currentStep = CreationStep.PlayerName;
+        private CreationStep currentStep = CreationStep.Ready;
 
         void Start()
         {
