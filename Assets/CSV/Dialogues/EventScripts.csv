@@ -2,9 +2,9 @@ EventID,Seq,Type,Name,CharacterID,Text,Condition,Action,NextID
 OUTPOST_1,1,TALK,,chr_01,근처에서 뭔가 느껴져.,None,None,2
 OUTPOST_1,2,TALK,,chr_01,긴장 풀지 마.,None,None,END
 
-OUTPOST_2,1,TALK,???,npc,이보게 젊은이. 이 앞으로 가려는 건가?,None,None,2
-OUTPOST_2,2,TALK,???,npc,그렇다면 조심하는 게 좋아. 이 앞은 E입자에 심하게 오염되었다네.,None,None,3
-OUTPOST_2,3,TALK,???,npc,나 같은 몬스터가 언제 튀어나올지 모른다고. 껄껄껄.,None,None,END
+OUTPOST_2,1,TALK,???,minotaur,이보게 젊은이. 이 앞으로 가려는 건가?,None,None,2
+OUTPOST_2,2,TALK,???,minotaur,그렇다면 조심하는 게 좋아. 이 앞은 E입자에 심하게 오염되었다네.,None,None,3
+OUTPOST_2,3,TALK,???,minotaur,나 같은 몬스터가 언제 튀어나올지 모른다고. 껄껄껄.,None,None,END
 
 TOWER_0,1,TALK,,chr_01,여기가 몬스터들의 소굴이 된 타워야.,None,None,2
 TOWER_0,2,TALK,,chr_01,원래라면 엘리베이터로 정상까지 바로 올라갈 수 있었지만 지금은 그리 간단히 일이 풀리진 않겠지.,None,None,3
@@ -15,8 +15,8 @@ TOWER_0,6,BRANCH,,chr_00,[돌아간다],,,8
 TOWER_0,7,TALK,,chr_01,좋아. 돈을 받는 만큼은 확실히 내 역할을 해줄 테니까.,None,None,END
 TOWER_0,8,TALK,,chr_01,현명한 판단이야. 이 근처는 지금의 너에게는 무리.,None,None,END
 
-EVT_GUARD_MEET,1,TALK,무장경찰,npc,거기 서라! 통행증은 있나?,None,None,2
-EVT_GUARD_MEET,2,CHOICE,System,npc,(행동을 선택하세요),None,None,"3, 4"
-EVT_GUARD_MEET,3,BRANCH,플레이어,npc,[공격한다],None,BATTLE:guard_mob,END
-EVT_GUARD_MEET,4,BRANCH,플레이어,npc,[돈을 준다],HasItem:Gold_100,REMOVE:Gold_100,5
-EVT_GUARD_MEET,5,TALK,무장경찰,npc,"흐흠, 이번만 봐주지.",None,SET_FLAG:passed_guard,END
+EVT_GUARD_MEET,1,TALK,무장경찰,minotaur,거기 서라! 통행증은 있나?,None,None,2
+EVT_GUARD_MEET,2,CHOICE,System,minotaur,(행동을 선택하세요),None,None,"3, 4"
+EVT_GUARD_MEET,3,BRANCH,플레이어,minotaur,[공격한다],None,BATTLE:guard_mob,END
+EVT_GUARD_MEET,4,BRANCH,플레이어,minotaur,[돈을 준다],HasItem:Gold_100,REMOVE:Gold_100,5
+EVT_GUARD_MEET,5,TALK,무장경찰,minotaur,"흐흠, 이번만 봐주지.",None,SET_FLAG:passed_guard,END
