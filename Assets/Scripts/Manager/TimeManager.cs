@@ -53,7 +53,20 @@ namespace Manager
         {
             Day++;
 
-            // 설정한 월말(예: 30일)이 넘어가면 다음 달 1일로 변경
+            // 하루가 지났으므로 정규 파트너들의 workedDays 1 증가
+            if (ManagerRoot.Party != null && ManagerRoot.Party.partyData != null)
+            {
+                foreach (var member in ManagerRoot.Party.partyData)
+                {
+                    // 커맨더(플레이어)와 몬스터를 제외한 정규 파트너만 조건에 포함
+                    if (!member.isCommander && !member.isMonster && member.isRegular)
+                    {
+                        member.workedDays++;
+                    }
+                }
+            }
+
+            // 설정한 daysPerMonth이 넘어가면 다음 달 1일로 변경
             if (Day > daysPerMonth)
             {
                 Day = 1;
