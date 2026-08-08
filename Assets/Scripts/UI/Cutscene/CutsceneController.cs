@@ -77,7 +77,7 @@ namespace UI.IntroScene
                 skipRequested = true;
             }
             // 컷씬 시퀀스 전체를 스킵
-            else if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            else if (Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
             {
                 SkipCutscene();
             }

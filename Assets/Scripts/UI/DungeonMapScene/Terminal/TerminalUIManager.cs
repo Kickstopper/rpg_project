@@ -223,7 +223,7 @@ namespace UI
                 }
 
                 // 메인 메뉴 전용 입력 처리
-                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
                 {
                     OnCancel(); // 터미널 완전 종료
                     return;
@@ -251,7 +251,7 @@ namespace UI
             else if (_currentState == TerminalState.WarpMode)
             {
                 // 기존 워프 메뉴 입력 처리
-                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1))
+                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
                 {
                     ReturnToMainMenu(); // ESC를 누르면 터미널 종료 대신 메인 메뉴로 복귀
                     return;
