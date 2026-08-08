@@ -706,17 +706,21 @@ MonoBehaviour:
     delayAfter: 4
   - image: {fileID: 21300000, guid: f5907b4de32fe0e4395a38471ccd1a26, type: 3}
     background: {fileID: 0}
-    text: "\uAC11\uC790\uAE30 \uB098\uD0C0\uB09C \uB9C8\uBB3C\uB4E4\uC5D0 \uC758\uD574"
+    text: "\uC778\uAC04\uC774 \uC544\uB2CC \uAC83\uB4E4\uC774 \uB098\uD0C0\uB098
+      \uC778\uB958\uC758 \uC0DD\uC874\uC744 \uC704\uD611\uD558\uAE30 \uC2DC\uC791\uD55C\uC9C0
+      \uC218\uB144\uC774 \uD758\uB800\uB2E4"
     lineDelay: 0.1
     delayAfter: 4
   - image: {fileID: 21300000, guid: d45d361938ee36844880ec5fe14b5cef, type: 3}
     background: {fileID: 21300000, guid: a1fd49298ca208e45abe1ca76932b099, type: 3}
-    text: "\uC778\uB958\uC758 \uBB38\uBA85\uC740 \uB05D\uB0AC\uB2E4"
+    text: "\uACF5\uAD8C\uB825\uB9CC\uC73C\uB85C\uB294 \uAC01\uC9C0\uC5D0\uC11C \uBC1C\uC0DD\uD558\uB294
+      \uC0AC\uAC74\uB4E4\uC744 \uAC10\uB2F9\uD558\uAE30 \uC5B4\uB824\uC6CC\uC9C0\uC790"
     lineDelay: 0.1
     delayAfter: 4
   - image: {fileID: 0}
     background: {fileID: 0}
-    text: "\n\n\uADF8\uB9AC\uACE0 \uC2DC\uAC04\uC740 \uD758\uB7EC..."
+    text: "\uC815\uBD80\uB294 \uBBFC\uAC04 \uACBD\uBE44 \uC5C5\uCCB4\uC5D0\uAC8C\uB3C4
+      \uADF8\uB4E4\uACFC \uC2F8\uC6B8 \uAD8C\uD55C\uC744 \uBD80\uC5EC\uD588\uB2E4."
     lineDelay: 0.1
     delayAfter: 4
   nextSceneName: TitleScene

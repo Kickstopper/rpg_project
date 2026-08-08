@@ -1,10 +1,26 @@
 EventID,Seq,Type,Name,CharacterID,Text,Condition,Action,NextID
-OUTPOST_1,1,TALK,,chr_01,근처에서 뭔가 느껴져.,None,None,2
-OUTPOST_1,2,TALK,,chr_01,긴장 풀지 마.,None,None,END
+OUTPOST_1,1,TALK,,chr_01,네가 [chr_00]이지? 기다리고 있었어.,None,None,2
+OUTPOST_1,2,TALK,,chr_01,나는 오늘부터 한 달 간 너의 파트너로서 함께하게 된 [chr_01]이라고 해. 잘 부탁해,None,None,3
+OUTPOST_1,3,TALK,,chr_01,우선 사무실로 가자. 바로 일을 시작하고 싶겠지만 입사 수속을 밟아야 하니까.,None,None,4
+OUTPOST_1,4,TALK,,chr_01,왼쪽의 빨간 문이 보이지? 거기가 사무실이야. 자 가자.,None,None,END
 
-OUTPOST_2,1,TALK,???,minotaur,이보게 젊은이. 이 앞으로 가려는 건가?,None,None,2
-OUTPOST_2,2,TALK,???,minotaur,그렇다면 조심하는 게 좋아. 이 앞은 E입자에 심하게 오염되었다네.,None,None,3
-OUTPOST_2,3,TALK,???,minotaur,나 같은 몬스터가 언제 튀어나올지 모른다고. 껄껄껄.,None,None,END
+OUTPOST_2,1,TALK,,chr_01,여기가 사무실이야. 앞으로 자주 드나들게 되는 곳이니까 잘 기억해둬.,None,None,2
+OUTPOST_2,2,TALK,,chr_01,자. 들어가자.,None,None,3
+
+OUTPOST_3,1,TALK,,chr_01,정식으로 미토스 브레이커즈의 인턴 사원이 된 걸 환영해.,None,None,2
+OUTPOST_3,2,TALK,,chr_01,나도 이 일을 하게 된지 반년 밖에 안 됐지만 그래도 정사원이니까 아예 도움이 안 되진 않겠지.,None,None,3
+OUTPOST_3,3,TALK,,chr_01,첫 달은 무료 서비스지만 다음달부터는 파트너 렌탈 요금이 청구돼.,None,None,4
+OUTPOST_3,4,TALK,,chr_01,다음달부터는 다른 파트너도 선택할 수 있게 되겠지만 되도록 나를 이용해줬으면 좋겠어.,None,None,5
+OUTPOST_3,5,TALK,,chr_01,고정 수입이 없는 직업이잖아. 지명해 주는 사람이 많을수록 나도 안정적인 생활이 가능해지니까.,None,None,END
+
+OUTPOST_4,1,TALK,,chr_01,이 안은 터미널이야. 행동의 기록이나 열람이 가능하고 등록된 장소가 있다면 워프할 수 있어.,None,None,2
+OUTPOST_4,2,TALK,,chr_01,"마침 비어있는 것 같으니, 바로 시험해 보는 게 어때?",None,None,END
+
+OUTPOST_5,1,TALK,,chr_01,"업무의 시작도 보고, 끝도 보고라는 걸 잊지마.",None,None,END
+
+OUTPOST_9,1,TALK,???,minotaur,이보게 젊은이. 이 앞으로 가려는 건가?,None,None,2
+OUTPOST_9,2,TALK,???,minotaur,그렇다면 조심하는 게 좋아. 이 앞은 E입자에 심하게 오염되었다네.,None,None,3
+OUTPOST_9,3,TALK,???,minotaur,나 같은 몬스터가 언제 튀어나올지 모른다고. 껄껄껄.,None,None,END
 
 TOWER_0,1,TALK,,chr_01,여기가 몬스터들의 소굴이 된 타워야.,None,None,2
 TOWER_0,2,TALK,,chr_01,원래라면 엘리베이터로 정상까지 바로 올라갈 수 있었지만 지금은 그리 간단히 일이 풀리진 않겠지.,None,None,3
