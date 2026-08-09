@@ -46,7 +46,7 @@ Material:
     m_Ints: []
     m_Floats:
     - PixelSnap: 0
-    - _CycleSpeed: 1
+    - _CycleSpeed: 1.5
     - _EnableExternalAlpha: 0
     - _ZWrite: 0
     m_Colors:

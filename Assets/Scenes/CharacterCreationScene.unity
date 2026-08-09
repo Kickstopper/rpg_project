@@ -18531,7 +18531,7 @@ MonoBehaviour:
   fadeDuration: 1
   skipFadeDuration: 0.3
   bootSequence:
-  - text: '[mythOS v1.30]
+  - text: '[ANATTA-OS v1.30]
 
 
       System Initializing...
@@ -18541,54 +18541,38 @@ MonoBehaviour:
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 1024
-  - text: "MYTHOS DATABASE \u2014 ONLINE \nENTITY LINK \u2014 ONLINE SUMMONING MODULE
+  - text: "ANATTA DATABASE \u2014 ONLINE \nSURA LINK \u2014 ONLINE SUMMONING MODULE
       \u2014 ONLINE\nCONTRACT MODULE \u2014 ONLINE \n\n"
     preDelay: 1
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: "       IIII         IIII III      IIIIIIIIIIIIIIIIIII       IIII    IIIIIIIIII     
-      IIIIIIII        \r\n       IIIII        IIII IIII     IIIIIIIIIIIIIII III      
-      IIII   IIIIIIIIIIIII  IIIIIIIIII        \r\n       IIIII       IIIII  IIII  
-      III     IIII     III       IIII IIII        III  IIII              \r\n      
-      IIIIII     IIIIII   IIIIIIII      IIII     III       IIII III          III
-      IIIII             \r\n       IIIIIII   IIIIIII    IIIIII       IIII     IIIIIIIIIIIIIIIIII         
-      III  IIIIIII          \r\n       III IIII IIII III     IIII        IIII    
-      IIIIIIIIIIIIIIIIII          III     IIIIII        \r\n       III  IIIIIII 
-      III     IIII        IIII     III       IIII IIII        IIII        IIII      
-      \r\n       III   IIIII   III     IIII        IIII     III       IIII  IIII    
-      IIIII  II     IIII       \r\n       III    III    III     IIII        IIII    
-      III       IIII   IIIIIIIIIIII   IIIIIIIIII        \r\n        I      I    
-      II       II          II       II        II       IIIIII        IIIII          
-      \r\n                                                                                                   
-      \r\n                                                                                                   
-      \r\n IIIIIIIIII   IIIIIIIIII   IIIIIIIII      IIII      III    IIIIIIIIIIIIIII
-      IIIIIIIIII    IIIIIIIII  \r\n IIII  IIIII  III   IIIII  III           IIIIII    
-      III  IIIII  III        IIII   IIII  IIII    II  \r\n IIII   IIII  III    IIII 
-      III          IIIIIII     IIIIIIII    III        IIII    IIII IIII        \r\n
-      IIIIIIIIII   III   IIII   IIIIIIII     III IIII    IIIIIII     IIIIIIIII  IIII  
-      IIII  IIIIII      \r\n IIIIIIIIIII  IIIIIIIII    IIIIIIIII   IIII  IIII   IIIIII     
-      IIIIIIIII  IIIIIIIIII     IIIIIII   \r\n IIII   IIII  IIIIIIIII    III       
-      IIIIIIIIIIII  IIIIIII     III        IIIIIIIIII        IIIII  \r\n IIII   
-      IIII III   IIII   III       IIII     IIII  III IIIII   III        IIII   IIII        
-      IIII \r\n IIIIIIIIIII  III    IIII  IIIIIIIII III       IIII III   IIIII IIIIIIIIII
-      IIII    IIII III   IIII  \r\n IIIIIIIII    III     IIII IIIIIIIIIIIII       
-      IIIIIII     IIIIIIIIIIIIII IIII     IIIIIIIIIIIII   \n"
+  - text: "       IIIIIII      IIIIII      IIIII       IIIIII   IIIIIIIIIIIIIIIIIIIIIIIIIIIIII  
+      IIIIII        \r\n      IIIIIIII      IIIIIII     IIIII      IIIIIII   IIIIIIIIIIIIIIIIIIIIIIIIIIIIII 
+      IIIIIIII       \r\n     IIIIIIIIII     IIIIIIIII   IIIII     IIIIIIIII      
+      IIIII          IIII       IIIIIIIIII      \r\n     IIII  IIIII    IIII IIIII 
+      IIIII    IIIII  IIII      IIIII          IIII      IIIII  IIII      \r\n   
+      IIIII  IIIII    IIII  IIIII IIIII    IIIII  IIIII     IIIII          IIII     
+      IIIII  IIIII     \r\n   IIIIIIIIIIIIII   IIII   IIIIIIIIII   IIIIIIIIIIIII    
+      IIIII          IIII     IIIIIIIIIIIIII    \r\n   IIIIIIIIIIIIIII  IIII    IIIIIIIII 
+      IIIIIIIIIIIIIII    IIIII          IIII    IIIIIIIIIIIIIII    \r\n  IIIII     
+      IIIII  IIII      IIIIIII  IIIII      IIIII   IIIII          IIII    IIIII     
+      IIIII   \r\n  IIII        IIIII IIII       IIIIII IIIII       IIIII   IIIII         
+      IIII   IIIII       IIIIII  \n"
     preDelay: 1
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
   - text: "> \uD604 \uC2DC\uAC04\uBD80\uB85C \uB2F9\uC2E0\uC740 \uC774\uD615\uC758
-      \uC874\uC7AC, \uBBF8\uD1A0\uC2A4\uAC00 \uC77C\uC73C\uD0A4\uB294 \uB09C\uB3D9\uC744
-      \uC9C4\uC555\uD558\uAE30 \uC704\uD55C\n> \uD2B9\uC218 \uBBFC\uAC04 \uACBD\uBE44
-      \uC5C5\uCCB4 '\uBBF8\uD1A0\uC2A4 \uBE0C\uB808\uC774\uCEE4\uC988'\uC758 \uC778\uD134
-      \uC694\uC6D0\uC73C\uB85C \uC778\uAC00\uB418\uC5C8\uC2B5\uB2C8\uB2E4.\n"
+      \uC874\uC7AC, \uC218\uB77C\uAC00 \uC77C\uC73C\uD0A4\uB294 \uD3ED\uB3D9\uC744
+      \uC9C4\uC555\uD558\uAE30 \uC704\uD55C\n> \uD2B9\uC218 \uBBFC\uAC04 \uACBD\uBE44\uB300
+      '\uC544\uB098\uB530'\uC758 \uAE30\uAC04\uC81C \uC694\uC6D0\uC73C\uB85C \uC778\uAC00\uB418\uC5C8\uC2B5\uB2C8\uB2E4.\n"
     preDelay: 0.25
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: "> \uBBF8\uD1A0\uC2A4\uB97C \uC12C\uBA78\uD558\uACE0 \r\n> \uC9C0\uC5ED
-      \uC0AC\uD68C\uC758 \uD3C9\uD654\uB97C \uD0C8\uD658\uD558\uC2ED\uC2DC\uC624.\n"
+  - text: "> \uC218\uB77C\uB97C \uC12C\uBA78\uD558\uACE0 \r\n> \uC9C0\uC5ED \uC0AC\uD68C\uC758
+      \uD3C9\uD654\uB97C \uD0C8\uD658\uD558\uC2ED\uC2DC\uC624.\n"
     preDelay: 0.25
     isMemoryCheck: 0
     memoryStart: 0
@@ -18596,13 +18580,13 @@ MonoBehaviour:
   - text: "> \uB9E8\uBAB8\uC73C\uB85C \uADF8\uB4E4\uACFC \uAD50\uC804\uD558\uB294
       \uAC83\uC740 \uC9C0\uADF9\uD788 \uBE44\uD569\uB9AC\uC801\uC785\uB2C8\uB2E4.\r\n>
       \uC774\uC5D0 \uACE0\uB300\uC758 \uC18C\uD658\uC220\uACFC \uCCA8\uB2E8 \uACFC\uD559\uC758
-      \uACB0\uD569, \r\n> \uC774\uD615 \uC18C\uD658\uAE30 [TERMINAL]\uC758 \uC811\uADFC
+      \uACB0\uD569, \r\n> \uC218\uB77C \uC18C\uD658\uAE30 [TERMINAL]\uC758 \uC811\uADFC
       \uAD8C\uD55C\uC744 \uBD80\uC5EC\uD569\uB2C8\uB2E4.\n"
     preDelay: 0.25
     isMemoryCheck: 0
     memoryStart: 0
     memoryEnd: 0
-  - text: "> \uC774\uD615\uC744 \uD1B5\uC81C\uD558\uC5EC \uC774\uD615\uC5D0 \uB300\uC751\uD558\uC2ED\uC2DC\uC624.\r\n>
+  - text: "> \uC218\uB77C\uB97C \uD1B5\uC81C\uD558\uC5EC \uC218\uB77C\uC5D0 \uB300\uC751\uD558\uC2ED\uC2DC\uC624.\r\n>
       [TERMINAL]\uC758 \uC870\uC791 \uC219\uB828\uB3C4\uAC00 \uACE7 \uB2F9\uC2E0\uC758
       \uC0DD\uC874\uC744 \uACB0\uC815\uC9C0\uC744 \uAC83\uC785\uB2C8\uB2E4.\n"
     preDelay: 0.25

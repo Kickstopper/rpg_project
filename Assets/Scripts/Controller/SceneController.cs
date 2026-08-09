@@ -241,6 +241,7 @@ namespace Controller
             if (ManagerRoot.Party != null) ManagerRoot.Party.Initialize();
             if (ManagerRoot.DungeonMapState != null) ManagerRoot.DungeonMapState.ClearAllMapData();
             if (ManagerRoot.Module != null) ManagerRoot.Module.Initialize();
+            ManagerRoot.Sound.StopBGM();
             SceneManager.LoadScene(GameScene.CHARACTER_CREATION_SCENE);
         }
 
@@ -253,6 +254,7 @@ namespace Controller
         {
             if (ManagerRoot.Save.HasSuspendData())
             {
+                ManagerRoot.Sound.StopBGM();
                 ManagerRoot.Save.LoadGame(SaveManager.SUSPEND_SLOT_INDEX);
             }
         }

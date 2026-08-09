@@ -41,7 +41,7 @@ namespace Manager
 
         void Start()
         {
-            ManagerRoot.Sound.PlayBGM(Data.BgmID.Fusion);
+            ManagerRoot.Sound.PlayBGM(Data.BgmID.Fusion_Start);
             // 몬스터 이미지 세팅 (시퀀스 시작 전 필수)
             SetupMonstersFromDatabase();
 
