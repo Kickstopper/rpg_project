@@ -15,11 +15,14 @@ namespace UI.Battle
         public MonsterDatabase.MonsterEntry sourceData;
         [Header("VFX")]
         public Material baseAnaglyphMaterial;
+
+        [Header("Targeting UI")]
+        public GameObject portraitPanel;
+        public Image portraitImage;
         
         // Monster 전용 필드
         public Color backRowColor = new Color(0.6f, 0.6f, 0.6f, 1f); 
         public Color frontRowColor = Color.white;
-        public Button selectButton;
 
         public RowType currentRow;
         public ColumnType currentColumn;
@@ -193,6 +196,8 @@ namespace UI.Battle
                 preferredImage.SetNativeSize();
                 originalColor = preferredImage.color;
                 preferredImage.rectTransform.pivot = new Vector2(0.5f, 0f);
+
+                preferredImage.raycastTarget = false; 
                 
                 if (data.image.Length > 1 && data.animInterval > 0f) 
                 {
@@ -200,15 +205,16 @@ namespace UI.Battle
                     animSpeed = data.animInterval;
                 }
             }
+
+            // 초상화 UI 초기 설정
+            if (portraitPanel != null && portraitImage != null && data.image != null && data.portrait)
+            {
+                portraitImage.sprite = data.portrait;
+                portraitImage.raycastTarget = true; // 오직 초상화 UI만 마우스/터치를 감지
+                portraitPanel.SetActive(false);
+            }
             
             gameObject.name = entityName;
-
-            selectButton = GetComponent<Button>();
-            if (selectButton != null)
-            {
-                selectButton.onClick.RemoveAllListeners();
-                selectButton.onClick.AddListener(OnClicked);
-            }
         }
 
         private void OnEnable()
@@ -256,8 +262,6 @@ namespace UI.Battle
             {
                 preferredImage.color = targetColor;
             }
-
-            // "이제부터 이 색이 나의 기본 색이다"라고 저장
             originalColor = targetColor;
         }
 
@@ -277,6 +281,26 @@ namespace UI.Battle
         public void SetPositionInfo(int colIndex)
         {
             this.columnIndex = colIndex;
+        }
+
+        // 타겟 선택 시 초상화를 띄우는 오버라이드 함수
+        public override void SetTargetingMode(bool isTargeting)
+        {
+            if (portraitImage == null) return;
+            portraitPanel.SetActive(isTargeting);
+
+            if (isTargeting)
+            {
+                // 초상화 UI의 앵커(기준점)를 무조건 하단 중앙으로 강제 고정
+                // 몬스터 본체의 높이가 제각각이어도 항상 발밑을 기준 0으로 삼도록
+                var panel = portraitPanel.GetComponent<RawImage>();
+                panel.rectTransform.anchorMin = new Vector2(0.5f, 0f);
+                panel.rectTransform.anchorMax = new Vector2(0.5f, 0f);
+                
+                // 피벗도 중앙으로 맞춤
+                panel.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+                panel.rectTransform.anchoredPosition = new Vector2(-24, 24);
+            }
         }
 
         // 타겟 지정

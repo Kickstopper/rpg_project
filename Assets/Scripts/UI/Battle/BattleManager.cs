@@ -350,7 +350,8 @@ namespace UI.Battle
             
             fieldController.currentTargetIndex = 0;
             fieldController.UpdateValidTargetsHighlight(); // 다수일 경우 전체 하이라이트가 켜짐
-            
+            fieldController.ToggleTargetingPortraits(true);
+
             uiController.SetCmdPanelVisible(false);
             uiController.ShowLog("타겟 선택");
             
@@ -1226,6 +1227,7 @@ namespace UI.Battle
             
             fieldController.currentTargetIndex = 0; 
             fieldController.UpdateValidTargetsHighlight();
+            fieldController.ToggleTargetingPortraits(true);
             inputCooldown = 0.05f;
 
             // 타겟팅이 시작될 때 시야를 가리지 않도록 커맨드 패널 전체를 숨김
@@ -1292,7 +1294,10 @@ namespace UI.Battle
 
             isSelectingTarget = true;
             fieldController.currentTargetIndex = 0;
+
+            // 타겟팅
             fieldController.UpdateValidTargetsHighlight();
+            fieldController.ToggleTargetingPortraits(true);
             
             // UI 숨기기
             uiController.SetCmdPanelVisible(false);
@@ -1304,6 +1309,11 @@ namespace UI.Battle
         {
             fieldController.StopBlinkEffects();
             currentUnionParticipants.Clear();
+
+            // CancelTargetSelection() 내부에서 이미 호출되므로 여기엔 안 적어도 되지만,
+            // 독립적으로 취소될 경우를 대비
+            fieldController.ToggleTargetingPortraits(false);
+            
             CancelTargetSelection();
         }
 
@@ -1731,6 +1741,7 @@ namespace UI.Battle
             isSelectingTarget = false;
             uiController.SetTargetCursorVisible(false);
             fieldController.HighlightToCurrentCharacter();
+            fieldController.ToggleTargetingPortraits(false);
             inputCooldown = 0.05f; 
             
             // 타겟팅 진입 시 껐던 커맨드 패널을 다시 켬
@@ -1963,6 +1974,7 @@ namespace UI.Battle
         public void OnTargetSelected(BattleEntity targetEntity)
         {
             if (!isSelectingTarget) return;
+            fieldController.ToggleTargetingPortraits(false);
 
             if (currentSelectedAction == ActionType.Talk)
             {

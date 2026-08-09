@@ -274,14 +274,6 @@ namespace UI.Battle
 
             if (controller.currentHp <= 0) { Destroy(newMonsterObj); return; }
 
-            // 몬스터 버튼의 자동 내비게이션 비활성화
-            if (controller.selectButton != null)
-            {
-                Navigation nav = new Navigation();
-                nav.mode = Navigation.Mode.None;
-                controller.selectButton.navigation = nav;
-            }
-
             // 배치된 위치 정보를 컨트롤러에 주입
             bool isFront = (targetSlots == frontSlots);
             
@@ -333,6 +325,20 @@ namespace UI.Battle
             // 알파값 완전 복구
             foreach (var p in activePlayers) (p as PlayerController).ResetHighlightColor();
         }
+
+        public void ToggleTargetingPortraits(bool isTargeting)
+        {
+            if (validTargets == null) return;
+
+            foreach (var target in validTargets)
+            {
+                if (target != null)
+                {
+                    target.SetTargetingMode(isTargeting);
+                }
+            }
+        }
+        
         public void UpdateValidTargetsHighlight()
         {
             foreach (var monster in validTargets) monster.SetSelectionState(false);

@@ -231,6 +231,10 @@ namespace UI.Battle
             return RestrictionType.None; // 무사통과
         }
 
+        // 타겟팅 모드(초상화 UI 등)를 켜고 끄기 위한 가상 함수
+        public virtual void SetTargetingMode(bool isTargeting) { } 
+
+
         // 데미지 처리는 연출과 로직(UI갱신 vs 사망처리)이 다르므로 추상화
         public abstract IEnumerator OnDamageTaken(int damage);
 
