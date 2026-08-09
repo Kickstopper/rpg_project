@@ -7,7 +7,7 @@ OUTPOST_1,4,TALK,,chr_01,왼쪽의 빨간 문이 보이지? 거기가 사무실�
 OUTPOST_2,1,TALK,,chr_01,여기가 사무실이야. 앞으로 자주 드나들게 되는 곳이니까 잘 기억해둬.,None,None,2
 OUTPOST_2,2,TALK,,chr_01,자. 들어가자.,None,None,3
 
-OUTPOST_3,1,TALK,,chr_01,정식으로 미토스 브레이커즈의 인턴 사원이 된 걸 환영해.,None,None,2
+OUTPOST_3,1,TALK,,chr_01,정식으로 미토스 브레이커즈의 인턴 요원이 된 걸 환영해.,None,None,2
 OUTPOST_3,2,TALK,,chr_01,나도 이 일을 하게 된지 반년 밖에 안 됐지만 그래도 정사원이니까 아예 도움이 안 되진 않겠지.,None,None,3
 OUTPOST_3,3,TALK,,chr_01,첫 달은 무료 서비스지만 다음달부터는 파트너 렌탈 요금이 청구돼.,None,None,4
 OUTPOST_3,4,TALK,,chr_01,다음달부터는 다른 파트너도 선택할 수 있게 되겠지만 되도록 나를 이용해줬으면 좋겠어.,None,None,5

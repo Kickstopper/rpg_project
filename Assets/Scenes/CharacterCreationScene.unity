@@ -1134,9 +1134,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1582856908}
   - {fileID: 5109227362855024516}
   - {fileID: 635673193}
-  - {fileID: 1582856908}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1582856907
@@ -18596,8 +18596,8 @@ MonoBehaviour:
   - text: "> \uB9E8\uBAB8\uC73C\uB85C \uADF8\uB4E4\uACFC \uAD50\uC804\uD558\uB294
       \uAC83\uC740 \uC9C0\uADF9\uD788 \uBE44\uD569\uB9AC\uC801\uC785\uB2C8\uB2E4.\r\n>
       \uC774\uC5D0 \uACE0\uB300\uC758 \uC18C\uD658\uC220\uACFC \uCCA8\uB2E8 \uACFC\uD559\uC758
-      \uACB0\uD569, \r\n> \uC774\uD615 \uC18C\uD658 \uB2E8\uB9D0 'TERMINAL'\uC758
-      \uC811\uADFC \uAD8C\uD55C\uC744 \uBD80\uC5EC\uD569\uB2C8\uB2E4.\n"
+      \uACB0\uD569, \r\n> \uC774\uD615 \uC18C\uD658\uAE30 [TERMINAL]\uC758 \uC811\uADFC
+      \uAD8C\uD55C\uC744 \uBD80\uC5EC\uD569\uB2C8\uB2E4.\n"
     preDelay: 0.25
     isMemoryCheck: 0
     memoryStart: 0

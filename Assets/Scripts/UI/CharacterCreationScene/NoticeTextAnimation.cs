@@ -25,9 +25,9 @@ public class NoticeTextAnimation : MonoBehaviour
     private void StartAnimation()
     {
         Sequence seq = DOTween.Sequence();
-        seq.Append(noticeText.DOFade(1, 1f));
+        seq.Append(noticeText.DOFade(1, 3f));
         seq.AppendInterval(3f);
-        seq.Append(noticeText.DOFade(0, 1f));
+        seq.Append(noticeText.DOFade(0, 3f));
         seq.OnComplete(() =>
         {
             noticePanel.SetActive(false);
