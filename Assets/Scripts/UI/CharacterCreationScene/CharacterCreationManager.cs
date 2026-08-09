@@ -52,7 +52,7 @@ namespace UI.CharacterCreationScene
             {
                 case CreationStep.PlayerName:
                     if (ManagerRoot.Sound != null)
-                        ManagerRoot.Sound.PlayBGM(BgmID.LevelUp);
+                        ManagerRoot.Sound.PlayBGM(BgmID.Character_Creation);
                     titleText.text = "당신의 이름을 입력하세요";
 
                     nameInputPanel.SetActive(true);
@@ -72,7 +72,7 @@ namespace UI.CharacterCreationScene
 
                 case CreationStep.PlayerStats:
                     if (ManagerRoot.Sound != null)
-                        ManagerRoot.Sound.PlayBGM(BgmID.LevelUp);
+                        ManagerRoot.Sound.PlayBGM(BgmID.Character_Creation);
                     nameInputPanel.SetActive(false);
                     levelUpPanel.SetActive(true);
 
@@ -85,7 +85,7 @@ namespace UI.CharacterCreationScene
                     if (ManagerRoot.Sound != null)
                     {
                         ManagerRoot.Sound.StopBGM(false);
-                        ManagerRoot.Sound.PlayBGM(BgmID.LevelUp);
+                        ManagerRoot.Sound.PlayBGM(BgmID.Character_Creation);
                     }
                     
                     SetCharacterStats(PartyID.CHARACTER_01, CreateBaseStat(5)); // 히로인 기본 스탯 저장

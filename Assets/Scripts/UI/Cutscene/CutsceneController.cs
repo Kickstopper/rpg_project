@@ -177,7 +177,7 @@ namespace UI.IntroScene
         private IEnumerator FadeOut()
         {
             if (fadeOverlay == null) yield break;
-            ManagerRoot.Sound.StopBGM(true, fadeOutDuration);
+            //ManagerRoot.Sound.StopBGM(true, fadeOutDuration);
             float timer = 0f;
             Color startColor = new Color(fadeOutColor.r, fadeOutColor.g, fadeOutColor.b, 0);
             Color endColor = new Color(fadeOutColor.r, fadeOutColor.g, fadeOutColor.b, 1);
@@ -194,7 +194,7 @@ namespace UI.IntroScene
 
         private void SkipCutscene()
         {
-            ManagerRoot.Sound.StopBGM();
+            //ManagerRoot.Sound.StopBGM();
             StopAllCoroutines();
             TransitionToNextScene();
         }

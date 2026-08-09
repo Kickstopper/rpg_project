@@ -39,8 +39,8 @@ public class StarWarpController : MonoBehaviour
     
     private bool isWarping = false;
     private Vector2 currentOffset = Vector2.zero;
-
-    void Start()
+    
+    void Awake() 
     {
         if (starMaterial != null)
         {
@@ -48,7 +48,6 @@ public class StarWarpController : MonoBehaviour
             if (targetImage != null) targetImage.material = starMaterial;
         }
         
-        //starDensity = Shader.PropertyToID("_Density");
         starMaterial.SetFloat("_Density", starDensity);
 
         customTimeId = Shader.PropertyToID("_CustomTime");
@@ -171,7 +170,7 @@ public class StarWarpController : MonoBehaviour
     }
 
     // 진행 중인 연출을 즉시 중단하고 Idle 상태로 초기화
-    public void Reset()
+    public void ResetToIdle()
     {
         // 진행 중인 워프 수축이나 페이드 복귀 코루틴을 즉시 강제 종료
         StopAllCoroutines();
@@ -188,9 +187,9 @@ public class StarWarpController : MonoBehaviour
             starMaterial.SetFloat(stretchId, idleStretch);
             starMaterial.SetFloat(masterAlphaId, 1.0f);
             
-            // 시점을 즉시 정중앙으로 초기화
+            // 시점을 즉시 정중앙으로 초기화 (Vector4로 전달하여 더 안전하게 처리)
             currentOffset = Vector2.zero;
-            starMaterial.SetVector(viewOffsetId, Vector2.zero);
+            starMaterial.SetVector(viewOffsetId, Vector4.zero);
         }
     }
 

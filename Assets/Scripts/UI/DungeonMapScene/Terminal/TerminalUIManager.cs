@@ -76,7 +76,8 @@ namespace UI
 
         public void OpenTerminal(string currentTerminalID)
         {
-            ManagerRoot.Sound.PlayBGM(Data.BgmID.Terminal);
+            ManagerRoot.Sound.PlayBGM(Data.BgmID.Terminal, 0);
+            ManagerRoot.Sound.SetBgmVolume(1f);
             IsSelectionComplete = false;
             IsCanceled = false;
             SelectedTerminal = null;
@@ -370,7 +371,7 @@ namespace UI
                   .SetEase(Ease.InExpo);
             }
 
-            ManagerRoot.Sound.StopBGM();
+            //ManagerRoot.Sound.SetBgmVolume(0.5f); // sfx가 잘 들리도록 bgm 볼륨을 반으로 줄임
 
             fadeOverlay.DOFade(1f, 0.5f).OnStart(()=>{fadeOverlay.color = new Color(0f, 0f, 0f, 0f);});
             
@@ -382,7 +383,7 @@ namespace UI
             if (characterImage != null && characterAscii != null && objectPool != null)
             {
                 warp.gameObject.SetActive(true);
-                warp.Reset();
+                warp.ResetToIdle();
                 
                 characterImage.gameObject.SetActive(true);
                 yield return StartCoroutine(FadeSpriteAlpha(characterImage, 0f, 1f, 0.5f, Color.white));

@@ -171,6 +171,55 @@ namespace Manager
             }
         }
 
+        /// <summary>
+        /// BGM의 볼륨을 변경합니다.
+        /// </summary>
+        /// <param name="targetVolume">목표 볼륨 (0.0f ~ 1.0f)</param>
+        /// <param name="useFade">페이드 효과 사용 여부</param>
+        /// <param name="fadeDuration">페이드 진행 시간(초)</param>
+        public void SetBgmVolume(float targetVolume, bool useFade = true, float fadeDuration = 1.0f)
+        {
+            if (bgmSource == null) return;
+
+            // 진행 중인 페이드 코루틴이 있다면 중단
+            if (bgmFadeCoroutine != null)
+            {
+                StopCoroutine(bgmFadeCoroutine);
+                bgmFadeCoroutine = null;
+            }
+
+            if (useFade)
+            {
+                bgmFadeCoroutine = StartCoroutine(FadeVolume(bgmSource, targetVolume, fadeDuration));
+            }
+            else
+            {
+                bgmSource.volume = targetVolume;
+            }
+        }
+
+        // 볼륨 변경 전용 페이드 코루틴
+        private IEnumerator FadeVolume(AudioSource source, float targetVolume, float duration)
+        {
+            float startVolume = source.volume;
+            float timer = 0f;
+
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+                // 시간에 따라 현재 볼륨에서 목표 볼륨으로 부드럽게 변경
+                source.volume = Mathf.Lerp(startVolume, targetVolume, timer / duration);
+                yield return null;
+            }
+
+            // 정확한 목표 볼륨으로 최종 보정
+            source.volume = targetVolume;
+            
+            // BGM의 경우 코루틴 변수 초기화
+            if (source == bgmSource)
+                bgmFadeCoroutine = null;
+        }
+
         #endregion
 
         #region Helper Methods
