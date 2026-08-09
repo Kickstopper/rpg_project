@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Outpost
   m_EditorClassIdentifier: 
   themeID: Outpost
-  bgmID: 7
+  bgmID: 21
   useWakeUpEffect: 0
   monsterList: []
   maxEnemyCount: 2
