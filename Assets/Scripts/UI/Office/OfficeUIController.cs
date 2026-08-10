@@ -132,7 +132,7 @@ namespace UI.Office
         private void OnPartnerClicked()
         {
             buttonContainer.SetActive(false);
-            SpeakAndDo("파트너를 바꾸려고?", () => 
+            SpeakAndDo("파트너 렌탈? 지금의 파트너에 불만이 있는 건가?", () => 
             {
                 dialoguePanel.SetActive(false);
                 partnerUI.gameObject.SetActive(true);
@@ -195,7 +195,7 @@ namespace UI.Office
 
         private IEnumerator WaitAndExecuteCallback()
         {
-            yield return YieldCache.WaitForSeconds(0.2f);
+            yield return YieldCache.WaitForSeconds(0.5f);
             if (onDialogueComplete != null)
             {
                 System.Action tempAction = onDialogueComplete;
