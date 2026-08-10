@@ -470,7 +470,7 @@
             "value": -1,
             "wallTextureIDs": [
                 1,
-                6,
+                -1,
                 1,
                 3
             ],

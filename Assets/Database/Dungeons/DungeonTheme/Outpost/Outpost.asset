@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Outpost
   m_EditorClassIdentifier: 
   themeID: Outpost
-  bgmID: 21
+  bgmID: 29
   useWakeUpEffect: 0
   monsterList: []
   maxEnemyCount: 2
@@ -30,13 +30,19 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 62f50738d34f71e43b7c445b8e3fe4e0, type: 3}
   - {fileID: 2800000, guid: 61d96c4d5b311de4899342dab9061505, type: 3}
   - {fileID: 2800000, guid: 7a87d9e8b73f76644b22172530fd7554, type: 3}
+  - {fileID: 2800000, guid: 9ee097a712846e942b577c73709ca99c, type: 3}
+  - {fileID: 2800000, guid: bce683c8a338f5648a90d75e8982ebf8, type: 3}
+  - {fileID: 2800000, guid: 379cfbcca2e1c404abdd0bed5a9ad058, type: 3}
   - {fileID: 2800000, guid: 0a8359ec91578d24c957c9d74626529a, type: 3}
   ceilingTexIdx: 5
   floorTexIdx: 4
   passableWallTexIDs: 
   doorAnimations:
   - closedTexId: 3
-    openFrameTexIds: 060000000700000008000000
+    openFrameTexIds: 06000000070000000b000000
+    animSpeed: 0.05
+  - closedTexId: 8
+    openFrameTexIds: 090000000a0000000b000000
     animSpeed: 0.05
   wallAnimations: []
   objectSprites: []

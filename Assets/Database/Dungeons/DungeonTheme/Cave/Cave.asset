@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Cave
   m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
   themeID: Cave
-  bgmID: 8
+  bgmID: 32
   useWakeUpEffect: 0
   monsterList:
   - enemy_045

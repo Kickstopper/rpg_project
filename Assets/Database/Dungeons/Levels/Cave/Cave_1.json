@@ -2501,7 +2501,7 @@
             "type": 0,
             "sourceX": 4,
             "sourceY": 1,
-            "isWallEntrance": true,
+            "isWallEntrance": false,
             "stairType": 0,
             "isWorldMap": false,
             "destinationID": "Cave_0",

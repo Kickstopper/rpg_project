@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: NpcDatabase
   m_EditorClassIdentifier: Assembly-CSharp::Data.Database.NpcDatabase
   entries:
-  - id: minotaur
-    name: "\uBBF8\uB178\uD0C0\uC6B0\uB85C\uC2A4"
+  - id: npc_00
+    name: "\uACBD\uBE44\uB300"
     gender: 0
-    portraitImage: {fileID: 21300000, guid: bf2883976a5148945b66a3ad31b2e633, type: 3}
-    standingImage: {fileID: 21300000, guid: fffcc59f505577446892db452f73f636, type: 3}
+    portraitImage: {fileID: 0}
+    standingImage: {fileID: 21300000, guid: 222da1596c1ba8341b8f1a8f60bbcd6f, type: 3}

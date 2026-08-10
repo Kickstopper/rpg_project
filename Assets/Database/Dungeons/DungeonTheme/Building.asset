@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Building
   m_EditorClassIdentifier: 
   themeID: Building
-  bgmID: 13
+  bgmID: 31
   useWakeUpEffect: 0
   monsterList:
   - 000

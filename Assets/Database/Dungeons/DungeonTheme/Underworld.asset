@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Underworld
   m_EditorClassIdentifier: Assembly-CSharp::Data.DungeonTheme
   themeID: Underworld
-  bgmID: 7
+  bgmID: 33
   useWakeUpEffect: 1
   monsterList: []
   maxEnemyCount: 2
