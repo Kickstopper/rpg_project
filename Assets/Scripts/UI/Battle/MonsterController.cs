@@ -317,7 +317,9 @@ namespace UI.Battle
             }
             else
             {
+                // 몬스터 색상 복구
                 preferredImage.color = originalColor;
+                if (portraitImage != null) portraitImage.color = Color.white;
             }
         }
 
@@ -327,7 +329,16 @@ namespace UI.Battle
             while (true)
             {
                 float time = Mathf.PingPong(Time.time * 5f, 1f); 
+                
+                // 몬스터 본체 하이라이트
                 preferredImage.color = Color.Lerp(originalColor, Color.cyan, time);
+
+                // 초상화 하이라이트
+                if (portraitImage != null && portraitImage.gameObject.activeSelf)
+                {
+                    portraitImage.color = Color.Lerp(Color.white, Color.cyan, time);
+                }
+
                 yield return null;
             }
         }
