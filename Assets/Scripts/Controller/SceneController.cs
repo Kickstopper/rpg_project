@@ -38,7 +38,7 @@ namespace Controller
         [Header("Slide Settings")]
         public List<Sprite> backgroundImages; 
         public float fadeDuration = 1f; 
-        public float displayDuration = 0.5f; 
+        public float displayDuration = 1f; 
 
         private bool isEnable = false;     
         public bool IsEnable => isEnable;
@@ -78,9 +78,9 @@ namespace Controller
                 {
                     targetImage.SetNativeSize();
                     Sequence seq = DOTween.Sequence();
-                    seq.Append(targetImage.DOFade(1f, fadeDuration).OnComplete(EnableUI));
+                    seq.Append(targetImage.DOFade(1f, fadeDuration));
                     seq.AppendInterval(displayDuration); // 이미지 감상 시간 추가
-                    seq.Append(targetImage.DOFade(0.5f, fadeDuration));
+                    seq.Append(targetImage.DOFade(1f, fadeDuration).OnComplete(EnableUI));
                 }
             }
             else

@@ -1231,7 +1231,7 @@ MonoBehaviour:
   backgroundImages:
   - {fileID: 21300000, guid: 337da0f4665a8e84dab6248610cf2755, type: 3}
   fadeDuration: 0.5
-  displayDuration: 0.5
+  displayDuration: 1
 --- !u!1 &1034886870
 GameObject:
   m_ObjectHideFlags: 0
