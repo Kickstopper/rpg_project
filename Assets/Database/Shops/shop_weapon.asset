@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: shop_weapon
   m_EditorClassIdentifier: Assembly-CSharp::Data.ShopData
   shopID: weapon
-  bgmID: 28
-  BackgroundImage: {fileID: -4029819251187114856, guid: e7407659e8799484c811cf85374ec7d7, type: 3}
+  bgmID: 15
+  BackgroundImage: {fileID: 21300000, guid: 32da63b313319dd42b1df0748428bb55, type: 3}
   displayName: WEAPON
   itemsForSale:
   - {fileID: 11400000, guid: 057baaf782a4d5140a0a85c9ef35b330, type: 2}
@@ -23,7 +23,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2b3d320b167595d438540d1aeca6852b, type: 2}
   - {fileID: 11400000, guid: 33ba5fa312d6e62498af50911e3c1130, type: 2}
   - {fileID: 11400000, guid: b441541eb356f284faa75afa8ee89f28, type: 2}
-  characterImage: {fileID: 21300000, guid: 536317139cb5421409390fe9c59a70f5, type: 3}
+  characterImage: {fileID: 21300000, guid: 6a4582f31e003c9499c67ba18f5de8cc, type: 3}
   characterName: 
   startMessage: "\uC5B4\uC11C\uC640. \uC88B\uC740 \uBB3C\uAC74\uC774 \uB9CE\uC544."
   endMessage: "\uC0B4\uC544\uC11C \uB2E4\uC2DC \uBCF4\uC790\uACE0."

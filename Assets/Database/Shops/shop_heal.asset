@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: shop_heal
   m_EditorClassIdentifier: Assembly-CSharp::Data.ShopData
   shopID: heal
-  bgmID: 31
-  BackgroundImage: {fileID: 1729840402284382006, guid: 70217d3118aedad4480191e67cd27a80, type: 3}
+  bgmID: 18
+  BackgroundImage: {fileID: 21300000, guid: 3c18eea18514a3a40bd9a50ae5394293, type: 3}
   displayName: HEAL
   itemsForSale:
   - {fileID: 11400000, guid: bd2f2cacf7720df4aa89aa3cccf3527d, type: 2}
@@ -23,7 +23,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 706bab1c94cebf14fb6742723e1bb2ca, type: 2}
   - {fileID: 11400000, guid: d5c96fb2e13c61140b02d7d8f2c59305, type: 2}
   - {fileID: 11400000, guid: 1c541520573dd9e499d9230fe84a1a6c, type: 2}
-  characterImage: {fileID: 21300000, guid: b3bb7d69af49bec46bf3f3c899e13062, type: 3}
+  characterImage: {fileID: 21300000, guid: 569d530f125759d45bac4ddf2ad61ef9, type: 3}
   characterName: 
   startMessage: "\uC5B4\uB514\uB4E0 \uB0AB\uAC8C \uD574\uB4DC\uB9BD\uB2C8\uB2E4."
   endMessage: "\uB0B4\uC77C\uC774 \uC5C6\uB294 \uAC83\uCC98\uB7FC \uC2F8\uC6CC\uC8FC\uC138\uC694."

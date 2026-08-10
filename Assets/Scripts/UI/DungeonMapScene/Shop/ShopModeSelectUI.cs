@@ -140,7 +140,7 @@ namespace UI.Shop
                     {
                         characterPortrait.sprite = portrait;
                         characterPortrait.color = Color.white;
-                        characterPortrait.SetNativeSize();
+                        //characterPortrait.SetNativeSize();
                     }
                     else characterPortrait.color = Color.clear; 
                 }
