@@ -332,8 +332,8 @@ namespace UI
                     // 메인 메뉴 상태일 때의 환영 메시지
                     percentageText.text = "SELECT SERVICE";
                     percentageText.color = Color.cyan;
-                    
-                    infoText.text = "<size=120%>SYSTEM ONLINE</size>\n<color=#A0A0A0>Awaiting Input</color>\n\nPlease select a service to use.";
+                    // "<size=120%>SYSTEM ONLINE</size>\n<color=#A0A0A0>Awaiting Input</color>\n\nPlease select a service to use.";
+                    infoText.text = "<size=120%>SYSTEM ONLINE</size>\n<color=#A0A0A0>입력 대기 중</color>\n\n이용할 서비스를 선택하세요.";
                 }
                 else
                 {

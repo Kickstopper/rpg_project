@@ -299,9 +299,10 @@ namespace UI
             if (UnityEngine.Random.value > 0.25f) targetCurve = UnityEngine.Random.Range(-maxCurveAmount, maxCurveAmount);
             float duration = UnityEngine.Random.Range(curveDurationRange.x, curveDurationRange.y);
             float delay = UnityEngine.Random.Range(curveDelayRange.x, curveDelayRange.y);
-            _curveSequence.Append(DOTween.To(() => _currentCurve, x => { _currentCurve = x; SetMatFloat("_CurveAmount", _currentCurve); }, targetCurve, duration).SetEase(Ease.InOutSine));
+            _curveSequence.Append(DOTween.To(() => _currentCurve, x => { _currentCurve = x; SetMatFloat("_CurveAmount", _currentCurve); }, targetCurve, duration).SetEase(Ease.InOutSine))
+            .OnStart(()=>ManagerRoot.Sound.PlaySFX(SfxID.Car_Brake));
             _curveSequence.AppendInterval(delay);
-            _curveSequence.OnComplete(() => StartRandomCurveRoutine());
+            _curveSequence.OnComplete(() => {StartRandomCurveRoutine(); ManagerRoot.Sound.StopAllSFX();});
         }
 
         private void StartRandomHillRoutine()
@@ -327,6 +328,7 @@ namespace UI
 
         public IEnumerator ExecuteRoadTransitionRoutine(float totalDistance, float totalGameHours, Action onMapLoadAction)
         {
+            ManagerRoot.Sound.PlayBGM(BgmID.Drive);
             _skipRequested = false;
             _transitionProgress = 0f; 
 
@@ -463,7 +465,8 @@ namespace UI
                 pauseTimer += Time.deltaTime;
                 yield return null;
             }
-
+            
+            ManagerRoot.Sound.StopBGM(true, 0.6f);
             yield return fadeOverlay.DOFade(1f, 0.3f).WaitForCompletion();
             
             roadScroller.isMoving = false;
