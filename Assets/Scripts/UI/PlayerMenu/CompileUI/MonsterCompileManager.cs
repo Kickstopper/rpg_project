@@ -113,23 +113,24 @@ public class MonsterCompileManager : MonoBehaviour
 
         // 몬스터 A 시퀀스
         yield return StartCoroutine(MoveAndFadeSprite(spriteA, leftOffScreen, centerPos, moveAndFadeDuration, true));
-
         DrawAscii(asciiA, 0f);
         StartCoroutine(FadeSpriteAlpha(spriteA, 1f, 0f, asciiRevealDuration));
+        ManagerRoot.Sound.PlaySFX(Data.SfxID.Compile_Swoosh);
         yield return StartCoroutine(RevealAsciiSequential(asciiRevealDuration));
 
         yield return StartCoroutine(DissolveAsciiRandomly(asciiDissolveDuration));
         
         // 몬스터 B 시퀀스
         yield return StartCoroutine(MoveAndFadeSprite(spriteB, rightOffScreen, centerPos, moveAndFadeDuration, true));
-
         DrawAscii(asciiB, 0f);
         StartCoroutine(FadeSpriteAlpha(spriteB, 1f, 0f, asciiRevealDuration));
+        ManagerRoot.Sound.PlaySFX(Data.SfxID.Compile_Swoosh);
         yield return StartCoroutine(RevealAsciiSequential(asciiRevealDuration));
 
         yield return StartCoroutine(DissolveAsciiRandomly(asciiDissolveDuration));
 
         // 결과 몬스터 시퀀스
+        ManagerRoot.Sound.PlaySFX(Data.SfxID.Compile_Swoosh);
         DrawAscii(asciiResult, 0f);
 
         // 결과 몬스터 아스키 랜덤 페이드인 & 50% 시점에 스프라이트와 매트릭스 효과 동시 페이드인

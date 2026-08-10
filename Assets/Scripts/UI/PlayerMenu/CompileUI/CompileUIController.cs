@@ -276,20 +276,40 @@ namespace Controller
 
             // 컷신 연출이 시작될 때 PlayerMenu의 모든 입력을 잠금
             menuController.isInputLocked = true;
+            ManagerRoot.Sound.PlaySFX(SfxID.Computer, 0.5f);
+
+            // 컷신이 끝난 후 데이터를 갱신하기 위해 현재 선택된 ID와 결과물을 미리 캐싱
+            string idA = selectedMonsterIDs[0];
+            string idB = selectedMonsterIDs[1];
+            var resultEntry = ManagerRoot.Database.monsterDB.GetCompileResult(idA, idB);
 
             compileManager.OnCompileFinished = () => 
             {
+                // 파티 데이터 갱신 (기존 몬스터 삭제 및 결과 몬스터 추가)
+                if (resultEntry != null)
+                {
+                    ManagerRoot.Party.RemoveMember(idA);
+                    ManagerRoot.Party.RemoveMember(idB);
+                    
+                    // isMonster 플래그를 true로 설정하여 영입
+                    ManagerRoot.Party.AddMember(MonsterConversionHelper.ToCharacterEntry(resultEntry), true);
+                }
+
+                // UI 상태 복구 및 갱신
                 compilePanel.SetActive(false);
                 monsterSelectPanel.SetActive(true);
                 selectedMonsterIDs.Clear();
-                RefreshMonsterGrid(); 
+                
+                RefreshMonsterGrid(); // 리스트 갱신
                 RefreshSelectedMonsterPanels();
 
                 // 컷신 연출이 완전히 끝났을 때 입력을 다시 풀어줌
                 menuController.isInputLocked = false;
                 
                 // 오작동을 막기 위해 입력 타이머를 한 번 초기화
-                menuController.ResetInputTimer(); 
+                menuController.ResetInputTimer();
+                
+                ManagerRoot.Sound.PlaySFX(SfxID.Computer, 0.25f);
             };
 
             compileManager.StartCompileSequence(selectedMonsterIDs[0], selectedMonsterIDs[1]);
