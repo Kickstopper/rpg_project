@@ -28,7 +28,11 @@ namespace Data
         Spash,          // 물에 빠지는 소리
         Warp_Start,
         Warp_End,
-        Computer
+        Computer,
+        Elevator,
+        Car_Brake,
+        Compile_Swoosh,
+        Dialogue_Impact, // 대화 중 임팩트 효과
     }
 
     public enum BgmID
@@ -54,14 +58,26 @@ namespace Data
         Shop_Heal,
         Talk_Good,
         Talk_Bad,
+        Partner_A,
+        Partner_B,
+        Partner_C,
+        Partner_D,
+        Partner_E,
+        Partner_F,
+        Partner_G,
+        Partner_H,
         Dungeon_Outpost,
         Dungeon_Underground,
         Dungeon_Tower,
         Dungeon_Cave,
         Dungeon_Underworld,
         Dungeon_Labyrinth,
+        Dungeon_Castle,
+        Dungeon_Station,
         Dungeon_Random,
-        Heroine,
+        Office,
+        Level_UP,
+        Drive,
     }
 
     [CreateAssetMenu(fileName = "AudioLibrary", menuName = "Audio/AudioLibrary")]

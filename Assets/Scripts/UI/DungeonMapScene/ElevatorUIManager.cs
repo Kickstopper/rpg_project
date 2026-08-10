@@ -5,6 +5,7 @@ using TMPro;
 using Data;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using Manager;
 
 namespace UI
 {
@@ -318,6 +319,7 @@ namespace UI
 
             for (int i = 0; i < absDiff; i++)
             {
+                ManagerRoot.Sound.PlaySFX(SfxID.Elevator);
                 float elapsed = 0f;
                 while (elapsed < timePerFloor)
                 {
@@ -329,7 +331,6 @@ namespace UI
                     
                     _bgSweepMat.SetFloat("_ShineLocation", bgLoc);
                     _chrSweepMat.SetFloat("_ShineLocation", chrLoc);
-                    
                     yield return null; 
                 }
             }

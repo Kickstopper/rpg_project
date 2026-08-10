@@ -123,9 +123,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 641636adc6943794582897dbbbd8a10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.SimpleGradient
-  colorLeft: {r: 0.13207549, g: 0.13207549, b: 0.13207549, a: 0.9019608}
-  colorRight: {r: 0.23773581, g: 0.23773581, b: 0.23773581, a: 0.9019608}
-  m_Angle: 45
+  colorLeft: {r: 0, g: 0, b: 1, a: 1}
+  colorRight: {r: 0.802, g: 0, b: 0.321, a: 1}
+  m_Angle: 31
 --- !u!114 &805182828324630367
 MonoBehaviour:
   m_ObjectHideFlags: 0
