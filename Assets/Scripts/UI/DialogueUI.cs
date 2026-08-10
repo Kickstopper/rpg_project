@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 using Data;
 using Helper;
 using UI.Battle;
-
+using System.Text.RegularExpressions;
 namespace UI
 {
     public enum NegotiationResult { PLAYER_TURN, MONSTER_TURN, BATTLE_END }
@@ -20,6 +20,14 @@ namespace UI
         public GameObject choiceContainer;       // 선택지들이 들어갈 컨테이너
         public GameObject choiceButtonPrefab;    // 선택지 프리팹
 
+        [Header("Speech Bubble Effects")]
+        public Image speechBubbleUI;         // 화면 중앙 등에 띄울 말풍선 UI 컴포넌트
+        public Transform[] additionalShakeTargets;
+        public Sprite bubbleGentle;
+        public Sprite bubbleThreat;
+        public Sprite bubbleAccept;
+        public Sprite bubbleRefuse;
+
         [Header("Settings")]
         public float typingSpeed = 0.05f;        // 글자당 시간 (작을수록 빠름)
         public float imageFadeSpeed = 0.3f;
@@ -28,6 +36,7 @@ namespace UI
 
         [Header("UI Components")]
         public GameObject uiCanvas;
+        public GameObject portraitPanel;
         public Image portraitImageUI;
         public Image standingImageUI;
         public TextMeshProUGUI nameText;
@@ -52,7 +61,7 @@ namespace UI
         private int currentChoiceIndex = 0;
 
         private float inputCooldown = 0f;
-
+        private bool isProcessingChoice = false;
         private event Action<int> onDialogueFinished;
         private event Action<string> onChoiceMade;
         private Func<string, int, bool> onResourceDemanded; // 교섭 중 몬스터의 요구 발생
@@ -111,6 +120,7 @@ namespace UI
             lastCharacterId = "";
             inputCooldown = 0.05f;
             currentLineIndex = 0;
+            isProcessingChoice = false;
             isDialogueActive = true;
             uiCanvas.SetActive(true);
             ShowCurrentLine();
@@ -234,6 +244,37 @@ namespace UI
 
             // 텍스트 설정 및 타이핑 효과 시작
             string fullText = lineData.ContainsKey("Text") ? lineData["Text"] : "";
+
+            // 정규식을 이용해 [ID] 또는 [ID|조사포맷] 패턴을 처리
+            // 패턴 설명: \[ 는 여는 대괄호, ([^\]]+) 는 닫는 대괄호가 아닌 문자들의 연속을 그룹화, \] 는 닫는 대괄호
+            fullText = Regex.Replace(fullText, @"\[([^\]]+)\]", match =>
+            {
+                string innerContent = match.Groups[1].Value; 
+                
+                // '|' 기호를 기준으로 분리 (예: "chr_01|이/가" -> parts[0]="chr_01", parts[1]="이/가")
+                string[] parts = innerContent.Split('|');
+                
+                string charId = parts[0].Trim();
+                string resolvedName = GetCharacterNameFromDB(charId); 
+                
+                // DB에서 캐릭터 이름을 찾은 경우
+                if (!string.IsNullOrEmpty(resolvedName))
+                {
+                    // '|' 뒤에 조사 포맷이 존재한다면 KoreanParticleHelper를 통해 조사 추가
+                    if (parts.Length > 1)
+                    {
+                        string particleFormat = parts[1].Trim();
+                        return resolvedName.AttachParticle(particleFormat); //
+                    }
+                    
+                    // 조사가 없다면 이름만 반환
+                    return resolvedName;
+                }
+                
+                // DB에서 이름을 찾지 못했으면 오류 방지를 위해 원본 문자열(예: "[system_var]") 그대로 유지
+                return match.Value;
+            });
+
             contentText.text = fullText;
             contentText.maxVisibleCharacters = 0; // 글자 표시 개수를 0으로 초기화
             
@@ -345,10 +386,15 @@ namespace UI
                 if (portrait != null)
                 {
                     portraitImageUI.sprite = portrait;
-                    portraitImageUI.SetNativeSize();
-                    portraitImageUI.enabled = true;
+                    //portraitImageUI.SetNativeSize();
                     portraitImageUI.color = Color.white;
+                    portraitPanel.SetActive(true);
                 }
+                else
+                {
+                    portraitPanel.SetActive(false);
+                }
+
                 if (standing != null)
                 {
                     standingImageUI.sprite = standing;
@@ -376,16 +422,12 @@ namespace UI
         IEnumerator ImageFadeRoutine(Sprite portrait, Sprite standing)
         {
             // 초상화는 스탠딩이 뜰 때까지 일단 숨김
+            portraitPanel.SetActive(false);
             if (portrait != null)
             {
                 portraitImageUI.sprite = portrait;
-                portraitImageUI.SetNativeSize();
+                //portraitImageUI.SetNativeSize();
                 portraitImageUI.color = Color.white; 
-                portraitImageUI.enabled = false; // 대기 상태
-            }
-            else
-            {
-                portraitImageUI.enabled = false;
             }
 
             // 스탠딩 이미지 서서히 나타나는 애니메이션
@@ -393,7 +435,6 @@ namespace UI
             {
                 standingImageUI.sprite = standing;
                 standingImageUI.SetNativeSize();
-                standingImageUI.enabled = true;
                 
                 // 시작: 검은색 반투명
                 Color startColor = new Color(0f, 0f, 0f, 0.9f);
@@ -423,15 +464,16 @@ namespace UI
             // 스탠딩 이미지가 완전히 나타난 후(또는 스탠딩이 없을 때), 초상화 표시
             if (portrait != null)
             {
-                portraitImageUI.enabled = true;
+                portraitPanel.SetActive(true);
             }
+            else portraitPanel.SetActive(false);
 
             imageFadeCoroutine = null; // 연출 완료
         }
 
         void Update()
         {
-            if (!isDialogueActive) return;
+            if (!isDialogueActive || isProcessingChoice) return;
 
             if (inputCooldown > 0)
             {
@@ -496,9 +538,9 @@ namespace UI
             {
                 if (activeChoiceButtons[currentChoiceIndex].interactable)
                 {
-                    isWaitingForChoice = false;
+                    //isWaitingForChoice = false;
                     ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
-                    //activeChoiceButtons[currentChoiceIndex].onClick.Invoke();
+                    activeChoiceButtons[currentChoiceIndex].onClick.Invoke();
                 }
             }
         }
@@ -521,9 +563,9 @@ namespace UI
                     standingImageUI.color = new Color(1f, 1f, 1f, 1f); // 스탠딩 즉시 불투명/원래색
                 }
                 
-                if (portraitImageUI.sprite != null && !portraitImageUI.enabled)
+                if (portraitImageUI.sprite != null && !portraitPanel.activeInHierarchy)
                 {
-                    portraitImageUI.enabled = true; // 초상화 즉시 표시
+                    portraitPanel.SetActive(true); // 초상화 즉시 표시
                 }
             }
 
@@ -573,8 +615,39 @@ namespace UI
                     Button btn = btnObj.GetComponent<Button>();
                     // 버튼 클릭 시 액션 실행 후 대사 넘기기 연동
                     btn.onClick.AddListener(() => {
-                        ExecuteAction(actionStr);          // 액션 먼저 실행
-                        OnChoiceSelected(nextTargetID);    // 그 다음 목표 ID로 점프
+                        if (isProcessingChoice) return;
+                        isProcessingChoice = true;
+                        inputCooldown = 0.2f;
+
+                        ChoiceTone? foundTone = null;
+                        if (!string.IsNullOrEmpty(actionStr))
+                        {
+                            string[] actions = actionStr.Split(';'); 
+                            foreach (string act in actions)
+                            {
+                                string[] parts = act.Trim().Split(':'); 
+                                if (parts.Length >= 2 && parts[0].ToUpper() == "TONE")
+                                {
+                                    if (Enum.TryParse<ChoiceTone>(parts[1], true, out ChoiceTone parsedTone))
+                                    {
+                                        foundTone = parsedTone;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // 교섭 TONE 액션이 발견되었다면 말풍선 연출 코루틴 실행
+                        if (foundTone.HasValue)
+                        {
+                            StartCoroutine(PlaySpeechBubbleRoutine(foundTone.Value, actionStr, nextTargetID));
+                        }
+                        else
+                        {
+                            // TONE이 없는 일반 선택지라면 기존처럼 즉시 실행
+                            ExecuteAction(actionStr);          
+                            OnChoiceSelected(nextTargetID);    
+                        }
                     });
 
                     activeChoiceButtons.Add(btn);
@@ -598,7 +671,7 @@ namespace UI
         void OnChoiceSelected(string nextTargetID)
         {
             inputCooldown = 0.05f;
-
+            isProcessingChoice = false;
             // 선택지 UI 정리
             isWaitingForChoice = false;
             choiceContainer.SetActive(false);
@@ -785,6 +858,121 @@ namespace UI
             }
         }
 
+        // 자신(Dialogue)과 외부 타겟(Battle)을 하나로 묶어 동시에 흔드는 코루틴
+        private IEnumerator UIShakeRoutine(float duration, float magnitude)
+        {
+            // 흔들어야 할 모든 객체들의 원래 위치를 저장할 딕셔너리
+            Dictionary<Transform, Vector3> originalPositions = new Dictionary<Transform, Vector3>();
+
+            // Dialogue 캔버스 내부의 자식들 등록
+            if (uiCanvas != null)
+            {
+                foreach (Transform child in uiCanvas.transform)
+                {
+                    originalPositions[child] = child.localPosition;
+                }
+            }
+
+            // 외부 타겟(배틀 UI 등) 등록
+            if (additionalShakeTargets != null)
+            {
+                foreach (Transform target in additionalShakeTargets)
+                {
+                    if (target != null && !originalPositions.ContainsKey(target))
+                    {
+                        originalPositions[target] = target.localPosition;
+                    }
+                }
+            }
+
+            float elapsed = 0f;
+
+            // 등록된 모든 UI를 한꺼번에 동일한 방향으로 흔듦
+            while (elapsed < duration)
+            {
+                float offsetX = UnityEngine.Random.Range(-1f, 1f) * magnitude;
+                float offsetY = UnityEngine.Random.Range(-1f, 1f) * magnitude;
+                Vector3 offset = new Vector3(offsetX, offsetY, 0f);
+
+                foreach (var kvp in originalPositions)
+                {
+                    kvp.Key.localPosition = kvp.Value + offset;
+                }
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            // 흔들림이 끝나면 모두 원래 위치로 정확히 복구
+            foreach (var kvp in originalPositions)
+            {
+                kvp.Key.localPosition = kvp.Value;
+            }
+        }
+
+        // 말풍선 연출 후 다음 대사로 넘어가는 코루틴
+        private IEnumerator PlaySpeechBubbleRoutine(ChoiceTone tone, string actionStr, string nextTargetID)
+        {
+            // 선택지 UI 숨기기 및 조작 잠금
+            isWaitingForChoice = false;
+            choiceContainer.SetActive(false);
+            EventSystem.current.SetSelectedGameObject(null);
+
+            // TONE에 맞는 이미지 매핑
+            Sprite targetSprite = null;
+            switch (tone)
+            {
+                case ChoiceTone.Gentle: //우호적 
+                    targetSprite = bubbleGentle;
+                break;
+                
+                case ChoiceTone.Threat: // 위압적
+                case ChoiceTone.Mad: // 화냄
+                    targetSprite = bubbleThreat;
+                break;
+
+                case ChoiceTone.Accept: // 수락
+                    targetSprite = bubbleAccept;
+                break;
+
+                case ChoiceTone.Refuse: // 거절
+                    targetSprite = bubbleRefuse;
+                break;
+                
+                case ChoiceTone.Relieve: // 안심
+                case ChoiceTone.Persuade: // 설득 
+                case ChoiceTone.Request: // 요구
+                case ChoiceTone.Bribe: // 상납
+                case ChoiceTone.Flirt: // 희롱
+                case ChoiceTone.Insult: // 모욕
+                break;
+                
+            }
+
+            // 연출 실행
+            if (targetSprite != null && speechBubbleUI != null)
+            {
+                speechBubbleUI.sprite = targetSprite;
+                speechBubbleUI.SetNativeSize();
+                speechBubbleUI.gameObject.SetActive(true);
+
+                // 짧고 강하게 화면을 흔듦 (지속 시간, 강도)
+                StartCoroutine(UIShakeRoutine(0.3f, 30f));
+
+                // 사운드 재생
+                ManagerRoot.Sound.PlaySFX(SfxID.Dialogue_Impact);
+
+                // 말풍선이 떠 있는 동안 잠시 대기
+                yield return YieldCache.WaitForSeconds(0.8f);
+
+                speechBubbleUI.gameObject.SetActive(false);
+            }
+
+            // 효과 종료 후, 액션과 대사를 실행
+            ExecuteAction(actionStr);
+            OnChoiceSelected(nextTargetID);
+        }
+
         // 유저가 타이핑이 끝난 후 클릭했을 때 실행되는 함수
         void AdvanceLine()
         {
@@ -943,5 +1131,33 @@ namespace UI
                 Destroy(child.gameObject);
         }
 
+        // CharacterID를 통해 DB에서 이름을 찾아 반환하는 헬퍼 메서드
+        private string GetCharacterNameFromDB(string charId)
+        {
+            if (string.IsNullOrEmpty(charId)) return null;
+
+            var chrDB = ManagerRoot.Database.charDB;
+            var npcDB = ManagerRoot.Database.npcDB;
+            var monDB = ManagerRoot.Database.monsterDB;
+
+            // 1순위: NPC DB 검색
+            var npcEntry = npcDB != null ? npcDB.GetEntry(charId) : null;
+            if (npcEntry != null) return npcEntry.name;
+
+            // 2순위: Character DB 검색
+            var charEntry = chrDB != null ? chrDB.GetEntry(charId) : null;
+            if (charEntry != null)
+            {
+                // 파티에 존재하여 변경된 이름이 있다면 그것을 우선 사용
+                var pData = ManagerRoot.Party.GetCharacterByID(charId);
+                return pData != null ? pData.name : charEntry.name;
+            }
+
+            // 3순위: Monster DB 검색
+            var monEntry = monDB != null ? monDB.GetEntry(charId) : null;
+            if (monEntry != null) return monEntry.name;
+
+            return null;
+        }
     }
 }
