@@ -36,6 +36,7 @@ namespace UI
 
         [Header("UI Components")]
         public GameObject uiCanvas;
+        public Image backgroundImageUI;
         public GameObject portraitPanel;
         public Image portraitImageUI;
         public Image standingImageUI;
@@ -181,6 +182,35 @@ namespace UI
                     AdvanceLine();
                     return;
                 }
+            }
+
+            // 배경 이미지 처리 로직
+            if (lineData.ContainsKey("BackgroundID"))
+            {
+                string bgID = lineData["BackgroundID"].Trim();
+
+                // BG를 꺼야 하는 경우 (예약어 "NONE" 또는 "CLEAR")
+                if (bgID.ToUpper() == "NONE" || bgID.ToUpper() == "CLEAR")
+                {
+                    backgroundImageUI.enabled = false;
+                    backgroundImageUI.sprite = null;
+                }
+                // 새로운 BG ID가 입력된 경우 변경
+                else if (ManagerRoot.Database != null)
+                {
+                    var bgDB = ManagerRoot.Database.bgDB;
+                    var bgEntry = bgDB != null ? bgDB.GetEntry(bgID) : null;
+                    if (bgEntry != null && bgEntry.bgImage != null)
+                    {
+                        backgroundImageUI.sprite = bgEntry.bgImage;
+                        backgroundImageUI.enabled = true;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[DialogueUI] BackgroundID '{bgID}'를 찾을 수 없습니다.");
+                    }
+                }
+                // 빈칸("")인 경우 아무 작업도 하지 않음. 이전 배경 유지
             }
             
             string name = lineData.ContainsKey("Name") ? lineData["Name"] : "";

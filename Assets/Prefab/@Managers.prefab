@@ -456,15 +456,16 @@ MonoBehaviour:
     destinationImage: {fileID: 0}
     floorNumber: 1
     description: "\uC804\uCD08\uAE30\uC9C0"
-  - terminalID: Terminal_Bridge_0
-    displayName: "\uBB3C\uC5D0 \uC7A0\uAE34 \uB3C4\uC2DC"
+  - terminalID: Terminal_Cave
+    displayName: "\uB3D9\uAD74"
     mapID: Cave_0
     targetX: 11
     targetY: 11
     targetDir: 2
     destinationImage: {fileID: 0}
     floorNumber: 1
-    description: "\uCD95\uCD95\uD574\uC694"
+    description: "\uC9C0\uBC18 \uCE68\uD558\uB85C \uC77C\uBD80 \uAD6C\uAC04\uC774
+      \uBB3C\uC5D0 \uC7A0\uACA8 \uC788\uB2E4."
 --- !u!1 &2951667405501977806
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,7 +636,7 @@ MonoBehaviour:
   effectManager: {fileID: 5220103417725183502}
   flagManager: {fileID: 7268152281881028572}
   inventoryManager: {fileID: 8635199694777829871}
-  financeManager: {fileID: 0}
+  financeManager: {fileID: 546602901364373160}
   moduleManager: {fileID: 8060303235335069286}
   partyManager: {fileID: 4605073592105765919}
   saveManager: {fileID: 8319155127516932806}
@@ -883,6 +884,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   globalExpTable: {fileID: 11400000, guid: 0a109a7319f60bb47bb30d455147ed4f, type: 2}
+  bgDB: {fileID: 11400000, guid: 9a4e14995391308489ced56f13f53c75, type: 2}
   charDB: {fileID: 11400000, guid: 89d0e2e30bc8d6c40985b195be7ff30d, type: 2}
   monsterDB: {fileID: 11400000, guid: 5a02d40de261d314a98aeca05c430997, type: 2}
   npcDB: {fileID: 11400000, guid: 6cbd568b4c68f7f4097128a7ac8b0bc7, type: 2}

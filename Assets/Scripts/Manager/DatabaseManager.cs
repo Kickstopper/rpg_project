@@ -10,6 +10,7 @@ namespace Manager
         public ExpTable globalExpTable;
 
         [Header("Databases")]
+        public BackgroundDatabase bgDB;
         public CharacterDatabase charDB;
         public MonsterDatabase monsterDB;
         public NpcDatabase npcDB;
@@ -25,6 +26,7 @@ namespace Manager
         void Awake()
         {
             // 게임 시작 시 딕셔너리 초기화
+            bgDB.Initialize();
             charDB.Initialize();
             monsterDB.Initialize();
             npcDB.Initialize();

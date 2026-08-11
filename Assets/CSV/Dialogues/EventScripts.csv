@@ -1,37 +1,37 @@
-EventID,Seq,Type,Name,CharacterID,Text,Condition,Action,NextID
-OUTPOST_1,1,TALK,,chr_01,네가 [chr_00|이지/지]? 기다리고 있었어.,None,None,2
-OUTPOST_1,2,TALK,,chr_01,나는 오늘부터 한 달간 너의 파트너로서 함께하게 된 [chr_01|이라고/라고] 해. 잘 부탁해,None,None,3
-OUTPOST_1,3,TALK,,chr_01,우선 사무실로 가자. 바로 일을 시작하고 싶겠지만 입사 수속을 밟아야 하니까.,None,None,4
-OUTPOST_1,4,TALK,,chr_01,왼쪽의 빨간 문이 보이지? 거기가 사무실이야. 자 가자.,None,None,END
-
-OUTPOST_2,1,TALK,,chr_01,여기가 사무실이야. 앞으로 자주 드나들게 되는 곳이니까 잘 기억해둬.,None,None,2
-OUTPOST_2,2,TALK,,chr_01,자. 들어가자.,None,None,3
-
-OUTPOST_3,1,TALK,,chr_01,정식으로 미토스 브레이커즈의 인턴 요원이 된 걸 환영해.,None,None,2
-OUTPOST_3,2,TALK,,chr_01,나도 이 일을 하게 된지 반년 밖에 안 됐지만 그래도 정사원이니까 아예 도움이 안 되진 않겠지.,None,None,3
-OUTPOST_3,3,TALK,,chr_01,첫 달은 무료 서비스지만 다음달부터는 파트너 렌탈 요금이 청구돼.,None,None,4
-OUTPOST_3,4,TALK,,chr_01,다음달부터는 다른 파트너도 선택할 수 있게 되겠지만 되도록 나를 이용해줬으면 좋겠어.,None,None,5
-OUTPOST_3,5,TALK,,chr_01,고정 수입이 없는 직업이잖아. 지명해 주는 사람이 많을수록 나도 안정적인 생활이 가능해지니까.,None,None,END
-
-OUTPOST_4,1,TALK,,chr_01,이 안은 터미널이야. 행동의 기록이나 열람이 가능하고 등록된 장소가 있다면 워프할 수 있어.,None,None,2
-OUTPOST_4,2,TALK,,chr_01,"마침 비어있는 것 같으니, 바로 시험해 보는 게 어때?",None,None,END
-
-OUTPOST_5,1,TALK,,chr_01,"업무의 시작도 보고, 끝도 보고라는 걸 잊지마.",None,None,END
-
-OUTPOST_9,1,TALK,,npc_00,이 너머는 너 같은 D랭커 애송이가 들어갔다간 순살이다.,None,None,2
-OUTPOST_9,2,TALK,,npc_00,좋은 말로 할 때 돌아가.,None,None,END
-
-TOWER_0,1,TALK,,chr_01,여기가 몬스터들의 소굴이 된 타워야.,None,None,2
-TOWER_0,2,TALK,,chr_01,원래라면 엘리베이터로 정상까지 바로 올라갈 수 있었지만 지금은 그리 간단히 일이 풀리진 않겠지.,None,None,3
-TOWER_0,3,TALK,,chr_01,어떻게 할래? 바로 시작할까?,None,None,4
-TOWER_0,4,CHOICE,,,(행동을 선택하세요),None,None,"5,6"
-TOWER_0,5,BRANCH,,chr_00,[탐색을 시작한다],,,7
-TOWER_0,6,BRANCH,,chr_00,[돌아간다],,,8
-TOWER_0,7,TALK,,chr_01,좋아. 돈을 받는 만큼은 확실히 내 역할을 해줄 테니까.,None,None,END
-TOWER_0,8,TALK,,chr_01,현명한 판단이야. 이 근처는 지금의 너에게는 무리.,None,None,END
-
-EVT_GUARD_MEET,1,TALK,무장경찰,minotaur,거기 서라! 통행증은 있나?,None,None,2
-EVT_GUARD_MEET,2,CHOICE,System,minotaur,(행동을 선택하세요),None,None,"3, 4"
-EVT_GUARD_MEET,3,BRANCH,플레이어,minotaur,[공격한다],None,BATTLE:guard_mob,END
-EVT_GUARD_MEET,4,BRANCH,플레이어,minotaur,[돈을 준다],HasItem:Gold_100,REMOVE:Gold_100,5
-EVT_GUARD_MEET,5,TALK,무장경찰,minotaur,"흐흠, 이번만 봐주지.",None,SET_FLAG:passed_guard,END
+EventID,Seq,Type,BackgroundID,CharacterID,Name,Text,Condition,Action,NextID
+OUTPOST_1,1,TALK,,chr_01,,네가 [chr_00|이지/지]? 기다리고 있었어.,None,None,2
+OUTPOST_1,2,TALK,,chr_01,,나는 오늘부터 한 달간 너의 파트너로서 함께하게 된 [chr_01|이라고/라고] 해. 잘 부탁해,None,None,3
+OUTPOST_1,3,TALK,,chr_01,,우선 사무실로 가자. 바로 일을 시작하고 싶겠지만 입사 수속을 밟아야 하니까.,None,None,4
+OUTPOST_1,4,TALK,,chr_01,,왼쪽의 빨간 문이 보이지? 거기가 사무실이야. 자 가자.,None,None,END
+,,,,,,,,,
+OUTPOST_2,1,TALK,,chr_01,,여기가 사무실이야. 앞으로 자주 드나들게 되는 곳이니까 잘 기억해둬.,None,None,2
+OUTPOST_2,2,TALK,,chr_01,,자. 들어가자.,None,None,3
+,,,,,,,,,
+OUTPOST_3,1,TALK,,chr_01,,정식으로 미토스 브레이커즈의 인턴 요원이 된 걸 환영해.,None,None,2
+OUTPOST_3,2,TALK,,chr_01,,나도 이 일을 하게 된지 반년 밖에 안 됐지만 그래도 정사원이니까 아예 도움이 안 되진 않겠지.,None,None,3
+OUTPOST_3,3,TALK,,chr_01,,첫 달은 무료 서비스지만 다음달부터는 파트너 렌탈 요금이 청구돼.,None,None,4
+OUTPOST_3,4,TALK,,chr_01,,다음달부터는 다른 파트너도 선택할 수 있게 되겠지만 되도록 나를 이용해줬으면 좋겠어.,None,None,5
+OUTPOST_3,5,TALK,,chr_01,,고정 수입이 없는 직업이잖아. 지명해 주는 사람이 많을수록 나도 안정적인 생활이 가능해지니까.,None,None,END
+,,,,,,,,,
+OUTPOST_4,1,TALK,,chr_01,,이 안은 터미널이야. 행동의 기록이나 열람이 가능하고 등록된 장소가 있다면 워프할 수 있어.,None,None,2
+OUTPOST_4,2,TALK,,chr_01,,"마침 비어있는 것 같으니, 바로 시험해 보는 게 어때?",None,None,END
+,,,,,,,,,
+OUTPOST_5,1,TALK,,chr_01,,"업무의 시작도 보고, 끝도 보고라는 걸 잊지마.",None,None,END
+,,,,,,,,,
+OUTPOST_9,1,TALK,,npc_00,,이 너머는 너 같은 D랭커 애송이가 들어갔다간 순살이다.,None,None,2
+OUTPOST_9,2,TALK,,npc_00,,좋은 말로 할 때 돌아가.,None,None,END
+,,,,,,,,,
+TOWER_0,1,TALK,,chr_01,,여기가 몬스터들의 소굴이 된 타워야.,None,None,2
+TOWER_0,2,TALK,,chr_01,,원래라면 엘리베이터로 정상까지 바로 올라갈 수 있었지만 지금은 그리 간단히 일이 풀리진 않겠지.,None,None,3
+TOWER_0,3,TALK,,chr_01,,어떻게 할래? 바로 시작할까?,None,None,4
+TOWER_0,4,CHOICE,,,,(행동을 선택하세요),None,None,"5,6"
+TOWER_0,5,BRANCH,,chr_00,,[탐색을 시작한다],,,7
+TOWER_0,6,BRANCH,,chr_00,,[돌아간다],,,8
+TOWER_0,7,TALK,,chr_01,,좋아. 돈을 받는 만큼은 확실히 내 역할을 해줄 테니까.,None,None,END
+TOWER_0,8,TALK,,chr_01,,현명한 판단이야. 이 근처는 지금의 너에게는 무리.,None,None,END
+,,,,,,,,,
+EVT_GUARD_MEET,1,TALK,,minotaur,무장경찰,거기 서라! 통행증은 있나?,None,None,2
+EVT_GUARD_MEET,2,CHOICE,,minotaur,System,(행동을 선택하세요),None,None,"3, 4"
+EVT_GUARD_MEET,3,BRANCH,,minotaur,플레이어,[공격한다],None,BATTLE:guard_mob,END
+EVT_GUARD_MEET,4,BRANCH,,minotaur,플레이어,[돈을 준다],HasItem:Gold_100,REMOVE:Gold_100,5
+EVT_GUARD_MEET,5,TALK,,minotaur,무장경찰,"흐흠, 이번만 봐주지.",None,SET_FLAG:passed_guard,END
