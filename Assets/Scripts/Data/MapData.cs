@@ -112,6 +112,18 @@ namespace Data
         }
     }
 
+    // 다중 이벤트를 처리하기 위한 새로운 데이터 구조
+    [Serializable]
+    public class CellEventData
+    {
+        public string eventID = "";
+        public string requiredFlag = "";
+        public bool requiredFlagState = true;
+        public bool isEventRepeatable = false;
+        public bool useForceDir = false;
+        public Direction evForceDir = Direction.North;
+    }
+
     [Serializable]
     public class CellData
     {
@@ -124,13 +136,7 @@ namespace Data
         public int centerObjectID = -1;
         public int[] faceObjectIDs = new int[4] { -1, -1, -1, -1 }; // North, East, South, West
         
-        public string eventID = "";
-        public bool isEventRepeatable = false;
-        public string requiredFlag = ""; 
-        public bool requiredFlagState = true; // 플래그가 True일 때 이벤트 발동
-
-        public bool useForceDir = false; 
-        public Direction evForceDir = Direction.North;
+        public List<CellEventData> events = new List<CellEventData>(); // 다중 이벤트 처리
 
         [Header("Object Interaction")]
         public bool canInteract = false;               // 상호작용 가능 여부

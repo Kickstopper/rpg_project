@@ -552,18 +552,20 @@ public class DungeonMapEditor : EditorWindow
                 }
 
                 // 이벤트(보스, NPC 등) 배치 시각화
-                if (!string.IsNullOrEmpty(cell.eventID))
+                if (cell.events != null && cell.events.Count > 0 && !string.IsNullOrEmpty(cell.events[0].eventID))
                 {
-                    // 1회성은 보라색 'E', 반복성은 시안색 'R'로 마크를 다르게 표시합니다.
-                    Rect eventRect = new Rect(rect.xMax - 12f, rect.y + 2f, 10f, 10f);
-                    Color markColor = cell.isEventRepeatable ? Color.cyan : Color.magenta;
-                    string markText = cell.isEventRepeatable ? "R" : "E";
+                    bool isRep = cell.events[0].isEventRepeatable;
+                    Rect eventRect = new Rect(rect.xMax - 14f, rect.y + 2f, 12f, 10f);
+                    Color markColor = isRep ? Color.cyan : Color.magenta;
+                    
+                    // 이벤트가 2개 이상이면 '+' 기호를 붙여 다중 이벤트임을 표시
+                    string markText = (cell.events.Count > 1) ? (isRep ? "R+" : "E+") : (isRep ? "R" : "E");
 
                     EditorGUI.DrawRect(eventRect, markColor);
                     
                     GUIStyle evStyle = new GUIStyle(EditorStyles.miniLabel);
                     evStyle.alignment = TextAnchor.MiddleCenter;
-                    evStyle.normal.textColor = cell.isEventRepeatable ? Color.black : Color.white; // 시안색 배경엔 검은 글씨
+                    evStyle.normal.textColor = isRep ? Color.black : Color.white; 
                     evStyle.fontSize = 8;
                     evStyle.padding = new RectOffset(0,0,0,0);
                     GUI.Label(eventRect, markText, evStyle);
@@ -655,16 +657,6 @@ public class DungeonMapEditor : EditorWindow
             GUILayout.Label("Batch Interaction Settings", EditorStyles.miniBoldLabel);
             DrawBatchInteractionFields();
 
-            // 다중 셀에 동일한 이벤트를 일괄 적용할 때 사용
-            GUILayout.Space(5);
-            GUILayout.Label("Batch Events", EditorStyles.miniBoldLabel);
-            DrawBatchEventField();
-            DrawBatchEventRepeatableField(); // 다중 셀 반복 여부 일괄 적용
-
-            // 다중 셀 시점 강제 전환 일괄 적용 UI
-            DrawBatchUseForceDirField();
-            DrawBatchEvForceDirField();
-
             GUILayout.Space(5);
             GUILayout.Label("Batch Face Objects", EditorStyles.miniBoldLabel);
             
@@ -752,28 +744,60 @@ public class DungeonMapEditor : EditorWindow
 
                 // 이벤트 ID와 반복 여부 토글을 함께 표시
                 GUILayout.Space(10);
-                GUILayout.Label("Event Settings", EditorStyles.boldLabel);
-                selectedCell.eventID = EditorGUILayout.TextField("Event ID", selectedCell.eventID);
+                GUILayout.Label("Event Settings (Priority: Top to Bottom)", EditorStyles.boldLabel);
                 
-                // 이벤트 ID가 있을 때만 반복 여부 토글을 보여주어 깔끔하게 유지
-                if (!string.IsNullOrEmpty(selectedCell.eventID))
+                // 리스트가 null이면 초기화
+                if (selectedCell.events == null) selectedCell.events = new List<CellEventData>();
+
+                for (int i = 0; i < selectedCell.events.Count; i++)
                 {
-                    // 플래그 조건 UI
-                    selectedCell.requiredFlag = EditorGUILayout.TextField("Required Flag", selectedCell.requiredFlag);
-
-                    if (!string.IsNullOrEmpty(selectedCell.requiredFlag))
+                    var ev = selectedCell.events[i];
+                    EditorGUILayout.BeginVertical("box");
+                    
+                    EditorGUILayout.BeginHorizontal();
+                    ev.eventID = EditorGUILayout.TextField($"Event #{i+1} ID", ev.eventID);
+                    
+                    // 이벤트 삭제 버튼 (빨간색)
+                    GUI.backgroundColor = new Color(1f, 0.5f, 0.5f);
+                    if (GUILayout.Button("X", GUILayout.Width(25)))
                     {
-                        selectedCell.requiredFlagState = EditorGUILayout.Toggle("Required State (T/F)", selectedCell.requiredFlagState);
+                        selectedCell.events.RemoveAt(i);
+                        GUI.changed = true;
+                        GUI.backgroundColor = Color.white;
+                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.EndVertical();
+                        break; // 요소가 삭제되었으므로 루프를 탈출하고 다음 프레임에 다시 그림
                     }
+                    GUI.backgroundColor = Color.white;
+                    EditorGUILayout.EndHorizontal();
 
-                    GUILayout.Space(5);
-                    selectedCell.isEventRepeatable = EditorGUILayout.Toggle("Is Repeatable", selectedCell.isEventRepeatable);
-                    // 시점 강제 전환 UI
-                    selectedCell.useForceDir = EditorGUILayout.Toggle("Use Force Dir", selectedCell.useForceDir);
-                    if (selectedCell.useForceDir)
+                    // ID가 입력되어 있을 때만 세부 설정 표시
+                    if (!string.IsNullOrEmpty(ev.eventID))
                     {
-                        selectedCell.evForceDir = (Direction)EditorGUILayout.EnumPopup("Force Direction", selectedCell.evForceDir);
+                        ev.requiredFlag = EditorGUILayout.TextField("  Required Flag", ev.requiredFlag);
+                        if (!string.IsNullOrEmpty(ev.requiredFlag))
+                        {
+                            ev.requiredFlagState = EditorGUILayout.Toggle("    ↳ Req State (T/F)", ev.requiredFlagState);
+                        }
+
+                        GUILayout.Space(2);
+                        ev.isEventRepeatable = EditorGUILayout.Toggle("  Is Repeatable", ev.isEventRepeatable);
+                        
+                        ev.useForceDir = EditorGUILayout.Toggle("  Use Force Dir", ev.useForceDir);
+                        if (ev.useForceDir)
+                        {
+                            ev.evForceDir = (Direction)EditorGUILayout.EnumPopup("    ↳ Force Direction", ev.evForceDir);
+                        }
                     }
+                    EditorGUILayout.EndVertical();
+                    GUILayout.Space(3);
+                }
+
+                // 이벤트 목록 추가 버튼
+                if (GUILayout.Button("+ Add Event", GUILayout.Height(22)))
+                {
+                    selectedCell.events.Add(new CellEventData());
+                    GUI.changed = true;
                 }
 
                 GUILayout.Space(20);
@@ -1079,82 +1103,6 @@ public class DungeonMapEditor : EditorWindow
 
             EditorGUILayout.EndVertical();
         }
-    }
-
-    // 이벤트 일괄 적용 헬퍼 함수
-    void DrawBatchEventField()
-    {
-        string firstVal = selectedCells[0].eventID;
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.eventID != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        string newVal = EditorGUILayout.TextField("Event ID", isMixed ? "" : firstVal);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.eventID = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
-    }
-
-    // 이벤트 반복 여부 플래그 일괄 적용 헬퍼 함수
-    void DrawBatchEventRepeatableField()
-    {
-        bool firstVal = selectedCells[0].isEventRepeatable;
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.isEventRepeatable != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        bool newVal = EditorGUILayout.Toggle("Is Repeatable", isMixed ? false : firstVal);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.isEventRepeatable = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
-    }
-
-    // 방향 강제 여부 일괄 적용 헬퍼
-    void DrawBatchUseForceDirField()
-    {
-        bool firstVal = selectedCells[0].useForceDir;
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.useForceDir != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        bool newVal = EditorGUILayout.Toggle("Use Force Dir", isMixed ? false : firstVal);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.useForceDir = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
-    }
-
-    // 강제할 방향 일괄 적용 헬퍼
-    void DrawBatchEvForceDirField()
-    {
-        Direction firstVal = selectedCells[0].evForceDir;
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.evForceDir != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        Direction newVal = (Direction)EditorGUILayout.EnumPopup("Force Direction", isMixed ? Direction.North : firstVal);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.evForceDir = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
     }
 
     // 중앙 고정 오브젝트 일괄 적용 헬퍼
