@@ -16,22 +16,22 @@ namespace Manager
             currentMapID = mapID;
         }
 
-        public (string eventID, int forceDir) CheckEvent(int x, int y)
+        public (string eventID, int forceDir) CheckEvent(int x, int y, bool checkOnAttempt)
         {
-            // 던전 데이터가 로드되어 있지 않으면 무시
             if (ManagerRoot.Dungeon == null || ManagerRoot.Dungeon.CurrentDungeonData == null)
                 return (null, -1);
 
             CellData cell = ManagerRoot.Dungeon.CurrentDungeonData.GetCell(x, y);
             
-            // 타일에 이벤트 리스트가 할당되어 있지 않거나 비어있으면 무시
             if (cell == null || cell.events == null || cell.events.Count == 0)
                 return (null, -1);
 
-            // 리스트의 위에서부터 순서대로 조건 검사
             foreach (var ev in cell.events)
             {
                 if (string.IsNullOrEmpty(ev.eventID)) continue;
+                
+                // 요구하는 발동 시점이 맞지 않으면 패스
+                if (ev.triggerOnAttempt != checkOnAttempt) continue; 
 
                 // 플래그 조건 검사
                 if (!string.IsNullOrEmpty(ev.requiredFlag))

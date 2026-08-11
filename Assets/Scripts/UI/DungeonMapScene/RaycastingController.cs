@@ -774,10 +774,13 @@ namespace UI.DungeonMapScene
                 bool isMovingForward = (inputDir == facingDir);
 
                 EntranceData validEntrance = CheckForEntrance(tx, ty);
-
+                // 진입 시도 시(true) 발동하는 이벤트가 있는지 검사
+                (string attemptEventID, int attemptForceDir) = ManagerRoot.DungeonEvent.CheckEvent(tx, ty, true);
+                bool isEventBlocking = !string.IsNullOrEmpty(attemptEventID);
+                
                 if (walkable)
                 {
-                    if (validEntrance != null && !validEntrance.isWallEntrance)
+                    if (validEntrance != null && !validEntrance.isWallEntrance && !isEventBlocking)
                     {
                         StartCoroutine(TransitionToOtherPlace(validEntrance, moveVec));
                     }
@@ -792,6 +795,17 @@ namespace UI.DungeonMapScene
                 {
                     if (validEntrance != null && validEntrance.isWallEntrance && isMovingForward)
                     {
+                        // 가로막는 Attempt 이벤트가 있다면 부딪히고 대화창 실행
+                        if (isEventBlocking)
+                        {
+                            ManagerRoot.Sound.PlaySFX(SfxID.Bump_Wall);
+                            StartCoroutine(_player.BumpRoutine(moveVec)); 
+                            
+                            _inputLocked = true;
+                            StartCoroutine(ShowDialog(attemptEventID, attemptForceDir));   
+                            return; // 진입을 차단하고 여기서 종료
+                        }
+
                         if (doorConfig != null && hitCell != null) 
                         {
                             StartCoroutine(OpenDoorAndTransitionRoutine(hitCell, validEntrance, moveVec, doorConfig));
@@ -839,6 +853,34 @@ namespace UI.DungeonMapScene
                     }
                 }
             }
+        }
+
+        // 지정된 좌표에 실행 가능한 이벤트가 있는지 미리 확인 (확인만 하고 발생시키지 않음)
+        private bool HasValidEvent(int x, int y)
+        {
+            if (_currentMap == null || ManagerRoot.DungeonEvent == null) return false;
+            
+            CellData cell = _currentMap.GetCell(x, y);
+            if (cell == null || cell.events == null || cell.events.Count == 0) return false;
+
+            List<string> completedList = ManagerRoot.DungeonEvent.GetCompletedTriggers();
+            foreach (var ev in cell.events)
+            {
+                if (string.IsNullOrEmpty(ev.eventID)) continue;
+                
+                // 선행 플래그 검사
+                if (!string.IsNullOrEmpty(ev.requiredFlag))
+                {
+                    if (ManagerRoot.Flag.CheckFlag(ev.requiredFlag) != ev.requiredFlagState) continue;
+                }
+                
+                // 완료 여부 검사
+                string uniqueKey = $"{_currentMap.mapID}_{x}_{y}_{ev.eventID}";
+                if (!ev.isEventRepeatable && completedList.Contains(uniqueKey)) continue;
+
+                return true; // 실행 가능한 이벤트가 하나라도 있다면 true 반환
+            }
+            return false;
         }
 
         private IEnumerator SymbolEncounterRoutine(MapEnemy enemy, Vector2Int moveVec, EncounterType encType)
@@ -1277,6 +1319,9 @@ namespace UI.DungeonMapScene
             int preEntranceLogicX = _player.LogicX;
             int preEntranceLogicY = _player.LogicY;
 
+            int targetGridX = _player.LogicX + moveDir.x;
+            int targetGridY = _player.LogicY + moveDir.y;
+
             // [Phase A] 문을 통과하며 미끄러져 들어가는 연출 및 1차 암전
             if (transitionManager != null && transitionManager.fadeOverlay != null)
             {
@@ -1285,8 +1330,7 @@ namespace UI.DungeonMapScene
                 
                 float startX = _player.PosX;
                 float startY = _player.PosY;
-                int targetGridX = _player.LogicX + moveDir.x;
-                int targetGridY = _player.LogicY + moveDir.y;
+                
                 Vector2 targetPos = _player.GetOffsetPosition(targetGridX, targetGridY, _player.DirectionIdx);
 
                 transitionManager.fadeOverlay.alpha = 0f;
@@ -1308,6 +1352,28 @@ namespace UI.DungeonMapScene
             
             onFadeOutComplete?.Invoke();
             ManagerRoot.Time.AddStep(1);
+
+            // 해당 셀로 완전히 진입한 뒤 발동하는(false) 이벤트 검사
+            (string afterEventID, int forceDir) = ManagerRoot.DungeonEvent.CheckEvent(targetGridX, targetGridY, false);
+            if (!string.IsNullOrEmpty(afterEventID))
+            {
+                // 대화창이 암전에 가려지지 않도록 화면을 밝힘
+                if (transitionManager != null && transitionManager.fadeOverlay != null)
+                {
+                    transitionManager.fadeOverlay.alpha = 0f;
+                    transitionManager.fadeOverlay.blocksRaycasts = false;
+                }
+
+                // 대화 이벤트가 끝날 때까지 대기
+                yield return StartCoroutine(ShowDialog(afterEventID, forceDir));
+
+                // 대화가 끝난 후 UI로 넘어가기 전 자연스러운 처리를 위해 다시 암전
+                if (transitionManager != null && transitionManager.fadeOverlay != null)
+                {
+                    transitionManager.fadeOverlay.alpha = 1f;
+                    transitionManager.fadeOverlay.blocksRaycasts = true;
+                }
+            }
 
             // [Phase B] 맵 분기 처리
             if (entrance.type == EntranceType.Map)
@@ -1925,7 +1991,8 @@ namespace UI.DungeonMapScene
         {
             if (ManagerRoot.DungeonEvent == null) return;
 
-            (string eventID, int forceDir) = ManagerRoot.DungeonEvent.CheckEvent(_player.LogicX, _player.LogicY);
+            // cell에 완전히 올라선 뒤(false) 발동하는 이벤트 검사
+            (string eventID, int forceDir) = ManagerRoot.DungeonEvent.CheckEvent(_player.LogicX, _player.LogicY, false);
             if (!string.IsNullOrEmpty(eventID))
             {
                 _inputLocked = true;

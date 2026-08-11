@@ -782,7 +782,7 @@ public class DungeonMapEditor : EditorWindow
 
                         GUILayout.Space(2);
                         ev.isEventRepeatable = EditorGUILayout.Toggle("  Is Repeatable", ev.isEventRepeatable);
-                        
+                        ev.triggerOnAttempt = EditorGUILayout.Toggle("  Trigger On Attempt", ev.triggerOnAttempt);
                         ev.useForceDir = EditorGUILayout.Toggle("  Use Force Dir", ev.useForceDir);
                         if (ev.useForceDir)
                         {

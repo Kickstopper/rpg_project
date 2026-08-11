@@ -120,6 +120,11 @@ namespace Data
         public string requiredFlag = "";
         public bool requiredFlagState = true;
         public bool isEventRepeatable = false;
+        
+        // 이벤트 발동 시점
+        // false: 해당 칸으로 이동을 완료한 직후 발생
+        // true: 해당 칸으로 이동을 시도할 때 발생
+        public bool triggerOnAttempt = false;
         public bool useForceDir = false;
         public Direction evForceDir = Direction.North;
     }
