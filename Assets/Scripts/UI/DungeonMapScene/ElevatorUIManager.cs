@@ -6,6 +6,7 @@ using Data;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 using Manager;
+using System.Collections.Generic;
 
 namespace UI
 {
@@ -182,6 +183,7 @@ namespace UI
 
                 Button firstValidButton = null; 
                 Button currentFloorButton = null; // 현재 층 버튼을 별도로 기억할 변수
+                List<Button> spawnedButtons = new List<Button>(); // 생성된 모든 버튼을 담을 리스트
 
                 for (int i = elevatorData.maxFloor; i >= elevatorData.minFloor; i--)
                 {
@@ -226,10 +228,7 @@ namespace UI
                             btn.onClick.AddListener(() => SelectFloor(matchedFloor));
                         }
 
-                        if (firstValidButton == null) 
-                        {
-                            firstValidButton = btn;
-                        }
+                        if (firstValidButton == null) firstValidButton = btn;
                     }
                     else
                     {
@@ -237,7 +236,12 @@ namespace UI
                         btn.interactable = false;
                         txt.color = new Color(txt.color.r, txt.color.g, txt.color.b, 0.3f);
                     }
+
+                    spawnedButtons.Add(btn);
                 }
+
+                // 버튼 생성이 끝나면 그리드 바깥으로 빠져나가지 못하게 네비게이션을 연결
+                SetupExplicitNavigation(spawnedButtons, columnCount);
                 
                 // 현재 층 버튼이 존재하면 무조건 하이라이트를 줌
                 if (currentFloorButton != null)
@@ -250,6 +254,52 @@ namespace UI
                     StartCoroutine(SetFirstSelectedButton(firstValidButton.gameObject));
                 }
             }
+        }
+
+        // 그리드 형태에 맞춰 명시적 네비게이션을 설정하는 메서드
+        private void SetupExplicitNavigation(List<Button> buttons, int cols)
+        {
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                Button btn = buttons[i];
+                if (!btn.interactable) continue; // 비활성화된 버튼은 설정 패스
+
+                Navigation nav = new Navigation();
+                nav.mode = Navigation.Mode.Explicit;
+
+                // 상하는 cols만큼 인덱스 차이가 남
+                nav.selectOnUp = FindNextValid(buttons, i, -cols, cols, false);
+                nav.selectOnDown = FindNextValid(buttons, i, cols, cols, false);
+                
+                // 좌우는 1만큼 인덱스 차이가 남
+                nav.selectOnLeft = FindNextValid(buttons, i, -1, cols, true);
+                nav.selectOnRight = FindNextValid(buttons, i, 1, cols, true);
+
+                btn.navigation = nav;
+            }
+        }
+
+        // 특정 방향으로 가면서 가장 먼저 만나는 활성화된 버튼을 반환
+        private Button FindNextValid(List<Button> list, int startIndex, int step, int cols, bool isHorizontal)
+        {
+            int curr = startIndex + step;
+            while (curr >= 0 && curr < list.Count)
+            {
+                // 왼쪽 또는 오른쪽 방향일 때 그리드 바깥으로 넘어가면 연결을 멈춤
+                if (isHorizontal)
+                {
+                    if (step == 1 && curr % cols == 0) break; // 오른쪽 끝에서 더 갔을 때
+                    if (step == -1 && curr % cols == cols - 1) break; // 왼쪽 끝에서 더 갔을 때
+                }
+
+                // 이동한 곳의 버튼이 상호작용 가능하다면 해당 버튼으로 연결
+                if (list[curr].interactable) 
+                    return list[curr];
+                    
+                // 비활성화 층이라면 건너뛰고 같은 방향으로 계속 탐색
+                curr += step;
+            }
+            return null; // 연결할 버튼이 없다면 포커스가 이동하지 않고 제자리에 머무름
         }
 
         // UI 레이아웃 정렬이 끝날 때까지 1프레임 대기 후 포커스를 표시
