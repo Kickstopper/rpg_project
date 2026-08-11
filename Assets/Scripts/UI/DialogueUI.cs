@@ -922,7 +922,8 @@ namespace UI
             Sprite targetSprite = null;
             switch (tone)
             {
-                case ChoiceTone.Gentle: //우호적 
+                case ChoiceTone.Gentle: //우호적
+                case ChoiceTone.Persuade: // 설득  
                     targetSprite = bubbleGentle;
                 break;
                 
@@ -940,7 +941,6 @@ namespace UI
                 break;
                 
                 case ChoiceTone.Relieve: // 안심
-                case ChoiceTone.Persuade: // 설득 
                 case ChoiceTone.Request: // 요구
                 case ChoiceTone.Bribe: // 상납
                 case ChoiceTone.Flirt: // 희롱
