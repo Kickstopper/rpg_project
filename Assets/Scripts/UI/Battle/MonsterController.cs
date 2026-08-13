@@ -299,7 +299,7 @@ namespace UI.Battle
                 
                 // 피벗도 중앙으로 맞춤
                 panel.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-                panel.rectTransform.anchoredPosition = new Vector2(-24, 24);
+                panel.rectTransform.anchoredPosition = new Vector2(0, 30);
             }
         }
 

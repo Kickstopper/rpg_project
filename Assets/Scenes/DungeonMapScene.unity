@@ -12118,6 +12118,7 @@ MonoBehaviour:
     dangerColor:
       serializedVersion: 2
       rgba: 4278190335
+  renderEnemySprites: 0
   isUIHoldingMovement: 0
 --- !u!1 &1702368348
 GameObject:
@@ -14482,9 +14483,10 @@ MonoBehaviour:
   mapSize: 7
   visibleSize: 5
   rectScale: 4
+  showEnemyIcons: 1
   enemyPrefab: {fileID: 8936402495519818880, guid: 5d8f8160cf1a0a9439f0c598af2f0ee0, type: 3}
-  enemyNormalColor: {r: 1, g: 1, b: 1, a: 1}
-  enemyFallenColor: {r: 0, g: 1, b: 1, a: 1}
+  enemyNormalColor: {r: 1, g: 0, b: 0, a: 1}
+  enemyFallenColor: {r: 1, g: 1, b: 0, a: 1}
   parentRT: {fileID: 2086873636}
   gridPrefab: {fileID: 2873164270439364527, guid: 3b14602e6186c456ca8156bac5dddc0a, type: 3}
   arrowPrefab: {fileID: 8936402495519818880, guid: fec19776124ef4b10a94acd1a105c197, type: 3}
