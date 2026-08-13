@@ -15,9 +15,10 @@ namespace UI.DungeonMapScene
         public int visibleSize = 5; 
         public int rectScale = 3; 
 
-        [Header("Enemy Icons")]
-        public GameObject enemyPrefab; // 인스펙터에서 할당 안 하면 기본 빨간 점 생성
-        public Color enemyNormalColor = Color.red;
+        [Header("Enemy Settings")]
+        public bool showEnemyIcons = true;
+        public GameObject enemyPrefab; // 인스펙터에서 할당 안 하면 기본 사각형 생성
+        public Color enemyNormalColor = Color.white;
         public Color enemyFallenColor = Color.gray;
 
         [Header("References")]
@@ -260,12 +261,24 @@ namespace UI.DungeonMapScene
             SetDirection(dirIndex, 0f);
         }
 
-        // --- 에너미 마커 실시간 반영 핵심 로직 --- //
+        // 에너미 마커 실시간 반영 로직
         public void UpdateEnemyIcons(List<RaycastingController.MapEnemy> enemies)
         {
             if (_mapParent == null) return;
 
-            // 1. 필요한 아이콘 개수만큼 풀링(생성)
+            // 미니맵 아이콘 표시가 꺼져 있다면, 기존에 켜져 있던 모든 아이콘을 끄고 즉시 종료
+            if (!showEnemyIcons)
+            {
+                foreach (var icon in _enemyIcons)
+                {
+                    if (icon != null && icon.gameObject.activeSelf)
+                    {
+                        icon.gameObject.SetActive(false);
+                    }
+                }
+                return; 
+            }
+
             while (_enemyIcons.Count < enemies.Count)
             {
                 GameObject iconObj;
@@ -281,7 +294,8 @@ namespace UI.DungeonMapScene
                     Image img = iconObj.AddComponent<Image>();
                     
                     RectTransform rt = img.rectTransform;
-                    rt.sizeDelta = new Vector2(6f, 6f); // 그리드 칸(11)보다 약간 작은 크기
+                    int size = wallWidth - 5; // 그리드보다 작은 크기
+                    rt.sizeDelta = new Vector2(size, size);
                 }
                 
                 RectTransform rectT = iconObj.GetComponent<RectTransform>();
@@ -293,13 +307,13 @@ namespace UI.DungeonMapScene
                 _enemyIcons.Add(iconObj.GetComponent<Image>());
             }
 
-            // 2. 사용하지 않는 남은 아이콘 비활성화
+            // 사용하지 않는 남은 아이콘 비활성화
             for (int i = enemies.Count; i < _enemyIcons.Count; i++)
             {
                 _enemyIcons[i].gameObject.SetActive(false);
             }
 
-            // 3. 현재 맵 기준점(_gridOrigin)을 토대로 로컬 위치 부드럽게 보정
+            // _gridOrigin(현재 맵 기준점)을 토대로 로컬 위치 부드럽게 보정
             for (int i = 0; i < enemies.Count; i++)
             {
                 var enemy = enemies[i];

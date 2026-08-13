@@ -44,6 +44,7 @@ namespace UI.DungeonMapScene
         
         [Header("Encounter System")]
         public EncounterSystem encounterSystem;
+        public bool renderEnemySprites = false; // 몬스터 렌더링 여부
 
         public enum LookState { None, Up, Down }
         private LookState _currentLookState = LookState.None;
@@ -2441,27 +2442,71 @@ namespace UI.DungeonMapScene
 
         private Vector2Int GetChaseDirection(int ex, int ey, int px, int py)
         {
-            int dx = px - ex;
-            int dy = py - ey;
+            Vector2Int start = new Vector2Int(ex, ey);
+            Vector2Int target = new Vector2Int(px, py);
 
-            List<Vector2Int> preferredDirs = new List<Vector2Int>();
-            
-            if (Mathf.Abs(dx) > Mathf.Abs(dy))
+            // BFS를 위한 큐와 방문 및 경로 추적 딕셔너리
+            Queue<Vector2Int> frontier = new Queue<Vector2Int>();
+            Dictionary<Vector2Int, Vector2Int> cameFrom = new Dictionary<Vector2Int, Vector2Int>();
+            Dictionary<Vector2Int, int> costSoFar = new Dictionary<Vector2Int, int>(); // 탐색 깊이 제한용
+
+            frontier.Enqueue(start);
+            cameFrom[start] = start;
+            costSoFar[start] = 0;
+
+            bool found = false;
+            Vector2Int[] dirs = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+
+            // 무한 루프 및 프레임 드랍을 방지하기 위한 최대 탐색 깊이
+            int maxDepth = 8; 
+
+            while (frontier.Count > 0)
             {
-                if (dx != 0) preferredDirs.Add(new Vector2Int((int)Mathf.Sign(dx), 0));
-                if (dy != 0) preferredDirs.Add(new Vector2Int(0, (int)Mathf.Sign(dy)));
-            }
-            else
-            {
-                if (dy != 0) preferredDirs.Add(new Vector2Int(0, (int)Mathf.Sign(dy)));
-                if (dx != 0) preferredDirs.Add(new Vector2Int((int)Mathf.Sign(dx), 0));
+                Vector2Int current = frontier.Dequeue();
+
+                // 플레이어 위치에 도달할 수 있는 경로를 찾음
+                if (current == target)
+                {
+                    found = true;
+                    break;
+                }
+
+                // 최대 탐색 깊이에 도달하면 더 이상 파고들지 않음
+                if (costSoFar[current] >= maxDepth) continue;
+
+                foreach (Vector2Int dir in dirs)
+                {
+                    // 벽이나 장애물, 다른 몬스터가 없는 유효한 칸인지 검사
+                    if (CanEnemyMove(current.x, current.y, dir))
+                    {
+                        Vector2Int next = current + dir;
+                        
+                        // 아직 방문하지 않은 칸이라면 큐에 추가
+                        if (!cameFrom.ContainsKey(next))
+                        {
+                            frontier.Enqueue(next);
+                            cameFrom[next] = current;
+                            costSoFar[next] = costSoFar[current] + 1;
+                        }
+                    }
+                }
             }
 
-            foreach (var dir in preferredDirs)
+            // 경로가 아예 없거나(완전히 막힌 방), maxDepth 내에 플레이어가 없다면 제자리 대기 후 배회
+            if (!found) return Vector2Int.zero;
+
+            // 경로를 찾았다면, 플레이어 위치에서부터 거꾸로 역추적하여 몬스터가 딛어야 할 첫 걸음을 찾아냄
+            Vector2Int currentTrace = target;
+            Vector2Int nextStep = currentTrace;
+
+            while (currentTrace != start)
             {
-                if (CanEnemyMove(ex, ey, dir)) return dir;
+                nextStep = currentTrace;
+                currentTrace = cameFrom[currentTrace];
             }
-            return Vector2Int.zero;
+
+            // 몬스터의 현재 위치에서 다음 스텝으로 향하는 방향 벡터 반환
+            return nextStep - start;
         }
 
         private Vector2Int GetRandomWanderDirection(int ex, int ey)
@@ -2586,14 +2631,17 @@ namespace UI.DungeonMapScene
         private void UpdateSpriteData()
         {
             List<SpriteInfo> spriteList = new List<SpriteInfo>();
-
-            foreach (var enemy in _activeEnemies)
+            // renderEnemySprites가 켜져 있을 때만 렌더러에 몬스터 스프라이트 정보를 넘김
+            if (renderEnemySprites)
             {
-                if (enemy.isAlive)
+                foreach (var enemy in _activeEnemies)
                 {
-                    spriteList.Add(new SpriteInfo { 
-                        x = enemy.x, y = enemy.y, texIdx = enemy.currentTexIdx, isEnemy = true, isFallen = enemy.isFallen
-                    });
+                    if (enemy.isAlive)
+                    {
+                        spriteList.Add(new SpriteInfo { 
+                            x = enemy.x, y = enemy.y, texIdx = enemy.currentTexIdx, isEnemy = true, isFallen = enemy.isFallen
+                        });
+                    }
                 }
             }
 
