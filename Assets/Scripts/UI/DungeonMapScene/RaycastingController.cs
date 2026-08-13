@@ -280,14 +280,18 @@ namespace UI.DungeonMapScene
 
             UpdateWallAnimations();
             
-            // 심볼 몬스터 로직은 랜덤 인카운터 모드가 아닐 때만 실행
-            if (monsterExist && _maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random)
+            // 심볼 인카운터 로직
+            if (monsterExist && _maxSpawnCount > 0 && theme.encounterMode == EncounterMode.Symbol)
             {
                 // 몬스터 심볼의 이동과 스폰
                 UpdateEnemyAI();
                 UpdateEnemySprites();
                 UpdateEnemySpawner();
                 UpdateEncounterSensor(); // 위험도 센서 실시간 갱신
+                
+                // 미니맵에 에너미들의 위치를 실시간으로 넘겨줍니다.
+                if (miniMap != null && miniMap.gameObject.activeSelf)
+                    miniMap.UpdateEnemyIcons(_activeEnemies);
             }
 
             _renderer.RenderFrame(_player, renderSettings);

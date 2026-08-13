@@ -10,10 +10,15 @@ namespace UI.DungeonMapScene
     public class GridMap : MonoBehaviour
     {
         [Header("Settings")]
-        public float spacing = 0f; // 그리드 간격
-        public int mapSize = 7; // 그려질 맵의 크기
-        public int visibleSize = 5; // 실제 보여질 맵의 크기
-        public int rectScale = 2; // 맵의 스케일
+        public float spacing = 0f; 
+        public int mapSize = 7; 
+        public int visibleSize = 5; 
+        public int rectScale = 3; 
+
+        [Header("Enemy Icons")]
+        public GameObject enemyPrefab; // 인스펙터에서 할당 안 하면 기본 빨간 점 생성
+        public Color enemyNormalColor = Color.red;
+        public Color enemyFallenColor = Color.gray;
 
         [Header("References")]
         public RectTransform parentRT;
@@ -25,12 +30,15 @@ namespace UI.DungeonMapScene
         private MapData _map;
         
         private Dictionary<int, GridCellController> _gridCellDict = new Dictionary<int, GridCellController>();
+        private List<Image> _enemyIcons = new List<Image>(); // 에너미 아이콘 풀링 리스트
         
         private float _moveDistX;
         private float _moveDistY;
         
         private int _curPx;
         private int _curPy;
+        private int _gridOriginX; // 그리드가 생성된 기준 X좌표 (이동 애니메이션 보정용)
+        private int _gridOriginY; // 그리드가 생성된 기준 Y좌표
         private int _gridHalfSize;
 
         private int wallWidth = 11;
@@ -58,11 +66,12 @@ namespace UI.DungeonMapScene
             
             _curPx = _map.startX;
             _curPy = _map.startY;
+            _gridOriginX = _curPx;
+            _gridOriginY = _curPy;
             _gridHalfSize = mapSize / 2;
 
             CreateMapLayout();
             
-            // 초기 상태 설정
             UpdateGridColors(_curPx, _curPy);
             SetDirection((int)_map.startDirection, 0f);
         }
@@ -96,8 +105,14 @@ namespace UI.DungeonMapScene
             illusionTextures = null;
             doorTextures.Clear();
 
-            if (_mapParent != null) _mapParent.DOKill();
+            if (_mapParent != null) _mapParent.DOKill(true);
             if (_arrowImg != null) _arrowImg.rectTransform.DOKill();
+
+            foreach (var icon in _enemyIcons)
+            {
+                if (icon != null && icon.gameObject != null) Destroy(icon.gameObject);
+            }
+            _enemyIcons.Clear();
 
             if (_mapParent != null)
             {
@@ -116,38 +131,38 @@ namespace UI.DungeonMapScene
 
         private void CreateMapLayout()
         {
-            parentRT.localScale = Vector2.one * rectScale;
-            
-            parentRT.localPosition = new Vector2(-(Screen.width - visibleSize * wallWidth * rectScale) / 2f, 
-                                                 -(Screen.height - visibleSize * wallWidth * rectScale) / 2f);
-            parentRT.sizeDelta = new Vector2(visibleSize * wallWidth, visibleSize * wallWidth);
-            
-            GameObject mapObj = new GameObject("MapContent");
-            _mapParent = mapObj.AddComponent<RectTransform>();
-            _mapParent.SetParent(transform);
-            _mapParent.localPosition = Vector3.zero;
-            _mapParent.localScale = Vector2.one;
-            _mapParent.anchorMin = new Vector2(0.5f, 0.5f);
-            _mapParent.anchorMax = new Vector2(0.5f, 0.5f);
-            _mapParent.pivot = new Vector2(0.5f, 0.5f);
-            _mapParent.sizeDelta = new Vector2(Screen.width, Screen.height);
-
             Vector2 gridSize = Vector2.one * wallWidth;
             _moveDistX = gridSize.x + spacing;
             _moveDistY = gridSize.y + spacing;
 
-            // 중앙 정렬을 위한 전체 맵 크기 계산
-            float totalWidth = _moveDistX * mapSize - spacing;
-            float totalHeight = _moveDistY * mapSize - spacing;
+            float totalWidth = (_moveDistX * mapSize);
+            float totalHeight = (_moveDistY * mapSize);
+
+            parentRT.localScale = Vector2.one * rectScale;
+            parentRT.anchorMin = new Vector2(0, 0);
+            parentRT.anchorMax = new Vector2(0, 0);
+            parentRT.pivot = new Vector2(0, 0);
+            parentRT.anchoredPosition = new Vector2(30f, 30f); 
+            parentRT.sizeDelta = new Vector2(visibleSize * wallWidth, visibleSize * wallWidth);
+            
+            GameObject mapObj = new GameObject("MapContent");
+            _mapParent = mapObj.AddComponent<RectTransform>();
+            _mapParent.SetParent(parentRT);
+            
+            _mapParent.anchorMin = new Vector2(0.5f, 0.5f);
+            _mapParent.anchorMax = new Vector2(0.5f, 0.5f);
+            _mapParent.pivot = new Vector2(0.5f, 0.5f);
+            _mapParent.anchoredPosition = Vector2.zero; 
+            _mapParent.localScale = Vector2.one;
+            _mapParent.sizeDelta = new Vector2(totalWidth, totalHeight);
+
             float startOffsetX = -(totalWidth * 0.5f) + (gridSize.x * 0.5f);
             float startOffsetY = (totalHeight * 0.5f) - (gridSize.y * 0.5f);
 
-            // 그리드 생성 및 캐싱
             for (int r = 0; r < mapSize; r++)
             {
                 for (int c = 0; c < mapSize; c++)
                 {
-                    // 위치 계산: c가 증가하면 X(우측)로, r이 증가하면 Y(아래)로
                     Vector2 pos = new Vector2(
                         startOffsetX + c * _moveDistX,
                         startOffsetY - r * _moveDistY
@@ -158,63 +173,45 @@ namespace UI.DungeonMapScene
                     RectTransform rt = gridObj.GetComponent<RectTransform>();
                     rt.anchoredPosition = pos;
 
-                    // GridCellController 캐싱. 키 값: (Row * Size + Col)
                     _gridCellDict.Add(r * mapSize + c, gridObj.GetComponent<GridCellController>());
                 }
             }
 
-            // 화살표 생성
             GameObject arrowObj = Instantiate(arrowPrefab, transform);
             _arrowImg = arrowObj.GetComponent<Image>();
             _arrowImg.rectTransform.localScale = Vector2.one;
-            _arrowImg.rectTransform.localPosition = Vector3.zero; // 항상 중앙 유지
+            _arrowImg.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+            _arrowImg.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            _arrowImg.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            _arrowImg.rectTransform.anchoredPosition = Vector2.zero; 
         }
 
         public void TranslateToNewPosition(int targetX, int targetY, float duration = 0f)
         {
             if (targetX == _curPx && targetY == _curPy) return;
 
-            float targetMoveX = 0;
-            float targetMoveY = 0;
+            int deltaX = targetX - _curPx;
+            int deltaY = targetY - _curPy;
 
-            if (targetX > _curPx) 
-            {
-                // 오른쪽으로 이동했다면, 맵은 왼쪽으로 밀림
-                targetMoveX = -_moveDistX; 
-            }
-            else if (targetX < _curPx) 
-            {
-                //왼쪽으로 이동했다면, 맵은 오른쪽으로 밀림
-                targetMoveX = _moveDistX; 
-            }
-            
-            if (targetY > _curPy) 
-            {
-                // 위로 이동했다면, 맵은 아래로 밀림
-                targetMoveY = -_moveDistY; 
-            }
-            else if (targetY < _curPy) 
-            {
-                // 아래로 이동했다면, 맵은 위로 밀림   
-                targetMoveY = _moveDistY; 
-            }
+            float targetMoveX = -deltaX * _moveDistX;
+            float targetMoveY = -deltaY * _moveDistY;
 
-            // 좌표 갱신
             _curPx = targetX;
             _curPy = targetY;
 
-            // 이동 애니메이션 실행
-            _mapParent.DOLocalMove(new Vector3(targetMoveX, targetMoveY, 0), duration)
+            _mapParent.DOKill(true);
+            _mapParent.anchoredPosition = Vector2.zero;
+
+            _mapParent.DOAnchorPos(new Vector2(targetMoveX, targetMoveY), duration)
                 .SetEase(Ease.Linear)
                 .OnComplete(OnMoveComplete);
         }
 
         private void OnMoveComplete()
         {
-            // 슬라이드 애니메이션이 끝나면 다시 중앙으로 (눈속임) 
-            _mapParent.localPosition = Vector3.zero;
-            
-            // 현재 좌표 기준으로 그리드의 색상을 갱신
+            _mapParent.anchoredPosition = Vector2.zero;
+            _gridOriginX = _curPx; // 이동이 완료되면 맵 논리 기준점 갱신
+            _gridOriginY = _curPy; 
             UpdateGridColors(_curPx, _curPy);
         }
 
@@ -224,10 +221,7 @@ namespace UI.DungeonMapScene
             {
                 for (int c = 0; c < mapSize; c++)
                 {
-                    // mapX: 화면 가로(c) 증가 -> 맵 동쪽(+X) (정방향)
                     int mapX = centerX + (c - _gridHalfSize); 
-                    
-                    // mapY: 화면 세로(r) 증가(아래로 감) -> 맵 남쪽(-Y) (역방향)
                     int mapY = centerY - (r - _gridHalfSize);
 
                     CellData cellData = null;
@@ -243,40 +237,102 @@ namespace UI.DungeonMapScene
             }
         }
 
-        // 자유 이동 시 매 프레임 호출될 함수 (부드러운 회전 X, 즉시 회전 O)
         public void SetFreeDirection(float dirX, float dirY)
         {
-            // 기존에 실행 중이던 화살표 회전 애니메이션이 있다면 강제 종료
             _arrowImg.rectTransform.DOKill();
-
-            // 벡터에서 각도로 변환 (Atan2)
-            // 좌표계: North(0, 1), East(1, 0), South(0, -1), West(-1, 0)
-            // Atan2(y, x)의 반환값 (동쪽 0도 기준 반시계 방향):
-            // North(0, 1) -> 90도
-            // East(1, 0)  -> 0도
             float angleRad = Mathf.Atan2(dirY, dirX); 
             float angleDeg = angleRad * Mathf.Rad2Deg;
-
-            // 좌표계 보정값 적용 (-90도)
-            // North: 90도 - 90 = 0도 (UI Up)
-            // East:   0도 - 90 = -90도 (UI Right)
             float uiAngle = angleDeg - 90f;
-
-            // 회전 적용 (Z축 회전)
             _arrowImg.rectTransform.localEulerAngles = new Vector3(0, 0, uiAngle);
         }
 
-        // 모드 전환 시, 애니메이션 없이 즉시 해당 좌표와 방향으로 맵을 '스냅'하는 함수
         public void SnapToGrid(int targetX, int targetY, int dirIndex)
         {
             _curPx = targetX;
             _curPy = targetY;
+            _gridOriginX = _curPx;
+            _gridOriginY = _curPy;
 
-            _mapParent.DOKill();
-            _mapParent.localPosition = Vector3.zero;
+            _mapParent.DOKill(true);
+            _mapParent.anchoredPosition = Vector2.zero;
 
             UpdateGridColors(_curPx, _curPy);
             SetDirection(dirIndex, 0f);
+        }
+
+        // --- 에너미 마커 실시간 반영 핵심 로직 --- //
+        public void UpdateEnemyIcons(List<RaycastingController.MapEnemy> enemies)
+        {
+            if (_mapParent == null) return;
+
+            // 1. 필요한 아이콘 개수만큼 풀링(생성)
+            while (_enemyIcons.Count < enemies.Count)
+            {
+                GameObject iconObj;
+                if (enemyPrefab != null)
+                {
+                    iconObj = Instantiate(enemyPrefab, _mapParent);
+                }
+                else
+                {
+                    // 프리팹이 없다면 기본 빨간 정사각형 생성
+                    iconObj = new GameObject("EnemyIcon");
+                    iconObj.transform.SetParent(_mapParent);
+                    Image img = iconObj.AddComponent<Image>();
+                    
+                    RectTransform rt = img.rectTransform;
+                    rt.sizeDelta = new Vector2(6f, 6f); // 그리드 칸(11)보다 약간 작은 크기
+                }
+                
+                RectTransform rectT = iconObj.GetComponent<RectTransform>();
+                rectT.anchorMin = new Vector2(0.5f, 0.5f);
+                rectT.anchorMax = new Vector2(0.5f, 0.5f);
+                rectT.pivot = new Vector2(0.5f, 0.5f);
+                rectT.localScale = Vector2.one;
+
+                _enemyIcons.Add(iconObj.GetComponent<Image>());
+            }
+
+            // 2. 사용하지 않는 남은 아이콘 비활성화
+            for (int i = enemies.Count; i < _enemyIcons.Count; i++)
+            {
+                _enemyIcons[i].gameObject.SetActive(false);
+            }
+
+            // 3. 현재 맵 기준점(_gridOrigin)을 토대로 로컬 위치 부드럽게 보정
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                var enemy = enemies[i];
+                var iconImg = _enemyIcons[i];
+                
+                if (!enemy.isAlive)
+                {
+                    iconImg.gameObject.SetActive(false);
+                    continue;
+                }
+
+                iconImg.gameObject.SetActive(true);
+
+                // enemy.x, y는 실수(Float). 중앙 기준을 0.5로 보고 기준점 대비 칸수를 픽셀 간격으로 환산
+                float localX = (enemy.x - 0.5f - _gridOriginX) * _moveDistX;
+                float localY = (enemy.y - 0.5f - _gridOriginY) * _moveDistY;
+
+                iconImg.rectTransform.anchoredPosition = new Vector2(localX, localY);
+
+                // 방향 회전
+                float angle = 0;
+                switch (enemy.direction)
+                {
+                    case 0: angle = 0f; break;   // North
+                    case 1: angle = -90f; break; // East
+                    case 2: angle = 180f; break; // South
+                    case 3: angle = 90f; break;  // West
+                }
+                iconImg.rectTransform.localEulerAngles = new Vector3(0, 0, angle);
+
+                // 상태에 따른 색상 변경
+                iconImg.color = enemy.isFallen ? enemyFallenColor : enemyNormalColor;
+            }
         }
 
         private void OnDisable()

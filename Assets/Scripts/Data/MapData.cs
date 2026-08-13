@@ -130,10 +130,30 @@ namespace Data
     }
 
     [Serializable]
+    public enum CellType
+    {
+        Void_Floor = -1, // 바닥의 구멍
+        Corridor = 0,    // 통로
+        Void_Ceil = 1,   // 천장의 구멍
+        Weapon_Shop,
+        Armor_Shop,
+        Item_Shop,
+        Heal_Spot,
+        Terminal,
+        Office,
+        Downstairs,
+        Upstairs,
+        Elevator,
+        Entrance,
+        Trap_Hole,      // 강제로 아래로 이동시키는 구멍
+        Trap_Poison,    // Poison 상태가 되는 칸
+    }
+
+    [Serializable]
     public class CellData
     {
         public int x, y;
-        public int value = 0;
+        public int value = 0; // CellType
         public int[] wallTextureIDs = new int[4] { -1, -1, -1, -1 }; // up, right, down, left
         public int floorTexIdx = -1; // -1이면 DungeonTheme의 floorTexIdx를 따름
         public int ceilTexIdx = -1;  // -1이면 DungeonTheme의 ceilTexIdx를 따름

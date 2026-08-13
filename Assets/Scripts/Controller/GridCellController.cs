@@ -23,7 +23,7 @@ namespace Controller
         public Color noWallColor;
         
         [Header("Ceil & Floor Color")]
-        public Color defaultFloorColor;
+        public Color corridorColor;
         private Color entranceColor = Color.darkGreen;
         public Color roomColor;
         private Color shopColor = Color.crimson;
@@ -63,44 +63,51 @@ namespace Controller
 
         Color GetWallColor(int wallId, HashSet<int> illusions, HashSet<int> doors)
         {
-
-            if (wallId == -1 || (illusions != null && illusions.Contains(wallId))) return noWallColor;
+            if (wallId == -1 || (illusions.Contains(wallId))) return noWallColor;
             if (doors != null && doors.Contains(wallId)) return doorWallColor;
             return defaultWallColor;
         }
 
         Color GetFaceColor(int cellValue)
         {
-            if (cellValue == -1 || cellValue >= 99) return noFloorColor;
-            if (cellValue == 0) return defaultFloorColor;
-            if (cellValue == 1) return noCeilColor;
-            if (cellValue >=2 && cellValue <= 5) return shopColor;
-            if (cellValue == 6) return terminalColor;
-            if (cellValue == 7) return officeColor;
-
-            if (cellValue == 8) return dnstairsColor;
-            if (cellValue == 9) return upstairsColor;
-            if (cellValue == 10) return elevatorColor;
-            
-            if (cellValue == 11) return entranceColor; // 출입구
-            return noCellColor;
+            CellType type = (CellType)cellValue;
+            return type switch
+            {
+                CellType.Void_Floor => noFloorColor,
+                CellType.Corridor => corridorColor,
+                CellType.Void_Ceil => noCeilColor,
+                CellType.Weapon_Shop => shopColor,
+                CellType.Armor_Shop => shopColor,
+                CellType.Item_Shop => shopColor,
+                CellType.Heal_Spot => shopColor,
+                CellType.Terminal => terminalColor,
+                CellType.Office => officeColor,
+                CellType.Downstairs => dnstairsColor,
+                CellType.Upstairs => upstairsColor,
+                CellType.Elevator => elevatorColor,
+                CellType.Entrance => entranceColor,
+                _ => noCellColor
+            };
         }
 
-        string GetText(int cellValue)
+        private string GetText(int cellValue)
         {
-            if (cellValue == 2) return "W";
-            if (cellValue == 3) return "A";
-            if (cellValue == 4) return "I";
-            if (cellValue == 5) return "H";
-            if (cellValue == 6) return "T";
-            if (cellValue == 7) return "O";
-
-            if (cellValue == 8) return "▼";
-            if (cellValue == 9) return "▲";
-            if (cellValue == 10) return "V"; // 엘리베이터
+            CellType type = (CellType)cellValue;
+            return type switch
+            {
+                CellType.Weapon_Shop => "W",
+                CellType.Armor_Shop => "A",
+                CellType.Item_Shop => "I",
+                CellType.Heal_Spot => "H",
+                CellType.Terminal => "T",
+                CellType.Office => "O",
+                CellType.Downstairs => "▼",
+                CellType.Upstairs => "▲",
+                CellType.Elevator => "V",
+                CellType.Entrance => "E",
+                _ => string.Empty
+            };
             
-            if (cellValue == 11) return "E"; // 출입구
-            return string.Empty;
         }
     }
     
