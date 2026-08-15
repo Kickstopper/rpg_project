@@ -42,7 +42,7 @@ namespace UI.DungeonMapScene
         private Dictionary<int, Color32[]> _flatObjectPixels;  
         private Dictionary<int, Vector2Int> _objectDimensions; 
 
-        private MapData _worldMap;
+        private MapData _mapData;
         private Texture2D[] _wallTextures;
         private Sprite[] _enemySprite;
         private Dictionary<int, Texture2D> _objectSpriteDict;
@@ -185,7 +185,7 @@ namespace UI.DungeonMapScene
 
         public void SetMapData(MapData map, DungeonTheme theme, TileAnimState[,] animStates)
         {
-            _worldMap = map;
+            _mapData = map;
             _ceilTexIdx = theme.ceilingTexIdx;
             _floorTexIdx = theme.floorTexIdx;
             _tileAnimStates = animStates;
@@ -340,11 +340,11 @@ namespace UI.DungeonMapScene
                     if (sideDistX < sideDistY) { sideDistX += deltaDistX; mapX += stepX; side = 0; }
                     else { sideDistY += deltaDistY; mapY += stepY; side = 1; }
 
-                    if (mapX < 0 || mapX >= _worldMap.width || mapY < 0 || mapY >= _worldMap.height)
+                    if (mapX < 0 || mapX >= _mapData.width || mapY < 0 || mapY >= _mapData.height)
                     {
                         hit = 1; hitBackFace = true;
                         hitTexId = GetBoundaryTex(prevX, prevY, side, stepX, stepY);
-                        CellData prevCell = _worldMap.GetCell(prevX, prevY);
+                        CellData prevCell = _mapData.GetCell(prevX, prevY);
                         bool isPrevSolid = (prevCell != null && prevCell.value != -1);
                         if (!isPrevSolid && voidEdgeDist < 0f)
                         {
@@ -361,8 +361,8 @@ namespace UI.DungeonMapScene
                     }
                     else
                     {
-                        CellData prevCell = _worldMap.GetCell(prevX, prevY);
-                        CellData currCell = _worldMap.GetCell(mapX,  mapY);
+                        CellData prevCell = _mapData.GetCell(prevX, prevY);
+                        CellData currCell = _mapData.GetCell(mapX,  mapY);
 
                         bool isPrevSolid = (prevCell != null && prevCell.value != -1);
                         bool isCurrSolid = (currCell != null && currCell.value != -1);
@@ -897,7 +897,7 @@ namespace UI.DungeonMapScene
             {
                 bool isFloor = y < horizon;
                 // 맵 데이터에 천장이 없으면 천장(isFloor == false) 부분은 픽셀 렌더링을 생략
-                if (!isFloor && !_worldMap.hasCeil) continue;
+                if (!isFloor && !_mapData.hasCeil) continue;
 
                 // _ceilTexIdx == -1 이더라도 개별 셀에 천장이 있을 수 있으므로 가로줄 전체 스킵 최적화 코드를 비활성화
                 // if (!isFloor && _ceilTexIdx == -1 && !_isScanning) continue;
@@ -947,7 +947,7 @@ namespace UI.DungeonMapScene
                     int cellX = (int)floorX;
                     int cellY = (int)floorY;
 
-                    CellData cell = _worldMap.GetCell(cellX, cellY);
+                    CellData cell = _mapData.GetCell(cellX, cellY);
                     bool isVoid = isFloor && (cell != null && cell.value == -1);
                     Color32 col;
 
@@ -1282,7 +1282,7 @@ namespace UI.DungeonMapScene
 
         private int GetBoundaryTex(int x, int y, int side, int stepX, int stepY)
         {
-             CellData last = _worldMap.GetCell(x, y);
+             CellData last = _mapData.GetCell(x, y);
              return (last != null) ? GetTextureIdOnSide(last, side, stepX, stepY, true) : 0;
         }
     }

@@ -27,7 +27,7 @@ namespace UI.DungeonMapScene
         public CompassUI compassUI;
         public CalendarUI calendarUI;
         public GridMap miniMap;
-        public AutoMapRenderer autoMapRenderer;
+        public FullGridMapUI fullGridMapUI;
         public GameObject autoMapContainer;
         
         public MapTransitionManager transitionManager; // 맵 전환 시의 페이드 처리
@@ -270,31 +270,60 @@ namespace UI.DungeonMapScene
                 return;
             }
             
+            // 현재 전체 지도가 열려있는지 여부
+            bool isFullMapOpen = autoMapContainer != null && autoMapContainer.activeSelf;
+
+            // 맵 토글 처리
             if (!_inputLocked && Input.GetKeyDown(KeyCode.M))
             {
                 if (!theme.moduleEnable || !ManagerRoot.Module.IsMounted(ModuleFeature.AutoMapper)) return;
-                autoMapContainer.SetActive(!autoMapContainer.activeSelf);
+                
+                isFullMapOpen = !isFullMapOpen; // 상태 반전
+                autoMapContainer.SetActive(isFullMapOpen);
+                
+                if (isFullMapOpen && fullGridMapUI != null)
+                {
+                    fullGridMapUI.UpdatePlayerIcon(_player.LogicX, _player.LogicY, (Direction)_player.DirectionIdx, true);
+                    fullGridMapUI.UpdateEnemyIcons(_activeEnemies); 
+                }
                 return;
             }
 
-            if (!_inputLocked) HandleInput(); 
-
-            UpdateWallAnimations();
-            
-            // 심볼 인카운터 로직
-            if (monsterExist && _maxSpawnCount > 0 && theme.encounterMode == EncounterMode.Symbol)
+            // 전체 맵이 열려있지 않을 때만 게임 내 시간이 흐르도록 처리
+            if (!isFullMapOpen)
             {
-                // 몬스터 심볼의 이동과 스폰
-                UpdateEnemyAI();
-                UpdateEnemySprites();
-                UpdateEnemySpawner();
-                UpdateEncounterSensor(); // 위험도 센서 실시간 갱신
+                // 플레이어 조작 허용
+                if (!_inputLocked) HandleInput(); 
                 
-                // 미니맵에 에너미들의 위치를 실시간으로 넘겨줍니다.
-                if (miniMap != null && miniMap.gameObject.activeSelf)
-                    miniMap.UpdateEnemyIcons(_activeEnemies);
+                // 벽/바닥 애니메이션 실행
+                UpdateWallAnimations();
+                
+                // 심볼 몬스터 AI (이동, 스프라이트 애니메이션, 스폰 등) 정상 실행
+                if (monsterExist && _maxSpawnCount > 0 && theme.encounterMode != EncounterMode.Random)
+                {
+                    UpdateEnemyAI();
+                    UpdateEnemySprites();
+                    UpdateEnemySpawner();
+                    UpdateEncounterSensor();
+                    
+                    // 미니맵 아이콘도 시간이 흐를 때만 갱신
+                    if (miniMap != null && miniMap.gameObject.activeSelf)
+                    {
+                        miniMap.UpdateEnemyIcons(_activeEnemies);
+                    }
+                }
+            }
+            else
+            {
+                // 전체 맵이 열려있어 모든 시간이 멈춘 상태지만, 
+                // 인스펙터에서 토글을 클릭했을 때 실시간으로 반영하기 위해 UI 아이콘 갱신만 호출
+                if (fullGridMapUI != null)
+                {
+                    fullGridMapUI.UpdateEnemyIcons(_activeEnemies);
+                }
             }
 
+            // 맵이 열려있더라도 뒤에 깔린 3D 던전 화면이 검게 꺼지면 안 되므로 렌더러는 계속 호출
             _renderer.RenderFrame(_player, renderSettings);
             UpdateBackgroundUV();
         }
@@ -1250,7 +1279,7 @@ namespace UI.DungeonMapScene
                     {
                         isLookingAtDoor = true;
                     }
-                    
+
                     // 이 칸의 4면 중 어딘가에 문이 하나라도 존재하는가?
                     foreach (int tex in frontCell.wallTextureIDs)
                     {
@@ -1358,7 +1387,7 @@ namespace UI.DungeonMapScene
             if (ManagerRoot.Dungeon != null && ManagerRoot.Dungeon.CurrentDungeonState != null)
             {
                 ManagerRoot.Dungeon.CurrentDungeonState.MarkVisited(targetGridX, targetGridY);
-                if (autoMapRenderer != null) autoMapRenderer.RevealCell(targetGridX, targetGridY);
+                if (fullGridMapUI != null) fullGridMapUI.RevealCell(targetGridX, targetGridY);
             }
 
             onFadeOutComplete?.Invoke();
@@ -1961,7 +1990,15 @@ namespace UI.DungeonMapScene
             if (autoMapContainer != null)
             {
                 autoMapContainer.SetActive(false);
-                autoMapRenderer.DrawFullMap(_currentMap, ManagerRoot.Dungeon.CurrentDungeonState);
+                
+                if (fullGridMapUI != null)
+                {
+                    // 맵 데이터 초기화
+                    fullGridMapUI.Initialize(_currentMap, ManagerRoot.Dungeon.CurrentDungeonState, theme.passableWallTexIDs, theme.doorAnimations);
+                    
+                    // 백그라운드 상태에서도 화살표 위치를 갱신
+                    fullGridMapUI.UpdatePlayerIcon(_player.LogicX, _player.LogicY, (Direction)_player.DirectionIdx, true);
+                }
             }
             if (encounterSystem != null) encounterSystem.SetVisible(theme.moduleEnable && ManagerRoot.Module.IsMounted(ModuleFeature.MobSensor));
         }
@@ -2023,8 +2060,8 @@ namespace UI.DungeonMapScene
         private void UpdateMapDiscovery(int x, int y)
         {
             ManagerRoot.Dungeon.CurrentDungeonState.MarkVisited(x, y);
-            autoMapRenderer.RevealCell(x, y);
-            autoMapRenderer.UpdatePlayerIcon(x, y, (Direction)_player.DirectionIdx);
+            fullGridMapUI.RevealCell(x, y);
+            fullGridMapUI.UpdatePlayerIcon(x, y, (Direction)_player.DirectionIdx);
             ManagerRoot.DungeonMapState.UpdatePlayerPosition(x, y, (Direction)_player.DirectionIdx, _currentMap.mapID);
         }
 
