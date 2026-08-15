@@ -25,6 +25,8 @@ namespace UI.DungeonMapScene
         private Texture2D mapTexture;
         private MapData currentMapData;
         private DungeonMapState currentMapState; // 현재 탐험 상태 참조
+        
+        private Color[] _cellBuffer;
 
         // 초기화 및 전체 그리기
         public void DrawFullMap(MapData mapData, DungeonMapState mapState)
@@ -43,6 +45,8 @@ namespace UI.DungeonMapScene
 
             if (mapTexture == null || mapTexture.width != texWidth || mapTexture.height != texHeight)
             {
+                if (mapTexture != null) Destroy(mapTexture);  // 메모리에서 해제
+                
                 mapTexture = new Texture2D(texWidth, texHeight, TextureFormat.RGBA32, false);
                 mapTexture.filterMode = FilterMode.Point;
                 mapTexture.wrapMode = TextureWrapMode.Clamp;
@@ -109,33 +113,36 @@ namespace UI.DungeonMapScene
             }
         }
 
+        private void EnsureBuffer()
+        {
+            if (_cellBuffer == null || _cellBuffer.Length != cellSize * cellSize)
+                _cellBuffer = new Color[cellSize * cellSize];
+        }
+
         // 맵 그래픽 그리기 (바닥을 먼저 꽉 채워서 안개를 지움)
         void DrawCellGraphic(CellData cell)
         {
             int startX = cell.x * cellSize;
             int startY = cell.y * cellSize;
+            EnsureBuffer();
 
-            // 바닥 채우기 (Alpha 1.0f로 안개 완벽 제거)
             Color fColor = (cell.value > -1 && cell.value < floorColors.Length) 
                 ? floorColors[cell.value] : defaultColor;
 
-            // 성능 향상을 위해 배열로 한 번에 채우기
-            Color[] fillColors = new Color[cellSize * cellSize];
-            for (int i = 0; i < fillColors.Length; i++) fillColors[i] = fColor;
-            mapTexture.SetPixels(startX, startY, cellSize, cellSize, fillColors);
+            for (int i = 0; i < _cellBuffer.Length; i++) _cellBuffer[i] = fColor;
+            mapTexture.SetPixels(startX, startY, cellSize, cellSize, _cellBuffer);
 
-            // 벽 그리기
-            // Index 0: 왼쪽 (West)
-            DrawWallLine(cell.wallTextureIDs[0], startX, startY, wallThickness, cellSize);
-            
-            // Index 1: 위쪽 (North)
-            DrawWallLine(cell.wallTextureIDs[1], startX, startY + cellSize - wallThickness, cellSize, wallThickness);
-            
-            // Index 2: 오른쪽 (East)
-            DrawWallLine(cell.wallTextureIDs[2], startX + cellSize - wallThickness, startY, wallThickness, cellSize);
-            
-            // Index 3: 아래쪽 (South)
-            DrawWallLine(cell.wallTextureIDs[3], startX, startY, cellSize, wallThickness);
+            // Index 0: 위쪽 (North)
+            DrawWallLine(cell.wallTextureIDs[0], startX, startY + cellSize - wallThickness, cellSize, wallThickness);
+
+            // Index 1: 오른쪽 (East)
+            DrawWallLine(cell.wallTextureIDs[1], startX + cellSize - wallThickness, startY, wallThickness, cellSize);
+
+            // Index 2: 아래쪽 (South)
+            DrawWallLine(cell.wallTextureIDs[2], startX, startY, cellSize, wallThickness);
+
+            // Index 3: 왼쪽 (West)
+            DrawWallLine(cell.wallTextureIDs[3], startX, startY, wallThickness, cellSize);
         }
 
         // 안개 그래픽 그리기 (검은색 채우기)
@@ -143,30 +150,26 @@ namespace UI.DungeonMapScene
         {
             int startX = cellX * cellSize;
             int startY = cellY * cellSize;
-            Color color = fogColor;
-            color.a = 1.0f; // 안개도 불투명하게
+            EnsureBuffer();
 
-            for (int y = 0; y < cellSize; y++)
-            {
-                for (int x = 0; x < cellSize; x++)
-                {
-                    mapTexture.SetPixel(startX + x, startY + y, color);
-                }
-            }
+            Color fColor = fogColor;
+            fColor.a = 1.0f;
+
+            for (int i = 0; i < _cellBuffer.Length; i++) _cellBuffer[i] = fColor;
+            mapTexture.SetPixels(startX, startY, cellSize, cellSize, _cellBuffer);
         }
 
         void DrawWallLine(int wallID, int x, int y, int width, int height)
         {
-            Color wColor = defaultColor;
-            if (wallID < 0)
-            {
-                //wColor = Color.white;
-            }
-            else if (wallID < wallColors.Length)
-            {
-                wColor =  wallColors[wallID];
-            }
+            if (wallID < 0) return; // 벽이 뚫려있음(-1)
 
+            Color wColor = defaultColor;
+            if (wallColors != null && wallID < wallColors.Length)
+            {
+                wColor = wallColors[wallID];
+            }
+            
+            // SetPixels를 쓰거나 불가피하게 SetPixel을 써도 이정도 두께(wallThickness=2)면 무방
             for (int py = 0; py < height; py++)
                 for (int px = 0; px < width; px++)
                     mapTexture.SetPixel(x + px, y + py, wColor);
@@ -234,6 +237,11 @@ namespace UI.DungeonMapScene
                 case Direction.West:  return 90f;  // 왼쪽
                 default: return 0f;
             }
+        }
+
+        private void OnDestroy()
+        {
+            if (mapTexture != null) Destroy(mapTexture);
         }
     }
 }

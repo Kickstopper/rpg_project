@@ -1231,7 +1231,6 @@ namespace UI.DungeonMapScene
 
             if (frontEntrance != null && frontEntrance.isWallEntrance)
             {
-                // 일반 벽을 바라볼 때 UI가 뜨지 않도록 하는 방어 로직
                 int targetEnterFace = -1;
                 if (forwardVec.x > 0) targetEnterFace = 3;
                 else if (forwardVec.x < 0) targetEnterFace = 1;
@@ -1251,7 +1250,7 @@ namespace UI.DungeonMapScene
                     {
                         isLookingAtDoor = true;
                     }
-
+                    
                     // 이 칸의 4면 중 어딘가에 문이 하나라도 존재하는가?
                     foreach (int tex in frontCell.wallTextureIDs)
                     {
@@ -1354,7 +1353,14 @@ namespace UI.DungeonMapScene
             }
 
             yield return YieldCache.WaitForSeconds(0.2f);
-            
+
+            // 암전 연출이 끝난 직후 오토맵의 해당 셀을 개방
+            if (ManagerRoot.Dungeon != null && ManagerRoot.Dungeon.CurrentDungeonState != null)
+            {
+                ManagerRoot.Dungeon.CurrentDungeonState.MarkVisited(targetGridX, targetGridY);
+                if (autoMapRenderer != null) autoMapRenderer.RevealCell(targetGridX, targetGridY);
+            }
+
             onFadeOutComplete?.Invoke();
             ManagerRoot.Time.AddStep(1);
 
