@@ -33,6 +33,9 @@ namespace Data
         Car_Brake,
         Compile_Swoosh,
         Dialogue_Impact, // 대화 중 임팩트 효과
+        Coin,            // 코인 획득
+        Splatter_1,      // 로드 킬1
+        Splatter_2,      // 로드 킬2
     }
 
     public enum BgmID

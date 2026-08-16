@@ -59,11 +59,12 @@ namespace UI
         public GameObject roadContainer; 
         public Pseudo3DRoad roadScroller; 
         public Pseudo3DRoad skyScroller; 
+        public Pseudo3DMinigameManager minigameManager;
         
         public Slider progressBar;
         public TextMeshProUGUI distanceText;
         public TextMeshProUGUI timeText;
-        public float roadTransitionRealTime = 3.0f;
+        public float roadTransitionRealTime = 30f;
         
         [Header("Road Curve & Hill Settings")]
         public float maxCurveAmount = 0.5f; 
@@ -422,10 +423,15 @@ namespace UI
                 timeText.text = $"ELAPSED TIME {currentHours:F1}H";
             }, 1f, roadTransitionRealTime).SetEase(Ease.InOutSine);
 
+            bool hasStoppedSpawning = false; 
+
             while (progressTween.IsActive() && !progressTween.IsComplete())
             {
                 if (_skipRequested)
                 {
+                    // 스킵 시 즉시 스폰 중단
+                    if (minigameManager != null) minigameManager.StopSpawning();
+
                     progressTween.Kill();
                     foreach (var mat in _roadMaterials) mat.DOKill(); 
                     
@@ -453,6 +459,18 @@ namespace UI
                     timeText.text = $"ELAPSED TIME {totalGameHours:F1}H";
                     break; 
                 }
+
+                // 남은 시간을 실시간으로 계산하여 스폰 차단
+                // _transitionProgress는 0에서 1로 증가하므로 남은 비율을 구해 실제 남은 Time으로 환산
+                float remainingTime = roadTransitionRealTime * (1f - _transitionProgress);
+                
+                // 남은 시간이 5초 이하일 때 한 번만 호출
+                if (!hasStoppedSpawning && remainingTime <= 5.0f)
+                {
+                    if (minigameManager != null) minigameManager.StopSpawning();
+                    hasStoppedSpawning = true;
+                }
+
                 yield return null; 
             }
 

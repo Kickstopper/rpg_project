@@ -10323,33 +10323,9 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1433639888}
-    - target: {fileID: 3494342979617063810, guid: 3c2ac02c86233b74c8c70f3a02cd4d49, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3494342979617063810, guid: 3c2ac02c86233b74c8c70f3a02cd4d49, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6120599214388867690, guid: 3c2ac02c86233b74c8c70f3a02cd4d49, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6120599214388867690, guid: 3c2ac02c86233b74c8c70f3a02cd4d49, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6120599214388867690, guid: 3c2ac02c86233b74c8c70f3a02cd4d49, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: -17
-      objectReference: {fileID: 0}
     - target: {fileID: 9166409918121512886, guid: 3c2ac02c86233b74c8c70f3a02cd4d49, type: 3}
       propertyPath: m_Name
       value: FieldMap_UI_Prefab
-      objectReference: {fileID: 0}
-    - target: {fileID: 9166409918121512886, guid: 3c2ac02c86233b74c8c70f3a02cd4d49, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
