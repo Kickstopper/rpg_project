@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
-using System.Collections; // 코루틴 사용을 위해 필요
+using System.Collections;
 using System.Collections.Generic;
 using Data;
 
@@ -18,13 +18,25 @@ namespace Manager
 
         [Header("Sources")]
         [SerializeField] private AudioSource bgmSource;
-        private List<AudioSource> sfxSources;
         
-        // 페이드 아웃 코루틴을 제어하기 위한 변수
+        private List<SfxSourceWrapper> sfxWrappers;
+        
         private Coroutine bgmFadeCoroutine;
 
         private BgmID currentBgmId;
         public BgmID CurrentBgmID => currentBgmId;
+
+        private class SfxSourceWrapper
+        {
+            public AudioSource Source { get; private set; }
+            public SfxID CurrentId { get; set; }
+
+            public SfxSourceWrapper(AudioSource source)
+            {
+                Source = source;
+                CurrentId = SfxID.None;
+            }
+        }
 
         private void Awake()
         {
@@ -34,7 +46,7 @@ namespace Manager
 
         private void InitializeSFXPool()
         {
-            sfxSources = new List<AudioSource>();
+            sfxWrappers = new List<SfxSourceWrapper>();
 
             for (int i = 0; i < sfxPoolSize; i++)
             {
@@ -45,7 +57,7 @@ namespace Manager
                 source.outputAudioMixerGroup = sfxGroup;
                 source.playOnAwake = false;
 
-                sfxSources.Add(source);
+                sfxWrappers.Add(new SfxSourceWrapper(source));
             }
 
             if (bgmSource != null) return;
@@ -58,56 +70,77 @@ namespace Manager
 
         #region SFX Methods
 
-        public void PlaySFX(SfxID sfxId, float volume = 1.0f)
+        public void PlaySFX(SfxID sfxId, float volume = 1.0f, float pitch = 1.0f)
         {
             AudioClip clip = AudioLibrary.GetSfxClip(sfxId);
-            if (clip != null) PlaySFX(clip, volume); 
+            if (clip != null) 
+            {
+                SfxSourceWrapper availableWrapper = GetAvailableWrapper();
+
+                if (availableWrapper != null)
+                {
+                    // 현재 재생하는 사운드의 ID를 래퍼에 저장
+                    availableWrapper.CurrentId = sfxId; 
+                    
+                    availableWrapper.Source.clip = clip;
+                    availableWrapper.Source.volume = volume;
+                    availableWrapper.Source.pitch = pitch;
+                    availableWrapper.Source.Play();
+                }
+                else
+                {
+                    Debug.Log("모든 오디오 소스가 사용 중입니다!");
+                }
+            } 
         }
 
-        public void PlaySFX(AudioClip clip, float volume = 1.0f, float pitch = 1.0f)
+        private SfxSourceWrapper GetAvailableWrapper()
         {
-            AudioSource availableSource = GetAvailableSource();
-
-            if (availableSource != null)
+            foreach (var wrapper in sfxWrappers)
             {
-                availableSource.clip = clip;
-                availableSource.volume = volume;
-                availableSource.pitch = pitch;
-                availableSource.Play();
-            }
-            else
-            {
-                Debug.Log("모든 오디오 소스가 사용 중입니다!");
-            }
-        }
-
-        private AudioSource GetAvailableSource()
-        {
-            foreach (var source in sfxSources)
-            {
-                if (!source.isPlaying) return source;
+                // 사용 중이지 않은 소스를 찾으면 해당 래퍼 반환
+                if (!wrapper.Source.isPlaying) return wrapper;
             }
             return null;
         }
 
-        /// <summary>
-        /// 모든 효과음을 중단합니다.
-        /// </summary>
-        /// <param name="useFade">페이드 아웃 사용 여부</param>
-        /// <param name="fadeDuration">페이드 아웃 시간(초)</param>
+        private SfxSourceWrapper GetPlayingSfxWrapper(SfxID sfxId)
+        {
+            foreach (var wrapper in sfxWrappers)
+            {
+                if (wrapper.Source.isPlaying && wrapper.CurrentId == sfxId)
+                {
+                    return wrapper;
+                }
+            }
+            return null;
+        }
+
+        public bool IsSfxPlaying(SfxID sfxId)
+        {
+            SfxSourceWrapper sfx = GetPlayingSfxWrapper(sfxId);
+            return sfx != null;
+        }
+
+        public void StopSFX(SfxID sfxId)
+        {
+            SfxSourceWrapper sfx = GetPlayingSfxWrapper(sfxId);
+            if (sfx != null) sfx.Source.Stop();
+        }
+
         public void StopAllSFX(bool useFade = false, float fadeDuration = 0.5f)
         {
-            foreach (var source in sfxSources)
+            foreach (var wrapper in sfxWrappers)
             {
-                if (source.isPlaying)
+                if (wrapper.Source.isPlaying)
                 {
                     if (useFade)
                     {
-                        StartCoroutine(FadeOutAndStop(source, fadeDuration));
+                        StartCoroutine(FadeOutAndStop(wrapper.Source, fadeDuration));
                     }
                     else
                     {
-                        source.Stop();
+                        wrapper.Source.Stop();
                     }
                 }
             }
