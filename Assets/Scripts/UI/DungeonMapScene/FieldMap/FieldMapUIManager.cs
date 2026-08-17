@@ -300,8 +300,7 @@ namespace UI
             if (UnityEngine.Random.value > 0.25f) targetCurve = UnityEngine.Random.Range(-maxCurveAmount, maxCurveAmount);
             float duration = UnityEngine.Random.Range(curveDurationRange.x, curveDurationRange.y);
             float delay = UnityEngine.Random.Range(curveDelayRange.x, curveDelayRange.y);
-            _curveSequence.Append(DOTween.To(() => _currentCurve, x => { _currentCurve = x; SetMatFloat("_CurveAmount", _currentCurve); }, targetCurve, duration).SetEase(Ease.InOutSine))
-            .OnStart(()=>ManagerRoot.Sound.PlaySFX(SfxID.Car_Brake));
+            _curveSequence.Append(DOTween.To(() => _currentCurve, x => { _currentCurve = x; SetMatFloat("_CurveAmount", _currentCurve); }, targetCurve, duration).SetEase(Ease.InOutSine));
             _curveSequence.AppendInterval(delay);
             _curveSequence.OnComplete(() => {StartRandomCurveRoutine(); ManagerRoot.Sound.StopAllSFX();});
         }

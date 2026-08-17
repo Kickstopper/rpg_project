@@ -560,9 +560,15 @@ MonoBehaviour:
   roadScroller: {fileID: 6278994566757761357}
   container: {fileID: 3665999515837904348}
   itemContainer: {fileID: 4840952281367038953}
+  playerCarImage: {fileID: 8973279069644572571}
+  carCenterSprite: {fileID: 21300000, guid: 12cae4870b68c8a48a11409bec251934, type: 3}
+  carLeftSprite: {fileID: 21300000, guid: 157e8f15fef97f94a9b0bfa31b8cdeb2, type: 3}
+  carRightSprite: {fileID: 21300000, guid: 0ad09c2c0fa88ac4ebd70dac7085793d, type: 3}
+  turnSpriteThreshold: 0.2
   playerCar: {fileID: 7984347353090656868}
   carMoveSpeed: 1
   maxCarXOffset: 0.4
+  centrifugalMultiplier: 1.5
   cameraRoot: {fileID: 3249287327268511396}
   cameraFollowSpeed: 2.5
   maxCameraPan: 300
@@ -690,7 +696,7 @@ MonoBehaviour:
   buttonNormalColor: {r: 0, g: 0, b: 0.53333336, a: 1}
   buttonHighlightColor: {r: 0, g: 0.69803923, b: 0.6901961, a: 1}
   fadeOverlay: {fileID: 5407437934688790850}
-  roadContainer: {fileID: 4495546464572956294}
+  roadContainer: {fileID: 4803908929029085277}
   roadScroller: {fileID: 6278994566757761357}
   skyScroller: {fileID: 1371665733814884221}
   minigameManager: {fileID: 6871552570807075566}
@@ -1003,7 +1009,7 @@ RectTransform:
   - {fileID: 6568867910625353476}
   - {fileID: 3072135454398850305}
   - {fileID: 7168954714716346047}
-  - {fileID: 3249287327268511396}
+  - {fileID: 3415991244863619494}
   - {fileID: 6967123758352189300}
   m_Father: {fileID: 1449060994142448227}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1316,7 +1322,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3665999515837904348
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1342,7 +1348,6 @@ RectTransform:
   - {fileID: 7174940882595678144}
   - {fileID: 2670908776100671273}
   - {fileID: 7984347353090656868}
-  - {fileID: 609956441239918156}
   m_Father: {fileID: 3249287327268511396}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1447,12 +1452,49 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4758727757065039837}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3665999515837904348}
+  m_Father: {fileID: 3415991244863619494}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &4803908929029085277
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3415991244863619494}
+  m_Layer: 0
+  m_Name: Drive_UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &3415991244863619494
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4803908929029085277}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3249287327268511396}
+  - {fileID: 609956441239918156}
   m_Father: {fileID: 5258403552592211038}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2104,13 +2146,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7750966728210432479}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6714621019586382864}
-  m_Father: {fileID: 3665999515837904348}
+  m_Father: {fileID: 3415991244863619494}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

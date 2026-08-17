@@ -30,7 +30,7 @@ namespace Data
         Warp_End,
         Computer,
         Elevator,
-        Car_Brake,
+        Car_Skid,
         Compile_Swoosh,
         Dialogue_Impact, // 대화 중 임팩트 효과
         Coin,            // 코인 획득

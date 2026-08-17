@@ -25,10 +25,24 @@ namespace UI
         public RectTransform container; // 전체 화면 진동을 위한 최상위 컨테이너
         public RectTransform itemContainer; // 코인과 몬스터가 생성될 전용 레이어
         
+        [Header("Car Sprites")]
+        public Image playerCarImage;                // 자동차 UI의 Image 컴포넌트
+        public Sprite carCenterSprite;              // 직진 이미지
+        public Sprite carLeftSprite;                // 좌측 커브 이미지
+        public Sprite carRightSprite;               // 우측 커브 이미지
+
+        [Tooltip("스프라이트가 교체되기 위한 최소 원심력 임계값")]
+        public float turnSpriteThreshold = 0.1f;
+
+        [Tooltip("마찰음이 발생하기 시작하는 원심력 임계값")]
+        public float skidForceThreshold = 0.15f;    
+        private bool _isSkidding = false; // 매 프레임 재생 방지용 상태 플래그
+
         [Header("Player Car")]
         public RectTransform playerCar;
         public float carMoveSpeed = 3.0f;
         public float maxCarXOffset = 0.4f;
+        public float centrifugalMultiplier = 1.5f; // 원심력 강도 (값이 클수록 커브에서 더 강하게 밀려남)
         
         [Tooltip("카메라 좌우 패닝을 담당할 최상단 컨테이너")]
         public RectTransform cameraRoot; 
@@ -73,7 +87,9 @@ namespace UI
         private void OnEnable()
         {
             if (roadScroller != null) _roadImage = roadScroller.GetComponent<RawImage>();
-            
+            _isSkidding = false;
+            if (ManagerRoot.Sound != null) ManagerRoot.Sound.StopAllSFX();
+
             // 논리적 위치 초기화
             _playerRoadX = 0f;
             _cameraRoadX = 0f; 
@@ -100,13 +116,16 @@ namespace UI
             Material currentMat = _roadImage.material;
             if (currentMat == null) return;
 
-            HandlePlayerInput();
+            // 쉐이더에서 현재 도로가 꺾인 정도(커브 값)를 먼저 읽어옴
+            float currentCurve = currentMat.GetFloat("_CurveAmount");
+            float currentHill = currentMat.GetFloat("_HillAmount");
+
+            // 플레이어 조작 함수에 커브 값을 전달하여 원심력을 계산
+            HandlePlayerInput(currentCurve);
 
             float moveAmount = approachSpeed * Time.deltaTime;
             HandleSpawning(moveAmount);
 
-            float currentCurve = currentMat.GetFloat("_CurveAmount");
-            float currentHill = currentMat.GetFloat("_HillAmount");
             float width = container.rect.width;
             float height = container.rect.height;
 
@@ -139,36 +158,77 @@ namespace UI
             }
         }
 
-        private void HandlePlayerInput()
+        private void HandlePlayerInput(float currentCurve)
         {
             // 플레이어 조작 입력
             float horizontal = 0f;
             if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) horizontal = -1f;
             if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) horizontal = 1f;
 
-            // 플레이어의 논리적 위치 이동 (-1.0 ~ 1.0)
-            _playerRoadX = Mathf.Clamp(_playerRoadX + (horizontal * carMoveSpeed * Time.deltaTime), -1f, 1f);
+            // 원심력 계산
+            float centrifugalForce = -currentCurve * centrifugalMultiplier;
 
-            // 카메라 추적 로직
-            // 카메라(_cameraRoadX)가 플레이어(_playerRoadX)의 위치를 부드럽게 쫓아감
+            // 최종 이동 속도
+            float finalMoveSpeed = (horizontal * carMoveSpeed) + centrifugalForce;
+
+            // 플레이어의 논리적 위치 이동 
+            _playerRoadX = Mathf.Clamp(_playerRoadX + (finalMoveSpeed * Time.deltaTime), -1f, 1f);
+
+            // 카메라 추적 로직 
             _cameraRoadX = Mathf.Lerp(_cameraRoadX, _playerRoadX, Time.deltaTime * cameraFollowSpeed);
 
-            // 카메라 월드 패닝
+            // 카메라 월드 패닝 
             if (cameraRoot != null)
             {
                 cameraRoot.anchoredPosition = new Vector2(-_cameraRoadX * maxCameraPan, cameraRoot.anchoredPosition.y);
             }
 
-            // 자동차 UI 렌더링
+            // 자동차 UI 물리적 이동 및 기울임
             if (playerCar != null)
             {
-                // 차체의 물리적 위치
                 float targetX = _playerRoadX * (container.rect.width * maxCarXOffset);
                 playerCar.anchoredPosition = new Vector2(targetX, playerCar.anchoredPosition.y);
                 
-                // 차체 기울임
-                float targetTilt = horizontal * -4f; 
+                float targetTilt = (horizontal * -1.5f) + (currentCurve * 2f); 
                 playerCar.localRotation = Quaternion.Lerp(playerCar.localRotation, Quaternion.Euler(0, 0, targetTilt), Time.deltaTime * 10f);
+            }
+
+            // 조건부 스프라이트 교체 로직
+            if (playerCarImage != null)
+            {
+                // 원심력의 크기(절대값)가 설정한 임계값 이상인지 확인
+                if (Mathf.Abs(centrifugalForce) >= turnSpriteThreshold)
+                {
+                    if (horizontal < 0f) 
+                        playerCarImage.sprite = carLeftSprite;  // 강한 원심력 중 왼쪽으로 이동 시도
+                    else if (horizontal > 0f) 
+                        playerCarImage.sprite = carRightSprite; // 강한 원심력 중 오른쪽으로 이동 시도
+                    else 
+                        playerCarImage.sprite = carCenterSprite; // 키보드에서 손을 뗀 상태
+                }
+                else
+                {
+                    // 직진 구간이거나 원심력이 매우 약할 때는 항상 중앙 이미지 유지
+                    playerCarImage.sprite = carCenterSprite;
+                }
+            }
+
+            // 타이어 마찰음 재생 로직. 원심력이 임계값을 넘고 && 플레이어가 해당 방향으로 조향하여 저항이 발생할 때
+            bool isDrifting = Mathf.Abs(centrifugalForce) >= skidForceThreshold && horizontal != 0f;
+
+            if (isDrifting && !_isSkidding)
+            {
+                // 막 코너링을 시작했을 때 1번만 실행됨
+                _isSkidding = true;
+                if (!ManagerRoot.Sound.IsSfxPlaying(Data.SfxID.Car_Skid))
+                    ManagerRoot.Sound.PlaySFX(Data.SfxID.Car_Skid);
+            }
+            else if (!isDrifting && _isSkidding)
+            {
+                // 코너링이 끝나거나 키보드에서 손을 뗐을 때 1번만 실행됨
+                _isSkidding = false;
+                if (ManagerRoot.Sound.IsSfxPlaying(Data.SfxID.Car_Skid))
+                    ManagerRoot.Sound.StopSFX(Data.SfxID.Car_Skid);
             }
         }
 
