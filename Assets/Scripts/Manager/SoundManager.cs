@@ -70,7 +70,7 @@ namespace Manager
 
         #region SFX Methods
 
-        public void PlaySFX(SfxID sfxId, float volume = 1.0f, float pitch = 1.0f)
+        public void PlaySFX(SfxID sfxId, float volume = 1.0f, float pitch = 1.0f, bool loop = false)
         {
             AudioClip clip = AudioLibrary.GetSfxClip(sfxId);
             if (clip != null) 
@@ -79,12 +79,13 @@ namespace Manager
 
                 if (availableWrapper != null)
                 {
-                    // 현재 재생하는 사운드의 ID를 래퍼에 저장
                     availableWrapper.CurrentId = sfxId; 
                     
                     availableWrapper.Source.clip = clip;
                     availableWrapper.Source.volume = volume;
                     availableWrapper.Source.pitch = pitch;
+                    availableWrapper.Source.loop = loop; 
+                    
                     availableWrapper.Source.Play();
                 }
                 else

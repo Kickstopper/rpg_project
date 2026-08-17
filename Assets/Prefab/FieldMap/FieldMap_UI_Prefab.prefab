@@ -565,6 +565,7 @@ MonoBehaviour:
   carLeftSprite: {fileID: 21300000, guid: 157e8f15fef97f94a9b0bfa31b8cdeb2, type: 3}
   carRightSprite: {fileID: 21300000, guid: 0ad09c2c0fa88ac4ebd70dac7085793d, type: 3}
   turnSpriteThreshold: 0.2
+  skidForceThreshold: 0.15
   playerCar: {fileID: 7984347353090656868}
   carMoveSpeed: 1
   maxCarXOffset: 0.4
@@ -574,11 +575,13 @@ MonoBehaviour:
   maxCameraPan: 300
   coinPrefab: {fileID: 8139991756390133006, guid: 536caa718da042b4a8cfa09646359e81, type: 3}
   monsterPrefab: {fileID: 450337412179346435, guid: ad1e55cf60f2e264094436ff3ccdb801, type: 3}
+  trafficCarPrefab: {fileID: 6435503422172779079, guid: e67870ae43a69d647b8db36f3586d99f, type: 3}
   approachSpeed: 16
   spawnZ: 20
   cullZ: 0.5
   hitZ: 2
   hitTolerance: 0.3
+  trafficCarRelativeSpeed: 0.6
   baseScale: 6
   horizonY: 0.5
   yOffset: 0

@@ -36,6 +36,7 @@ namespace Data
         Coin,            // 코인 획득
         Splatter_1,      // 로드 킬1
         Splatter_2,      // 로드 킬2
+        Car_Crash,       // 차량 충돌
     }
 
     public enum BgmID

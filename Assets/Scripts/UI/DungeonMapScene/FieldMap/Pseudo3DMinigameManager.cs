@@ -6,7 +6,7 @@ using Manager;
 
 namespace UI
 {
-    public enum InteractType { Coin, Monster }
+    public enum InteractType { Coin, Monster, TrafficCar }
 
     public class Pseudo3DMinigameManager : MonoBehaviour
     {
@@ -52,13 +52,20 @@ namespace UI
         [Header("Prefabs")]
         public GameObject coinPrefab;
         public GameObject monsterPrefab;
+        public GameObject trafficCarPrefab;
 
         [Header("Spawn Settings")]
         public float approachSpeed = 10.0f;
-        public float spawnZ = 10.0f;
+        public float spawnZ = 10.0f; // 소실점
         public float cullZ = 0.2f;
         public float hitZ = 0.8f; 
         public float hitTolerance = 0.3f; 
+
+        [Tooltip("앞차의 상대 속도 (1.0이면 정지 사물과 같고, 0.5면 플레이어 속도의 절반으로 달리는 효과)")]
+        public float trafficCarRelativeSpeed = 0.6f;
+        [Tooltip("앞차의 절대 주행 속도 (이 값이 approachSpeed보다 작아야 유저가 추월 가능)")]
+        public float trafficCarAbsoluteSpeed = 5.0f;
+        private float _baseApproachSpeed; // 감속 후 원래 속도로 복구하기 위해 기본값을 저장할 변수
 
         [Header("Visuals")]
         public float baseScale = 2.0f;
@@ -68,6 +75,7 @@ namespace UI
         private List<InteractableObj> _activeObjects = new List<InteractableObj>();
         private Queue<InteractableObj> _coinPool = new Queue<InteractableObj>();
         private Queue<InteractableObj> _monsterPool = new Queue<InteractableObj>();
+        private Queue<InteractableObj> _trafficCarPool = new Queue<InteractableObj>();
         private RawImage _roadImage;
 
         private float _playerRoadX = 0f;
@@ -86,9 +94,11 @@ namespace UI
 
         private void OnEnable()
         {
+            _baseApproachSpeed = approachSpeed;
+
             if (roadScroller != null) _roadImage = roadScroller.GetComponent<RawImage>();
             _isSkidding = false;
-            if (ManagerRoot.Sound != null) ManagerRoot.Sound.StopAllSFX();
+            if (ManagerRoot.Sound != null) ManagerRoot.Sound.StopSFX(Data.SfxID.Car_Skid);
 
             // 논리적 위치 초기화
             _playerRoadX = 0f;
@@ -133,12 +143,25 @@ namespace UI
             {
                 InteractableObj obj = _activeObjects[i];
                 
-                // 몬스터가 충돌하지 않은 상태일 때만 플레이어를 향해 다가옴
-                if (!obj.isHit)
+                // 절대 속도 기반 물리적 위치 이동
+                if (obj.type == InteractType.TrafficCar)
+                {
+                    float relativeSpeed = approachSpeed - trafficCarAbsoluteSpeed;
+                    obj.currentZ -= relativeSpeed * Time.deltaTime;
+
+                    // 차가 멀어지면 다시 충돌할 수 있도록 isHit 해제. 충돌 거리(hitZ)보다 0.5f 이상 멀어지면 다음 충돌을 허용
+                    if (obj.isHit && obj.currentZ > hitZ + 0.5f)
+                    {
+                        obj.isHit = false;
+                        obj.img.color = Color.white; // 점멸 중이었다면 색상도 즉시 원상복구
+                    }
+                }
+                else if (!obj.isHit)
                 {
                     obj.currentZ -= moveAmount;
                 }
 
+                // 살아있는 경우에만 충돌 판정
                 if (!obj.isHit && obj.currentZ <= hitZ && obj.currentZ > cullZ)
                 {
                     if (Mathf.Abs(_playerRoadX - obj.roadX) <= hitTolerance)
@@ -147,13 +170,15 @@ namespace UI
                     }
                 }
 
-                if (obj.currentZ <= cullZ)
+                // Culling 판정. 플레이어가 차를 지나쳤거나(cullZ), 감속하여 앞차가 지평선 너머로 멀어진 경우 삭제
+                if (obj.currentZ <= cullZ || obj.currentZ > spawnZ + 2f)
                 {
                     ReturnToPool(obj);
                     _activeObjects.RemoveAt(i);
-                    continue; // 삭제된 후에는 렌더링을 건너뜀
+                    continue; 
                 }
 
+                // 시각 업데이트
                 UpdateObjectVisuals(obj, currentCurve, currentHill, width, height);
             }
         }
@@ -196,7 +221,7 @@ namespace UI
             // 조건부 스프라이트 교체 로직
             if (playerCarImage != null)
             {
-                // 원심력의 크기(절대값)가 설정한 임계값 이상인지 확인
+                // 원심력의 크기가 설정한 임계값 이상인지 확인
                 if (Mathf.Abs(centrifugalForce) >= turnSpriteThreshold)
                 {
                     if (horizontal < 0f) 
@@ -218,10 +243,9 @@ namespace UI
 
             if (isDrifting && !_isSkidding)
             {
-                // 막 코너링을 시작했을 때 1번만 실행됨
                 _isSkidding = true;
                 if (!ManagerRoot.Sound.IsSfxPlaying(Data.SfxID.Car_Skid))
-                    ManagerRoot.Sound.PlaySFX(Data.SfxID.Car_Skid);
+                    ManagerRoot.Sound.PlaySFX(Data.SfxID.Car_Skid, 1.0f, 1.0f, true); 
             }
             else if (!isDrifting && _isSkidding)
             {
@@ -252,11 +276,17 @@ namespace UI
                 if (_spawnTimer <= 0)
                 {
                     float randomRoadX = Random.Range(-0.8f, 0.8f);
+                    float randVal = Random.value;
                     
-                    if (Random.value > 0.3f) 
+                    if (randVal > 0.8f) 
                     {
                         _pendingCoins = Random.Range(3, 6);
                         _pendingCoinX = randomRoadX;
+                    }
+                    else if (randVal > 0.7f)
+                    {
+                        float laneX = Random.value > 0.5f ? 0.4f : -0.4f; 
+                        SpawnObject(InteractType.TrafficCar, laneX);
                     }
                     else 
                     {
@@ -307,7 +337,7 @@ namespace UI
             obj.rect.anchoredPosition = new Vector2(finalX, (yNorm * height) + yOffset);
 
             float scale = depth * baseScale;
-            if (!obj.isHit) 
+            if (!obj.isHit || obj.type == InteractType.TrafficCar) 
             {
                 obj.rect.localScale = new Vector3(scale, scale, 1f);
             }
@@ -345,12 +375,49 @@ namespace UI
                     obj.currentZ = cullZ - 1f; 
                 });
             }
+            else if (obj.type == InteractType.TrafficCar)
+            {
+                ManagerRoot.Sound.PlaySFX(Data.SfxID.Car_Crash);
+                
+                // 충돌 진동 
+                container.DOShakeAnchorPos(0.4f, 40f, 40);
+
+                // 데미지 깜빡임
+                obj.img.DOColor(Color.red, 0.1f).SetLoops(6, LoopType.Yoyo).OnComplete(() => {
+                    obj.img.color = Color.white;
+                });
+
+                // 실제 속도 감속 
+                DOTween.Kill("SpeedRecovery"); 
+                
+                // 부딪힌 앞 차가 멀어짐
+                DOTween.To(() => approachSpeed, x => approachSpeed = x, _baseApproachSpeed * 0.1f, 0.1f)
+                       .SetId("SpeedRecovery")
+                       .OnComplete(() => {
+                           // 1.5초에 걸쳐 원래 속도로 엔진 가속 복구
+                           DOTween.To(() => approachSpeed, x => approachSpeed = x, _baseApproachSpeed, 1.5f)
+                                  .SetEase(Ease.InQuad)
+                                  .SetId("SpeedRecovery");
+                       });
+
+                // 페널티 부여: 수리비 차감
+                int repairCost = 500;
+                Debug.Log($"일반 차량과 충돌! 수리비 {repairCost} 청구!");
+                // TODO: 차감된 금액 표시 로직
+                ManagerRoot.Finance.SubMoney(repairCost); 
+            }
         }
 
         #region Object Pooling
         private InteractableObj GetFromPool(InteractType type)
         {
-            Queue<InteractableObj> pool = type == InteractType.Coin ? _coinPool : _monsterPool;
+            Queue<InteractableObj> pool;
+            GameObject prefab;
+
+            if (type == InteractType.Coin) { pool = _coinPool; prefab = coinPrefab; }
+            else if (type == InteractType.Monster) { pool = _monsterPool; prefab = monsterPrefab; }
+            else { pool = _trafficCarPool; prefab = trafficCarPrefab; } // TrafficCar 추가
+
             if (pool.Count > 0)
             {
                 InteractableObj obj = pool.Dequeue();
@@ -359,7 +426,6 @@ namespace UI
             }
             else
             {
-                GameObject prefab = type == InteractType.Coin ? coinPrefab : monsterPrefab;
                 GameObject go = Instantiate(prefab, itemContainer);
                 InteractableObj obj = new InteractableObj
                 {
@@ -378,7 +444,8 @@ namespace UI
         {
             obj.rect.gameObject.SetActive(false);
             if (obj.type == InteractType.Coin) _coinPool.Enqueue(obj);
-            else _monsterPool.Enqueue(obj);
+            else if (obj.type == InteractType.Monster) _monsterPool.Enqueue(obj);
+            else _trafficCarPool.Enqueue(obj);
         }
 
         private void OnDisable()
