@@ -11,12 +11,23 @@ public class DungeonMapEditor : EditorWindow
 
     string[] availableMapIDs = new string[] { 
         "Outpost", "Bridge_0", 
-        "Underground_0", "Underground_0_0", "Underground_1", "Underworld_0", "Underworld_1",
+        
+        "Building_0","Building_1","Building_2","Building_3","Building_4","Building_5",
+
+        "Cave_0", "Cave_1", "Cave_2", "Cave_3", "Cave_4", "Cave_5", "Cave_6",
+        
+        "Labyrinth_0", "Labyrinth_1", "Labyrinth_2", "Labyrinth_3", "Labyrinth_4", "Labyrinth_5", 
+        
+        "Underground_0", "Underground_0_0", "Underground_1",
+        
+        "Underworld_0", "Underworld_1",
+        
         "Tower_0", "Tower_1", "Tower_2", "Tower_3", "Tower_4", "Tower_5", "Tower_6", "Tower_7", 
         "Tower_8", "Tower_9", "Tower_10", "Tower_11", 
-        "Cave_0", "Cave_1", "Cave_2", "Cave_3", "Cave_4", "Cave_5", "Cave_6",
-        "Labyrinth_0", "Labyrinth_1", "Labyrinth_2", "Labyrinth_3", "Labyrinth_4", "Labyrinth_5", 
-        "VampireCastle_0","VampireCastle_1","VampireCastle_2","VampireCastle_3","VampireCastle_4","VampireCastle_5","VampireCastle_6","VampireCastle_7","VampireCastle_8","VampireCastle_9"
+        
+        "VampireCastle_0","VampireCastle_1","VampireCastle_2","VampireCastle_3","VampireCastle_4",
+        "VampireCastle_5","VampireCastle_6",
+        
     }; 
     bool isInvalidIDLoaded = false;
 
