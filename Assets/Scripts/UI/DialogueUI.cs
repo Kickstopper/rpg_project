@@ -1189,5 +1189,21 @@ namespace UI
 
             return null;
         }
+
+        // DialogueEditorWindow에서 실시간 미리보기용으로 사용함
+        public void InitializeDynamic(List<Dictionary<string, string>> dynamicLines, Action<int> onComplete = null)
+        {
+            currentEventLines = dynamicLines;
+            if (currentEventLines == null || currentEventLines.Count == 0) return;
+            
+            onDialogueFinished = onComplete; 
+            
+            // 에디터 미리보기 모드이므로 몬스터와 자원 요구 콜백을 비움
+            currentMonster = null;
+            onResourceDemanded = null;
+            negotiationResult = NegotiationResult.PLAYER_TURN;
+            
+            StartDialogueFlow();
+        }
     }
 }
