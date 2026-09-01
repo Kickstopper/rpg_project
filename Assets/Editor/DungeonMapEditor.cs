@@ -262,6 +262,8 @@ public class DungeonMapEditor : EditorWindow
 
         DrawToolbar();
         if (mapData == null) return;
+        
+        DrawMapResizeTools();
 
         EditorGUILayout.BeginHorizontal();
         DrawGridView();
@@ -1002,6 +1004,116 @@ public class DungeonMapEditor : EditorWindow
         }
 
         EditorGUILayout.EndVertical();
+    }
+
+    // 맵 리사이징 UI를 그리는 메서드
+    void DrawMapResizeTools()
+    {
+        EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
+        GUILayout.Label("Map Resize", EditorStyles.boldLabel, GUILayout.Width(80));
+
+        // 가로 (Left / Right)
+        GUILayout.Label("Left:", GUILayout.Width(30));
+        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(25))) ResizeMap(1, 0, 0, 0);
+        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(25))) ResizeMap(-1, 0, 0, 0);
+
+        GUILayout.Space(10);
+        GUILayout.Label("Right:", GUILayout.Width(35));
+        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(25))) ResizeMap(0, 1, 0, 0);
+        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(25))) ResizeMap(0, -1, 0, 0);
+
+        // 세로 (Top / Bottom)
+        GUILayout.Space(15);
+        GUILayout.Label("Top:", GUILayout.Width(30));
+        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(25))) ResizeMap(0, 0, 0, 1);
+        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(25))) ResizeMap(0, 0, 0, -1);
+
+        GUILayout.Space(10);
+        GUILayout.Label("Bottom:", GUILayout.Width(50));
+        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(25))) ResizeMap(0, 0, 1, 0);
+        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(25))) ResizeMap(0, 0, -1, 0);
+
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
+    }
+
+    // 기존 데이터를 유지한 상태로 2차원 배열 크기를 변경하는 로직
+    void ResizeMap(int leftDelta, int rightDelta, int bottomDelta, int topDelta)
+    {
+        if (mapData == null) return;
+
+        int newWidth = mapData.width + leftDelta + rightDelta;
+        int newHeight = mapData.height + bottomDelta + topDelta;
+
+        // 1x1 이하로는 줄일 수 없음
+        if (newWidth < 1 || newHeight < 1)
+        {
+            Debug.LogWarning("[DungeonEditor] 맵 크기는 1x1보다 작아질 수 없습니다.");
+            return;
+        }
+
+        CellData[] newCells = new CellData[newWidth * newHeight];
+
+        for (int nx = 0; nx < newWidth; nx++)
+        {
+            for (int ny = 0; ny < newHeight; ny++)
+            {
+                int oldX = nx - leftDelta;
+                int oldY = ny - bottomDelta;
+                int newIndex = ny * newWidth + nx;
+
+                // 기존 맵 데이터 영역 안이라면 복사 후 좌표만 갱신
+                if (oldX >= 0 && oldX < mapData.width && oldY >= 0 && oldY < mapData.height)
+                {
+                    CellData oldCell = mapData.cells[oldY * mapData.width + oldX];
+                    oldCell.x = nx;
+                    oldCell.y = ny;
+                    newCells[newIndex] = oldCell;
+                }
+                else
+                {
+                    // 영역을 벗어난 새로운 공간이라면 빈 셀로 초기화
+                    newCells[newIndex] = new CellData { x = nx, y = ny };
+                }
+            }
+        }
+
+        // 데이터 덮어쓰기 및 에디터 UI 동기화
+        mapData.cells = newCells;
+        mapData.width = newWidth;
+        mapData.height = newHeight;
+        inputWidth = newWidth;
+        inputHeight = newHeight;
+
+        // 플레이어 시작 위치 시프트 및 맵 밖으로 나가는 것 방지
+        mapData.startX = Mathf.Clamp(mapData.startX + leftDelta, 0, newWidth - 1);
+        mapData.startY = Mathf.Clamp(mapData.startY + bottomDelta, 0, newHeight - 1);
+        inputStartX = mapData.startX;
+        inputStartY = mapData.startY;
+
+        // 입구 좌표 시프트 연산
+        if (mapData.entrances != null)
+        {
+            for (int i = mapData.entrances.Count - 1; i >= 0; i--)
+            {
+                var ent = mapData.entrances[i];
+                ent.sourceX += leftDelta;
+                ent.sourceY += bottomDelta;
+                
+                // 만약 맵을 축소하다가 포탈이 잘려나갔다면 삭제 처리
+                if (ent.sourceX < 0 || ent.sourceX >= newWidth || ent.sourceY < 0 || ent.sourceY >= newHeight)
+                {
+                    mapData.entrances.RemoveAt(i);
+                }
+            }
+        }
+
+        // 변경 사항 반영을 위한 초기화 및 갱신
+        selectedCells.Clear();
+        selectedCell = null;
+        UpdateVisualizer();
+        GUI.FocusControl(null); 
+        GUI.changed = true;
     }
 
     void DrawBatchFloorTexField()
