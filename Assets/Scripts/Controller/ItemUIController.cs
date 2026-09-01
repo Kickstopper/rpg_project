@@ -260,7 +260,7 @@ namespace Controller
 
         private void HandleItemNavigation()
         {
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || GameInput.GetCancelDown())
+            if (GameInput.GetCancelDown())
             {
                 menuController.CloseItemUI(); 
             }
@@ -278,7 +278,7 @@ namespace Controller
                 UpdateItemSelection();
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 SelectItem();
             }
@@ -486,7 +486,7 @@ namespace Controller
             }
 
             // 확인
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 localCooldown = 0.05f;
                 // 전체 대상 아이템이거나, 단일 대상일 때 타겟이 유효한 경우에만 실행
@@ -502,7 +502,7 @@ namespace Controller
             }
 
             // 취소 키
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || GameInput.GetCancelDown())
+            if (GameInput.GetCancelDown())
             {
                 CancelTargetSelection();
             }

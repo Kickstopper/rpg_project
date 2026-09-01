@@ -263,22 +263,30 @@ namespace UI.DungeonMapScene
                 return;
             }
 
-            if (!_inputLocked && theme.moduleEnable && (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown()))
-            {
-                ManagerRoot.GameState.ChangeState(GameState.PlayerMenu);
-                inputCooldown = 0.05f;
-                return;
-            }
-            
-            // 현재 전체 지도가 열려있는지 여부
             bool isFullMapOpen = autoMapContainer != null && autoMapContainer.activeSelf;
 
-            // 맵 토글 처리
-            if (!_inputLocked && Input.GetKeyDown(KeyCode.M))
+            // 맵이 열려있을 때 취소 키를 누르면 맵을 닫음
+            if (!_inputLocked && isFullMapOpen && GameInput.GetCancelDown())
+            {
+                autoMapContainer.SetActive(false);
+                inputCooldown = 0.1f; 
+                return;
+            }
+
+            // 맵이 꺼져있을 때 메뉴 키를 누르면 플레이어 메뉴 열기
+            if (!_inputLocked && !isFullMapOpen && theme.moduleEnable && GameInput.GetMenuDown())
+            {
+                ManagerRoot.GameState.ChangeState(GameState.PlayerMenu);
+                inputCooldown = 0.1f;
+                return;
+            }
+
+            // 전용 맵 토글 입력 처리
+            if (!_inputLocked && GameInput.GetMapToggleDown())
             {
                 if (!theme.moduleEnable || !ManagerRoot.Module.IsMounted(ModuleFeature.AutoMapper)) return;
                 
-                isFullMapOpen = !isFullMapOpen; // 상태 반전
+                isFullMapOpen = !isFullMapOpen; 
                 autoMapContainer.SetActive(isFullMapOpen);
                 
                 if (isFullMapOpen && fullGridMapUI != null)
@@ -286,6 +294,8 @@ namespace UI.DungeonMapScene
                     fullGridMapUI.UpdatePlayerIcon(_player.LogicX, _player.LogicY, (Direction)_player.DirectionIdx, true);
                     fullGridMapUI.UpdateEnemyIcons(_activeEnemies); 
                 }
+                
+                inputCooldown = 0.1f;
                 return;
             }
 
@@ -336,7 +346,7 @@ namespace UI.DungeonMapScene
             {
                 if (Input.anyKeyDown)
                 {
-                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                    if (Common.GameInput.GetConfirmDown())
                     {
                        if (_currentLookState == LookState.Up)
                         {
@@ -380,18 +390,14 @@ namespace UI.DungeonMapScene
 
             if (_inputLocked) return;
             
-            if (!_player.IsMoving && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)))
+            if (!_player.IsMoving && GameInput.GetSelectDown())
             {
                 UI_Action();
                 return;
             }
             
             if (Input.GetKeyDown(KeyCode.R)) StartCoroutine(ScanRoutine());
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                if (!ManagerRoot.Module.IsMounted(ModuleFeature.AutoMapper)) return;
-                autoMapContainer.SetActive(!autoMapContainer.activeSelf);
-            } 
+            
             if (Input.GetKeyDown(KeyCode.P))
             {
                 ManagerRoot.GameSetting.useAnaglyph = !ManagerRoot.GameSetting.useAnaglyph;

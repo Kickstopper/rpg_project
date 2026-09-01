@@ -158,7 +158,7 @@ public class MonsterCompileManager : MonoBehaviour
                     timer += Time.deltaTime;
                     
                     // 타이핑 도중 스페이스/엔터/클릭 시 전체 문장 즉시 출력 (스킵)
-                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                    if (UI.Common.GameInput.GetConfirmDown())
                     {
                         isSkipped = true;
                         break;
@@ -178,11 +178,7 @@ public class MonsterCompileManager : MonoBehaviour
         }
 
         // 인삿말이 완전히 다 나온 후, 플레이어의 입력을 대기하여 창 닫기
-        yield return new WaitUntil(() => 
-            Input.GetKeyDown(KeyCode.Space) || 
-            Input.GetKeyDown(KeyCode.Return) || 
-            Input.GetMouseButtonDown(0)
-        );
+        yield return new WaitUntil(() => UI.Common.GameInput.GetConfirmDown());
 
         // 마무리 정리 및 콜백 호출
         objectPool.ReturnAllObjects(activeAsciiNodes);

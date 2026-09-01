@@ -726,7 +726,7 @@ namespace UI.Battle
             // 스킬 선택 모드에서 스페이스/엔터 키 무조건 작동 보장
             if (currentSection == FocusSection.NewSkillSelect)
             {
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                if (UI.Common.GameInput.GetSelectDown())
                 {
                     if (currentObj != null && currentObj.transform.IsChildOf(skillContent))
                     {
@@ -740,7 +740,7 @@ namespace UI.Battle
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 if (currentSection == FocusSection.NewSkillSelect)
                 {

@@ -164,14 +164,14 @@ namespace Controller
             }
 
             // 확인 키
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 OnClickMonster(currentFocusedIndex);
                 menuController.ResetInputTimer();
             }
 
             // 취소 키
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab))
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 if (selectedMonsterIDs.Count > 0)
                 {

@@ -119,13 +119,13 @@ namespace Controller
             }
 
             // 선택 (Space / Enter / Z)
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 SelectCurrentSlot();
             }
 
             // 취소 (Esc / Shift / X)
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 OnCancel();
             }

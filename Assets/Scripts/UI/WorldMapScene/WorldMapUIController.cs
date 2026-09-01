@@ -13,7 +13,7 @@ namespace UI.WorldMapScene
         {
             if (ManagerRoot.GameState == null || ManagerRoot.GameState.CurrentState != GameState.Exploration) return;
             
-            if (Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 ShowMenu(); 
             } 

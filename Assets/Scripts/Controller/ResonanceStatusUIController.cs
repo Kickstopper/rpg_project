@@ -44,7 +44,7 @@ namespace Controller
 
         private void HandleInput()
         {
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 Close();
             }

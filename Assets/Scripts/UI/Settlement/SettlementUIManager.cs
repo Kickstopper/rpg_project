@@ -100,7 +100,7 @@ public class SettlementUIManager : MonoBehaviour
         UpdateSettlementData(); 
 
         yield return null; 
-        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0));
+        yield return new WaitUntil(() => UI.Common.GameInput.GetConfirmDown());
 
         // 다음 페이즈로 넘어가기 전에 프레임을 한 칸 비워 입력 버퍼를 비움
         yield return null;
@@ -120,7 +120,7 @@ public class SettlementUIManager : MonoBehaviour
         }
 
         // 빚을 졌더라도 한도 내라면 정상 진행 대기
-        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0));
+        yield return new WaitUntil(() => UI.Common.GameInput.GetConfirmDown());
         
         settlementPanel.SetActive(false);
 
@@ -191,8 +191,7 @@ public class SettlementUIManager : MonoBehaviour
         // 버튼 클릭뿐만 아니라, 포커스를 잃었을 때를 대비하여 키보드 스페이스/엔터 입력도 함께 검사
         yield return new WaitUntil(() => 
             isOkPressed || 
-            Input.GetKeyDown(KeyCode.Space) || 
-            Input.GetKeyDown(KeyCode.Return)
+            UI.Common.GameInput.GetSelectDown()
         );
         btnOk.onClick.RemoveAllListeners();
         

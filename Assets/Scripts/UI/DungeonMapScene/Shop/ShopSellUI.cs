@@ -113,7 +113,7 @@ namespace UI.Shop
 
         private void HandleInput()
         {
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Common.GameInput.GetCancelDown())
+            if (Common.GameInput.GetCancelDown())
             {
                 if (currentSellQuantity > 0)
                 {
@@ -167,7 +167,7 @@ namespace UI.Shop
                 }
 
                 // 판매
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+                if (UI.Common.GameInput.GetSelectDown())
                 {
                     if (currentSellQuantity > 0) OnConfirmSellClicked();
                 }

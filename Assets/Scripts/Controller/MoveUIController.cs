@@ -148,12 +148,12 @@ namespace Controller
                 UpdateVisualFeedback();
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 ExecuteSelection();
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 if (firstSelectedIndex != -1)
                 {

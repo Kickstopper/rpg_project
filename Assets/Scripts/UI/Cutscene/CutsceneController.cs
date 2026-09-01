@@ -72,12 +72,12 @@ namespace UI.IntroScene
         private void Update()
         {
             // 마우스 좌클릭, 스페이스바, 엔터키 입력 시 스킵 요청
-            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (Common.GameInput.GetConfirmDown())
             {
                 skipRequested = true;
             }
             // 컷씬 시퀀스 전체를 스킵
-            else if (Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
+            else if (UI.Common.GameInput.GetCancelDown())
             {
                 SkipCutscene();
             }

@@ -424,7 +424,7 @@ namespace UI.Battle
                 if (isPlayerActing && uiController.GetEnemyGaugeValue() >= 0.99f)
                 {
                     if (isAutoMode) StartCoroutine(TriggerInterrupt(false)); // 오토 모드면 즉시 적 난입 실행
-                    else if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                    else if (Common.GameInput.GetConfirmDown())
                     {
                         StartCoroutine(TriggerInterrupt(false)); 
                     }
@@ -435,7 +435,7 @@ namespace UI.Battle
                 if (isEnemyActing && uiController.GetPartyGaugeValue() >= 0.99f)
                 {
                     if (isAutoMode) StartCoroutine(TriggerInterrupt(true)); // 오토 모드면 AI가 즉시 난입
-                    else if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                    else if (Common.GameInput.GetConfirmDown())
                     {
                         StartCoroutine(TriggerInterrupt(true)); 
                     }
@@ -444,7 +444,7 @@ namespace UI.Battle
 
             if (isAutoMode)
             {
-                if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
+                if (Common.GameInput.GetCancelDown())
                 {
                     if (!reserveAutoOff)
                     {
@@ -805,7 +805,7 @@ namespace UI.Battle
         
         void HandleCommandInput()
         {
-            if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 
@@ -989,7 +989,7 @@ namespace UI.Battle
 
             if (changed) UpdateSelection(currentList, currentIndex);
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 if (currentList[currentIndex].interactable)
                 {
@@ -1681,14 +1681,14 @@ namespace UI.Battle
                 fieldController.RefreshMoveHighlights(currentMoveSlotIndex); 
             }
 
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 CancelMoveSelection();
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
                 ConfirmMoveSelection();
@@ -1821,8 +1821,8 @@ namespace UI.Battle
         void HandleTargetSelectionInput()
         {
             // 취소 및 확정 입력 처리
-            bool isCancel = (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown());
-            if (isCancel || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            bool isCancel = Common.GameInput.GetCancelDown();
+            if (isCancel || Common.GameInput.GetSelectDown())
             {
                 if (fieldController.validTargets.Count > fieldController.currentTargetIndex)
                 {
@@ -2900,7 +2900,7 @@ namespace UI.Battle
                 {
                     timer += Time.deltaTime;
                     uiController.UpdateQTESliderValue(1.0f - (timer / qteDuration));
-                    if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+                    if (Common.GameInput.GetConfirmDown())
                     {
                         List<GameObject> currentTargets = fieldController.GetTargetsByScope(scope, action.actor, action.target);
                         if (currentTargets.Count == 0) break;

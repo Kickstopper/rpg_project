@@ -198,7 +198,7 @@ namespace UI.Office
             if (isPopupOpen)
             {
                 // 팝업이 열려있을 때 취소 키(ESC)를 누르면 자연스럽게 팝업이 닫힘
-                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Common.GameInput.GetCancelDown())
+                if (Common.GameInput.GetCancelDown())
                 {
                     ClosePopups();
                 }
@@ -237,7 +237,7 @@ namespace UI.Office
             }
 
             // 팝업이 열려있지 않을 때 취소 키를 누르면 메인 메뉴로 복귀
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Common.GameInput.GetCancelDown())
+            if (Common.GameInput.GetCancelDown())
             {
                 gameObject.SetActive(false);
                 mainUI.ReturnFromSubPanel("잘 확인했나?", mainUI.questButton);

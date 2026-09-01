@@ -40,14 +40,13 @@ namespace UI.Office
         void Update()
         {
             // 타이핑 스킵 로직 (쿨타임 적용)
-            if (isTyping && Time.unscaledTime > typingStartTime + 0.1f && 
-               (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0)))
+            if (isTyping && Time.unscaledTime > typingStartTime + 0.1f && GameInput.GetConfirmDown())
             {
                 CompleteTypingImmediately();
             }
 
             // 메인 메뉴 상태에서 취소 키 입력 시 퇴장
-            if (buttonContainer.activeSelf && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || GameInput.GetCancelDown()))
+            if (buttonContainer.activeSelf && GameInput.GetCancelDown())
             {
                 OnExitClicked();
             }

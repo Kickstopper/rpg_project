@@ -83,13 +83,13 @@ namespace UI.Shop
             if (isCurrentlyActive) return;
 
             // 0.1초가 지난 후에만 메시지 스킵이 되도록 함
-            if (isTyping && Time.unscaledTime > typingStartTime + 0.1f && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0)))
+            if (isTyping && Time.unscaledTime > typingStartTime + 0.1f && Common.GameInput.GetConfirmDown())
             {
                 CompleteTypingImmediately();
             }
             
             // 서브 UI들이 모두 꺼져있고, 메인 메뉴 상태일 때 취소 키 처리
-            if (buttonContainer.activeSelf && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Common.GameInput.GetCancelDown()))
+            if (buttonContainer.activeSelf && Common.GameInput.GetCancelDown())
             {
                 OnExitClicked();
                 return;

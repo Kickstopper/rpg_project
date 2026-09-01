@@ -71,7 +71,7 @@ namespace UI.CharacterCreationScene
             bool isDirectionalKey = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) ||
                                     Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow);
             
-            bool isActionKey = Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
+            bool isActionKey = UI.Common.GameInput.GetSelectDown();
 
             // 빈 공간 클릭 시 포커스 증발 방어 로직 (유저가 방향키나 엔터를 누르면 즉시 복구)
             if (currentSelected == null)

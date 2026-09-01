@@ -215,7 +215,7 @@ namespace Controller
                 UpdateSelection(currentIndex);                   // 포커스 이동 및 사운드 재생
             }
             
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 if (allMenuBtns[currentIndex].interactable)
                 {

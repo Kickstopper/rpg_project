@@ -130,7 +130,7 @@ namespace UI.Battle
         {
             if (!isClosing)
             {
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Escape))
+                if (Common.GameInput.GetConfirmDown() || Common.GameInput.GetCancelDown())
                 {
                     OnContinueClicked();
                 }

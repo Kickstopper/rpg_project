@@ -36,7 +36,7 @@ namespace UI.WorldMapScene
 
         void Update()
         {
-            if (isPlayerInTrigger && !isTransporting && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)))
+            if (isPlayerInTrigger && !isTransporting && Common.GameInput.GetSelectDown())
             {
                 StartTeleportSequence();
             }

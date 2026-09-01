@@ -62,7 +62,7 @@ namespace UI.Battle
             }
 
             // 닫기 (Cancel)
-            if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 Close();
             }

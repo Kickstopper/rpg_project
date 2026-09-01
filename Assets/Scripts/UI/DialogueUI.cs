@@ -517,7 +517,7 @@ namespace UI
                 return;
             }
 
-            if (Input.GetButtonDown("Submit") || Input.GetMouseButtonDown(0))
+            if (Common.GameInput.GetConfirmDown())
             {
                 if (isTyping)
                 {
@@ -564,7 +564,7 @@ namespace UI
             }
 
             // 결정
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 if (activeChoiceButtons[currentChoiceIndex].interactable)
                 {

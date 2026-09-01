@@ -111,9 +111,9 @@ namespace Controller
                 ChangeCharacter(1);
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) ShowresonanceStatusUI();
+            if (UI.Common.GameInput.GetSelectDown()) ShowresonanceStatusUI();
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 if (menuController != null)
                 {

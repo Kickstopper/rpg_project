@@ -6,6 +6,7 @@ using TMPro;
 using Manager;
 using Data.Database;
 using Data;
+using UI.Common;
 
 namespace UI.Office
 {
@@ -255,7 +256,7 @@ namespace UI.Office
 
             if (isPopupActive)
             {
-                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+                if (GameInput.GetConfirmDown() || GameInput.GetCancelDown())
                 {
                     CloseWarningPopup();
                 }
@@ -289,7 +290,7 @@ namespace UI.Office
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Common.GameInput.GetCancelDown())
+            if (Common.GameInput.GetCancelDown())
             {
                 gameObject.SetActive(false);
                 mainUI.ReturnFromSubPanel("둘이서 힘을 합쳐 쌓인 일들을 한시바삐 처리해 주게나.", mainUI.partnerButton);

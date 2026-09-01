@@ -149,7 +149,7 @@ namespace Controller
             }
             
             // 확인 키
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 ResetInputTimer();
                 // 알림 모드일 때는 확인 키를 누르면 무조건 닫기(No버튼 동작) 수행
@@ -173,7 +173,7 @@ namespace Controller
             }
             
             // 취소 키
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 ResetInputTimer();
                 OnClickCancelButton();
@@ -240,7 +240,7 @@ namespace Controller
             }
 
             // 확인 키
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 if (allMenuBtns[currentBtnIndex].interactable)
                 {
@@ -250,7 +250,7 @@ namespace Controller
             }
 
             // 취소 키
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 ResetInputTimer();
@@ -377,7 +377,7 @@ namespace Controller
                 ResetInputTimer();
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 if (spawnedControllers[currentPartySelectIndex] != null)
                 {
@@ -399,7 +399,7 @@ namespace Controller
             }
 
             // 취소. 메인 메뉴로 복귀
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 CancelCharacterSelection();
             }

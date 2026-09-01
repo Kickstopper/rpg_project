@@ -154,7 +154,7 @@ namespace UI
             // 상호작용 가능한 그룹 B 몬스터가 한 마리도 없을 때는 취소 키만 허용
             if (interactablePanels.Count == 0)
             {
-                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab))
+                if (GameInput.GetCancelDown())
                 {
                     CloseUI();
                 }
@@ -194,14 +194,14 @@ namespace UI
             }
 
             // 확인 키
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 OnClickCharacter(currentFocusedIndex);
                 menuController.ResetInputTimer();
             }
 
             // 취소 키
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab))
+            if (GameInput.GetCancelDown())
             {
                 CloseUI();
             }

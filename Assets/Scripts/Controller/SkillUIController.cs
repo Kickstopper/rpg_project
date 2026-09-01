@@ -103,7 +103,7 @@ namespace Controller
                 UpdateVisuals();
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 // 빈 슬롯이거나, HP가 없거나, 스킬이 없을 때는 에러음 출력 및 선택 불가
                 if (partyControllers[currentCasterIndex].IsEmpty || partyControllers[currentCasterIndex].currentHp <= 0 || currentSkillIds.Count == 0)
@@ -119,7 +119,7 @@ namespace Controller
                 menuController.ResetInputTimer();
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 menuController.CloseSkillUI();
             }
@@ -145,7 +145,7 @@ namespace Controller
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
+            if (UI.Common.GameInput.GetSelectDown())
             {
                 // 타겟팅 가능한지 체크
                 if (IsCostEnough() && IsValidTarget(currentTargetIndex)) 
@@ -159,7 +159,7 @@ namespace Controller
                 menuController.ResetInputTimer();
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || GameInput.GetCancelDown())
+            if (GameInput.GetCancelDown())
             {
                 ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 currentState = SkillUIState.SelectSkill;
@@ -182,9 +182,9 @@ namespace Controller
                 UpdateSkillScroll();
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)) AttemptSelectSkill();
+            if (UI.Common.GameInput.GetSelectDown()) AttemptSelectSkill();
 
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Tab) || UI.Common.GameInput.GetCancelDown())
+            if (UI.Common.GameInput.GetCancelDown())
             {
                 ManagerRoot.Sound.PlaySFX(SfxID.UI_Cancel);
                 currentState = SkillUIState.SelectCaster;

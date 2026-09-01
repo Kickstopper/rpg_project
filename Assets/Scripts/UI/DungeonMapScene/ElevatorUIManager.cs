@@ -100,7 +100,7 @@ namespace UI
             if (gameObject.activeSelf && !IsSelectionComplete && EventSystem.current != null)
             {
                 // 취소 키를 누르면 현재 층을 선택하여 내림
-                if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Escape) || UI.Common.GameInput.GetCancelDown())
+                if (UI.Common.GameInput.GetCancelDown())
                 {
                     if (_hasCurrentFloor)
                     {
