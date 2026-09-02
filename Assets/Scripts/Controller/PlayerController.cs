@@ -19,12 +19,13 @@ namespace UI.Battle
         public Image highlightImage;         // 하이라이트 사각형 이미지
         public Slider hpSlider;       // HP 게이지
         public Slider mpSlider;       // MP 게이지
-        public GameObject messagePanel;
+        public Image messageBg;
         public TextMeshProUGUI messageText;
         public TextMeshProUGUI nameText;         // 이름 텍스트
         public TextMeshProUGUI alignText;        // 성향
         public TextMeshProUGUI resonanceText;       // 빙의한 신의 이름
         public GameObject dim;
+        public GameObject inSquadIndicator;
 
         public Button selectButton;
         
@@ -85,7 +86,7 @@ namespace UI.Battle
 
         private bool hasAnimation = false;
 
-        void Start()
+        void Awake()
         {
             if (selectButton != null)
             {
@@ -531,6 +532,11 @@ namespace UI.Battle
             currentHp = healAmount;
         }
 
+        public void SetSquadIndicator(bool enable)
+        {
+            if (inSquadIndicator) inSquadIndicator.SetActive(enable);
+        }
+
         public void RefreshView()
         {
             UpdateUI(); 
@@ -541,7 +547,7 @@ namespace UI.Battle
             if (IsEmpty)
             {
                 if (dim) dim.SetActive(false);
-                if (messagePanel) messagePanel.SetActive(false);
+                if (inSquadIndicator) inSquadIndicator.SetActive(false);
                 if (messageText) messageText.SetText(string.Empty);
                 // 비활성화 시 진행 중인 트윈(애니메이션)이 있다면 즉시 중단
                 if (hpSlider != null) hpSlider.DOKill();
@@ -562,7 +568,6 @@ namespace UI.Battle
             else
             {
                 if (dim) dim.SetActive(!IsAlive);
-                if (messagePanel) messagePanel.SetActive(true);
                 if (messageText) messageText.SetText(string.Empty);
                 if (alignText) alignText.text = AlignmentSystem.GetAlignString(align);
                 if (resonanceText && resonanceData) resonanceText.text = resonanceData.entityName;

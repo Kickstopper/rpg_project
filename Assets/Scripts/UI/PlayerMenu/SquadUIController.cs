@@ -83,7 +83,9 @@ namespace UI
                     PlayerController pc = go.GetComponent<PlayerController>();
                     pc.Initialize(member, null);
 
-                    // 딤 처리 로직: 그룹 A에 존재한다면 어둡게 표시
+                    // 딤 처리 로직
+                    pc.SetSquadIndicator(member.isRegular);
+
                     if (member.isRegular)
                     {
                         pc.SetMessage("IN SQUAD");

@@ -13889,7 +13889,7 @@ MonoBehaviour:
   - {fileID: 5952601997814263975}
   - {fileID: 3851903924562784706}
   - {fileID: 5968806061366476065}
-  charHighlightColor: {r: 0.47843137, g: 0, b: 0.62352943, a: 1}
+  charHighlightColor: {r: 1, g: 0.8431373, b: 0, a: 0.6}
   isInputLocked: 0
 --- !u!1 &2385413199165449866
 GameObject:
