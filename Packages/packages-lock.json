@@ -354,6 +354,12 @@
       },
       "url": "https://packages.unity.com"
     },
+    "minigame-blackjack": {
+      "version": "file:C:/Users/cwsdo/Documents/GitHub/minigame-blackjack",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
       "depth": 0,
