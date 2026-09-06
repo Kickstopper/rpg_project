@@ -8,7 +8,6 @@ using DG.Tweening;
 using Manager;
 using Data;
 using UnityEngine.EventSystems;
-using UnityEditor;
 using Helper;
 
 namespace UI

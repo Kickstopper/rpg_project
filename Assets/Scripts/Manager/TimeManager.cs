@@ -27,6 +27,17 @@ namespace Manager
         // 달이 바뀌어 디바이스 렌탈비 및 급여를 정산해야 할 때 호출
         public event Action OnPayday; 
 
+        // 새 게임 시작 시 시간 상태 초기화
+        public void Initialize()
+        {
+            Year = 1;
+            Month = 1;
+            Day = 1;
+            CurrentSteps = 0;
+
+            OnTimeUpdated?.Invoke();
+        }
+
         // 던전에서 1칸 이동할 때마다 RaycastingController에서 호출
         public void AddStep(int steps = 1)
         {

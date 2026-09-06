@@ -241,7 +241,8 @@ namespace Controller
             if (ManagerRoot.Party != null) ManagerRoot.Party.Initialize();
             if (ManagerRoot.DungeonMapState != null) ManagerRoot.DungeonMapState.ClearAllMapData();
             if (ManagerRoot.Module != null) ManagerRoot.Module.Initialize();
-            ManagerRoot.Sound.StopBGM();
+            if (ManagerRoot.Time != null) ManagerRoot.Time.Initialize();
+            if (ManagerRoot.Sound != null) ManagerRoot.Sound.StopBGM();
             SceneManager.LoadScene(GameScene.CHARACTER_CREATION_SCENE);
         }
 
