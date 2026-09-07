@@ -6,6 +6,9 @@ namespace Manager
 {
     public class DungeonManager : MonoBehaviour
     {
+        [Header("맵 에디터 카탈로그 (선택)")]
+        [SerializeField] private DungeonMapCatalog mapCatalog;
+
         [Header("맵 데이터 리스트 (json)")]
         public List<TextAsset> mapJsonFiles; // 인스펙터에서 할당
         
@@ -42,24 +45,50 @@ namespace Manager
         private void InitializeMapAssets()
         {
             mapAssetDict.Clear();
-            foreach (var jsonAsset in mapJsonFiles)
+            // 기존 Inspector 설정을 유지하고 카탈로그의 새 맵을 추가합니다.
+            AddMapAssets(mapJsonFiles);
+            if (mapCatalog != null) AddMapAssets(mapCatalog.maps);
+        }
+
+        private void AddMapAssets(IEnumerable<TextAsset> assets)
+        {
+            if (assets == null) return;
+            foreach (var asset in assets)
             {
-                if (jsonAsset != null && !mapAssetDict.ContainsKey(jsonAsset.name))
-                    mapAssetDict.Add(jsonAsset.name, jsonAsset); // TextAsset의 name은 파일명과 정확히 일치. 확장자를 제외
+                if (asset == null) continue;
+                if (mapAssetDict.TryGetValue(asset.name, out var existing))
+                {
+                    if (existing != asset)
+                        Debug.LogError($"[DungeonManager] 중복 맵 파일명: {asset.name}");
+                    continue;
+                }
+                mapAssetDict.Add(asset.name, asset);
             }
         }
 
-        // 던전 테마 사전 초기화
         private void InitializeDungeonThemes()
         {
             dungeonThemes = new Dictionary<string, DungeonTheme>();
-            foreach (var theme in allDungeonThemes)
-            {
-                if (!dungeonThemes.ContainsKey(theme.themeID))
-                    dungeonThemes.Add(theme.themeID, theme);
-            }
+            AddThemes(allDungeonThemes);
+            if (mapCatalog != null) AddThemes(mapCatalog.themes);
         }
 
+        private void AddThemes(IEnumerable<DungeonTheme> themes)
+        {
+            if (themes == null) return;
+            foreach (var theme in themes)
+            {
+                if (theme == null || string.IsNullOrWhiteSpace(theme.themeID)) continue;
+                if (dungeonThemes.TryGetValue(theme.themeID, out var existing))
+                {
+                    if (existing != theme)
+                        Debug.LogError($"[DungeonManager] 중복 테마 ID: {theme.themeID}");
+                    continue;
+                }
+                dungeonThemes.Add(theme.themeID, theme);
+            }
+        }
+        
         // JSON 파일을 읽지 않고, 코드에서 생성된 MapData를 메모리에 직접 로드
         public void LoadDynamicDungeon(MapData dynamicMapData)
         {
@@ -153,7 +182,11 @@ namespace Manager
                 return theme;
             }
             Debug.LogWarning($"테마를 찾을 수 없습니다: {themeID}, 기본 테마를 반환합니다.");
-            return allDungeonThemes.Count > 0 ? allDungeonThemes[0] : null;
+            if (allDungeonThemes != null)
+                foreach (var fallback in allDungeonThemes) if (fallback != null) return fallback;
+            if (mapCatalog != null && mapCatalog.themes != null)
+                foreach (var fallback in mapCatalog.themes) if (fallback != null) return fallback;
+            return null;
         }
 
         // 던전 내의 시작 좌표 업데이트

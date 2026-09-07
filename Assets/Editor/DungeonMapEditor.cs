@@ -1,1322 +1,372 @@
-using UnityEngine;
-using UnityEditor;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Data;
 using UI;
-using System.Collections.Generic;
-using System;
-public class DungeonMapEditor : EditorWindow
+using UnityEditor;
+using UnityEngine;
+
+public partial class DungeonMapEditor : EditorWindow
 {
-    string currentFilePath = null; // 현재 로드된 파일 경로 (null이면 미로드 상태)
-
-    string[] availableMapIDs = new string[] { 
-        "Outpost", "Bridge_0", 
-        
-        "Building_0","Building_1","Building_2","Building_3","Building_4","Building_5",
-
-        "Cave_0", "Cave_1", "Cave_2", "Cave_3", "Cave_4", "Cave_5", "Cave_6",
-        
-        "Labyrinth_0", "Labyrinth_1", "Labyrinth_2", "Labyrinth_3", "Labyrinth_4", "Labyrinth_5", 
-        
-        "Underground_0", "Underground_0_0", "Underground_1",
-        
-        "Underworld_0", "Underworld_1",
-        
-        "Tower_0", "Tower_1", "Tower_2", "Tower_3", "Tower_4", "Tower_5", "Tower_6", "Tower_7", 
-        "Tower_8", "Tower_9", "Tower_10", "Tower_11", 
-        
-        "VampireCastle_0","VampireCastle_1","VampireCastle_2","VampireCastle_3","VampireCastle_4",
-        "VampireCastle_5","VampireCastle_6",
-        
-    }; 
-    bool isInvalidIDLoaded = false;
-
-    MapData mapData;
-    Vector2 scrollPos;
-    CellData selectedCell;                          // 단일 선택
-    List<CellData> selectedCells = new List<CellData>(); // 다중 선택 목록
-
-    bool _isDragging = false;   // 드래그 확정 상태
-    bool _dragPending = false;  // MouseDown 이후 이동 확인 대기
-    Vector2 _dragStartPos;      // 드래그 시작 마우스 위치
-    CellData _dragStartCell;    // 드래그 시작 셀
-    const float DragThreshold = 5f; // 드래그 인정 거리 (px)
-
-    // 맵 크기 입력을 위한 변수
-    int inputWidth = 10;
-    int inputHeight = 10;
-
-    // ID와 테마 입력을 위한 변수
-    
-    int inputStartX = 0;
-    int inputStartY = 0;
-    Direction inputStartDirection = Direction.North; 
-
-    string inputMapID;
-    string inputLocationID;
-    DungeonTheme inputTheme;
-    bool inputHasCeil = true;
+    [SerializeField] private DungeonMapEditorDocument document;
+    [SerializeField] private string currentFilePath = "";
+    [SerializeField] private string savedJson = "";
+    [SerializeField] private string diskJson = "";
+    [SerializeField] private List<Vector2Int> selection = new List<Vector2Int>();
+    [SerializeField] private Vector2 gridScroll, inspectorScroll, paletteScroll;
+    [SerializeField] private float cellSize = 46;
+    [SerializeField] private int inspectorTab;
+    [SerializeField] private bool showAdvanced;
+    [SerializeField] private string status = "새 맵을 만들거나 프로젝트 맵을 열어주세요.";
+    private DungeonMapEditorIndex index;
+    private List<DungeonMapIssue> issues = new List<DungeonMapIssue>();
+    private double recoveryAt;
+    private bool needsValidation;
+    private const string RecoveryPath = "Library/DungeonMapEditor/recovery.json";
+    private MapData Map => document != null ? document.map : null;
+    private DungeonTheme Theme => index.Theme(Map.themeID);
+    private IEnumerable<CellData> Selected => selection.Select(p => Map.GetCell(p.x, p.y)).Where(c => c != null);
+    private CellData Active => selection.Count == 0 ? null : Map.GetCell(selection[selection.Count - 1].x, selection[selection.Count - 1].y);
 
     [MenuItem("Tools/Dungeon Map Editor")]
     public static void ShowWindow()
     {
-        GetWindow<DungeonMapEditor>("Dungeon Editor");
+        var window = GetWindow<DungeonMapEditor>();
+        window.titleContent = new GUIContent("던전 맵 편집기");
+        window.minSize = new Vector2(1000, 600);
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
-        // 초기화 시 기본값 설정
-        if (mapData == null) InitializeMap(10, 10, "MapId", "None (Location)", null, 0, 0, 0);
-    }
-
-    // 크기를 인자로 받아 초기화
-    void InitializeMap(int w, int h, string mapId, string locationID, DungeonTheme theme, int startX, int startY, Direction startDir, bool hasCeil = true)
-    {
-        mapData = new MapData();
-        mapData.width = w;
-        mapData.height = h;
-        mapData.mapID = mapId;
-        mapData.locationID = locationID;
-        mapData.themeID = (theme != null) ? theme.themeID : "";
-        mapData.hasCeil = hasCeil;
-
-        // 시작 위치 및 방향 설정
-        mapData.startX = startX;
-        mapData.startY = startY;
-        mapData.startDirection = startDir;
-
-        mapData.cells = new CellData[w * h];
-        mapData.entrances = new List<EntranceData>();
-        
-        for (int i = 0; i < mapData.cells.Length; i++)
+        minSize = new Vector2(1000, 600);
+        index = new DungeonMapEditorIndex();
+        index.Refresh();
+        selection = selection ?? new List<Vector2Int>();
+        if (document == null || document.map == null)
         {
-            mapData.cells[i] = new CellData { x = i % w, y = i / w };
+            document = CreateInstance<DungeonMapEditorDocument>();
+            document.hideFlags = HideFlags.HideAndDontSave;
+            document.map = DungeonMapEditing.Create(10, 10, "NewMap", "", "", true);
+            savedJson = JsonUtility.ToJson(document.map);
+            currentFilePath = "";
         }
-        
-        selectedCell = null;
-        
-        // 에디터 입력값 동기화
-        inputWidth = w;
-        inputHeight = h;
-        inputMapID = mapId;
-        inputLocationID = locationID;
-        inputTheme = theme;
-        
-        // 플레이어 위치 입력값 동기화
-        inputStartX = startX;
-        inputStartY = startY;
-        inputStartDirection = startDir;
-        inputHasCeil = hasCeil;
+        Undo.undoRedoPerformed += OnUndoRedo;
+        EditorApplication.update += Tick;
+        EditorApplication.projectChanged += ProjectChanged;
+        RefreshState();
+    }
+    private void OnDisable()
+    {
+        FinishGesture();
+        WriteRecovery();
+        Undo.undoRedoPerformed -= OnUndoRedo;
+        EditorApplication.update -= Tick;
+        EditorApplication.projectChanged -= ProjectChanged;
+    }
+    private void OnDestroy()
+    {
+        if (document != null) { Undo.ClearUndo(document); DestroyImmediate(document); }
+    }
+    private void ProjectChanged() { needsValidation = true; }
+    private void Tick()
+    {
+        if (EditorApplication.timeSinceStartup < recoveryAt) return;
+        recoveryAt = EditorApplication.timeSinceStartup + 10;
+        WriteRecovery();
+    }
+    private void WriteRecovery()
+    {
+        if (!hasUnsavedChanges || Map == null) return;
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(RecoveryPath));
+            DungeonMapFileIO.WriteAtomic(RecoveryPath, JsonUtility.ToJson(Map, true));
+        }
+        catch (Exception ex) { status = "복구본 저장 실패: " + ex.Message; }
+    }
+    private static void DeleteRecovery()
+    {
+        try
+        {
+            if (File.Exists(RecoveryPath)) File.Delete(RecoveryPath);
+            if (File.Exists(RecoveryPath + ".bak")) File.Delete(RecoveryPath + ".bak");
+        }
+        catch (IOException) { /* 문서 저장 성공 여부와 복구본 정리는 별개입니다. */ }
+        catch (UnauthorizedAccessException) { /* 읽기 전용인 복구본이 문서 저장을 막지 않게 합니다. */ }
+    }
+    public override void SaveChanges()
+    {
+        // 저장 취소/실패 시 hasUnsavedChanges를 유지하여 Unity가 창을 닫지 않게 합니다.
+        if (SaveMap(false)) base.SaveChanges();
+    }
+    public override void DiscardChanges()
+    {
+        DeleteRecovery();
+        base.DiscardChanges();
+    }
+    private bool ConfirmDocumentChange()
+    {
+        FinishGesture();
+        if (!hasUnsavedChanges) return true;
+        int choice = EditorUtility.DisplayDialogComplex("변경 사항 저장", "현재 맵의 변경 사항을 저장하시겠습니까?", "저장", "취소", "저장하지 않음");
+        if (choice == 1) return false;
+        if (choice == 0) return SaveMap(false);
+        return true;
+    }
+    private void ReplaceDocument(MapData map, string path, string originalJson, bool isSaved)
+    {
+        FinishGesture();
+        Undo.ClearUndo(document);
+        document.map = map;
+        currentFilePath = path ?? "";
+        diskJson = originalJson ?? "";
+        savedJson = isSaved ? JsonUtility.ToJson(map) : "";
+        selection.Clear();
+        gridScroll = Vector2.zero;
+        DeleteRecovery();
+        RefreshState();
+    }
+    private void Edit(string label, Action<MapData> edit)
+    {
+        document.Edit(label, edit);
+        RefreshState();
+    }
+    private void EditSelected(string label, Action<CellData> edit)
+    {
+        var coordinates = selection.ToArray();
+        Edit(label, map => { foreach (var p in coordinates) { var c = map.GetCell(p.x, p.y); if (c != null) edit(c); } });
+    }
+    private void RefreshState()
+    {
+        if (Map == null) return;
+        selection.RemoveAll(p => Map.GetCell(p.x, p.y) == null);
+        hasUnsavedChanges = JsonUtility.ToJson(Map) != savedJson;
+        saveChangesMessage = $"'{Map.mapID}'의 변경 사항을 저장하시겠습니까?";
+        titleContent = new GUIContent("던전 맵 — " + Map.mapID);
+        needsValidation = true;
         UpdateVisualizer();
-        Debug.Log($"New Map Created: ID={mapId}, Size={w}x{h}, Theme={mapData.themeID}");
+        Repaint();
     }
-
-
-    void DrawToolbar()
+    private void OnUndoRedo() { CancelGesture(); RefreshState(); }
+    private void ValidateMap(bool reloadIndex = false)
     {
-        EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-
-        GUILayout.Label("ID", GUILayout.Width(20));
-
-        // 현재 inputMapID가 배열의 몇 번째 인덱스인지 확인
-        int selectedIndex = Array.IndexOf(availableMapIDs, inputMapID);
-
-        // Popup에 -1이 들어가면 자동으로 빈 칸을 표시함
-        int newIndex = EditorGUILayout.Popup(selectedIndex, availableMapIDs, GUILayout.Width(100));
-
-        if (newIndex >= 0 && newIndex != selectedIndex)
-        {
-            inputMapID = availableMapIDs[newIndex];
-            isInvalidIDLoaded = false;
-        }
-
-        // 로케이션 ID 입력
-        GUILayout.Space(10);
-        GUILayout.Label("LocationID", GUILayout.Width(65));
-        inputLocationID = EditorGUILayout.TextField(inputLocationID, GUILayout.Width(100));
-
-        // 시작 위치 및 방향 입력
-        GUILayout.Space(10);
-        GUILayout.Label("Player Start", EditorStyles.boldLabel, GUILayout.Width(80));
-
-        // Start X/Y
-        GUILayout.Label("X", GUILayout.Width(15));
-        inputStartX = EditorGUILayout.IntField(inputStartX, GUILayout.Width(30));
-        GUILayout.Label("Y", GUILayout.Width(15));
-        inputStartY = EditorGUILayout.IntField(inputStartY, GUILayout.Width(30));
-
-        // Start Direction (Enum 팝업 필드 사용)
-        GUILayout.Label("Dir", GUILayout.Width(25));
-        inputStartDirection = (Direction)EditorGUILayout.EnumPopup(inputStartDirection, GUILayout.Width(60));
-
-        // Width / Height 입력
-        GUILayout.Label("W", GUILayout.Width(20));
-        inputWidth = EditorGUILayout.IntField(inputWidth, GUILayout.Width(30));
-        GUILayout.Label("H", GUILayout.Width(20));
-        inputHeight = EditorGUILayout.IntField(inputHeight, GUILayout.Width(30));
-
-        // 천장 토글 UI
-        GUILayout.Space(5);
-        GUILayout.Label("Ceil", GUILayout.Width(25));
-        inputHasCeil = EditorGUILayout.Toggle(inputHasCeil, GUILayout.Width(15));
-
-        // DungeonTheme Object Field (드래그 앤 드롭 슬롯)
-        GUILayout.Label("Theme", GUILayout.Width(45));
-        // typeof(DungeonTheme)를 사용하여 해당 타입의 에셋만 들어오게 함
-        inputTheme = (DungeonTheme)EditorGUILayout.ObjectField(inputTheme, typeof(DungeonTheme), false, GUILayout.Width(150));
-
-        // 생성 버튼
-        if (GUILayout.Button("Create", EditorStyles.toolbarButton, GUILayout.Width(50)))
-        {
-            if (EditorUtility.DisplayDialog("Create New Map", 
-                "Current map data will be lost. Create new?", "Yes", "No"))
-            {
-                // InitializeMap 호출 시 플레이어 위치/방향 인자 전달
-                InitializeMap(inputWidth, inputHeight, inputMapID, inputLocationID, inputTheme, 
-                              inputStartX, inputStartY, inputStartDirection, inputHasCeil);
-            }
-        }
-        // 절차적 미로 생성 버튼
-        if (GUILayout.Button("Gen Maze", EditorStyles.toolbarButton, GUILayout.Width(70)))
-        {
-            if (EditorUtility.DisplayDialog("Generate Maze", 
-                "현재 맵 데이터가 무작위 미로로 덮어씌워집니다. 진행하시겠습니까?", "Yes", "No"))
-            {
-                string themeID = (inputTheme != null) ? inputTheme.themeID : "";
-                
-                // DungeonGenerator의 스크립트 호출하여 맵 데이터 생성
-                mapData = Generator.DungeonGenerator.GenerateRandomMaze(
-                    inputWidth, inputHeight, inputMapID, themeID, 0, 0.05f); // 0.05f는 루프 생성 확률
-                
-                // 생성된 데이터를 에디터 입력 필드 UI와 동기화
-                mapData.locationID = inputLocationID;
-                inputStartX = mapData.startX;
-                inputStartY = mapData.startY;
-                inputStartDirection = mapData.startDirection;
-                inputWidth = mapData.width;
-                inputHeight = mapData.height;
-
-                selectedCells.Clear();
-                selectedCell = null;
-
-                UpdateVisualizer();
-                GUI.FocusControl(null); // 포커스 해제하여 UI 즉시 갱신
-                
-                Debug.Log($"[DungeonEditor] {inputWidth}x{inputHeight} 크기의 무작위 미로가 생성되었습니다!");
-            }
-        }
-
-        GUILayout.FlexibleSpace();
-
-        // Refresh 버튼
-        if (GUILayout.Button("Refresh", EditorStyles.toolbarButton, GUILayout.Width(60)))
-        {
-            ApplyUIToData();    // 입력값 데이터에 반영
-            UpdateVisualizer(); // 화면 갱신
-            Debug.Log("Map Refreshed");
-        }
-
-        if (GUILayout.Button("Load",   EditorStyles.toolbarButton)) LoadMap();
-
-        // Save 버튼. 로드된 파일이 없으면 비활성화
-        GUI.enabled = !string.IsNullOrEmpty(currentFilePath);
-        if (GUILayout.Button("Save",   EditorStyles.toolbarButton)) SaveMap();
-        GUI.enabled = true;
-
-        if (GUILayout.Button("Export", EditorStyles.toolbarButton)) ExportMap();
-
-        EditorGUILayout.EndHorizontal();
-
-        // 현재 파일 경로 표시
-        if (!string.IsNullOrEmpty(currentFilePath))
-        {
-            EditorGUILayout.HelpBox(
-                $"Current Map: ID [{mapData.mapID}] / Theme [{mapData.themeID}]\n" +
-                $"File: {currentFilePath}",
-                MessageType.Info);
-        }
-        
-        // 잘못된 ID가 로드되었을 때 경고
-        if (isInvalidIDLoaded)
-        {
-            EditorGUILayout.HelpBox(
-                "로드된 파일의 Map ID가 유효한 목록에 없어 삭제되었습니다. 반드시 올바른 Map ID를 다시 선택한 후 저장하세요.", 
-                MessageType.Warning);
-        }
+        if (reloadIndex) index.Refresh();
+        issues = DungeonMapValidation.Check(Map, index, currentFilePath);
+        needsValidation = false;
     }
-
-    void OnGUI()
+    private void UpdateVisualizer()
     {
-        Event e = Event.current;
-
-        // Ctrl+S 단축키
-        if (e.type == EventType.KeyDown && e.keyCode == KeyCode.S && (e.control || e.command))
-        { SaveMap(); e.Use(); }
-
-        // 마우스 버튼을 놓으면 드래그 종료
-        if (e.type == EventType.MouseUp)
-        {
-            _isDragging = false;
-            _dragPending = false;
-        }
-
-        DrawToolbar();
-        if (mapData == null) return;
-        
-        DrawMapResizeTools();
-
-        EditorGUILayout.BeginHorizontal();
-        DrawGridView();
-        DrawInspectorView();
-        EditorGUILayout.EndHorizontal();
-
-        if (GUI.changed) UpdateVisualizer();
-    }
-
-    void UpdateVisualizer()
-    {
-        EditorGridVisualizer visualizer = FindFirstObjectByType<EditorGridVisualizer>();
-        if (visualizer != null)
-        {
-            visualizer.mapData = this.mapData; // 데이터 동기화
-            
-            // 씬 뷰 강제 갱신 (즉시 반영되도록)
-            SceneView.RepaintAll(); 
-        }
-    }
-
-    void LoadMap()
-    {
-        string path = EditorUtility.OpenFilePanel("Load Map JSON", "", "json");
-        if (path.Length != 0)
-        {
-            string json = File.ReadAllText(path);
-            mapData = JsonUtility.FromJson<MapData>(json);
-            currentFilePath = path;
-
-            // 로드된 ID가 availableMapIDs 배열에 있는지 확인
-            if (System.Array.IndexOf(availableMapIDs, mapData.mapID) == -1)
-            {
-                Debug.LogWarning($"[DungeonEditor] 로드된 맵 ID '{mapData.mapID}'는 유효한 목록에 없습니다. 빈 칸으로 초기화됩니다.");
-                inputMapID = ""; // 배열에 없으면 빈 칸으로 덮어씀
-                isInvalidIDLoaded = true;
-            }
-            else
-            {
-                inputMapID = mapData.mapID; // 배열에 있으면 정상 동기화
-                isInvalidIDLoaded = false;
-            }
-
-            // UI 값 동기화
-            inputWidth = mapData.width;
-            inputHeight = mapData.height;
-            inputMapID = mapData.mapID;
-            inputLocationID = mapData.locationID;
-
-            // 플레이어 위치 동기화
-            inputStartX = mapData.startX;
-            inputStartY = mapData.startY;
-            inputStartDirection = mapData.startDirection;
-            inputHasCeil = mapData.hasCeil;
-
-            // 저장된 테마 이름으로 프로젝트에서 Theme 파일을 찾아 연결 시도
-            if (!string.IsNullOrEmpty(mapData.themeID))
-            {
-                // Resources 폴더를 사용한다면
-                // inputTheme = Resources.Load<DungeonTheme>(mapData.themeID);
-
-                // 에디터 전용. AssetDatabase 검색
-                string[] guids = AssetDatabase.FindAssets($"t:DungeonTheme {mapData.themeID}");
-                if (guids.Length > 0)
-                {
-                    string assetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
-                    inputTheme = AssetDatabase.LoadAssetAtPath<DungeonTheme>(assetPath);
-                }
-                else
-                {
-                    inputTheme = null;
-                    Debug.LogWarning($"Theme '{mapData.themeID}' not found in project.");
-                }
-            }
-            else
-            {
-                inputTheme = null;
-            }
-
-            selectedCell = null;
-            UpdateVisualizer();
-        }
-    }
-
-    void SaveMap()
-    {
-        if (string.IsNullOrEmpty(currentFilePath))
-        {
-            // 로드된 파일이 없으면 다른 이름으로 저장(Export)로 대체
-            ExportMap();
-            return;
-        }
-
-        ApplyUIToData();
-        string json = JsonUtility.ToJson(mapData, true);
-        File.WriteAllText(currentFilePath, json);
-        Debug.Log($"Map Saved: {currentFilePath}");
-        UpdateVisualizer();
-    }
-
-    void ExportMap()
-    {
-        ApplyUIToData();
-
-        string json = JsonUtility.ToJson(mapData, true);
-
-        // 파일명으로 사용할 변수 설정 (ID가 없으면 기본값 사용)
-        string defaultFileName = string.IsNullOrEmpty(inputMapID) ? "dungeon_map" : inputMapID;
-
-        // SaveFilePanel의 세 번째 인자에 변수 전달
-        string path = EditorUtility.SaveFilePanel("Save Map", "", defaultFileName, "json");
-
-        if (path.Length != 0)
-        {
-            File.WriteAllText(path, json);
-            currentFilePath = path;
-            Debug.Log($"Map Exported: {path}");
-            
-            UpdateVisualizer(); 
-        }
-    }
-
-    void DrawGridView()
-    {
-        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(position.width * 0.7f));
-
-        Event e = Event.current;
-        bool isCtrl = e.control || e.command;
-
-        for (int y = mapData.height - 1; y >= 0; y--)
-        {
-            EditorGUILayout.BeginHorizontal();
-            for (int x = 0; x < mapData.width; x++)
-            {
-                int index = y * mapData.width + x;
-                CellData cell = mapData.cells[index];
-                bool isSelected = selectedCells.Contains(cell);
-                bool hasEntrance = mapData.entrances != null && 
-                                   mapData.entrances.Exists(e => e.sourceX == cell.x && e.sourceY == cell.y);
-
-                GUI.backgroundColor = isSelected         ? Color.cyan
-                                    : hasEntrance        ? Color.red     // 입구가 있으면 빨간색
-                                    : cell.value == -1   ? Color.white
-                                    : cell.value == 1    ? Color.brown
-                                                         : Color.gray;
-
-                // GUILayout.Button 대신 Rect를 먼저 예약
-                float cellSize = 38f;
-                Rect rect = GUILayoutUtility.GetRect(
-                    new GUIContent($"{x},{y}"),
-                    GUI.skin.button,
-                    GUILayout.Width(cellSize), GUILayout.Height(cellSize));
-
-                bool mouseOverCell = rect.Contains(e.mousePosition);
-
-                // 드래그 대기 시작 (Ctrl + MouseDown)
-                if (isCtrl && e.type == EventType.MouseDown && mouseOverCell)
-                {
-                    _dragPending  = true;
-                    _dragStartPos  = e.mousePosition;
-                    _dragStartCell = cell;
-                }
-
-                // 드래그 대기 중 마우스가 충분히 이동하면 드래그 확정
-                if (_dragPending && e.type == EventType.MouseDrag)
-                {
-                    if (Vector2.Distance(e.mousePosition, _dragStartPos) > DragThreshold)
-                    {
-                        _isDragging   = true;
-                        _dragPending  = false;
-
-                        // 드래그 시작 셀을 선택 목록에 추가
-                        if (!selectedCells.Contains(_dragStartCell))
-                        {
-                            selectedCells.Add(_dragStartCell);
-                            selectedCell = _dragStartCell;
-                        }
-                        UpdateVisualizerSelection(selectedCells);
-                        Repaint();
-                    }
-                }
-
-                // 드래그 확정 상태에서 마우스가 올라온 셀을 선택 목록에 추가
-                if (_isDragging && mouseOverCell &&
-                    (e.type == EventType.MouseDrag || e.type == EventType.Repaint))
-                {
-                    if (!selectedCells.Contains(cell))
-                    {
-                        selectedCells.Add(cell);
-                        selectedCell = cell;
-                        UpdateVisualizerSelection(selectedCells);
-                    }
-                }
-
-                // 드래그 중이 아닐 때만 버튼 클릭 처리
-                if (GUI.Button(rect, $"{x},{y}") && !_isDragging)
-                {
-                    if (isCtrl)
-                    {
-                        // 토글
-                        if (selectedCells.Contains(cell)) selectedCells.Remove(cell);
-                        else selectedCells.Add(cell);
-                        selectedCell = selectedCells.Count > 0
-                            ? selectedCells[selectedCells.Count - 1] : null;
-                    }
-                    else
-                    {
-                        selectedCells.Clear();
-                        selectedCells.Add(cell);
-                        selectedCell = cell;
-                    }
-                    UpdateVisualizerSelection(selectedCells);
-                    GUI.FocusControl(null);
-                }
-
-                // 벽 시각화
-                float defaultWt = 3f; // 꽉 막힌 벽 및 문의 두께
-                float passableWt = 1.5f; // 통과 가능한 환영의 벽 두께 (얇게)
-
-                for (int i = 0; i < 4; i++)
-                {
-                    int texID = cell.wallTextureIDs[i];
-                    if (texID != -1)
-                    {
-                        // 통과 가능한 환영의 벽인지 검사
-                        bool isPassable = (inputTheme != null && 
-                                           inputTheme.passableWallTexIDs != null && 
-                                           inputTheme.passableWallTexIDs.Contains(texID));
-
-                        // 텍스처 ID가 테마에 등록된 문(Door)인지 검사
-                        bool isDoor = false;
-                        if (inputTheme != null && inputTheme.doorAnimations != null)
-                        {
-                            foreach (var door in inputTheme.doorAnimations)
-                            {
-                                if (door.closedTexId == texID)
-                                {
-                                    isDoor = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // 상태에 따른 색상 및 두께 할당
-                        Color wc;
-                        float wt = defaultWt;
-
-                        if (isPassable)
-                        {
-                            wc = new Color(0f, 1f, 1f, 0.8f); // 환영의 벽: 시안색(Cyan)
-                            wt = passableWt;
-                        }
-                        else if (isDoor)
-                        {
-                            wc = new Color(0.2f, 0.9f, 0.2f, 1f); // 문(Door): 밝은 녹색(Green)
-                        }
-                        else
-                        {
-                            wc = new Color(1f, 0.3f, 0.3f, 1f); // 꽉 막힌 벽: 빨간색(Red)
-                        }
-
-                        // 렌더링
-                        if (isPassable)
-                        {
-                            // 통과 가능한 벽은 점선으로 렌더링
-                            int dashCount = 4;
-                            float dashStepX = rect.width / (dashCount * 2 - 1);
-                            float dashStepY = rect.height / (dashCount * 2 - 1);
-
-                            for (int d = 0; d < dashCount; d++)
-                            {
-                                if (i == 0) EditorGUI.DrawRect(new Rect(rect.x + d * dashStepX * 2, rect.y, dashStepX, wt), wc); // 북쪽 (Top)
-                                else if (i == 1) EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y + d * dashStepY * 2, wt, dashStepY), wc); // 동쪽 (Right)
-                                else if (i == 2) EditorGUI.DrawRect(new Rect(rect.x + d * dashStepX * 2, rect.yMax - wt, dashStepX, wt), wc); // 남쪽 (Bottom)
-                                else if (i == 3) EditorGUI.DrawRect(new Rect(rect.x, rect.y + d * dashStepY * 2, wt, dashStepY), wc); // 서쪽 (Left)
-                            }
-                        }
-                        else
-                        {
-                            // 일반 벽과 문은 굵은 실선으로 렌더링
-                            if (i == 0) EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, wt), wc); // 북쪽 (Top)
-                            else if (i == 1) EditorGUI.DrawRect(new Rect(rect.xMax - wt, rect.y, wt, rect.height), wc); // 동쪽 (Right)
-                            else if (i == 2) EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - wt, rect.width, wt), wc); // 남쪽 (Bottom)
-                            else if (i == 3) EditorGUI.DrawRect(new Rect(rect.x, rect.y, wt, rect.height), wc); // 서쪽 (Left)
-                        }
-                    }
-                }
-                
-                // 중앙 고정 오브젝트 시각화
-                if (cell.centerObjectID != -1)
-                {
-                    Rect centerObjRect = new Rect(rect.x + rect.width * 0.35f, rect.y + rect.height * 0.35f, rect.width * 0.3f, rect.height * 0.3f);
-                    EditorGUI.DrawRect(centerObjRect, Color.yellow);
-                    
-                    GUIStyle style = new GUIStyle(EditorStyles.miniLabel);
-                    style.alignment = TextAnchor.MiddleCenter;
-                    style.normal.textColor = Color.black;
-                    GUI.Label(centerObjRect, cell.centerObjectID.ToString(), style);
-                }
-
-                // 이벤트(보스, NPC 등) 배치 시각화
-                if (cell.events != null && cell.events.Count > 0 && !string.IsNullOrEmpty(cell.events[0].eventID))
-                {
-                    bool isRep = cell.events[0].isEventRepeatable;
-                    Rect eventRect = new Rect(rect.xMax - 14f, rect.y + 2f, 12f, 10f);
-                    Color markColor = isRep ? Color.cyan : Color.magenta;
-                    
-                    // 이벤트가 2개 이상이면 '+' 기호를 붙여 다중 이벤트임을 표시
-                    string markText = (cell.events.Count > 1) ? (isRep ? "R+" : "E+") : (isRep ? "R" : "E");
-
-                    EditorGUI.DrawRect(eventRect, markColor);
-                    
-                    GUIStyle evStyle = new GUIStyle(EditorStyles.miniLabel);
-                    evStyle.alignment = TextAnchor.MiddleCenter;
-                    evStyle.normal.textColor = isRep ? Color.black : Color.white; 
-                    evStyle.fontSize = 8;
-                    evStyle.padding = new RectOffset(0,0,0,0);
-                    GUI.Label(eventRect, markText, evStyle);
-                }
-
-                // 벽면 오브젝트 시각화
-                float dotSize = 6f;
-                Color dotColor = new Color(1f, 0.9f, 0f); // 진노랑
-
-                // 북쪽 (Top) - Index 0
-                if (cell.faceObjectIDs[0] != -1) 
-                    EditorGUI.DrawRect(new Rect(rect.center.x - dotSize/2, rect.y + 2, dotSize, dotSize), dotColor);
-                // 동쪽 (Right) - Index 1
-                if (cell.faceObjectIDs[1] != -1) 
-                    EditorGUI.DrawRect(new Rect(rect.xMax - dotSize - 2, rect.center.y - dotSize/2, dotSize, dotSize), dotColor);
-                // 남쪽 (Bottom) - Index 2
-                if (cell.faceObjectIDs[2] != -1) 
-                    EditorGUI.DrawRect(new Rect(rect.center.x - dotSize/2, rect.yMax - dotSize - 2, dotSize, dotSize), dotColor);
-                // 서쪽 (Left) - Index 3
-                if (cell.faceObjectIDs[3] != -1) 
-                    EditorGUI.DrawRect(new Rect(rect.x + 2, rect.center.y - dotSize/2, dotSize, dotSize), dotColor);
-            }
-            EditorGUILayout.EndHorizontal();
-        }
-
-        GUI.backgroundColor = Color.white;
-        EditorGUILayout.EndScrollView();
-    }
-
-    void UpdateVisualizerSelection(List<CellData> cells)
-    {
-        EditorGridVisualizer visualizer = FindFirstObjectByType<EditorGridVisualizer>();
+        if (EditorApplication.isPlaying) return;
+        var visualizer = FindFirstObjectByType<EditorGridVisualizer>();
         if (visualizer == null) return;
-
-        visualizer.mapData = this.mapData;
-        visualizer.selectedCoords = cells.ConvertAll(c => new Vector2Int(c.x, c.y));
+        visualizer.mapData = Map;
+        visualizer.selectedCoords = new List<Vector2Int>(selection);
         SceneView.RepaintAll();
     }
-
-    void DrawInspectorView()
+    private void Later(Action action)
     {
-        EditorGUILayout.BeginVertical(GUILayout.Width(position.width * 0.3f));
-        if (selectedCells.Count > 1)
+        EditorApplication.delayCall += () =>
         {
-            // ── 다중 선택 일괄 편집 UI ──
-            GUILayout.Label($"{selectedCells.Count} cells selected", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox("Ctrl+Click to add/remove cells.\nChanges apply to ALL selected cells.", MessageType.Info);
-
-            GUILayout.Space(8);
-            GUILayout.Label("Batch Wall Textures", EditorStyles.miniBoldLabel);
-
-            // 방향별 일괄 설정.
-            DrawBatchWallField("↑ Tex (N)", 0);
-            DrawBatchWallField("→ Tex (E)", 1);
-            DrawBatchWallField("↓ Tex (S)", 2);
-            DrawBatchWallField("← Tex (W)", 3);
-
+            if (this == null) return;
+            try { action(); }
+            catch (Exception ex) { status = "작업 실패: " + ex.Message; Debug.LogException(ex); }
+            Repaint();
+        };
+    }
+    private void OnGUI()
+    {
+        if (document == null || index == null) return;
+        if (EditorApplication.isPlayingOrWillChangePlaymode) FinishGesture();
+        HandleShortcuts();
+        using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
+        {
+            DrawToolbar();
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                using (new EditorGUILayout.VerticalScope(GUILayout.Width(208))) DrawPalette();
+                using (new EditorGUILayout.VerticalScope(GUILayout.ExpandWidth(true))) DrawGrid();
+                using (new EditorGUILayout.VerticalScope(GUILayout.Width(330)))
+                {
+                    inspectorScroll = EditorGUILayout.BeginScrollView(inspectorScroll);
+                    DrawInspector();
+                    EditorGUILayout.EndScrollView();
+                }
+            }
+        }
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+            EditorGUILayout.HelpBox("맵 편집은 Play 모드 종료 후 사용할 수 있습니다.", MessageType.Info);
+        EditorGUILayout.LabelField(status, EditorStyles.helpBox, GUILayout.Height(36));
+        // 단일 클릭은 즉시 검증하되 드래그 중에는 문서 전체를 반복 검사하지 않습니다.
+        if (needsValidation && !gestureActive && Event.current.type == EventType.Layout) ValidateMap();
+    }
+    private void HandleShortcuts()
+    {
+        var e = Event.current;
+        if (EditorApplication.isPlayingOrWillChangePlaymode || e.type != EventType.KeyDown) return;
+        bool command = e.control || e.command;
+        if (command && e.keyCode == KeyCode.S) { bool saveAs = e.shift; Later(() => SaveMap(saveAs)); e.Use(); }
+        if (command && !EditorGUIUtility.editingTextField && e.keyCode == KeyCode.Z)
+        { FinishGesture(); if (e.shift) Undo.PerformRedo(); else Undo.PerformUndo(); e.Use(); }
+        if (command && !EditorGUIUtility.editingTextField && e.keyCode == KeyCode.Y)
+        { FinishGesture(); Undo.PerformRedo(); e.Use(); }
+        if (command && !EditorGUIUtility.editingTextField && e.keyCode == KeyCode.A)
+        { selection = Map.cells.Select(c => new Vector2Int(c.x, c.y)).ToList(); UpdateVisualizer(); e.Use(); }
+        if (e.keyCode == KeyCode.Escape && !EditorGUIUtility.editingTextField)
+        { FinishGesture(); selection.Clear(); UpdateVisualizer(); e.Use(); }
+    }
+    private void DrawToolbar()
+    {
+        using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+        {
+            if (GUILayout.Button("새 맵", EditorStyles.toolbarButton)) Later(OpenNewMap);
+            if (GUILayout.Button("맵 목록", EditorStyles.toolbarButton)) OpenMapPicker();
+            if (GUILayout.Button("JSON 열기", EditorStyles.toolbarButton)) Later(() =>
+            { string p = EditorUtility.OpenFilePanel("맵 JSON 열기", "Assets/Database/Dungeons/Levels", "json"); if (!string.IsNullOrEmpty(p)) LoadMap(p); });
+            if (GUILayout.Button("저장", EditorStyles.toolbarButton)) Later(() => SaveMap(false));
+            if (GUILayout.Button("다른 이름으로 저장", EditorStyles.toolbarButton)) Later(() => SaveMap(true));
             GUILayout.Space(10);
-            GUILayout.Label("Floor & Ceiling Textures", EditorStyles.miniBoldLabel);
-            
-            selectedCell.floorTexIdx = EditorGUILayout.IntField("Floor Tex ID", selectedCell.floorTexIdx);
-            selectedCell.ceilTexIdx = EditorGUILayout.IntField("Ceil Tex ID", selectedCell.ceilTexIdx);
-
-            GUILayout.Space(5);
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Open All (-1)", EditorStyles.miniButtonLeft))
-            {
-                foreach (var c in selectedCells)
-                    for (int i = 0; i < 4; i++) c.wallTextureIDs[i] = -1;
-                GUI.changed = true; GUI.FocusControl(null);
-            }
-            if (GUILayout.Button("Wall All (0)", EditorStyles.miniButtonRight))
-            {
-                foreach (var c in selectedCells)
-                    for (int i = 0; i < 4; i++) c.wallTextureIDs[i] = 0;
-                GUI.changed = true; GUI.FocusControl(null);
-            }
-            EditorGUILayout.EndHorizontal();
-
-            GUILayout.Space(10);
-            GUILayout.Label("Batch Value", EditorStyles.miniBoldLabel);
-            DrawBatchValueField();
-
-            GUILayout.Space(10);
-            GUILayout.Label("Batch Static Objects", EditorStyles.miniBoldLabel);
-            DrawBatchCenterObjectField();
-
-            GUILayout.Space(10);
-            GUILayout.Label("Batch Interaction Settings", EditorStyles.miniBoldLabel);
-            DrawBatchInteractionFields();
-
-            GUILayout.Space(5);
-            GUILayout.Label("Batch Face Objects", EditorStyles.miniBoldLabel);
-            
-            // 4면 고정 오브젝트
-            DrawBatchFaceObjectField("↑ Face Obj (N)", 0);
-            DrawBatchFaceObjectField("→ Face Obj (E)", 1);
-            DrawBatchFaceObjectField("↓ Face Obj (S)", 2);
-            DrawBatchFaceObjectField("← Face Obj (W)", 3);
-
-            GUILayout.Space(5);
-            if (GUILayout.Button("Remove All Objects (-1)", EditorStyles.miniButton))
-            {
-                foreach (var c in selectedCells)
-                {
-                    c.centerObjectID = -1;
-                    for (int i = 0; i < 4; i++) c.faceObjectIDs[i] = -1;
-                }
-                GUI.changed = true; GUI.FocusControl(null);
-            }
-
-            GUILayout.Space(5);
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Value = 0", EditorStyles.miniButtonLeft))
-            {
-                foreach (var c in selectedCells) c.value = 0;
-                GUI.changed = true; GUI.FocusControl(null);
-            }
-            if (GUILayout.Button("Value = -1", EditorStyles.miniButtonRight))
-            {
-                foreach (var c in selectedCells) c.value = -1;
-                GUI.changed = true; GUI.FocusControl(null);
-            }
-            EditorGUILayout.EndHorizontal();
+            if (GUILayout.Button("실행 취소", EditorStyles.toolbarButton)) { FinishGesture(); Undo.PerformUndo(); }
+            if (GUILayout.Button("다시 실행", EditorStyles.toolbarButton)) { FinishGesture(); Undo.PerformRedo(); }
+            if (GUILayout.Button("검사 / 목록 갱신", EditorStyles.toolbarButton)) Later(() => { ValidateMap(true); status = $"검사 완료: 오류 {issues.Count(i => i.severity == MessageType.Error)}개"; });
+            if (GUILayout.Button("1인칭 미리보기", EditorStyles.toolbarButton)) Later(OpenPreview);
+            GUILayout.FlexibleSpace();
+            GUILayout.Label(hasUnsavedChanges ? "● 미저장" : "저장됨", EditorStyles.miniLabel);
         }
-        else if (selectedCells.Count == 1)
+        using (new EditorGUILayout.HorizontalScope())
         {
-            if (selectedCell != null)
-            {
-                GUILayout.Space(10);
-                GUILayout.Label("Wall Textures (ID)", EditorStyles.miniBoldLabel);
-                
-                // 4방향 텍스처 ID 입력 (기존 코드)
-                selectedCell.wallTextureIDs[0] = EditorGUILayout.IntField("↑ Tex (N)", selectedCell.wallTextureIDs[0]);
-                selectedCell.wallTextureIDs[1] = EditorGUILayout.IntField("→ Tex (E)", selectedCell.wallTextureIDs[1]);
-                selectedCell.wallTextureIDs[2] = EditorGUILayout.IntField("↓ Tex (S)", selectedCell.wallTextureIDs[2]);
-                selectedCell.wallTextureIDs[3] = EditorGUILayout.IntField("← Tex (W)", selectedCell.wallTextureIDs[3]);
-
-                // 텍스처 일괄 설정 버튼 (Quick Actions)
-                GUILayout.Space(5);
-                EditorGUILayout.BeginHorizontal();
-                
-                // 버튼 1: 모두 비우기 (-1)
-                if (GUILayout.Button("Open All (-1)", EditorStyles.miniButtonLeft))
-                {
-                    for (int i = 0; i < 4; i++) selectedCell.wallTextureIDs[i] = -1;
-                    
-                    // 벽이 없어졌으므로 셀의 타입도 복도(0)로 바꿀지 결정
-                    selectedCell.value = -1; 
-                    
-                    GUI.changed = true; // 화면 갱신 트리거
-                    GUI.FocusControl(null); // 입력 필드 포커스 해제 (값 즉시 반영)
-                }
-
-                // 버튼 2: 모두 기본 벽 (0)
-                if (GUILayout.Button("Wall All (0)", EditorStyles.miniButtonRight))
-                {
-                    for (int i = 0; i < 4; i++) selectedCell.wallTextureIDs[i] = 0;
-                    
-                    // 벽이 생겼으므로 셀의 타입도 벽(1)으로 바꿀지 결정
-                    selectedCell.value = 0;
-
-                    GUI.changed = true;
-                    GUI.FocusControl(null);
-                }
-                
-                EditorGUILayout.EndHorizontal();
-                
-                GUILayout.Space(10);
-                GUILayout.Label("Batch Floor & Ceil Textures", EditorStyles.miniBoldLabel);
-                DrawBatchFloorTexField();
-                DrawBatchCeilTexField();
-
-                GUILayout.Space(10);
-                selectedCell.value = EditorGUILayout.IntField("Value", selectedCell.value);
-
-                // 이벤트 ID와 반복 여부 토글을 함께 표시
-                GUILayout.Space(10);
-                GUILayout.Label("Event Settings (Priority: Top to Bottom)", EditorStyles.boldLabel);
-                
-                // 리스트가 null이면 초기화
-                if (selectedCell.events == null) selectedCell.events = new List<CellEventData>();
-
-                for (int i = 0; i < selectedCell.events.Count; i++)
-                {
-                    var ev = selectedCell.events[i];
-                    EditorGUILayout.BeginVertical("box");
-                    
-                    EditorGUILayout.BeginHorizontal();
-                    ev.eventID = EditorGUILayout.TextField($"Event #{i+1} ID", ev.eventID);
-                    
-                    // 이벤트 삭제 버튼 (빨간색)
-                    GUI.backgroundColor = new Color(1f, 0.5f, 0.5f);
-                    if (GUILayout.Button("X", GUILayout.Width(25)))
-                    {
-                        selectedCell.events.RemoveAt(i);
-                        GUI.changed = true;
-                        GUI.backgroundColor = Color.white;
-                        EditorGUILayout.EndHorizontal();
-                        EditorGUILayout.EndVertical();
-                        break; // 요소가 삭제되었으므로 루프를 탈출하고 다음 프레임에 다시 그림
-                    }
-                    GUI.backgroundColor = Color.white;
-                    EditorGUILayout.EndHorizontal();
-
-                    // ID가 입력되어 있을 때만 세부 설정 표시
-                    if (!string.IsNullOrEmpty(ev.eventID))
-                    {
-                        ev.requiredFlag = EditorGUILayout.TextField("  Required Flag", ev.requiredFlag);
-                        if (!string.IsNullOrEmpty(ev.requiredFlag))
-                        {
-                            ev.requiredFlagState = EditorGUILayout.Toggle("    ↳ Req State (T/F)", ev.requiredFlagState);
-                        }
-
-                        GUILayout.Space(2);
-                        ev.isEventRepeatable = EditorGUILayout.Toggle("  Is Repeatable", ev.isEventRepeatable);
-                        ev.triggerOnAttempt = EditorGUILayout.Toggle("  Trigger On Attempt", ev.triggerOnAttempt);
-                        ev.useForceDir = EditorGUILayout.Toggle("  Use Force Dir", ev.useForceDir);
-                        if (ev.useForceDir)
-                        {
-                            ev.evForceDir = (Direction)EditorGUILayout.EnumPopup("    ↳ Force Direction", ev.evForceDir);
-                        }
-                    }
-                    EditorGUILayout.EndVertical();
-                    GUILayout.Space(3);
-                }
-
-                // 이벤트 목록 추가 버튼
-                if (GUILayout.Button("+ Add Event", GUILayout.Height(22)))
-                {
-                    selectedCell.events.Add(new CellEventData());
-                    GUI.changed = true;
-                }
-
-                GUILayout.Space(20);
-
-                // 입구 포털 설정 UI
-                GUILayout.Label("Door / Entrance / Portal Settings", EditorStyles.boldLabel);
-
-                // 현재 셀(x, y)에 존재하는 입구 데이터를 찾음
-                // (MapData에 Entrances 리스트가 초기화되어 있어야 함)
-                if (mapData.entrances == null) mapData.entrances = new System.Collections.Generic.List<EntranceData>();
-                
-                EntranceData existingEntrance = mapData.entrances.Find(w => w.sourceX == selectedCell.x && w.sourceY == selectedCell.y);
-
-                if (existingEntrance != null)
-                {
-                    // 입구 데이터 편집
-                    GUI.backgroundColor = new Color(0.8f, 0.8f, 1f);
-                    EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                    
-                    GUILayout.Label($"Entrance at ({existingEntrance.sourceX}, {existingEntrance.sourceY})", EditorStyles.miniBoldLabel);
-                    // 입구의 타입 (다른 던전맵으로의 입구인가 상점으로의 입구인가)
-                    existingEntrance.type = (EntranceType)EditorGUILayout.EnumPopup("Entrance Type", existingEntrance.type);
-
-                    // 타입에 따른 인스펙터 분기 처리
-                    if (existingEntrance.type == EntranceType.RandomMaze)
-                    {
-                        GUILayout.Space(5);
-                        GUILayout.Label("Random Maze Parameters", EditorStyles.miniBoldLabel);
-                        
-                        EditorGUILayout.BeginHorizontal();
-                        existingEntrance.randomMapWidth = EditorGUILayout.IntField("Width", existingEntrance.randomMapWidth);
-                        existingEntrance.randomMapHeight = EditorGUILayout.IntField("Height", existingEntrance.randomMapHeight);
-                        EditorGUILayout.EndHorizontal();
-                        
-                        // Max Count와 Repeat Count를 함께 표시
-                        EditorGUILayout.BeginHorizontal();
-                        existingEntrance.randomMapMaxCount = EditorGUILayout.IntField("Total Floors", existingEntrance.randomMapMaxCount);
-                        existingEntrance.randomMapRepeatCount = EditorGUILayout.IntField("Remaining", existingEntrance.randomMapRepeatCount);
-                        EditorGUILayout.EndHorizontal();
-                        
-                        existingEntrance.randomMapThemeID = EditorGUILayout.TextField("ThemeID (Opt.)", existingEntrance.randomMapThemeID);
-                        existingEntrance.finalDestinationID = EditorGUILayout.TextField("Final Dest ID", existingEntrance.finalDestinationID);
-                    }
-                    else if (existingEntrance.type == EntranceType.Map || existingEntrance.type == EntranceType.FieldMap)
-                    {
-                        // 기존 Map 이동 설정 UI
-                        existingEntrance.isWallEntrance = EditorGUILayout.Toggle("Is Wall Entrance", existingEntrance.isWallEntrance);
-                        existingEntrance.stairType = (StairType)EditorGUILayout.EnumPopup("Stair Transition", existingEntrance.stairType);
-                        
-                        GUILayout.Space(5);
-                        GUILayout.Label("Target Destination", EditorStyles.miniBoldLabel);
-                        
-                        existingEntrance.isWorldMap = EditorGUILayout.Toggle("Is World Map", existingEntrance.isWorldMap);
-                        existingEntrance.destinationID = EditorGUILayout.TextField("Destination ID", existingEntrance.destinationID);
-                        
-                        EditorGUILayout.BeginHorizontal();
-                        existingEntrance.targetX = EditorGUILayout.IntField("X", existingEntrance.targetX);
-                        existingEntrance.targetY = EditorGUILayout.IntField("Y", existingEntrance.targetY);
-                        EditorGUILayout.EndHorizontal();
-
-                        existingEntrance.targetDirection = (Direction)EditorGUILayout.EnumPopup("Face Dir", existingEntrance.targetDirection);
-                    }
-
-                    existingEntrance.isWallEntrance = EditorGUILayout.Toggle("Is Wall Entrance", existingEntrance.isWallEntrance);
-                    
-                    // 계단 연출 타입 입력란
-                    existingEntrance.stairType = (StairType)EditorGUILayout.EnumPopup("Stair Transition", existingEntrance.stairType);
-                    
-                    GUILayout.Space(5);
-                    GUILayout.Label("Target Destination", EditorStyles.miniBoldLabel);
-                    
-                    existingEntrance.isWorldMap = EditorGUILayout.Toggle("Is World Map", existingEntrance.isWorldMap);
-                    
-                    existingEntrance.destinationID = EditorGUILayout.TextField("Destination ID", existingEntrance.destinationID);
-                    
-                    EditorGUILayout.BeginHorizontal();
-                    existingEntrance.targetX = EditorGUILayout.IntField("X", existingEntrance.targetX);
-                    existingEntrance.targetY = EditorGUILayout.IntField("Y", existingEntrance.targetY);
-                    EditorGUILayout.EndHorizontal();
-
-                    existingEntrance.targetDirection = (Direction)EditorGUILayout.EnumPopup("Face Dir", existingEntrance.targetDirection);
-
-                    GUILayout.Space(10);
-                    GUI.backgroundColor = new Color(1f, 0.5f, 0.5f);
-                    if (GUILayout.Button("Remove Entrance"))
-                    {
-                        mapData.entrances.Remove(existingEntrance);
-                        GUI.FocusControl(null); // 포커스 해제
-                        GUI.changed = true;
-                    }
-                    EditorGUILayout.EndVertical();
-                    GUI.backgroundColor = Color.white;
-                }
-                else
-                {
-                    // 입구 추가 버튼
-                    if (GUILayout.Button("Add Entrance Portal"))
-                    {
-                        EntranceData newEntrance = new EntranceData
-                        {
-                            type = EntranceType.Map,
-                            sourceX = selectedCell.x,
-                            sourceY = selectedCell.y,
-                            isWallEntrance = true,
-                            isWorldMap = false,
-                            destinationID = "NewDestination",
-                            targetX = 1,
-                            targetY = 1,
-                            targetDirection = Direction.North
-                        };
-                        mapData.entrances.Add(newEntrance);
-                        GUI.changed = true;
-                    }
-                }
-
-                // 고정 오브젝트 설정
-                GUILayout.Space(15);
-                GUILayout.Label("Static Object Settings", EditorStyles.boldLabel);
-
-                // 중앙 오브젝트
-                selectedCell.centerObjectID = EditorGUILayout.IntField("Center Obj ID", selectedCell.centerObjectID);
-
-
-                GUILayout.Space(5);
-                GUILayout.Label("Face Objects (Wall Decor)", EditorStyles.miniBoldLabel);
-
-                // 4방향 면 오브젝트 입력 필드
-                selectedCell.faceObjectIDs[0] = EditorGUILayout.IntField("↑ Face Obj (N)", selectedCell.faceObjectIDs[0]);
-                selectedCell.faceObjectIDs[1] = EditorGUILayout.IntField("→ Face Obj (E)", selectedCell.faceObjectIDs[1]);
-                selectedCell.faceObjectIDs[2] = EditorGUILayout.IntField("↓ Face Obj (S)", selectedCell.faceObjectIDs[2]);
-                selectedCell.faceObjectIDs[3] = EditorGUILayout.IntField("← Face Obj (W)", selectedCell.faceObjectIDs[3]);
-
-                // 맵 오브젝트 상호작용(Interaction) 설정 UI
-                GUILayout.Space(15);
-                GUILayout.Label("Object Interaction Settings", EditorStyles.boldLabel);
-                
-                // 토글 스위치: 상호작용 가능 여부
-                selectedCell.canInteract = EditorGUILayout.Toggle("Can Interact", selectedCell.canInteract);
-                
-                // canInteract가 True일 때만 세부 설정 창을 펼쳐서 에디터 공간을 깔끔하게 유지합니다.
-                if (selectedCell.canInteract)
-                {
-                    EditorGUILayout.BeginVertical("box");
-                    
-                    // 1. 발동 조건 (선행 플래그)
-                    GUILayout.Label("[ Condition ]", EditorStyles.boldLabel);
-                    selectedCell.interactReqFlag = EditorGUILayout.TextField("Required Flag", selectedCell.interactReqFlag);
-                    if (!string.IsNullOrEmpty(selectedCell.interactReqFlag))
-                    {
-                        selectedCell.interactReqFlagState = EditorGUILayout.Toggle("  ↳ Required State", selectedCell.interactReqFlagState);
-                    }
-                    
-                    EditorGUILayout.Space();
-                    
-                    // 2. 결과 및 상태 영구 저장
-                    GUILayout.Label("[ Result / Save State ]", EditorStyles.boldLabel);
-                    selectedCell.interactSetFlag = EditorGUILayout.TextField("Set Flag (Save)", selectedCell.interactSetFlag);
-                    if (!string.IsNullOrEmpty(selectedCell.interactSetFlag))
-                    {
-                        selectedCell.interactSetFlagState = EditorGUILayout.Toggle("  ↳ Target State", selectedCell.interactSetFlagState);
-                    }
-                    
-                    EditorGUILayout.Space();
-                    
-                    // 3. 시각적 변화 및 실행될 이벤트
-                    GUILayout.Label("[ Visual & Event ]", EditorStyles.boldLabel);
-                    // 변경 전(Target) 텍스처 입력 필드 추가
-                    selectedCell.interactTargetTexID = EditorGUILayout.IntField("Target Object ID", selectedCell.interactTargetTexID);
-                    selectedCell.interactChangeObjectID = EditorGUILayout.IntField("Change Object ID", selectedCell.interactChangeObjectID);
-                    
-                    EditorGUILayout.Space();
-                    selectedCell.interactEventID = EditorGUILayout.TextField("Trigger Event ID", selectedCell.interactEventID);
-                    
-                    // 이벤트 ID가 비어있을 때만 단순 시스템 메시지 입력창을 보여줍니다.
-                    if (string.IsNullOrEmpty(selectedCell.interactEventID))
-                    {
-                        selectedCell.interactSystemMessage = EditorGUILayout.TextField("Fallback Message", selectedCell.interactSystemMessage);
-                    }
-                    
-                    EditorGUILayout.EndVertical();
-                }
-            }
-            else
-            {
-                GUILayout.Label("Select a cell to edit.");
-            }
-        }
-        else
-        {
-            GUILayout.Label("Select a cell to edit.");
-        }
-
-        EditorGUILayout.EndVertical();
-    }
-
-    // 맵 리사이징 UI를 그리는 메서드
-    void DrawMapResizeTools()
-    {
-        EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
-        GUILayout.Label("Map Resize", EditorStyles.boldLabel, GUILayout.Width(80));
-
-        // 가로 (Left / Right)
-        GUILayout.Label("Left:", GUILayout.Width(30));
-        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(25))) ResizeMap(1, 0, 0, 0);
-        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(25))) ResizeMap(-1, 0, 0, 0);
-
-        GUILayout.Space(10);
-        GUILayout.Label("Right:", GUILayout.Width(35));
-        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(25))) ResizeMap(0, 1, 0, 0);
-        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(25))) ResizeMap(0, -1, 0, 0);
-
-        // 세로 (Top / Bottom)
-        GUILayout.Space(15);
-        GUILayout.Label("Top:", GUILayout.Width(30));
-        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(25))) ResizeMap(0, 0, 0, 1);
-        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(25))) ResizeMap(0, 0, 0, -1);
-
-        GUILayout.Space(10);
-        GUILayout.Label("Bottom:", GUILayout.Width(50));
-        if (GUILayout.Button("+", EditorStyles.miniButtonLeft, GUILayout.Width(25))) ResizeMap(0, 0, 1, 0);
-        if (GUILayout.Button("-", EditorStyles.miniButtonRight, GUILayout.Width(25))) ResizeMap(0, 0, -1, 0);
-
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
-    }
-
-    // 기존 데이터를 유지한 상태로 2차원 배열 크기를 변경하는 로직
-    void ResizeMap(int leftDelta, int rightDelta, int bottomDelta, int topDelta)
-    {
-        if (mapData == null) return;
-
-        int newWidth = mapData.width + leftDelta + rightDelta;
-        int newHeight = mapData.height + bottomDelta + topDelta;
-
-        // 1x1 이하로는 줄일 수 없음
-        if (newWidth < 1 || newHeight < 1)
-        {
-            Debug.LogWarning("[DungeonEditor] 맵 크기는 1x1보다 작아질 수 없습니다.");
-            return;
-        }
-
-        CellData[] newCells = new CellData[newWidth * newHeight];
-
-        for (int nx = 0; nx < newWidth; nx++)
-        {
-            for (int ny = 0; ny < newHeight; ny++)
-            {
-                int oldX = nx - leftDelta;
-                int oldY = ny - bottomDelta;
-                int newIndex = ny * newWidth + nx;
-
-                // 기존 맵 데이터 영역 안이라면 복사 후 좌표만 갱신
-                if (oldX >= 0 && oldX < mapData.width && oldY >= 0 && oldY < mapData.height)
-                {
-                    CellData oldCell = mapData.cells[oldY * mapData.width + oldX];
-                    oldCell.x = nx;
-                    oldCell.y = ny;
-                    newCells[newIndex] = oldCell;
-                }
-                else
-                {
-                    // 영역을 벗어난 새로운 공간이라면 빈 셀로 초기화
-                    newCells[newIndex] = new CellData { x = nx, y = ny };
-                }
-            }
-        }
-
-        // 데이터 덮어쓰기 및 에디터 UI 동기화
-        mapData.cells = newCells;
-        mapData.width = newWidth;
-        mapData.height = newHeight;
-        inputWidth = newWidth;
-        inputHeight = newHeight;
-
-        // 플레이어 시작 위치 시프트 및 맵 밖으로 나가는 것 방지
-        mapData.startX = Mathf.Clamp(mapData.startX + leftDelta, 0, newWidth - 1);
-        mapData.startY = Mathf.Clamp(mapData.startY + bottomDelta, 0, newHeight - 1);
-        inputStartX = mapData.startX;
-        inputStartY = mapData.startY;
-
-        // 입구 좌표 시프트 연산
-        if (mapData.entrances != null)
-        {
-            for (int i = mapData.entrances.Count - 1; i >= 0; i--)
-            {
-                var ent = mapData.entrances[i];
-                ent.sourceX += leftDelta;
-                ent.sourceY += bottomDelta;
-                
-                // 만약 맵을 축소하다가 포탈이 잘려나갔다면 삭제 처리
-                if (ent.sourceX < 0 || ent.sourceX >= newWidth || ent.sourceY < 0 || ent.sourceY >= newHeight)
-                {
-                    mapData.entrances.RemoveAt(i);
-                }
-            }
-        }
-
-        // 변경 사항 반영을 위한 초기화 및 갱신
-        selectedCells.Clear();
-        selectedCell = null;
-        UpdateVisualizer();
-        GUI.FocusControl(null); 
-        GUI.changed = true;
-    }
-
-    void DrawBatchFloorTexField()
-    {
-        int firstVal = selectedCells[0].floorTexIdx;
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.floorTexIdx != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        int newVal = EditorGUILayout.IntField("Floor Tex ID", isMixed ? -1 : firstVal);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.floorTexIdx = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
-    }
-
-    void DrawBatchCeilTexField()
-    {
-        int firstVal = selectedCells[0].ceilTexIdx;
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.ceilTexIdx != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        int newVal = EditorGUILayout.IntField("Ceil Tex ID", isMixed ? -1 : firstVal);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.ceilTexIdx = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
-    }
-
-    // 상호작용 설정 일괄 적용 헬퍼
-    void DrawBatchInteractionFields()
-    {
-        // 1. Can Interact 일괄 토글
-        bool firstCanInteract = selectedCells[0].canInteract;
-        bool isMixedInteract = false;
-        foreach (var c in selectedCells)
-            if (c.canInteract != firstCanInteract) { isMixedInteract = true; break; }
-
-        EditorGUI.showMixedValue = isMixedInteract;
-        EditorGUI.BeginChangeCheck();
-        bool newCanInteract = EditorGUILayout.Toggle("Can Interact", isMixedInteract ? false : firstCanInteract);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.canInteract = newCanInteract;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
-
-        // 일괄 적용된 상태가 모두 True일 때만 세부 설정 노출
-        if (!isMixedInteract && newCanInteract)
-        {
-            EditorGUILayout.BeginVertical("box");
-            
-            // Target Object ID 일괄 적용
-            int firstTargetID = selectedCells[0].interactTargetTexID;
-            bool isMixedTargetID = false;
-            foreach (var c in selectedCells)
-                if (c.interactTargetTexID != firstTargetID) { isMixedTargetID = true; break; }
-            
-            EditorGUI.showMixedValue = isMixedTargetID;
-            EditorGUI.BeginChangeCheck();
-            int newTargetID = EditorGUILayout.IntField("Target Object ID", isMixedTargetID ? -1 : firstTargetID);
-            if (EditorGUI.EndChangeCheck())
-            {
-                foreach (var c in selectedCells) c.interactTargetTexID = newTargetID;
-                GUI.changed = true;
-            }
-            EditorGUI.showMixedValue = false;
-
-            // Change Object ID 일괄 적용
-            int firstChangeID = selectedCells[0].interactChangeObjectID;
-            bool isMixedChangeID = false;
-            foreach (var c in selectedCells)
-                if (c.interactChangeObjectID != firstChangeID) { isMixedChangeID = true; break; }
-                
-            EditorGUI.showMixedValue = isMixedChangeID;
-            EditorGUI.BeginChangeCheck();
-            int newChangeID = EditorGUILayout.IntField("Change Object ID", isMixedChangeID ? -1 : firstChangeID);
-            if (EditorGUI.EndChangeCheck())
-            {
-                foreach (var c in selectedCells) c.interactChangeObjectID = newChangeID;
-                GUI.changed = true;
-            }
-            EditorGUI.showMixedValue = false;
-
-            // Fallback Message 일괄 적용
-            string firstMsg = selectedCells[0].interactSystemMessage;
-            bool isMixedMsg = false;
-            foreach (var c in selectedCells)
-                if (c.interactSystemMessage != firstMsg) { isMixedMsg = true; break; }
-            
-            EditorGUI.showMixedValue = isMixedMsg;
-            EditorGUI.BeginChangeCheck();
-            string newMsg = EditorGUILayout.TextField("Fallback Message", isMixedMsg ? "" : firstMsg);
-            if (EditorGUI.EndChangeCheck())
-            {
-                foreach (var c in selectedCells) c.interactSystemMessage = newMsg;
-                GUI.changed = true;
-            }
-            EditorGUI.showMixedValue = false;
-
-            EditorGUILayout.EndVertical();
+            EditorGUILayout.LabelField(string.IsNullOrEmpty(currentFilePath) ? "새 문서 · 첫 저장 시 파일을 지정합니다." : currentFilePath, EditorStyles.miniLabel);
+            if (File.Exists(RecoveryPath) && GUILayout.Button("복구본 열기", GUILayout.Width(100))) Later(() => LoadMap(RecoveryPath, true));
         }
     }
-
-    // 중앙 고정 오브젝트 일괄 적용 헬퍼
-    void DrawBatchCenterObjectField()
+    private void OpenMapPicker()
     {
-        int firstVal = selectedCells[0].centerObjectID;
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.centerObjectID != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        int newVal = EditorGUILayout.IntField("Center Obj ID", isMixed ? -1 : firstVal);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.centerObjectID = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
+        var entries = index.maps.ToArray();
+        DungeonMapChoiceWindow.Show("맵 열기", entries.Select(m => m.Label).ToArray(), i => Later(() => LoadMap(entries[i].path)));
     }
-
-    // 벽면 고정 오브젝트 4방향 일괄 적용 헬퍼
-    void DrawBatchFaceObjectField(string label, int faceIdx)
+    private void LoadMap(string path, bool recovery = false)
     {
-        int firstVal = selectedCells[0].faceObjectIDs[faceIdx];
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.faceObjectIDs[faceIdx] != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        int newVal = EditorGUILayout.IntField(label, isMixed ? -1 : firstVal);
-        if (EditorGUI.EndChangeCheck())
-        {
-            foreach (var c in selectedCells) c.faceObjectIDs[faceIdx] = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
+        // 파일 읽기/구조 검사가 끝난 뒤에만 현재 문서의 저장 여부를 물어봅니다.
+        string json = File.ReadAllText(path);
+        if (!DungeonMapEditing.TryRead(json, out var candidate, out var error)) { status = error; return; }
+        if (!ConfirmDocumentChange()) return;
+        string assetPath = recovery ? null : DungeonMapFileIO.AssetPath(path);
+        ReplaceDocument(candidate, assetPath, json, !string.IsNullOrEmpty(assetPath));
+        status = recovery ? "복구본을 열었습니다. 다른 이름으로 저장하세요." : "맵을 열었습니다.";
     }
-
-    // 방향별 "mixed" 상태를 표시하고 일괄 적용하는 헬퍼
-    void DrawBatchWallField(string label, int dirIdx)
+    private void OpenNewMap()
     {
-        // 선택된 셀들의 값이 모두 같은지 확인
-        int firstVal = selectedCells[0].wallTextureIDs[dirIdx];
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.wallTextureIDs[dirIdx] != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        int newVal = EditorGUILayout.IntField(label, isMixed ? 0 : firstVal);
-        if (EditorGUI.EndChangeCheck())
+        DungeonMapCreateWindow.Show(index.themes.ToArray(), (w, h, id, location, theme, ceil) =>
         {
-            foreach (var c in selectedCells)
-                c.wallTextureIDs[dirIdx] = newVal;
-            GUI.changed = true;
-        }
-        EditorGUI.showMixedValue = false;
+            if (this == null) return false;
+            if (index.HasIdentityConflict(id, null)) { status = "이미 사용 중인 맵 ID입니다."; return false; }
+            if (!ConfirmDocumentChange()) return false;
+            ReplaceDocument(DungeonMapEditing.Create(w, h, id, location, theme != null ? theme.themeID : "", ceil), "", "", false);
+            status = "새 맵을 만들었습니다. 왼쪽 팔레트에서 재료를 선택하세요.";
+            return true;
+        });
     }
-
-    void DrawBatchValueField()
+    private bool SaveMap(bool saveAs)
     {
-        int firstVal = selectedCells[0].value;
-        bool isMixed = false;
-        foreach (var c in selectedCells)
-            if (c.value != firstVal) { isMixed = true; break; }
-
-        EditorGUI.showMixedValue = isMixed;
-        EditorGUI.BeginChangeCheck();
-        int newVal = EditorGUILayout.IntField("Value", isMixed ? 0 : firstVal);
-        if (EditorGUI.EndChangeCheck())
+        try { return SaveMapCore(saveAs); }
+        catch (Exception ex) { status = "저장 실패 — 현재 문서는 유지됩니다: " + ex.Message; return false; }
+    }
+    private bool SaveMapCore(bool saveAs)
+    {
+        FinishGesture();
+        if (!DungeonMapEditing.CheckStructure(Map, out var error)) { status = error; return false; }
+        var candidate = DungeonMapEditing.Clone(Map);
+        string path = currentFilePath;
+        if (saveAs || string.IsNullOrEmpty(path) || Path.GetFileNameWithoutExtension(path) != candidate.mapID)
         {
-            foreach (var c in selectedCells) c.value = newVal;
-            GUI.changed = true;
+            string id = DungeonMapFileIO.ValidID(candidate.mapID) ? candidate.mapID : "NewMap";
+            path = EditorUtility.SaveFilePanelInProject("맵 저장", id, "json", "파일명이 맵 ID가 됩니다.", "Assets/Database/Dungeons/Levels");
+            if (string.IsNullOrEmpty(path)) return false;
+            string oldID = candidate.mapID;
+            candidate.mapID = Path.GetFileNameWithoutExtension(path);
+            if (oldID != candidate.mapID)
+                foreach (var e in candidate.entrances)
+                    if (e.type == EntranceType.Map && !e.isWorldMap && e.destinationID == oldID) e.destinationID = candidate.mapID;
         }
-        EditorGUI.showMixedValue = false;
+        if (!DungeonMapFileIO.ValidID(candidate.mapID)) { status = "파일명으로 사용할 수 없는 맵 ID입니다."; return false; }
+        index.Refresh();
+        string assetPath = DungeonMapFileIO.AssetPath(path);
+        if (index.HasIdentityConflict(candidate.mapID, assetPath))
+        { status = "다른 맵과 ID가 중복됩니다. 복사본은 새로운 파일명을 사용하세요."; return false; }
+        if (path == currentFilePath && File.Exists(path) && File.ReadAllText(path) != diskJson)
+        { status = "디스크의 파일이 외부에서 변경되었습니다. 다른 이름으로 저장하거나 다시 열어 비교하세요."; return false; }
+        try
+        {
+            string json = JsonUtility.ToJson(candidate, true);
+            DungeonMapFileIO.WriteAtomic(path, json);
+            if (JsonUtility.ToJson(Map) != JsonUtility.ToJson(candidate)) document.Edit("저장할 맵 ID 변경", _ => document.map = candidate);
+            currentFilePath = assetPath;
+            diskJson = json;
+            savedJson = JsonUtility.ToJson(Map);
+            DeleteRecovery();
+            RefreshState();
+            status = "맵 저장 완료: " + currentFilePath;
+            try
+            {
+                AssetDatabase.ImportAsset(currentFilePath, ImportAssetOptions.ForceUpdate);
+                index.Refresh();
+                ValidateMap();
+                if (!issues.Any(i => i.severity == MessageType.Error))
+                {
+                    DungeonMapEditorIndex.Register(currentFilePath, Theme);
+                    status += " · 카탈로그 등록 완료";
+                }
+                else status += " · 초안으로 저장됨 (검사 오류를 수정한 뒤 게임 등록)";
+            }
+            catch (Exception ex) { status = "JSON 저장 완료 / 게임 등록 실패: " + ex.Message; }
+            return true;
+        }
+        catch (Exception ex) { status = "저장 실패 — 변경 사항은 유지됩니다: " + ex.Message; return false; }
     }
-
-    // UI 입력값을 실제 데이터에 적용하는 헬퍼 함수
-    void ApplyUIToData()
+    private void RegisterMap()
     {
-        if (mapData == null) return;
-
-        mapData.mapID = inputMapID;
-        mapData.locationID = inputLocationID;
-        mapData.themeID = (inputTheme != null) ? inputTheme.themeID : "";
-        mapData.hasCeil = inputHasCeil;
-        
-        mapData.startX = inputStartX;
-        mapData.startY = inputStartY;
-        mapData.startDirection = inputStartDirection;
+        if (hasUnsavedChanges || string.IsNullOrEmpty(currentFilePath))
+        { status = "먼저 맵을 저장하세요."; return; }
+        ValidateMap(true);
+        if (issues.Any(i => i.severity == MessageType.Error)) { status = "검사 오류를 수정한 뒤 등록하세요."; return; }
+        var catalog = DungeonMapEditorIndex.Register(currentFilePath, Theme);
+        Selection.activeObject = catalog;
+        status = "카탈로그 등록 완료. 아래 매니저 프리팹 연결 상태를 확인하세요.";
+    }
+    private void ResizeMap(int width, int height, int offsetX, int offsetY)
+    {
+        if (!DungeonMapEditing.ValidSize(width, height)) { status = "맵 크기는 1~256입니다."; return; }
+        int removed = DungeonMapEditing.CountRemovedEntrances(Map, width, height, offsetX, offsetY);
+        int keptW = Mathf.Max(0, Mathf.Min(Map.width, width - offsetX) - Mathf.Max(0, -offsetX));
+        int keptH = Mathf.Max(0, Mathf.Min(Map.height, height - offsetY) - Mathf.Max(0, -offsetY));
+        int removedCells = Map.cells.Length - keptW * keptH;
+        if (removedCells > 0 && !EditorUtility.DisplayDialog("맵 크기 변경",
+            $"타일 {removedCells}개와 입구 {removed}개가 삭제됩니다. 시작점이 잘리면 맵 안으로 이동합니다.\n실행 취소로 복원할 수 있습니다.", "변경", "취소")) return;
+        if (offsetX != 0 || offsetY != 0)
+        {
+            var inbound = index.maps.Where(m => m.path != currentFilePath && m.map.entrances.Any(e =>
+                e.type == EntranceType.Map && !e.isWorldMap && e.destinationID == Map.mapID && (e.targetX >= 0 || e.targetY >= 0))).ToArray();
+            if (inbound.Length > 0 && !EditorUtility.DisplayDialog("다른 맵의 도착 좌표 확인",
+                "좌표 이동 후 아래 맵의 입구 도착점을 다시 확인해야 합니다:\n" + string.Join("\n", inbound.Select(m => m.Key)), "계속", "취소")) return;
+        }
+        Edit("맵 크기 변경", _ => document.map = DungeonMapEditing.Resize(Map, width, height, offsetX, offsetY));
+        selection.Clear(); RefreshState();
+    }
+    private void GenerateMaze()
+    {
+        if (Map.width < 3 || Map.height < 3 || Map.width > 255 || Map.height > 255 || !DungeonMapValidation.TextureValid(Theme, 0))
+        { status = "미로는 크기 3~255, 기본 벽 텍스처 0이 있는 테마가 필요합니다."; return; }
+        if (!EditorUtility.DisplayDialog("무작위 미로", "타일·입구·이벤트를 새 미로로 바꿉니다. 짝수 크기는 다음 홀수가 됩니다. 실행 취소로 복원할 수 있습니다.", "생성", "취소")) return;
+        var maze = Generator.DungeonGenerator.GenerateRandomMaze(Map.width, Map.height, Map.mapID, Map.themeID);
+        maze.locationID = Map.locationID; maze.hasCeil = Map.hasCeil;
+        Edit("무작위 미로 생성", _ => document.map = maze);
+        selection.Clear(); RefreshState();
+    }
+    private void OpenPreview()
+    {
+        ValidateMap();
+        if (Theme == null) { status = "테마를 먼저 선택하세요."; return; }
+        var p = Active != null ? new Vector2Int(Active.x, Active.y) : new Vector2Int(Map.startX, Map.startY);
+        DungeonMapPreviewWindow.Open(Map, Theme, p);
     }
 }

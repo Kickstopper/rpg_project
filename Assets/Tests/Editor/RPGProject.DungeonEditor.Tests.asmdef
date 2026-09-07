@@ -1,0 +1,7 @@
+{
+    "name": "RPGProject.DungeonEditor.Tests",
+    "references": ["RPGProject.Editor", "RPGProject.Runtime"],
+    "includePlatforms": ["Editor"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "autoReferenced": false
+}

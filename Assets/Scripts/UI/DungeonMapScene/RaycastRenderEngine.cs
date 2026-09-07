@@ -225,7 +225,14 @@ namespace UI.DungeonMapScene
         // ================= 메인 렌더링 루프 =================
         public void RenderFrame(DungeonPlayer player, RenderSettings settings)
         {
-            settings.animTime = Time.time;
+            RenderFrame(player, settings,
+                ManagerRoot.GameSetting != null && ManagerRoot.GameSetting.useAnaglyph, Time.time);
+        }
+
+        // 에디터에서도 같은 렌더러를 쓰도록 외부 상태를 인자로 받습니다.
+        public void RenderFrame(DungeonPlayer player, RenderSettings settings, bool useAnaglyph, float animationTime)
+        {
+            settings.animTime = animationTime;
 
             Array.Clear(_buffer, 0, _buffer.Length);
             
@@ -233,7 +240,7 @@ namespace UI.DungeonMapScene
             for (int i = 0; i < _depthBuffer.Length; i++) _depthBuffer[i] = 10000f;
             for (int i = 0; i < _zBuffer1D.Length; i++) _zBuffer1D[i] = 10000f;
 
-            if (ManagerRoot.GameSetting.useAnaglyph)
+            if (useAnaglyph)
             {
                 RenderStereo(player, settings);
             }
@@ -242,10 +249,7 @@ namespace UI.DungeonMapScene
                 PerformPass(player, settings, 1, false);
             }
 
-            ScreenTexture.LoadRawTextureData(
-                System.Runtime.InteropServices.Marshal.UnsafeAddrOfPinnedArrayElement(_buffer, 0),
-                _buffer.Length * 4
-            );
+            ScreenTexture.SetPixels32(_buffer);
             ScreenTexture.Apply();
         }
 
