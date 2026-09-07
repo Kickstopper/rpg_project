@@ -19,11 +19,11 @@ namespace Manager
 
         void LoadData()
         {
-            ParseCSVToDatabase(eventScriptsCSV, "일반 대화");
+            ParseCSVToDatabase(eventScriptsCSV, "일반 대화", true);
             ParseCSVToDatabase(negotiationCSV, "교섭 대화");
         }
 
-        void ParseCSVToDatabase(TextAsset csvFile, string logName)
+        void ParseCSVToDatabase(TextAsset csvFile, string logName, bool useDialogueCsv = false)
         {
             if (csvFile == null)
             {
@@ -31,7 +31,16 @@ namespace Manager
                 return;
             }
 
-            var parsedData = CSVReader.Read(csvFile);
+            List<Dictionary<string, string>> parsedData;
+            try
+            {
+                parsedData = useDialogueCsv ? DialogueCsv.Read(csvFile.text) : CSVReader.Read(csvFile);
+            }
+            catch (System.FormatException ex)
+            {
+                Debug.LogError($"[{logName}] {csvFile.name}: {ex.Message}");
+                return;
+            }
             int rowCount = 0;
 
             foreach (var row in parsedData)
