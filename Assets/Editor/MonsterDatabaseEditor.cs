@@ -1,383 +1,400 @@
-using UnityEngine;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Data;
+using MonsterEditing;
 using UnityEditor;
+using UnityEngine;
 
 public class MonsterDatabaseEditor : EditorWindow
 {
-    private MonsterDatabase database;
+    [SerializeField] private MonsterDatabase database;
+    [SerializeField] private int selectedIndex;
+    [SerializeField] private string search = "";
+    [SerializeField] private bool bossesOnly, ascending = true, autoPlay = true;
+    [SerializeField] private float zoom = 1f;
+    [SerializeField] private Color previewBackground = new Color(0.15f, 0.16f, 0.18f);
+    private enum SortType { Original, Name, Race, Level, Gender }
+    [SerializeField] private SortType sort = SortType.Original;
     private SerializedObject serializedDB;
     private SerializedProperty entriesProp;
-    private Vector2 scrollPosition;
-    private bool showAnimImages = true; // 이미지 표시 여부를 결정하는 변수
-    private enum SortType { None, Race, Level, Gender } // 정렬 상태를 저장하기 위한 변수들
-    private SortType currentSortType = SortType.None;
-    private bool sortAscending = true;
+    private Vector2 listScroll, detailScroll, frameScroll, previewScroll;
+    private readonly List<int> visible = new List<int>();
+    private readonly HashSet<string> duplicateIds = new HashSet<string>();
+    private MonsterPreviewClock clock;
+    private Sprite[] previewFrames = Array.Empty<Sprite>();
+    private Vector2 canvasPixels = Vector2.one;
+    private float configuredInterval;
+    private double nextUpdate, nextLoadingRefresh;
+    private int previewSource;
+    private bool loadingPreview;
+    private string notice = "";
+    private static readonly string[] SortLabels = { "등록 순서", "이름", "종족", "레벨", "성별" };
+    private static readonly string[] SourceFields = { "image", "fallDownImgs", "downImgs", "leftImgs", "rightImgs", "upImgs" };
+    private static readonly string[] SourceLabels = { "기본 / 전투", "넘어짐 (참고)", "아래 이동 (참고)", "왼쪽 이동 (참고)", "오른쪽 이동 (참고)", "위 이동 (참고)" };
+    private static readonly HashSet<string> MainFields = new HashSet<string>
+    { "id", "name", "isBoss", "race", "align", "gender", "portrait", "image", "animInterval", "fallDownImgs", "downImgs", "leftImgs", "rightImgs", "upImgs" };
+    private MonsterDatabase.MonsterEntry Selected => database != null && database.entries != null && selectedIndex >= 0 && selectedIndex < database.entries.Count ? database.entries[selectedIndex] : null;
 
     [MenuItem("Tools/Monster Database Editor")]
-    public static void ShowWindow()
-    {
-        var window = GetWindow<MonsterDatabaseEditor>("Monster DB Editor");
-        window.minSize = new Vector2(1200, 600); 
-        window.Show();
-    }
+    public static void ShowWindow() => GetWindow<MonsterDatabaseEditor>("몬스터 DB").Show();
 
     private void OnEnable()
     {
-        FindDatabase();
-        showAnimImages = EditorPrefs.GetBool("MonsterDBEditor_ShowAnimImages", true);
+        minSize = new Vector2(980, 650);
+        clock = new MonsterPreviewClock();
+        if (database == null)
+        {
+            database = AssetDatabase.LoadAssetAtPath<MonsterDatabase>("Assets/Database/MonsterDatabase.asset");
+            if (database == null)
+            {
+                string guid = AssetDatabase.FindAssets("t:MonsterDatabase").OrderBy(g => g).FirstOrDefault();
+                if (guid != null) database = AssetDatabase.LoadAssetAtPath<MonsterDatabase>(AssetDatabase.GUIDToAssetPath(guid));
+            }
+        }
+        BindDatabase(database);
+        EditorApplication.update += EditorTick;
+        EditorApplication.projectChanged += OnProjectChanged;
+        Undo.undoRedoPerformed += OnUndo;
     }
 
     private void OnDisable()
     {
-        EditorPrefs.SetBool("MonsterDBEditor_ShowAnimImages", showAnimImages);
+        EditorApplication.update -= EditorTick;
+        EditorApplication.projectChanged -= OnProjectChanged;
+        Undo.undoRedoPerformed -= OnUndo;
+        serializedDB?.Dispose(); serializedDB = null; entriesProp = null;
+        // AssetPreview textures and Sprite textures are owned by Unity; never destroy them here.
     }
 
-    private void FindDatabase()
+    private void BindDatabase(MonsterDatabase next)
     {
-        string[] guids = AssetDatabase.FindAssets("t:MonsterDatabase");
-        if (guids.Length > 0)
+        serializedDB?.Dispose(); serializedDB = null; entriesProp = null;
+        database = next;
+        if (database != null)
         {
-            string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-            database = AssetDatabase.LoadAssetAtPath<MonsterDatabase>(path);
-            if (database != null)
-            {
-                serializedDB = new SerializedObject(database);
-                entriesProp = serializedDB.FindProperty("entries");
-            }
+            serializedDB = new SerializedObject(database);
+            entriesProp = serializedDB.FindProperty("entries");
+            selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, entriesProp.arraySize - 1));
         }
+        RebuildList(); ConfigurePreview(true, true); Repaint();
+    }
+
+    private void OnProjectChanged()
+    {
+        // Preserve the selected database and pause state after unrelated asset imports.
+        if (database == null) { BindDatabase(null); return; }
+        OnUndo();
+    }
+    private void OnUndo()
+    {
+        if (serializedDB != null) serializedDB.Update();
+        if (database != null && database.entries != null) selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, database.entries.Count - 1));
+        RebuildList(); ConfigurePreview(true, false); Repaint();
+    }
+
+    private void RebuildList()
+    {
+        visible.Clear(); duplicateIds.Clear();
+        if (database == null || database.entries == null) return;
+        foreach (var group in database.entries.Where(e => e != null && !string.IsNullOrEmpty(e.id)).GroupBy(e => e.id))
+            if (group.Count() > 1) duplicateIds.Add(group.Key);
+        for (int i = 0; i < database.entries.Count; i++)
+        {
+            var e = database.entries[i];
+            if (e == null) { if (!bossesOnly && string.IsNullOrEmpty(search)) visible.Add(i); continue; }
+            if (bossesOnly && !e.isBoss) continue;
+            string text = (e.name ?? "") + " " + e.id + " " + e.race;
+            if (!string.IsNullOrEmpty(search) && text.IndexOf(search, StringComparison.OrdinalIgnoreCase) < 0) continue;
+            visible.Add(i);
+        }
+        visible.Sort((a, b) =>
+        {
+            var left = database.entries[a]; var right = database.entries[b];
+            int compare = 0;
+            if (left == null || right == null) compare = left == right ? 0 : left == null ? 1 : -1;
+            else switch (sort)
+            {
+                case SortType.Name: compare = string.Compare(left.name, right.name, StringComparison.Ordinal); break;
+                case SortType.Race: compare = left.race.CompareTo(right.race); break;
+                case SortType.Level: compare = left.stats.level.CompareTo(right.stats.level); break;
+                case SortType.Gender: compare = left.gender.CompareTo(right.gender); break;
+            }
+            if (compare != 0) return ascending ? compare : -compare;
+            return a.CompareTo(b); // Stable ties; database storage order never changes.
+        });
+    }
+
+    private Sprite[] FramesFor(MonsterDatabase.MonsterEntry entry)
+    {
+        if (entry == null) return Array.Empty<Sprite>();
+        switch (previewSource)
+        {
+            case 1: return entry.fallDownImgs ?? Array.Empty<Sprite>();
+            case 2: return entry.downImgs ?? Array.Empty<Sprite>();
+            case 3: return entry.leftImgs ?? Array.Empty<Sprite>();
+            case 4: return entry.rightImgs ?? Array.Empty<Sprite>();
+            case 5: return entry.upImgs ?? Array.Empty<Sprite>();
+            default: return entry.image ?? Array.Empty<Sprite>();
+        }
+    }
+
+    private void ConfigurePreview(bool resetFrame, bool useAutoPlay)
+    {
+        if (clock == null) clock = new MonsterPreviewClock();
+        var entry = Selected;
+        Sprite[] frames = FramesFor(entry);
+        previewFrames = (Sprite[])frames.Clone();
+        canvasPixels = Vector2.one;
+        foreach (Sprite sprite in previewFrames)
+            if (sprite != null) canvasPixels = Vector2.Max(canvasPixels, sprite.rect.size);
+        configuredInterval = entry == null ? 0 : entry.animInterval;
+        clock.Configure(previewFrames.Length, configuredInterval, EditorApplication.timeSinceStartup, resetFrame);
+        if (useAutoPlay) clock.SetPlaying(autoPlay, EditorApplication.timeSinceStartup);
+        loadingPreview = false;
+    }
+
+    private void EditorTick()
+    {
+        if (database == null || clock == null || EditorApplication.isCompiling) return;
+        double now = EditorApplication.timeSinceStartup;
+        if (now < nextUpdate) return;
+        nextUpdate = now + 1.0 / 60.0;
+        Sprite[] current = FramesFor(Selected);
+        bool changed = current.Length != previewFrames.Length;
+        for (int i = 0; !changed && i < current.Length; i++) changed = current[i] != previewFrames[i];
+        float interval = Selected == null ? 0 : Selected.animInterval;
+        if (changed || !interval.Equals(configuredInterval))
+        {
+            ConfigurePreview(changed, false); Repaint();
+        }
+        bool loadingRefresh = loadingPreview && now >= nextLoadingRefresh;
+        if (loadingRefresh) nextLoadingRefresh = now + 0.1;
+        if (clock.Tick(now) || loadingRefresh) Repaint();
+    }
+
+    private void Mutate(string label, Action action)
+    {
+        if (database == null || EditorApplication.isPlaying) return;
+        serializedDB.ApplyModifiedProperties();
+        Undo.RegisterCompleteObjectUndo(database, label);
+        action(); EditorUtility.SetDirty(database);
+        serializedDB.Update(); RebuildList(); ConfigurePreview(true, true);
+        int selectedRow = visible.IndexOf(selectedIndex);
+        if (selectedRow >= 0) listScroll.y = selectedRow * 49;
+        Repaint();
     }
 
     private void OnGUI()
     {
-        EditorGUILayout.Space();
-        
-        // --- [상단 컨트롤 패널] ---
-        EditorGUILayout.BeginHorizontal();
-        GUILayout.Label("Monster DB", EditorStyles.boldLabel, GUILayout.Width(80));
-        
-        EditorGUI.BeginChangeCheck();
-        database = (MonsterDatabase)EditorGUILayout.ObjectField(database, typeof(MonsterDatabase), false, GUILayout.Width(200));
-        if (EditorGUI.EndChangeCheck() && database != null)
+        using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
         {
-            serializedDB = new SerializedObject(database);
-            entriesProp = serializedDB.FindProperty("entries");
-        }
-        
-        if (GUILayout.Button("Refresh", GUILayout.Width(60)))
-        {
-            FindDatabase();
-        }
-        
-        if (GUILayout.Button("Auto Generate IDs", GUILayout.Width(130)))
-        {
-            if (database != null)
+            EditorGUI.BeginChangeCheck();
+            var chosen = (MonsterDatabase)EditorGUILayout.ObjectField(database, typeof(MonsterDatabase), false, GUILayout.Width(245));
+            if (EditorGUI.EndChangeCheck()) { selectedIndex = 0; BindDatabase(chosen); }
+            if (GUILayout.Button("새로고침", EditorStyles.toolbarButton, GUILayout.Width(75))) BindDatabase(database);
+            using (new EditorGUI.DisabledScope(database == null))
+                if (GUILayout.Button("에셋 위치", EditorStyles.toolbarButton, GUILayout.Width(75))) EditorGUIUtility.PingObject(database);
+            using (new EditorGUI.DisabledScope(database == null || EditorApplication.isPlaying))
             {
-                database.AutoGenerateIds();
-                serializedDB.Update();
+                if (GUILayout.Button("저장", EditorStyles.toolbarButton, GUILayout.Width(55)))
+                { serializedDB.ApplyModifiedProperties(); AssetDatabase.SaveAssetIfDirty(database); notice = "선택한 몬스터 DB를 저장했습니다."; }
+                if (GUILayout.Button("빈 ID 채우기", EditorStyles.toolbarButton, GUILayout.Width(95)))
+                { Mutate("빈 몬스터 ID 채우기", () => notice = MonsterEditorOperations.FillMissingIds(database.entries) + "개의 빈 ID를 채웠습니다. 기존 ID는 유지됩니다."); GUIUtility.ExitGUI(); }
+            }
+            GUILayout.FlexibleSpace();
+            if (database != null) GUILayout.Label(EditorUtility.IsDirty(database) ? "저장하지 않은 변경 있음" : "저장됨", EditorStyles.miniLabel);
+        }
+        if (!string.IsNullOrEmpty(notice)) EditorGUILayout.HelpBox(notice, MessageType.Info);
+        if (database == null || serializedDB == null || entriesProp == null)
+        { EditorGUILayout.HelpBox("편집할 MonsterDatabase 에셋을 선택하세요.", MessageType.Info); return; }
+        if (EditorApplication.isPlaying) EditorGUILayout.HelpBox("Play Mode에서는 미리보기만 사용할 수 있습니다. 데이터 편집은 Play Mode를 종료한 뒤 진행하세요.", MessageType.Info);
+        serializedDB.Update();
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            DrawList();
+            using (new EditorGUILayout.VerticalScope(GUILayout.MinWidth(340), GUILayout.ExpandWidth(true)))
+            {
+                detailScroll = EditorGUILayout.BeginScrollView(detailScroll);
+                using (new EditorGUI.DisabledScope(EditorApplication.isPlaying)) DrawDetails();
+                EditorGUILayout.EndScrollView();
+            }
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox, GUILayout.Width(330)))
+            {
+                previewScroll = EditorGUILayout.BeginScrollView(previewScroll);
+                DrawAnimationPreview(); EditorGUILayout.EndScrollView();
             }
         }
-
-        GUILayout.Space(15);
-        
-        // --- [정렬(Sort) 툴바] ---
-        GUILayout.Label("Sort By:", EditorStyles.label, GUILayout.Width(50));
-        if (GUILayout.Button("Race" + GetSortArrow(SortType.Race), EditorStyles.miniButtonLeft, GUILayout.Width(60))) SortEntries(SortType.Race);
-        if (GUILayout.Button("Level" + GetSortArrow(SortType.Level), EditorStyles.miniButtonMid, GUILayout.Width(60))) SortEntries(SortType.Level);
-        if (GUILayout.Button("Gender" + GetSortArrow(SortType.Gender), EditorStyles.miniButtonRight, GUILayout.Width(70))) SortEntries(SortType.Gender);
-
-        GUILayout.Space(15);
-
-        // --- [비주얼 토글 버튼] ---
-        EditorGUI.BeginChangeCheck();
-        showAnimImages = GUILayout.Toggle(showAnimImages, "Show Anim Images", "Button", GUILayout.Width(120));
-        if (EditorGUI.EndChangeCheck())
+        if (serializedDB.ApplyModifiedProperties())
         {
-            EditorPrefs.SetBool("MonsterDBEditor_ShowAnimImages", showAnimImages);
-        }
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.Space();
-
-        if (database == null || serializedDB == null)
-        {
-            EditorGUILayout.HelpBox("MonsterDatabase 에셋을 찾을 수 없습니다. 에셋을 할당해주세요.", MessageType.Warning);
-            return;
-        }
-
-        serializedDB.Update();
-
-        // --- [데이터베이스 헤더] ---
-        DrawHeader();
-
-        // --- [데이터 리스트 스크롤 뷰] ---
-        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
-
-        for (int i = 0; i < entriesProp.arraySize; i++)
-        {
-            DrawMonsterEntry(entriesProp.GetArrayElementAtIndex(i), i);
-        }
-
-        EditorGUILayout.EndScrollView();
-
-        serializedDB.ApplyModifiedProperties();
-        
-        // --- [하단 데이터 추가 버튼] ---
-        EditorGUILayout.Space();
-        if (GUILayout.Button("Add New Monster", GUILayout.Height(30)))
-        {
-            entriesProp.arraySize++;
-            serializedDB.ApplyModifiedProperties();
+            RebuildList();
+            // EditorTick detects changes to frames/interval without marking the asset dirty itself.
+            Repaint();
         }
     }
 
-    // 정렬 방향 화살표를 표시하는 헬퍼 함수
-    private string GetSortArrow(SortType type)
+    private void DrawList()
     {
-        if (currentSortType == type)
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox, GUILayout.Width(260)))
         {
-            return sortAscending ? " ▲" : " ▼";
-        }
-        return "";
-    }
-
-    // 실제 데이터를 정렬하는 함수
-    private void SortEntries(SortType type)
-    {
-        if (database == null || database.entries == null) return;
-
-        // 에디터 창에서 수정한 내용을 실제 데이터베이스에 먼저 저장
-        serializedDB.ApplyModifiedProperties();
-
-        // 같은 정렬 버튼을 다시 누르면 정렬 방향(오름차순/내림차순)을 반전시킴
-        if (currentSortType == type)
-        {
-            sortAscending = !sortAscending;
-        }
-        else
-        {
-            currentSortType = type;
-            sortAscending = true; // 새로운 정렬 기준이면 오름차순으로 초기화
-        }
-
-        // 정렬
-        database.entries.Sort((a, b) =>
-        {
-            int result = 0;
-            switch (type)
+            GUILayout.Label("몬스터 선택", EditorStyles.boldLabel);
+            EditorGUI.BeginChangeCheck();
+            search = EditorGUILayout.TextField(search, EditorStyles.toolbarSearchField);
+            using (new EditorGUILayout.HorizontalScope())
             {
-                case SortType.Race:
-                    result = a.race.CompareTo(b.race);
-                    break;
-                case SortType.Level:
-                    float levelA = a.stats.level;
-                    float levelB = b.stats.level;
-                    result = levelA.CompareTo(levelB);
-                    break;
-                case SortType.Gender:
-                    result = a.gender.CompareTo(b.gender);
-                    break;
+                GUILayout.Label("정렬", GUILayout.Width(30));
+                sort = (SortType)EditorGUILayout.Popup((int)sort, SortLabels);
+                ascending = GUILayout.Toggle(ascending, "오름차순", "Button", GUILayout.Width(70));
             }
-
-            // 내림차순일 경우 결과를 반전
-            return sortAscending ? result : -result;
-        });
-
-        // 정렬된 리스트를 유니티가 저장하도록 Dirty 마킹 후 직렬화 데이터 업데이트
-        EditorUtility.SetDirty(database);
-        serializedDB.Update();
-    }
-
-    private void DrawHeader()
-    {
-        EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-        GUILayout.Space(25); 
-        GUILayout.Label("No.", GUILayout.Width(30));
-        GUILayout.Label("Portrait", GUILayout.Width(50));
-        
-        if (showAnimImages)
-        {
-            GUILayout.Label("Anim Images", GUILayout.Width(135)); 
-        }
-        
-        GUILayout.Label("ID", GUILayout.Width(80));
-        GUILayout.Label("Name", GUILayout.Width(120));
-        GUILayout.Label("Boss", GUILayout.Width(40));
-        GUILayout.Label("Lv", GUILayout.Width(30));
-        GUILayout.Label("Race", GUILayout.Width(80));
-        GUILayout.Label("Align", GUILayout.Width(80));
-        GUILayout.Label("Gender", GUILayout.Width(80));
-        GUILayout.FlexibleSpace();
-        GUILayout.Label("Actions", GUILayout.Width(60));
-        EditorGUILayout.EndHorizontal();
-    }
-
-    private void DrawMonsterEntry(SerializedProperty entryProp, int index)
-    {
-        SerializedProperty idProp = entryProp.FindPropertyRelative("id");
-        SerializedProperty nameProp = entryProp.FindPropertyRelative("name");
-        SerializedProperty isBossProp = entryProp.FindPropertyRelative("isBoss");
-        SerializedProperty raceProp = entryProp.FindPropertyRelative("race");
-        SerializedProperty alignProp = entryProp.FindPropertyRelative("align");
-        SerializedProperty genderProp = entryProp.FindPropertyRelative("gender");
-        
-        SerializedProperty portraitProp = entryProp.FindPropertyRelative("portrait");
-        SerializedProperty imageArrayProp = entryProp.FindPropertyRelative("image");
-
-        // 전투 스탯 내의 레벨 프로퍼티 찾기
-        SerializedProperty statsProp = entryProp.FindPropertyRelative("stats");
-        SerializedProperty levelProp = statsProp != null ? statsProp.FindPropertyRelative("level") : null;
-
-        EditorGUILayout.BeginVertical(GUI.skin.box);
-        EditorGUILayout.BeginHorizontal();
-
-        // 접기/펼치기 토글
-        entryProp.isExpanded = EditorGUILayout.Toggle(entryProp.isExpanded, EditorStyles.foldout, GUILayout.Width(15));
-        GUILayout.Label(index.ToString(), GUILayout.Width(30));
-
-        // 썸네일 렌더링
-        EditorGUILayout.BeginHorizontal(GUILayout.Width(50));
-        DrawThumbnail(portraitProp);
-        EditorGUILayout.EndHorizontal();
-
-        if (showAnimImages)
-        {
-            DrawSpriteArrayPreview(imageArrayProp, 135);
-        }
-
-        // 주요 기본 정보
-        EditorGUILayout.PropertyField(idProp, GUIContent.none, GUILayout.Width(80));
-        EditorGUILayout.PropertyField(nameProp, GUIContent.none, GUILayout.Width(120));
-        EditorGUILayout.PropertyField(isBossProp, GUIContent.none, GUILayout.Width(40));
-        
-        // 레벨 필드 노출 (정렬 결과를 바로 볼 수 있도록)
-        if (levelProp != null)
-        {
-            EditorGUILayout.PropertyField(levelProp, GUIContent.none, GUILayout.Width(30));
-        }
-        else
-        {
-            GUILayout.Label("-", GUILayout.Width(30));
-        }
-
-        EditorGUILayout.PropertyField(raceProp, GUIContent.none, GUILayout.Width(80));
-        EditorGUILayout.PropertyField(alignProp, GUIContent.none, GUILayout.Width(80));
-        EditorGUILayout.PropertyField(genderProp, GUIContent.none, GUILayout.Width(80));
-        
-        GUILayout.FlexibleSpace();
-
-        // 삭제 버튼
-        GUI.backgroundColor = new Color(1f, 0.4f, 0.4f);
-        if (GUILayout.Button("X", GUILayout.Width(25)))
-        {
-            entriesProp.DeleteArrayElementAtIndex(index);
-            GUI.backgroundColor = Color.white;
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.EndVertical();
-            return;
-        }
-        GUI.backgroundColor = Color.white;
-
-        EditorGUILayout.EndHorizontal();
-
-        // 항목을 펼쳤을 때 세부 정보 표시
-        if (entryProp.isExpanded)
-        {
-            EditorGUI.indentLevel++;
-            EditorGUILayout.Space();
-            
-            SerializedProperty iterator = entryProp.Copy();
-            SerializedProperty endProperty = iterator.GetEndProperty();
-            iterator.NextVisible(true);
-            
-            do 
+            bossesOnly = EditorGUILayout.ToggleLeft("보스만 보기", bossesOnly);
+            if (EditorGUI.EndChangeCheck()) { RebuildList(); listScroll = Vector2.zero; }
+            GUILayout.Label($"표시 {visible.Count} / 전체 {entriesProp.arraySize}", EditorStyles.miniLabel);
+            listScroll = EditorGUILayout.BeginScrollView(listScroll);
+            const float rowHeight = 49;
+            Rect all = GUILayoutUtility.GetRect(0, Mathf.Max(1, visible.Count * rowHeight), GUILayout.ExpandWidth(true));
+            int first = Mathf.Max(0, Mathf.FloorToInt(listScroll.y / rowHeight) - 1);
+            int last = Mathf.Min(visible.Count, first + Mathf.CeilToInt(position.height / rowHeight) + 2);
+            for (int row = first; row < last; row++)
             {
-                if (SerializedProperty.EqualContents(iterator, endProperty)) break;
-
-                string propName = iterator.name;
-                
-                // 가로에 표시한 속성 제외
-                if (propName == "id" || propName == "name" || propName == "isBoss" || 
-                    propName == "race" || propName == "align" || propName == "gender" || 
-                    propName == "portrait")
+                int index = visible[row]; var entry = database.entries[index];
+                string label = entry == null ? "비어 있는 항목" : $"{(entry.isBoss ? "[보스] " : "")}{entry.name}\n{entry.id} · Lv {entry.stats.level} · {entry.race}";
+                var rect = new Rect(all.x, all.y + row * rowHeight, all.width, rowHeight - 3);
+                if (GUI.Toggle(rect, selectedIndex == index, label, "Button") && selectedIndex != index)
+                { selectedIndex = index; detailScroll = frameScroll = Vector2.zero; ConfigurePreview(true, true); GUI.FocusControl(null); }
+            }
+            EditorGUILayout.EndScrollView();
+            using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
+            {
+                if (GUILayout.Button("＋ 새 몬스터"))
                 {
-                    continue;
+                    Mutate("몬스터 추가", () =>
+                    {
+                        if (database.entries == null) database.entries = new List<MonsterDatabase.MonsterEntry>();
+                        database.entries.Add(MonsterEditorOperations.NewEntry(database.entries));
+                        selectedIndex = database.entries.Count - 1; search = ""; bossesOnly = false;
+                    });
+                    GUIUtility.ExitGUI();
                 }
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    using (new EditorGUI.DisabledScope(Selected == null))
+                        if (GUILayout.Button("선택 항목 복제"))
+                        {
+                            Mutate("몬스터 복제", () => { database.entries.Add(MonsterEditorOperations.Duplicate(Selected, database.entries)); selectedIndex = database.entries.Count - 1; search = ""; bossesOnly = false; });
+                            GUIUtility.ExitGUI();
+                        }
+                    using (new EditorGUI.DisabledScope(entriesProp.arraySize == 0))
+                        if (GUILayout.Button("삭제") && EditorUtility.DisplayDialog("몬스터 삭제", "던전·대화·아이템 등에서 이 ID를 참조할 수 있습니다. 선택한 항목을 삭제할까요? 되돌리기로 복구할 수 있습니다.", "삭제", "취소"))
+                        {
+                            Mutate("몬스터 삭제", () => { database.entries.RemoveAt(selectedIndex); selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, database.entries.Count - 1)); });
+                            GUIUtility.ExitGUI();
+                        }
+                }
+            }
+            EditorGUILayout.HelpBox("정렬은 목록 표시만 바꿉니다. 실제 DB의 순서와 기존 ID는 유지됩니다.", MessageType.None);
+        }
+    }
 
-                EditorGUILayout.PropertyField(iterator, true);
+    private void Property(SerializedProperty entry, string field, string label)
+    {
+        var property = entry.FindPropertyRelative(field);
+        if (property != null) EditorGUILayout.PropertyField(property, new GUIContent(label), true);
+    }
+
+    private void DrawDetails()
+    {
+        if (Selected == null) { EditorGUILayout.HelpBox("목록에서 몬스터를 선택하거나 새 항목을 추가하세요.", MessageType.Info); return; }
+        SerializedProperty entry = entriesProp.GetArrayElementAtIndex(selectedIndex);
+        GUILayout.Label("기본 정보", EditorStyles.boldLabel);
+        if (!visible.Contains(selectedIndex)) EditorGUILayout.HelpBox("현재 편집 중인 몬스터가 검색 필터 밖에 있습니다.", MessageType.Info);
+        Property(entry, "name", "이름"); Property(entry, "id", "고유 ID");
+        if (string.IsNullOrWhiteSpace(Selected.id)) EditorGUILayout.HelpBox("ID가 비어 있습니다. '빈 ID 채우기'를 사용할 수 있습니다.", MessageType.Warning);
+        else if (duplicateIds.Contains(Selected.id)) EditorGUILayout.HelpBox("같은 ID가 중복됩니다. 참조가 모호해지므로 고유 ID로 수정하세요.", MessageType.Error);
+        EditorGUILayout.HelpBox("기존 ID를 직접 수정하면 그 ID를 사용하는 던전·대화 등의 참조도 별도로 갱신해야 합니다.", MessageType.None);
+        Property(entry, "isBoss", "보스"); Property(entry, "race", "종족"); Property(entry, "align", "성향"); Property(entry, "gender", "성별");
+        Property(entry, "portrait", "초상화");
+        GUILayout.Space(8);
+        GUILayout.Label("애니메이션 이미지", EditorStyles.boldLabel);
+        int source = EditorGUILayout.Popup("편집할 프레임", previewSource, SourceLabels);
+        if (source != previewSource) { previewSource = source; frameScroll = Vector2.zero; ConfigurePreview(true, true); }
+        Property(entry, "animInterval", "프레임 간격 (초)");
+        if (previewSource != 0) EditorGUILayout.HelpBox("이동·넘어짐 배열은 편집 참고용으로 같은 animInterval을 적용해 보여줍니다. 실제 이동 연출의 재생 속도와는 다를 수 있습니다.", MessageType.Info);
+        var frames = entry.FindPropertyRelative(SourceFields[previewSource]);
+        EditorGUILayout.PropertyField(frames, new GUIContent("프레임 배열 — 위에서부터 재생"), true);
+        EditorGUILayout.HelpBox("프레임 배열에서 개수·이미지·순서를 편집하면 오른쪽 미리보기에 반영됩니다. 프레임을 클릭해 해당 이미지를 정지 상태로 확인할 수도 있습니다.", MessageType.None);
+        GUILayout.Space(8);
+        GUILayout.Label("전투·능력치·교섭·보상", EditorStyles.boldLabel);
+        SerializedProperty iterator = entry.Copy(), end = iterator.GetEndProperty();
+        if (iterator.NextVisible(true))
+            do
+            {
+                if (SerializedProperty.EqualContents(iterator, end)) break;
+                if (!MainFields.Contains(iterator.name)) EditorGUILayout.PropertyField(iterator, true);
             } while (iterator.NextVisible(false));
-
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space();
-        }
-
-        EditorGUILayout.EndVertical();
     }
 
-    private void DrawSpriteArrayPreview(SerializedProperty arrayProp, float areaWidth)
+    private void DrawAnimationPreview()
     {
-        int maxPreviewCount = 3; 
-        int arraySize = arrayProp.arraySize;
-        int displayCount = Mathf.Min(arraySize, maxPreviewCount);
-
-        EditorGUILayout.BeginHorizontal(GUILayout.Width(areaWidth));
-
-        if (arraySize == 0)
+        GUILayout.Label("애니메이션 미리보기", EditorStyles.boldLabel);
+        if (Selected == null) { GUILayout.Label("몬스터를 선택하세요."); return; }
+        GUILayout.Label((Selected.name ?? "") + " · " + SourceLabels[previewSource], EditorStyles.wordWrappedLabel);
+        autoPlay = EditorGUILayout.ToggleLeft("몬스터 선택 시 자동 재생", autoPlay);
+        using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
         {
-            GUI.color = Color.gray;
-            GUILayout.Label("No Img", EditorStyles.centeredGreyMiniLabel, GUILayout.Width(40), GUILayout.Height(40));
-            GUI.color = Color.white;
+            var interval = entriesProp.GetArrayElementAtIndex(selectedIndex).FindPropertyRelative("animInterval");
+            EditorGUILayout.PropertyField(interval, new GUIContent("프레임 간격 (초)"));
         }
-        else
+        double seconds = configuredInterval;
+        if (seconds > 0 && !double.IsNaN(seconds) && !double.IsInfinity(seconds))
+            GUILayout.Label($"초당 {1.0 / seconds:0.##} 프레임 · 한 바퀴 {seconds * previewFrames.Length:0.###}초", EditorStyles.miniLabel);
+        previewBackground = EditorGUILayout.ColorField("배경색", previewBackground);
+        zoom = EditorGUILayout.Slider("확대", zoom, 0.25f, 3f);
+        Rect canvas = GUILayoutUtility.GetRect(300, 265, GUILayout.ExpandWidth(true));
+        EditorGUI.DrawRect(canvas, previewBackground);
+        Sprite current = previewFrames.Length > 0 ? previewFrames[Mathf.Clamp(clock.Frame, 0, previewFrames.Length - 1)] : null;
+        bool waiting = MonsterSpritePreview.Draw(canvas, current, canvasPixels, zoom);
+        if (Event.current.type == EventType.Repaint) loadingPreview = waiting;
+        GUILayout.Label(previewFrames.Length == 0 ? "프레임 0 / 0" : $"프레임 {clock.Frame + 1} / {previewFrames.Length} · {(current != null ? current.name : "빈 프레임")}", EditorStyles.centeredGreyMiniLabel);
+        using (new EditorGUILayout.HorizontalScope())
         {
-            for (int i = 0; i < displayCount; i++)
+            using (new EditorGUI.DisabledScope(!clock.CanPlay))
+                if (GUILayout.Button(clock.Playing ? "일시정지" : "재생")) { clock.SetPlaying(!clock.Playing, EditorApplication.timeSinceStartup); Repaint(); }
+            using (new EditorGUI.DisabledScope(previewFrames.Length == 0))
             {
-                SerializedProperty spriteProp = arrayProp.GetArrayElementAtIndex(i);
-                DrawThumbnail(spriteProp);
-            }
-
-            if (arraySize > maxPreviewCount)
-            {
-                GUILayout.Label($"+{arraySize - maxPreviewCount}", EditorStyles.boldLabel, GUILayout.Width(25), GUILayout.Height(40));
-            }
-        }
-
-        EditorGUILayout.EndHorizontal();
-    }
-
-    private void DrawThumbnail(SerializedProperty spriteProp)
-    {
-        Rect previewRect = GUILayoutUtility.GetRect(40, 40, GUILayout.Width(40), GUILayout.Height(40));
-        
-        Sprite sprite = spriteProp.objectReferenceValue as Sprite;
-        if (sprite != null)
-        {
-            Texture2D tex = AssetPreview.GetAssetPreview(sprite);
-            
-            if (tex == null && sprite.texture != null) 
-            {
-                tex = sprite.texture;
-            }
-
-            if (tex != null)
-            {
-                GUI.DrawTexture(previewRect, tex, ScaleMode.ScaleToFit);
-            }
-            else
-            {
-                GUI.Box(previewRect, "Load");
+                if (GUILayout.Button("처음")) { clock.Seek(0, EditorApplication.timeSinceStartup); Repaint(); }
+                if (GUILayout.Button("이전")) { clock.Seek((clock.Frame + previewFrames.Length - 1) % previewFrames.Length, EditorApplication.timeSinceStartup); Repaint(); }
+                if (GUILayout.Button("다음")) { clock.Seek((clock.Frame + 1) % previewFrames.Length, EditorApplication.timeSinceStartup); Repaint(); }
             }
         }
-        else
+        if (previewFrames.Length > 1)
         {
-            GUI.Box(previewRect, "None");
+            EditorGUI.BeginChangeCheck();
+            int frame = EditorGUILayout.IntSlider("직접 선택", clock.Frame + 1, 1, previewFrames.Length);
+            if (EditorGUI.EndChangeCheck()) { clock.Seek(frame - 1, EditorApplication.timeSinceStartup); Repaint(); }
         }
-
-        // ObjectField의 회색 배경을 투명하게 만들어 이미지를 가리지 않도록 처리
-        Color defaultColor = GUI.color;
-        GUI.color = new Color(0, 0, 0, 0); 
-        
-        spriteProp.objectReferenceValue = EditorGUI.ObjectField(previewRect, spriteProp.objectReferenceValue, typeof(Sprite), false);
-        
-        GUI.color = defaultColor;
+        if (previewFrames.Length == 0) EditorGUILayout.HelpBox("프레임 배열에 Sprite를 추가하세요.", MessageType.Info);
+        else if (previewFrames.Length == 1) EditorGUILayout.HelpBox("프레임이 한 장이므로 정지 이미지로 표시합니다.", MessageType.Info);
+        if (float.IsNaN(configuredInterval) || float.IsInfinity(configuredInterval) || configuredInterval <= 0)
+            EditorGUILayout.HelpBox("재생 간격이 0 이하이거나 유효하지 않아 자동 재생하지 않습니다. 양수로 설정한 뒤 재생을 누르세요.", MessageType.Warning);
+        if (previewFrames.Any(s => s == null)) EditorGUILayout.HelpBox("비어 있는 프레임도 순서와 시간을 차지합니다. 누락된 이미지를 확인하세요.", MessageType.Warning);
+        frameScroll = EditorGUILayout.BeginScrollView(frameScroll, GUILayout.Height(76));
+        using (new EditorGUILayout.HorizontalScope())
+            for (int i = 0; i < previewFrames.Length; i++)
+            {
+                Sprite sprite = previewFrames[i];
+                Rect thumb = GUILayoutUtility.GetRect(58, 56, GUILayout.Width(58), GUILayout.Height(56));
+                Color previousColor = GUI.backgroundColor;
+                if (i == clock.Frame) GUI.backgroundColor = new Color(0.4f, 0.8f, 1f);
+                bool clicked = GUI.Button(thumb, new GUIContent("", sprite != null ? sprite.name : "빈 프레임"));
+                GUI.backgroundColor = previousColor;
+                if (clicked) { clock.Seek(i, EditorApplication.timeSinceStartup); Repaint(); }
+                Rect picture = new Rect(thumb.x + 3, thumb.y + 2, thumb.width - 6, 36);
+                bool pending = MonsterSpritePreview.Draw(picture, sprite, sprite != null ? sprite.rect.size : Vector2.one, 1f);
+                if (Event.current.type == EventType.Repaint) loadingPreview |= pending;
+                GUI.Label(new Rect(thumb.x, thumb.y + 37, thumb.width, 17), (i + 1).ToString(), EditorStyles.centeredGreyMiniLabel);
+            }
+        EditorGUILayout.EndScrollView();
+        GUILayout.Label("에디터 실제 시간을 사용합니다. Play Mode·Time.timeScale에 영향을 받지 않습니다. 화면 갱신은 최대 60회/초이며 그보다 빠른 프레임은 건너뛰어 보일 수 있습니다.", EditorStyles.wordWrappedMiniLabel);
+        GUILayout.FlexibleSpace();
     }
 }
