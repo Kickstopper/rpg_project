@@ -34,10 +34,10 @@ namespace UI.Battle
             get => _currentHp;
             set
             {
-                // 값이 실제로 변했을 때만 로직 수행
-                if (_currentHp != value)
+                int clampedValue = Mathf.Clamp(value, 0, maxHp);
+                if (_currentHp != clampedValue)
                 {
-                    _currentHp = Mathf.Clamp(value, 0, maxHp);
+                    _currentHp = clampedValue;
                     
                     UpdateUI(); 
                 }
@@ -50,9 +50,10 @@ namespace UI.Battle
             get => _currentMp;
             set
             {
-                if (_currentMp != value)
+                int clampedValue = Mathf.Clamp(value, 0, maxMp);
+                if (_currentMp != clampedValue)
                 {
-                    _currentMp = Mathf.Clamp(value, 0, maxMp);
+                    _currentMp = clampedValue;
                     
                     UpdateUI(); 
                 }
@@ -85,6 +86,9 @@ namespace UI.Battle
 
         // 공통 코루틴 참조
         protected Coroutine highlightCoroutine;
+        private Coroutine hitShakeCoroutine;
+        private Vector3 hitShakeOrigin;
+        private bool isHitShaking;
         public Color originalColor { get; protected set; }
 
         [Header("Buff/Debuff Stacks (-4 ~ +4)")]
@@ -123,29 +127,43 @@ namespace UI.Battle
         // 피격 시 흔들림 연출 (두 클래스에서 완전히 동일한 코드)
         public void TriggerHitShake(bool isCritical)
         {
-            // 오브젝트가 꺼져있으면 코루틴을 시작하지 않음
-            if (!gameObject.activeInHierarchy) return;
-
-            StopCoroutine("ProcessHitShake");
+            if (!isActiveAndEnabled) return;
+            StopHitShake();
             float magnitude = isCritical ? critShakeMagnitude : normalShakeMagnitude;
             float duration = isCritical ? critShakeDuration : normalShakeDuration;
-            StartCoroutine(ProcessHitShake(magnitude, duration));
+            hitShakeCoroutine = StartCoroutine(ProcessHitShake(magnitude, duration));
+        }
+
+        private void StopHitShake()
+        {
+            if (hitShakeCoroutine != null) StopCoroutine(hitShakeCoroutine);
+            hitShakeCoroutine = null;
+            if (!isHitShaking) return;
+            transform.localPosition = hitShakeOrigin;
+            isHitShaking = false;
+        }
+
+        protected virtual void OnDisable()
+        {
+            StopHitShake();
         }
 
         protected IEnumerator ProcessHitShake(float magnitude, float duration)
         {
-            Vector3 originalPos = transform.localPosition;
+            hitShakeOrigin = transform.localPosition;
+            isHitShaking = true;
             float elapsed = 0f;
-
             while (elapsed < duration)
             {
                 float xOffset = Random.Range(-1f, 1f) * magnitude;
                 float yOffset = Random.Range(-1f, 1f) * magnitude;
-                transform.localPosition = originalPos + new Vector3(xOffset, yOffset, 0);
+                transform.localPosition = hitShakeOrigin + new Vector3(xOffset, yOffset, 0);
                 elapsed += Time.deltaTime;
-                yield return null; 
+                yield return null;
             }
-            transform.localPosition = originalPos;
+            transform.localPosition = hitShakeOrigin;
+            isHitShaking = false;
+            hitShakeCoroutine = null;
         }
         
         // 상태이상 부여

@@ -5,6 +5,7 @@ using Controller;
 using Data;
 using DG.Tweening;
 using Manager;
+using Helper;
 using UnityEngine;
 using UnityEngine.UI;
 namespace UI.Battle
@@ -72,6 +73,11 @@ namespace UI.Battle
             activePlayers.Clear();
             activeMonsters.Clear();
             encounterLog.Clear();
+            allSlotControllers.Clear();
+            validTargets.Clear();
+            currentTargetIndex = 0;
+            currentPlayerIndex = -1;
+            isGroupTargeting = false;
 
             // 파괴되거나 null인 슬롯 참조를 리스트에서 제거
             frontSlots.RemoveAll(slot => slot == null);
@@ -92,7 +98,7 @@ namespace UI.Battle
 
         void CreateSlotsFor(Transform container, List<Transform> slotList)
         {
-            foreach (Transform child in container) Destroy(child.gameObject);
+            DetachAndDestroyChildren(container);
             slotList.Clear();
             for (int i = 0; i < 3; i++)
             {
@@ -105,7 +111,20 @@ namespace UI.Battle
 
         void ClearSlotContents(List<Transform> slotList)
         {
-            foreach (var slot in slotList) foreach (Transform child in slot) Destroy(child.gameObject);
+            foreach (Transform slot in slotList) DetachAndDestroyChildren(slot);
+        }
+
+        private static void DetachAndDestroyChildren(Transform parent)
+        {
+            if (parent == null) return;
+            // Destroy is deferred. Detach now so spawning in this frame sees empty slots.
+            for (int i = parent.childCount - 1; i >= 0; i--)
+            {
+                Transform child = parent.GetChild(i);
+                child.gameObject.SetActive(false);
+                child.SetParent(null, false);
+                Destroy(child.gameObject);
+            }
         }
 
         public int ActivePlayerCount()
@@ -854,6 +873,7 @@ namespace UI.Battle
         {
             GameObject bestTarget = null;
             float closestDistance = float.MaxValue;
+            if (attacker == null) return null;
             Vector3 attackerPos = attacker.transform.position;
 
             if (attacker.GetComponent<PlayerController>() != null)
@@ -862,7 +882,7 @@ namespace UI.Battle
                 {
                     if (monster != null && monster.currentHp > 0 && monster.gameObject.activeSelf)
                     {
-                        float dist = Vector3.Distance(attackerPos, monster.transform.position);
+                        float dist = (attackerPos - monster.transform.position).sqrMagnitude;
                         if (dist < closestDistance) { closestDistance = dist; bestTarget = monster.gameObject; }
                     }
                 }
@@ -873,7 +893,7 @@ namespace UI.Battle
                 {
                     if (player != null && player.currentHp > 0 && player.gameObject.activeSelf)
                     {
-                        float dist = Vector3.Distance(attackerPos, player.transform.position);
+                        float dist = (attackerPos - player.transform.position).sqrMagnitude;
                         if (dist < closestDistance) { closestDistance = dist; bestTarget = player.gameObject; }
                     }
                 }
@@ -891,12 +911,12 @@ namespace UI.Battle
         
         public bool IsAllEnemiesDead()
         {
-            return activeMonsters.TrueForAll(m => m.currentHp <= 0);
+            return LivingMonsterCount == 0;
         }
 
         public bool IsAllPartyDead()
         {
-            return activePlayers.TrueForAll(p => p.currentHp <= 0);
+            return LivingPartyCount == 0;
         }
 
         bool IsRowFull(List<Transform> slots)
@@ -923,22 +943,26 @@ namespace UI.Battle
             Transform targetFrontContainer = GetTargetFrontContainer();
             
             // 현재 타겟이 전열에 있는지 확인
-            return (currentEntity.transform.parent.parent == targetFrontContainer);
+            return currentEntity != null && currentEntity.transform.parent != null
+                && currentEntity.transform.parent.parent == targetFrontContainer;
         }
 
         public bool IsCharacterInFrontRow(PlayerController pc)
         {
-            return (pc.transform.parent.parent == playerFrontRowContainer);
+            return pc != null && pc.transform.parent != null
+                && pc.transform.parent.parent == playerFrontRowContainer;
         }
 
         public bool IsMonsterInFrontRow(BattleEntity monster)
         {
-            return (monster.transform.parent.parent == enemyFrontRowContainer);;
+            return monster != null && monster.transform.parent != null
+                && monster.transform.parent.parent == enemyFrontRowContainer;
         }
 
         public PlayerController GetCurrentCharacter()
         {
-            return activePlayers[currentPlayerIndex] as PlayerController;
+            return currentPlayerIndex >= 0 && currentPlayerIndex < activePlayers.Count
+                ? activePlayers[currentPlayerIndex] as PlayerController : null;
         }
 
         public int GetPlayerSlotIndex(PlayerController slot)
@@ -974,14 +998,32 @@ namespace UI.Battle
             return activePlayers.OfType<PlayerController>().ToList();
         }
 
+        public int LivingPartyCount => BattleCollectionUtility.CountLiving(activePlayers);
+        public int LivingMonsterCount => BattleCollectionUtility.CountLiving(activeMonsters);
+
+        public void FillLivingParty(List<BattleEntity> destination)
+        {
+            BattleCollectionUtility.CopyLiving(activePlayers, destination);
+        }
+
+        public void FillLivingMonsters(List<BattleEntity> destination)
+        {
+            BattleCollectionUtility.CopyLiving(activeMonsters, destination);
+        }
+
+        // Existing callers still receive an independent snapshot.
         public List<BattleEntity> GetLivingParty()
         {
-            return activePlayers.Where(p => p.currentHp > 0).ToList();
+            var result = new List<BattleEntity>(activePlayers.Count);
+            FillLivingParty(result);
+            return result;
         }
 
         public List<BattleEntity> GetLivingMonsters()
         {
-            return activeMonsters.Where(m => m.currentHp > 0).ToList();
+            var result = new List<BattleEntity>(activeMonsters.Count);
+            FillLivingMonsters(result);
+            return result;
         }
 
         public List<PlayerController> GetCharactersInFrontRow()
@@ -994,7 +1036,8 @@ namespace UI.Battle
 
         public BattleEntity GetCurrentValidTarget()
         {
-            return validTargets[currentTargetIndex];
+            return currentTargetIndex >= 0 && currentTargetIndex < validTargets.Count
+                ? validTargets[currentTargetIndex] : null;
         }
 
         public Transform GetTargetFrontContainer()
@@ -1004,52 +1047,96 @@ namespace UI.Battle
 
         public List<GameObject> GetTargetsByScope(TargetScope scope, GameObject actor, GameObject specifiedTarget)
         {
-            List<GameObject> targets = new List<GameObject>();
-            var livingMonsters = GetLivingMonsters();
-            var livingPlayers = GetLivingParty(); // 아군 생존자
-
-            if (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Single_Enemy || 
-                scope == TargetScope.One_Ally || scope == TargetScope.Dead_Ally)
-            {
-                if (specifiedTarget != null) targets.Add(specifiedTarget);
-            }
-            else if (scope == TargetScope.Random_Front_Enemy || scope == TargetScope.Random_Enemy)
-            {
-                List<GameObject> candidates = new List<GameObject>();
-                foreach(var m in livingMonsters) 
-                {
-                    // 컨테이너 직접 비교 방식
-                    bool isFront = IsMonsterInFrontRow(m);
-                    if (scope == TargetScope.Random_Front_Enemy && !isFront) continue;
-                    candidates.Add(m.gameObject);
-                }
-                if (candidates.Count > 0) targets.Add(candidates[Random.Range(0, candidates.Count)]);
-            }
-            else if (scope == TargetScope.Front_Enemies || scope == TargetScope.All_Enemies)
-            {
-                foreach(var m in livingMonsters) 
-                {
-                    bool isFront = IsMonsterInFrontRow(m);
-                    if (scope == TargetScope.Front_Enemies && !isFront) continue;
-                    targets.Add(m.gameObject);
-                }
-                if (scope == TargetScope.Front_Enemies && targets.Count == 0) targets.AddRange(livingMonsters.Select(m => m.gameObject));
-            }
-            else if (scope == TargetScope.All_Allies)
-            {
-                foreach (var p in livingPlayers) targets.Add(p.gameObject);
-            }
-            else if (scope == TargetScope.Self)
-            {
-                if (actor != null) targets.Add(actor);
-            }
-            
+            var targets = new List<GameObject>(6);
+            FillTargetsByScope(scope, actor, specifiedTarget, targets);
             return targets;
+        }
+
+        /// <summary>
+        /// Clears and fills a caller-owned snapshot. Preserve the existing player-command
+        /// convention: enemies = activeMonsters, allies = activePlayers.
+        /// </summary>
+        public void FillTargetsByScope(TargetScope scope, GameObject actor,
+            GameObject specifiedTarget, List<GameObject> targets)
+        {
+            if (targets == null) throw new System.ArgumentNullException(nameof(targets));
+            targets.Clear();
+            switch (scope)
+            {
+                case TargetScope.Front_Single_Enemy:
+                case TargetScope.Single_Enemy:
+                case TargetScope.One_Ally:
+                case TargetScope.Dead_Ally:
+                    if (specifiedTarget != null) targets.Add(specifiedTarget);
+                    break;
+                case TargetScope.Random_Front_Enemy:
+                case TargetScope.Random_Enemy:
+                    BattleEntity randomTarget = GetRandomLivingMonster(scope == TargetScope.Random_Front_Enemy);
+                    if (randomTarget != null) targets.Add(randomTarget.gameObject);
+                    break;
+                case TargetScope.Front_Enemies:
+                case TargetScope.All_Enemies:
+                    AddLivingMonsterObjects(targets, scope == TargetScope.Front_Enemies);
+                    if (scope == TargetScope.Front_Enemies && targets.Count == 0)
+                        AddLivingMonsterObjects(targets, false);
+                    break;
+                case TargetScope.All_Allies:
+                    foreach (BattleEntity player in activePlayers)
+                        if (player != null && player.currentHp > 0) targets.Add(player.gameObject);
+                    break;
+                case TargetScope.All_Dead_Allies:
+                    // This scope was already supported by selection UI, but missing in execution.
+                    foreach (BattleEntity player in activePlayers)
+                        if (player is PlayerController pc && !pc.IsEmpty && pc.currentHp <= 0)
+                            targets.Add(pc.gameObject);
+                    break;
+                case TargetScope.Self:
+                    if (actor != null) targets.Add(actor);
+                    break;
+            }
+        }
+
+        private void AddLivingMonsterObjects(List<GameObject> targets, bool frontOnly)
+        {
+            foreach (BattleEntity monster in activeMonsters)
+                if (monster != null && monster.currentHp > 0 && (!frontOnly || IsMonsterInFrontRow(monster)))
+                    targets.Add(monster.gameObject);
+        }
+
+        public PlayerController GetFirstDeadPartyMember()
+        {
+            foreach (BattleEntity player in activePlayers)
+                if (player is PlayerController pc && !pc.IsEmpty && pc.currentHp <= 0) return pc;
+            return null;
+        }
+
+        public BattleEntity GetRandomLivingMonster(bool frontOnly)
+        {
+            int count = 0;
+            foreach (BattleEntity monster in activeMonsters)
+                if (monster != null && monster.currentHp > 0 && (!frontOnly || IsMonsterInFrontRow(monster))) count++;
+            if (count == 0) return null;
+
+            // Exactly one random draw, same candidate order as the original implementation.
+            // Random_Front_Enemy deliberately retains its existing no-back-row fallback rule.
+            int selectedIndex = Random.Range(0, count);
+            foreach (BattleEntity monster in activeMonsters)
+            {
+                if (monster == null || monster.currentHp <= 0 || (frontOnly && !IsMonsterInFrontRow(monster))) continue;
+                if (selectedIndex-- == 0) return monster;
+            }
+            return null;
         }
 
         public int GetFrontLivingCharacterCount()
         {
-            return allSlotControllers.Take(3).Count(p => p != null && !p.IsEmpty && p.currentHp > 0);
+            int count = 0;
+            for (int i = 0; i < 3 && i < allSlotControllers.Count; i++)
+            {
+                PlayerController player = allSlotControllers[i];
+                if (player != null && !player.IsEmpty && player.currentHp > 0) count++;
+            }
+            return count;
         }
 
         public BattlePosition GetUnitPosition(GameObject unit)
@@ -1085,81 +1172,79 @@ namespace UI.Battle
         public void SortValidTargets()
         {
             if (validTargets == null || validTargets.Count <= 1) return;
-
-            validTargets = validTargets.OrderBy(t => 
+            for (int i = 1; i < validTargets.Count; i++)
             {
-                bool isBackRow = false;
-                
-                // 아군/적군 구분에 맞춰 후열 여부 판별
-                if (t is PlayerController) 
-                    isBackRow = (t.transform.parent.parent == playerBackRowContainer);
-                else 
-                    isBackRow = (t.transform.parent.parent == enemyBackRowContainer);
-                
-                // 전열은 0, 후열은 10의 가중치를 더해 전열이 무조건 앞쪽 인덱스(0)로 오게 함
-                // 그리고 columnIndex(0, 1, 2)를 더해 왼쪽부터 오름차순으로 정렬
-                return (isBackRow ? 10 : 0) + t.columnIndex;
-                
-            }).ToList();
+                BattleEntity target = validTargets[i];
+                int key = GetTargetSortKey(target);
+                int j = i - 1;
+                while (j >= 0 && GetTargetSortKey(validTargets[j]) > key)
+                {
+                    validTargets[j + 1] = validTargets[j];
+                    j--;
+                }
+                validTargets[j + 1] = target;
+            }
+        }
+
+        private int GetTargetSortKey(BattleEntity target)
+        {
+            if (target == null) return int.MaxValue;
+            Transform slot = target.transform.parent;
+            Transform row = slot != null ? slot.parent : null;
+            bool isBack = row != null && row == (target is PlayerController
+                ? playerBackRowContainer : enemyBackRowContainer);
+            return (isBack ? 10 : 0) + target.columnIndex;
         }
 
         public void SetValidMonsterTargets()
         {
             isGroupTargeting = false;
             validTargets.Clear();
-            // 전열 몬스터만 필터링
-            validTargets.Clear();
-            validTargets = activeMonsters
-                .Where(m => m.currentHp > 0 && m.transform.parent.parent == enemyFrontRowContainer)
-                .ToList();
-                
+            AddLivingMonsterTargets(true);
             SortValidTargets();
+        }
+
+        private void AddLivingMonsterTargets(bool frontOnly)
+        {
+            foreach (BattleEntity monster in activeMonsters)
+                if (monster != null && monster.currentHp > 0 && (!frontOnly || IsMonsterInFrontRow(monster)))
+                    validTargets.Add(monster);
         }
 
         public void SetValidTargetsByTargetScope(TargetScope scope)
         {
             validTargets.Clear();
-            // 타겟 스코프가 전체 범위인지 확인하고 플래그를 설정
-            isGroupTargeting = (scope == TargetScope.All_Enemies || scope == TargetScope.Front_Enemies || 
-                                scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies);
-
-            var livingMonsters = GetLivingMonsters();
-            var livingPlayers = GetLivingParty();
+            isGroupTargeting = scope == TargetScope.All_Enemies || scope == TargetScope.Front_Enemies
+                || scope == TargetScope.All_Allies || scope == TargetScope.All_Dead_Allies;
 
             switch (scope)
             {
                 case TargetScope.Single_Enemy:
                 case TargetScope.All_Enemies:
                 case TargetScope.Random_Enemy:
-                    validTargets.AddRange(livingMonsters);
+                    AddLivingMonsterTargets(false);
                     break;
-
                 case TargetScope.Front_Single_Enemy:
                 case TargetScope.Front_Enemies:
                 case TargetScope.Random_Front_Enemy:
-                    // 전열 몬스터만 먼저 찾고, 전열이 텅 비었다면 후열 몬스터를 타겟으로
-                    var frontMonsters = livingMonsters.Where(m => IsMonsterInFrontRow(m)).ToList();
-                    if (frontMonsters.Count > 0) validTargets.AddRange(frontMonsters);
-                    else validTargets.AddRange(livingMonsters); 
+                    AddLivingMonsterTargets(true);
+                    if (validTargets.Count == 0) AddLivingMonsterTargets(false);
                     break;
-
                 case TargetScope.One_Ally:
                 case TargetScope.All_Allies:
-                    validTargets.AddRange(livingPlayers);
+                    FillLivingParty(validTargets);
                     break;
-
                 case TargetScope.Dead_Ally:
                 case TargetScope.All_Dead_Allies:
-                    // 빈 슬롯이 아니면서 체력이 0 이하인 죽은 아군만 필터링
-                    validTargets.AddRange(activePlayers.Where(p => p != null && !((PlayerController)p).IsEmpty && p.currentHp <= 0));
+                    foreach (BattleEntity player in activePlayers)
+                        if (player is PlayerController pc && !pc.IsEmpty && pc.currentHp <= 0)
+                            validTargets.Add(pc);
                     break;
-
                 case TargetScope.Self:
-                    // 시전자 본인을 찾아 타겟 리스트에 넣음
-                    validTargets.Add(GetCurrentCharacter());
+                    PlayerController actor = GetCurrentCharacter();
+                    if (actor != null) validTargets.Add(actor);
                     break;
             }
-
             SortValidTargets();
         }
 
@@ -1187,8 +1272,11 @@ namespace UI.Battle
         public void SetValidTargets(List<BattleEntity> targets)
         {
             isGroupTargeting = false;
-            validTargets = targets;
-            
+            if (!ReferenceEquals(validTargets, targets))
+            {
+                validTargets.Clear();
+                if (targets != null) validTargets.AddRange(targets);
+            }
             SortValidTargets();
         }
 
@@ -1212,4 +1300,3 @@ namespace UI.Battle
 
     }
 }
-

@@ -51,7 +51,9 @@ namespace UI.Battle
         public Vector3 cursorOffset = new Vector3(0, 50, 0); // 몬스터 머리 위 오프셋
 
         // 현재 실행 중인 액션 추적용
-        private BattleAction currentProcessingAction; 
+        private BattleAction currentProcessingAction;
+        private BattleEntity currentActingEntity;
+        private bool isEndingBattle; 
         private Coroutine runningActionCoroutine; // 실행 중인 코루틴을 담아둘 변수
         private bool isInterrupted = false;
 
@@ -142,6 +144,8 @@ namespace UI.Battle
 
         public void Initialize(List<string> monsterIds, Color fogColor, EncounterType encType, Sprite capturedBg)
         {
+            isEndingBattle = false;
+            currentActingEntity = null;
             this.fogColor = fogColor;
             currentEncounterType = encType;
 
@@ -222,19 +226,14 @@ namespace UI.Battle
         // 파티와 적군의 평균 스탯을 비교하여 인카운터 타입을 결정
         private EncounterType DetermineEncounterType()
         {
-            // 살아있는 파티원과 몬스터 추출
-            var players = fieldController.GetLivingParty();
-            var monsters = fieldController.GetLivingMonsters();
+            int playerCount = BattleCollectionUtility.GetLivingAverages(
+                fieldController.activePlayers, true,
+                out float avgPlayerAgi, out float avgPlayerLuc, out float avgPlayerLv);
+            int monsterCount = BattleCollectionUtility.GetLivingAverages(
+                fieldController.activeMonsters, false,
+                out float avgMonsterAgi, out _, out float avgMonsterLv);
 
-            if (players.Count == 0 || monsters.Count == 0) return EncounterType.Normal;
-
-            // 평균 민첩성, 운, 레벨 계산
-            float avgPlayerAgi = (float)players.Average(p => p.GetComponent<BattleEntity>().GetTotalAgi());
-            float avgPlayerLuc = (float)players.Average(p => p.GetComponent<BattleEntity>().GetTotalLuc());
-            float avgPlayerLv = (float)players.Average(p => p.GetComponent<BattleEntity>().level);
-
-            float avgMonsterAgi = (float)monsters.Average(m => m.GetComponent<BattleEntity>().GetTotalAgi());
-            float avgMonsterLv = (float)monsters.Average(m => m.GetComponent<BattleEntity>().level);
+            if (playerCount == 0 || monsterCount == 0) return EncounterType.Normal;
 
             // 확률 계산 공식
             // 기본 기습 확률 10%, 선제공격 확률 10%에서 출발
@@ -416,9 +415,9 @@ namespace UI.Battle
             if (!isBattleState) return;
             
             // 난입 입력 감지
-            if ((state == BattleState.Processing || state == BattleState.EnemyInput) && currentProcessingAction != null && !isInterrupted)
+            if ((state == BattleState.Processing || state == BattleState.EnemyInput) && currentProcessingAction != null && currentProcessingAction.actor != null && !isInterrupted)
             {
-                bool isPlayerActing = currentProcessingAction.actor.GetComponent<PlayerController>() != null;
+                bool isPlayerActing = currentActingEntity is PlayerController;
 
                 // 아군의 행동 중, 적의 게이지가 꽉 찼을 때 (적의 난입)
                 if (isPlayerActing && uiController.GetEnemyGaugeValue() >= 0.99f)
@@ -431,7 +430,7 @@ namespace UI.Battle
                 }
                 
                 // 적의 행동 중, 아군의 게이지가 꽉 찼을 때 (아군의 난입)
-                bool isEnemyActing = currentProcessingAction.actor.GetComponent<MonsterController>() != null;
+                bool isEnemyActing = currentActingEntity is MonsterController;
                 if (isEnemyActing && uiController.GetPartyGaugeValue() >= 0.99f)
                 {
                     if (isAutoMode) StartCoroutine(TriggerInterrupt(true)); // 오토 모드면 AI가 즉시 난입
@@ -523,6 +522,7 @@ namespace UI.Battle
             // ActionQueue 완전히 비우기
             actionQueue.Clear();
             currentProcessingAction = null;
+            currentActingEntity = null;
 
             // 턴 강제 전환
             if (isPlayerInterrupting) PreparePlayerTurn();
@@ -602,7 +602,7 @@ namespace UI.Battle
                     if (player.currentHp <= 0) continue;
 
                     // 살아있는 적 중 하나 랜덤 타겟
-                    var target = fieldController.activeMonsters.FirstOrDefault(m => m.currentHp > 0);
+                    var target = BattleCollectionUtility.FirstLiving(fieldController.activeMonsters);
                     if (target == null) 
                     {
                         battleEnded = true; 
@@ -611,8 +611,8 @@ namespace UI.Battle
 
                     // 데미지 계산
                     BattleAction fakeAction = new BattleAction(player.gameObject, target.gameObject, ActionType.Attack, 0);
-                    BattleEntity pEntity = player.GetComponent<BattleEntity>();
-                    BattleEntity tEntity = target.GetComponent<BattleEntity>();
+                    BattleEntity pEntity = player;
+                    BattleEntity tEntity = target;
                     int dmg = BattleCalculator.CalculateDamage(pEntity, tEntity, fakeAction, false, 1.0f);
 
                     // 애니메이션 없이 HP 즉시 차감
@@ -626,12 +626,12 @@ namespace UI.Battle
                 {
                     if (monster.currentHp <= 0) continue;
 
-                    var target = fieldController.activePlayers.FirstOrDefault(p => p.currentHp > 0);
+                    var target = BattleCollectionUtility.FirstLiving(fieldController.activePlayers);
                     if (target == null) break;
 
                     BattleAction fakeAction = new BattleAction(monster.gameObject, target.gameObject, ActionType.Attack, 0);
-                    BattleEntity mEntity = monster.GetComponent<BattleEntity>();
-                    BattleEntity ptEntity = target.GetComponent<BattleEntity>();
+                    BattleEntity mEntity = monster;
+                    BattleEntity ptEntity = target;
                     int dmg = BattleCalculator.CalculateDamage(mEntity, ptEntity, fakeAction, false, 1.0f);
                     target.currentHp = Mathf.Max(0, target.currentHp - dmg);
                 }
@@ -644,8 +644,8 @@ namespace UI.Battle
             // 모듈이 설치되지 않았으면 패스
             if (!ManagerRoot.Module.IsMounted(ModuleFeature.KillSwitch)) return false;
             // 아직 몬스터나 플레이어가 세팅되지 않았으면 패스
-            int mCount = fieldController.GetLivingMonsters().Count;
-            int pCount = fieldController.GetLivingParty().Count;
+            int mCount = fieldController.LivingMonsterCount;
+            int pCount = fieldController.LivingPartyCount;
             if (mCount == 0 || pCount == 0) return false;
 
             // 적 그룹의 수가 아군보다 작아야 함
@@ -1538,17 +1538,8 @@ namespace UI.Battle
             GameObject finalTarget = null;
             if (actionType == ActionType.Attack)
             {
-                List<BattleEntity> candidates = new List<BattleEntity>();
-                var livingMonsters = fieldController.GetLivingMonsters();
-                foreach (var m in livingMonsters)
-                {
-                    bool isFront = (m.transform.parent.parent == fieldController.enemyFrontRowContainer);
-                    if (!isFront) continue;
-                    candidates.Add(m);
-                }
-                
-                if (candidates.Count > 0)
-                    finalTarget = candidates[Random.Range(0, candidates.Count)].gameObject;
+                BattleEntity target = fieldController.GetRandomLivingMonster(true);
+                if (target != null) finalTarget = target.gameObject;
             }
             int speed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
             actor.nextTurnSpeedPenalty = 0;
@@ -1590,11 +1581,11 @@ namespace UI.Battle
 
             // 아군 대상(회복/버프) 스코프인지 확인
             bool isAllyScope = (scope == TargetScope.One_Ally || scope == TargetScope.All_Allies || 
-                                scope == TargetScope.Self || scope == TargetScope.Dead_Ally);
+                                scope == TargetScope.Self || scope == TargetScope.Dead_Ally || scope == TargetScope.All_Dead_Allies);
 
             if (isAllyScope)
             {
-                if (autoTargetIndex != -1)
+                if (autoTargetIndex >= 0 && autoTargetIndex < fieldController.allSlotControllers.Count)
                 {
                     PlayerController restoredTarget = fieldController.allSlotControllers[autoTargetIndex];
                     if (restoredTarget != null && !restoredTarget.IsEmpty)
@@ -1609,26 +1600,20 @@ namespace UI.Battle
                 }
 
                 // 지정된 동료가 죽었거나 조건에 안 맞으면 본인(또는 살아있는 다른 대상)으로 타겟 변경
+                if (finalTarget == null && scope == TargetScope.All_Dead_Allies)
+                {
+                    PlayerController deadAlly = fieldController.GetFirstDeadPartyMember();
+                    if (deadAlly != null) finalTarget = deadAlly.gameObject;
+                }
                 if (finalTarget == null) finalTarget = actor.gameObject;
             }
             else
             {
                 // 적 대상인 경우 살아있는 몬스터 중 랜덤 선택
-                List<BattleEntity> candidates = new List<BattleEntity>();
-                var livingMonsters = fieldController.GetLivingMonsters();
-                bool targetFrontOnly = (scope == TargetScope.Front_Single_Enemy || scope == TargetScope.Random_Front_Enemy || scope == TargetScope.Front_Enemies);
-
-                foreach (var m in livingMonsters)
-                {
-                    bool isFront = (m.transform.parent.parent == fieldController.enemyFrontRowContainer);
-                    if (targetFrontOnly && !isFront) continue;
-                    candidates.Add(m);
-                }
-
-                if (candidates.Count > 0)
-                {
-                    finalTarget = candidates[Random.Range(0, candidates.Count)].gameObject;
-                }
+                bool targetFrontOnly = scope == TargetScope.Front_Single_Enemy
+                    || scope == TargetScope.Random_Front_Enemy || scope == TargetScope.Front_Enemies;
+                BattleEntity target = fieldController.GetRandomLivingMonster(targetFrontOnly);
+                if (target != null) finalTarget = target.gameObject;
             }
 
             int speed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
@@ -2137,7 +2122,7 @@ namespace UI.Battle
             uiController.HideLog();
             fieldController.HideTurnOrderUI();
 
-            actionQueue = actionQueue.OrderByDescending(x => x.speed).ToList();
+            BattleCollectionUtility.SortActionsBySpeed(actionQueue);
             StartCoroutine(ExecuteActions());
         }
 
@@ -2166,7 +2151,7 @@ namespace UI.Battle
                 }
             }
 
-            actionQueue = actionQueue.OrderByDescending(x => x.speed).ToList();
+            BattleCollectionUtility.SortActionsBySpeed(actionQueue);
             StartCoroutine(ExecuteActions());
         }
 
@@ -2180,6 +2165,8 @@ namespace UI.Battle
                 if (isInterrupted) yield break; // 난입 시 루프 즉시 종료
 
                 currentProcessingAction = actionQueue[0];
+                currentActingEntity = currentProcessingAction.actor != null
+                    ? currentProcessingAction.actor.GetComponent<BattleEntity>() : null;
                 actionQueue.RemoveAt(0);
 
                 if (CheckBattleEnd(out bool isWin)) { StartCoroutine(EndBattleRoutine(isWin)); yield break; }
@@ -2190,7 +2177,7 @@ namespace UI.Battle
                 if (isActorDead) continue; 
 
                 // 적의 자동 난입 체크
-                bool isPlayerActing = currentProcessingAction.actor.GetComponent<PlayerController>() != null;
+                bool isPlayerActing = currentActingEntity is PlayerController;
 
                 // 적 게이지가 꽉 찼고, 현재 큐에서 꺼낸 행동이 아군의 행동이라면 적이 즉시 난입
                 if (isPlayerActing && uiController.GetEnemyGaugeValue() >= 0.99f)
@@ -2200,7 +2187,7 @@ namespace UI.Battle
                 }
 
                 int delay = CalculateActionDelay(currentProcessingAction);
-                BattleEntity actorEntity = currentProcessingAction.actor.GetComponent<BattleEntity>();
+                BattleEntity actorEntity = currentActingEntity;
                 if (actorEntity != null) actorEntity.nextTurnSpeedPenalty += delay; 
 
                 // 실행되는 액션 코루틴을 추적 변수에 담는다
@@ -2211,6 +2198,7 @@ namespace UI.Battle
             }
 
             currentProcessingAction = null;
+            currentActingEntity = null;
 
             // 행동할 수 있는 적이 없는지 한 번 더 체크
             if (CheckBattleEnd(out bool finalWin)) 
@@ -2348,10 +2336,9 @@ namespace UI.Battle
 
                     if (action.target == null || action.target.GetComponent<PlayerController>() != null)
                     {
-                        var livingEnemies = fieldController.activeMonsters.Where(m => m.currentHp > 0).ToList();
-                        if (livingEnemies.Count > 0)
-                            action.target = livingEnemies[Random.Range(0, livingEnemies.Count)].gameObject;
-                        else yield break;
+                        BattleEntity target = fieldController.GetRandomLivingMonster(false);
+                        if (target == null) yield break;
+                        action.target = target.gameObject;
                     }
 
                     action.type = ActionType.Attack;
@@ -2410,6 +2397,13 @@ namespace UI.Battle
             bool isReviveSkill = skill != null && 
                                  (skill.effectType == EffectType.Revive_Empty || 
                                   skill.effectType == EffectType.Revive_Fully);
+
+            // A group revive remains valid when the originally selected ally was revived earlier.
+            if (isReviveSkill && skill.targetScope == TargetScope.All_Dead_Allies)
+            {
+                PlayerController deadAlly = fieldController.GetFirstDeadPartyMember();
+                action.target = deadAlly != null ? deadAlly.gameObject : null;
+            }
 
             // 스킬 타겟 자동 변경 로직. 부활 스킬이 아닐 때만 살아있는 타겟으로 자동 변경
             if (!isReviveSkill)
@@ -2683,12 +2677,13 @@ namespace UI.Battle
             Coroutine rainbowRoutine = StartCoroutine(ProcessRainbowEffect(participants));
 
             // 난사 시작
+            var enemies = new List<BattleEntity>(6);
             float shotInterval = 0.08f; 
             
             for (int i = 0; i < totalAmmo; i++)
             {
                 // 매 발사마다 살아있는 적 확인
-                List<BattleEntity> enemies = fieldController.GetLivingMonsters();
+                fieldController.FillLivingMonsters(enemies);
 
                 // 적이 살아있을 때만 데미지 처리
                 if (enemies.Count > 0)
@@ -2698,7 +2693,7 @@ namespace UI.Battle
                         if (enemy.currentHp <= 0) continue;
                         
                         PlayerController shooter = participants[i % participants.Count];
-                        BattleEntity enemyEntity = enemy.gameObject.GetComponent<BattleEntity>();
+                        BattleEntity enemyEntity = enemy;
                         int dmg = BattleCalculator.CalculateGunDamage(shooter, enemyEntity, false);
                         
                         ApplyDamage(enemy.gameObject, dmg, false);
@@ -2884,6 +2879,7 @@ namespace UI.Battle
                 uiController.HideStateMessage();
             
             // 타격 처리 (QTE or Auto)
+            var currentTargets = new List<GameObject>(6);
             int currentHits = 0;
             int hitsPerformed = 0; // 실제로 수행한 타격 수 카운트
 
@@ -2902,7 +2898,7 @@ namespace UI.Battle
                     uiController.UpdateQTESliderValue(1.0f - (timer / qteDuration));
                     if (Common.GameInput.GetConfirmDown())
                     {
-                        List<GameObject> currentTargets = fieldController.GetTargetsByScope(scope, action.actor, action.target);
+                        fieldController.FillTargetsByScope(scope, action.actor, action.target, currentTargets);
                         if (currentTargets.Count == 0) break;
                         foreach (var target in currentTargets) StartCoroutine(ProcessSingleHit(action, target));
                         currentHits++;
@@ -2942,7 +2938,7 @@ namespace UI.Battle
                     else break; // 더 이상 살아있는 적이 없으면 허공에 쏘지 않고 즉시 공격을 멈춤
                 }
 
-                List<GameObject> currentTargets = fieldController.GetTargetsByScope(scope, action.actor, action.target);
+                fieldController.FillTargetsByScope(scope, action.actor, action.target, currentTargets);
                 if (currentTargets.Count == 0) break; 
                 foreach (var target in currentTargets)
                 {
@@ -3342,6 +3338,9 @@ namespace UI.Battle
 
         IEnumerator EndBattleRoutine(bool isWin)
         {
+            if (isEndingBattle) yield break;
+            isEndingBattle = true;
+            currentActingEntity = null;
             state = isWin ? BattleState.Won : BattleState.Lost;
             uiController.SetCmdPanelVisible(false);
             uiController.HideStateMessage();

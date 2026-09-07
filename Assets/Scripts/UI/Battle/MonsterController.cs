@@ -226,9 +226,11 @@ namespace UI.Battle
             }
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             if (animationCoroutine != null) StopCoroutine(animationCoroutine);
+            animationCoroutine = null;
         }
 
         // 몬스터 대기 모션 애니메이션

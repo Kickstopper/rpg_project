@@ -1,0 +1,8 @@
+{
+    "name": "RPGProject.Battle.Tests",
+    "references": ["RPGProject.Runtime"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "autoReferenced": false
+}
