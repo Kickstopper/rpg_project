@@ -1,0 +1,7 @@
+{
+    "name": "RPGProject.VFXEditor",
+    "rootNamespace": "RPGProject.Editor.VFX",
+    "references": ["RPGProject.Runtime", "UnityEngine.UI"],
+    "includePlatforms": ["Editor"],
+    "autoReferenced": true
+}

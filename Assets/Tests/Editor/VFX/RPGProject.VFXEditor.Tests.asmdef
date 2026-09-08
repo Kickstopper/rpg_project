@@ -1,0 +1,7 @@
+{
+    "name": "RPGProject.VFXEditor.Tests",
+    "references": ["RPGProject.Runtime", "RPGProject.VFXEditor", "UnityEngine.UI"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "includePlatforms": ["Editor"],
+    "autoReferenced": false
+}
