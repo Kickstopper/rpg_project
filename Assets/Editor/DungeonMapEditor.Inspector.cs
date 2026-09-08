@@ -358,17 +358,29 @@ public partial class DungeonMapEditor
             if (GUILayout.Button("카탈로그를 매니저 프리팹에 연결")) Later(() =>
             { DungeonMapEditorIndex.ConnectCatalog(index.managersPrefab, catalog); status = "매니저 프리팹 연결 완료"; });
     }
+    // 저장/등록/목록 갱신에서 issues가 바뀌어도 현재 Layout의 표시 항목은 유지합니다.
+    private DungeonMapIssue[] layoutIssues = new DungeonMapIssue[0];
+    private string[] layoutIndexProblems = new string[0];
+    private int layoutIssueCount;
+
+    private void CaptureIssueLayout()
+    {
+        layoutIssueCount = issues.Count;
+        layoutIssues = issues.Take(80).ToArray();
+        layoutIndexProblems = index.problems.Take(5).ToArray();
+    }
+
     private void DrawIssues()
     {
-        issuesOpen = EditorGUILayout.Foldout(issuesOpen, $"맵 검사 ({issues.Count}건)", true);
+        issuesOpen = EditorGUILayout.Foldout(issuesOpen, $"맵 검사 ({layoutIssueCount}건)", true);
         if (!issuesOpen) return;
-        foreach (var issue in issues.Take(80))
+        foreach (var issue in layoutIssues)
         {
             string prefix = issue.severity == MessageType.Error ? "오류" : "안내";
             string coordinate = issue.position.x >= 0 ? $" ({issue.position.x},{issue.position.y})" : "";
             if (GUILayout.Button($"{prefix}{coordinate}: {issue.message}", EditorStyles.wordWrappedMiniLabel)) FocusCell(issue.position);
         }
-        if (issues.Count > 80) GUILayout.Label($"외 {issues.Count - 80}건. 먼저 표시된 항목을 수정하세요.", EditorStyles.wordWrappedMiniLabel);
-        foreach (var problem in index.problems.Take(5)) EditorGUILayout.HelpBox(problem, MessageType.Warning);
+        if (layoutIssueCount > 80) GUILayout.Label($"외 {layoutIssueCount - 80}건. 먼저 표시된 항목을 수정하세요.", EditorStyles.wordWrappedMiniLabel);
+        foreach (var problem in layoutIndexProblems) EditorGUILayout.HelpBox(problem, MessageType.Warning);
     }
 }

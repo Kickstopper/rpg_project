@@ -178,6 +178,12 @@ public partial class DungeonMapEditor : EditorWindow
     {
         if (document == null || index == null) return;
         if (EditorApplication.isPlayingOrWillChangePlaymode) FinishGesture();
+        
+        if (Event.current.type == EventType.Layout)
+        {
+            if (needsValidation && !gestureActive) ValidateMap();
+            CaptureIssueLayout();
+        }
         HandleShortcuts();
         using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
         {
@@ -197,8 +203,6 @@ public partial class DungeonMapEditor : EditorWindow
         if (EditorApplication.isPlayingOrWillChangePlaymode)
             EditorGUILayout.HelpBox("맵 편집은 Play 모드 종료 후 사용할 수 있습니다.", MessageType.Info);
         EditorGUILayout.LabelField(status, EditorStyles.helpBox, GUILayout.Height(36));
-        // 단일 클릭은 즉시 검증하되 드래그 중에는 문서 전체를 반복 검사하지 않습니다.
-        if (needsValidation && !gestureActive && Event.current.type == EventType.Layout) ValidateMap();
     }
     private void HandleShortcuts()
     {
