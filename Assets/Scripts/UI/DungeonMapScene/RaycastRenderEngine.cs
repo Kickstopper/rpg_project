@@ -66,6 +66,14 @@ namespace UI.DungeonMapScene
         private DustParticle[] _dustArray;
 
         public Texture2D ScreenTexture { get; private set; }
+        private readonly DungeonTalkIcon talkIcon = new DungeonTalkIcon();
+        private bool showTalkIcon;
+
+        public void SetTalkPrompt(bool visible, Sprite sprite = null, int pixelWidth = 48)
+        {
+            showTalkIcon = visible;
+            if (visible) talkIcon.Configure(sprite, pixelWidth);
+        }
 
         public void Initialize(int width, int height)
         {
@@ -249,6 +257,8 @@ namespace UI.DungeonMapScene
                 PerformPass(player, settings, 1, false);
             }
 
+            // Draw once after stereo composition so the prompt stays centered and legible.
+            if (showTalkIcon) talkIcon.DrawCentered(_buffer, _screenWidth, _screenHeight);
             ScreenTexture.SetPixels32(_buffer);
             ScreenTexture.Apply();
         }

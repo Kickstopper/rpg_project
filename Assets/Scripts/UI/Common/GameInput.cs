@@ -4,13 +4,19 @@ namespace UI.Common
 {
     public static class GameInput
     {
+        private static int confirmConsumedFrame = -1;
+        public static bool IsConfirmConsumed => confirmConsumedFrame == Time.frameCount;
+        public static void ConsumeConfirmThisFrame() => confirmConsumedFrame = Time.frameCount;
         public static bool GetConfirmDown()
         {
+            if (IsConfirmConsumed) return false;
+            if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began) return true;
             return Input.GetButtonDown("Submit") || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return);
         }
 
         public static bool GetSelectDown()
         {
+            if (IsConfirmConsumed) return false;
             return Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space);
         }
 

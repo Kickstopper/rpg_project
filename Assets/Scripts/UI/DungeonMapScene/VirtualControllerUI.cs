@@ -52,7 +52,7 @@ namespace UI.DungeonMapScene
             if (ManagerRoot.GameState.CurrentState != GameState.Exploration) return;
             
             // 마우스 클릭 시 패널 나타남
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !UI.Common.GameInput.IsConfirmConsumed)
             {
                 ShowController();
             }

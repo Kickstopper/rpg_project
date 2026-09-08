@@ -119,6 +119,7 @@ namespace Data
         public string eventID = "";
         public string requiredFlag = "";
         public bool requiredFlagState = true;
+        [Tooltip("처음에는 지정한 발동 시점에 자동 실행됩니다. 완료 후에는 같은 셀의 TALK 입력으로 다시 실행합니다.")]
         public bool isEventRepeatable = false;
         
         // 이벤트 발동 시점

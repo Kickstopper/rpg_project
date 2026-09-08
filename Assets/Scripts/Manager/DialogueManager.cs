@@ -61,6 +61,12 @@ namespace Manager
             Debug.Log($"[DialogueManager] {logName} 데이터 로드 완료. 추가된 Rows: {rowCount}");
         }
 
+        // Allocation-free availability check for cell prompts and automatic event selection.
+        public bool HasEvent(string eventID)
+        {
+            return !string.IsNullOrEmpty(eventID) && eventDatabase.TryGetValue(eventID, out var lines) && lines.Count > 0;
+        }
+
         public List<Dictionary<string, string>> GetEventData(string eventID)
         {
             if (eventDatabase.ContainsKey(eventID))

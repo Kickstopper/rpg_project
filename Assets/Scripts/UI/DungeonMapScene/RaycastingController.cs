@@ -14,7 +14,7 @@ using UI.Common;
 
 namespace UI.DungeonMapScene
 {
-    public class RaycastingController : MonoBehaviour
+    public partial class RaycastingController : MonoBehaviour
     {
         [Header("Settings")]
         public RenderSettings renderSettings;
@@ -213,8 +213,8 @@ namespace UI.DungeonMapScene
             CheckFrontForEntranceName();
             CheckCurrentTileEvent(); 
 
-            // 조작 잠금 해제
-            _inputLocked = false;
+            // Keep the lock if entering the tile started a dialogue.
+            _inputLocked = _cellDialogueActive;
             _isLookTransitioning = false;
         }
 
@@ -303,7 +303,8 @@ namespace UI.DungeonMapScene
             if (!isFullMapOpen)
             {
                 // 플레이어 조작 허용
-                if (!_inputLocked) HandleInput(); 
+                if (!_inputLocked) HandleInput();
+                if (!_canRender) return;
                 
                 // 벽/바닥 애니메이션 실행
                 UpdateWallAnimations();
@@ -334,12 +335,14 @@ namespace UI.DungeonMapScene
             }
 
             // 맵이 열려있더라도 뒤에 깔린 3D 던전 화면이 검게 꺼지면 안 되므로 렌더러는 계속 호출
-            _renderer.RenderFrame(_player, renderSettings);
+            RenderDungeonFrame();
             UpdateBackgroundUV();
         }
 
         private void HandleInput()
         {
+            if (_cellDialogueActive) return;
+            if (TalkPointerPressed() && TryReplayCurrentCellDialogue()) return;
             if (_isLookTransitioning) return;
 
             if (_currentLookState != LookState.None)
@@ -842,7 +845,7 @@ namespace UI.DungeonMapScene
                             StartCoroutine(_player.BumpRoutine(moveVec)); 
                             
                             _inputLocked = true;
-                            StartCoroutine(ShowDialog(attemptEventID, attemptForceDir));   
+                            StartCoroutine(ShowCellDialog(attemptEventID, attemptForceDir, tx, ty));
                             return; // 진입을 차단하고 여기서 종료
                         }
 
@@ -898,29 +901,10 @@ namespace UI.DungeonMapScene
         // 지정된 좌표에 실행 가능한 이벤트가 있는지 미리 확인 (확인만 하고 발생시키지 않음)
         private bool HasValidEvent(int x, int y)
         {
-            if (_currentMap == null || ManagerRoot.DungeonEvent == null) return false;
-            
-            CellData cell = _currentMap.GetCell(x, y);
-            if (cell == null || cell.events == null || cell.events.Count == 0) return false;
-
-            List<string> completedList = ManagerRoot.DungeonEvent.GetCompletedTriggers();
-            foreach (var ev in cell.events)
-            {
-                if (string.IsNullOrEmpty(ev.eventID)) continue;
-                
-                // 선행 플래그 검사
-                if (!string.IsNullOrEmpty(ev.requiredFlag))
-                {
-                    if (ManagerRoot.Flag.CheckFlag(ev.requiredFlag) != ev.requiredFlagState) continue;
-                }
-                
-                // 완료 여부 검사
-                string uniqueKey = $"{_currentMap.mapID}_{x}_{y}_{ev.eventID}";
-                if (!ev.isEventRepeatable && completedList.Contains(uniqueKey)) continue;
-
-                return true; // 실행 가능한 이벤트가 하나라도 있다면 true 반환
-            }
-            return false;
+            var events = ManagerRoot.DungeonEvent;
+            return _currentMap != null && events != null &&
+                (events.FindAutomaticEvent(_currentMap, x, y, false) != null ||
+                 events.FindAutomaticEvent(_currentMap, x, y, true) != null);
         }
 
         private IEnumerator SymbolEncounterRoutine(MapEnemy enemy, Vector2Int moveVec, EncounterType encType)
@@ -1055,7 +1039,9 @@ namespace UI.DungeonMapScene
 
         public void UI_Action()
         {
-            if (_inputLocked || _player.IsMoving || _isLookTransitioning) return;
+            if (!_canRender || _inputLocked || _player.IsMoving || _isLookTransitioning ||
+                (autoMapContainer != null && autoMapContainer.activeSelf) || GameInput.IsConfirmConsumed) return;
+            if (TryReplayCurrentCellDialogue()) return;
             CellData currentCell = null;
             // 위 쳐다보기 처리
             if (_currentLookState == LookState.Up)
@@ -1411,7 +1397,7 @@ namespace UI.DungeonMapScene
                 }
 
                 // 대화 이벤트가 끝날 때까지 대기
-                yield return StartCoroutine(ShowDialog(afterEventID, forceDir));
+                yield return StartCoroutine(ShowCellDialog(afterEventID, forceDir, targetGridX, targetGridY));
 
                 // 대화가 끝난 후 UI로 넘어가기 전 자연스러운 처리를 위해 다시 암전
                 if (transitionManager != null && transitionManager.fadeOverlay != null)
@@ -1538,7 +1524,7 @@ namespace UI.DungeonMapScene
                         if (miniMap) miniMap.SnapToGrid(exitLogicX, exitLogicY, exitDir);
                         UpdateMapDiscovery(exitLogicX, exitLogicY);
 
-                        _renderer.RenderFrame(_player, renderSettings);
+                        RenderDungeonFrame();
 
                         yield return StartCoroutine(RestoreViewAndCheckEventRoutine(0.5f));
                         
@@ -1788,7 +1774,7 @@ namespace UI.DungeonMapScene
             Vector2 startPos = new Vector2(targetPos.x - (forward.x * 0.8f), targetPos.y - (forward.y * 0.8f));
             
             _player.SetDirectPosition(startPos.x, startPos.y, _player.DirectionIdx);
-            _renderer.RenderFrame(_player, renderSettings);
+            RenderDungeonFrame();
 
             if (ManagerRoot.GameState.explorationCanvas != null) ManagerRoot.GameState.explorationCanvas.SetActive(true);
 
@@ -1812,7 +1798,7 @@ namespace UI.DungeonMapScene
                 for (int i = 0; i < doorConfig.openFrameTexIds.Length; i++)
                 {
                     doorCell.wallTextureIDs[doorFrontFace] = doorConfig.openFrameTexIds[i];
-                    _renderer.RenderFrame(_player, renderSettings); 
+                    RenderDungeonFrame();
                     yield return YieldCache.WaitForSeconds(doorConfig.animSpeed);
                 }
             }
@@ -1829,7 +1815,7 @@ namespace UI.DungeonMapScene
                 corridorCell.wallTextureIDs[corridorBackFace] = -1;
             }
 
-            _renderer.RenderFrame(_player, renderSettings);
+            RenderDungeonFrame();
 
             float stepOutTime = 0.6f;
             StartCoroutine(ElevatorUIManager.Instance.StepOutZoomRoutine(stepOutTime)); 
@@ -1855,16 +1841,18 @@ namespace UI.DungeonMapScene
                 float easeT = t < 0.5f ? 4f * t * t * t : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
 
                 _player.SetDirectPosition(Mathf.Lerp(startPos.x, targetPos.x, easeT), Mathf.Lerp(startPos.y, targetPos.y, easeT), _player.DirectionIdx);
-                _renderer.RenderFrame(_player, renderSettings);
+                RenderDungeonFrame();
                 yield return null;
             }
 
             _player.SetDirectPosition(targetPos.x, targetPos.y, _player.DirectionIdx);
-            _renderer.RenderFrame(_player, renderSettings);
+            RenderDungeonFrame();
         }
 
         private void LoadMapData(EntranceData entryEntrance = null)
         {
+            _talkPromptShown = false;
+            _renderer.SetTalkPrompt(false);
             _currentMap = ManagerRoot.Dungeon.CurrentDungeonData;
             theme = ManagerRoot.Dungeon.GetDungeonTheme(_currentMap.themeID);
             
@@ -2043,7 +2031,8 @@ namespace UI.DungeonMapScene
 
         private void CheckCurrentTileEvent()
         {
-            if (ManagerRoot.DungeonEvent == null) return;
+            if (ManagerRoot.DungeonEvent == null || _cellDialogueActive || ManagerRoot.GameState == null ||
+                ManagerRoot.GameState.CurrentState != GameState.Exploration) return;
 
             // cell에 완전히 올라선 뒤(false) 발동하는 이벤트 검사
             (string eventID, int forceDir) = ManagerRoot.DungeonEvent.CheckEvent(_player.LogicX, _player.LogicY, false);
@@ -2051,16 +2040,48 @@ namespace UI.DungeonMapScene
             {
                 _inputLocked = true;
                 _player.SetRunning(false);
-                StartCoroutine(ShowDialog(eventID, forceDir));
+                StartCoroutine(ShowCellDialog(eventID, forceDir, _player.LogicX, _player.LogicY));
             }
         }
 
-        IEnumerator ShowDialog(string eventID, int forceDir)
+        IEnumerator ShowDialog(string eventID, int forceDir, Action onCompleted = null)
         {
-            if (forceDir != -1) yield return TurnToDirectionRoutine(forceDir);
-            ManagerRoot.GameState.StartEventDialogue(eventID);
-            yield return new WaitUntil(() => ManagerRoot.GameState.CurrentState == GameState.Exploration);
-            _inputLocked = false;
+            if (_cellDialogueActive) yield break;
+            _cellDialogueActive = true;
+            _inputLocked = true;
+            GameInput.ConsumeConfirmThisFrame();
+            RenderDungeonFrame(true);
+            try
+            {
+                var gameState = ManagerRoot.GameState;
+                if (gameState == null || gameState.dialogueController == null ||
+                    ManagerRoot.Dialogue == null || !ManagerRoot.Dialogue.HasEvent(eventID))
+                {
+                    Debug.LogWarning($"[Dungeon] 대화를 실행할 수 없습니다: {eventID}");
+                    yield break;
+                }
+                if (gameState.dialogueController.IsDialogueActive) yield break;
+                if (forceDir != -1) yield return TurnToDirectionRoutine(forceDir);
+                bool completed = false;
+                gameState.StartEventDialogue(eventID, result =>
+                {
+                    if (completed) return;
+                    completed = true;
+                    onCompleted?.Invoke();
+                    _cellDialogueActive = false;
+                    _inputLocked = false;
+                    BlockTalkInputAfterDialogue();
+                    gameState.ChangeState(GameState.Exploration);
+                });
+                yield return new WaitUntil(() => completed || gameState == null ||
+                    (gameState.dialogueController != null && !gameState.dialogueController.IsDialogueActive && gameState.CurrentState == GameState.Exploration));
+            }
+            finally
+            {
+                _cellDialogueActive = false;
+                _inputLocked = false;
+                BlockTalkInputAfterDialogue();
+            }
         }
 
         private void UpdateMapDiscovery(int x, int y)
@@ -2710,6 +2731,9 @@ namespace UI.DungeonMapScene
         private void OnGameStateChanged(GameState newState)
         {
             _canRender = (newState == GameState.Exploration);
+            _talkBlockedThroughFrame = Time.frameCount + 1;
+            _talkReadyAt = Time.unscaledTime + 0.12f;
+            if (!_canRender) RenderDungeonFrame(true);
             if (!_canRender)
             {
                 HideSystemMessage();
@@ -2724,6 +2748,8 @@ namespace UI.DungeonMapScene
 
         public Sprite CaptureCurrentDungeonView()
         {
+            // TALK is an exploration affordance, not part of a captured battle background.
+            RenderDungeonFrame(true);
             if (screenImage == null || screenImage.material == null || screenImage.material.mainTexture == null) return null;
             Texture sourceTex = screenImage.material.mainTexture;
             Texture2D capturedTex = null;
