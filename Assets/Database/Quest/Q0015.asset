@@ -10,11 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a51393ac7af01634bb7951ce9cdc173b, type: 3}
-  m_Name: Q0015
-  m_EditorClassIdentifier: Assembly-CSharp::Data.QuestData
+  m_Name: 
+  m_EditorClassIdentifier: RPGProject.Runtime::Data.QuestData
   QuestID: Q0015
   QuestName: "\uC0AC\uC2E0\uC774 \uAC77\uB294 \uC120\uB85C"
   QuestType: Main
+  completionFlag: 
+  prerequisiteQuestIDs: []
   Targets:
   - monsterID: enemy_024
     requiredCount: 1
