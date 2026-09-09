@@ -1,0 +1,1 @@
+{"name":"RPGProject.Balance.Tests","references":["RPGProject.Runtime","RPGProject.Editor"],"includePlatforms":["Editor"],"optionalUnityReferences":["TestAssemblies"],"autoReferenced":false}
