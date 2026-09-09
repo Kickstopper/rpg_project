@@ -74,14 +74,32 @@ namespace Data
         // 습득한 스킬 목록
         public List<string> learnedSkills = new();
         
-        // 전투 외에서도 유지되는 상태이상의 ID     
-        public StatusEffectID persistentStatusId; 
-        // UI나 필드 로직에서 쉽게 데이터에 접근하기 위한 프로퍼티
+        public event System.Action ExplorationVitalsChanged;
+        public void NotifyExplorationVitalsChanged() => ExplorationVitalsChanged?.Invoke();
+        private StatusEffectSet statusEffects;
+        private List<StatusEffectSaveEntry> pendingStatusEffects;
+        public StatusEffectSet StatusEffects
+        {
+            get
+            {
+                if (statusEffects == null)
+                {
+                    statusEffects = new StatusEffectSet();
+                    statusEffects.Import(pendingStatusEffects, id => ManagerRoot.Database.GetStatusEffect(id));
+                    pendingStatusEffects = null;
+                }
+                return statusEffects;
+            }
+        }
+        // Read compatibility for old views. New code must use the complete collection.
+        public StatusEffectID persistentStatusId => CurrentStatusEffect != null ? CurrentStatusEffect.id : StatusEffectID.None;
         public StatusEffectData CurrentStatusEffect
         {
-            get {
-                if (persistentStatusId == StatusEffectID.None) return null;
-                return ManagerRoot.Database.GetStatusEffect(persistentStatusId); 
+            get
+            {
+                foreach (var effect in StatusEffects.Effects)
+                    if (effect.data.durationType == EffectDurationType.Persistent) return effect.data;
+                return null;
             }
         }
 
@@ -97,7 +115,14 @@ namespace Data
             if (System.Enum.TryParse(save.column, out ColumnType parsedCol)) column = parsedCol;
             if (System.Enum.TryParse(save.gender, out Gender parsedGender)) gender = parsedGender;
             if (System.Enum.TryParse(save.basicAttackVfxID, out VfxID parseBasicAtkVfx)) basicAttackVfxId = parseBasicAtkVfx;
-            if (System.Enum.TryParse(save.persistentStatusId, out StatusEffectID parseStatusEffectID)) persistentStatusId = parseStatusEffectID;
+            pendingStatusEffects = save.statusEffects;
+            if (save.statusEffectsVersion == 0 && (pendingStatusEffects == null || pendingStatusEffects.Count == 0) &&
+                System.Enum.TryParse(save.persistentStatusId, out StatusEffectID legacyId) && legacyId != StatusEffectID.None)
+            {
+                pendingStatusEffects = new List<StatusEffectSaveEntry> {
+                    new StatusEffectSaveEntry { id = legacyId.ToString(), turnsRemaining = 3 }
+                };
+            }
             resonanceId = save.resonanceId;
 
             stats = save.stats;
@@ -182,6 +207,8 @@ namespace Data
             data.row = this.row.ToString();
             data.column = this.column.ToString();
 
+            data.statusEffectsVersion = 1;
+            data.statusEffects = StatusEffects.ExportPersistent();
             data.persistentStatusId = this.persistentStatusId.ToString();
             
             data.resistances = this.resistances;

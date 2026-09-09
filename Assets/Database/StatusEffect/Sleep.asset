@@ -13,15 +13,25 @@ MonoBehaviour:
   m_Name: Sleep
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 8
-  effectName: SLEEP
+  effectName: "수면"
   durationType: 0
   cureType: 2
   maxTurns: 3
   cureChancePerTurn: 0.25
   atkMultiplier: 1
   defMultiplier: 1
-  evaMultiplier: 1
+  evaMultiplier: 0
   accMultiplier: 1
   restrictionType: 1
   restrictionChance: 1
   dotDamage: 0
+  icon: {fileID: 0}
+  description: "행동과 회피가 불가능합니다. 직접 공격의 피해로 깨어납니다. 지속 피해에는 깨어나지 않습니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 90
+  cureOnDirectDamage: 1
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

@@ -13,15 +13,25 @@ MonoBehaviour:
   m_Name: Burn
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 1
-  effectName: BURN
+  effectName: "화상"
   durationType: 0
-  cureType: 2
+  cureType: 1
   maxTurns: 3
   cureChancePerTurn: 0.5
-  atkMultiplier: 1
+  atkMultiplier: 0.8
   defMultiplier: 1
   evaMultiplier: 1
   accMultiplier: 1
   restrictionType: 0
-  restrictionChance: 1
+  restrictionChance: 0
   dotDamage: 10
+  icon: {fileID: 0}
+  description: "지속 피해를 받고 공격력이 감소합니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 30
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

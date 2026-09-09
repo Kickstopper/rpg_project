@@ -13,15 +13,25 @@ MonoBehaviour:
   m_Name: Charm
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 12
-  effectName: CHARM
+  effectName: "매료"
   durationType: 0
   cureType: 2
   maxTurns: 3
-  cureChancePerTurn: 0.5
+  cureChancePerTurn: 0.25
   atkMultiplier: 1
   defMultiplier: 1
   evaMultiplier: 1
   accMultiplier: 1
   restrictionType: 4
-  restrictionChance: 0.35
+  restrictionChance: 1
   dotDamage: 0
+  icon: {fileID: 0}
+  description: "명령 대신 같은 진영의 다른 캐릭터를 공격합니다. 대상이 없으면 대기합니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 80
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

@@ -13,15 +13,25 @@ MonoBehaviour:
   m_Name: Silence
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 4
-  effectName: SILENCE
+  effectName: "침묵"
   durationType: 0
-  cureType: 0
+  cureType: 2
   maxTurns: 3
-  cureChancePerTurn: 0.5
+  cureChancePerTurn: 0.25
   atkMultiplier: 1
   defMultiplier: 1
   evaMultiplier: 1
   accMultiplier: 1
   restrictionType: 2
-  restrictionChance: 0.35
+  restrictionChance: 1
   dotDamage: 0
+  icon: {fileID: 0}
+  description: "스킬을 사용할 수 없습니다. 일반 공격과 아이템은 사용할 수 있습니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 60
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

@@ -136,35 +136,35 @@ namespace UI.Battle
         public override int GetAttack()
         {
             float baseAtk = (level + GetTotalStr()) * 2;
-            return Mathf.RoundToInt(baseAtk * GetBuffMultiplier(buffPhysAtk));
+            return Mathf.RoundToInt(baseAtk * GetBuffMultiplier(buffPhysAtk) * StatusAttackMultiplier);
         }
 
         public override int GetDefense()
         {
             float baseDef = sourceData.stats.vit + Mathf.FloorToInt(sourceData.stats.level * 0.5f);
-            return Mathf.RoundToInt(baseDef * GetBuffMultiplier(buffPhysDef));
+            return Mathf.RoundToInt(baseDef * GetBuffMultiplier(buffPhysDef) * StatusDefenseMultiplier);
         }
         
         public override int GetMagicAttack()
         {
             float baseMagAtk = (GetTotalInt() / 2) + (GetTotalMag() / 2);
-            return Mathf.RoundToInt(baseMagAtk * GetBuffMultiplier(buffMagAtk));
+            return Mathf.RoundToInt(baseMagAtk * GetBuffMultiplier(buffMagAtk) * StatusAttackMultiplier);
         }
 
         public override int GetMagicDefense()
         {
             float baseMagDef = GetTotalInt() + (GetTotalMag() / 4) + (GetTotalVit() / 2) + (level / 2);
-            return Mathf.RoundToInt(baseMagDef * GetBuffMultiplier(buffMagDef));
+            return Mathf.RoundToInt(baseMagDef * GetBuffMultiplier(buffMagDef) * StatusDefenseMultiplier);
         }
 
         public override int GetHitRate()
         {
-            return ((GetTotalStr() + GetTotalLuc()) / 4) + GetTotalAgi() + (level / 2) + level;
+            return Mathf.RoundToInt((((GetTotalStr() + GetTotalLuc()) / 4) + GetTotalAgi() + (level / 2) + level) * StatusAccuracyMultiplier);
         }
 
         public override int GetEvasion()
         {
-            return GetTotalAgi() + (GetTotalInt() / 4) + (GetTotalLuc() / 4) + level + (level / 2);
+            return Mathf.RoundToInt((GetTotalAgi() + (GetTotalInt() / 4) + (GetTotalLuc() / 4) + level + (level / 2)) * StatusEvasionMultiplier);
         }
 
         public override ResistanceData GetResistances()
@@ -180,6 +180,7 @@ namespace UI.Battle
             frontRowColor = Color.Lerp(manager.fogColor, Color.white, 0.8f);
 
             sourceData = data;
+            BindStatusEffects(new StatusEffectSet());
             entityName = data.name;
             level = data.stats.level;
             
@@ -354,23 +355,7 @@ namespace UI.Battle
         // AI 행동 결정 함수
         public BattleAction ChooseAction(BattleContext context)
         {
-            // 상태이상에 대한 공통 처리
-            RestrictionType restriction = CheckActionRestriction();
-
-            if (restriction == RestrictionType.SkipTurn)
-            {
-                Debug.Log($"{this.name}은(는) 상태이상으로 움직일 수 없다!");
-                return new BattleAction(this.gameObject, this.gameObject, UI.ActionType.Next, 0);
-            }
-            else if (restriction == RestrictionType.Panic || restriction == RestrictionType.Charm)
-            {
-                Debug.Log($"{this.name}은(는) 혼란에 빠졌다!");
-                // 아군 적군 구분 없이 무작위 타겟을 골라 평타를 치는 액션 강제 반환
-                var allTargets = context.activePlayers.Concat(context.activeMonsters).Where(e => e.currentHp > 0).ToList();
-                var randomTarget = allTargets[Random.Range(0, allTargets.Count)];
-                return new BattleAction(this.gameObject, randomTarget.gameObject, UI.ActionType.Attack, this.GetTotalAgi());
-            }
-
+            // Random action restrictions are resolved once, immediately before execution.
             // 상태이상 통과 시, AI에 판단 위임
             if (sourceData.aiProfile != null)
                 return sourceData.aiProfile.DecideAction(this, context);

@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Stun
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 10
-  effectName: STUN
+  effectName: "기절"
   durationType: 0
   cureType: 1
-  maxTurns: 2
+  maxTurns: 1
   cureChancePerTurn: 0.5
   atkMultiplier: 1
   defMultiplier: 1
@@ -25,3 +25,13 @@ MonoBehaviour:
   restrictionType: 1
   restrictionChance: 1
   dotDamage: 0
+  icon: {fileID: 0}
+  description: "다음 행동 기회를 잃습니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 86
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

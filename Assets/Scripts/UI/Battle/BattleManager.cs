@@ -17,7 +17,7 @@ namespace UI.Battle
     public enum BattleState { Start, PlayerInput, EnemyInput, Processing, Won, Lost }
     public enum EncounterType { Normal, Preemptive, Ambush, Random }
     
-    public class BattleManager : MonoBehaviour
+    public partial class BattleManager : MonoBehaviour
     {
         [Header("UI References")]
         public Image battleBackgroundImage;
@@ -169,6 +169,7 @@ namespace UI.Battle
             questBattleRecord.Reset(); questBattleApplied = false;
             questBattleLocation = ManagerRoot.Dungeon?.CurrentDungeonData?.locationID;
             isEndingBattle = false;
+            pendingStatusOpportunities = null;
             currentActingEntity = null;
             this.fogColor = fogColor;
             currentEncounterType = encType;
@@ -229,6 +230,11 @@ namespace UI.Battle
                 return;  
             }  
             
+            if (CheckBattleEnd(out bool endedAtEntry))
+            {
+                StartCoroutine(EndBattleRoutine(endedAtEntry));
+                return;
+            }
             // 인스턴트 윈 조건 체크 및 분기
             if (CheckInstantWinCondition())
             {
@@ -523,6 +529,13 @@ namespace UI.Battle
                 StopCoroutine(runningActionCoroutine);
                 runningActionCoroutine = null;
             }
+            yield return CompletePendingStatusOpportunities();
+            currentUnionParticipants.Clear();
+            if (CheckBattleEnd(out bool wonAfterStatus))
+            {
+                yield return EndBattleRoutine(wonAfterStatus);
+                yield break;
+            }
 
             if (currentProcessingAction != null && currentProcessingAction.actor != null)
             {
@@ -686,6 +699,7 @@ namespace UI.Battle
 
         private bool CheckUnionAttackCondition(PlayerController actor)
         {
+            if (!actor.CanCooperate) return false;
             List<PlayerController> unionPartners = GetValidUnionPartners(actor);
             return !isUnionAttackUsedThisTurn && (unionPartners.Count >= 2);
         }
@@ -703,7 +717,8 @@ namespace UI.Battle
             }
             int frontLivingCount = fieldController.GetFrontLivingCharacterCount();
             
-            return isFrontRow && isFirstFrontRowInput && (frontLivingCount == 3);
+            return isFrontRow && isFirstFrontRowInput && (frontLivingCount == 3) &&
+                fieldController.GetCharactersInFrontRow().All(p => p.CanCooperate);
         }
 
         // Rolling Vulcan 발동 조건 검사
@@ -722,7 +737,7 @@ namespace UI.Battle
             foreach (var p in livingPlayers)
             {
                 var pc = p as PlayerController;
-                if (pc.equippedGunId != "gun_001") return false;
+                if (!pc.CanCooperate || pc.equippedGunId != "gun_001") return false;
                 if (pc.currentGun == null || pc.currentGunAmmo < pc.currentGun.maxHits) return false;
             }
 
@@ -752,7 +767,7 @@ namespace UI.Battle
             uiController.InitCommandButtons();
 
             // Skill 조건. 배운 스킬이 있고, Silence 제약이 걸리지 않아야 함
-            bool hasSilence = actor.activeEffects.Exists(e => e.data.restrictionType == RestrictionType.Silence);
+            bool hasSilence = !actor.CanUseSkills;
             bool canSkill = actor.learnedSkillIds.Count > 0 && !hasSilence;
 
             // Item 조건
@@ -1471,27 +1486,6 @@ namespace UI.Battle
 
             PlayerController activePlayer = fieldController.GetCurrentCharacter();
 
-            // 제약 조건 체크
-            RestrictionType restriction = activePlayer.CheckActionRestriction();
-
-            if (restriction == RestrictionType.SkipTurn)
-            {
-                uiController.ShowLog($"{activePlayer.name.AttachParticle("은/는")} 움직일 수 없다!");
-                BattleAction skipAction = new BattleAction(activePlayer.gameObject, activePlayer.gameObject, ActionType.Next, 0);
-                actionQueue.Add(skipAction);
-                
-                // 재귀 호출 대신 루프 바깥에서 다시 호출
-                NextPlayerInput(); 
-                return;
-            }
-            else if (restriction == RestrictionType.Panic || restriction == RestrictionType.Charm)
-            {
-                uiController.ShowLog($"{currentPlayer.name.AttachParticle("은/는")} 혼란에 빠졌다!");
-                // 플레이어 조작을 막고, 랜덤 타겟 자동 액션(Attack, Guard, Next)을 큐에 넣음.
-                ProcessRandomAction(currentPlayer);
-                return;
-            }
-
             // Union Attack / Rolling Vulcan 참가자 스킵 처리
             if (currentUnionParticipants.Contains(currentPlayer))
             {
@@ -1501,6 +1495,17 @@ namespace UI.Battle
                 actionQueue.Add(skipAction);
                 */
                 
+                NextPlayerInput();
+                return;
+            }
+
+            if (activePlayer.StatusEffects.HasRestriction(RestrictionType.SkipTurn, true) ||
+                activePlayer.StatusEffects.HasRestriction(RestrictionType.Charm, true) ||
+                activePlayer.StatusEffects.HasRestriction(RestrictionType.Panic, true))
+            {
+                var target = fieldController.GetRandomLivingMonster(false);
+                actionQueue.Add(new BattleAction(activePlayer.gameObject, target != null ? target.gameObject : null,
+                    ActionType.Attack, activePlayer.GetTotalAgi()));
                 NextPlayerInput();
                 return;
             }
@@ -1553,24 +1558,6 @@ namespace UI.Battle
             {
                 UpdateSelection(list, index);
             }
-        }
-
-        void ProcessRandomAction(PlayerController actor)
-        {
-            List<ActionType> randAction = new(){ ActionType.Attack, ActionType.Guard, ActionType.Next };
-            ActionType actionType = randAction[Random.Range(0, randAction.Count)] ;
-            GameObject finalTarget = null;
-            if (actionType == ActionType.Attack)
-            {
-                BattleEntity target = fieldController.GetRandomLivingMonster(true);
-                if (target != null) finalTarget = target.gameObject;
-            }
-            int speed = actor.GetTotalAgi() - actor.nextTurnSpeedPenalty;
-            actor.nextTurnSpeedPenalty = 0;
-            BattleAction action = new BattleAction(actor.gameObject, finalTarget, actionType, speed);
-            actionQueue.Add(action);
-
-            NextPlayerInput();
         }
 
         void ProcessAutoAction(PlayerController actor)
@@ -1814,6 +1801,7 @@ namespace UI.Battle
                 uiController.ShowMessage("휴~ 도망쳤다.");
                 yield return YieldCache.WaitForSeconds(1f);
 
+                FinalizeBattleStatusEffects();
                 fieldController.ClearMonsterField(); // 전장 몬스터 지우기
                 uiController.ShowBattleEndAnimation(()=>{ ManagerRoot.GameState.ChangeState(GameState.Exploration); });
             }
@@ -2252,7 +2240,7 @@ namespace UI.Battle
                 if (actorEntity != null) actorEntity.nextTurnSpeedPenalty += delay; 
 
                 // 실행되는 액션 코루틴을 추적 변수에 담는다
-                runningActionCoroutine = StartCoroutine(PerformAction(currentProcessingAction));
+                runningActionCoroutine = StartCoroutine(PerformStatusAwareAction(currentProcessingAction));
                 yield return runningActionCoroutine;
 
                 if (isInterrupted) yield break;
@@ -2268,48 +2256,12 @@ namespace UI.Battle
                 yield break; 
             }
 
-            // 각 진영의 모든 행동이 끝난 직후 상태이상 틱 일괄 처리
-            if (state == BattleState.Processing) // 아군 페이즈 종료 시
-            { 
-                foreach (var p in fieldController.activePlayers)
-                {
-                    if (p != null && p.currentHp > 0) 
-                    {
-                        // 도트 데미지가 발생하면 ApplyDamage를 호출
-                        p.TickStatusEffects((dotDmg) => 
-                        {
-                            ApplyDamage(p.gameObject, dotDmg, false);
-                        });
-                    }
-                }
-                
-                // 연출 동기화: 독 데미지 이펙트와 흔들림이 끝날 때까지 잠깐 대기
-                yield return YieldCache.WaitForSeconds(0.5f);
-
-                // 도트 데미지로 인해 누군가 사망했을 수 있으므로 게임 종료 재검사
-                if (CheckBattleEnd(out bool winAfterTick)) { StartCoroutine(EndBattleRoutine(winAfterTick)); yield break; }
-
-                yield return uiController.ShowPhaseIndicator(true);
-                ProcessEnemyTurn(); 
-            }
-            else if (state == BattleState.EnemyInput) // 적군 페이즈 종료 시
+            if (state == BattleState.Processing)
             {
-                foreach (var m in fieldController.activeMonsters)
-                {
-                    if (m != null && m.currentHp > 0) 
-                    {
-                        m.TickStatusEffects((dotDmg) => 
-                        {
-                            ApplyDamage(m.gameObject, dotDmg, false);
-                        });
-                    }
-                }
-                
-                yield return YieldCache.WaitForSeconds(0.5f);
-
-                if (CheckBattleEnd(out bool win)) StartCoroutine(EndBattleRoutine(win));
-                else PreparePlayerTurn(); 
+                yield return uiController.ShowPhaseIndicator(true);
+                ProcessEnemyTurn();
             }
+            else if (state == BattleState.EnemyInput) PreparePlayerTurn();
         }
 
         int CalculateActionDelay(BattleAction action)
@@ -2330,20 +2282,14 @@ namespace UI.Battle
 
         bool CheckBattleEnd(out bool isWin)
         {
+            var party = fieldController.GetPlayerControllers().Where(p => p != null && !p.IsEmpty).ToList();
+            bool defeated = party.Count == 0 || party.All(p => p.currentHp <= 0 || p.IsPetrified) ||
+                party.Any(p => p.isCommander && (p.currentHp <= 0 || p.IsPetrified));
             isWin = false;
-            if (fieldController.IsAllEnemiesDead()) { isWin = true; return true; }
-            
-            // 전멸했거나, 지휘관(isCommander)이 사망했는지 체크
-            bool isAllDead = fieldController.IsAllPartyDead();
-            bool isCommanderDead = fieldController.GetPlayerControllers().Any(p => p.currentHp <= 0 && p.isCommander);
-
-            if (isAllDead || isCommanderDead) 
-            { 
-                isWin = false; 
-                return true; 
-            }
-            
-            return false;
+            if (defeated) return true;
+            isWin = fieldController.IsAllEnemiesDead() || fieldController.activeMonsters
+                .Where(m => m != null).All(m => m.currentHp <= 0 || m.IsPetrified);
+            return isWin;
         }
 
         IEnumerator PerformAction(BattleAction action)
@@ -2418,7 +2364,7 @@ namespace UI.Battle
                 // 공격 계열 vs 보조 계열 분기 처리
                 bool isAttack = item.effectType == EffectType.Special_Atk || 
                 item.effectType == EffectType.Magic_Atk || 
-                (item.statusEffectData != null && item.statusEffectData.restrictionType != RestrictionType.None);
+                item.statusEffectData != null;
 
                 if (isAttack)
                 {
@@ -2428,7 +2374,11 @@ namespace UI.Battle
                     
                     // 아이템의 고정 데미지(effectValue)를 그대로 줄지, 계산식을 탈지는 기획이 확정되면 수정하자
                     // 일단 ApplyDamage를 통해 피격 연출(OnDamageTaken)까지 연결함
-                    yield return ApplyDamage(targetObj, item.effectValue, false);
+                    if (item.effectType == EffectType.Special_Atk || item.effectType == EffectType.Magic_Atk)
+                        yield return ApplyDamage(targetObj, Mathf.Max(0, item.effectValue), false);
+                    if (item.statusEffectData != null)
+                        BattleCalculator.ProcessSkillStatusEffect(action.actor.GetComponent<BattleEntity>(),
+                            targetObj.GetComponent<BattleEntity>(), item);
                 }
                 else
                 {
@@ -2452,7 +2402,8 @@ namespace UI.Battle
 
         IEnumerator HandleSkillAction(BattleAction action)
         {
-            var skill = action.actionData as SkillData; 
+            var skill = action.actionData as SkillData;
+            if (skill == null) yield break;
             PlayerController actor = action.actor.GetComponent<PlayerController>();
 
             bool isReviveSkill = skill != null && 
@@ -2507,7 +2458,7 @@ namespace UI.Battle
 
             bool isAttack = skill.effectType == EffectType.Special_Atk || 
                             skill.effectType == EffectType.Magic_Atk || 
-                            (skill.statusEffectData != null && skill.statusEffectData.restrictionType != RestrictionType.None);
+                            skill.statusEffectData != null;
             
             if (!isAutoMode)
             {
@@ -2579,7 +2530,7 @@ namespace UI.Battle
             {
                 // 참가자 목록에서 살아있는 캐릭터만 추출
                 partners = currentUnionParticipants
-                    .Where(p => p != null && p.currentHp > 0)
+                    .Where(p => p != null && p.CanCooperate)
                     .ToList();
             }
 
@@ -2689,7 +2640,7 @@ namespace UI.Battle
             isLastStandActive = true; 
             uiController.ShowLog("LAST STAND!!");
 
-            List<PlayerController> frontRowMembers = fieldController.GetCharactersInFrontRow();
+            List<PlayerController> frontRowMembers = fieldController.GetCharactersInFrontRow().Where(p => p.CanCooperate).ToList();
 
             Sequence seq = DOTween.Sequence();
 
@@ -2731,7 +2682,8 @@ namespace UI.Battle
             Color bgColor = uiController.GetBackgroundColor();
             
             // 데이터 준비
-            List<PlayerController> participants = currentUnionParticipants;
+            List<PlayerController> participants = currentUnionParticipants.Where(p => p != null && p.CanCooperate).ToList();
+            if (participants.Count < 4) { uiController.ShowLog("상태이상으로 협동 사격 불가"); yield break; }
             int totalAmmo = participants.Sum(p => p.currentGunAmmo);
 
             // 무지개 빛 효과 시작
@@ -3276,12 +3228,13 @@ namespace UI.Battle
             else uiController.AddEnemyGauge(amount);
         }
 
-        Coroutine ApplyDamage(GameObject target, int damage, bool isCritical)
+        Coroutine ApplyDamage(GameObject target, int damage, bool isCritical, bool isStatusDamage = false)
         {
             if (target == null || !target.activeInHierarchy) return null;
 
             var entity = target.GetComponent<BattleEntity>();
             if (entity == null) return null;
+            if (damage > 0 && !isStatusDamage) entity.StatusEffects.OnDirectDamage();
 
             // 몬스터 데미지 팝업
             if (entity is MonsterController)
@@ -3341,7 +3294,7 @@ namespace UI.Battle
                 PlayerController p = fieldController.allSlotControllers[i];
 
                 // 기본 상태 체크 (존재함, 빈 슬롯 아님, 살아있음)
-                if (p == null || p.IsEmpty || p.currentHp <= 0) continue;
+                if (p == null || p.IsEmpty || !p.CanCooperate) continue;
 
                 // Align 호환성 체크
                 if (!BattleCalculator.IsAlignCompatible(leader.align, p.align)) continue;
@@ -3406,30 +3359,8 @@ namespace UI.Battle
             uiController.SetCmdPanelVisible(false);
             uiController.HideStateMessage();
 
-            // 파티원들의 상태이상을 검사하여 필드 유지(Persistent)와 전투 전용(BattleOnly)을 분리
+            FinalizeBattleStatusEffects();
             List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
-            foreach (var p in allPlayers) 
-            {
-                if (p != null) 
-                {
-                    // 전투 중 걸려있던 효과들 중, 필드 유지형(Persistent)이 있는지 찾아 저장
-                    var persistentEffect = p.activeEffects.Find(e => e.data.durationType == EffectDurationType.Persistent);
-                    
-                    if (persistentEffect != null)
-                    {
-                        // 필드 유지형 상태이상 ID를 원본 데이터에 넘겨줌
-                        p.sourceData.persistentStatusId = persistentEffect.data.id;
-                    }
-                    else
-                    {
-                        // 없으면 비워줌
-                        p.sourceData.persistentStatusId = StatusEffectID.None;
-                    }
-
-                    // 전투 전용(BattleOnly) 버프/디버프는 전부 지움
-                    p.ClearBattleOnlyEffects(); 
-                }
-            }
 
             if (isWin)
             {

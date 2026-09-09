@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Panic
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 7
-  effectName: PANIC
+  effectName: "혼란"
   durationType: 0
   cureType: 2
   maxTurns: 3
@@ -25,3 +25,13 @@ MonoBehaviour:
   restrictionType: 3
   restrictionChance: 1
   dotDamage: 0
+  icon: {fileID: 0}
+  description: "절반 확률로 대기하고, 나머지는 자신을 제외한 무작위 대상을 공격합니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 75
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

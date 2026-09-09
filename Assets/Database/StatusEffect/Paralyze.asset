@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Paralyze
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 9
-  effectName: PARALYZE
+  effectName: "마비"
   durationType: 1
   cureType: 0
   maxTurns: 0
@@ -23,5 +23,15 @@ MonoBehaviour:
   evaMultiplier: 1
   accMultiplier: 1
   restrictionType: 1
-  restrictionChance: 1
-  dotDamage: 3
+  restrictionChance: 0.35
+  dotDamage: 0
+  icon: {fileID: 0}
+  description: "확률적으로 행동하지 못합니다. 마비 치료 또는 상태이상 치료가 필요합니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 70
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

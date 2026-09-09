@@ -18,6 +18,9 @@ namespace Helper
         {
             if (attacker == null || defender == null) return 0;
 
+            if (action.actionData != null && action.actionData.statusEffectData != null &&
+                action.actionData.effectType != EffectType.Special_Atk && action.actionData.effectType != EffectType.Magic_Atk)
+                return 0;
             bool isMagic = (action.actionData != null && action.actionData.element != ElementType.Physical);
             
             float rawDamage = 0f;
@@ -87,6 +90,8 @@ namespace Helper
         public static bool CheckEvasion(BattleEntity attacker, BattleEntity defender, BattleAction action, float positionalEvasionBonus)
         {
             if (attacker == null || defender == null) return false;
+            if (attacker.StatusAccuracyMultiplier <= 0) return true;
+            if (defender.StatusEvasionMultiplier <= 0) return false;
 
             bool isMagic = (action != null && action.actionData != null && action.actionData.element != ElementType.Physical);
             float n = 0;
@@ -95,6 +100,7 @@ namespace Helper
             {
                 // [마법 회피율]: n = ((나의 INT) + (나의 LUCK/4) + 24 - (상대의 MATK)) / 4
                 n = (defender.GetTotalInt() + (defender.GetTotalLuc() / 4f) + 24f - attacker.GetMagicAttack()) / 4f;
+                n *= defender.StatusEvasionMultiplier / Mathf.Max(0.01f, attacker.StatusAccuracyMultiplier);
             }
             else
             {
@@ -284,16 +290,18 @@ namespace Helper
         public static void ProcessSkillStatusEffect(BattleEntity attacker, BattleEntity defender, BaseRootData data)
         {
             // 스킬이나 아이템에 상태 이상 효과가 설정되어 있지 않다면 리턴
-            if (data == null || data.statusEffectData == null) return;
+            if (data == null || data.statusEffectData == null || attacker == null || defender == null ||
+                defender.currentHp <= 0 || defender.IsPetrified) return;
 
             // LUC 스탯을 기반으로 한 상태 이상 회피/적중 보정치 계산
             float lucDiff = (attacker.GetTotalLuc() - defender.GetTotalLuc()) * 0.01f;
             
             // 최종 성공 확률 = (기본 스킬 성공 확률 + 스탯 보정치)
-            float finalChance = (data.statusEffectChance + lucDiff);
+            float resistance = defender.GetResistances().GetStatusEffectMultiplier(data.statusEffectData.id);
+            float finalChance = Mathf.Clamp01((Mathf.Clamp01(data.statusEffectChance) + lucDiff) * resistance);
 
             // 확률 판정
-            if (Random.value <= finalChance)
+            if (Random.value < finalChance)
             {
                 // 타입 캐스팅(SkillData) 없이 바로 부모 클래스의 statusEffectData를 사용해 부여합니다!
                 defender.ApplyStatusEffect(data.statusEffectData);

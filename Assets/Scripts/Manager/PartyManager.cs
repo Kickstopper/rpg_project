@@ -16,6 +16,24 @@ namespace Manager
         // 한 번이라도 영입된 적 있는 모든 캐릭터의 원본 데이터를 보관하는 사전
         public Dictionary<string, RuntimeCharacterData> unlockedRoster = new Dictionary<string, RuntimeCharacterData>();
 
+        /// <summary>Only a completed dungeon step calls this; turns, bumps and teleports do not.</summary>
+        public string ApplyExplorationStatusStep()
+        {
+            var messages = new List<string>();
+            foreach (var member in partyData.Distinct())
+            {
+                if (member == null || member.currentHp <= 0) continue;
+                int before = member.currentHp;
+                member.currentHp = member.StatusEffects.Step(before, member.maxHp);
+                if (member.currentHp != before)
+                {
+                    member.NotifyExplorationVitalsChanged();
+                    messages.Add($"{member.name} -{before - member.currentHp} HP");
+                }
+            }
+            return string.Join(" / ", messages);
+        }
+
         // 저장 시, SaveManager가 호출할 메서드
         public void SaveToData(SaveData data)
         {

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Curse
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 6
-  effectName: CURSE
-  durationType: 0
+  effectName: "저주"
+  durationType: 1
   cureType: 0
   maxTurns: 3
   cureChancePerTurn: 0
@@ -22,6 +22,16 @@ MonoBehaviour:
   defMultiplier: 1
   evaMultiplier: 1
   accMultiplier: 1
-  restrictionType: 2
-  restrictionChance: 0.35
+  restrictionType: 0
+  restrictionChance: 0
   dotDamage: 0
+  icon: {fileID: 0}
+  description: "받는 HP 회복량이 감소합니다. 저주 해제 또는 상태이상 치료가 필요합니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 50
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 0.5
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

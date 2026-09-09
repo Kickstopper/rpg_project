@@ -2022,6 +2022,8 @@ namespace UI.DungeonMapScene
         {
             UpdateMapDiscovery(_player.LogicX, _player.LogicY);
             ManagerRoot.Time.AddStep(1);
+            string statusDamage = ManagerRoot.Party.ApplyExplorationStatusStep();
+            if (!string.IsNullOrEmpty(statusDamage)) ShowSystemMessage("상태이상 피해: " + statusDamage, 2f);
             
             if (theme != null && theme.encounterMode == EncounterMode.Random) encounterSystem.OnStepTaken();
             

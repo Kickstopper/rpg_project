@@ -13,15 +13,25 @@ MonoBehaviour:
   m_Name: Freeze
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 11
-  effectName: FREEZE
+  effectName: "빙결"
   durationType: 0
-  cureType: 2
-  maxTurns: 3
+  cureType: 1
+  maxTurns: 1
   cureChancePerTurn: 0.5
   atkMultiplier: 1
   defMultiplier: 1
-  evaMultiplier: 1
+  evaMultiplier: 0
   accMultiplier: 1
   restrictionType: 1
   restrictionChance: 1
   dotDamage: 0
+  icon: {fileID: 0}
+  description: "다음 행동 기회에 행동과 회피가 불가능합니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 88
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

@@ -98,8 +98,11 @@ namespace UI.Battle
         // 빈 슬롯용 초기화 함수
         public void InitializeEmpty(int colIndex)
         {
+            if (sourceData != null) sourceData.ExplorationVitalsChanged -= RefreshExplorationVitals;
+            sourceData = null;
             IsEmpty = true;
             columnIndex = colIndex;
+            BindStatusEffects(null);
 
             align = Align.None;
 
@@ -138,7 +141,10 @@ namespace UI.Battle
             }
 
             // 데이터 초기화
+            if (sourceData != null) sourceData.ExplorationVitalsChanged -= RefreshExplorationVitals;
             this.sourceData = runtimeData;
+            sourceData.ExplorationVitalsChanged += RefreshExplorationVitals;
+            BindStatusEffects(runtimeData.StatusEffects);
             this.entityName = runtimeData.name;
             this.isCommander = runtimeData.isCommander;
             this.gameObject.name = entityName;
@@ -282,7 +288,7 @@ namespace UI.Battle
         public int GetGunAttack()
         {
             if (currentGun == null || currentAmmo == null) return 0;
-            return currentGun.attackPower + currentAmmo.damageBonus + (level / 4);
+            return Mathf.RoundToInt((currentGun.attackPower + currentAmmo.damageBonus + (level / 4)) * StatusAttackMultiplier);
         }
         
         // 발사 가능 여부 확인
@@ -347,14 +353,14 @@ namespace UI.Battle
             // ATK = STR + 무기 공격력 + (LV/4)
             int weaponBonus = (currentWeapon != null) ? currentWeapon.attackPower : 0;
             float baseAtk = GetTotalStr() + weaponBonus + (level / 4);
-            return Mathf.RoundToInt(baseAtk * GetBuffMultiplier(buffPhysAtk));
+            return Mathf.RoundToInt(baseAtk * GetBuffMultiplier(buffPhysAtk) * StatusAttackMultiplier);
         }
 
         public override int GetMagicAttack()
         {
             // 마법 공격력 (MATK = (MAG*2) + (INT/2))
             float baseMagAtk = (GetTotalMag() * 2f) + (GetTotalInt() / 2f);
-            return Mathf.RoundToInt(baseMagAtk * GetBuffMultiplier(buffMagAtk));
+            return Mathf.RoundToInt(baseMagAtk * GetBuffMultiplier(buffMagAtk) * StatusAttackMultiplier);
         }
 
         public override int GetDefense()
@@ -363,7 +369,7 @@ namespace UI.Battle
             int armorBonus = 0;
             foreach (var armor in currentArmors) armorBonus += armor.defense;
             float baseDef = armorBonus + GetTotalVit() + GetTotalAgi();
-            return Mathf.RoundToInt(baseDef * GetBuffMultiplier(buffPhysDef));
+            return Mathf.RoundToInt(baseDef * GetBuffMultiplier(buffPhysDef) * StatusDefenseMultiplier);
         }
 
         public override int GetMagicDefense()
@@ -373,14 +379,14 @@ namespace UI.Battle
             foreach (var armor in currentArmors) armorBonus += armor.defense;
             
             float baseMagDef = (GetTotalMag() + GetTotalVit() + GetTotalAgi()) / 4f + GetTotalInt() + armorBonus / 4f;
-            return Mathf.RoundToInt(baseMagDef * GetBuffMultiplier(buffMagDef));
+            return Mathf.RoundToInt(baseMagDef * GetBuffMultiplier(buffMagDef) * StatusDefenseMultiplier);
         }
 
         public override int GetHitRate()
         {
             int weaponHit = currentWeapon != null ? currentWeapon.hitRateBonus : 0;
             float baseHitRate = GetTotalAgi() + weaponHit + (GetTotalLuc() / 2f) + level;
-            return Mathf.RoundToInt(baseHitRate);
+            return Mathf.RoundToInt(baseHitRate * StatusAccuracyMultiplier);
         }
 
         public override int GetEvasion()
@@ -388,7 +394,7 @@ namespace UI.Battle
             int armorEva = 0;
             foreach (var armor in currentArmors) armorEva += armor.evasionMod;
             float baseEvation = armorEva + GetTotalAgi() + (GetTotalInt() / 4) + (GetTotalLuc() / 4) + level;
-            return Mathf.RoundToInt(baseEvation);
+            return Mathf.RoundToInt(baseEvation * StatusEvasionMultiplier);
         }
 
         public override ResistanceData GetResistances()
@@ -554,6 +560,18 @@ namespace UI.Battle
         public void SetSquadIndicator(bool enable)
         {
             if (inSquadIndicator) inSquadIndicator.SetActive(enable);
+        }
+
+        private void RefreshExplorationVitals()
+        {
+            if (sourceData == null) return;
+            currentHp = sourceData.currentHp;
+            currentMp = sourceData.currentMp;
+        }
+
+        private void OnDestroy()
+        {
+            if (sourceData != null) sourceData.ExplorationVitalsChanged -= RefreshExplorationVitals;
         }
 
         public void RefreshView()

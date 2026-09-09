@@ -15,7 +15,7 @@ namespace Data.AI
             var livingPlayers = context.activePlayers.Where(p => p != null && p.currentHp > 0).ToList();
             var livingMonsters = context.activeMonsters.Where(m => m != null && m.currentHp > 0).ToList();
             
-            bool isSilenced = self.activeEffects.Exists(e => e.data.restrictionType == RestrictionType.Silence);
+            bool isSilenced = !self.CanUseSkills;
 
             // 점수 평가용 변수
             BattleAction bestAction = null;

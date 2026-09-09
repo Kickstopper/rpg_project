@@ -13,7 +13,7 @@ namespace Data.AI
         public override BattleAction DecideAction(MonsterController self, BattleContext context)
         {
             // 상태이상 확인 (침묵)
-            bool isSilenced = self.activeEffects.Exists(e => e.data.restrictionType == RestrictionType.Silence);
+            bool isSilenced = !self.CanUseSkills;
 
             if (!isSilenced)
             {

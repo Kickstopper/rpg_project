@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Poison
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 2
-  effectName: POISON
+  effectName: "독"
   durationType: 1
   cureType: 0
   maxTurns: 0
@@ -23,5 +23,15 @@ MonoBehaviour:
   evaMultiplier: 1
   accMultiplier: 1
   restrictionType: 0
-  restrictionChance: 0.5
-  dotDamage: 5
+  restrictionChance: 0
+  dotDamage: 0
+  icon: {fileID: 0}
+  description: "전투와 탐색에서 지속 피해를 받습니다. 해독 또는 상태이상 치료로 해제합니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 40
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0.05
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0.01

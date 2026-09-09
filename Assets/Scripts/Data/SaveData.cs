@@ -107,7 +107,9 @@ namespace Data
         public bool isRegular;
 
         public string resonanceId;
-        public string persistentStatusId; // 지속되는 상태 이상
+        public string persistentStatusId;
+        public int statusEffectsVersion;
+        public List<StatusEffectSaveEntry> statusEffects;
 
         public StatData stats;
         public ResistanceData resistances;

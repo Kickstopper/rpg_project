@@ -24,6 +24,13 @@ namespace Data
     {
         public StatusEffectID id;
         public string effectName;
+        public Sprite icon;
+        [TextArea(2, 5)] public string description;
+        public Color displayColor = new Color(1f, 0.75f, 0.25f);
+        public int displayPriority;
+        [Tooltip("Direct hit damage cures this effect; poison ticks do not.")]
+        public bool cureOnDirectDamage;
+        [Range(0f, 2f)] public float healingReceivedMultiplier = 1f;
 
         [Header("Duration & Cure")]
         public EffectDurationType durationType;
@@ -44,6 +51,16 @@ namespace Data
         [Range(0, 1f)] public float restrictionChance = 0f; 
 
         [Header("Damage Over Time (DoT)")]
-        public int dotDamage;
+        [Min(0)] public int dotDamage;
+        [Range(0f, 1f)] public float battleDotMaxHpRatio;
+        [Header("Exploration (Persistent effects only)")]
+        [Min(1)] public int explorationStepInterval = 1;
+        [Min(0)] public int explorationDamage;
+        [Range(0f, 1f)] public float explorationMaxHpRatio;
+
+        public int BattleDamage(int maxHp) => Mathf.Max(0, dotDamage) +
+            Mathf.CeilToInt(Mathf.Max(0, maxHp) * Mathf.Clamp01(battleDotMaxHpRatio));
+        public int FieldDamage(int maxHp) => Mathf.Max(0, explorationDamage) +
+            Mathf.CeilToInt(Mathf.Max(0, maxHp) * Mathf.Clamp01(explorationMaxHpRatio));
     }
 }

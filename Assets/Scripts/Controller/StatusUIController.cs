@@ -177,15 +177,8 @@ namespace Controller
             nextExpText.text = charData.GetRequiredExpForNextLevel().ToString(); 
             alignText.text = charData.align.ToString().ToUpper().Replace("_", " ");
 
-            if (charData.CurrentStatusEffect != null)
-            {
-                // 상태이상의 이름을 출력
-                statusFxText.text = charData.CurrentStatusEffect.effectName.ToUpper();
-            }
-            else
-            {
-                statusFxText.text = string.Empty;
-            }
+            if (statusFxText != null)
+                statusFxText.text = UI.Battle.StatusEffectText.Summary(charData.StatusEffects, true);
 
             // Vitals (HP/MP)
             UpdateSliderAndText(hpSlider, hpText, charData.currentHp, charData.maxHp);

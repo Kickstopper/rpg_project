@@ -21,7 +21,10 @@ namespace Manager
                 // --- 회복 계열 ---
                 case EffectType.Recover_HP:
                     if (target.IsMaxHp) return false; // 이미 풀피면 실패
-                    target.ApplyHpChange(data.effectValue);
+                    int healing = Mathf.Max(0, data.effectValue);
+                    if (entity != null) healing = Mathf.FloorToInt(healing * entity.StatusEffects.Multiplier(d => d.healingReceivedMultiplier));
+                    if (healing == 0 || !target.IsAlive) return false;
+                    target.ApplyHpChange(healing);
                     success = true;
                     break;
 
@@ -95,15 +98,16 @@ namespace Manager
 
                 // --- 상태이상 --- 
                 case EffectType.Recover_Bad_Status:
+                    if (entity != null) success = entity.StatusEffects.RemoveWhere(e => true);
+                    break;
                 case EffectType.Recover_Poison:
+                    if (entity != null) success = entity.StatusEffects.Remove(StatusEffectID.Poison);
+                    break;
                 case EffectType.Recover_Curse:
+                    if (entity != null) success = entity.StatusEffects.Remove(StatusEffectID.Curse);
+                    break;
                 case EffectType.Recover_Paralyze:
-                    if (entity != null && entity.activeEffects.Count > 0)
-                    {
-                        // TODO: EffectType에 맞춰 특정 상태이상만 지우도록 세분화
-                        entity.activeEffects.Clear(); 
-                        success = true;
-                    }
+                    if (entity != null) success = entity.StatusEffects.Remove(StatusEffectID.Paralyze);
                     break;
             }
 

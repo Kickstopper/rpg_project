@@ -279,6 +279,8 @@ namespace Controller
         // EffectManager를 사용하여 스킬 발동
         private void UseSkill()
         {
+            if (currentCaster == null || !currentCaster.IsAlive || !currentCaster.CanUseSkills ||
+                currentCaster.IsPetrified || selectedSkillData == null) return;
             bool success = false;
             TargetScope scope = selectedSkillData.targetScope;
 

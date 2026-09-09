@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bleed
   m_EditorClassIdentifier: Assembly-CSharp::Data.StatusEffectData
   id: 3
-  effectName: BLEED
+  effectName: "출혈"
   durationType: 0
   cureType: 1
   maxTurns: 3
@@ -23,5 +23,15 @@ MonoBehaviour:
   evaMultiplier: 1
   accMultiplier: 1
   restrictionType: 0
-  restrictionChance: 1
+  restrictionChance: 0
   dotDamage: 10
+  icon: {fileID: 0}
+  description: "행동 기회가 끝날 때 지속 피해를 받습니다."
+  displayColor: {r: 1, g: 0.75, b: 0.25, a: 1}
+  displayPriority: 25
+  cureOnDirectDamage: 0
+  healingReceivedMultiplier: 1
+  battleDotMaxHpRatio: 0
+  explorationStepInterval: 1
+  explorationDamage: 0
+  explorationMaxHpRatio: 0

@@ -11,12 +11,13 @@ namespace UI.Battle
     public class ActiveEffect
     {
         public StatusEffectData data;
-        public int turnsRemaining; // 남은 턴 수
+        public int turnsRemaining; // 남은 행동 기회 수
+        public int stepsElapsed;
 
         public ActiveEffect(StatusEffectData data)
         {
             this.data = data;
-            this.turnsRemaining = data.maxTurns;
+            this.turnsRemaining = Mathf.Max(1, data.maxTurns);
         }
     }
     // 공통 기능을 담은 추상 클래스
@@ -60,7 +61,25 @@ namespace UI.Battle
             }
         }
 
-        public List<ActiveEffect> activeEffects = new List<ActiveEffect>();
+        public StatusEffectSet StatusEffects { get; private set; } = new StatusEffectSet();
+        public IReadOnlyList<ActiveEffect> activeEffects => StatusEffects.Effects;
+        [Tooltip("Optional status badge anchor. Otherwise a badge is created on this card.")]
+        public RectTransform statusEffectAnchor;
+        public bool IsPetrified => StatusEffects.Has(StatusEffectID.Petrify);
+        public bool CanCooperate => currentHp > 0 &&
+            !StatusEffects.HasRestriction(RestrictionType.SkipTurn) &&
+            !StatusEffects.HasRestriction(RestrictionType.Charm) && !StatusEffects.HasRestriction(RestrictionType.Panic);
+        public bool CanUseSkills => !StatusEffects.HasRestriction(RestrictionType.Silence, true);
+        public float StatusAttackMultiplier => StatusEffects.Multiplier(d => d.atkMultiplier);
+        public float StatusDefenseMultiplier => StatusEffects.Multiplier(d => d.defMultiplier);
+        public float StatusAccuracyMultiplier => StatusEffects.Multiplier(d => d.accMultiplier);
+        public float StatusEvasionMultiplier => StatusEffects.Multiplier(d => d.evaMultiplier);
+
+        protected void BindStatusEffects(StatusEffectSet effects)
+        {
+            StatusEffects = effects ?? new StatusEffectSet();
+            StatusEffectHUD.Attach(this);
+        }
 
         public int maxHp;
         public int maxMp;
@@ -166,88 +185,26 @@ namespace UI.Battle
             hitShakeCoroutine = null;
         }
         
-        // 상태이상 부여
         public void ApplyStatusEffect(StatusEffectData effectData)
         {
-            // 이미 같은 상태이상이 있는지 확인 (갱신 처리)
-            var existing = activeEffects.Find(e => e.data.id == effectData.id);
-            if (existing != null)
-            {
-                existing.turnsRemaining = effectData.maxTurns; // 턴 수 초기화
-            }
-            else
-            {
-                activeEffects.Add(new ActiveEffect(effectData));
-            }
-            
-            Debug.Log($"{this.name}에게 {effectData.effectName} 부여됨!");
+            if (currentHp <= 0 || !StatusEffects.Apply(effectData)) return;
             UpdateUI();
         }
 
-        // 매 턴 시작 또는 종료 시 호출할 함수
         public void TickStatusEffects(System.Action<int> onDotDamageTaken = null)
         {
-            for (int i = activeEffects.Count - 1; i >= 0; i--)
-            {
-                var effect = activeEffects[i];
-
-                // 지속 데미지 처리
-                if (effect.data.dotDamage > 0)
-                {
-                    onDotDamageTaken?.Invoke(effect.data.dotDamage);
-                }
-
-                // 해제 조건 체크
-                bool isCured = false;
-                
-                if (effect.data.cureType == EffectCureType.TurnBased)
-                {
-                    effect.turnsRemaining--;
-                    if (effect.turnsRemaining <= 0) isCured = true;
-                }
-                else if (effect.data.cureType == EffectCureType.ChancePerTurn)
-                {
-                    if (Random.value < effect.data.cureChancePerTurn) isCured = true;
-                }
-
-                // 해제 처리
-                if (isCured)
-                {
-                    Debug.Log($"{this.name}의 {effect.data.effectName}이(가) 해제되었습니다.");
-                    activeEffects.RemoveAt(i);
-                }
-            }
+            int damage = StatusEffects.CompleteAction(StatusEffects.Snapshot(), maxHp, () => Random.value);
+            if (damage > 0) onDotDamageTaken?.Invoke(damage);
         }
 
-        // 전투 종료 시 호출할 함수
         public void ClearBattleOnlyEffects()
         {
-            // durationType이 BattleOnly인 것만 리스트에서 제거
-            activeEffects.RemoveAll(e => e.data.durationType == EffectDurationType.BattleOnly);
-
-            // 전투가 끝나면 버프/디버프 스택 초기화
-            buffPhysAtk = 0;
-            buffMagAtk = 0;
-            buffPhysDef = 0;
-            buffMagDef = 0;
+            StatusEffects.ClearBattleOnly();
+            buffPhysAtk = buffMagAtk = buffPhysDef = buffMagDef = 0;
+            ResetStatus();
         }
 
-        // 턴 시작 시 또는 행동 실행 직전에 호출하여 제약이 발동했는지 확인합니다.
-        public RestrictionType CheckActionRestriction()
-        {
-            foreach (var effect in activeEffects)
-            {
-                if (effect.data.restrictionType == RestrictionType.None) continue;
-
-                // 설정된 확률(restrictionChance)에 따라 제약 발동 여부 결정
-                if (Random.value < effect.data.restrictionChance)
-                {
-                    return effect.data.restrictionType; // 가장 먼저 걸린 제약 반환
-                }
-            }
-            
-            return RestrictionType.None; // 무사통과
-        }
+        public RestrictionType CheckActionRestriction() => StatusEffects.ResolveRestriction(() => Random.value);
 
         // 타겟팅 모드(초상화 UI 등)를 켜고 끄기 위한 가상 함수
         public virtual void SetTargetingMode(bool isTargeting) { } 

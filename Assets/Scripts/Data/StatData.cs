@@ -22,6 +22,14 @@ public enum ResistTier
 
 [System.Serializable]
 public struct ResistanceData {
+    public Data.StatusEffectResistance[] statusEffects;
+    public float GetStatusEffectMultiplier(Data.StatusEffectID id)
+    {
+        if (statusEffects != null)
+            foreach (var entry in statusEffects)
+                if (entry.id == id) return UnityEngine.Mathf.Max(0f, entry.inflictionMultiplier);
+        return 1f;
+    }
     public ResistTier phys; // 물리 내성
     public ResistTier fire;     // 화염 내성
     public ResistTier ice;      // 빙결 내성
