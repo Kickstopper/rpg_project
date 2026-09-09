@@ -150,6 +150,15 @@ namespace UI.Battle
             }
         }
 
+        private readonly QuestBattleRecord questBattleRecord = new QuestBattleRecord();
+        private bool questBattleApplied;
+        private string questBattleLocation;
+        public void RecordQuestKill(MonsterController monster)
+        {
+            if (monster != null && monster.sourceData != null && monster.currentHp <= 0)
+                questBattleRecord.Record(monster.GetInstanceID(), monster.sourceData.id);
+        }
+
         public void Initialize(List<string> monsterIds, Color fogColor, EncounterType encType, Sprite capturedBg)
         {
             negotiationSession?.Close();
@@ -157,6 +166,8 @@ namespace UI.Battle
             negotiationTarget = null;
             negotiationActor = null;
             negotiationItemRecipients.Clear();
+            questBattleRecord.Reset(); questBattleApplied = false;
+            questBattleLocation = ManagerRoot.Dungeon?.CurrentDungeonData?.locationID;
             isEndingBattle = false;
             currentActingEntity = null;
             this.fogColor = fogColor;
@@ -2116,6 +2127,7 @@ namespace UI.Battle
             
             var member = ManagerRoot.Party.GetCharacterByID(target.sourceData.id);
             member.isRegular = false;
+            ManagerRoot.Quest?.RecordNegotiation(questBattleLocation, target.sourceData.id);
             fieldController.activeMonsters.Remove(target);
             fieldController.encounterLog.Remove(target.sourceData); // Remove this occurrence only, not every copy of the species.
             target.SetSelectionState(false);
@@ -3510,29 +3522,10 @@ namespace UI.Battle
 
         public List<QuestData> GetCompletedQuests()
         {
-            // 이번 전투에서 죽인 몬스터의 ID 리스트 추출
-            List<string> killedMonsterIDs = new List<string>();
-            foreach(var monster in fieldController.activeMonsters)
-            {
-                if (monster.currentHp <= 0)
-                {
-                    MonsterController monsterCont = monster as MonsterController;
-                    if (monsterCont != null) killedMonsterIDs.Add(monsterCont.sourceData.id);
-                } 
-            }
-
-            // 현재 맵의 LocationID 취득
-            string currentLocationID = ManagerRoot.Dungeon.CurrentDungeonData.locationID;
-
-            // 달성한 퀘스트 목록 취득
-            List<QuestData> completedQuests = ManagerRoot.Quest.ProcessBattleResult(currentLocationID, killedMonsterIDs);
-
-            if (completedQuests.Count > 0)
-            {
-                return completedQuests;
-            }
-
-            return null;
+            if (questBattleApplied) return new List<QuestData>();
+            questBattleApplied = true;
+            return ManagerRoot.Quest == null ? new List<QuestData>() :
+                ManagerRoot.Quest.ProcessBattleResult(questBattleLocation, questBattleRecord.Consume());
         }
 
         // 게임 오버 전용 코루틴

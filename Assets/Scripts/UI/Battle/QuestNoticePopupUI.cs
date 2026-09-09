@@ -11,11 +11,6 @@ namespace UI.Battle
         public TextMeshProUGUI rewardText;
         public TextMeshProUGUI descriptionText;
 
-        void Awake()
-        {
-            Close();
-        }
-        
         public void Open(QuestData data)
         {
             gameObject.SetActive(true);
@@ -24,19 +19,9 @@ namespace UI.Battle
             riskText.text = $"RANK {data.Risk}";
             rewardText.text = $"Gold: {data.Reward}";
             
-            if (descriptionText != null && !string.IsNullOrEmpty(data.Description))
-            {
-                descriptionText.text = data.Description;
-            }
-            else if (descriptionText != null)
-            {
-                descriptionText.text = "의뢰 목표를 달성했습니다!";
-            }
+            if (descriptionText != null) descriptionText.text = "목표 달성 — Office에서 보고하고 보상을 받으세요.\n[확인] 다음";
         }
 
-        public void Close()
-        {
-            gameObject.SetActive(false);
-        }
+        public void Close() { gameObject.SetActive(false); }
     }
 }

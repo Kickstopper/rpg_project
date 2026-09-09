@@ -28,6 +28,7 @@ namespace Data
     public class QuestProgress
     {
         public string questID;
+        public string runID;
         // 몬스터ID를 Key로, 현재 토벌한 마릿수를 Value로 저장합니다.
         public Dictionary<string, int> killCounts = new Dictionary<string, int>(); 
         public bool isReadyToReport = false;

@@ -17,29 +17,36 @@ namespace Manager
         public event System.Action OnMoneyChanged;
 
         
+        private void NotifyMoneyChanged()
+        {
+            if (OnMoneyChanged == null) return;
+            foreach (System.Action listener in OnMoneyChanged.GetInvocationList())
+                try { listener(); } catch (System.Exception ex) { Debug.LogException(ex); }
+        }
+
         public void AddMoney(int money)
         {
             CurrentMoney += money;
-            OnMoneyChanged?.Invoke();
+            NotifyMoneyChanged();
         }
 
         public void SubMoney(int money)
         {
             CurrentMoney -= money;
             //if (this.money < 0) this.money = 0;
-            OnMoneyChanged?.Invoke();
+            NotifyMoneyChanged();
         }
 
         public void SetMoney(int money)
         {
             CurrentMoney = money;
-            OnMoneyChanged?.Invoke();
+            NotifyMoneyChanged();
         } 
         
         public void Reset()
         {
             CurrentMoney = 0;
-            OnMoneyChanged?.Invoke();
+            NotifyMoneyChanged();
         }
 
         public int GetMonthlyTotalExpense()

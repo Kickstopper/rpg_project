@@ -41,7 +41,7 @@ namespace UI.Office
                     entry = ManagerRoot.Database.monsterDB.GetEntry(target.monsterID);
                     if (entry != null)
                     {
-                        targetStr += $"- {entry.name} {target.requiredCount}마리\n";
+                        targetStr += $"- {entry.name} {(isCompleted ? target.requiredCount : ManagerRoot.Quest.GetKillCount(data.QuestID, target.monsterID))}/{target.requiredCount}마리\n";
                     }
                 }
             }
@@ -49,6 +49,7 @@ namespace UI.Office
             {
                 targetStr += "- 목표 없음\n";
             }
+            if (!string.IsNullOrEmpty(data.completionFlag)) targetStr += "- 관련 대화·조사 이벤트를 해결해도 달성 가능\n";
             targetInfoText.text = targetStr;
 
             if (!string.IsNullOrEmpty(data.Description))
@@ -60,21 +61,14 @@ namespace UI.Office
                 descriptionText.text = string.Empty;
             }
             
-            // 상태 표시
-            if (isCompleted)
+            var state = ManagerRoot.Quest.GetState(data.QuestID);
+            switch (state)
             {
-                statusText.text = "완료";
-                statusText.color = Color.gold; // 회색
-            }
-            else if (isActive)
-            {
-                statusText.text = "진행 중";
-                statusText.color = Color.cyan; // 하늘색
-            }
-            else
-            {
-                statusText.text = "수주 가능";
-                statusText.color = Color.magenta; // 흰색
+                case QuestState.ReadyToReport: statusText.text = "보고 가능 — Office에서 보상 수령"; statusText.color = Color.yellow; break;
+                case QuestState.Claimed: statusText.text = "보상 수령 완료"; statusText.color = Color.gray; break;
+                case QuestState.Active: statusText.text = "진행 중"; statusText.color = Color.cyan; break;
+                case QuestState.Locked: statusText.text = "선행 의뢰 미완료"; statusText.color = Color.gray; break;
+                default: statusText.text = data.IsRepeatable ? "접수 가능 (반복 의뢰)" : "접수 가능"; statusText.color = Color.white; break;
             }
         }
     }

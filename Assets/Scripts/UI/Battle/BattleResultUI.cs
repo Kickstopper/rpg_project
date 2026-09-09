@@ -31,6 +31,8 @@ namespace UI.Battle
 
         private System.Action onClosed;
         private bool isClosing = false;
+        private bool showingNotice, noticeConfirmed;
+        private float noticeAcceptAt, resultAcceptAt;
         
         // 실행 중인 팝업 코루틴을 추적하여 안전하게 끄기 위한 변수
         private Coroutine questPopupCoroutine; 
@@ -41,9 +43,13 @@ namespace UI.Battle
                          List<QuestData> completedQuests,
                          System.Action onCloseCallback)
         {
+            if (questPopupCoroutine != null) StopCoroutine(questPopupCoroutine);
+            if (popupUI != null) popupUI.Close();
             this.gameObject.SetActive(true);
             this.onClosed = onCloseCallback;
-            this.isClosing = false; 
+            this.isClosing = false;
+            showingNotice = false; noticeConfirmed = false;
+            resultAcceptAt = Time.unscaledTime + 0.2f;
 
             // 텍스트 설정
             moneyText.text = $"{reward.totalMoney} G";
@@ -105,18 +111,17 @@ namespace UI.Battle
         // 퀘스트 팝업 순차 표시 코루틴
         private IEnumerator ShowQuestPopupsSequentially(List<QuestData> quests)
         {
-            // 원하는 간격으로 시간을 조절할 수 있습니다 (현재 2.5초)
-            WaitForSeconds waitTime = YieldCache.WaitForSeconds(2.5f);
-
+            showingNotice = true;
             foreach (var q in quests)
             {
+                noticeConfirmed = false;
+                noticeAcceptAt = Time.unscaledTime + 0.2f;
                 popupUI.Open(q);
-                // ManagerRoot.Sound.PlaySFX(SfxID.UI_Notification); // 갱신될 때마다 효과음 출력
-                yield return waitTime;
+                yield return null;
+                while (!noticeConfirmed) yield return null;
             }
-
-            // 모든 퀘스트를 보여준 후 팝업을 닫고 싶다면 아래 주석을 해제하세요.
-            // popupUI.Close();
+            popupUI.Close(); showingNotice = false; questPopupCoroutine = null;
+            resultAcceptAt = Time.unscaledTime + 0.2f;
         }
 
         System.Collections.IEnumerator SelectButtonDelayed()
@@ -139,7 +144,12 @@ namespace UI.Battle
 
         void OnContinueClicked()
         {
-            if (isClosing) return;
+            if (isClosing || Time.unscaledTime < resultAcceptAt) return;
+            if (showingNotice)
+            {
+                if (Time.unscaledTime >= noticeAcceptAt) noticeConfirmed = true;
+                return;
+            }
             isClosing = true;
 
             if (questPopupCoroutine != null) StopCoroutine(questPopupCoroutine);
@@ -148,7 +158,7 @@ namespace UI.Battle
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
             gameObject.SetActive(false);
-            onClosed?.Invoke();
+            var completed = onClosed; onClosed = null; completed?.Invoke();
         }
     }
 }

@@ -9,6 +9,7 @@ namespace UI.Office
     // 인터페이스를 추가하여 키보드/게임패드 포커스 감지
     public class QuestSlotUI : MonoBehaviour, ISelectHandler, IDeselectHandler
     {
+        public System.Action Selected;
         public Image background;
         public Color normalColor = Color.white;
         public Color selectColor = Color.gray; // 완료된 퀘스트의 배경색
@@ -61,6 +62,7 @@ namespace UI.Office
         public void OnSelect(BaseEventData eventData)
         {
             // 선택되었을 때 텍스트 색상을 노란색 등으로 강조
+            Selected?.Invoke();
             SetColor(Color.yellow); 
         }
 

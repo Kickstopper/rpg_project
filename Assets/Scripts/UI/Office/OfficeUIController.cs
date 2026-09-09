@@ -1,205 +1,137 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Manager;
 using UI.Common;
-using Data;
-using System.Collections.Generic;
 
 namespace UI.Office
 {
     public class OfficeUIController : MonoBehaviour
     {
-        [Header("Dialogue UI")]
         public GameObject dialoguePanel;
         public TextMeshProUGUI dialogueText;
         public float typingSpeed = 0.05f;
         public AudioClip typingSound;
-
-        [Header("Menu UI")]
         public GameObject buttonContainer;
-        public Button questButton;
-        public Button partnerButton;
-        
-        [Header("Sub Panels")]
+        public Button questButton, partnerButton;
         public OfficeQuestUI questUI;
         public OfficePartnerUI partnerUI;
+        private bool opened, busy;
+        private Coroutine flow;
 
-        private Coroutine typingCoroutine;
-        private bool isTyping = false;
-        private float typingStartTime;
-        private System.Action onDialogueComplete;
-
-        void Start()
+        void Awake()
         {
             questButton.onClick.AddListener(OnQuestClicked);
             partnerButton.onClick.AddListener(OnPartnerClicked);
         }
-
+        void OnDisable()
+        {
+            StopAllCoroutines(); flow = null; opened = false; busy = false;
+        }
         void Update()
         {
-            // 타이핑 스킵 로직 (쿨타임 적용)
-            if (isTyping && Time.unscaledTime > typingStartTime + 0.1f && GameInput.GetConfirmDown())
-            {
-                CompleteTypingImmediately();
-            }
-
-            // 메인 메뉴 상태에서 취소 키 입력 시 퇴장
-            if (buttonContainer.activeSelf && GameInput.GetCancelDown())
-            {
-                OnExitClicked();
-            }
+            if (opened && !busy && buttonContainer.activeSelf && GameInput.GetCancelDown()) Run(Exit());
         }
-
         public void OpenOffice()
         {
+            if (opened) return;
+            opened = true;
             gameObject.SetActive(true);
-            buttonContainer.SetActive(false);
-            questUI.gameObject.SetActive(false);
-            partnerUI.gameObject.SetActive(false);
-
-            // 진입 시 퀘스트 달성 여부를 검사하는 코루틴 시작
-            StartCoroutine(CheckAndProcessRewardsRoutine());
+            questUI.gameObject.SetActive(false); partnerUI.gameObject.SetActive(false);
+            Run(Enter());
         }
-
-        // 보상 지급 및 진입 연출 코루틴
-        private IEnumerator CheckAndProcessRewardsRoutine()
+        private void Run(IEnumerator routine)
         {
-            // 보상받을 수 있는 퀘스트 목록 가져오기
-            List<QuestData> readyQuests = ManagerRoot.Quest.GetReadyToReportQuests();
-
-            if (readyQuests.Count > 0)
-            {
-                // 달성한 퀘스트가 있을 경우의 특수 인삿말
-                bool isSpeaking = true;
-                SpeakAndDo("의뢰를 완수했군. 여기 약속된 보수네.", () => isSpeaking = false);
-                
-                // 오피서의 대사가 다 타이핑될 때까지 대기
-                yield return new WaitUntil(() => !isSpeaking);
-
-                foreach (var q in readyQuests)
-                {
-                    // 보상 지급
-                    ManagerRoot.Finance.AddMoney(q.Reward);
-                    
-                    // 퀘스트 완료 처리 (이 안에서 QuestComplete 플래그도 켜짐)
-                    ManagerRoot.Quest.CompleteQuest(q.QuestID); 
-                    
-                    // 용도 폐기된 Ready 플래그 제거 (선택 사항)
-                    ManagerRoot.Flag.SetFlag($"QuestReady_{q.QuestID}", false);
-
-                    // TODO: 유저에게 보상 획득을 알리는 팝업 UI 표시
-                    // 예: ManagerRoot.UI.ShowAlertPopup($"{q.QuestName} 완료! {q.Reward}G 획득!");
-                    // yield return new WaitUntil(() => !ManagerRoot.UI.IsPopupOpen);
-                    
-                    Debug.Log($"[Office] {q.QuestName} 보상 지급 완료: {q.Reward}G");
-                    
-                    // 팝업 없이 텍스트로만 처리한다면 약간의 딜레이
-                    yield return YieldCache.WaitForSeconds(0.5f); 
-                }
-
-                // 보상 지급이 끝나면 자연스럽게 메인 메뉴 표시
-                SpeakAndDo("다른 볼일이 남았나?", () => 
-                {
-                    buttonContainer.SetActive(true);
-                    questButton.Select();
-                });
-            }
-            else
-            {
-                // 달성한 퀘스트가 없을 경우 기존 인삿말
-                SpeakAndDo("어서 오게나. 무슨 일로 온 거지?", () => 
-                {
-                    buttonContainer.SetActive(true);
-                    questButton.Select();
-                });
-            }
+            if (flow != null) StopCoroutine(flow);
+            busy = true; buttonContainer.SetActive(false); dialoguePanel.SetActive(true);
+            flow = StartCoroutine(routine);
         }
-
+        private IEnumerator Enter()
+        {
+            var receipts = new List<QuestReceipt>();
+            var errors = new List<string>();
+            var manager = ManagerRoot.Quest;
+            manager.RefreshExternalGoals();
+            // No yields inside a claim batch. A disabled window cannot interrupt a single payment.
+            foreach (var q in manager.GetReadyToReportQuests())
+            {
+                string runID = manager.GetRunID(q.QuestID);
+                if (manager.TryClaimReward(q.QuestID, runID, out var receipt, out var reason)) receipts.Add(receipt);
+                else errors.Add(q.QuestName + ": " + reason);
+            }
+            if (receipts.Count > 0)
+            {
+                long total = 0;
+                foreach (var r in receipts)
+                {
+                    total += r.gold;
+                    yield return Say($"보고 완료: {r.questName}\n보상 {r.gold:N0} G를 지급했습니다.\n[확인] 계속", true);
+                }
+                yield return Say($"총 {receipts.Count}건 보고 완료\n합계 {total:N0} G 수령\n[확인] 계속", true);
+            }
+            if (errors.Count > 0) yield return Say(string.Join("\n", errors) + "\n[확인] 계속", true);
+            yield return Say("어서 오게나. 무슨 일로 온 거지?", false);
+            ShowMenu(questButton);
+        }
+        private void ShowMenu(Button focus)
+        {
+            busy = false; flow = null; buttonContainer.SetActive(true); focus.Select();
+        }
         private void OnQuestClicked()
         {
-            buttonContainer.SetActive(false);
-            SpeakAndDo("현재 가능한 일거리 목록이다.", () => 
-            {
-                dialoguePanel.SetActive(false);
-                questUI.gameObject.SetActive(true);
-                questUI.Show(this); // this를 넘겨주어 서브패널이 부모를 알게 함
-            });
+            if (!busy && buttonContainer.activeSelf) Run(OpenQuests());
         }
-
+        private IEnumerator OpenQuests()
+        {
+            yield return Say("현재 의뢰 목록이다. 목표 달성 후 돌아오면 보상을 지급하지.", false);
+            dialoguePanel.SetActive(false); questUI.gameObject.SetActive(true); questUI.Show(this);
+            busy = false; flow = null;
+        }
         private void OnPartnerClicked()
         {
-            buttonContainer.SetActive(false);
-            SpeakAndDo("파트너 렌탈? 지금의 파트너에 불만이 있는 건가?", () => 
-            {
-                dialoguePanel.SetActive(false);
-                partnerUI.gameObject.SetActive(true);
-                partnerUI.Show(this);
-            });
+            if (!busy && buttonContainer.activeSelf) Run(OpenPartners());
         }
-
-        private void OnExitClicked()
+        private IEnumerator OpenPartners()
         {
-            buttonContainer.SetActive(false);
-            SpeakAndDo("행운을 비네. 무사히 돌아오게나.", () => 
-            {
-                gameObject.SetActive(false);
-                ManagerRoot.GameState.ChangeState(GameState.Exploration); // 던전 복귀
-            });
+            yield return Say("파트너를 확인하겠나?", false);
+            dialoguePanel.SetActive(false); partnerUI.gameObject.SetActive(true); partnerUI.Show(this);
+            busy = false; flow = null;
         }
-
-        // 서브 패널에서 취소 키를 눌렀을 때 호출되는 복귀 함수
-        public void ReturnFromSubPanel(string returnMessage, Button buttonToFocus)
+        public void ReturnFromSubPanel(string message, Button focus) { Run(Return(message, focus)); }
+        private IEnumerator Return(string message, Button focus)
+        {
+            yield return Say(message, false); ShowMenu(focus);
+        }
+        private IEnumerator Exit()
+        {
+            yield return Say("행운을 비네. 무사히 돌아오게나.", false);
+            ManagerRoot.GameState.ChangeState(GameState.Exploration);
+            gameObject.SetActive(false);
+        }
+        private IEnumerator Say(string message, bool requireConfirm)
         {
             dialoguePanel.SetActive(true);
-            SpeakAndDo(returnMessage, () => 
-            {
-                buttonContainer.SetActive(true);
-                buttonToFocus.Select();
-            });
-        }
-
-        // --- 타이핑 애니메이션 핵심 로직 ---
-        private void SpeakAndDo(string message, System.Action onComplete)
-        {
-            if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-            onDialogueComplete = onComplete;
-            typingCoroutine = StartCoroutine(TypeText(message));
-        }
-
-        private IEnumerator TypeText(string message)
-        {
-            isTyping = true;
-            typingStartTime = Time.unscaledTime;
             dialogueText.text = message;
             dialogueText.maxVisibleCharacters = 0;
-
-            for (int i = 0; i < message.Length; i++)
+            dialogueText.ForceMeshUpdate();
+            int count = dialogueText.textInfo.characterCount;
+            float started = Time.unscaledTime;
+            for (int i = 1; i <= count; i++)
             {
-                dialogueText.maxVisibleCharacters = i + 1;
-                if (typingSound != null) ManagerRoot.Sound.PlaySFX(SfxID.UI_Cursor);
-                yield return YieldCache.WaitForSeconds(typingSpeed);
+                dialogueText.maxVisibleCharacters = i;
+                if (Time.unscaledTime - started > 0.15f && GameInput.GetConfirmDown()) break;
+                if (typingSound != null) ManagerRoot.Sound.PlaySFX(Data.SfxID.UI_Cursor);
+                yield return new WaitForSecondsRealtime(Mathf.Max(0, typingSpeed));
             }
-            CompleteTypingImmediately();
-        }
-
-        private void CompleteTypingImmediately()
-        {
-            if (typingCoroutine != null) StopCoroutine(typingCoroutine);
-            dialogueText.maxVisibleCharacters = dialogueText.text.Length;
-            isTyping = false;
-            StartCoroutine(WaitAndExecuteCallback());
-        }
-
-        private IEnumerator WaitAndExecuteCallback()
-        {
-            yield return YieldCache.WaitForSeconds(0.5f);
-            if (onDialogueComplete != null)
+            dialogueText.maxVisibleCharacters = int.MaxValue;
+            yield return new WaitForSecondsRealtime(0.2f);
+            if (requireConfirm)
             {
-                System.Action tempAction = onDialogueComplete;
-                onDialogueComplete = null;
-                tempAction.Invoke();
+                while (!GameInput.GetConfirmDown() && !GameInput.GetCancelDown()) yield return null;
+                yield return null;
             }
         }
     }

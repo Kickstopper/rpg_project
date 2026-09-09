@@ -40,7 +40,7 @@ namespace UI.Office
 
         private System.Action onConfirmYesAction;
 
-        void Start()
+        void Awake()
         {
             // 기존에 연결된 이벤트나 인스펙터 설정이 꼬여있다면 전부 초기화
             confirmYesBtn.onClick.RemoveAllListeners();
@@ -56,6 +56,10 @@ namespace UI.Office
         public void Show(OfficeUIController parentUI)
         {
             mainUI = parentUI;
+            ManagerRoot.Quest.RefreshExternalGoals();
+            popupCooldown = 0;
+            currentSlotIndex = 0;
+            onConfirmYesAction = null;
             ClosePopups(); 
             PopulateQuestList();
         }
@@ -80,12 +84,23 @@ namespace UI.Office
                 slotScript.Setup(q, isCompleted, isActive);
                 
                 Button btn = go.GetComponent<Button>();
-                btn.onClick.AddListener(() => OnQuestSlotSelected(slotScript, q));
+                int index = i;
+                slotScript.Selected = () => SetSelectedIndex(index);
+                btn.onClick.AddListener(() => { SetSelectedIndex(index); OnQuestSlotSelected(slotScript, q); });
 
                 spawnedSlots.Add(go);
             }
 
+            currentSlotIndex = Mathf.Clamp(currentSlotIndex, 0, Mathf.Max(0, spawnedSlots.Count - 1));
+            if (spawnedSlots.Count == 0 && infoView != null) infoView.UpdateView(null, false, false);
             SelectCurrentSlot();
+        }
+
+        private void SetSelectedIndex(int index)
+        {
+            if (isPopupOpen || index < 0 || index >= spawnedSlots.Count) return;
+            currentSlotIndex = index;
+            UpdateQuestInfoView();
         }
 
         private void SelectCurrentSlot()
@@ -115,28 +130,19 @@ namespace UI.Office
 
         private void OnQuestSlotSelected(QuestSlotUI slot, QuestData data)
         {
-            if (slot.IsCompleted || slot.IsActive) return;
+            if (isPopupOpen) return;
+            var state = ManagerRoot.Quest.GetState(data.QuestID);
+            if (state == QuestState.Locked) { ShowAlertPopup("선행 의뢰를 완료해야 접수할 수 있습니다."); return; }
+            if (state == QuestState.ReadyToReport) { ShowAlertPopup("목표를 달성했습니다. Office에 다시 방문하면 보고됩니다."); return; }
+            if (state != QuestState.Available) return;
 
             ManagerRoot.Sound.PlaySFX(SfxID.UI_Click);
 
-            var commander = ManagerRoot.Party.partyData.Find(p => p.isCommander);
-            int commanderLevel = (commander != null) ? commander.stats.level : 1;
-
-            int maxAllowedQuests = 1 + (commanderLevel / 15);
-            int currentActiveCount = ManagerRoot.Quest.GetActiveQuests().Count;
-
-            if (currentActiveCount >= maxAllowedQuests)
+            ShowConfirmPopup($"'{data.QuestName}' 의뢰를 접수하시겠습니까?\n보수: {data.Reward:N0} G", () =>
             {
-                ShowAlertPopup($"현재 당신의 LV에서는 {maxAllowedQuests}개의 퀘스트만 수주할 수 있습니다.");
-            }
-            else
-            {
-                ShowConfirmPopup("이 퀘스트를 진행하시겠습니까?", () => 
-                {
-                    ManagerRoot.Quest.AcceptQuest(data.QuestID);
-                    PopulateQuestList(); 
-                });
-            }
+                if (!ManagerRoot.Quest.TryAcceptQuest(data.QuestID, out var reason)) ShowAlertPopup(reason);
+                PopulateQuestList();
+            });
         }
 
         // 팝업 제어 로직
@@ -167,13 +173,15 @@ namespace UI.Office
 
         private void OnConfirmYesClicked()
         {
-            if (popupCooldown > 0f) return; 
+            if (!isPopupOpen || !confirmPopup.activeSelf || popupCooldown > 0f) return;
 
             confirmPopup.SetActive(false);
             alertPopup.SetActive(false);
             isPopupOpen = false;
             
-            onConfirmYesAction?.Invoke();
+            var accept = onConfirmYesAction;
+            onConfirmYesAction = null;
+            accept?.Invoke();
         }
 
         private void ClosePopups()
@@ -183,17 +191,17 @@ namespace UI.Office
             confirmPopup.SetActive(false);
             alertPopup.SetActive(false);
             isPopupOpen = false;
-            
+            onConfirmYesAction = null;
             SelectCurrentSlot();
         }
 
         // 입력 제어 로직
         void Update()
         {
-            if (inputCooldown > 0) inputCooldown -= Time.deltaTime;
+            if (inputCooldown > 0) inputCooldown -= Time.unscaledDeltaTime;
             
             // 팝업 쿨타임 감소
-            if (popupCooldown > 0) popupCooldown -= Time.deltaTime; 
+            if (popupCooldown > 0) popupCooldown -= Time.unscaledDeltaTime;
 
             if (isPopupOpen)
             {

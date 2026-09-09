@@ -13,6 +13,8 @@ namespace Data
             lookupTable = new Dictionary<string, QuestData>();
             foreach (var data in db)
             {
+                string error = QuestDefinitionValidation.Error(data);
+                if (error != null) { Debug.LogError(error); continue; }
                 if (!lookupTable.ContainsKey(data.QuestID))
                 {
                     lookupTable.Add(data.QuestID, data);

@@ -1,246 +1,217 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Data;
-using System.Linq;
 
 namespace Manager
 {
+    public enum QuestState { Locked, Available, Active, ReadyToReport, Claimed }
+    public sealed class QuestReceipt
+    {
+        public string questID, questName, runID;
+        public int gold;
+    }
+
     public class QuestManager : MonoBehaviour
     {
-        private List<QuestData> allQuests = new List<QuestData>();
-
-        // 퀘스트 상태를 메모리에서 관리하는 딕셔너리
-        private Dictionary<string, bool> completedQuests = new Dictionary<string, bool>();
-        private Dictionary<string, QuestProgress> activeQuests = new Dictionary<string, QuestProgress>();
-
-        // 게임 실행 시 CSV에서 읽어온 데이터를 주입
-        public void InitializeQuests(List<QuestData> questDataList)
+        private readonly Dictionary<string, QuestData> definitions = new Dictionary<string, QuestData>();
+        private readonly HashSet<string> completedQuests = new HashSet<string>();
+        private readonly Dictionary<string, QuestProgress> activeQuests = new Dictionary<string, QuestProgress>();
+        private bool claiming;
+        public event Action Changed;
+        public int MaxActiveQuests
         {
-            allQuests = questDataList;
-            Debug.Log($"[QuestManager] {allQuests.Count}개의 퀘스트 데이터 로드 완료.");
+            get
+            {
+                var commander = ManagerRoot.Party?.partyData?.Find(p => p.isCommander);
+                return 1 + Mathf.Max(1, commander == null ? 1 : commander.stats.level) / 15;
+            }
         }
-
-        // 전체 퀘스트 목록 반환
-        public List<QuestData> GetAllQuests()
+        public void InitializeQuests(List<QuestData> quests)
         {
-            return allQuests;
+            definitions.Clear();
+            
+            foreach (var q in quests ?? new List<QuestData>())
+            {
+                string error = QuestDefinitionValidation.Error(q);
+                if (error != null) { Debug.LogError("[Quest] " + error); continue; }
+                if (definitions.ContainsKey(q.QuestID)) { Debug.LogError("중복 QuestID: " + q.QuestID); continue; }
+                definitions.Add(q.QuestID, q);
+            }
         }
-
-        // 특정 ID의 퀘스트 데이터 반환
-        public QuestData GetQuestData(string questID)
+        public List<QuestData> GetAllQuests() => definitions.Values.ToList();
+        public QuestData GetQuestData(string id) => id != null && definitions.TryGetValue(id, out var q) ? q : null;
+        public List<QuestData> GetActiveQuests() => GetAllQuests().Where(q => IsQuestActive(q.QuestID)).ToList();
+        public List<QuestData> GetAvailableQuests() => GetAllQuests().Where(q => GetState(q.QuestID) == QuestState.Available).ToList();
+        public List<QuestData> GetReadyToReportQuests() => GetAllQuests().Where(q => GetState(q.QuestID) == QuestState.ReadyToReport).ToList();
+        public bool IsQuestActive(string id) => id != null && activeQuests.ContainsKey(id);
+        public bool IsQuestCompleted(string id) => GetState(id) == QuestState.Claimed;
+        public bool HasCompleted(string id) => id != null && completedQuests.Contains(id);
+        public QuestState GetState(string id)
         {
-            return allQuests.Find(q => q.QuestID == questID);
-        }
-
-        // 현재 진행 중인 퀘스트 목록만 반환
-        public List<QuestData> GetActiveQuests()
-        {
-            return allQuests.Where(q => IsQuestActive(q.QuestID)).ToList();
-        }
-
-        // 아직 수락하지 않은(진행 가능) 퀘스트 목록만 반환
-        public List<QuestData> GetAvailableQuests()
-        {
-            return allQuests.Where(q => !IsQuestActive(q.QuestID) && !IsQuestCompleted(q.QuestID)).ToList();
+            var q = GetQuestData(id);
+            if (q == null) return QuestState.Locked;
+            if (activeQuests.TryGetValue(id, out var p)) return p.isReadyToReport ? QuestState.ReadyToReport : QuestState.Active;
+            if (HasCompleted(id) && !q.IsRepeatable) return QuestState.Claimed;
+            if (q.prerequisiteQuestIDs != null && q.prerequisiteQuestIDs.Any(required => !HasCompleted(required))) return QuestState.Locked;
+            return QuestState.Available;
         }
         
-        // 데이터 초기화 (New Game)
+        public int GetKillCount(string questID, string monsterID) => activeQuests.TryGetValue(questID, out var p) &&
+            p.killCounts.TryGetValue(monsterID, out var count) ? count : 0;
+        
+        public string GetRunID(string id) => activeQuests.TryGetValue(id, out var p) ? p.runID : null;
+        
+        public bool TryAcceptQuest(string id, out string reason)
+        {
+            reason = null;
+            if (claiming || GetState(id) != QuestState.Available) 
+            {
+                reason = "현재 접수할 수 없는 의뢰입니다.";
+                return false;
+            }
+
+            if (activeQuests.Count >= MaxActiveQuests)
+            {
+                reason = $"동시 접수 한도는 {MaxActiveQuests}개입니다.";
+                return false; 
+            }
+            
+            var p = new QuestProgress { questID = id, runID = Guid.NewGuid().ToString("N") };
+            foreach (var t in definitions[id].Targets) p.killCounts.Add(t.monsterID, 0);
+            
+            activeQuests.Add(id, p);
+            RefreshExternalGoals();
+            SyncFlags(id); Notify(); return true;
+        }
+        public void AcceptQuest(string id) { if (!TryAcceptQuest(id, out var reason)) Debug.LogWarning(reason); }
+
+        public bool TryClaimReward(string id, string expectedRunID, out QuestReceipt receipt, out string reason)
+        {
+            receipt = null; reason = null;
+            if (claiming || GetState(id) != QuestState.ReadyToReport ||
+                string.IsNullOrEmpty(expectedRunID) || GetRunID(id) != expectedRunID)
+            {
+                reason = "이미 수령했거나 보고할 수 없는 의뢰입니다.";
+                return false;
+            }
+            
+            var finance = ManagerRoot.Finance;
+            var q = definitions[id];
+            
+            if (finance == null || (long)finance.CurrentMoney + q.Reward > int.MaxValue)
+            {
+                reason = "보상을 지급할 수 없습니다. 소지금 상한을 확인하세요.";
+                return false;
+            }
+            
+            claiming = true;
+            
+            try
+            {
+                // Finance listeners observe the completed quest and the credited balance together.
+                activeQuests.Remove(id); completedQuests.Add(id);
+                if (q.IsRepeatable && !string.IsNullOrEmpty(q.completionFlag)) ManagerRoot.Flag?.SetFlag(q.completionFlag, false);
+                SyncFlags(id);
+                receipt = new QuestReceipt { questID = id, questName = q.QuestName, runID = expectedRunID, gold = q.Reward };
+                finance.AddMoney(q.Reward);
+            }
+            finally { claiming = false; }
+            
+            Notify();
+            return true;
+        }
+        [Obsolete("Use TryClaimReward with the accepted run ID; completion includes payment.")]
+        public void CompleteQuest(string id) { TryClaimReward(id, GetRunID(id), out _, out _); }
+
+        public List<QuestData> RefreshExternalGoals()
+        {
+            var ready = new List<QuestData>();
+            foreach (var pair in activeQuests)
+            {
+                var q = GetQuestData(pair.Key);
+                if (q == null || pair.Value.isReadyToReport || string.IsNullOrEmpty(q.completionFlag)) continue;
+                if (ManagerRoot.Flag != null && ManagerRoot.Flag.CheckFlag(q.completionFlag))
+                {
+                    pair.Value.isReadyToReport = true; SyncFlags(q.QuestID); ready.Add(q);
+                }
+            }
+            if (ready.Count > 0) Notify();
+            return ready;
+        }
+        // Called only after a successful recruitment. Kept separate from the kill record.
+        public void RecordNegotiation(string location, string monsterID)
+        {
+            if (ManagerRoot.Flag != null) ManagerRoot.Flag.SetFlag("QuestTalk_" + location + "_" + monsterID, true);
+        }
+
+        public List<QuestData> ProcessBattleResult(string location, List<string> killedIDs)
+        {
+            var newlyReady = RefreshExternalGoals();
+            foreach (var pair in activeQuests)
+            {
+                var q = GetQuestData(pair.Key); var p = pair.Value;
+                if (q == null || p.isReadyToReport || q.locationID != location) continue;
+                foreach (var id in killedIDs ?? new List<string>())
+                {
+                    var t = q.Targets.Find(target => target.monsterID == id);
+                    if (t != null) p.killCounts[id] = Mathf.Min(t.requiredCount, p.killCounts[id] + 1);
+                }
+                if (q.Targets.Count > 0 && q.Targets.All(t => p.killCounts[t.monsterID] >= t.requiredCount))
+                { p.isReadyToReport = true; newlyReady.Add(q); SyncFlags(q.QuestID); }
+            }
+            Notify(); return newlyReady;
+        }
         public void NewGame()
         {
-            completedQuests.Clear();
-            activeQuests.Clear();
-            
-            Debug.Log("[QuestManager] 퀘스트 데이터가 초기화되었습니다. (New Game)");
+            completedQuests.Clear(); activeQuests.Clear(); claiming = false;
+            foreach (var id in definitions.Keys) SyncFlags(id);
+            Notify();
         }
-
-        // =========================================================
-        // 2. 데이터 저장 (Save)
-        // =========================================================
         public void Save(SaveData data)
         {
-            // 완료된 퀘스트 ID 저장 (기존과 동일)
-            data.completedQuestIDs = new List<string>(completedQuests.Keys);
-            
-            // 진행 중인 퀘스트 데이터 저장
-            // Dictionary의 Value(QuestProgress 객체들)를 그대로 List로 변환하여 저장합니다.
-            data.activeQuests = new List<QuestProgress>(activeQuests.Values);
-            
-            Debug.Log($"[QuestManager] 퀘스트 저장 완료: 완료 {completedQuests.Count}개, 진행중 {activeQuests.Count}개");
+            data.completedQuestIDs = completedQuests.ToList();
+            data.activeQuests = activeQuests.Values.Select(p => new QuestProgress
+            { questID = p.questID, runID = p.runID, isReadyToReport = p.isReadyToReport,
+                killCounts = new Dictionary<string, int>(p.killCounts) }).ToList();
         }
-
-        // =========================================================
-        // 3. 데이터 불러오기 (Load)
-        // =========================================================
         public void Load(SaveData data)
         {
-            // 기존 메모리 데이터 초기화
-            completedQuests.Clear();
-            activeQuests.Clear();
-
-            // 세이브 파일에서 완료된 퀘스트 복원
-            if (data.completedQuestIDs != null)
+            NewGame();
+            foreach (var id in data.completedQuestIDs ?? new List<string>())
+                if (GetQuestData(id) != null) completedQuests.Add(id);
+            foreach (var saved in data.activeQuests ?? new List<QuestProgress>())
             {
-                foreach (string qId in data.completedQuestIDs)
+                if (saved == null) continue;
+                var q = GetQuestData(saved.questID);
+                if (q == null || (HasCompleted(q.QuestID) && !q.IsRepeatable) || activeQuests.ContainsKey(q.QuestID)) continue;
+                var p = new QuestProgress { questID = q.QuestID,
+                    runID = string.IsNullOrEmpty(saved.runID) ? Guid.NewGuid().ToString("N") : saved.runID };
+                foreach (var t in q.Targets)
                 {
-                    completedQuests[qId] = true;
-                    
-                    // 기존 FlagManager와 호환성을 위해 플래그 세팅
-                    if (ManagerRoot.Flag != null)
-                    {
-                        ManagerRoot.Flag.SetFlag($"QuestComplete_{qId}", true);
-                    }
+                    int count = 0;
+                    saved.killCounts?.TryGetValue(t.monsterID, out count);
+                    p.killCounts[t.monsterID] = Mathf.Clamp(count, 0, t.requiredCount);
                 }
+                p.isReadyToReport = (q.Targets.Count > 0 && q.Targets.All(t => p.killCounts[t.monsterID] >= t.requiredCount)) ||
+                    (!string.IsNullOrEmpty(q.completionFlag) && ManagerRoot.Flag != null && ManagerRoot.Flag.CheckFlag(q.completionFlag));
+                activeQuests.Add(q.QuestID, p);
             }
-
-            // 세이브 파일에서 진행 중인 퀘스트 복원
-            if (data.activeQuests != null)
-            {
-                foreach (QuestProgress progress in data.activeQuests)
-                {
-                    // 딕셔너리에 퀘스트 ID를 Key로 하여 복원된 진행도 객체 삽입
-                    activeQuests[progress.questID] = progress;
-
-                    // 만약 게임을 껐다 켰는데 이미 완료 조건을 다 채워둔(보고 대기 중인) 상태라면
-                    // 오피스 UI에서 바로 보상을 줄 수 있도록 Ready 플래그를 다시 켜줌
-                    if (progress.isReadyToReport && ManagerRoot.Flag != null)
-                    {
-                        ManagerRoot.Flag.SetFlag($"QuestReady_{progress.questID}", true);
-                    }
-                }
-            }
-            
-            Debug.Log($"[QuestManager] 퀘스트 로드 완료: 완료 {completedQuests.Count}개, 진행중 {activeQuests.Count}개");
+            foreach (var id in definitions.Keys) SyncFlags(id);
+            Notify();
         }
-
-        // 전투 종료 후 킬 카운트 정산
-        public List<QuestData> ProcessBattleResult(string maplocationID, List<string> killedMonsterIDs)
+        private void SyncFlags(string id)
         {
-            List<QuestData> newlyCompletedQuests = new List<QuestData>();
-
-            foreach (var kvp in activeQuests)
-            {
-                QuestProgress progress = kvp.Value;
-                if (progress.isReadyToReport) continue; // 이미 달성해서 보고 대기 중인 퀘스트는 패스
-
-                QuestData data = GetQuestData(progress.questID);
-                
-                // 장소(locationID)가 일치하는지 확인
-                if (data.locationID != maplocationID) continue; 
-
-                bool isUpdated = false;
-
-                // 잡은 몬스터가 퀘스트 타겟인지 확인하고 카운트 증가
-                foreach (string mID in killedMonsterIDs)
-                {
-                    if (progress.killCounts.ContainsKey(mID))
-                    {
-                        int reqCount = data.Targets.Find(t => t.monsterID == mID).requiredCount;
-                        if (progress.killCounts[mID] < reqCount)
-                        {
-                            progress.killCounts[mID]++;
-                            isUpdated = true;
-                        }
-                    }
-                }
-
-                // 카운트가 올랐다면, 모든 목표를 달성했는지 체크
-                if (isUpdated)
-                {
-                    bool allMet = true;
-                    foreach (var target in data.Targets)
-                    {
-                        if (progress.killCounts[target.monsterID] < target.requiredCount)
-                        {
-                            allMet = false;
-                            break;
-                        }
-                    }
-
-                    // 모두 달성했다면 Ready 상태로 변경하고 결과 리스트에 추가
-                    if (allMet)
-                    {
-                        progress.isReadyToReport = true;
-                        newlyCompletedQuests.Add(data);
-                        
-                        // OfficeUI에서 보상을 주기 위한 플래그 활성화
-                        if (ManagerRoot.Flag != null) 
-                            ManagerRoot.Flag.SetFlag($"QuestReady_{data.QuestID}", true);
-                    }
-                }
-            }
-
-            // 이번 전투로 방금 막 달성한 퀘스트 리스트를 반환합니다. (UI 표시용)
-            return newlyCompletedQuests; 
+            if (ManagerRoot.Flag == null) return;
+            ManagerRoot.Flag.SetFlag("QuestReady_" + id, GetState(id) == QuestState.ReadyToReport);
+            ManagerRoot.Flag.SetFlag("QuestComplete_" + id, HasCompleted(id));
         }
-
-        // 퀘스트 수락. 퀘스트 수주 시 카운트를 0으로 초기화
-        public void AcceptQuest(string questID)
+        private void Notify()
         {
-            if (!completedQuests.ContainsKey(questID) && !activeQuests.ContainsKey(questID))
-            {
-                QuestData data = GetQuestData(questID);
-                QuestProgress progress = new QuestProgress { questID = questID };
-                // 타겟 몬스터들의 킬 카운트를 0으로 세팅
-                if (data.Targets != null)
-                {
-                    foreach (var target in data.Targets)
-                    {
-                        progress.killCounts[target.monsterID] = 0;
-                    }
-                }
-                
-                activeQuests[questID] = progress;
-                Debug.Log($"[QuestManager] {questID} 수주 성공!");
-            }
-        }
-
-        // 퀘스트 완료
-        public void CompleteQuest(string questID)
-        {
-            if (!completedQuests.ContainsKey(questID))
-            {
-                // 완료 목록에 추가하고, 진행 중 목록에서는 제거
-                completedQuests[questID] = true;
-                if (activeQuests.ContainsKey(questID))
-                {
-                    activeQuests.Remove(questID);
-                }
-
-                // 범용 이벤트/UI 처리(OfficeUI 등)를 위해 FlagManager에도 기록
-                if (ManagerRoot.Flag != null)
-                {
-                    ManagerRoot.Flag.SetFlag($"QuestComplete_{questID}", true);
-                }
-            }
-        }
-
-        // 오피스 진입 시 보상을 받을 수 있는 퀘스트 목록 반환
-        public List<QuestData> GetReadyToReportQuests()
-        {
-            List<QuestData> readyQuests = new List<QuestData>();
-            
-            foreach (var qId in activeQuests.Keys)
-            {
-                // 던전에서 조건을 달성하여 Ready 플래그가 켜진 퀘스트인지 확인
-                if (ManagerRoot.Flag != null && ManagerRoot.Flag.CheckFlag($"QuestReady_{qId}"))
-                {
-                    QuestData data = GetQuestData(qId);
-                    if (data != null) readyQuests.Add(data);
-                }
-            }
-            return readyQuests;
-        }
-
-        // 퀘스트 완료 여부 확인
-        public bool IsQuestCompleted(string questID)
-        {
-            return completedQuests.ContainsKey(questID) && completedQuests[questID];
-        }
-
-        // 퀘스트 진행 중 여부 확인
-        public bool IsQuestActive(string questID)
-        {
-            return activeQuests.ContainsKey(questID);
+            if (Changed == null) return;
+            foreach (Action listener in Changed.GetInvocationList())
+                try { listener(); } catch (Exception ex) { Debug.LogException(ex); }
         }
     }
 }

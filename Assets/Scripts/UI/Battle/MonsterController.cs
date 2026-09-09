@@ -382,6 +382,7 @@ namespace UI.Battle
         public override IEnumerator OnDamageTaken(int damage)
         {
             currentHp -= damage;
+            if (currentHp <= 0) manager?.RecordQuestKill(this);
             Debug.Log($"<color=red>{sourceData.name}에게 {damage} 데미지!</color> (남은 HP: {currentHp})");
 
             // 몬스터 전용 피격 연출 (빨간색 깜빡임 + 진동)
@@ -407,6 +408,7 @@ namespace UI.Battle
         public void ApplyHpChange(int amount)
         {
             currentHp = Mathf.Clamp(currentHp + amount, 0, maxHp);
+            if (currentHp <= 0) manager?.RecordQuestKill(this);
         }
 
         public void ApplyMpChange(int amount)

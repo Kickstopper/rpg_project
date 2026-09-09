@@ -83,7 +83,7 @@ namespace Manager
             data.mountedModules = new List<PlacedModuleData>(ManagerRoot.Module.GetMountedModules());
 
             string json = JsonConvert.SerializeObject(data, Formatting.Indented); // Indented를 사용해 Json 파일이 줄바꿈되게 함
-            File.WriteAllText(GetSavePath(slotIndex), json);
+            WriteSaveAtomically(GetSavePath(slotIndex), json);
             
             Debug.Log($"[Slot {slotIndex}] 게임 저장 완료");
         }
@@ -93,11 +93,11 @@ namespace Manager
         public void LoadGame(int slotIndex)
         {
             string path = GetSavePath(slotIndex);
-            if (!File.Exists(path)) return;
+            if (!File.Exists(path) && !File.Exists(path + ".bak")) return;
 
-            string json = File.ReadAllText(path);
-            
-            SaveData data = JsonConvert.DeserializeObject<SaveData>(json);
+            SaveData data;
+            try { data = ReadSaveWithBackup(path); }
+            catch (System.Exception ex) { Debug.LogError("저장 데이터를 읽지 못했습니다: " + ex.Message); return; }
 
             // 골드 및 인벤토리 복구
             ManagerRoot.Finance.SetMoney(data.money);
@@ -163,16 +163,51 @@ namespace Manager
             Debug.Log("게임 불러오기 완료");
         }
 
+        public static void WriteSaveAtomically(string path, string json)
+        {
+            string temp = path + ".tmp";
+            string directory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
+            try
+            {
+                using (var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);
+                    stream.Write(bytes, 0, bytes.Length);
+                    stream.Flush(true);
+                }
+                if (File.Exists(path)) File.Replace(temp, path, path + ".bak");
+                else File.Move(temp, path);
+            }
+            finally { if (File.Exists(temp)) File.Delete(temp); }
+        }
+
+        public static SaveData ReadSaveWithBackup(string path)
+        {
+            try { return ReadSave(path); }
+            catch (System.Exception ex) when (ex is IOException || ex is JsonException)
+            {
+                if (!File.Exists(path + ".bak")) throw;
+                Debug.LogWarning("기본 세이브를 읽지 못해 이전 백업을 불러옵니다.");
+                return ReadSave(path + ".bak");
+            }
+        }
+        private static SaveData ReadSave(string path)
+        {
+            var data = JsonConvert.DeserializeObject<SaveData>(File.ReadAllText(path));
+            if (data == null || string.IsNullOrEmpty(data.sceneName)) throw new JsonSerializationException("잘못된 저장 데이터입니다.");
+            return data;
+        }
+
         // 해당 슬롯의 데이터 미리보기
         public SaveData GetSaveDataHeader(int slotIndex)
         {
             string path = GetSavePath(slotIndex);
-            if (!File.Exists(path)) return null;
+            if (!File.Exists(path) && !File.Exists(path + ".bak")) return null;
 
             try
             {
-                string json = File.ReadAllText(path);
-                return JsonConvert.DeserializeObject<SaveData>(json);
+                return ReadSaveWithBackup(path);
             }
             catch
             {
@@ -183,7 +218,7 @@ namespace Manager
         // 중단 저장 데이터가 존재하는지 확인 (타이틀 화면용)
         public bool HasSuspendData()
         {
-            return File.Exists(GetSavePath(SUSPEND_SLOT_INDEX));
+            return File.Exists(GetSavePath(SUSPEND_SLOT_INDEX)) || File.Exists(GetSavePath(SUSPEND_SLOT_INDEX) + ".bak");
         }
     }
 }
