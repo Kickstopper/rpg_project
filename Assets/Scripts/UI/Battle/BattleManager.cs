@@ -11,6 +11,7 @@ using DG.Tweening;
 using Helper;
 using Manager;
 using Controller;
+using RPGProject.Negotiation;
 namespace UI.Battle
 {
     public enum BattleState { Start, PlayerInput, EnemyInput, Processing, Won, Lost }
@@ -101,12 +102,19 @@ namespace UI.Battle
         private List<PlayerController> currentUnionParticipants = new List<PlayerController>();
         private bool isUnionAttackUsedThisTurn = false;
         private EncounterType currentEncounterType = EncounterType.Random;
-        EnvironmentState currentEnv = new EnvironmentState 
+        [Header("Negotiation Environment (set by the world before negotiation)")]
+        [SerializeField] private EnvironmentState currentEnv = new EnvironmentState
         { 
-            moonPhase = MoonPhase.Full, 
+            moonPhase = MoonPhase.New,
             weather = Weather.Clear 
         };
         
+        private NegotiationSession negotiationSession;
+        private MonsterController negotiationTarget;
+        private PlayerController negotiationActor;
+        private readonly HashSet<MonsterController> negotiationItemRecipients = new HashSet<MonsterController>();
+        public void SetNegotiationEnvironment(EnvironmentState environment) { currentEnv = environment; }
+
         public struct BattleReward
         {
             public int totalExp;      // 파티가 획득한 총 경험치
@@ -144,6 +152,11 @@ namespace UI.Battle
 
         public void Initialize(List<string> monsterIds, Color fogColor, EncounterType encType, Sprite capturedBg)
         {
+            negotiationSession?.Close();
+            negotiationSession = null;
+            negotiationTarget = null;
+            negotiationActor = null;
+            negotiationItemRecipients.Clear();
             isEndingBattle = false;
             currentActingEntity = null;
             this.fogColor = fogColor;
@@ -1035,7 +1048,7 @@ namespace UI.Battle
         {
             // 대화할 수 있는 적 타겟팅 시작
             currentSelectedAction = ActionType.Talk;
-            StartTargetSelection(TargetScope.Single_Enemy, ActionType.Talk, "누구와 대화합니까?");
+            StartTargetSelection(TargetScope.Single_Enemy, ActionType.Talk, "누구와 대화합니까? (교섭 종료 시 아군 턴이 끝납니다)");
         }
 
         public void OnBaseCommand_Auto()
@@ -2020,97 +2033,133 @@ namespace UI.Battle
 
         public void StartNegotiation(MonsterController targetMonster)
         {
-            if (targetMonster == null || targetMonster.sourceData == null)
+            if (negotiationSession != null || state != BattleState.PlayerInput || isEndingBattle ||
+                (dialogueUI != null && dialogueUI.IsDialogueActive)) return;
+            if (targetMonster == null || targetMonster.sourceData == null || !targetMonster.IsAlive ||
+                !fieldController.activeMonsters.Contains(targetMonster) || targetMonster.sourceData.isBoss)
             {
-                Debug.LogWarning("교섭할 대상 몬스터가 없습니다.");
+                RestoreNegotiationInput("이 대상과는 교섭할 수 없습니다.");
                 return;
             }
-
+            var actor = fieldController.GetCurrentCharacter();
+            if (actor == null || !actor.IsAlive || actor.sourceData == null || dialogueUI == null || ManagerRoot.Dialogue == null)
+            {
+                RestoreNegotiationInput("교섭을 시작할 수 없습니다.");
+                return;
+            }
+            var lines = ManagerRoot.Dialogue.GetNegotiationDialogues(targetMonster.sourceData);
+            var errors = NegotiationScriptValidator.Validate(lines);
+            if (errors.Count > 0)
+            {
+                Debug.LogError("[교섭] " + string.Join("\n", errors));
+                RestoreNegotiationInput("교섭 대사를 사용할 수 없습니다.");
+                return;
+            }
+            negotiationTarget = targetMonster;
+            negotiationActor = actor;
+            var data = targetMonster.sourceData;
+            negotiationSession = new NegotiationSession(data.personality, data.race, currentEnv,
+                targetMonster.CurrentAnger, targetMonster.CurrentJoy, targetMonster.CurrentInterest,
+                TryPayNegotiationDemand, TryRecruitNegotiationTarget, TryGiveNegotiationItem);
+            isSelectingTarget = false;
+            fieldController.StopBlinkEffects();
+            EventSystem.current?.SetSelectedGameObject(null);
             ManagerRoot.Sound.PlayBGM(BgmID.Encounter);
-            
-            // 불필요한 UI 비활성화
             uiController.HideLog();
             uiController.SetBreakSliderVisible(false);
             uiController.SetCmdPanelVisible(false);
             fieldController.SetPartyVisible(false);
-
-            var sourceData = targetMonster.sourceData;
-            
-            List<Dictionary<string, string>> negotiationLines = ManagerRoot.Dialogue.GetNegotiationDialogues(sourceData);
-
-            if (negotiationLines != null && negotiationLines.Count > 0)
-            {
-                dialogueUI.StartNegotiation(negotiationLines, targetMonster, OnNegotiationEnded, HandleResourceDemand);
-            }
-            else
-            {
-                Debug.LogError($"교섭 스크립트를 DialogueManager에서 찾을 수 없습니다. CSV 파일을 확인해주세요.");
-                
-                // 대사가 없을 경우 기본 대사 처리 혹은 교섭 취소
-                List<Dictionary<string, string>> fallbackLines = new List<Dictionary<string, string>>
-                {
-                    new Dictionary<string, string> { { "Name", targetMonster.entityName }, { "Content", "으르렁거리고 있다..." }, { "NextID", "END" } }
-                };
-                dialogueUI.StartNegotiation(fallbackLines, targetMonster, OnNegotiationEnded);
-            }
+            dialogueUI.StartNegotiation(lines, targetMonster, OnNegotiationEnded, null, negotiationSession);
         }
 
-        // 몬스터 요구 처리 메서드
-        private bool HandleResourceDemand(string resourceType, int amount)
+        private void RestoreNegotiationInput(string message)
         {
-            // 교섭을 시도한 현재 주인공 캐릭터 가져오기
-            PlayerController pc = fieldController.GetCurrentCharacter();
-            if (pc == null) return false;
-
-            if (resourceType == "HP")
-            {
-                // HP를 내어줄 때 죽으면 안 되므로, 남은 체력이 요구량보다 커야 함
-                if (pc.currentHp > amount)
-                {
-                    // 피격 이펙트 및 사운드 재생
-                    ManagerRoot.Sound.PlaySFX(SfxID.Attack_Sword);
-                    ApplyDamage(pc.gameObject, amount, false);
-                    
-                    return true;
-                }
-            }
-            else if (resourceType == "MP")
-            {
-                if (pc.currentMp >= amount)
-                {
-                    pc.ApplyMpChange(-amount);
-                    // TODO: 마력 흡수 이펙트 및 사운드 재생
-                    ApplyDamage(pc.gameObject, 0, false); // 대미지 없이 피격 효과와 UI 업데이트만 사용
-                    return true;
-                }
-            }
-
-            // 조건 미달 (체력/마력이 부족함)
-            return false;
+            isSelectingTarget = false;
+            uiController.SetTargetCursorVisible(false);
+            fieldController.StopBlinkEffects();
+            fieldController.SetPartyVisible(true);
+            uiController.SetCmdPanelVisible(true);
+            uiController.SetBaseCmdInteractable(true);
+            uiController.SetFightCmdInteractable(true);
+            uiController.ShowLog(message);
+            inputCooldown = 0.2f;
         }
-        
-        // 대화가 종료되었을 때 선택지 결과(Tone)를 판정
+
+        private bool TryPayNegotiationDemand(NegotiationDemand demand)
+        {
+            if (negotiationSession == null || negotiationSession.Closed || negotiationActor == null ||
+                !negotiationActor.IsAlive || demand.Amount <= 0) return false;
+            switch (demand.Kind)
+            {
+                case DemandKind.HP:
+                case DemandKind.MP:
+                    return negotiationActor.TryPayNegotiationResource(demand.Kind == DemandKind.HP, demand.Amount);
+                case DemandKind.Gold:
+                    if (ManagerRoot.Finance == null || ManagerRoot.Finance.CurrentMoney < demand.Amount) return false;
+                    ManagerRoot.Finance.SubMoney(demand.Amount);
+                    return true;
+                case DemandKind.Item:
+                    if (ManagerRoot.Inventory == null || string.IsNullOrEmpty(demand.ItemID) ||
+                        ManagerRoot.Inventory.GetItemCount(demand.ItemID) < demand.Amount) return false;
+                    ManagerRoot.Inventory.RemoveItem(demand.ItemID, demand.Amount);
+                    return true;
+                default: return false;
+            }
+        }
+
+        private bool TryRecruitNegotiationTarget()
+        {
+            var target = negotiationTarget;
+            if (target == null || !target.IsAlive || target.sourceData == null || target.sourceData.isBoss ||
+                ManagerRoot.Party == null || ManagerRoot.Party.GetCharacterByID(target.sourceData.id) != null) return false;
+            if (!ManagerRoot.Party.AddMember(MonsterConversionHelper.ToCharacterEntry(target.sourceData), true)) return false;
+            
+            var member = ManagerRoot.Party.GetCharacterByID(target.sourceData.id);
+            member.isRegular = false;
+            fieldController.activeMonsters.Remove(target);
+            fieldController.encounterLog.Remove(target.sourceData); // Remove this occurrence only, not every copy of the species.
+            target.SetSelectionState(false);
+            target.gameObject.SetActive(false);
+            target.transform.SetParent(transform, false); // Free the row slot for the remaining enemies.
+            return true;
+        }
+
+        private bool TryGiveNegotiationItem()
+        {
+            var target = negotiationTarget;
+            if (target == null || target.sourceData == null || !target.IsAlive || negotiationItemRecipients.Contains(target) ||
+                ManagerRoot.Database == null || ManagerRoot.Inventory == null) return false;
+            var drops = target.sourceData.dropItemIds;
+            if (drops == null) return false;
+            
+            var candidates = drops.Where(id => !string.IsNullOrWhiteSpace(id) && ManagerRoot.Database.GetItem(id) != null).ToList();
+            if (candidates.Count == 0) return false;
+            string itemID = candidates[Random.Range(0, candidates.Count)];
+            ManagerRoot.Inventory.AddItem(itemID, 1);
+            negotiationItemRecipients.Add(target);
+            return true;
+        }
+
         private void OnNegotiationEnded(int result)
         {
-            // Fight UI 켜기
-            uiController.SetCmdPanelVisible(true);
+            if (negotiationSession == null) return;
+            if (negotiationSession.Recruited && negotiationTarget != null) Destroy(negotiationTarget.gameObject);
+            negotiationSession.Close();
+            negotiationSession = null;
+            negotiationTarget = null;
+            negotiationActor = null;
             fieldController.SetPartyVisible(true);
+            foreach (var player in fieldController.GetPlayerControllers())
+                if (player != null) player.RefreshView();
             uiController.SetBreakSliderVisible(true);
-            if (result == (int)NegotiationResult.BATTLE_END)
-            {
-                // 전투 없이 상황 종료
-                StartCoroutine(EndBattleRoutine(true));
-            }
-            else if (result == (int)NegotiationResult.PLAYER_TURN)
-            {
-                // 플레이어의 턴으로 전투 재개
-                PreparePlayerTurn();
-            }
-            else
-            {
-                // 몬스터의 턴으로 전투 재개 
-                ProcessTurn();
-            }
+            ManagerRoot.Sound.PlayBGM(BgmID.Normal_Battle);
+            
+            actionQueue.Clear();
+            currentProcessingAction = null;
+            currentActingEntity = null;
+            inputCooldown = 0.2f;
+            if (CheckBattleEnd(out bool isWin)) StartCoroutine(EndBattleRoutine(isWin));
+            else ProcessTurn();
         }
 
         void ProcessTurn()

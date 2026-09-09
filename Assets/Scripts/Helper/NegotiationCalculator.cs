@@ -1,4 +1,3 @@
-using UnityEngine;
 using Data;
 using UI.Battle;
 
@@ -8,43 +7,51 @@ namespace Helper
     {
         public static MoodDelta CalculateMoodChange(ChoiceTone choice, MonsterController monster, EnvironmentState env)
         {
-            int anger = 0;
-            int joy = 0;
-            int interest = 0;
+            if (monster == null || monster.sourceData == null) return new MoodDelta(0, 0, 0);
+            return CalculateMoodChange(choice, monster.sourceData.personality, monster.sourceData.race, env);
+        }
 
-            Personality personality = monster.sourceData.personality;
-            Race species = monster.sourceData.race;
-
-            // 성격에 따른 기본 반응 계산
+        public static MoodDelta CalculateMoodChange(ChoiceTone choice, Personality personality, Race race, EnvironmentState env)
+        {
+            int anger = 0, joy = 0, interest = 0;
+            // Acceptance and offering money are not proof of payment.
+            if (choice == ChoiceTone.Bribe || choice == ChoiceTone.Accept || choice == ChoiceTone.Refuse)
+                return new MoodDelta(0, 0, 0);
+            switch (choice)
+            {
+                case ChoiceTone.Gentle: joy = 25; interest = 15; break;
+                case ChoiceTone.Relieve: anger = -15; joy = 20; interest = 20; break;
+                case ChoiceTone.Persuade: joy = 20; interest = 30; break;
+                case ChoiceTone.Request: joy = 5; interest = 15; break;
+                case ChoiceTone.Threat: anger = 20; interest = 15; break;
+                case ChoiceTone.Flirt: joy = 15; interest = 20; break;
+                case ChoiceTone.Insult: anger = 40; joy = -20; break;
+                case ChoiceTone.Mad: anger = 35; interest = -10; break;
+            }
             switch (personality)
             {
-                case Personality.Aggressive: // 다혈질
-                    if (choice == ChoiceTone.Gentle) anger += 20;    // 친절하게 대하면 얕봄
-                    if (choice == ChoiceTone.Threat) interest += 30; // 같이 화내면 마음에 들어함
+                case Personality.Polite:
+                    if (choice == ChoiceTone.Gentle || choice == ChoiceTone.Persuade) joy += 15;
+                    if (choice == ChoiceTone.Threat || choice == ChoiceTone.Insult) anger += 20;
                     break;
-
-                case Personality.Foolish: // 우둔함
-                    if (choice == ChoiceTone.Bribe) joy += 50;         // 돈/아이템을 가장 좋아함
-                    if (choice == ChoiceTone.Insult) anger += 30;     // 논리적으로 따지면 화를 냄
+                case Personality.Aggressive:
+                    if (choice == ChoiceTone.Threat) { anger = 0; joy += 20; interest += 25; }
+                    if (choice == ChoiceTone.Gentle) { anger += 20; joy = 5; }
+                    break;
+                case Personality.Sly:
+                    if (choice == ChoiceTone.Persuade || choice == ChoiceTone.Flirt) interest += 20;
+                    break;
+                case Personality.Foolish:
+                    if (choice == ChoiceTone.Relieve) joy += 20;
+                    if (choice == ChoiceTone.Insult) anger += 15;
+                    break;
+                case Personality.Childish:
+                    if (choice == ChoiceTone.Gentle || choice == ChoiceTone.Relieve) joy += 20;
+                    if (choice == ChoiceTone.Threat) anger += 20;
                     break;
             }
-
-            // 달의 위상(Moon Phase) 보정
-            if (env.moonPhase == MoonPhase.Full)
-            {
-                // 보름달에는 악마들이 흥분 상태라 대화가 잘 안 통함 (모든 수치 분노로 변환)
-                anger += 50; 
-                joy -= 20;
-            }
-
-            // 종족과 날씨 시너지
-            if (env.weather == Weather.Rain && species == Race.Beast)
-            {
-                // 비가 올 때 야수형 악마는 신경질적임
-                anger += 15;
-            }
-
-            // 최종 계산된 변화량을 구조체에 담아 반환
+            if (env.moonPhase == MoonPhase.Full) { anger += 15; joy -= 10; }
+            if ((env.weather == Weather.Rain || env.weather == Weather.Storm) && race == Race.Beast) anger += 10;
             return new MoodDelta(anger, joy, interest);
         }
     }

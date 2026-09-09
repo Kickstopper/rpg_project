@@ -9,6 +9,7 @@ using Data.Database;
 using UnityEngine.EventSystems;
 using Data;
 using Helper;
+using RPGProject.Negotiation;
 using UI.Battle;
 using System.Text.RegularExpressions;
 namespace UI
@@ -45,7 +46,9 @@ namespace UI
 
         private List<Dictionary<string, string>> currentEventLines;
         private MonsterController currentMonster;
-        private EnvironmentState currentEnvState;
+        private NegotiationSession negotiationSession;
+        private int negotiationLineVisits;
+        private readonly Dictionary<Transform, Vector3> shakeOrigins = new Dictionary<Transform, Vector3>();
 
         private int currentLineIndex = 0;
         private bool isDialogueActive = false;
@@ -60,12 +63,12 @@ namespace UI
 
         private List<Button> activeChoiceButtons = new List<Button>();
         private int currentChoiceIndex = 0;
+        private int choiceGeneration;
 
         private float inputCooldown = 0f;
         private bool isProcessingChoice = false;
         private event Action<int> onDialogueFinished;
         private event Action<string> onChoiceMade;
-        private Func<string, int, bool> onResourceDemanded; // 교섭 중 몬스터의 요구 발생
         private NegotiationResult negotiationResult = NegotiationResult.PLAYER_TURN; // 반환될 교섭 결과
 
         void Awake()
@@ -76,11 +79,13 @@ namespace UI
 
         void Start()
         {
-            uiCanvas.SetActive(false);
+            if (!isDialogueActive) uiCanvas.SetActive(false);
         }
 
         public void Initialize(string eventID, Action<int> onComplete = null)
         {
+            if (isDialogueActive) return;
+            ResetNegotiationContext();
             currentEventLines = ManagerRoot.Dialogue.GetEventData(eventID);
             if (currentEventLines == null || currentEventLines.Count == 0) return;
             
@@ -90,37 +95,63 @@ namespace UI
         }
 
         public void StartNegotiation(
-            List<Dictionary<string, string>> lines, MonsterController monster, 
-            Action<int> onNegotiationEnded, Func<string, int, bool> onResourceDemandCallback = null)
+            List<Dictionary<string, string>> lines, MonsterController monster,
+            Action<int> onNegotiationEnded, Func<string, int, bool> onResourceDemandCallback = null,
+            NegotiationSession session = null)
         {
-            negotiationResult = NegotiationResult.PLAYER_TURN;
+            if (isDialogueActive) return;
+            var errors = NegotiationScriptValidator.Validate(lines);
+            if (monster == null || monster.sourceData == null || errors.Count > 0)
+            {
+                Debug.LogError("[교섭] 시작 실패: " + string.Join("\n", errors));
+                onNegotiationEnded?.Invoke((int)NegotiationResult.PLAYER_TURN);
+                return;
+            }
+            ResetNegotiationContext();
+            negotiationResult = NegotiationResult.MONSTER_TURN;
             currentEventLines = lines;
             currentMonster = monster;
-
+            negotiationSession = session ?? new NegotiationSession(monster.sourceData.personality,
+                monster.sourceData.race, default, monster.CurrentAnger, monster.CurrentJoy, monster.CurrentInterest,
+                demand => (demand.Kind == DemandKind.HP || demand.Kind == DemandKind.MP) &&
+                    onResourceDemandCallback != null && onResourceDemandCallback(demand.Kind.ToString(), demand.Amount),
+                null, null);
             onDialogueFinished = onNegotiationEnded;
-            onResourceDemanded = onResourceDemandCallback;
-    
-            // 첫 시작 라인을 찾아서 인덱스를 설정
-            currentLineIndex = 0;
-            for (int i = 0; i < lines.Count; i++)
-            {
-                if (lines[i].ContainsKey("Situation") && lines[i]["Situation"] == "Intro")
-                {
-                    // TODO: 여기서 몬스터의 현재 누적된 감정(Anger, Interest 등)을 체크하여
-                    // 대화를 원천 거부하는 Intro 라인으로 분기
-                    currentLineIndex = i;
-                    break;
-                }
-            }
-
-            StartDialogueFlow();
+            string entry = negotiationSession.MustStop ? "NEGO_REJECT" : "INTRO";
+            int entryIndex = FindIndexBySeq(entry);
+            if (entryIndex < 0) entryIndex = FindIndexBySeq("FAIL");
+            // Negotiation has no scene background of its own; discard a previous event backdrop.
+            if (backgroundImageUI != null) { backgroundImageUI.enabled = false; backgroundImageUI.sprite = null; }
+            StartDialogueFlow(entryIndex);
         }
 
-        private void StartDialogueFlow()
+        private void ResetNegotiationContext()
+        {
+            negotiationSession?.Close();
+            negotiationSession = null;
+            currentMonster = null;
+            onChoiceMade = null;
+            negotiationResult = NegotiationResult.PLAYER_TURN;
+            negotiationLineVisits = 0;
+        }
+
+        private void SyncNegotiationMood()
+        {
+            if (negotiationSession == null || currentMonster == null) return;
+            currentMonster.CurrentAnger = negotiationSession.Anger;
+            currentMonster.CurrentJoy = negotiationSession.Joy;
+            currentMonster.CurrentInterest = negotiationSession.Interest;
+        }
+
+        private void StartDialogueFlow(int startIndex = 0)
         {
             lastCharacterId = "";
             inputCooldown = 0.05f;
-            currentLineIndex = 0;
+            currentLineIndex = Mathf.Max(0, startIndex);
+            isWaitingForChoice = false;
+            isTyping = false;
+            choiceContainer.SetActive(false);
+            ClearChoiceContainer();
             isProcessingChoice = false;
             isDialogueActive = true;
             uiCanvas.SetActive(true);
@@ -129,17 +160,44 @@ namespace UI
 
         void EndDialogue()
         {
+            if (!isDialogueActive) return;
             isDialogueActive = false;
+            isWaitingForChoice = false;
+            isProcessingChoice = false;
+            isTyping = false;
+            StopAllCoroutines();
+            typingCoroutine = null;
+            imageFadeCoroutine = null;
+            foreach (var pair in shakeOrigins)
+                if (pair.Key != null) pair.Key.localPosition = pair.Value;
+            shakeOrigins.Clear();
+            if (speechBubbleUI != null) speechBubbleUI.gameObject.SetActive(false);
             uiCanvas.SetActive(false);
             choiceContainer.SetActive(false);
-            
-            // BattleManager가 알아서 다음 턴을 이어감
-            onDialogueFinished?.Invoke((int)negotiationResult);
+            ClearChoiceContainer();
+            EventSystem.current?.SetSelectedGameObject(null);
+            SyncNegotiationMood();
+            var completed = onDialogueFinished;
+            int result = (int)negotiationResult;
+            onDialogueFinished = null;
+            ResetNegotiationContext();
+            completed?.Invoke(result);
+        }
+
+        private void OnDisable()
+        {
+            if (isDialogueActive) EndDialogue();
         }
 
         void ShowCurrentLine()
         {
-            if (currentLineIndex >= currentEventLines.Count)
+            if (negotiationSession != null && ++negotiationLineVisits > 128)
+            {
+                Debug.LogError("[교섭] 대사 진행 한도를 초과했습니다. CSV 순환 참조를 확인하세요.");
+                EndDialogue();
+                return;
+            }
+            if (currentLineIndex < 0 || currentLineIndex >= currentEventLines.Count)
             {
                 EndDialogue();
                 return;
@@ -643,9 +701,10 @@ namespace UI
                     string actionStr = branchData.ContainsKey("Action") ? branchData["Action"] : "";
                     
                     Button btn = btnObj.GetComponent<Button>();
-                    // 버튼 클릭 시 액션 실행 후 대사 넘기기 연동
+                    int generation = choiceGeneration;
+                    // Ignore stale button events and duplicate submit/click events.
                     btn.onClick.AddListener(() => {
-                        if (isProcessingChoice) return;
+                        if (!isDialogueActive || !isWaitingForChoice || isProcessingChoice || generation != choiceGeneration) return;
                         isProcessingChoice = true;
                         inputCooldown = 0.2f;
 
@@ -689,6 +748,12 @@ namespace UI
                 lookAheadIndex++;
             }
 
+            if (activeChoiceButtons.Count == 0)
+            {
+                Debug.LogWarning("표시 가능한 선택지가 없어 대화를 종료합니다.");
+                EndDialogue();
+                return;
+            }
             // 첫 번째 버튼에 포커스
             if (activeChoiceButtons.Count > 0)
             {
@@ -700,6 +765,14 @@ namespace UI
         // 버튼을 클릭했을 때 호출됨
         void OnChoiceSelected(string nextTargetID)
         {
+            if (!isDialogueActive) return;
+            if (negotiationSession != null)
+            {
+                var row = currentEventLines[currentLineIndex];
+                nextTargetID = negotiationSession.MustStop ? "FAIL" :
+                    negotiationSession.Resolve(NegotiationScriptValidator.Value(row, "Seq"), nextTargetID);
+                SyncNegotiationMood();
+            }
             inputCooldown = 0.05f;
             isProcessingChoice = false;
             // 선택지 UI 정리
@@ -783,7 +856,9 @@ namespace UI
                             else
                             {
                                 // 필요시 parts[2]를 이용해 요구 수량을 파싱 (예: HASITEM:Potion:3)
-                                if (!ManagerRoot.Inventory.HasItem(itemID)) return false;
+                                int count = 1;
+                                if (parts.Length > 3 || (parts.Length == 3 && (!int.TryParse(parts[2], out count) || count <= 0))) return false;
+                                if (ManagerRoot.Inventory == null || ManagerRoot.Inventory.GetItemCount(itemID) < count) return false;
                             }
                         }
                         break;
@@ -817,18 +892,11 @@ namespace UI
                 switch (command)
                 {
                     case "TONE":
-                        if (parts.Length >= 2 && currentMonster != null)
+                        if (parts.Length == 2 && negotiationSession != null &&
+                            Enum.TryParse(parts[1], true, out ChoiceTone tone))
                         {
-                            if (Enum.TryParse<ChoiceTone>(parts[1], true, out ChoiceTone tone))
-                            {
-                                MoodDelta delta = NegotiationCalculator.CalculateMoodChange(tone, currentMonster, new EnvironmentState());
-                                
-                                currentMonster.CurrentAnger += delta.addedAnger;
-                                currentMonster.CurrentJoy += delta.addedJoy;
-                                currentMonster.CurrentInterest += delta.addedInterest;
-                                
-                                Debug.Log($"[교섭 액션] {tone} 선택 -> 분노:{currentMonster.CurrentAnger}, 기쁨:{currentMonster.CurrentJoy}, 흥미:{currentMonster.CurrentInterest}");
-                            }
+                            negotiationSession.ApplyTone(tone);
+                            SyncNegotiationMood();
                         }
                         break;
 
@@ -892,7 +960,8 @@ namespace UI
         private IEnumerator UIShakeRoutine(float duration, float magnitude)
         {
             // 흔들어야 할 모든 객체들의 원래 위치를 저장할 딕셔너리
-            Dictionary<Transform, Vector3> originalPositions = new Dictionary<Transform, Vector3>();
+            var originalPositions = shakeOrigins;
+            originalPositions.Clear();
 
             // Dialogue 캔버스 내부의 자식들 등록
             if (uiCanvas != null)
@@ -936,8 +1005,9 @@ namespace UI
             // 흔들림이 끝나면 모두 원래 위치로 정확히 복구
             foreach (var kvp in originalPositions)
             {
-                kvp.Key.localPosition = kvp.Value;
+                if (kvp.Key != null) kvp.Key.localPosition = kvp.Value;
             }
+            originalPositions.Clear();
         }
 
         // 말풍선 연출 후 다음 대사로 넘어가는 코루틴
@@ -1008,109 +1078,10 @@ namespace UI
         {
             var currentData = currentEventLines[currentLineIndex];
             string nextTargetID = currentData.ContainsKey("NextID") ? currentData["NextID"].Trim() : "";
-            string[] parts = nextTargetID.Split(':');
-            string param = parts.Length > 1 ? parts[1].Trim() : "";
-            string choice = parts.Length > 2 ? parts[2].Trim() : "";
-            string item = parts.Length > 3 ? parts[3].Trim() : "";
-
-            // NextID가 "CHECK_MOOD:목적지" 형태일 경우 점수 판정
-
-            if (nextTargetID.StartsWith("CHECK_MOOD"))
+            if (negotiationSession != null)
             {
-                negotiationResult = NegotiationResult.PLAYER_TURN;
-                // 플레이어의 원군 요청
-                if (param == "RECRUIT")
-                {
-                    if (currentMonster.CurrentJoy >= 100 || currentMonster.CurrentInterest >= 100) 
-                    {
-                        nextTargetID = "SUCCESS_RECRUIT"; // 테이밍 성공
-                    }
-                    else
-                    {
-                        nextTargetID = "FAIL_RECRUIT"; // 테이밍 실패
-                    }
-                }
-                // 플레이어의 아이템 요구
-                else if (param == "ITEM")
-                {
-                    if (currentMonster.CurrentJoy >= 50 && currentMonster.CurrentInterest >= 50)
-                    {
-                        nextTargetID = "SUCCESS_ITEM";
-                    }
-                    else
-                    {
-                        nextTargetID = "FAIL_ITEM";
-                    }
-                }
-                // 몬스터의 아이템 요구
-                else if (param == "GIVE")
-                {
-                    nextTargetID = "NEGO_START"; // 기본적으로 다음 대화로 이어짐
-                    if (choice == "ACCEPT")
-                    {
-                        if (item.StartsWith("HP_")) 
-                        {
-                            // HP 요구 (예: GIVE:ACCEPT:HP_50)
-                            int amount = int.Parse(item.Substring(3));
-                            
-                            // BattleManager에 HP 차감 요청
-                            bool success = onResourceDemanded != null && onResourceDemanded.Invoke("HP", amount);
-                            
-                            if (!success) 
-                            { 
-                                negotiationResult = NegotiationResult.MONSTER_TURN; 
-                                nextTargetID = "FAIL"; 
-                            }
-                        }
-                        else if (item.StartsWith("MP_")) 
-                        {
-                            // MP 요구 (예: GIVE:ACCEPT:MP_20)
-                            int amount = int.Parse(item.Substring(3));
-                            
-                            bool success = onResourceDemanded != null && onResourceDemanded.Invoke("MP", amount);
-                            
-                            if (!success) 
-                            { 
-                                negotiationResult = NegotiationResult.MONSTER_TURN; 
-                                nextTargetID = "FAIL"; 
-                            }
-                        }
-                        else if (int.TryParse(item, out int gold)) 
-                        {
-                            // 골드 요구
-                            if (ManagerRoot.Finance.CurrentMoney >= gold) ManagerRoot.Finance.SubMoney(gold);
-                            else { negotiationResult = NegotiationResult.MONSTER_TURN; nextTargetID = "INSUFFICIENT_ITEM"; }
-                        }
-                        else if (ManagerRoot.Inventory.HasItem(item)) 
-                        {
-                            // 아이템 요구
-                            ManagerRoot.Inventory.RemoveItem(item, 1);
-                        }
-                        else
-                        {
-                            negotiationResult = NegotiationResult.MONSTER_TURN;
-                            nextTargetID = "INSUFFICIENT_ITEM";
-                        }
-                    }
-                    else
-                    {
-                        nextTargetID = "END";
-                    }
-                }
-                else if (param == "ANGRY")
-                {
-                    negotiationResult = NegotiationResult.MONSTER_TURN;
-                    nextTargetID = "FAIL";
-                }
-                else if (param == "DISAPPOINT")
-                {
-                    negotiationResult = NegotiationResult.MONSTER_TURN;
-                    nextTargetID = "FAIL";
-                }
-                else
-                {
-                    nextTargetID = param;
-                }
+                nextTargetID = negotiationSession.Resolve(NegotiationScriptValidator.Value(currentData, "Seq"), nextTargetID);
+                SyncNegotiationMood();
             }
 
             // 현재 줄의 NextID가 "END"라면 즉시 대화 종료
@@ -1152,6 +1123,7 @@ namespace UI
 
         private void ClearChoiceContainer()
         {
+            choiceGeneration++;
             // 리스트와 인덱스 초기화
             activeChoiceButtons.Clear();
             currentChoiceIndex = 0;
@@ -1193,6 +1165,8 @@ namespace UI
         // DialogueEditorWindow에서 실시간 미리보기용으로 사용함
         public void InitializeDynamic(List<Dictionary<string, string>> dynamicLines, Action<int> onComplete = null)
         {
+            if (isDialogueActive) return;
+            ResetNegotiationContext();
             currentEventLines = dynamicLines;
             if (currentEventLines == null || currentEventLines.Count == 0) return;
             
@@ -1200,7 +1174,6 @@ namespace UI
             
             // 에디터 미리보기 모드이므로 몬스터와 자원 요구 콜백을 비움
             currentMonster = null;
-            onResourceDemanded = null;
             negotiationResult = NegotiationResult.PLAYER_TURN;
             
             StartDialogueFlow();

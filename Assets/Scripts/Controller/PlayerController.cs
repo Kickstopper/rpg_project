@@ -514,6 +514,25 @@ namespace UI.Battle
             currentHp = Mathf.Clamp(currentHp + amount, 0, maxHp);
         }
 
+        public bool TryPayNegotiationResource(bool useHP, int amount)
+        {
+            if (amount <= 0 || !IsAlive || sourceData == null) return false;
+            if (useHP)
+            {
+                if (currentHp <= amount) return false;
+                currentHp -= amount;
+                sourceData.currentHp = currentHp;
+            }
+            else
+            {
+                if (currentMp < amount) return false;
+                currentMp -= amount;
+                sourceData.currentMp = currentMp;
+            }
+            if (isActiveAndEnabled) RefreshView();
+            return true;
+        }
+
         public void ApplyMpChange(int amount)
         {
             if (!IsAlive) return;
