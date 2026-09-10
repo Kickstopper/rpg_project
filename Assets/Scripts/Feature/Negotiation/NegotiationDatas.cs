@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace RPGProject.Feature.Negotiation
 {
-    public enum Personality { Polite, Aggressive, Sly, Foolish, Childish } // 공손, 공격적, 교활, 멍청, 유치
+    public enum Personality { Polite, Aggressive, Sly, Foolish, Childish, Proud, Principled, Rational } // 공손, 공격적, 교활, 멍청, 유치, 긍지, 원칙, 합리
     public enum Gender { Male, Female, None }
-    public enum Race { Human, Beast, Demihuman, Demon, Dragon, Machine, Plant, Spirit, Undead }
+    public enum Race { Human, Beast, Demihuman, Demon, Dragon, Machine, Plant, Spirit, Undead, Fairy, Divine, Construct, Aberration }
 
     public enum TimeOfDay { Morning, Day, Evening, Night }
     public enum Weather { Clear, Cloud, Rain, Storm }

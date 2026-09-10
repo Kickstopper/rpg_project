@@ -16,8 +16,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_000
     name: "\uC2AC\uB77C\uC784"
-    race: 1
-    align: 6
+    race: 12
+    align: 5
     gender: 0
     compileResultMsg: "\uC624, \uC0C8\uB85C\uC6B4 \uBAB8\uC774\uAD70! \uC57D\uD574
       \uBCF4\uC5EC\uB3C4 \uBC29\uC2EC\uD558\uBA74 \uD070\uCF54\uB2E4\uCE60\uAC78?"
@@ -63,6 +63,7 @@ MonoBehaviour:
       agi: 1
       luc: 1
     resistances:
+      statusEffects: []
       phys: 2
       fire: 1
       ice: 0
@@ -83,7 +84,7 @@ MonoBehaviour:
     id: enemy_001
     name: "\uD638\uC800"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uAC00\uC2DC\uB294 \uC801\uC5D0\uAC8C\uB9CC \uD5A5\uD55C\uB2E4.
       \uB0B4 \uB4F1\uC744 \uBBFF\uACE0 \uC2F8\uC6CC\uB77C."
@@ -129,6 +130,7 @@ MonoBehaviour:
       agi: 3
       luc: 4
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -149,7 +151,7 @@ MonoBehaviour:
     id: enemy_002
     name: "\uD0AC\uB7EC\uBE44"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uCE68 \uD55C \uBC29\uC774\uBA74 \uB05D\uC774\uB2E4. \uB204\uAD6C\uB97C
       \uBA3C\uC800 \uC3E0\uAE4C?"
@@ -194,6 +196,7 @@ MonoBehaviour:
       agi: 4
       luc: 1
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -214,7 +217,7 @@ MonoBehaviour:
     id: enemy_003
     name: "\uD0AC\uB7EC\uD53C\uC2DC"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uBB3C\uC18D\uC774\uB4E0 \uC721\uC9C0\uB4E0 \uBA39\uC787\uAC10\uC740
       \uB193\uCE58\uC9C0 \uC54A\uC544."
@@ -260,6 +263,7 @@ MonoBehaviour:
       agi: 3
       luc: 1
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -280,7 +284,7 @@ MonoBehaviour:
     id: enemy_004
     name: "\uC824\uB9AC\uD53C\uC2DC"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uCC9C\uCC9C\uD788... \uD558\uC9C0\uB9CC \uD655\uC2E4\uD558\uAC8C
       \uB3C5\uC774 \uD37C\uC9C8 \uAC70\uB2E4."
@@ -326,6 +330,7 @@ MonoBehaviour:
       agi: 4
       luc: 1
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -346,7 +351,7 @@ MonoBehaviour:
     id: enemy_005
     name: "\uC6DC"
     race: 1
-    align: 6
+    align: 5
     gender: 2
     compileResultMsg: "\u2026\u2026\uB545\uC744 \uAC00\uB978\uB2E4. \uAE38\uC744
       \uB9CC\uB4E0\uB2E4."
@@ -391,6 +396,7 @@ MonoBehaviour:
       agi: 1
       luc: 5
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -411,7 +417,7 @@ MonoBehaviour:
     id: enemy_006
     name: "\uB79C\uB4DC\uD130\uD2C0"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uC11C\uB450\uB97C \uD544\uC694\uB294 \uC5C6\uB2E4. \uB05D\uAE4C\uC9C0
       \uC0B4\uC544\uB0A8\uB294 \uAC74 \uB098\uB2C8\uAE4C."
@@ -457,6 +463,7 @@ MonoBehaviour:
       agi: 1
       luc: 5
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -477,7 +484,7 @@ MonoBehaviour:
     id: enemy_007
     name: "\uB370\uBE4C \uD50C\uB79C\uD2B8"
     race: 6
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uAC00\uAE4C\uC774 \uC640\uB77C. \uD55C \uBC88 \uBD99\uC7A1\uD788\uBA74
       \uB2E4\uC2DC\uB294 \uB193\uCE58\uC9C0 \uC54A\uB294\uB2E4."
@@ -523,6 +530,7 @@ MonoBehaviour:
       agi: 2
       luc: 5
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 1
@@ -589,6 +597,7 @@ MonoBehaviour:
       agi: 4
       luc: 5
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -608,7 +617,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_009
     name: "\uACE0\uBE14\uB9B0"
-    race: 7
+    race: 2
     align: 6
     gender: 0
     compileResultMsg: "\uC57D\uD0C8\uC774\uB4E0 \uC2F8\uC6C0\uC774\uB4E0 \uBB50\uB4E0
@@ -655,6 +664,7 @@ MonoBehaviour:
       agi: 5
       luc: 4
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -674,8 +684,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_010
     name: "\uBA38\uB9E8"
-    race: 1
-    align: 6
+    race: 2
+    align: 5
     gender: 0
     compileResultMsg: "\uBC14\uB2E4\uC758 \uD798\uC744 \uBE4C\uB824 \uD568\uAED8
       \uC2F8\uC6B0\uACA0\uB2E4."
@@ -720,6 +730,7 @@ MonoBehaviour:
       agi: 5
       luc: 4
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 5
@@ -740,7 +751,7 @@ MonoBehaviour:
     id: enemy_011
     name: "\uB9E8\uB4DC\uB808\uC774\uD06C"
     race: 6
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uB0B4 \uBE44\uBA85\uC744 \uB4E4\uC73C\uBA74 \uD6C4\uD68C\uD558\uAC8C
       \uB420 \uAC70\uC57C."
@@ -785,6 +796,7 @@ MonoBehaviour:
       agi: 5
       luc: 6
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 1
@@ -804,8 +816,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_012
     name: "\uBA38\uBA54\uC774\uB4DC"
-    race: 1
-    align: 6
+    race: 2
+    align: 2
     gender: 1
     compileResultMsg: "\uD30C\uB3C4\uC758 \uB178\uB798\uB97C \uB4E4\uB824\uC904\uAC8C.
       \uD568\uAED8 \uC5EC\uD589\uD558\uC790."
@@ -851,6 +863,7 @@ MonoBehaviour:
       agi: 7
       luc: 3
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 5
@@ -871,7 +884,7 @@ MonoBehaviour:
     id: enemy_013
     name: "\uD06C\uB9AC\uD551 \uBC14\uC778"
     race: 6
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uB3C4\uB9DD\uCCD0\uB3C4 \uC18C\uC6A9\uC5C6\uB2E4. \uACB0\uAD6D
       \uBD99\uC7A1\uD788\uAC8C \uB420 \uD14C\uB2C8\uAE4C."
@@ -917,6 +930,7 @@ MonoBehaviour:
       agi: 5
       luc: 6
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -936,7 +950,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_014
     name: "\uD074\uB85C\uC6B4"
-    race: 0
+    race: 7
     align: 6
     gender: 0
     compileResultMsg: "\uD558\uD558\uD558! \uC624\uB298 \uBB34\uB300\uC758 \uC8FC\uC778\uACF5\uC740
@@ -983,6 +997,7 @@ MonoBehaviour:
       agi: 6
       luc: 6
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -1049,6 +1064,7 @@ MonoBehaviour:
       agi: 6
       luc: 5
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -1068,7 +1084,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_016
     name: "\uC624\uD06C"
-    race: 1
+    race: 2
     align: 6
     gender: 0
     compileResultMsg: "\uAC15\uD55C \uB140\uC11D\uC744 \uC4F0\uB7EC\uB728\uB9AC\uB294
@@ -1115,6 +1131,7 @@ MonoBehaviour:
       agi: 7
       luc: 1
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -1134,8 +1151,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_017
     name: "\uC880\uBE44"
-    race: 1
-    align: 6
+    race: 8
+    align: 5
     gender: 0
     compileResultMsg: "\u2026\u2026\uBA85\uB839\u2026\u2026\uB530\uB978\uB2E4\u2026\u2026."
     compileAscii: {fileID: 4900000, guid: 8ed2abd4dacfd7d4a8482f3ad3903fa7, type: 3}
@@ -1179,6 +1196,7 @@ MonoBehaviour:
       agi: 6
       luc: 7
     resistances:
+      statusEffects: []
       phys: 2
       fire: 1
       ice: 2
@@ -1199,7 +1217,7 @@ MonoBehaviour:
     id: enemy_018
     name: "\uC2A4\uCF08\uB808\uD1A4"
     race: 8
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uBF08\uB9CC \uB0A8\uC544\uB3C4 \uC2F8\uC6B8 \uC218\uB294
       \uC788\uB2E4."
@@ -1245,6 +1263,7 @@ MonoBehaviour:
       agi: 6
       luc: 3
     resistances:
+      statusEffects: []
       phys: 2
       fire: 1
       ice: 2
@@ -1264,8 +1283,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_019
     name: "\uC717\uCE58"
-    race: 2
-    align: 6
+    race: 0
+    align: 9
     gender: 1
     compileResultMsg: "\uD765\uBBF8\uB86D\uAD70\uC694. \uB2F9\uC2E0\uC758 \uD798,
       \uC9C1\uC811 \uD655\uC778\uD574 \uBCF4\uACA0\uC2B5\uB2C8\uB2E4."
@@ -1311,6 +1330,7 @@ MonoBehaviour:
       agi: 8
       luc: 5
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -1376,6 +1396,7 @@ MonoBehaviour:
       agi: 6
       luc: 5
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -1396,7 +1417,7 @@ MonoBehaviour:
     id: enemy_021
     name: "\uAC00\uACE0\uC77C"
     race: 3
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uC624\uB79C \uC7A0\uC5D0\uC11C \uAE68\uC5B4\uB0AC\uB2E4.
       \uC774\uC81C \uB108\uB97C \uC9C0\uD0A4\uACA0\uB2E4."
@@ -1442,6 +1463,7 @@ MonoBehaviour:
       agi: 7
       luc: 8
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -1461,8 +1483,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_022
     name: "\uBBF8\uBBF9"
-    race: 3
-    align: 6
+    race: 12
+    align: 5
     gender: 0
     compileResultMsg: "\uB0A0 \uC0C1\uC790\uB77C\uACE0 \uC0DD\uAC01\uD588\uB2E4\uBA74
       \uC774\uBBF8 \uB2A6\uC5C8\uC9C0."
@@ -1508,6 +1530,7 @@ MonoBehaviour:
       agi: 9
       luc: 6
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -1527,7 +1550,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_023
     name: "\uD558\uD53C"
-    race: 1
+    race: 2
     align: 6
     gender: 1
     compileResultMsg: "\uD558\uB298\uC740 \uB0B4 \uC601\uC5ED\uC774\uC57C! \uB530\uB77C\uC62C
@@ -1574,6 +1597,7 @@ MonoBehaviour:
       agi: 6
       luc: 4
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -1593,8 +1617,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_024
     name: "\uADF8\uB9BC \uB9AC\uD37C"
-    race: 3
-    align: 6
+    race: 7
+    align: 4
     gender: 0
     compileResultMsg: "\uC8FD\uC74C\uC740 \uB204\uAD6C\uC5D0\uAC8C\uB098 \uCC3E\uC544\uC628\uB2E4.
       \uADF8\uB54C\uAE4C\uC9C0\uB294 \uB124 \uACC1\uC5D0 \uC788\uC9C0."
@@ -1640,6 +1664,7 @@ MonoBehaviour:
       agi: 8
       luc: 6
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -1659,7 +1684,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_025
     name: "\uB124\uCF54\uB9C8\uD0C0"
-    race: 1
+    race: 2
     align: 6
     gender: 1
     compileResultMsg: "\uD6C4\uD6C4, \uC774\uC81C\uBD80\uD130\uB294 \uB124 \uACC1\uC5D0\uC11C
@@ -1707,6 +1732,7 @@ MonoBehaviour:
       agi: 7
       luc: 11
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -1727,7 +1753,7 @@ MonoBehaviour:
     id: enemy_026
     name: "\uAC00\uB4DC"
     race: 5
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uACBD\uACC4 \uD0DC\uC138 \uC644\uB8CC. \uB2F9\uC2E0\uC744
       \uCD5C\uC6B0\uC120\uC73C\uB85C \uBCF4\uD638\uD558\uACA0\uB2E4."
@@ -1773,6 +1799,7 @@ MonoBehaviour:
       agi: 8
       luc: 9
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -1793,7 +1820,7 @@ MonoBehaviour:
     id: enemy_027
     name: "\uB4DC\uB860"
     race: 5
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uC2DC\uC2A4\uD15C \uAE30\uB3D9. \uBAA8\uB4E0 \uC784\uBB34\uB97C
       \uC218\uD589\uD560 \uC900\uBE44\uAC00 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
@@ -1839,6 +1866,7 @@ MonoBehaviour:
       agi: 8
       luc: 5
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -1858,8 +1886,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_028
     name: "\uB4DC\uB77C\uC774\uC5B4\uB4DC"
-    race: 6
-    align: 6
+    race: 9
+    align: 2
     gender: 1
     compileResultMsg: "\uC232\uC758 \uC228\uACB0\uC744 \uB2F9\uC2E0\uACFC \uD568\uAED8
       \uB098\uB204\uACA0\uC5B4\uC694."
@@ -1906,6 +1934,7 @@ MonoBehaviour:
       agi: 5
       luc: 10
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 1
@@ -1926,7 +1955,7 @@ MonoBehaviour:
     id: enemy_029
     name: "\uC2A4\uD504\uB77C\uC774\uD2B8"
     race: 7
-    align: 6
+    align: 3
     gender: 1
     compileResultMsg: "\uBC18\uAC00\uC6CC! \uC7AC\uBBF8\uC788\uB294 \uBAA8\uD5D8\uC774
       \uB420 \uAC83 \uAC19\uC740 \uC608\uAC10\uC774 \uB4DC\uB294\uAC78!"
@@ -1972,6 +2001,7 @@ MonoBehaviour:
       agi: 10
       luc: 6
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -1991,7 +2021,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_030
     name: "\uD37D"
-    race: 2
+    race: 9
     align: 6
     gender: 0
     compileResultMsg: "\uD0A5\uD0A5! \uC7A5\uB09C\uB3C4 \uC88B\uC9C0\uB9CC, \uC2F8\uC6C0\uB3C4
@@ -2037,6 +2067,7 @@ MonoBehaviour:
       agi: 8
       luc: 9
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -2057,7 +2088,7 @@ MonoBehaviour:
     id: enemy_031
     name: "\uC774\uBE14 \uC544\uC774"
     race: 5
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uBAA9\uD45C \uC2DD\uBCC4 \uC644\uB8CC. \uC704\uD611 \uC694\uC18C\uB97C
       \uAC10\uC2DC\uD569\uB2C8\uB2E4."
@@ -2102,6 +2133,7 @@ MonoBehaviour:
       agi: 11
       luc: 11
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -2122,7 +2154,7 @@ MonoBehaviour:
     id: enemy_032
     name: "\uC70C\uC624\uC704\uC2A4\uD504"
     race: 7
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uD76C\uBBF8\uD55C \uBD88\uBE5B\uC774\uB77C \uC595\uBCF4\uC9C0
       \uB9C8\uB77C. \uC5B4\uB460\uC740 \uB0B4 \uD3B8\uC774\uB2E4."
@@ -2168,6 +2200,7 @@ MonoBehaviour:
       agi: 7
       luc: 10
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -2188,7 +2221,7 @@ MonoBehaviour:
     id: enemy_033
     name: "\uC774\uBE14 \uC6E8\uD3F0"
     race: 5
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uC804\uD22C \uBAA8\uB4DC \uD65C\uC131\uD654. \uC801\uC744
       \uC12C\uBA78\uD558\uACA0\uC2B5\uB2C8\uB2E4."
@@ -2237,6 +2270,7 @@ MonoBehaviour:
       agi: 11
       luc: 11
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -2257,7 +2291,7 @@ MonoBehaviour:
     id: enemy_034
     name: "\uC6B4\uB514\uB124"
     race: 7
-    align: 6
+    align: 2
     gender: 1
     compileResultMsg: "\uB9D1\uC740 \uBB3C\uC740 \uC0DD\uBA85\uC744 \uC0B4\uB9AC\uACE0,
       \uAC70\uC13C \uBB3C\uACB0\uC740 \uC801\uC744 \uC0BC\uCF1C\uC694."
@@ -2303,6 +2337,7 @@ MonoBehaviour:
       agi: 8
       luc: 11
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 5
@@ -2369,6 +2404,7 @@ MonoBehaviour:
       agi: 11
       luc: 8
     resistances:
+      statusEffects: []
       phys: 0
       fire: 5
       ice: 1
@@ -2388,7 +2424,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_036
     name: "\uC6E8\uC5B4\uC6B8\uD504"
-    race: 1
+    race: 2
     align: 6
     gender: 0
     compileResultMsg: "\uB2EC\uC774 \uB5A0\uB3C4 \uB728\uC9C0 \uC54A\uC544\uB3C4,
@@ -2434,6 +2470,7 @@ MonoBehaviour:
       agi: 13
       luc: 12
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -2454,7 +2491,7 @@ MonoBehaviour:
     id: enemy_037
     name: "\uD4E8\uCC98 \uC194\uC800 M"
     race: 0
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uC791\uC804 \uD655\uC778. \uC784\uBB34 \uC644\uB8CC\uAE4C\uC9C0
       \uB2F9\uC2E0\uC744 \uC9C0\uC6D0\uD558\uACA0\uC2B5\uB2C8\uB2E4."
@@ -2499,6 +2536,7 @@ MonoBehaviour:
       agi: 11
       luc: 6
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -2519,7 +2557,7 @@ MonoBehaviour:
     id: enemy_038
     name: "\uD2B8\uB80C\uD2B8"
     race: 6
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uC218\uBC31 \uD574\uB97C \uAE30\uB2E4\uB9B0 \uB05D\uC5D0
       \uC0C8\uB85C\uC6B4 \uB3D9\uB8CC\uB97C \uB9CC\uB0AC\uAD70."
@@ -2565,6 +2603,7 @@ MonoBehaviour:
       agi: 11
       luc: 10
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 1
@@ -2585,7 +2624,7 @@ MonoBehaviour:
     id: enemy_039
     name: "\uD4E8\uCC98 \uC194\uC800 F"
     race: 0
-    align: 6
+    align: 4
     gender: 1
     compileResultMsg: "\uC804\uD22C \uB370\uC774\uD130 \uB3D9\uAE30\uD654 \uC644\uB8CC.
       \uD568\uAED8\uB77C\uBA74 \uC5B4\uB5A4 \uC804\uC7A5\uB3C4 \uB3CC\uD30C\uD560
@@ -2632,6 +2671,7 @@ MonoBehaviour:
       agi: 6
       luc: 9
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -2651,8 +2691,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_040
     name: "\uC608\uD2F0"
-    race: 1
-    align: 6
+    race: 2
+    align: 5
     gender: 0
     compileResultMsg: "\uD558\uD558! \uCD94\uC704\uCBE4\uC740 \uC544\uBB34\uAC83\uB3C4
       \uC544\uB2C8\uB2E4. \uC55E\uC7A5\uC11C\uACA0\uB2E4!"
@@ -2698,6 +2738,7 @@ MonoBehaviour:
       agi: 12
       luc: 13
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -2718,7 +2759,7 @@ MonoBehaviour:
     id: enemy_041
     name: "\uAE00\uB798\uB514\uC5D0\uC774\uD130"
     race: 0
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uAC80\uD22C\uC0AC\uB294 \uC2B9\uB9AC\uB85C \uB9D0\uD55C\uB2E4.
       \uC601\uAD11\uC740 \uC6B0\uB9AC\uC758 \uAC83\uC774\uB2E4."
@@ -2764,6 +2805,7 @@ MonoBehaviour:
       agi: 11
       luc: 13
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -2783,8 +2825,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_042
     name: "\uCF04\uD0C0\uC6B0\uB85C\uC2A4"
-    race: 1
-    align: 6
+    race: 2
+    align: 4
     gender: 0
     compileResultMsg: "\uB0B4 \uB2E4\uB9AC\uC640 \uCC3D\uC740 \uC804\uC7A5\uC744
       \uB2EC\uB9AC\uAE30 \uC704\uD574 \uC874\uC7AC\uD55C\uB2E4."
@@ -2830,6 +2872,7 @@ MonoBehaviour:
       agi: 7
       luc: 16
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -2849,8 +2892,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_043
     name: "\uCF08\uD53C"
-    race: 1
-    align: 6
+    race: 9
+    align: 8
     gender: 0
     compileResultMsg: "\uAC15\uBB3C\uC740 \uAE4A\uACE0 \uC870\uC6A9\uD558\uC9C0.
       \uD558\uC9C0\uB9CC \uBC29\uC2EC\uD55C \uC790\uB294 \uACB0\uCF54 \uB3CC\uC544\uC624\uC9C0
@@ -2897,6 +2940,7 @@ MonoBehaviour:
       agi: 15
       luc: 7
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 5
@@ -2917,7 +2961,7 @@ MonoBehaviour:
     id: enemy_044
     name: "\uBC34\uC2DC"
     race: 8
-    align: 6
+    align: 5
     gender: 1
     compileResultMsg: "\uB0B4 \uB178\uB798\uB97C \uB450\uB824\uC6CC\uD558\uC9C0 \uB9C8.
       \uC624\uB298\uC740 \uC801\uB4E4\uB9CC \uC6B8\uAC8C \uB420 \uD14C\uB2C8\uAE4C."
@@ -2963,6 +3007,7 @@ MonoBehaviour:
       agi: 8
       luc: 6
     resistances:
+      statusEffects: []
       phys: 2
       fire: 1
       ice: 2
@@ -2983,7 +3028,7 @@ MonoBehaviour:
     id: enemy_045
     name: "\uD788\uBBF8\uCF54"
     race: 0
-    align: 6
+    align: 4
     gender: 1
     compileResultMsg: "\uC2E0\uB4E4\uC758 \uB73B\uC774 \uC6B0\uB9AC\uB97C \uC774\uC5B4
       \uC8FC\uC5C8\uAD70\uC694. \uD568\uAED8 \uBBF8\uB798\uB97C \uC5F4\uC5B4 \uBD05\uC2DC\uB2E4."
@@ -3029,6 +3074,7 @@ MonoBehaviour:
       agi: 13
       luc: 13
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -3049,7 +3095,7 @@ MonoBehaviour:
     id: enemy_046
     name: "\uCF54\uCE74\uD2B8\uB9AC\uC2A4"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uB208\uC744 \uB9C8\uC8FC\uCE60 \uC6A9\uAE30\uAC00 \uC788\uB2E4\uBA74
       \uC5B4\uB514 \uD55C\uBC88 \uD574\uBD10\uB77C."
@@ -3095,6 +3141,7 @@ MonoBehaviour:
       agi: 8
       luc: 16
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -3161,6 +3208,7 @@ MonoBehaviour:
       agi: 18
       luc: 12
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -3227,6 +3275,7 @@ MonoBehaviour:
       agi: 8
       luc: 14
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -3246,8 +3295,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_049
     name: "\uB8CC\uC0B4\uD39C"
-    race: 0
-    align: 6
+    race: 9
+    align: 2
     gender: 1
     compileResultMsg: "\uBE5B\uC758 \uCD95\uBCF5\uC774 \uB2F9\uC2E0\uC758 \uC5EC\uC815\uC5D0
       \uB298 \uD568\uAED8\uD558\uAE38."
@@ -3293,6 +3342,7 @@ MonoBehaviour:
       agi: 16
       luc: 12
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -3312,8 +3362,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_050
     name: "\uD6CC\uB4DC\uB77C"
-    race: 2
-    align: 6
+    race: 9
+    align: 5
     gender: 1
     compileResultMsg: "\uC232\uC740 \uAC70\uC9D3\uB9D0\uC744 \uD558\uC9C0 \uC54A\uC544.
       \uB0B4 \uBC1C\uAC78\uC74C\uC744 \uB530\uB77C\uC628\uB2E4\uBA74 \uAE38\uC744
@@ -3360,6 +3410,7 @@ MonoBehaviour:
       agi: 9
       luc: 11
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -3379,8 +3430,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_051
     name: "\uB8CC\uC0B4\uD504\uB974"
-    race: 0
-    align: 6
+    race: 9
+    align: 2
     gender: 0
     compileResultMsg: "\uBE5B\uC758 \uC232\uC5D0\uC11C \uCC3E\uC544\uC654\uB2E4.
       \uB124 \uAC80\uC774 \uC62C\uBC14\uB978 \uAE38\uC744 \uD5A5\uD558\uB3C4\uB85D
@@ -3427,6 +3478,7 @@ MonoBehaviour:
       agi: 11
       luc: 13
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -3446,8 +3498,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_052
     name: "\uD6CC\uB4DC\uB808\uCE7C"
-    race: 2
-    align: 6
+    race: 9
+    align: 4
     gender: 0
     compileResultMsg: "\uC232\uC758 \uC218\uD638\uC790\uB294 \uC57D\uC18D\uC744 \uC800\uBC84\uB9AC\uC9C0
       \uC54A\uB294\uB2E4. \uB4F1\uC744 \uB9E1\uACA8\uB77C."
@@ -3493,6 +3545,7 @@ MonoBehaviour:
       agi: 18
       luc: 14
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -3512,8 +3565,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_053
     name: "\uACE8\uB818"
-    race: 7
-    align: 6
+    race: 11
+    align: 4
     gender: 0
     compileResultMsg: "\uBA85\uB839\uC744 \uC218\uB77D\uD588\uB2E4. \uC9C0\uAE08\uBD80\uD130
       \uB108\uB97C \uC8FC\uC778\uC73C\uB85C \uC778\uC2DD\uD55C\uB2E4."
@@ -3559,6 +3612,7 @@ MonoBehaviour:
       agi: 13
       luc: 20
     resistances:
+      statusEffects: []
       phys: 3
       fire: 0
       ice: 0
@@ -3578,8 +3632,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_054
     name: "\uC624\uC624\uBB34\uCE74\uB370"
-    race: 4
-    align: 6
+    race: 1
+    align: 5
     gender: 0
     compileResultMsg: "\uC218\uB9CE\uC740 \uB2E4\uB9AC\uB85C \uC801\uC744 \uC9D3\uBC1F\uC544
       \uC8FC\uB9C8. \uB3C4\uB9DD\uCE60 \uACF3\uC740 \uC5C6\uB2E4."
@@ -3625,6 +3679,7 @@ MonoBehaviour:
       agi: 14
       luc: 9
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -3645,7 +3700,7 @@ MonoBehaviour:
     id: enemy_055
     name: "\uBAA8\uCE58\uC988\uD0A4 \uCE58\uC694\uBA54"
     race: 0
-    align: 6
+    align: 4
     gender: 1
     compileResultMsg: "\uADF8\uB9BC\uC790 \uC18D\uC5D0\uC11C \uC784\uBB34\uB97C \uC644\uC218\uD558\uACA0\uC2B5\uB2C8\uB2E4.
       \uC81C \uC874\uC7AC\uC870\uCC28 \uB208\uCE58\uCC44\uC9C0 \uBABB\uD560 \uAC81\uB2C8\uB2E4."
@@ -3691,6 +3746,7 @@ MonoBehaviour:
       agi: 13
       luc: 11
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -3711,7 +3767,7 @@ MonoBehaviour:
     id: enemy_056
     name: "\uC624\uC624\uAC00\uB9C8"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uD06C\uB974\uB975... \uD55C\uC785\uC5D0 \uC0BC\uCF1C \uBC84\uB9B4\uAE4C?
       \uC544\uB2C8, \uC9C0\uAE08\uC740 \uB124 \uD3B8\uC774\uC9C0."
@@ -3757,6 +3813,7 @@ MonoBehaviour:
       agi: 8
       luc: 13
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -3777,7 +3834,7 @@ MonoBehaviour:
     id: enemy_057
     name: "\uBE4C\uD5EC\uB984 \uD154"
     race: 0
-    align: 6
+    align: 3
     gender: 0
     compileResultMsg: "\uACFC\uB141\uC740 \uC774\uBBF8 \uBCF4\uC600\uB2E4. \uBE57\uB098\uAC00\uB294
       \uD654\uC0B4\uC740 \uC5C6\uB2E4."
@@ -3823,6 +3880,7 @@ MonoBehaviour:
       agi: 9
       luc: 15
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -3842,8 +3900,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_058
     name: "\uB4DC\uB798\uACE4\uD3EC\uD06C"
-    race: 1
-    align: 6
+    race: 4
+    align: 4
     gender: 0
     compileResultMsg: "\uC6A9\uC758 \uD53C\uB294 \uC27D\uAC8C \uAEBE\uC774\uC9C0
       \uC54A\uB294\uB2E4. \uD568\uAED8 \uD558\uB298\uC744 \uD5A5\uD574 \uB098\uC544\uAC00\uC790."
@@ -3888,6 +3946,7 @@ MonoBehaviour:
       agi: 9
       luc: 12
     resistances:
+      statusEffects: []
       phys: 2
       fire: 2
       ice: 0
@@ -3908,7 +3967,7 @@ MonoBehaviour:
     id: enemy_059
     name: "\uC554\uC0B4\uC790"
     race: 0
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uC801\uC774 \uB208\uC744 \uAC10\uB294 \uC21C\uAC04\uAE4C\uC9C0...
       \uB0B4 \uC874\uC7AC\uB294 \uADF8\uB9BC\uC790\uB2E4."
@@ -3954,6 +4013,7 @@ MonoBehaviour:
       agi: 17
       luc: 15
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -4020,6 +4080,7 @@ MonoBehaviour:
       agi: 18
       luc: 12
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -4040,7 +4101,7 @@ MonoBehaviour:
     id: enemy_061
     name: "\uC544\uC2A4\uD14C\uB9AC\uC628"
     race: 0
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uBBF8\uAD81\uC740 \uB0B4 \uC9D1\uC774\uB2E4. \uADF8 \uC548\uC5D0\uC11C\uB294
       \uB204\uAD6C\uB3C4 \uB098\uB97C \uC774\uAE38 \uC218 \uC5C6\uB2E4."
@@ -4086,6 +4147,7 @@ MonoBehaviour:
       agi: 15
       luc: 16
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -4152,6 +4214,7 @@ MonoBehaviour:
       agi: 13
       luc: 20
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -4171,8 +4234,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_063
     name: "\uCFE0\uAD6C\uCE20 \uB2CC\uC790"
-    race: 8
-    align: 6
+    race: 11
+    align: 4
     gender: 1
     compileResultMsg: "\uC2E4\uC740 \uBCF4\uC774\uC9C0 \uC54A\uC544\uB3C4 \uBAA8\uB4E0
       \uAC83\uC740 \uB0B4 \uC190\uC548\uC5D0\uC11C \uC6C0\uC9C1\uC785\uB2C8\uB2E4."
@@ -4218,6 +4281,7 @@ MonoBehaviour:
       agi: 14
       luc: 9
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -4238,7 +4302,7 @@ MonoBehaviour:
     id: enemy_064
     name: "\uCF00\uB974\uBCA0\uB85C\uC2A4"
     race: 1
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uC138 \uAC1C\uC758 \uBA38\uB9AC\uB85C \uB9F9\uC138\uD55C\uB2E4.
       \uB204\uAD6C\uB3C4 \uB124\uAC8C \uC190\uB300\uC9C0 \uBABB\uD558\uAC8C \uD558\uACA0\uB2E4."
@@ -4284,6 +4348,7 @@ MonoBehaviour:
       agi: 11
       luc: 15
     resistances:
+      statusEffects: []
       phys: 2
       fire: 5
       ice: 1
@@ -4304,7 +4369,7 @@ MonoBehaviour:
     id: enemy_065
     name: "\uADF8\uB9AC\uD3F0"
     race: 1
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uD558\uB298\uACFC \uB300\uC9C0\uB97C \uBAA8\uB450 \uC9C0\uBC30\uD558\uB294
       \uD798\uC744 \uBCF4\uC5EC \uC8FC\uACA0\uB2E4."
@@ -4350,6 +4415,7 @@ MonoBehaviour:
       agi: 16
       luc: 24
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -4416,6 +4482,7 @@ MonoBehaviour:
       agi: 20
       luc: 14
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -4436,7 +4503,7 @@ MonoBehaviour:
     id: enemy_067
     name: "\uC190\uC0C1\uD5A5"
     race: 0
-    align: 6
+    align: 1
     gender: 1
     compileResultMsg: "\uC624\uB098\uB77C\uC758 \uC774\uB984\uC5D0 \uBD80\uB044\uB7FD\uC9C0
       \uC54A\uAC8C, \uD568\uAED8 \uC2B9\uB9AC\uB97C \uAC70\uB450\uACA0\uC2B5\uB2C8\uB2E4."
@@ -4482,6 +4549,7 @@ MonoBehaviour:
       agi: 24
       luc: 15
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -4502,7 +4570,7 @@ MonoBehaviour:
     id: enemy_068
     name: "\uB9CC\uD2F0\uCF54\uC5B4"
     race: 1
-    align: 6
+    align: 8
     gender: 0
     compileResultMsg: "\uB3C5\uCE68\uACFC \uC1A1\uACF3\uB2C8... \uC5B4\uB290 \uCABD\uC73C\uB85C
       \uC8FD\uACE0 \uC2F6\uC740\uC9C0\uB294 \uC801\uB4E4\uC774 \uACB0\uC815\uD560
@@ -4549,6 +4617,7 @@ MonoBehaviour:
       agi: 15
       luc: 15
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -4568,7 +4637,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_069
     name: "\uCE74\uB9C8\uC18C\uD2B8"
-    race: 1
+    race: 10
     align: 6
     gender: 0
     compileResultMsg: "\uBC24\uC774 \uAE4A\uC744\uC218\uB85D \uB0B4 \uD798\uC740
@@ -4615,6 +4684,7 @@ MonoBehaviour:
       agi: 14
       luc: 19
     resistances:
+      statusEffects: []
       phys: 0
       fire: 1
       ice: 0
@@ -4634,7 +4704,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_070
     name: "\uC2A4\uD0AC\uB77C"
-    race: 3
+    race: 1
     align: 6
     gender: 1
     compileResultMsg: "\uBC14\uB2E4\uB294 \uC794\uC794\uD574 \uBCF4\uC5EC\uB3C4 \uC5B8\uC81C\uB4E0
@@ -4681,6 +4751,7 @@ MonoBehaviour:
       agi: 20
       luc: 14
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -4700,7 +4771,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_071
     name: "\uB77C\uBBF8\uC544"
-    race: 4
+    race: 2
     align: 6
     gender: 1
     compileResultMsg: "\uD6C4\uD6C4... \uB450\uB824\uC6CC\uD558\uC9C0 \uB9C8. \uC801\uC5D0\uAC8C\uB9CC
@@ -4747,6 +4818,7 @@ MonoBehaviour:
       agi: 11
       luc: 14
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -4767,7 +4839,7 @@ MonoBehaviour:
     id: enemy_072
     name: "\uC2AC\uB808\uC774\uD504\uB2C8\uB974"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uC5EC\uB35F \uB2E4\uB9AC\uC758 \uC9C8\uC8FC\uB294 \uB204\uAD6C\uB3C4
       \uB530\uB77C\uC7A1\uC9C0 \uBABB\uD55C\uB2E4. \uC790, \uCD9C\uBC1C\uD558\uC790."
@@ -4813,6 +4885,7 @@ MonoBehaviour:
       agi: 18
       luc: 11
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -4833,7 +4906,7 @@ MonoBehaviour:
     id: enemy_073
     name: "\uD06C\uB77C\uCF04"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uAE4A\uC740 \uBC14\uB2E4\uB294 \uB0B4 \uC601\uD1A0\uB2E4.
       \uAC70\uB300\uD55C \uD30C\uB3C4\uB85C \uC801\uC744 \uC9D1\uC5B4\uC0BC\uD0A4\uACA0\uB2E4."
@@ -4879,6 +4952,7 @@ MonoBehaviour:
       agi: 19
       luc: 22
     resistances:
+      statusEffects: []
       phys: 2
       fire: 1
       ice: 5
@@ -4898,8 +4972,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_074
     name: "\uBC40\uD30C\uC774\uC5B4"
-    race: 3
-    align: 6
+    race: 8
+    align: 8
     gender: 0
     compileResultMsg: "\uC601\uC6D0\uD55C \uBC24\uC740 \uAE38\uACE0\uB3C4 \uC544\uB984\uB2F5\uC9C0.
       \uB108\uC640\uC758 \uACC4\uC57D\uB3C4 \uADF8\uB9CC\uD07C \uC624\uB798 \uC774\uC5B4\uC9C8
@@ -4946,6 +5020,7 @@ MonoBehaviour:
       agi: 15
       luc: 13
     resistances:
+      statusEffects: []
       phys: 2
       fire: 1
       ice: 2
@@ -4965,8 +5040,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_075
     name: "\uB4C0\uB77C\uD55C"
-    race: 2
-    align: 6
+    race: 8
+    align: 4
     gender: 0
     compileResultMsg: "\uB0B4 \uBAA9\uC740 \uC783\uC5C8\uC9C0\uB9CC, \uBA85\uC608\uB294
       \uC783\uC9C0 \uC54A\uC558\uB2E4. \uB124 \uC801\uC744 \uB05D\uAE4C\uC9C0 \uCD94\uACA9\uD558\uACA0\uB2E4."
@@ -5012,6 +5087,7 @@ MonoBehaviour:
       agi: 29
       luc: 20
     resistances:
+      statusEffects: []
       phys: 2
       fire: 1
       ice: 2
@@ -5032,7 +5108,7 @@ MonoBehaviour:
     id: enemy_076
     name: "\uC2A4\uCE74\uD558\uD06C"
     race: 0
-    align: 6
+    align: 4
     gender: 1
     compileResultMsg: "\uCC3D\uC744 \uB4DC\uB294 \uBC95\uB3C4, \uC2B9\uB9AC\uD558\uB294
       \uBC95\uB3C4 \uAC00\uB974\uCCD0 \uC8FC\uC9C0. \uC2E4\uB9DD\uC2DC\uD0A4\uC9C0
@@ -5079,6 +5155,7 @@ MonoBehaviour:
       agi: 19
       luc: 12
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5145,6 +5222,7 @@ MonoBehaviour:
       agi: 25
       luc: 17
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5165,7 +5243,7 @@ MonoBehaviour:
     id: enemy_078
     name: "\uBCF4\uB514\uB2E4\uB974\uB9C8"
     race: 0
-    align: 6
+    align: 2
     gender: 1
     compileResultMsg: "\uB9C8\uC74C\uC744 \uB2E4\uC2A4\uB9AC\uB294 \uC790\uB9CC\uC774
       \uC9C4\uC815\uD55C \uAC15\uC790\uC785\uB2C8\uB2E4. \uD568\uAED8 \uAE68\uB2EC\uC74C\uC5D0
@@ -5212,6 +5290,7 @@ MonoBehaviour:
       agi: 28
       luc: 15
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5232,7 +5311,7 @@ MonoBehaviour:
     id: enemy_079
     name: "\uB4DC\uB798\uACE4 \uB098\uC774\uD2B8"
     race: 0
-    align: 6
+    align: 1
     gender: 0
     compileResultMsg: "\uC6A9\uC758 \uAE0D\uC9C0\uC640 \uAE30\uC0AC\uC758 \uB9F9\uC138\uB97C
       \uAC78\uACE0, \uB108\uC640 \uD568\uAED8 \uC2F8\uC6B0\uACA0\uB2E4."
@@ -5278,6 +5357,7 @@ MonoBehaviour:
       agi: 24
       luc: 24
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5298,7 +5378,7 @@ MonoBehaviour:
     id: enemy_080
     name: "\uD0C8\uB9AC\uC5D0\uC2E0"
     race: 0
-    align: 6
+    align: 2
     gender: 1
     compileResultMsg: "\uB178\uB798\uB294 \uAC80\uBCF4\uB2E4 \uC624\uB798 \uC0B4\uC544\uB0A8\uC2B5\uB2C8\uB2E4.
       \uB098\uC758 \uC2DC\uAC00 \uC6B0\uB9AC\uC758 \uC2B9\uB9AC\uB97C \uC804\uD558\uACA0\uC9C0\uC694."
@@ -5344,6 +5424,7 @@ MonoBehaviour:
       agi: 20
       luc: 22
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5364,7 +5445,7 @@ MonoBehaviour:
     id: enemy_081
     name: "\uBA38\uBBF8"
     race: 8
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uC218\uCC9C \uB144\uC758 \uC7A0\uC5D0\uC11C \uAE68\uC5B4\uB0AC\uB2E4.
       \uC774\uBC88\uC5D0\uB294 \uB124 \uACC1\uC744 \uC9C0\uD0A4\uACA0\uB2E4."
@@ -5410,6 +5491,7 @@ MonoBehaviour:
       agi: 27
       luc: 18
     resistances:
+      statusEffects: []
       phys: 2
       fire: 1
       ice: 2
@@ -5430,7 +5512,7 @@ MonoBehaviour:
     id: enemy_082
     name: "\uCE74\uD750\uBC14\uB4DC"
     race: 0
-    align: 6
+    align: 4
     gender: 0
     compileResultMsg: "\uC6B4\uBA85\uC758 \uC2E4\uC740 \uC774\uBBF8 \uC5BD\uD600
       \uC788\uB2E4. \uB098\uB294 \uADF8 \uB05D\uC744 \uC77D\uC5B4 \uC904 \uBFD0."
@@ -5476,6 +5558,7 @@ MonoBehaviour:
       agi: 21
       luc: 19
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5496,7 +5579,7 @@ MonoBehaviour:
     id: enemy_083
     name: "\uC250\uB3C4\uC6B0\uBE14\uB808\uC774\uB4DC"
     race: 0
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uBE5B\uC774 \uAC15\uD560\uC218\uB85D \uADF8\uB9BC\uC790\uB3C4
       \uC9D9\uC5B4\uC9C4\uB2E4. \uADF8 \uC5B4\uB460\uC740 \uB0B4 \uBB34\uAE30\uB2E4."
@@ -5542,6 +5625,7 @@ MonoBehaviour:
       agi: 16
       luc: 13
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5562,7 +5646,7 @@ MonoBehaviour:
     id: enemy_084
     name: "\uBA54\uB450\uC0AC"
     race: 2
-    align: 6
+    align: 5
     gender: 1
     compileResultMsg: "\uB0B4 \uB208\uC744 \uB450\uB824\uC6CC\uD560 \uD544\uC694\uB294
       \uC5C6\uC5B4. \uC624\uB298\uC740 \uC801\uB4E4\uB9CC \uB3CC\uC774 \uB420 \uD14C\uB2C8\uAE4C."
@@ -5608,6 +5692,7 @@ MonoBehaviour:
       agi: 25
       luc: 15
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5628,7 +5713,7 @@ MonoBehaviour:
     id: enemy_085
     name: "\uBCA8\uB808\uB2E4"
     race: 0
-    align: 6
+    align: 4
     gender: 1
     compileResultMsg: "\uC2E0\uD0C1\uC740 \uC6B0\uB9AC\uC5D0\uAC8C \uBBF8\uC18C \uC9D3\uACE0
       \uC788\uC2B5\uB2C8\uB2E4. \uC6B4\uBA85\uC744 \uD568\uAED8 \uAC1C\uCC99\uD574
@@ -5675,6 +5760,7 @@ MonoBehaviour:
       agi: 31
       luc: 18
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5695,7 +5781,7 @@ MonoBehaviour:
     id: enemy_086
     name: "\uC9C4"
     race: 7
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uC18C\uC6D0\uC744 \uC774\uB8E8\uC5B4 \uB2EC\uB77C\uACE0?
       \uD6C4\uD6C4... \uC6B0\uC120 \uC801\uBD80\uD130 \uCC98\uB9AC\uD558\uC9C0."
@@ -5741,6 +5827,7 @@ MonoBehaviour:
       agi: 27
       luc: 25
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5760,7 +5847,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_087
     name: "\uBCA8\uB85C\uB098"
-    race: 0
+    race: 10
     align: 6
     gender: 1
     compileResultMsg: "\uC804\uC7C1\uC740 \uB098\uC758 \uBB34\uB300\uB2E4. \uC2B9\uB9AC\uB97C
@@ -5807,6 +5894,7 @@ MonoBehaviour:
       agi: 18
       luc: 11
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5826,8 +5914,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_088
     name: "\uBE0C\uB9AC\uC9C0\uB4DC"
-    race: 0
-    align: 6
+    race: 10
+    align: 2
     gender: 1
     compileResultMsg: "\uBD88\uAF43\uC740 \uC0DD\uBA85\uC744 \uD488\uACE0 \uD76C\uB9DD\uC744
       \uBC1D\uD799\uB2C8\uB2E4. \uD568\uAED8 \uC55E\uC73C\uB85C \uB098\uC544\uAC00\uC694."
@@ -5873,6 +5961,7 @@ MonoBehaviour:
       agi: 15
       luc: 20
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -5938,6 +6027,7 @@ MonoBehaviour:
       agi: 27
       luc: 20
     resistances:
+      statusEffects: []
       phys: 0
       fire: 5
       ice: 1
@@ -5957,8 +6047,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_090
     name: "\uCF00\uB9AC\uB4DC\uC6EC"
-    race: 0
-    align: 6
+    race: 10
+    align: 5
     gender: 1
     compileResultMsg: "\uC9C0\uD61C\uC640 \uB9C8\uBC95\uC740 \uD798\uC744 \uC62C\uBC14\uB978
       \uACF3\uC73C\uB85C \uC774\uB04C\uAE30 \uC704\uD55C \uAC83\uC785\uB2C8\uB2E4."
@@ -6004,6 +6094,7 @@ MonoBehaviour:
       agi: 18
       luc: 19
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -6023,8 +6114,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_091
     name: "\uBC1C\uB85C\uADF8"
-    race: 7
-    align: 6
+    race: 3
+    align: 9
     gender: 0
     compileResultMsg: "\uC2EC\uC5F0\uC758 \uBD88\uAE38\uC774 \uB2E4\uC2DC \uD0C0\uC624\uB978\uB2E4.
       \uAC10\uB2F9\uD560 \uC900\uBE44\uB294 \uB418\uC5C8\uACA0\uC9C0."
@@ -6070,6 +6161,7 @@ MonoBehaviour:
       agi: 22
       luc: 21
     resistances:
+      statusEffects: []
       phys: 2
       fire: 4
       ice: 1
@@ -6137,6 +6229,7 @@ MonoBehaviour:
       agi: 25
       luc: 20
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -6157,7 +6250,7 @@ MonoBehaviour:
     id: enemy_093
     name: "\uBCA8\uB9AC\uC54C"
     race: 3
-    align: 6
+    align: 7
     gender: 0
     compileResultMsg: "\uD765\uBBF8\uB85C\uC6B4 \uACC4\uC57D\uC774\uAD70. \uC5B4\uB514,
       \uB05D\uAE4C\uC9C0 \uC990\uACA8 \uBCF4\uC790."
@@ -6203,6 +6296,7 @@ MonoBehaviour:
       agi: 16
       luc: 25
     resistances:
+      statusEffects: []
       phys: 2
       fire: 4
       ice: 1
@@ -6222,7 +6316,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_094
     name: "\uD0A4\uB974\uCF00"
-    race: 0
+    race: 10
     align: 6
     gender: 1
     compileResultMsg: "\uB9C8\uBC95\uB3C4 \uBCC0\uC2E0\uB3C4 \uBAA8\uB450 \uB0B4
@@ -6270,6 +6364,7 @@ MonoBehaviour:
       agi: 29
       luc: 32
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -6289,8 +6384,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_095
     name: "\uB4DC\uB77C\uD058\uB77C"
-    race: 3
-    align: 6
+    race: 8
+    align: 7
     gender: 0
     compileResultMsg: "\uAE34 \uBC24\uC740 \uC774\uC81C \uC2DC\uC791\uC774\uB2E4.
       \uB098\uC640 \uD568\uAED8 \uC601\uC6D0\uD55C \uC5B4\uB460\uC744 \uAC78\uC5B4\uAC00\uC790."
@@ -6336,6 +6431,7 @@ MonoBehaviour:
       agi: 30
       luc: 34
     resistances:
+      statusEffects: []
       phys: 2
       fire: 1
       ice: 2
@@ -6355,8 +6451,8 @@ MonoBehaviour:
   - isBoss: 1
     id: enemy_096
     name: "\uBC14\uC54C"
-    race: 3
-    align: 6
+    race: 10
+    align: 4
     gender: 0
     compileResultMsg: "\uCC9C\uB465\uC740 \uB098\uC758 \uBAA9\uC18C\uB9AC\uB2E4.
       \uAC10\uD788 \uB9DE\uC11C\uB294 \uC790\uC5D0\uAC8C \uC2EC\uD310\uC744 \uB0B4\uB9AC\uACA0\uB2E4."
@@ -6402,6 +6498,7 @@ MonoBehaviour:
       agi: 34
       luc: 20
     resistances:
+      statusEffects: []
       phys: 2
       fire: 4
       ice: 1
@@ -6421,8 +6518,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_097
     name: "\uD5E4\uCE74\uD14C"
-    race: 0
-    align: 6
+    race: 10
+    align: 5
     gender: 1
     compileResultMsg: "\uAC08\uB9BC\uAE38\uC5D0\uC11C \uAE38\uC744 \uC783\uC5C8\uB2E4\uBA74,
       \uB0B4 \uB4F1\uBD88\uC774 \uB108\uB97C \uC778\uB3C4\uD558\uACA0\uC2B5\uB2C8\uB2E4."
@@ -6469,6 +6566,7 @@ MonoBehaviour:
       agi: 24
       luc: 19
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -6536,6 +6634,7 @@ MonoBehaviour:
       agi: 32
       luc: 35
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -6552,11 +6651,11 @@ MonoBehaviour:
     - item_001
     - item_002
     - item_003
-  - isBoss: 0
+  - isBoss: 1
     id: enemy_099
     name: "\uBCA0\uD5E4\uBAA8\uC2A4"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uB300\uC9C0\uB97C \uB4A4\uD754\uB4DC\uB294 \uD798\uC744 \uC6D0\uD55C\uB2E4\uBA74,
       \uB098\uB97C \uC55E\uC138\uC6CC\uB77C."
@@ -6602,6 +6701,7 @@ MonoBehaviour:
       agi: 27
       luc: 32
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -6622,7 +6722,7 @@ MonoBehaviour:
     id: enemy_100
     name: "\uC9C0\uC988"
     race: 1
-    align: 6
+    align: 5
     gender: 0
     compileResultMsg: "\uCC3D\uACF5\uC758 \uB05D\uC5D0\uC11C \uB124 \uBD80\uB984\uC744
       \uB4E4\uC5C8\uB2E4. \uD558\uB298\uC740 \uC774\uC81C \uC6B0\uB9AC\uC758 \uAC83\uC774\uB2E4."
@@ -6668,6 +6768,7 @@ MonoBehaviour:
       agi: 18
       luc: 20
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -6688,7 +6789,7 @@ MonoBehaviour:
     id: enemy_101
     name: "\uB9B4\uB9AC\uC2A4"
     race: 3
-    align: 5
+    align: 6
     gender: 1
     compileResultMsg: "\uD6C4\uD6C4... \uB4DC\uB514\uC5B4 \uB9CC\uB0AC\uB124. \uB0B4
       \uD798\uC744 \uC6D0\uD55C\uB2E4\uBA74, \uB05D\uAE4C\uC9C0 \uB0A0 \uBBFF\uC5B4
@@ -6735,6 +6836,7 @@ MonoBehaviour:
       agi: 23
       luc: 35
     resistances:
+      statusEffects: []
       phys: 2
       fire: 4
       ice: 1
@@ -6755,7 +6857,7 @@ MonoBehaviour:
     id: enemy_102
     name: "\uD074\uB9C1\uC870\uB974"
     race: 0
-    align: 6
+    align: 8
     gender: 0
     compileResultMsg: "\uC131\uBC30\uC758 \uAE30\uC0AC\uC870\uCC28 \uAD74\uBCF5\uC2DC\uD0A8
       \uB9C8\uBC95\uC774\uB2E4. \uB108\uB294 \uADF8 \uD798\uC744 \uC5B4\uB5BB\uAC8C
@@ -6802,6 +6904,7 @@ MonoBehaviour:
       agi: 35
       luc: 22
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -6821,8 +6924,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_103
     name: "\uC5D4\uD0A4\uB450"
-    race: 1
-    align: 6
+    race: 2
+    align: 2
     gender: 0
     compileResultMsg: "\uBC97\uC744 \uC704\uD574 \uC2F8\uC6B0\uB294 \uAC83\uC740
       \uB0B4 \uC219\uBA85\uC774\uB2E4. \uC624\uB298\uBD80\uD130\uB294 \uB124 \uACC1\uC744
@@ -6869,6 +6972,7 @@ MonoBehaviour:
       agi: 35
       luc: 21
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -6888,8 +6992,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_104
     name: "\uC544\uD2C0\uB77C\uC2A4"
-    race: 7
-    align: 6
+    race: 10
+    align: 1
     gender: 0
     compileResultMsg: "\uC138\uC0C1\uC758 \uBB34\uAC8C\uB97C \uC9CA\uC5B4\uC9C4 \uC774
       \uC5B4\uAE68\uB77C\uBA74, \uC5B4\uB5A4 \uC2DC\uB828\uB3C4 \uACAC\uB38C\uB0BC
@@ -6936,6 +7040,7 @@ MonoBehaviour:
       agi: 35
       luc: 29
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -7003,6 +7108,7 @@ MonoBehaviour:
       agi: 35
       luc: 35
     resistances:
+      statusEffects: []
       phys: 2
       fire: 2
       ice: 3
@@ -7023,7 +7129,7 @@ MonoBehaviour:
     id: enemy_106
     name: "\uCFE0\uD6CC\uB9B0"
     race: 0
-    align: 6
+    align: 3
     gender: 0
     compileResultMsg: "\uCC3D\uC744 \uB4E4\uACE0 \uBB3C\uB7EC\uC11C\uB294 \uBC95\uC740
       \uC5C6\uB2E4. \uC2B9\uB9AC\uB294 \uC2F8\uC6B8 \uC790\uC758 \uAC83\uC774\uB2E4!"
@@ -7069,6 +7175,7 @@ MonoBehaviour:
       agi: 27
       luc: 35
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -7089,7 +7196,7 @@ MonoBehaviour:
     id: enemy_107
     name: "\uD540 \uB9C9 \uCFE8"
     race: 0
-    align: 6
+    align: 2
     gender: 0
     compileResultMsg: "\uC218\uB9CE\uC740 \uC804\uC7A5\uC744 \uC9C0\uB098 \uC5BB\uC740
       \uC9C0\uD61C\uC640 \uD798\uC744 \uB108\uC640 \uB098\uB204\uACA0\uB2E4."
@@ -7135,6 +7242,7 @@ MonoBehaviour:
       agi: 35
       luc: 35
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -7155,7 +7263,7 @@ MonoBehaviour:
     id: enemy_108
     name: "\uACE8\uB4DC \uB4DC\uB798\uACE4"
     race: 4
-    align: 6
+    align: 1
     gender: 0
     compileResultMsg: "\uC6A9\uC871\uC758 \uAE0D\uC9C0\uB294 \uACB0\uCF54 \uAEBE\uC774\uC9C0
       \uC54A\uB294\uB2E4. \uD558\uB298\uC744 \uB4A4\uB36E\uC744 \uD798\uC744 \uBCF4\uC5EC
@@ -7203,6 +7311,7 @@ MonoBehaviour:
       agi: 24
       luc: 30
     resistances:
+      statusEffects: []
       phys: 2
       fire: 4
       ice: 0
@@ -7223,7 +7332,7 @@ MonoBehaviour:
     id: enemy_109
     name: "\uB864\uB791"
     race: 0
-    align: 6
+    align: 1
     gender: 0
     compileResultMsg: "\uC815\uC758\uB85C\uC6B4 \uAC80\uC740 \uACB0\uCF54 \uB179\uC2AC\uC9C0
       \uC54A\uB294\uB2E4. \uD568\uAED8 \uC601\uAD11\uC744 \uD5A5\uD574 \uB098\uC544\uAC00\uC790."
@@ -7269,6 +7378,7 @@ MonoBehaviour:
       agi: 35
       luc: 35
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -7288,8 +7398,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_110
     name: "\uC544\uB354\uC655"
-    race: 6
-    align: 6
+    race: 0
+    align: 1
     gender: 0
     compileResultMsg: "\uC655\uC758 \uB9F9\uC138\uB97C \uAC78\uACE0 \uC120\uC5B8\uD55C\uB2E4.
       \uC774\uC81C\uBD80\uD130 \uADF8\uB300\uB294 \uB098\uC758 \uB3D9\uB9F9\uC774\uB2E4."
@@ -7336,6 +7446,7 @@ MonoBehaviour:
       agi: 35
       luc: 35
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -7355,8 +7466,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_111
     name: "\uBC1C\uD0A4\uB9AC"
-    race: 0
-    align: 6
+    race: 10
+    align: 4
     gender: 1
     compileResultMsg: "\uC6A9\uB9F9\uD55C \uC601\uD63C\uC744 \uC778\uB3C4\uD558\uB294
       \uAC83\uC774 \uB098\uC758 \uC0AC\uBA85. \uC624\uB298\uC740 \uADF8\uB300\uC758
@@ -7404,6 +7515,7 @@ MonoBehaviour:
       agi: 35
       luc: 34
     resistances:
+      statusEffects: []
       phys: 2
       fire: 0
       ice: 0
@@ -7424,7 +7536,7 @@ MonoBehaviour:
     id: enemy_112
     name: "\uC9C0\uD06C\uD504\uB9AC\uD2B8"
     race: 0
-    align: 6
+    align: 2
     gender: 0
     compileResultMsg: "\uC6A9\uC744 \uC4F0\uB7EC\uB728\uB9B0 \uC601\uC6C5\uC758 \uC774\uB984\uC5D0
       \uBD80\uB044\uB7FD\uC9C0 \uC54A\uAC8C \uC2F8\uC6B0\uACA0\uB2E4."
@@ -7470,6 +7582,7 @@ MonoBehaviour:
       agi: 25
       luc: 35
     resistances:
+      statusEffects: []
       phys: 0
       fire: 0
       ice: 0
@@ -7489,7 +7602,7 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_113
     name: "\uD504\uB808\uC774\uC57C"
-    race: 0
+    race: 10
     align: 6
     gender: 1
     compileResultMsg: "\uC0AC\uB791\uACFC \uC804\uC7C1\uC740 \uBAA8\uB450 \uC0B6\uC758
@@ -7538,6 +7651,7 @@ MonoBehaviour:
       agi: 21
       luc: 35
     resistances:
+      statusEffects: []
       phys: 2
       fire: 2
       ice: 2
@@ -7557,8 +7671,8 @@ MonoBehaviour:
   - isBoss: 1
     id: enemy_114
     name: "\uC2DC\uBC14"
-    race: 2
-    align: 6
+    race: 10
+    align: 5
     gender: 1
     compileResultMsg: "\uCC3D\uC870\uC640 \uD30C\uAD34\uB294 \uD558\uB098\uC758 \uC21C\uD658\uC785\uB2C8\uB2E4.
       \uADF8 \uB73B\uC744 \uD568\uAED8 \uC774\uB8E8\uC5B4 \uBD05\uC2DC\uB2E4."
@@ -7605,6 +7719,7 @@ MonoBehaviour:
       agi: 23
       luc: 27
     resistances:
+      statusEffects: []
       phys: 2
       fire: 2
       ice: 2
@@ -7624,8 +7739,8 @@ MonoBehaviour:
   - isBoss: 0
     id: enemy_115
     name: "\uC81C\uCC9C\uB300\uC131"
-    race: 1
-    align: 6
+    race: 10
+    align: 3
     gender: 0
     compileResultMsg: "\uD558\uD558\uD558! \uD558\uB298\uB3C4 \uB0B4 \uC55E\uC744
       \uB9C9\uC9C0 \uBABB\uD588\uB294\uB370, \uC774\uBC88 \uBAA8\uD5D8\uB3C4 \uC7AC\uBBF8\uC788\uACA0\uAD70!
@@ -7673,6 +7788,7 @@ MonoBehaviour:
       agi: 35
       luc: 35
     resistances:
+      statusEffects: []
       phys: 2
       fire: 2
       ice: 2
