@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Data;
-using Manager;
+using RPGProject.Core;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using RPGProject.Feature.Quests;
+using RPGProject.Feature.Economy;
+using RPGProject.Feature.Dialogue;
+using RPGProject.Infrastructure.Persistence;
 
 namespace RPGProject.Tests.Quests
 {

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RPGProject.Feature.Characters;
+using RPGProject.Feature.Skills;
 using UnityEngine;
 
 namespace MonsterEditing
@@ -22,7 +24,7 @@ namespace MonsterEditing
                 id = NewId(entries), name = "새 몬스터", image = Array.Empty<Sprite>(),
                 fallDownImgs = Array.Empty<Sprite>(), downImgs = Array.Empty<Sprite>(),
                 leftImgs = Array.Empty<Sprite>(), rightImgs = Array.Empty<Sprite>(), upImgs = Array.Empty<Sprite>(),
-                skills = new List<Data.SkillData>(), dropItemIds = new List<string>()
+                skills = new List<SkillData>(), dropItemIds = new List<string>()
             };
             entry.stats.level = 1;
             return entry;

@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Data;
-using Manager;
+using RPGProject.Feature.Exploration;
+using RPGProject.Feature.Shop;
+
 using UnityEditor;
 using UnityEngine;
 

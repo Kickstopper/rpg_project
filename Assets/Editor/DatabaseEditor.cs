@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 using System.Reflection;
-using Data;
+using RPGProject.Feature.Inventory;
+using RPGProject.Feature.Skills;
 
 // -----------------------------------------------------------
 // 실제 버튼 기능이 들어있는 부모 클래스 (속성 없음)

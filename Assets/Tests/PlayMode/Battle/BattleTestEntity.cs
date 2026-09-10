@@ -1,6 +1,5 @@
 using System.Collections;
-using Data;
-using UI.Battle;
+using RPGProject.Feature.Battle;
 
 namespace RPGProject.Tests.Battle
 {

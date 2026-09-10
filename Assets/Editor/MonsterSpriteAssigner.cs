@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Linq;
 using System.IO;
+using RPGProject.Feature.Characters;
 
 public class MonsterSpriteAssigner : EditorWindow
 {

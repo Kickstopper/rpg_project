@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Data;
-using Helper;
-using Manager;
-using UI.Battle;
-using UI.DungeonMapScene;
+using RPGProject.Feature.Battle;
+using RPGProject.Feature.Characters;
+using RPGProject.Feature.Skills;
+using RPGProject.Feature.StatusEffects;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -62,7 +61,7 @@ namespace RPGProject.Balance
                     if (slot == null) continue;
                     var entry = c.monsterDatabase.entries.FirstOrDefault(e => e != null && e.id == slot.monsterId);
                     var ai = entry?.aiProfile;
-                    if (ai != null && !(ai is Data.AI.BasicAttackAI) && !(ai is Data.AI.SmartDefendAI) && !(ai is Data.AI.SmartJudgeAI) && !(ai is Data.AI.HealerAI))
+                    if (ai != null && !(ai is BasicAttackAI) && !(ai is SmartDefendAI) && !(ai is SmartJudgeAI) && !(ai is HealerAI))
                         issues.Add("지원하지 않는 사용자 AI입니다. DB AI를 끄고 명시적인 시뮬레이션 정책을 사용하세요: " + ai.name);
                 }
             return issues;
@@ -153,11 +152,11 @@ namespace RPGProject.Balance
                 else
                 {
                     var skill = actor.planned != null ? actor.planned.actionData as SkillData : ChooseSkill(actor);
-                    if (actor.planned != null && actor.planned.type == UI.ActionType.Guard)
+                    if (actor.planned != null && actor.planned.type == ActionType.Guard)
                     {
                         actor.entity.isGuarding = true; message += " 방어";
                     }
-                    else if (actor.planned != null && actor.planned.type == UI.ActionType.Next) message += " 대기";
+                    else if (actor.planned != null && actor.planned.type == ActionType.Next) message += " 대기";
                     else if (skill != null && restriction == RestrictionType.Silence) message += " 침묵: 스킬 실패";
                     else if (skill != null) message += " " + UseSkill(actor, skill);
                     else
@@ -251,7 +250,7 @@ namespace RPGProject.Balance
         string Hit(Unit attacker, Unit target, SkillData skill)
         {
             var a = attacker.entity; var d = target.entity;
-            var action = new BattleAction(a.gameObject, d.gameObject, skill == null ? UI.ActionType.Attack : UI.ActionType.Skill, a.GetTotalAgi()) { actionData = skill };
+            var action = new BattleAction(a.gameObject, d.gameObject, skill == null ? ActionType.Attack : ActionType.Skill, a.GetTotalAgi()) { actionData = skill };
             if (BattleCalculator.CheckEvasion(a, d, action, 0)) return target.slot.label + " 회피";
             ElementType element = skill == null ? ElementType.Physical : skill.element;
             var tier = d.GetResistances().GetResistanceTier(element);

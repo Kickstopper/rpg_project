@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using global::UI.Battle;
+using RPGProject.Feature.Battle;
+
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;

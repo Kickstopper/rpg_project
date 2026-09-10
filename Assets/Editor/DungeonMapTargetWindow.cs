@@ -1,5 +1,5 @@
 using System;
-using Data;
+using RPGProject.Feature.Exploration;
 using UnityEditor;
 using UnityEngine;
 

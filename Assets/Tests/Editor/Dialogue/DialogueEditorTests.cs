@@ -7,6 +7,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using RPGProject.Feature.Dialogue;
 
 public sealed class DialogueEditorTests
 {

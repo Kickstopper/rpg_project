@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System;
-using Data;
+using RPGProject.Feature.Inventory;
 
 public class ArmorDataGenerator : EditorWindow
 {

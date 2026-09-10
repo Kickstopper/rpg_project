@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Data;
-using Data.Database;
+using RPGProject.Feature.Characters;
+using RPGProject.Feature.Dialogue;
+using RPGProject.Shared.GamePlay;
 using UnityEditor;
 using UnityEngine;
 

@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Data;
+using RPGProject.Feature.Characters;
+using RPGProject.Feature.Inventory;
+using RPGProject.Feature.Skills;
+using RPGProject.Feature.StatusEffects;
 using UnityEngine;
 
 namespace RPGProject.Balance

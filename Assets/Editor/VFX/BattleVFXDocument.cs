@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using global::UI.Battle;
+using RPGProject.Feature.Battle;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -106,7 +106,6 @@ namespace RPGProject.Editor.VFX
             {
                 root = PrefabUtility.LoadPrefabContents(path);
                 var animator = FindAnimator(root);
-                // Preserve images, Image settings, hierarchy, other components and prefab metadata.
                 animator.generateFramesNow = false;
                 animator.frames = (BattleVFXAnimator.FrameData[])frames.Clone();
                 animator.defaultDuration = defaultDuration;

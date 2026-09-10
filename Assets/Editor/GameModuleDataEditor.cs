@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using Data;
+using RPGProject.Feature.Module;
 
 [CustomEditor(typeof(GameModuleData))]
 public class GameModuleDataEditor : Editor

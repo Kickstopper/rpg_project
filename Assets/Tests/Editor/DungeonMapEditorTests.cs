@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Data;
 using NUnit.Framework;
-using UI.DungeonMapScene;
+using RPGProject.Feature.Exploration;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -215,7 +214,7 @@ public class DungeonMapEditorTests
         var renderer = new RaycastRenderEngine(); renderer.Initialize(64, 32); Track(renderer.ScreenTexture);
         renderer.LoadAssets(theme, Array.Empty<Sprite>(), 64, 64, Array.Empty<SpriteInfo>());
         renderer.SetMapData(map, theme, new TileAnimState[map.width, map.height]);
-        Assert.DoesNotThrow(() => renderer.RenderFrame(player, new UI.DungeonMapScene.RenderSettings(), false, 0));
+        Assert.DoesNotThrow(() => renderer.RenderFrame(player, new DungeonRenderSettings(), false, 0));
         Assert.That(renderer.ScreenTexture.GetPixels32().Length, Is.EqualTo(64 * 32));
     }
 }

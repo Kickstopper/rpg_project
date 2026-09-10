@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using Data;
-using Manager;
+
 using NUnit.Framework;
-using UI.Battle;
+using RPGProject.Feature.StatusEffects;
 using UnityEngine;
 
 namespace RPGProject.Tests.StatusEffects

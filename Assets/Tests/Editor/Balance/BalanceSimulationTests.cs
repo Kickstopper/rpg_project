@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Data;
 using NUnit.Framework;
 using RPGProject.Balance;
+using RPGProject.Feature.StatusEffects;
 using UnityEngine;
 
 namespace RPGProject.Tests.Balance

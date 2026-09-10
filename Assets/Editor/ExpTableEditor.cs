@@ -1,7 +1,8 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using Data;
+using RPGProject.Feature.Characters;
+using RPGProject.Feature.Negotiation;
 
 [CustomEditor(typeof(ExpTable))]
 public class ExpTableEditor : Editor

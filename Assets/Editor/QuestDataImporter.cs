@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Data;
+using RPGProject.Feature.Characters;
+using RPGProject.Feature.Dialogue;
+using RPGProject.Feature.Quests;
+
 using UnityEditor;
 using UnityEngine;
 

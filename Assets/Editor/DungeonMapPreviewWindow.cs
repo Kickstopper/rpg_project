@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Data;
-using UI.DungeonMapScene;
+using RPGProject.Feature.Exploration;
 using UnityEditor;
 using UnityEngine;
-using MapRenderSettings = UI.DungeonMapScene.RenderSettings;
 
 public sealed class DungeonMapPreviewWindow : EditorWindow
 {
@@ -16,7 +14,7 @@ public sealed class DungeonMapPreviewWindow : EditorWindow
     [SerializeField] private Direction direction;
     private RaycastRenderEngine renderer;
     private DungeonPlayer player;
-    private MapRenderSettings settings;
+    private DungeonRenderSettings settings;
     private string error;
     private bool animate;
     private double nextFrame;
@@ -52,9 +50,9 @@ public sealed class DungeonMapPreviewWindow : EditorWindow
                 throw new InvalidOperationException("테마의 벽/바닥 텍스처는 Read/Write가 켜진 64×64 이미지여야 합니다.");
             if (theme.objectSprites != null && theme.objectSprites.Any(o => o.texture != null && !o.texture.isReadable))
                 throw new InvalidOperationException("오브젝트 이미지의 Read/Write 설정을 확인하세요.");
-            settings = new MapRenderSettings();
+            settings = new DungeonRenderSettings();
             // 동일 이름/타입의 테마 효과 설정만 복사합니다. 화면 크기 등은 미리보기 설정을 유지합니다.
-            foreach (var field in typeof(MapRenderSettings).GetFields(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var field in typeof(DungeonRenderSettings).GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
                 var source = typeof(DungeonTheme).GetField(field.Name);
                 if (source != null && source.FieldType == field.FieldType) field.SetValue(settings, source.GetValue(theme));

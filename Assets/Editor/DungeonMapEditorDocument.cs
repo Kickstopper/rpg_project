@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Data;
+using RPGProject.Feature.Exploration;
+
 using UnityEditor;
 using UnityEngine;
 

@@ -2,16 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Controller;
-using Helper;
 using NUnit.Framework;
-using UI;
-using UI.Battle;
-using UI.DungeonMapScene;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Random = UnityEngine.Random;
 using Object = UnityEngine.Object;
+using RPGProject.Feature.Battle;
 
 namespace RPGProject.Tests.Battle
 {

@@ -1,6 +1,6 @@
-using Data;
+
+using RPGProject.Feature.StatusEffects;
 using UnityEditor;
-using UnityEngine;
 
 [CustomEditor(typeof(StatusEffectData))]
 public sealed class StatusEffectDataEditor : Editor

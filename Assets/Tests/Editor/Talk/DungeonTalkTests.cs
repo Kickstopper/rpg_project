@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Data;
-using Manager;
 using NUnit.Framework;
-using UI.Common;
-using UI.DungeonMapScene;
+using RPGProject.Feature.Exploration;
+using RPGProject.Shared.Input;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -186,7 +184,7 @@ namespace RPGProject.Tests.Talk
             var renderer = new RaycastRenderEngine(); renderer.Initialize(64, 32); Track(renderer.ScreenTexture);
             renderer.LoadAssets(theme, Array.Empty<Sprite>(), 64, 64, Array.Empty<SpriteInfo>());
             renderer.SetMapData(map, theme, new TileAnimState[3, 3]);
-            var settings = new UI.DungeonMapScene.RenderSettings();
+            var settings = new DungeonRenderSettings();
             renderer.RenderFrame(player, settings, stereo, 0);
             var before = renderer.ScreenTexture.GetPixels32();
             renderer.SetTalkPrompt(true, null, 24); renderer.RenderFrame(player, settings, stereo, 0);

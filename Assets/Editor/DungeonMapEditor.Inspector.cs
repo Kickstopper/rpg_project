@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Data;
+using RPGProject.Feature.Exploration;
 using UnityEditor;
 using UnityEngine;
 

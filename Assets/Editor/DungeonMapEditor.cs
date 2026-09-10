@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Data;
-using UI;
+using RPGProject.Diagnostics;
+using RPGProject.Feature.Exploration;
+
 using UnityEditor;
 using UnityEngine;
 
@@ -361,7 +362,7 @@ public partial class DungeonMapEditor : EditorWindow
         if (Map.width < 3 || Map.height < 3 || Map.width > 255 || Map.height > 255 || !DungeonMapValidation.TextureValid(Theme, 0))
         { status = "미로는 크기 3~255, 기본 벽 텍스처 0이 있는 테마가 필요합니다."; return; }
         if (!EditorUtility.DisplayDialog("무작위 미로", "타일·입구·이벤트를 새 미로로 바꿉니다. 짝수 크기는 다음 홀수가 됩니다. 실행 취소로 복원할 수 있습니다.", "생성", "취소")) return;
-        var maze = Generator.DungeonGenerator.GenerateRandomMaze(Map.width, Map.height, Map.mapID, Map.themeID);
+        var maze = DungeonGenerator.GenerateRandomMaze(Map.width, Map.height, Map.mapID, Map.themeID);
         maze.locationID = Map.locationID; maze.hasCeil = Map.hasCeil;
         Edit("무작위 미로 생성", _ => document.map = maze);
         selection.Clear(); RefreshState();

@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using NUnit.Framework;
 using RPGProject.Editor.VFX;
-using global::UI.Battle;
+using RPGProject.Feature.Battle;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;

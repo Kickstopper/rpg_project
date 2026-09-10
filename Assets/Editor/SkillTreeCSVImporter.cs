@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
-using Data;
+using RPGProject.Feature.Skills;
 
 public class SkillTreeCSVImporter : EditorWindow
 {

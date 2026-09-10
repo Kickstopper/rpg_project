@@ -1,5 +1,5 @@
 using System;
-using global::UI.Battle;
+using RPGProject.Feature.Battle;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;

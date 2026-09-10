@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RPGProject.Feature.Dialogue;
 using UnityEngine;
 
 namespace DialogueEditing

@@ -1,10 +1,14 @@
 using System.Collections.Generic;
 using System.Reflection;
-using Data;
-using Manager;
 using NUnit.Framework;
-using UI.Battle;
+using RPGProject.Feature.Battle;
+using RPGProject.Feature.StatusEffects;
+using RPGProject.Infrastructure.DataAccess;
+using RPGProject.Core;
 using UnityEngine;
+using RPGProject.Infrastructure.Persistence;
+using RPGProject.Feature.Characters;
+using RPGProject.Feature.Inventory;
 
 namespace RPGProject.Tests.StatusEffects
 {

@@ -2,6 +2,7 @@ using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
 using System;
+using RPGProject.Feature.Characters;
 public class MonsterCSVImporter
 {
     [MenuItem("Tools/CSV/Stats & Resistances From CSV")]

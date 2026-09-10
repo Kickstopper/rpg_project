@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Controller;
-using Data;
-using Helper;
 using NUnit.Framework;
-using RPGProject.Negotiation;
+using RPGProject.Feature.Battle;
+using RPGProject.Feature.Characters;
+using RPGProject.Feature.Dialogue;
+using RPGProject.Feature.Negotiation;
+using RPGProject.Infrastructure.Persistence;
 using UnityEngine;
 
 namespace RPGProject.Tests.Negotiation
@@ -167,7 +168,7 @@ namespace RPGProject.Tests.Negotiation
             root.SetActive(false);
             try
             {
-                var pc = root.AddComponent<UI.Battle.PlayerController>();
+                var pc = root.AddComponent<PlayerController>();
                 pc.sourceData = new RuntimeCharacterData(new CharacterSaveData
                 { currentHp = 100, maxHp = 100, currentMp = 20, maxMp = 20, learnedSkillIds = new List<string>() });
                 pc.currentHp = pc.maxHp = 100;
