@@ -5,6 +5,7 @@ using RPGProject.Feature.Battle;
 using RPGProject.Feature.Characters;
 using RPGProject.Feature.Skills;
 using RPGProject.Feature.StatusEffects;
+using RPGProject.Shared.Gameplay;
 using UnityEngine;
 using Random = UnityEngine.Random;
 

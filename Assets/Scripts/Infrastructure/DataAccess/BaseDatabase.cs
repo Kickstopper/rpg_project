@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 
 #if UNITY_EDITOR
 using UnityEditor;

@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 
 namespace RPGProject.Feature.Battle
 {

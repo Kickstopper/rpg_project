@@ -5,23 +5,24 @@ using RPGProject.Feature.Exploration;
 using RPGProject.Feature.Battle;
 using RPGProject.Feature.Shop;
 using RPGProject.Feature.Dialogue;
-public enum GameState
-{
-    None,
-    Exploration, // 월드맵 또는 Pseudo-3D 던전 탐험 모드
-    Battle,      // 전투 모드
-    PlayerMenu,  // 메뉴/인벤토리
-    Event,       // 이벤트
-    Shop,        // 상점
-    Elevator,    // 엘레베이터
-    Terminal,    // 터미널 (순간이동)
-    Office,      // 사무실
-    FieldMap,    // 필드맵
-    Settlement,  // 월말 정산
-}
 
 namespace RPGProject.Core
 {
+    public enum GameState
+    {
+        None,
+        Exploration, // 월드맵 또는 Pseudo-3D 던전 탐험 모드
+        Battle,      // 전투 모드
+        PlayerMenu,  // 메뉴/인벤토리
+        Event,       // 이벤트
+        Shop,        // 상점
+        Elevator,    // 엘레베이터
+        Terminal,    // 터미널 (순간이동)
+        Office,      // 사무실
+        FieldMap,    // 필드맵
+        Settlement,  // 월말 정산
+    }
+    
     public class GameStateManager : MonoBehaviour
     {
         [Header("UI Groups")]

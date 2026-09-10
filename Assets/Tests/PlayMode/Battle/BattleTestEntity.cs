@@ -1,5 +1,6 @@
 using System.Collections;
 using RPGProject.Feature.Battle;
+using RPGProject.Feature.Characters;
 
 namespace RPGProject.Tests.Battle
 {

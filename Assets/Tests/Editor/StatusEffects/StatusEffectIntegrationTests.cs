@@ -9,6 +9,7 @@ using UnityEngine;
 using RPGProject.Infrastructure.Persistence;
 using RPGProject.Feature.Characters;
 using RPGProject.Feature.Inventory;
+using RPGProject.Shared.Gameplay;
 
 namespace RPGProject.Tests.StatusEffects
 {

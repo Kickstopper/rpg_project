@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 
 namespace RPGProject.Feature.Exploration
 {

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
 using UnityEngine.UI;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using RPGProject.Shared.Input;
 using RPGProject.Core;
 

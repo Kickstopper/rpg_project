@@ -1,4 +1,5 @@
-using RPGProject.Shared.GamePlay;
+using RPGProject.Feature.Characters;
+using RPGProject.Shared.Gameplay;
 using UnityEngine;
 
 namespace RPGProject.Feature.Inventory

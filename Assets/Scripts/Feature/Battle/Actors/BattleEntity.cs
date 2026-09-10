@@ -8,19 +8,6 @@ using UnityEngine.UI;
 
 namespace RPGProject.Feature.Battle
 {
-    [System.Serializable]
-    public class ActiveEffect
-    {
-        public StatusEffectData data;
-        public int turnsRemaining; // 남은 행동 기회 수
-        public int stepsElapsed;
-
-        public ActiveEffect(StatusEffectData data)
-        {
-            this.data = data;
-            this.turnsRemaining = Mathf.Max(1, data.maxTurns);
-        }
-    }
     // 공통 기능을 담은 추상 클래스
     public abstract class BattleEntity : MonoBehaviour
     {

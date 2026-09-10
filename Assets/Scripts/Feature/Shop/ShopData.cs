@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using RPGProject.Infrastructure.Audio;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using UnityEngine;
 
 namespace RPGProject.Feature.Shop

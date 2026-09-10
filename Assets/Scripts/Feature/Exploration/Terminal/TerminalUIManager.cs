@@ -8,7 +8,7 @@ using RPGProject.Feature.SaveLoadUI;
 using RPGProject.Shared.UI;
 using RPGProject.Core;
 using RPGProject.Infrastructure.Audio;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using RPGProject.Shared.Input;
 using RPGProject.Feature.Compilation;
 

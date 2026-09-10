@@ -6,22 +6,22 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine.EventSystems;
 using RPGProject.Feature.SaveLoadUI;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using RPGProject.Shared.Input;
 using RPGProject.Infrastructure.Audio;
 using RPGProject.Infrastructure.Persistence;
 
-public static class GameScene
-{
-    public const string INTRO_SCENE = "IntroScene";
-    public const string TITLE_SCENE = "TitleScene";
-    public const string CHARACTER_CREATION_SCENE = "CharacterCreationScene";
-    public const string DUNGEON_MAP_SCENE = "DungeonMapScene";
-    public const string WORLD_MAP_SCENE = "WorldMapScene";
-}
-
 namespace RPGProject.Core
 {
+    public static class GameScene
+    {
+        public const string INTRO_SCENE = "IntroScene";
+        public const string TITLE_SCENE = "TitleScene";
+        public const string CHARACTER_CREATION_SCENE = "CharacterCreationScene";
+        public const string DUNGEON_MAP_SCENE = "DungeonMapScene";
+        public const string WORLD_MAP_SCENE = "WorldMapScene";
+    }
+
     public class SceneController : MonoBehaviour
     {
         [SerializeField] private GameObject confirmWindow; 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RPGProject.Utilities
+namespace RPGProject.Shared.Utilities
 {
     public static class YieldCache
     {

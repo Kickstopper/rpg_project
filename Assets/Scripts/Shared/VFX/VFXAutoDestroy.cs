@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 
 namespace RPGProject.VFX
 {

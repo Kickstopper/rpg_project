@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 using NUnit.Framework;
+using RPGProject.Feature.Characters;
 using RPGProject.Feature.StatusEffects;
 using UnityEngine;
 

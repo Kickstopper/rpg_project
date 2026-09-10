@@ -1,5 +1,5 @@
 using System.Collections;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 

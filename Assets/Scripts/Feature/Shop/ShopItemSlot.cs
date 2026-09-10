@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 
 namespace RPGProject.Feature.Shop
 {

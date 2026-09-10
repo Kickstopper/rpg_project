@@ -5,7 +5,7 @@ using DG.Tweening;
 using System.Collections;
 using RPGProject.Infrastructure.Audio;
 using RPGProject.Core;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using RPGProject.Shared.Input;
 
 namespace RPGProject.Feature.Shop

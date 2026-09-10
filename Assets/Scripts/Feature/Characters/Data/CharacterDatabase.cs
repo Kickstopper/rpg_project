@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using RPGProject.Feature.Negotiation;
 using RPGProject.Feature.Skills;
+using RPGProject.Feature.Battle;
 
 namespace RPGProject.Feature.Characters
 {

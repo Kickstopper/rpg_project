@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RPGProject.Feature.Skills;
+using RPGProject.Shared.Gameplay;
 using UnityEngine;
 
 namespace RPGProject.Feature.Battle

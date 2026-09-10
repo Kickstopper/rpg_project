@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using RPGProject.Core;
-using RPGProject.Feature.Module;
+using RPGProject.Feature.Modules;
 using RPGProject.Feature.Exploration;
 
 namespace RPGProject.Infrastructure.Persistence

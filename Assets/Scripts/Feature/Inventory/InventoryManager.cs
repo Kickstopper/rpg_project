@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using RPGProject.Infrastructure.Persistence;
 using RPGProject.Core;
 

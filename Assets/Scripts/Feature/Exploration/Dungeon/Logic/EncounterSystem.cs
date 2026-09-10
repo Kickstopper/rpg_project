@@ -4,7 +4,7 @@ using TMPro;
 using DG.Tweening;
 using System.Collections.Generic;
 using RPGProject.Core;
-using RPGProject.Feature.Module;
+using RPGProject.Feature.Modules;
 using RPGProject.Feature.Battle;
 
 namespace RPGProject.Feature.Exploration

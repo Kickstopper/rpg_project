@@ -5,7 +5,7 @@ using TMPro;
 using RPGProject.Feature.Characters;
 using RPGProject.Core;
 using RPGProject.Infrastructure.Audio;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 
 namespace RPGProject.Feature.Fusion
 {

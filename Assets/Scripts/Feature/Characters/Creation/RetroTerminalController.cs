@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Text;
 using RPGProject.Core;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 
 namespace RPGProject.Feature.Characters
 {

@@ -7,7 +7,7 @@ using RPGProject.Infrastructure.Persistence;
 using UnityEditor;
 #endif
 
-namespace RPGProject.Feature.Module
+namespace RPGProject.Feature.Modules
 {
     public class ModuleManager : MonoBehaviour
     {

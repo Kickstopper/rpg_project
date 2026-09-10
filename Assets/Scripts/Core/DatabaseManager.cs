@@ -5,11 +5,11 @@ using RPGProject.Feature.Dialogue;
 using RPGProject.Feature.Inventory;
 using RPGProject.Feature.Resonance;
 using RPGProject.Feature.Quests;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using RPGProject.Feature.StatusEffects;
 using RPGProject.Feature.Skills;
 
-namespace RPGProject.Infrastructure.DataAccess
+namespace RPGProject.Core
 {
     public class DatabaseManager : MonoBehaviour
     {

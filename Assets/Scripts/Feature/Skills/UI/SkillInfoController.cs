@@ -1,4 +1,5 @@
 
+using RPGProject.Shared.Gameplay;
 using TMPro;
 using UnityEngine;
 

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using RPGProject.Core;
 using RPGProject.Infrastructure.Audio;
 

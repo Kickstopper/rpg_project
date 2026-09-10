@@ -10,7 +10,7 @@ using RPGProject.Shared.Input;
 using RPGProject.Infrastructure.Audio;
 using RPGProject.Infrastructure.Persistence;
 
-namespace RPGProject.Feature.Module
+namespace RPGProject.Feature.Modules
 {
     public enum ExpansionBoardUIState
     {

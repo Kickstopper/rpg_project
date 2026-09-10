@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RPGProject.Feature.Module
+namespace RPGProject.Feature.Modules
 {
     public enum ModuleFeature
     {

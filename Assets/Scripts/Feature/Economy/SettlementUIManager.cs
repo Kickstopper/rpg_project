@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using RPGProject.Core;
 using RPGProject.Feature.Exploration;
 using RPGProject.Shared.Input;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 
 namespace RPGProject.Feature.Economy
 {

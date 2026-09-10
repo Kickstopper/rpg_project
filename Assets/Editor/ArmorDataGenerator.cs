@@ -4,6 +4,8 @@ using UnityEditor;
 using System.IO;
 using System;
 using RPGProject.Feature.Inventory;
+using RPGProject.Feature.Characters;
+using RPGProject.Shared.Gameplay;
 
 public class ArmorDataGenerator : EditorWindow
 {

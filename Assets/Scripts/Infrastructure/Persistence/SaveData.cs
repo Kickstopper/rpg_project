@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using RPGProject.Feature.Characters;
 using RPGProject.Feature.Exploration;
-using RPGProject.Feature.Module;
+using RPGProject.Feature.Modules;
 using RPGProject.Feature.StatusEffects;
 
 namespace RPGProject.Infrastructure.Persistence

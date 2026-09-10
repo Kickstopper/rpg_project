@@ -1,16 +1,16 @@
 using UnityEngine;
 
-public enum VfxID
-{
-    None, Hit, Blow, Tackle, Cut, Slash, Stab, Claw, 
-    Gun_Shot, Gun_Auto, 
-    Fire, Ice, Elec, Force, 
-    Heal, Revive, Buff, Debuff, 
-    Poison, Curse, Paralyze, Silence, Guard, Reflect, Absorb, Sleep, Stone, Panic, Charm, Lullaby,
-}
-
 namespace RPGProject.Feature.Battle
 {
+    public enum VfxID
+    {
+        None, Hit, Blow, Tackle, Cut, Slash, Stab, Claw, 
+        Gun_Shot, Gun_Auto, 
+        Fire, Ice, Elec, Force, 
+        Heal, Revive, Buff, Debuff, 
+        Poison, Curse, Paralyze, Silence, Guard, Reflect, Absorb, Sleep, Stone, Panic, Charm, Lullaby,
+    }
+    
     public class BattleVisualController : MonoBehaviour
     {
         [Header("Prefabs")]

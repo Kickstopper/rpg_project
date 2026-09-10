@@ -11,7 +11,7 @@ using RPGProject.Feature.Negotiation;
 using RPGProject.Core;
 using RPGProject.Shared.Localization;
 using RPGProject.Feature.Characters;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using RPGProject.Shared.Input;
 using RPGProject.Infrastructure.Audio;
 

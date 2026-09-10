@@ -1,7 +1,7 @@
 using UnityEngine;
 using RPGProject.Shared.Input;
 using RPGProject.Core;
-using RPGProject.Feature.Module;
+using RPGProject.Feature.Modules;
 
 namespace RPGProject.Feature.Exploration
 {

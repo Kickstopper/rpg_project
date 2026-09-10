@@ -6,7 +6,7 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using static RPGProject.Feature.Battle.BattleManager;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using RPGProject.Feature.Quests;
 using RPGProject.Core;
 using RPGProject.Shared.UI;

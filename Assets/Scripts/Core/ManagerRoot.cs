@@ -5,7 +5,7 @@ using RPGProject.Feature.Dialogue;
 using RPGProject.Feature.Economy;
 using RPGProject.Feature.Exploration;
 using RPGProject.Feature.Inventory;
-using RPGProject.Feature.Module;
+using RPGProject.Feature.Modules;
 using RPGProject.Feature.Quests;
 using RPGProject.Feature.Shop;
 using RPGProject.Feature.WorldConditions;

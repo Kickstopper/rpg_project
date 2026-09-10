@@ -16,10 +16,10 @@ using RPGProject.Feature.Skills;
 using RPGProject.Feature.Negotiation;
 using RPGProject.Shared.Localization;
 using RPGProject.Shared.Input;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using RPGProject.Infrastructure.Audio;
-using RPGProject.Utilities;
-using RPGProject.Feature.Module;
+using RPGProject.Shared.Utilities;
+using RPGProject.Feature.Modules;
 
 namespace RPGProject.Feature.Battle
 {

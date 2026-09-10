@@ -1,11 +1,11 @@
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using UnityEngine;
-
-public enum WeaponType { Melee, Gun } // 무기 타입 구분
-public enum WeaponCategory { Hit, Cut, Slash, Stab, Claw, Gun_Shot, Gun_Auto };
 
 namespace RPGProject.Feature.Inventory
 {
+    public enum WeaponType { Melee, Gun } // 무기 타입 구분
+    public enum WeaponCategory { Hit, Cut, Slash, Stab, Claw, Gun_Shot, Gun_Auto };
+
     [CreateAssetMenu(fileName = "New Weapon", menuName = "RPG/Item/Weapon")]
     public class WeaponData : BaseItemData
     {

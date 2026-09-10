@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using RPGProject.Feature.Inventory;
 using RPGProject.Shared.Input;
 using RPGProject.Core;
+using RPGProject.Shared.Gameplay;
 
 namespace RPGProject.Feature.Shop
 {

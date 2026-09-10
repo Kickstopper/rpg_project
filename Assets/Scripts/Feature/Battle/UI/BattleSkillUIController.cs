@@ -8,7 +8,7 @@ using RPGProject.Shared.Input;
 using RPGProject.Shared.UI;
 using RPGProject.Infrastructure.Audio;
 using RPGProject.Core;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 
 namespace RPGProject.Feature.Battle
 {

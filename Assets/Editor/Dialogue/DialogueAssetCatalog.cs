@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RPGProject.Feature.Characters;
 using RPGProject.Feature.Dialogue;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using UnityEditor;
 using UnityEngine;
 

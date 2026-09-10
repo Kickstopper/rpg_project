@@ -9,6 +9,7 @@ using RPGProject.Feature.Skills;
 using RPGProject.Infrastructure.Audio;
 using RPGProject.Core;
 using RPGProject.Shared.Input;
+using RPGProject.Feature.Characters;
 
 namespace RPGProject.Feature.Battle
 {

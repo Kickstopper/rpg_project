@@ -10,6 +10,7 @@ using RPGProject.Core;
 using RPGProject.Infrastructure.Audio;
 using RPGProject.Shared.Input;
 using RPGProject.Shared.UI;
+using RPGProject.Shared.Gameplay;
 
 namespace RPGProject.Feature.Inventory
 {

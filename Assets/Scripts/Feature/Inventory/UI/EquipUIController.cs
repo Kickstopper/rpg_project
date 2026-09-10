@@ -8,7 +8,7 @@ using RPGProject.Feature.Characters;
 using RPGProject.Shared.Input;
 using RPGProject.Core;
 using RPGProject.Infrastructure.Audio;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using RPGProject.Shared.UI;
 
 namespace RPGProject.Feature.Inventory

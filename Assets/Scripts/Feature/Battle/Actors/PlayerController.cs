@@ -9,7 +9,7 @@ using RPGProject.Feature.Characters;
 using RPGProject.Core;
 using RPGProject.Feature.Resonance;
 using RPGProject.Feature.Inventory;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 
 namespace RPGProject.Feature.Battle
 {

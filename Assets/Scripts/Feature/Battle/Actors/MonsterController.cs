@@ -2,7 +2,7 @@ using System.Collections;
 using RPGProject.Core;
 using RPGProject.Feature.Characters;
 using RPGProject.Feature.StatusEffects;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 

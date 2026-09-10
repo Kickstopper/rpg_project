@@ -2,9 +2,10 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using RPGProject.Feature.Negotiation;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using RPGProject.Core;
 using RPGProject.Feature.Characters;
+using RPGProject.Feature.Inventory;
 
 namespace RPGProject.Feature.Battle
 {

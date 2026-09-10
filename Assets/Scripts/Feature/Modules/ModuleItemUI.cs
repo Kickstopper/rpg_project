@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-namespace RPGProject.Feature.Module
+namespace RPGProject.Feature.Modules
 {
     public class ModuleItemUI : MonoBehaviour
     {

@@ -7,7 +7,7 @@ using TMPro;
 using RPGProject.Infrastructure.Audio;
 using RPGProject.Core;
 using RPGProject.Shared.Input;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 
 namespace RPGProject.Feature.Dialogue
 {

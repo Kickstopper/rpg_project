@@ -1,5 +1,5 @@
 using RPGProject.Feature.StatusEffects;
-using RPGProject.Shared.GamePlay;
+using RPGProject.Shared.Gameplay;
 using UnityEngine;
 
 namespace RPGProject.Feature.Battle

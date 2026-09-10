@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RPGProject.Core;
 using RPGProject.Feature.StatusEffects;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using UnityEngine;
 
 namespace RPGProject.Feature.Battle

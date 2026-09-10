@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using RPGProject.Balance;
+using RPGProject.Feature.Characters;
 using RPGProject.Feature.StatusEffects;
 using UnityEngine;
 

@@ -9,9 +9,9 @@ using UnityEngine.SceneManagement;
 using RPGProject.Core;
 using RPGProject.Infrastructure.Audio;
 using RPGProject.Feature.Battle;
-using RPGProject.Utilities;
+using RPGProject.Shared.Utilities;
 using RPGProject.Shared.Input;
-using RPGProject.Feature.Module;
+using RPGProject.Feature.Modules;
 using RPGProject.Feature.WorldConditions;
 
 namespace RPGProject.Feature.Exploration

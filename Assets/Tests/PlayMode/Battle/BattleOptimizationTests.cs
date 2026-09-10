@@ -8,6 +8,7 @@ using UnityEngine.TestTools;
 using Random = UnityEngine.Random;
 using Object = UnityEngine.Object;
 using RPGProject.Feature.Battle;
+using RPGProject.Shared.Gameplay;
 
 namespace RPGProject.Tests.Battle
 {
