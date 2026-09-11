@@ -64,7 +64,27 @@ namespace RPGProject.Feature.Negotiation
                 if (!next.StartsWith("CHECK_MOOD:", StringComparison.Ordinal))
                 { Require(next, id, ids, errors); continue; }
                 string[] command = next.Split(':');
-                if (command[1] == "GIVE")
+                if (command[1] == "TRADE")
+                {
+                    if (command.Length != 3 || !NegotiationTradeRules.TryGoal(command[2], out _))
+                        errors.Add($"{id}: TRADE에는 Recruit/Item/Gold/HP/MP를 지정하세요.");
+                    foreach (string target in new[] { "DEMAND_GOLD", "DEMAND_ITEM", "DEMAND_HP", "DEMAND_MP", "TRADE_DECLINED" })
+                        Require(target, id, ids, errors);
+                }
+                else if (command[1] == "PAY")
+                {
+                    if (command.Length != 3 || !NegotiationTradeRules.TryDemandKind(command[2], out _))
+                        errors.Add($"{id}: PAY에는 Gold/Item/HP/MP를 지정하세요.");
+                    foreach (string target in new[] { "SUCCESS_RECRUIT", "SUCCESS_ITEM", "SUCCESS_GOLD", "SUCCESS_HP", "SUCCESS_MP", "FLED", "FAIL_REWARD", "INSUFFICIENT_ITEM", "TRADE_DECLINED" })
+                        Require(target, id, ids, errors);
+                }
+                else if (command[1] == "SETTLE")
+                {
+                    if (command.Length != 2) errors.Add($"{id}: SETTLE에는 인수를 지정하지 않습니다.");
+                    foreach (string target in new[] { "SUCCESS_RECRUIT", "SUCCESS_ITEM", "SUCCESS_GOLD", "SUCCESS_HP", "SUCCESS_MP", "FLED", "FAIL_REWARD" })
+                        Require(target, id, ids, errors);
+                }
+                else if (command[1] == "GIVE")
                 {
                     if (command.Length == 3 && command[2] == "REFUSE") continue;
                     if (command.Length != 4 || command[2] != "ACCEPT" || !NegotiationDemand.TryParse(command[3], out _))

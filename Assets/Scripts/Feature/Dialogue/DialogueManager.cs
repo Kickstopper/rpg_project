@@ -5,6 +5,7 @@ using System.Linq;
 using RPGProject.Feature.Negotiation;
 using RPGProject.Feature.Characters;
 using RPGProject.Infrastructure.DataAccess;
+using RPGProject.Core;
 
 namespace RPGProject.Feature.Dialogue
 {
@@ -17,7 +18,7 @@ namespace RPGProject.Feature.Dialogue
         // 일반 이벤트와 교섭 카테고리는 ID 충돌을 막기 위해 별도 보관
         private Dictionary<string, List<Dictionary<string, string>>> eventDatabase = new Dictionary<string, List<Dictionary<string, string>>>();
 
-        private readonly Dictionary<string, List<Dictionary<string, string>>> negotiationDatabase = new Dictionary<string, List<Dictionary<string, string>>>();
+        private NegotiationDialogueCatalog negotiationCatalog;
 
         void Awake()
         {
@@ -86,49 +87,30 @@ namespace RPGProject.Feature.Dialogue
 
         private void LoadNegotiations()
         {
-            negotiationDatabase.Clear();
+            negotiationCatalog = null;
             if (negotiationCSV == null) { Debug.LogError("교섭 CSV가 없습니다."); return; }
             try
             {
                 var rows = DialogueCsv.Read(negotiationCSV.text);
-                foreach (var row in rows)
-                    foreach (var key in new[] { "EventID", "Seq", "Type", "Condition", "Action", "NextID" })
-                        if (row.ContainsKey(key)) row[key] = row[key].Trim();
-                foreach (var group in rows.GroupBy(r => NegotiationScriptValidator.Value(r, "EventID")))
-                {
-                    var lines = group.ToList();
-                    var errors = NegotiationScriptValidator.Validate(lines);
-                    if (string.IsNullOrWhiteSpace(group.Key)) errors.Add("EventID가 없습니다.");
-                    if (errors.Count > 0)
-                    {
-                        Debug.LogError($"[교섭 CSV] {group.Key}:\n" + string.Join("\n", errors));
-                        continue;
-                    }
-                    negotiationDatabase.Add(group.Key, lines);
-                }
+                negotiationCatalog = NegotiationDialogueCatalog.Create(rows);
             }
             catch (FormatException ex) { Debug.LogError("[교섭 CSV] " + ex.Message); }
         }
 
         public List<Dictionary<string, string>> GetNegotiationDialogues(MonsterDatabase.MonsterEntry sourceData)
         {
-            if (sourceData == null) return new List<Dictionary<string, string>>();
-            string personality = sourceData.personality.ToString().ToUpperInvariant();
-            string gender = sourceData.gender.ToString().ToUpperInvariant();
-            foreach (string key in new[] { personality + "_" + gender, personality, "DEFAULT" })
+            if (sourceData == null || negotiationCatalog == null) return new List<Dictionary<string, string>>();
+            var lines = negotiationCatalog.Resolve(sourceData.personality, sourceData.race, sourceData.gender, out _);
+            var demandItem = ManagerRoot.Database != null ? ManagerRoot.Database.GetItem(NegotiationTradeRules.ItemDemandID) : null;
+            foreach (var row in lines)
             {
-                if (!negotiationDatabase.TryGetValue(key, out var source)) continue;
-                var lines = DeepCopyList(source);
-                foreach (var row in lines)
-                {
-                    if (string.IsNullOrEmpty(NegotiationScriptValidator.Value(row, "Name"))) row["Name"] = sourceData.name;
-                    if (row.TryGetValue("Text", out var text))
-                        row["Text"] = text.Replace("{CallName}", "너").Replace("{Gender_Call}", "너");
-                }
-                return lines;
+                if (string.IsNullOrEmpty(NegotiationScriptValidator.Value(row, "Name"))) row["Name"] = sourceData.name;
+                if (row.TryGetValue("Text", out var text))
+                    row["Text"] = NegotiationTradeRules.ExpandText(text, demandItem != null ? demandItem.dataName : null)
+                        .Replace("{CallName}", "너").Replace("{Gender_Call}", "너")
+                        .Replace("{MonsterName}", sourceData.name ?? "");
             }
-            Debug.LogWarning($"[교섭] {personality}_{gender} 또는 DEFAULT 대사가 없습니다.");
-            return new List<Dictionary<string, string>>();
+            return lines;
         }
 
         private List<Dictionary<string, string>> DeepCopyList(List<Dictionary<string, string>> original)

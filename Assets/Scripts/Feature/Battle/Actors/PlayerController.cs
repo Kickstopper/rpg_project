@@ -541,6 +541,28 @@ namespace RPGProject.Feature.Battle
             return true;
         }
 
+        public bool TryRestoreNegotiationResource(bool useHP, int amount)
+        {
+            if (amount <= 0 || !IsAlive || sourceData == null) return false;
+            if (useHP)
+            {
+                amount = Mathf.FloorToInt(amount * StatusEffects.Multiplier(d => d.healingReceivedMultiplier));
+                int gain = Mathf.Min(Mathf.Max(0, amount), maxHp - currentHp);
+                if (gain <= 0) return false;
+                currentHp += gain;
+                sourceData.currentHp = currentHp;
+            }
+            else
+            {
+                int gain = Mathf.Min(amount, maxMp - currentMp);
+                if (gain <= 0) return false;
+                currentMp += gain;
+                sourceData.currentMp = currentMp;
+            }
+            if (isActiveAndEnabled) RefreshView();
+            return true;
+        }
+
         public void ApplyMpChange(int amount)
         {
             if (!IsAlive) return;

@@ -2068,7 +2068,8 @@ namespace RPGProject.Feature.Battle
             var data = targetMonster.sourceData;
             negotiationSession = new NegotiationSession(data.personality, data.race, currentEnv,
                 targetMonster.CurrentAnger, targetMonster.CurrentJoy, targetMonster.CurrentInterest,
-                TryPayNegotiationDemand, TryRecruitNegotiationTarget, TryGiveNegotiationItem);
+                TryPayNegotiationDemand, TryRecruitNegotiationTarget, TryGiveNegotiationItem,
+                CanTradeNegotiationReward, TryGiveNegotiationReward, TryFleeNegotiationTarget, () => Random.value);
             isSelectingTarget = false;
             fieldController.StopBlinkEffects();
             EventSystem.current?.SetSelectedGameObject(null);
@@ -2107,7 +2108,8 @@ namespace RPGProject.Feature.Battle
                     ManagerRoot.Finance.SubMoney(demand.Amount);
                     return true;
                 case DemandKind.Item:
-                    if (ManagerRoot.Inventory == null || string.IsNullOrEmpty(demand.ItemID) ||
+                    if (ManagerRoot.Database == null || ManagerRoot.Database.GetItem(demand.ItemID) == null ||
+                        ManagerRoot.Inventory == null || string.IsNullOrEmpty(demand.ItemID) ||
                         ManagerRoot.Inventory.GetItemCount(demand.ItemID) < demand.Amount) return false;
                     ManagerRoot.Inventory.RemoveItem(demand.ItemID, demand.Amount);
                     return true;
@@ -2141,7 +2143,8 @@ namespace RPGProject.Feature.Battle
             var drops = target.sourceData.dropItemIds;
             if (drops == null) return false;
             
-            var candidates = drops.Where(id => !string.IsNullOrWhiteSpace(id) && ManagerRoot.Database.GetItem(id) != null).ToList();
+            var candidates = drops.Where(id => !string.IsNullOrWhiteSpace(id) && ManagerRoot.Database.GetItem(id) != null &&
+                ManagerRoot.Inventory.GetItemCount(id) < int.MaxValue).ToList();
             if (candidates.Count == 0) return false;
             string itemID = candidates[Random.Range(0, candidates.Count)];
             ManagerRoot.Inventory.AddItem(itemID, 1);
@@ -2152,7 +2155,7 @@ namespace RPGProject.Feature.Battle
         private void OnNegotiationEnded(int result)
         {
             if (negotiationSession == null) return;
-            if (negotiationSession.Recruited && negotiationTarget != null) Destroy(negotiationTarget.gameObject);
+            if ((negotiationSession.Recruited || negotiationSession.Fled) && negotiationTarget != null) Destroy(negotiationTarget.gameObject);
             negotiationSession.Close();
             negotiationSession = null;
             negotiationTarget = null;

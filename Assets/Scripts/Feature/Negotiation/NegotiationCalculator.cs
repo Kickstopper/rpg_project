@@ -48,6 +48,24 @@ namespace RPGProject.Feature.Negotiation
                     if (choice == ChoiceTone.Gentle || choice == ChoiceTone.Relieve) joy += 20;
                     if (choice == ChoiceTone.Threat) anger += 20;
                     break;
+                case Personality.Proud:
+                    if (choice == ChoiceTone.Persuade) { joy += 10; interest += 15; }
+                    if (choice == ChoiceTone.Gentle) { joy = 10; interest += 5; }
+                    if (choice == ChoiceTone.Relieve) { joy = 5; interest = 10; }
+                    if (choice == ChoiceTone.Threat || choice == ChoiceTone.Insult) anger += 25;
+                    break;
+                case Personality.Principled:
+                    if (choice == ChoiceTone.Persuade) { joy += 10; interest += 15; }
+                    if (choice == ChoiceTone.Request) interest += 10;
+                    if (choice == ChoiceTone.Flirt) { joy = 0; interest = 0; }
+                    if (choice == ChoiceTone.Insult || choice == ChoiceTone.Mad) anger += 20;
+                    break;
+                case Personality.Rational:
+                    if (choice == ChoiceTone.Persuade) interest += 25;
+                    if (choice == ChoiceTone.Relieve) { joy = 5; interest = 10; }
+                    if (choice == ChoiceTone.Flirt) { joy = 0; interest = 0; }
+                    if (choice == ChoiceTone.Mad) { anger += 10; interest -= 10; }
+                    break;
             }
             if (env.moonPhase == MoonPhase.Full) { anger += 15; joy -= 10; }
             if ((env.weather == Weather.Rain || env.weather == Weather.Storm) && race == Race.Beast) anger += 10;

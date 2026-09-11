@@ -121,6 +121,9 @@ namespace RPGProject.Tests.Negotiation
         [TestCase(Personality.Sly)]
         [TestCase(Personality.Foolish)]
         [TestCase(Personality.Childish)]
+        [TestCase(Personality.Proud)]
+        [TestCase(Personality.Principled)]
+        [TestCase(Personality.Rational)]
         public void EveryPersonalityHasRecruitAndItemPaths(Personality personality)
         {
             int anger = 0, joy = 0, interest = 0;
@@ -146,18 +149,25 @@ namespace RPGProject.Tests.Negotiation
         {
             var rows = DialogueCsv.Read(File.ReadAllText("Assets/CSV/Dialogues/Negotiation.csv"));
             Assert.That(rows.Any(r => r["EventID"] == "DEFAULT"), Is.True);
-            foreach (var group in rows.GroupBy(r => r["EventID"]))
-                Assert.That(NegotiationScriptValidator.Validate(group.ToList()), Is.Empty, group.Key);
+            var catalog = NegotiationDialogueCatalog.Create(rows);
+            foreach (Personality p in Enum.GetValues(typeof(Personality)))
+                foreach (Race race in Enum.GetValues(typeof(Race)))
+                    foreach (Gender gender in Enum.GetValues(typeof(Gender)))
+                    {
+                        var script = catalog.Resolve(p, race, gender, out var key);
+                        Assert.That(key, Is.Not.EqualTo("DEFAULT"), p.ToString());
+                        Assert.That(NegotiationScriptValidator.Validate(script), Is.Empty, $"{p}/{race}/{gender}");
+                    }
         }
 
         [Test]
-        public void ValidatorRejectsMissingAmountDuplicateSeqAndMissingTarget()
+        public void ValidatorRejectsInvalidPaymentDuplicateSeqAndMissingTarget()
         {
             var rows = DialogueCsv.Read(File.ReadAllText("Assets/CSV/Dialogues/Negotiation.csv"))
-                .Where(r => r["EventID"] == "DEFAULT").ToList();
-            rows.First(r => r["Seq"] == "22")["NextID"] = "CHECK_MOOD:GIVE:ACCEPT";
+                .Where(r => r["EventID"] == "DEFAULT" && string.IsNullOrEmpty(r["Race"]) && string.IsNullOrEmpty(r["Gender"])).ToList();
+            rows.First(r => r["Seq"] == "PAY_GOLD")["NextID"] = "CHECK_MOOD:PAY:Unknown";
             rows.Add(new Dictionary<string, string>(rows[0]));
-            rows.First(r => r["Seq"] == "18")["NextID"] = "DOES_NOT_EXIST";
+            rows.First(r => r["Seq"] == "JOIN_CHECK")["NextID"] = "DOES_NOT_EXIST";
             Assert.That(NegotiationScriptValidator.Validate(rows).Count, Is.GreaterThanOrEqualTo(3));
         }
 
