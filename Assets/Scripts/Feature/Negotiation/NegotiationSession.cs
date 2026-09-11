@@ -55,6 +55,7 @@ namespace RPGProject.Feature.Negotiation
         private readonly Func<NegotiationRewardKind, bool> giveReward;
         private readonly Func<bool> flee;
         private readonly Func<float> roll;
+        private readonly Func<string> kinship;
         private NegotiationRewardKind? tradeGoal;
         private DemandKind pendingDemand;
         private bool tradePaid;
@@ -71,19 +72,24 @@ namespace RPGProject.Feature.Negotiation
         public bool Closed { get; private set; }
         public bool Fled { get; private set; }
         public bool HasPaidTrade => tradePaid;
+        public bool IsKinship => kinship != null;
+        public bool KinshipCompleted { get; private set; }
+        public bool ShouldEndBattle => KinshipCompleted || Recruited || RewardGranted;
         public bool MustStop => Anger >= 100 || choices >= 8;
 
         public NegotiationSession(Personality personality, Race race, EnvironmentState environment,
             int anger, int joy, int interest, Func<NegotiationDemand, bool> pay,
             Func<bool> recruit, Func<bool> giveItem,
             Func<NegotiationRewardKind, bool> canTrade = null,
-            Func<NegotiationRewardKind, bool> giveReward = null, Func<bool> flee = null, Func<float> roll = null)
+            Func<NegotiationRewardKind, bool> giveReward = null, Func<bool> flee = null, Func<float> roll = null,
+            Func<string> kinship = null)
         {
             this.personality = personality; this.race = race; this.environment = environment;
             Anger = Clamp(anger); Joy = Clamp(joy); Interest = Clamp(interest);
             this.pay = pay; this.recruit = recruit; this.giveItem = giveItem;
             this.canTrade = canTrade; this.giveReward = giveReward; this.flee = flee;
             this.roll = roll ?? (() => 1f);
+            this.kinship = kinship;
         }
 
         private static int Clamp(int value) => Math.Max(0, Math.Min(100, value));
@@ -91,7 +97,7 @@ namespace RPGProject.Feature.Negotiation
 
         public void ApplyTone(ChoiceTone tone)
         {
-            if (Closed || MustStop || tradeResult != null) return;
+            if (Closed || IsKinship || MustStop || tradeResult != null) return;
             choices++;
             var delta = NegotiationCalculator.CalculateMoodChange(tone, personality, race, environment);
             Anger = Clamp(Anger + delta.addedAnger);
@@ -117,6 +123,14 @@ namespace RPGProject.Feature.Negotiation
         private string ResolveCore(string instruction)
         {
             string[] parts = instruction.Split(':');
+            if (IsKinship)
+            {
+                if (KinshipCompleted) return "END";
+                if (parts.Length != 2 || parts[1] != "KINSHIP") return "FAIL";
+                // Guard before callbacks: UI notifications cannot commit the gift twice.
+                KinshipCompleted = true;
+                return kinship();
+            }
             if (parts[1] == "SETTLE" && parts.Length == 2) return SettleTrade();
             if (tradeResult != null) return "END";
             if (MustStop) return "FAIL";

@@ -2055,7 +2055,10 @@ namespace RPGProject.Feature.Battle
                 RestoreNegotiationInput("교섭을 시작할 수 없습니다.");
                 return;
             }
-            var lines = ManagerRoot.Dialogue.GetNegotiationDialogues(targetMonster.sourceData);
+            bool isKinship = NegotiationKinshipRules.HasCompanion(targetMonster.sourceData, ManagerRoot.Party?.partyData);
+            var kinshipOffer = isKinship ? CreateKinshipOffer(targetMonster) : null;
+            var lines = isKinship ? kinshipOffer.Lines :
+                ManagerRoot.Dialogue.GetNegotiationDialogues(targetMonster.sourceData);
             var errors = NegotiationScriptValidator.Validate(lines);
             if (errors.Count > 0)
             {
@@ -2069,7 +2072,8 @@ namespace RPGProject.Feature.Battle
             negotiationSession = new NegotiationSession(data.personality, data.race, currentEnv,
                 targetMonster.CurrentAnger, targetMonster.CurrentJoy, targetMonster.CurrentInterest,
                 TryPayNegotiationDemand, TryRecruitNegotiationTarget, TryGiveNegotiationItem,
-                CanTradeNegotiationReward, TryGiveNegotiationReward, TryFleeNegotiationTarget, () => Random.value);
+                CanTradeNegotiationReward, TryGiveNegotiationReward, TryFleeNegotiationTarget, () => Random.value,
+                isKinship ? new System.Func<string>(() => ResolveKinshipNegotiation(kinshipOffer)) : null);
             isSelectingTarget = false;
             fieldController.StopBlinkEffects();
             EventSystem.current?.SetSelectedGameObject(null);
@@ -2147,19 +2151,25 @@ namespace RPGProject.Feature.Battle
                 ManagerRoot.Inventory.GetItemCount(id) < int.MaxValue).ToList();
             if (candidates.Count == 0) return false;
             string itemID = candidates[Random.Range(0, candidates.Count)];
-            ManagerRoot.Inventory.AddItem(itemID, 1);
             negotiationItemRecipients.Add(target);
+            ManagerRoot.Inventory.AddItem(itemID, 1);
             return true;
         }
 
         private void OnNegotiationEnded(int result)
         {
             if (negotiationSession == null) return;
+            bool endPeacefully = negotiationSession.ShouldEndBattle;
             if ((negotiationSession.Recruited || negotiationSession.Fled) && negotiationTarget != null) Destroy(negotiationTarget.gameObject);
             negotiationSession.Close();
             negotiationSession = null;
             negotiationTarget = null;
             negotiationActor = null;
+            if (endPeacefully)
+            {
+                EndBattleByNegotiation();
+                return;
+            }
             fieldController.SetPartyVisible(true);
             foreach (var player in fieldController.GetPlayerControllers())
                 if (player != null) player.RefreshView();

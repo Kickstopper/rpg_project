@@ -64,7 +64,12 @@ namespace RPGProject.Feature.Negotiation
                 if (!next.StartsWith("CHECK_MOOD:", StringComparison.Ordinal))
                 { Require(next, id, ids, errors); continue; }
                 string[] command = next.Split(':');
-                if (command[1] == "TRADE")
+                if (command[1] == "KINSHIP")
+                {
+                    if (command.Length != 2) errors.Add($"{id}: KINSHIP에는 인수를 지정하지 않습니다.");
+                    Require("KIN_RESULT", id, ids, errors);
+                }
+                else if (command[1] == "TRADE")
                 {
                     if (command.Length != 3 || !NegotiationTradeRules.TryGoal(command[2], out _))
                         errors.Add($"{id}: TRADE에는 Recruit/Item/Gold/HP/MP를 지정하세요.");

@@ -161,7 +161,7 @@ namespace RPGProject.Feature.Battle
             for (int i = 0; i < partyCount; i++)
             {
                 var member  = ManagerRoot.Party.GetMember(i);
-                if (member == null || (!member.isRegular && member.currentHp <= 0)) continue;
+                if (member == null || !member.isRegular) continue;
 
                 // 데이터상의 위치를 인덱스로 변환
                 // 전열(0,1,2), 후열(3,4,5)
