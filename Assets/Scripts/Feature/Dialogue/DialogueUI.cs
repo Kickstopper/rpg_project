@@ -772,7 +772,7 @@ namespace RPGProject.Feature.Dialogue
             if (negotiationSession != null)
             {
                 var row = currentEventLines[currentLineIndex];
-                nextTargetID = negotiationSession.MustStop ? "FAIL" :
+                nextTargetID = negotiationSession.MustStop && nextTargetID != "CHECK_MOOD:WITHDRAW" ? "FAIL" :
                     negotiationSession.Resolve(NegotiationScriptValidator.Value(row, "Seq"), nextTargetID);
                 SyncNegotiationMood();
             }

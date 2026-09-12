@@ -42,6 +42,7 @@ namespace RPGProject.Feature.Battle
             {
                 case NegotiationRewardKind.Gold:
                     negotiationItemRecipients.Add(negotiationTarget);
+                    negotiationExitPending = true;
                     ManagerRoot.Finance.AddMoney(NegotiationTradeRules.GoldReward);
                     return true;
                 case NegotiationRewardKind.HP:
@@ -50,7 +51,11 @@ namespace RPGProject.Feature.Battle
                     success = negotiationActor.TryRestoreNegotiationResource(false, NegotiationTradeRules.MpReward); break;
                 default: return false;
             }
-            if (success) negotiationItemRecipients.Add(negotiationTarget);
+            if (success)
+            {
+                negotiationItemRecipients.Add(negotiationTarget);
+                negotiationExitPending = true;
+            }
             return success;
         }
 

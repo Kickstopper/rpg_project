@@ -74,7 +74,10 @@ namespace RPGProject.Feature.Negotiation
         public bool HasPaidTrade => tradePaid;
         public bool IsKinship => kinship != null;
         public bool KinshipCompleted { get; private set; }
-        public bool ShouldEndBattle => KinshipCompleted || Recruited || RewardGranted;
+        public bool IsResolving => resolving;
+        public bool PeacefulWithdrawal { get; private set; }
+        private string withdrawalResult;
+        public bool ShouldEndBattle => KinshipCompleted || Recruited || RewardGranted || PeacefulWithdrawal;
         public bool MustStop => Anger >= 100 || choices >= 8;
 
         public NegotiationSession(Personality personality, Race race, EnvironmentState environment,
@@ -97,7 +100,7 @@ namespace RPGProject.Feature.Negotiation
 
         public void ApplyTone(ChoiceTone tone)
         {
-            if (Closed || IsKinship || MustStop || tradeResult != null) return;
+            if (Closed || IsKinship || MustStop || tradeResult != null || withdrawalResult != null) return;
             choices++;
             var delta = NegotiationCalculator.CalculateMoodChange(tone, personality, race, environment);
             Anger = Clamp(Anger + delta.addedAnger);
@@ -130,6 +133,13 @@ namespace RPGProject.Feature.Negotiation
                 // Guard before callbacks: UI notifications cannot commit the gift twice.
                 KinshipCompleted = true;
                 return kinship();
+            }
+            if (withdrawalResult != null) return "END";
+            if (parts.Length == 2 && parts[1] == "WITHDRAW")
+            {
+                if (ShouldEndBattle || tradeResult != null) return "END";
+                PeacefulWithdrawal = NegotiationWithdrawalRules.IsPeaceful(personality, Anger, Joy, Interest, choices, roll());
+                return withdrawalResult = PeacefulWithdrawal ? "WITHDRAW_PEACE" : "WITHDRAW_HOSTILE";
             }
             if (parts[1] == "SETTLE" && parts.Length == 2) return SettleTrade();
             if (tradeResult != null) return "END";

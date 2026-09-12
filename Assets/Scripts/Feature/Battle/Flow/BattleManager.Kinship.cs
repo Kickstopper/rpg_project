@@ -19,7 +19,6 @@ namespace RPGProject.Feature.Battle
             public List<Dictionary<string, string>> Lines;
         }
 
-        // Prepare presentation only. The gift is committed after its offer line is acknowledged.
         private KinshipOffer CreateKinshipOffer(MonsterController target)
         {
             var data = target.sourceData;
@@ -33,7 +32,7 @@ namespace RPGProject.Feature.Battle
             if (drops.Count > 0) gifts.Add(KinshipGift.Item);
             FindKinshipRecovery(target, out var recoveryTarget, out _);
             if (recoveryTarget != null) gifts.Add(KinshipGift.Recovery);
-            // Equal probability among usable categories, not among all skills/items.
+
             var offer = new KinshipOffer
             {
                 Gift = gifts[Random.Range(0, gifts.Count)],
@@ -52,12 +51,12 @@ namespace RPGProject.Feature.Battle
                 !fieldController.activeMonsters.Contains(target) ||
                 !NegotiationKinshipRules.HasCompanion(target.sourceData, ManagerRoot.Party?.partyData)) return "FAIL";
             string receipt = "";
+
             switch (offer.Gift)
             {
                 case KinshipGift.Farewell: return "END";
                 case KinshipGift.Gold:
                     if (ManagerRoot.Finance == null) break;
-                    // Debt is valid in this game. Subtract in long to avoid overflow for negative balances.
                     int amount = (int)System.Math.Min(offer.Gold, (long)int.MaxValue - ManagerRoot.Finance.CurrentMoney);
                     if (amount <= 0) break;
                     ManagerRoot.Finance.AddMoney(amount);
@@ -74,7 +73,6 @@ namespace RPGProject.Feature.Battle
                     receipt = $"{itemName} 1개를 받았다.";
                     break;
                 case KinshipGift.Recovery:
-                    // Re-evaluate the lowest ratio after the offer, in case another system changed vitals.
                     FindKinshipRecovery(target, out var recoveryTarget, out var recoverySkill);
                     if (recoveryTarget == null) break;
                     bool hp = recoverySkill.effectType == EffectType.Recover_HP;
@@ -85,6 +83,7 @@ namespace RPGProject.Feature.Battle
                     receipt = $"{skillName}: {recoveryTarget.sourceData.name}의 {(hp ? "HP" : "MP")}가 {restored} 회복되었다.";
                     break;
             }
+
             var result = offer.Lines.Find(row => row["Seq"] == "KIN_RESULT");
             result["Name"] = receipt.Length == 0 ? target.sourceData.name : "";
             result["Text"] = receipt.Length == 0 ? "지금은 도와줄 수 없겠군. 우리는 이만 물러나겠다." : receipt;
@@ -96,7 +95,7 @@ namespace RPGProject.Feature.Battle
             target = null; skill = null;
             if (monster == null || monster.sourceData?.skills == null) return;
             var players = fieldController.GetPlayerControllers();
-            // Check HP first so an exact HP/MP ratio tie has a stable outcome.
+
             foreach (var effect in new[] { EffectType.Recover_HP, EffectType.Recover_MP })
             {
                 var strongest = monster.sourceData.skills.Where(s => s != null && s.effectType == effect && s.effectValue > 0)
@@ -115,11 +114,13 @@ namespace RPGProject.Feature.Battle
             }
         }
 
-        // A peaceful exit has no enemy phase, victory rewards or result screen.
         private void EndBattleByNegotiation()
         {
             if (isEndingBattle) return;
             isEndingBattle = true;
+            negotiationExitPending = true;
+            StopAllCoroutines();
+            runningActionCoroutine = null;
             state = BattleState.Won;
             isSelectingTarget = false;
             actionQueue.Clear();
@@ -141,7 +142,6 @@ namespace RPGProject.Feature.Battle
             foreach (var player in fieldController.GetPlayerControllers())
                 if (player != null) player.RefreshView();
             fieldController.validTargets.Clear();
-            // Process only real recorded kills and recruitment flags. Surviving enemies are not kills.
             GetCompletedQuests();
             fieldController.ClearMonsterField();
             fieldController.encounterLog.Clear();
