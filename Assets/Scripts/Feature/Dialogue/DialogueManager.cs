@@ -110,6 +110,7 @@ namespace RPGProject.Feature.Dialogue
                         .Replace("{CallName}", "너").Replace("{Gender_Call}", "너")
                         .Replace("{MonsterName}", sourceData.name ?? "");
             }
+            NegotiationWithdrawalRules.PrepareScript(lines, sourceData.personality, sourceData.name);
             return lines;
         }
 

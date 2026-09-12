@@ -120,7 +120,7 @@ namespace RPGProject.Feature.Dialogue
                     onResourceDemandCallback != null && onResourceDemandCallback(demand.Kind.ToString(), demand.Amount),
                 null, null);
             onDialogueFinished = onNegotiationEnded;
-            string entry = negotiationSession.MustStop ? "NEGO_REJECT" : "INTRO";
+            string entry = !negotiationSession.IsKinship && negotiationSession.MustStop ? "NEGO_REJECT" : "INTRO";
             int entryIndex = FindIndexBySeq(entry);
             if (entryIndex < 0) entryIndex = FindIndexBySeq("FAIL");
             // Negotiation has no scene background of its own; discard a previous event backdrop.
@@ -772,7 +772,7 @@ namespace RPGProject.Feature.Dialogue
             if (negotiationSession != null)
             {
                 var row = currentEventLines[currentLineIndex];
-                nextTargetID = negotiationSession.MustStop ? "FAIL" :
+                nextTargetID = negotiationSession.MustStop && nextTargetID != "CHECK_MOOD:WITHDRAW" ? "FAIL" :
                     negotiationSession.Resolve(NegotiationScriptValidator.Value(row, "Seq"), nextTargetID);
                 SyncNegotiationMood();
             }

@@ -119,6 +119,10 @@ namespace RPGProject.Feature.Battle
         };
         
         private NegotiationSession negotiationSession;
+        private bool negotiationExitPending;
+        private bool deferredNegotiationEnd;
+        private int deferredNegotiationResult;
+        private bool NegotiationBlocksTurns => isEndingBattle || negotiationExitPending || negotiationSession != null;
         private MonsterController negotiationTarget;
         private PlayerController negotiationActor;
         private readonly HashSet<MonsterController> negotiationItemRecipients = new HashSet<MonsterController>();
@@ -172,6 +176,8 @@ namespace RPGProject.Feature.Battle
         {
             negotiationSession?.Close();
             negotiationSession = null;
+            negotiationExitPending = false;
+            deferredNegotiationEnd = false;
             negotiationTarget = null;
             negotiationActor = null;
             negotiationItemRecipients.Clear();
@@ -399,6 +405,7 @@ namespace RPGProject.Feature.Battle
 
         void PreparePlayerTurn()
         {
+            if (NegotiationBlocksTurns) return;
             isUnionAttackUsedThisTurn = false;
             isLastStandInputMode = false; 
 
@@ -432,14 +439,18 @@ namespace RPGProject.Feature.Battle
 
         IEnumerator PreparePlayerTurnRoutine()
         {
+            if (NegotiationBlocksTurns) yield break;
             fieldController.ResetPartyStatus();
             fieldController.ResetMonstersStatus();
 
             yield return fieldController.ProcessEnemyRowShift();
+            if (NegotiationBlocksTurns) yield break;
             yield return fieldController.ProcessPlayerRowShift();
+            if (NegotiationBlocksTurns) yield break;
             
             state = BattleState.PlayerInput;
             yield return uiController.ShowPhaseIndicator(false);
+            if (NegotiationBlocksTurns) yield break;
 
             actionQueue.Clear(); 
             fieldController.currentPlayerIndex = -1; 
@@ -452,6 +463,13 @@ namespace RPGProject.Feature.Battle
         void Update()
         {
             if (!isBattleState) return;
+            if (deferredNegotiationEnd && negotiationSession != null && !negotiationSession.IsResolving)
+            {
+                deferredNegotiationEnd = false;
+                OnNegotiationEnded(deferredNegotiationResult);
+                return;
+            }
+            if (NegotiationBlocksTurns) return;
             
             // 난입 입력 감지
             if ((state == BattleState.Processing || state == BattleState.EnemyInput) && currentProcessingAction != null && currentProcessingAction.actor != null && !isInterrupted)
@@ -530,6 +548,7 @@ namespace RPGProject.Feature.Battle
         // 난입 실행 코루틴
         IEnumerator TriggerInterrupt(bool isPlayerInterrupting)
         {
+            if (NegotiationBlocksTurns) yield break;
             isInterrupted = true; 
 
             // 진행 중이던 액션 코루틴과 애니메이션을 즉시 폭파
@@ -1471,6 +1490,7 @@ namespace RPGProject.Feature.Battle
         
         void NextPlayerInput()
         {
+            if (NegotiationBlocksTurns) return;
             fieldController.ResetPlayerSlotHighlights();
             PlayerController currentPlayer = null;
             // 재귀 호출을 제거하고 while 루프를 통한 안전한 다음 캐릭터 탐색
@@ -2055,7 +2075,10 @@ namespace RPGProject.Feature.Battle
                 RestoreNegotiationInput("교섭을 시작할 수 없습니다.");
                 return;
             }
-            var lines = ManagerRoot.Dialogue.GetNegotiationDialogues(targetMonster.sourceData);
+            bool isKinship = NegotiationKinshipRules.HasCompanion(targetMonster.sourceData, ManagerRoot.Party?.partyData);
+            var kinshipOffer = isKinship ? CreateKinshipOffer(targetMonster) : null;
+            var lines = isKinship ? kinshipOffer.Lines :
+                ManagerRoot.Dialogue.GetNegotiationDialogues(targetMonster.sourceData);
             var errors = NegotiationScriptValidator.Validate(lines);
             if (errors.Count > 0)
             {
@@ -2063,13 +2086,22 @@ namespace RPGProject.Feature.Battle
                 RestoreNegotiationInput("교섭 대사를 사용할 수 없습니다.");
                 return;
             }
+
+            StopAllCoroutines();
+            runningActionCoroutine = null;
+            negotiationExitPending = false;
+            deferredNegotiationEnd = false;
+            actionQueue.Clear();
+            currentProcessingAction = null;
+            currentActingEntity = null;
             negotiationTarget = targetMonster;
             negotiationActor = actor;
             var data = targetMonster.sourceData;
             negotiationSession = new NegotiationSession(data.personality, data.race, currentEnv,
                 targetMonster.CurrentAnger, targetMonster.CurrentJoy, targetMonster.CurrentInterest,
                 TryPayNegotiationDemand, TryRecruitNegotiationTarget, TryGiveNegotiationItem,
-                CanTradeNegotiationReward, TryGiveNegotiationReward, TryFleeNegotiationTarget, () => Random.value);
+                CanTradeNegotiationReward, TryGiveNegotiationReward, TryFleeNegotiationTarget, () => Random.value,
+                isKinship ? new System.Func<string>(() => ResolveKinshipNegotiation(kinshipOffer)) : null);
             isSelectingTarget = false;
             fieldController.StopBlinkEffects();
             EventSystem.current?.SetSelectedGameObject(null);
@@ -2078,7 +2110,11 @@ namespace RPGProject.Feature.Battle
             uiController.SetBreakSliderVisible(false);
             uiController.SetCmdPanelVisible(false);
             fieldController.SetPartyVisible(false);
-            dialogueUI.StartNegotiation(lines, targetMonster, OnNegotiationEnded, null, negotiationSession);
+            var startedSession = negotiationSession;
+            dialogueUI.StartNegotiation(lines, targetMonster, result =>
+            {
+                if (ReferenceEquals(negotiationSession, startedSession)) OnNegotiationEnded(result);
+            }, null, startedSession);
         }
 
         private void RestoreNegotiationInput(string message)
@@ -2126,12 +2162,12 @@ namespace RPGProject.Feature.Battle
             
             var member = ManagerRoot.Party.GetCharacterByID(target.sourceData.id);
             member.isRegular = false;
+            negotiationExitPending = true;
             ManagerRoot.Quest?.RecordNegotiation(questBattleLocation, target.sourceData.id);
             fieldController.activeMonsters.Remove(target);
             fieldController.encounterLog.Remove(target.sourceData); // Remove this occurrence only, not every copy of the species.
             target.SetSelectionState(false);
-            target.gameObject.SetActive(false);
-            target.transform.SetParent(transform, false); // Free the row slot for the remaining enemies.
+            // Keep the speaker visible until the result dialogue ends. The peaceful exit clears every enemy.
             return true;
         }
 
@@ -2147,19 +2183,33 @@ namespace RPGProject.Feature.Battle
                 ManagerRoot.Inventory.GetItemCount(id) < int.MaxValue).ToList();
             if (candidates.Count == 0) return false;
             string itemID = candidates[Random.Range(0, candidates.Count)];
-            ManagerRoot.Inventory.AddItem(itemID, 1);
             negotiationItemRecipients.Add(target);
+            negotiationExitPending = true;
+            ManagerRoot.Inventory.AddItem(itemID, 1);
             return true;
         }
 
         private void OnNegotiationEnded(int result)
         {
             if (negotiationSession == null) return;
+            if (negotiationSession.IsResolving)
+            {
+                deferredNegotiationEnd = true;
+                deferredNegotiationResult = result;
+                return;
+            }
+            deferredNegotiationEnd = false;
+            bool endPeacefully = negotiationExitPending || negotiationSession.ShouldEndBattle;
             if ((negotiationSession.Recruited || negotiationSession.Fled) && negotiationTarget != null) Destroy(negotiationTarget.gameObject);
             negotiationSession.Close();
             negotiationSession = null;
             negotiationTarget = null;
             negotiationActor = null;
+            if (endPeacefully)
+            {
+                EndBattleByNegotiation();
+                return;
+            }
             fieldController.SetPartyVisible(true);
             foreach (var player in fieldController.GetPlayerControllers())
                 if (player != null) player.RefreshView();
@@ -2176,6 +2226,7 @@ namespace RPGProject.Feature.Battle
 
         void ProcessTurn()
         {
+            if (NegotiationBlocksTurns) return;
             ManagerRoot.Sound.PlayBGM(BgmID.Normal_Battle);
             state = BattleState.Processing; 
             
@@ -2189,6 +2240,7 @@ namespace RPGProject.Feature.Battle
 
         void ProcessEnemyTurn()
         {
+            if (NegotiationBlocksTurns) return;
             if (CheckBattleEnd(out bool isWin)) { StartCoroutine(EndBattleRoutine(isWin)); return; }
 
             state = BattleState.EnemyInput; 
@@ -2219,11 +2271,12 @@ namespace RPGProject.Feature.Battle
 
         IEnumerator ExecuteActions()
         {
+            if (NegotiationBlocksTurns) yield break;
             isInterrupted = false;
             
             while (actionQueue.Count > 0)
             {
-                if (isInterrupted) yield break; // 난입 시 루프 즉시 종료
+                if (isInterrupted || NegotiationBlocksTurns) yield break; // 중단된 턴은 교섭 중/종료 후 재개하지 않음
 
                 currentProcessingAction = actionQueue[0];
                 currentActingEntity = currentProcessingAction.actor != null
@@ -2255,12 +2308,13 @@ namespace RPGProject.Feature.Battle
                 runningActionCoroutine = StartCoroutine(PerformStatusAwareAction(currentProcessingAction));
                 yield return runningActionCoroutine;
 
-                if (isInterrupted) yield break;
+                if (isInterrupted || NegotiationBlocksTurns) yield break;
             }
 
             currentProcessingAction = null;
             currentActingEntity = null;
 
+            if (NegotiationBlocksTurns) yield break;
             // 행동할 수 있는 적이 없는지 한 번 더 체크
             if (CheckBattleEnd(out bool finalWin)) 
             { 
@@ -2271,6 +2325,7 @@ namespace RPGProject.Feature.Battle
             if (state == BattleState.Processing)
             {
                 yield return uiController.ShowPhaseIndicator(true);
+                if (NegotiationBlocksTurns) yield break;
                 ProcessEnemyTurn();
             }
             else if (state == BattleState.EnemyInput) PreparePlayerTurn();
