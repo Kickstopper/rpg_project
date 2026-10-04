@@ -5,7 +5,6 @@ using RPGProject.Feature.Negotiation;
 using RPGProject.Feature.Skills;
 using RPGProject.Shared.Gameplay;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace RPGProject.Feature.Battle
 {
@@ -116,31 +115,15 @@ namespace RPGProject.Feature.Battle
 
         private void EndBattleByNegotiation()
         {
-            if (isEndingBattle) return;
-            isEndingBattle = true;
+            if (!TryBeginBattleEnd(BattleEndReason.Negotiation)) return;
+
             negotiationExitPending = true;
-            StopAllCoroutines();
-            runningActionCoroutine = null;
-            state = BattleState.Won;
-            isSelectingTarget = false;
-            actionQueue.Clear();
-            currentProcessingAction = null;
-            currentActingEntity = null;
-            currentUnionParticipants.Clear();
-            EventSystem.current?.SetSelectedGameObject(null);
-            fieldController.StopBlinkEffects();
-            fieldController.HideTurnOrderUI();
-            uiController.SetTargetCursorVisible(false);
-            uiController.SetCmdPanelVisible(false);
-            uiController.SetBreakSliderVisible(false);
-            uiController.HideStateMessage();
             uiController.HideMessage();
-            uiController.HideLog();
             fieldController.SyncPositionsToPartyManager();
-            FinalizeBattleStatusEffects();
             fieldController.SetPartyVisible(true);
             foreach (var player in fieldController.GetPlayerControllers())
                 if (player != null) player.RefreshView();
+
             fieldController.validTargets.Clear();
             GetCompletedQuests();
             fieldController.ClearMonsterField();
