@@ -3,38 +3,59 @@ Shader "UI/RetroCRTShader"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        
+
         [Header(CRT Curvature)]
-        _Curvature ("Curvature Amount (0 is flat)", Range(0.0, 1.0)) = 0.2
-        _BlurAmount ("Curve Smoothing (Blur)", Range(0.0, 0.01)) = 0.0015
-        
-        [Header(Scanline Settings)]
-        _ScanlineSize ("Scanline Count", Float) = 100.0
-        _ScanlineIntensity ("Scanline Intensity", Range(0, 1)) = 0.5
-        
-        [Header(Dot Matrix Settings)]
-        _DotSize ("Dot Matrix Size", Float) = 50.0
-        _DotIntensity ("Dot Matrix Intensity", Range(0, 1)) = 0.0
+        _Curvature ("Curvature Amount (0 is flat)", Range(0.0, 1.0)) = 0.010
+        _BlurAmount ("CRT Beam Blur", Range(0.0, 0.01)) = 0.00075
+
+        [Header(Chromatic Aberration)]
+        _ChromaticAberration ("RGB Separation", Range(0.0, 0.005)) = 0.00070
+        _ChromaticEdgeBoost ("Edge Separation Boost", Range(0.0, 2.0)) = 0.65
+        _ChromaticIntensity ("Chromatic Intensity", Range(0.0, 1.0)) = 0.50
+        _ChromaticVertical ("Vertical Convergence", Range(0.0, 0.5)) = 0.04
+
+        [Header(Scanline Beam)]
+        _ScanlineSize ("Scanline Count", Float) = 128.0
+        _ScanlineIntensity ("Scanline Intensity", Range(0.0, 1.0)) = 0.22
+        _BeamSharpness ("Beam Sharpness", Range(0.5, 4.0)) = 1.5
+
+        [Header(Phosphor Mask)]
+        _PhosphorScale ("Phosphor Scale", Range(100.0, 1500.0)) = 720.0
+        _PhosphorIntensity ("Phosphor Mask Intensity", Range(0.0, 0.5)) = 0.10
+
+        [Header(CRT Glow)]
+        _GlowAmount ("Glow Radius", Range(0.0, 0.005)) = 0.0012
+        _GlowIntensity ("Glow Intensity", Range(0.0, 1.0)) = 0.10
+        _GlowThreshold ("Glow Threshold", Range(0.0, 1.0)) = 0.70
 
         [Header(Atmosphere)]
-        _Brightness ("Brightness Boost", Range(1, 2)) = 1.2
-        _VignetteSize ("Vignette Size", Range(0.1, 2.0)) = 1.5
-        _VignetteSmooth ("Vignette Smoothness", Range(0.1, 1.0)) = 0.5
+        _Brightness ("Brightness Boost", Range(0.5, 2.0)) = 1.30
+        _VignetteSize ("Vignette Size", Range(0.1, 2.0)) = 0.92
+        _VignetteSmooth ("Vignette Smoothness", Range(0.1, 1.0)) = 0.55
     }
+
     SubShader
     {
-        Tags { "RenderType"="Opaque" "Queue"="Transparent" }
+        Tags
+        {
+            "RenderType" = "Opaque"
+            "Queue" = "Transparent"
+        }
+
         LOD 100
-    
         Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
             CGPROGRAM
+
             #pragma vertex vert
             #pragma fragment frag
-            
+
             #include "UnityCG.cginc"
+
+            #define CRT_PI 3.14159265359
+            #define CRT_TAU 6.28318530718
 
             struct appdata
             {
@@ -50,18 +71,31 @@ Shader "UI/RetroCRTShader"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            
+
             float _Curvature;
             float _BlurAmount;
+
+            float _ChromaticAberration;
+            float _ChromaticEdgeBoost;
+            float _ChromaticIntensity;
+            float _ChromaticVertical;
+
             float _ScanlineSize;
             float _ScanlineIntensity;
-            float _DotSize;
-            float _DotIntensity;
+            float _BeamSharpness;
+
+            float _PhosphorScale;
+            float _PhosphorIntensity;
+
+            float _GlowAmount;
+            float _GlowIntensity;
+            float _GlowThreshold;
+
             float _Brightness;
             float _VignetteSize;
             float _VignetteSmooth;
 
-            v2f vert (appdata v)
+            v2f vert(appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
@@ -69,83 +103,222 @@ Shader "UI/RetroCRTShader"
                 return o;
             }
 
-            // 곡률 계산
+            // ------------------------------------------------------------
+            // CRT 곡률
+            // ------------------------------------------------------------
             float2 DistortUV(float2 uv, float curvature)
             {
-                // 0~1의 UV를 -1~1 범위로 변환하여 중앙을 영점으로 맞춤
                 uv = uv * 2.0 - 1.0;
-                
-                // curvature를 곱하여 왜곡 적용
                 uv += uv * (uv.yx * uv.yx) * curvature;
-                
-                // 다시 0~1 범위로 복구
                 return uv * 0.5 + 0.5;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            // ------------------------------------------------------------
+            // 빔 블러
+            // CRT 빔은 수직 확산보다 수평 확산을 약간 더 강하게 주었을 때 가독성이 더 좋음
+            // ------------------------------------------------------------
+            fixed4 SampleBeamBlur(float2 uv)
             {
-                // UV에 곡률 적용
-                float2 curvedUV = DistortUV(i.uv, _Curvature);
+                if (_BlurAmount <= 0.000001)
+                    return tex2D(_MainTex, uv);
 
-                // 2. 곡률로 인해 0~1 범위를 벗어난 가장자리 픽셀을 투명(또는 검은색) 처리
-                if (curvedUV.x < 0.0 || curvedUV.x > 1.0 || curvedUV.y < 0.0 || curvedUV.y > 1.0)
+                fixed4 center = tex2D(_MainTex, uv);
+                fixed4 left   = tex2D(_MainTex, saturate(uv + float2(-_BlurAmount, 0.0)));
+                fixed4 right  = tex2D(_MainTex, saturate(uv + float2( _BlurAmount, 0.0)));
+                fixed4 up     = tex2D(_MainTex, saturate(uv + float2(0.0,  _BlurAmount)));
+                fixed4 down   = tex2D(_MainTex, saturate(uv + float2(0.0, -_BlurAmount)));
+
+                return
+                    center * 0.40 +
+                    (left + right) * 0.18 +
+                    (up + down) * 0.12;
+            }
+
+            // ------------------------------------------------------------
+            // 가장자리 가중치가 적용된 RGB 수렴 오류.
+            // 녹색 채널이 기준 채널로 유지됨. 적청 채널은 서로 반대 방향으로 벗어나며, 화면 가장자리로 갈수록 분리(색 테두리 현상)가 더 심해짐
+            // ------------------------------------------------------------
+            fixed3 ApplyChromaticConvergence(float2 uv, fixed3 baseColor)
+            {
+                if (_ChromaticAberration <= 0.000001 ||
+                    _ChromaticIntensity <= 0.001)
                 {
-                    return fixed4(0, 0, 0, 0); 
+                    return baseColor;
                 }
 
-                // 3. 텍스처 색상 가져오기 및 조건부 블러 처리
-                fixed4 col = fixed4(0, 0, 0, 0);
+                float2 centered = uv - 0.5;
+                float edgeDistance = saturate(length(centered) * 1.6);
 
-                if (_Curvature > 0.001) 
+                float separation =
+                    _ChromaticAberration *
+                    lerp(0.25, 1.0 + _ChromaticEdgeBoost, edgeDistance);
+
+                float2 direction =
+                    normalize(
+                        float2(
+                            centered.x,
+                            centered.y * _ChromaticVertical
+                        ) +
+                        float2(0.00001, 0.0)
+                    );
+
+                float2 offset = direction * separation;
+
+                float2 redUV  = saturate(uv + offset);
+                float2 blueUV = saturate(uv - offset);
+
+                fixed redSample  = tex2D(_MainTex, redUV).r;
+                fixed blueSample = tex2D(_MainTex, blueUV).b;
+
+                baseColor.r = lerp(baseColor.r, redSample,  _ChromaticIntensity);
+                baseColor.b = lerp(baseColor.b, blueSample, _ChromaticIntensity);
+
+                return baseColor;
+            }
+
+            // ------------------------------------------------------------
+            // 밝기 의존형 글로우 / 할레이션.
+            // 밝은 주변 텍셀만 강하게 기여하므로, 어두운 픽셀은 비교적 또렷하게 유지되는 반면 하이라이트는 살짝 번짐(블러).
+            // ------------------------------------------------------------
+            fixed3 SampleHighlightGlow(float2 uv)
+            {
+                if (_GlowAmount <= 0.000001 ||
+                    _GlowIntensity <= 0.001)
                 {
-                    // 곡률이 활성화되었을 때: 십자(+) 형태로 5번 샘플링하여 뭉개주기
-                    fixed4 c1 = tex2D(_MainTex, curvedUV);
-                    fixed4 c2 = tex2D(_MainTex, curvedUV + float2(_BlurAmount, 0));
-                    fixed4 c3 = tex2D(_MainTex, curvedUV + float2(-_BlurAmount, 0));
-                    fixed4 c4 = tex2D(_MainTex, curvedUV + float2(0, _BlurAmount));
-                    fixed4 c5 = tex2D(_MainTex, curvedUV + float2(0, -_BlurAmount));
-
-                    // // 각각 CGA 팔레트로 스냅
-                    // c1.rgb = ApplyCGAPalette(c1.rgb);
-                    // c2.rgb = ApplyCGAPalette(c2.rgb);
-                    // c3.rgb = ApplyCGAPalette(c3.rgb);
-                    // c4.rgb = ApplyCGAPalette(c4.rgb);
-                    // c5.rgb = ApplyCGAPalette(c5.rgb);
-
-                    // 평균을 내어 부드럽게 합성
-                    col = (c1 + c2 + c3 + c4 + c5) / 5.0;
+                    return fixed3(0.0, 0.0, 0.0);
                 }
-                else 
+
+                fixed3 glow =
+                    tex2D(_MainTex, saturate(uv + float2( _GlowAmount, 0.0))).rgb +
+                    tex2D(_MainTex, saturate(uv + float2(-_GlowAmount, 0.0))).rgb +
+                    tex2D(_MainTex, saturate(uv + float2(0.0,  _GlowAmount))).rgb +
+                    tex2D(_MainTex, saturate(uv + float2(0.0, -_GlowAmount))).rgb;
+
+                glow *= 0.25;
+
+                float luminance =
+                    dot(glow, float3(0.299, 0.587, 0.114));
+
+                float thresholdRange =
+                    max(0.001, 1.0 - _GlowThreshold);
+
+                float glowMask =
+                    saturate(
+                        (luminance - _GlowThreshold) /
+                        thresholdRange
+                    );
+
+                return glow * glowMask * _GlowIntensity;
+            }
+
+            // ------------------------------------------------------------
+            // 소프트 CRT 빔 프로파일.
+            // BeamSharpness는 발광하는 스캔라인 빔의 폭이 얼마나 좁아질지를 조절함.
+            // intensity 속성은 전체적인 대비를 조절.
+            // ------------------------------------------------------------
+            float GetScanlineEffect(float2 uv)
+            {
+                float phase =
+                    0.5 +
+                    0.5 * sin(uv.y * _ScanlineSize * CRT_TAU);
+
+                float shapedBeam =
+                    pow(saturate(phase), _BeamSharpness);
+
+                return lerp(
+                    1.0,
+                    shapedBeam,
+                    _ScanlineIntensity
+                );
+            }
+
+            // ------------------------------------------------------------
+            // RGB 그릴 / 형광체 변조.
+            // ------------------------------------------------------------
+            float3 GetPhosphorMask(float2 uv)
+            {
+                if (_PhosphorIntensity <= 0.001)
+                    return float3(1.0, 1.0, 1.0);
+
+                float phase =
+                    uv.x * _PhosphorScale * CRT_TAU;
+
+                float3 phosphorWave =
+                    0.5 +
+                    0.5 * cos(
+                        phase +
+                        float3(
+                            0.0,
+                            CRT_TAU / 3.0,
+                            CRT_TAU * 2.0 / 3.0
+                        )
+                    );
+
+                float3 phosphorTarget =
+                    0.68 + phosphorWave * 0.32;
+
+                return lerp(
+                    float3(1.0, 1.0, 1.0),
+                    phosphorTarget,
+                    _PhosphorIntensity
+                );
+            }
+
+            fixed4 frag(v2f i) : SV_Target
+            {
+                float2 curvedUV =
+                    DistortUV(i.uv, _Curvature);
+
+                if (curvedUV.x < 0.0 || curvedUV.x > 1.0 ||
+                    curvedUV.y < 0.0 || curvedUV.y > 1.0)
                 {
-                    col = tex2D(_MainTex, curvedUV);
-                    //col.rgb = ApplyCGAPalette(col.rgb);
+                    return fixed4(0.0, 0.0, 0.0, 0.0);
                 }
 
-                // 스캔라인
-                float scanline = sin(curvedUV.y * _ScanlineSize * 3.14159 * 2.0);
-                float scanLineEffect = lerp(1.0, 0.5 + 0.5 * scanline, _ScanlineIntensity);
+                fixed4 col =
+                    SampleBeamBlur(curvedUV);
 
-                // 도트 매트릭스
-                float dotX = sin(curvedUV.x * _DotSize * 3.14159 * 2.0);
-                float dotY = sin(curvedUV.y * _DotSize * 3.14159 * 2.0);
-                float dotPattern = dotX * dotY;
-                float dotEffect = lerp(1.0, 0.5 + 0.5 * dotPattern, _DotIntensity);
+                col.rgb =
+                    ApplyChromaticConvergence(
+                        curvedUV,
+                        col.rgb
+                    );
 
-                // 비네팅
-                float2 dist = curvedUV - 0.5;
-                float len = length(dist);
-                float vignette = smoothstep(_VignetteSize, _VignetteSize - _VignetteSmooth, len);
+                col.rgb +=
+                    SampleHighlightGlow(curvedUV);
 
-                // 효과 합성
-                col.rgb *= scanLineEffect;
-                col.rgb *= dotEffect;
+                float scanlineEffect =
+                    GetScanlineEffect(curvedUV);
+
+                col.rgb *= scanlineEffect;
+
+                float3 phosphorMask =
+                    GetPhosphorMask(curvedUV);
+
+                col.rgb *= phosphorMask;
+
+                // 비네트
+                float2 dist =
+                    curvedUV - 0.5;
+
+                float len =
+                    length(dist);
+
+                float vignette =
+                    smoothstep(
+                        _VignetteSize,
+                        _VignetteSize - _VignetteSmooth,
+                        len
+                    );
+
                 col.rgb *= vignette;
-                
-                // 스캔라인 등으로 어두워진 화면 보정
+
+                // 스캔라인/마스크/비네트 효과로 인한 화면 어두워짐 보정
                 col.rgb *= _Brightness;
 
                 return col;
             }
+
             ENDCG
         }
     }

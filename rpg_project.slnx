@@ -1,5 +1,18 @@
 ﻿<Solution>
+  <Project Path="RPGProject.Runtime.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="RPGProject.Editor.csproj" />
+  <Project Path="RPGProject.VFXEditor.csproj" />
+  <Project Path="DOTween.Modules.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
-  <Project Path="Assembly-CSharp-firstpass.csproj" />
+  <Project Path="RPGProject.Negotiation.Tests.csproj" />
+  <Project Path="RPGProject.MonsterEditor.Tests.csproj" />
+  <Project Path="RPGProject.StatusEffects.Tests.csproj" />
+  <Project Path="RPGProject.Battle.Tests.csproj" />
+  <Project Path="RPGProject.DialogueEditor.Tests.csproj" />
+  <Project Path="RPGProject.VFXEditor.Tests.csproj" />
+  <Project Path="RPGProject.Balance.Tests.csproj" />
+  <Project Path="RPGProject.Talk.Tests.csproj" />
+  <Project Path="RPGProject.Quest.Tests.csproj" />
+  <Project Path="RPGProject.DungeonEditor.Tests.csproj" />
 </Solution>
