@@ -65,6 +65,9 @@ namespace RPGProject.Feature.Battle
         private BattleEntity currentActingEntity;
         private bool isEndingBattle; 
         private Coroutine runningActionCoroutine; // 실행 중인 코루틴을 담아둘 변수
+        // 별도로 시작된 하위 액션 코루틴(QTE 다단히트 등)도 안전하게 취소하기 위한 세대 번호.
+        // 난입/교섭/전투 종료 때 증가하며, 이전 세대의 코루틴은 다음 판정 지점에서 즉시 종료한다.
+        private int actionExecutionVersion;
         private bool isInterrupted = false;
 
         //이동 모드 관련 변수
@@ -545,18 +548,30 @@ namespace RPGProject.Feature.Battle
             }
         }
 
-        // 난입 실행 코루틴
-        IEnumerator TriggerInterrupt(bool isPlayerInterrupting)
+        private void CancelRunningActionExecution()
         {
-            if (NegotiationBlocksTurns) yield break;
-            isInterrupted = true; 
+            unchecked { actionExecutionVersion++; }
 
-            // 진행 중이던 액션 코루틴과 애니메이션을 즉시 폭파
             if (runningActionCoroutine != null)
             {
                 StopCoroutine(runningActionCoroutine);
                 runningActionCoroutine = null;
             }
+        }
+
+        private bool IsActionExecutionCancelled(int capturedVersion)
+        {
+            return capturedVersion != actionExecutionVersion;
+        }
+
+        // 난입 실행 코루틴
+        IEnumerator TriggerInterrupt(bool isPlayerInterrupting)
+        {
+            if (NegotiationBlocksTurns) yield break;
+            isInterrupted = true;
+
+            // 루트 액션과 이미 분기된 하위 타격 코루틴을 같은 취소 세대로 무효화한다.
+            CancelRunningActionExecution();
             yield return CompletePendingStatusOpportunities();
             currentUnionParticipants.Clear();
             if (CheckBattleEnd(out bool wonAfterStatus))
@@ -1826,11 +1841,12 @@ namespace RPGProject.Feature.Battle
 
             if (BattleCalculator.CalculateEscapeSuccess(fieldController.activePlayers, fieldController.activeMonsters, currentEscapeAttempts, guaranteedEscapeAttempts))
             {
+                if (!TryBeginBattleEnd(BattleEndReason.Escape)) yield break;
+
                 fieldController.SetEnemyVisualsActive(false);
                 uiController.ShowMessage("휴~ 도망쳤다.");
                 yield return YieldCache.WaitForSeconds(1f);
 
-                FinalizeBattleStatusEffects();
                 fieldController.ClearMonsterField(); // 전장 몬스터 지우기
                 uiController.ShowBattleEndAnimation(()=>{ ManagerRoot.GameState.ChangeState(GameState.Exploration); });
             }
@@ -2087,8 +2103,8 @@ namespace RPGProject.Feature.Battle
                 return;
             }
 
-            StopAllCoroutines();
-            runningActionCoroutine = null;
+            // BattleManager 전체 코루틴을 죽이지 않고 전투 액션 실행만 취소한다.
+            CancelRunningActionExecution();
             negotiationExitPending = false;
             deferredNegotiationEnd = false;
             actionQueue.Clear();
@@ -3049,6 +3065,9 @@ namespace RPGProject.Feature.Battle
 
         IEnumerator ProcessSingleHit(BattleAction action, GameObject target)
         {
+            int executionVersion = actionExecutionVersion;
+            if (IsActionExecutionCancelled(executionVersion)) yield break;
+
             // 광역기 반사 데미지 등으로 인해 공격자가 이미 사망했다면 즉시 취소
             BattleEntity checkAttacker = action.actor.GetComponent<BattleEntity>();
             if (checkAttacker == null || checkAttacker.currentHp <= 0) yield break;
@@ -3127,7 +3146,7 @@ namespace RPGProject.Feature.Battle
                 
                 // 공격자 본인에게 돌아갈 데미지 계산 및 적용
                 int reflectDmg = BattleCalculator.CalculateDamage(attackerEntity, attackerEntity, action, false, 1.0f);
-                ApplyDamage(action.actor, reflectDmg, false);
+                ApplyDamage(action.actor, reflectDmg, false, false, executionVersion);
                 
                 if (targetEntity is PlayerController pc)
                 {
@@ -3178,7 +3197,7 @@ namespace RPGProject.Feature.Battle
                     foreach (var defender in defenders)
                     {
                         defender.SetMessage("막아!");
-                        ApplyDamage(defender.gameObject, splitDamage, false);
+                        ApplyDamage(defender.gameObject, splitDamage, false, false, executionVersion);
                         visualController.SpawnVFX(VfxID.Guard, GetCenterPosition(defender.gameObject));
                     }
                     yield return YieldCache.WaitForSeconds(0.1f);
@@ -3244,10 +3263,13 @@ namespace RPGProject.Feature.Battle
                 yield return YieldCache.WaitForSeconds(0.1f);
             }
 
+            // 타격 연출을 기다리는 동안 난입/교섭/종료가 발생했다면 실제 피해는 적용하지 않는다.
+            if (IsActionExecutionCancelled(executionVersion)) yield break;
+
             Coroutine damageRoutine = null;
             if (!(damage == 0 && action.actionData != null && action.actionData.statusEffectData != null))
             {
-                damageRoutine = ApplyDamage(target, damage, isCritical);
+                damageRoutine = ApplyDamage(target, damage, isCritical, false, executionVersion);
             }
 
             // 치명타나 약점 공격으로 적이 방금 사망했는지 확인
@@ -3295,8 +3317,9 @@ namespace RPGProject.Feature.Battle
             else uiController.AddEnemyGauge(amount);
         }
 
-        Coroutine ApplyDamage(GameObject target, int damage, bool isCritical, bool isStatusDamage = false)
+        Coroutine ApplyDamage(GameObject target, int damage, bool isCritical, bool isStatusDamage = false, int? expectedActionVersion = null)
         {
+            if (expectedActionVersion.HasValue && IsActionExecutionCancelled(expectedActionVersion.Value)) return null;
             if (target == null || !target.activeInHierarchy) return null;
 
             var entity = target.GetComponent<BattleEntity>();
@@ -3417,16 +3440,48 @@ namespace RPGProject.Feature.Battle
             uiController.HideMessage();
         }
 
-        IEnumerator EndBattleRoutine(bool isWin)
+        private enum BattleEndReason
         {
-            if (isEndingBattle) yield break;
+            Victory,
+            Defeat,
+            Escape,
+            Negotiation
+        }
+
+        private bool TryBeginBattleEnd(BattleEndReason reason)
+        {
+            if (isEndingBattle) return false;
+
             isEndingBattle = true;
+            CancelRunningActionExecution();
+
+            currentProcessingAction = null;
             currentActingEntity = null;
-            state = isWin ? BattleState.Won : BattleState.Lost;
+            actionQueue.Clear();
+            currentUnionParticipants.Clear();
+            isSelectingTarget = false;
+            isSelectingMoveTarget = false;
+
+            state = reason == BattleEndReason.Defeat ? BattleState.Lost : BattleState.Won;
+            Time.timeScale = 1.0f;
+
+            EventSystem.current?.SetSelectedGameObject(null);
+            fieldController.StopBlinkEffects();
+            fieldController.HideTurnOrderUI();
+            uiController.SetTargetCursorVisible(false);
             uiController.SetCmdPanelVisible(false);
+            uiController.SetBreakSliderVisible(false);
             uiController.HideStateMessage();
+            uiController.HideLog();
 
             FinalizeBattleStatusEffects();
+            return true;
+        }
+
+        IEnumerator EndBattleRoutine(bool isWin)
+        {
+            if (!TryBeginBattleEnd(isWin ? BattleEndReason.Victory : BattleEndReason.Defeat)) yield break;
+
             List<PlayerController> allPlayers = fieldController.GetPlayerControllers();
 
             if (isWin)

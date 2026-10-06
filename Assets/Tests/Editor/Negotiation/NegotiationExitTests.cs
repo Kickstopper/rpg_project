@@ -114,6 +114,27 @@ namespace RPGProject.Tests.Negotiation
         }
 
         [Test]
+        public void CancellingActionExecutionInvalidatesOnlyThePreviousGeneration()
+        {
+            var go = new GameObject("action cancellation");
+            go.SetActive(false);
+            try
+            {
+                var manager = go.AddComponent<BattleManager>();
+                int before = (int)Field("actionExecutionVersion").GetValue(manager);
+
+                Assert.That((bool)Invoke(manager, "IsActionExecutionCancelled", before), Is.False);
+                Invoke(manager, "CancelRunningActionExecution");
+
+                int after = (int)Field("actionExecutionVersion").GetValue(manager);
+                Assert.That(after, Is.Not.EqualTo(before));
+                Assert.That((bool)Invoke(manager, "IsActionExecutionCancelled", before), Is.True);
+                Assert.That((bool)Invoke(manager, "IsActionExecutionCancelled", after), Is.False);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(go); }
+        }
+
+        [Test]
         public void DialogueCloseInsideRecruitCallbackIsDeferredUntilOutcomeIsWritten()
         {
             var go = new GameObject("reentrant completion"); go.SetActive(false);
