@@ -26,8 +26,23 @@ namespace RPGProject.Feature.Exploration
             public int mapX;
             public int mapY;
         }
-        private IllusionHit[] _illusionHits = new IllusionHit[32]; 
-        private HashSet<int> _passableTexIDs = new HashSet<int>();
+        private readonly IllusionHit[] _illusionHits = new IllusionHit[32];
+        private bool[] _passableTexLookup = Array.Empty<bool>();
+
+        private struct PixelCache
+        {
+            public Color32[] pixels;
+            public int width;
+            public int height;
+
+            public bool IsValid => pixels != null && width > 0 && height > 0;
+        }
+
+        private sealed class SpriteSortComparer : IComparer<SpriteSortInfo>
+        {
+            public static readonly SpriteSortComparer Instance = new SpriteSortComparer();
+            public int Compare(SpriteSortInfo a, SpriteSortInfo b) => b.distance.CompareTo(a.distance);
+        }
 
         private Color32[] _buffer;
         private Color32[] _leftEyeBuffer;
@@ -36,15 +51,14 @@ namespace RPGProject.Feature.Exploration
         private float[] _depthBuffer; // 2D 픽셀 뎁스
         private float[] _zBuffer1D;   // 1D 라인 뎁스
 
-        private Color32[] _flatWallPixels;   
-        private Color32[] _flatSpritePixels; 
-        private Dictionary<int, Color32[]> _flatObjectPixels;  
-        private Dictionary<int, Vector2Int> _objectDimensions; 
+        private Color32[] _flatWallPixels;
+        private int _wallTextureStride;
+        private PixelCache[] _enemyPixelCache = Array.Empty<PixelCache>();
+        private Dictionary<int, PixelCache> _objectPixelCache = new Dictionary<int, PixelCache>();
 
         private MapData _mapData;
         private Texture2D[] _wallTextures;
         private Sprite[] _enemySprite;
-        private Dictionary<int, Texture2D> _objectSpriteDict;
         
         private SpriteInfo[] _sprtData;
         private SpriteSortInfo[] _spriteSortList;
@@ -93,20 +107,21 @@ namespace RPGProject.Feature.Exploration
             _wallTextures = theme.texture;
             _enemySprite = dynamicEnemySprites;
 
-            _objectSpriteDict = new Dictionary<int, Texture2D>();
-            _flatObjectPixels = new Dictionary<int, Color32[]>();
-            _objectDimensions = new Dictionary<int, Vector2Int>();
+            int objectCapacity = theme.objectSprites != null ? theme.objectSprites.Length : 0;
+            _objectPixelCache = new Dictionary<int, PixelCache>(objectCapacity);
 
             if (theme.objectSprites != null)
             {
                 foreach (var obj in theme.objectSprites)
                 {
-                    if (obj.texture != null)
+                    if (obj.texture == null) continue;
+
+                    _objectPixelCache[obj.objectID] = new PixelCache
                     {
-                        _objectSpriteDict[obj.objectID] = obj.texture;
-                        _flatObjectPixels[obj.objectID] = obj.texture.GetPixels32();
-                        _objectDimensions[obj.objectID] = new Vector2Int(obj.texture.width, obj.texture.height);
-                    }
+                        pixels = obj.texture.GetPixels32(),
+                        width = obj.texture.width,
+                        height = obj.texture.height
+                    };
                 }
             }
             
@@ -119,56 +134,59 @@ namespace RPGProject.Feature.Exploration
             PrecomputeTextures();
         }
 
-        private Color32 GetObjectSpritePixelFast(int objId, int x, int y)
-        {
-            if (_flatObjectPixels != null && _flatObjectPixels.TryGetValue(objId, out Color32[] pixels))
-            {
-                Vector2Int dim = _objectDimensions[objId];
-                x = Mathf.Clamp(x, 0, dim.x - 1);
-                y = Mathf.Clamp(y, 0, dim.y - 1);
-                
-                return pixels[y * dim.x + x];
-            }
-            return new Color32(0, 0, 0, 0);
-        }
+
 
         private void PrecomputeTextures()
         {
-            int pxPerTex = _texWidth * _texHeight;
+            _wallTextureStride = _texWidth * _texHeight;
 
             if (_wallTextures != null && _wallTextures.Length > 0)
             {
-                _flatWallPixels = new Color32[_wallTextures.Length * pxPerTex];
+                _flatWallPixels = new Color32[_wallTextures.Length * _wallTextureStride];
                 for (int i = 0; i < _wallTextures.Length; i++)
                 {
-                    Color[] src = _wallTextures[i].GetPixels();
-                    int offset = i * pxPerTex;
-                    for (int p = 0; p < src.Length; p++)
-                        _flatWallPixels[offset + p] = (Color32)src[p];
+                    Texture2D texture = _wallTextures[i];
+                    if (texture == null) continue;
+
+                    Color32[] src = texture.GetPixels32();
+                    int copyLength = Math.Min(src.Length, _wallTextureStride);
+                    Array.Copy(src, 0, _flatWallPixels, i * _wallTextureStride, copyLength);
                 }
             }
-
-            if (_enemySprite != null && _enemySprite.Length > 0)
+            else
             {
-                _flatSpritePixels = new Color32[_enemySprite.Length * pxPerTex];
-                for (int i = 0; i < _enemySprite.Length; i++)
+                _flatWallPixels = Array.Empty<Color32>();
+            }
+
+            if (_enemySprite == null || _enemySprite.Length == 0)
+            {
+                _enemyPixelCache = Array.Empty<PixelCache>();
+                return;
+            }
+
+            _enemyPixelCache = new PixelCache[_enemySprite.Length];
+            for (int i = 0; i < _enemySprite.Length; i++)
+            {
+                Sprite spr = _enemySprite[i];
+                if (spr == null) continue;
+
+                int width = (int)spr.rect.width;
+                int height = (int)spr.rect.height;
+                Color[] src = spr.texture.GetPixels(
+                    (int)spr.rect.x,
+                    (int)spr.rect.y,
+                    width,
+                    height
+                );
+                Color32[] pixels = new Color32[src.Length];
+                for (int p = 0; p < src.Length; p++) pixels[p] = (Color32)src[p];
+
+                _enemyPixelCache[i] = new PixelCache
                 {
-                    Sprite spr = _enemySprite[i];
-                    if (spr == null) continue;
-
-                    Color[] src = spr.texture.GetPixels(
-                        (int)spr.rect.x, 
-                        (int)spr.rect.y, 
-                        (int)spr.rect.width, 
-                        (int)spr.rect.height
-                    );
-
-                    int offset = i * pxPerTex;
-                    for (int p = 0; p < src.Length; p++)
-                    {
-                        _flatSpritePixels[offset + p] = (Color32)src[p];
-                    }
-                }
+                    pixels = pixels,
+                    width = width,
+                    height = height
+                };
             }
         }
 
@@ -197,10 +215,25 @@ namespace RPGProject.Feature.Exploration
             _floorTexIdx = theme.floorTexIdx;
             _tileAnimStates = animStates;
 
+            int lookupSize = _wallTextures != null ? _wallTextures.Length : 0;
             if (theme.passableWallTexIDs != null)
-                _passableTexIDs = new HashSet<int>(theme.passableWallTexIDs);
-            else
-                _passableTexIDs.Clear();
+            {
+                for (int i = 0; i < theme.passableWallTexIDs.Count; i++)
+                {
+                    int id = theme.passableWallTexIDs[i];
+                    if (id >= lookupSize) lookupSize = id + 1;
+                }
+            }
+
+            _passableTexLookup = lookupSize > 0 ? new bool[lookupSize] : Array.Empty<bool>();
+            if (theme.passableWallTexIDs != null)
+            {
+                for (int i = 0; i < theme.passableWallTexIDs.Count; i++)
+                {
+                    int id = theme.passableWallTexIDs[i];
+                    if (id >= 0 && id < _passableTexLookup.Length) _passableTexLookup[id] = true;
+                }
+            }
         }
 
         public void SetScanState(bool scanning, float radius)
@@ -209,25 +242,24 @@ namespace RPGProject.Feature.Exploration
             _currentScanRadius = radius;
         }
 
-        private Color32 GetWallPixelFast(int texIdx, int x, int y)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool IsPassableTexture(int texId)
         {
-            if (_wallTextures == null || texIdx < 0 || texIdx >= _wallTextures.Length) 
-                return new Color32(255, 0, 255, 255); 
-            
-            x &= (_texWidth - 1);
-            y &= (_texHeight - 1);
-            return _flatWallPixels[(texIdx * _texWidth * _texHeight) + (y * _texWidth) + x];
+            return (uint)texId < (uint)_passableTexLookup.Length && _passableTexLookup[texId];
         }
 
-        private Color32 GetEnemySpritePixelFast(int texIdx, int x, int y)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Color32 GetWallPixelFast(int texIdx, int x, int y)
         {
-            if (_enemySprite == null || texIdx < 0 || texIdx >= _enemySprite.Length) 
-                return new Color32(0, 0, 0, 0); 
-            
+            if (_wallTextures == null || texIdx < 0 || texIdx >= _wallTextures.Length)
+                return new Color32(255, 0, 255, 255);
+
             x &= (_texWidth - 1);
             y &= (_texHeight - 1);
-            return _flatSpritePixels[(texIdx * _texWidth * _texHeight) + (y * _texWidth) + x];
+            return _flatWallPixels[(texIdx * _wallTextureStride) + (y * _texWidth) + x];
         }
+
+
 
         // ================= 메인 렌더링 루프 =================
         public void RenderFrame(DungeonPlayer player, DungeonRenderSettings settings)
@@ -259,7 +291,7 @@ namespace RPGProject.Feature.Exploration
             // Draw once after stereo composition so the prompt stays centered and legible.
             if (showTalkIcon) talkIcon.DrawCentered(_buffer, _screenWidth, _screenHeight);
             ScreenTexture.SetPixels32(_buffer);
-            ScreenTexture.Apply();
+            ScreenTexture.Apply(false, false);
         }
 
         private void RenderStereo(DungeonPlayer player, DungeonRenderSettings settings)
@@ -308,393 +340,400 @@ namespace RPGProject.Feature.Exploration
         // ================= 세부 렌더링 로직 =================
         private void CastWalls(DungeonPlayer player, DungeonRenderSettings settings, int step, float px, float py)
         {
+            int screenWidth = _screenWidth;
+            int screenHeight = _screenHeight;
+            int texWidth = _texWidth;
+            int texHeight = _texHeight;
+            int mapWidth = _mapData.width;
+            int mapHeight = _mapData.height;
+            CellData[] cells = _mapData.cells;
+
+            float dirX = player.DirX;
+            float dirY = player.DirY;
+            float planeX = player.PlaneX;
+            float planeY = player.PlaneY;
+            int logicX = player.LogicX;
+            int logicY = player.LogicY;
+            int horizon = (int)(screenHeight / 2f - player.JumpOffset + player.Pitch);
+            int pitch256 = (int)player.Pitch * 256;
+            int jump256 = (int)player.JumpOffset * 256;
+
+            bool useCylinder = settings.useCylinderEffect;
+            float cylinderStrength = settings.cylinderStrength;
+            bool useGridLighting = settings.useGridLighting;
+            float lightingIntensity = settings.lightingIntensity;
+            bool useOrganic = settings.useOrganicEffect;
+            float organicTime = settings.animTime * settings.organicSpeed;
+            float organicFreqX = settings.organicFreqX;
+            float organicAmplitude = settings.organicAmplitude;
+            float organicBreath = settings.organicBreath;
+            bool useMelt = settings.useMeltEffect;
+            float meltTime = settings.animTime * settings.meltEdgeSpeed;
+            float meltEdgeBump = settings.meltEdgeBump;
+            bool useDistortion = settings.useWallDistortion;
+            float distortionFreq = settings.distortionFreq;
+            float distortionAmp = settings.distortionAmp;
+
+            bool scanning = _isScanning;
+            float scanRadius = _currentScanRadius;
             Color32 pulseColor = settings.pulseColor;
             Color32 wireframeColor = settings.wireframeColor;
+            Color32 fogColor = settings.fogColor;
+            Color32 black = new Color32(0, 0, 0, 255);
             float pulseWidth = settings.pulseWidth;
+            const float hScale = 0.66f;
+            int illusionCapacity = _illusionHits.Length;
 
-            for (int x = 0; x < _screenWidth; x += step)
+            int tileAnimWidth = _tileAnimStates != null ? _tileAnimStates.GetLength(0) : 0;
+            int tileAnimHeight = _tileAnimStates != null ? _tileAnimStates.GetLength(1) : 0;
+            float cameraScale = 2f / screenWidth;
+
+            for (int x = 0; x < screenWidth; x += step)
             {
+                int columnWidth = Math.Min(step, screenWidth - x);
                 int illusionHitCount = 0;
 
-                float cameraX = 2 * x / (float)_screenWidth - 1;
-                float rayDirX = player.DirX + player.PlaneX * cameraX;
-                float rayDirY = player.DirY + player.PlaneY * cameraX;
+                float cameraX = x * cameraScale - 1f;
+                float rayDirX = dirX + planeX * cameraX;
+                float rayDirY = dirY + planeY * cameraX;
+                float cylinderScale = useCylinder ? 1f + cameraX * cameraX * cylinderStrength : 1f;
 
                 int mapX = (int)px;
                 int mapY = (int)py;
 
-                float sideDistX, sideDistY;
-                float deltaDistX = (rayDirX == 0) ? 1e30f : Mathf.Abs(1 / rayDirX);
-                float deltaDistY = (rayDirY == 0) ? 1e30f : Mathf.Abs(1 / rayDirY);
-                float perpWallDist;
+                float deltaDistX = rayDirX == 0f ? 1e30f : Mathf.Abs(1f / rayDirX);
+                float deltaDistY = rayDirY == 0f ? 1e30f : Mathf.Abs(1f / rayDirY);
+                float sideDistX;
+                float sideDistY;
+                int stepX;
+                int stepY;
 
-                int stepX, stepY;
-                int hit = 0, side = 0;
+                if (rayDirX < 0f) { stepX = -1; sideDistX = (px - mapX) * deltaDistX; }
+                else { stepX = 1; sideDistX = (mapX + 1f - px) * deltaDistX; }
+                if (rayDirY < 0f) { stepY = -1; sideDistY = (py - mapY) * deltaDistY; }
+                else { stepY = 1; sideDistY = (mapY + 1f - py) * deltaDistY; }
+
+                bool hit = false;
+                int side = 0;
                 bool hitBackFace = false;
                 int hitTexId = 0;
-
-                if (rayDirX < 0) { stepX = -1; sideDistX = (px - mapX) * deltaDistX; }
-                else { stepX = 1; sideDistX = (mapX + 1.0f - px) * deltaDistX; }
-                if (rayDirY < 0) { stepY = -1; sideDistY = (py - mapY) * deltaDistY; }
-                else { stepY = 1; sideDistY = (mapY + 1.0f - py) * deltaDistY; }
+                float lastStepDist = 0f;
 
                 float voidEdgeDist = -1f;
-                int   voidEdgeSide = 0;
-                int   clipY = 0; 
+                int voidEdgeSide = 0;
+                int clipY = 0;
                 float ceilEdgeDist = -1f;
-                int   ceilEdgeSide = 0;
-                int   ceilClipY = _screenHeight; 
-                
-                int horizon = 0;
+                int ceilEdgeSide = 0;
+                int ceilClipY = screenHeight;
 
-                while (hit == 0)
+                CellData prevCell = null;
+                if (cells != null && (uint)mapX < (uint)mapWidth && (uint)mapY < (uint)mapHeight)
+                    prevCell = cells[mapY * mapWidth + mapX];
+
+                while (!hit)
                 {
-                    int prevX = mapX, prevY = mapY;
-                    if (sideDistX < sideDistY) { sideDistX += deltaDistX; mapX += stepX; side = 0; }
-                    else { sideDistY += deltaDistY; mapY += stepY; side = 1; }
+                    int prevX = mapX;
+                    int prevY = mapY;
 
-                    if (mapX < 0 || mapX >= _mapData.width || mapY < 0 || mapY >= _mapData.height)
+                    if (sideDistX < sideDistY)
                     {
-                        hit = 1; hitBackFace = true;
-                        hitTexId = GetBoundaryTex(prevX, prevY, side, stepX, stepY);
-                        CellData prevCell = _mapData.GetCell(prevX, prevY);
-                        bool isPrevSolid = (prevCell != null && prevCell.value != -1);
-                        if (!isPrevSolid && voidEdgeDist < 0f)
-                        {
-                            voidEdgeDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
-                            voidEdgeSide = side;
-                        }
-
-                        bool isPrevCeilSolid = (prevCell != null && prevCell.value != 1);
-                        if (!isPrevCeilSolid && ceilEdgeDist < 0f)
-                        {
-                            ceilEdgeDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
-                            ceilEdgeSide = side;
-                        }
+                        sideDistX += deltaDistX;
+                        mapX += stepX;
+                        side = 0;
+                        lastStepDist = sideDistX - deltaDistX;
                     }
                     else
                     {
-                        CellData prevCell = _mapData.GetCell(prevX, prevY);
-                        CellData currCell = _mapData.GetCell(mapX,  mapY);
-
-                        bool isPrevSolid = (prevCell != null && prevCell.value != -1);
-                        bool isCurrSolid = (currCell != null && currCell.value != -1);
-
-                        if (isPrevSolid && !isCurrSolid && voidEdgeDist < 0f)
-                        {
-                            float nearDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
-                            if (settings.useCylinderEffect) nearDist *= (1.0f + cameraX * cameraX * settings.cylinderStrength);
-                            if (nearDist <= 0.001f) nearDist = 0.001f;
-                            int nearLineHeight = (int)((_screenHeight / nearDist) * 0.66f);
-                            horizon = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
-                            clipY = Mathf.Max(clipY, horizon - nearLineHeight / 2); 
-                        }
-
-                        if (!isPrevSolid && isCurrSolid)
-                        {
-                            if (voidEdgeDist < 0f) 
-                            {
-                                voidEdgeDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
-                                voidEdgeSide = side;
-                            }
-                        }
-
-                        bool isPrevCeilSolid = (prevCell != null && prevCell.value != 1);
-                        bool isCurrCeilSolid = (currCell != null && currCell.value != 1);
-
-                        if (isPrevCeilSolid && !isCurrCeilSolid && ceilEdgeDist < 0f)
-                        {
-                            float nearDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
-                            if (settings.useCylinderEffect) nearDist *= (1.0f + cameraX * cameraX * settings.cylinderStrength);
-                            if (nearDist <= 0.001f) nearDist = 0.001f;
-                            int nearLineHeight = (int)((_screenHeight / nearDist) * 0.66f);
-                            horizon = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
-                            ceilClipY = Mathf.Min(ceilClipY, horizon + nearLineHeight / 2); 
-                        }
-
-                        if (!isPrevCeilSolid && isCurrCeilSolid)
-                        {
-                            if (ceilEdgeDist < 0f)
-                            {
-                                ceilEdgeDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
-                                ceilEdgeSide = side;
-                            }
-                        }
-
-                        if (currCell != null && currCell.HasWall())
-                        {
-                            int fId = GetTextureIdOnSide(currCell, side, stepX, stepY, false);
-                            if (fId != -1) 
-                            { 
-                                if (!_passableTexIDs.Contains(fId)) 
-                                {
-                                    hit = 1; hitTexId = fId; hitBackFace = false; 
-                                }
-                                else 
-                                {
-                                    if (illusionHitCount < 32)
-                                    {
-                                        float perpDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
-                                        if (settings.useCylinderEffect) perpDist *= (1.0f + cameraX * cameraX * settings.cylinderStrength);
-                                        if (perpDist <= 0.001f) perpDist = 0.001f;
-
-                                        float wX = (side == 0) ? py + perpDist * rayDirY : px + perpDist * rayDirX;
-                                        wX -= Mathf.Floor(wX);
-                                        int tX = (int)(wX * _texWidth);
-                                        if ((side == 0 && rayDirX > 0)) tX = _texWidth - tX - 1;
-                                        if ((side == 1 && rayDirY < 0)) tX = _texWidth - tX - 1;
-
-                                        _illusionHits[illusionHitCount++] = new IllusionHit { perpWallDist = perpDist, texX = tX, hitTexId = fId, side = side, mapX = mapX, mapY = mapY };
-                                    }
-                                }
-                            }
-                        }
-                        if (hit == 0)
-                        {
-                            if (prevCell != null && prevCell.HasWall())
-                            {
-                                int bId = GetTextureIdOnSide(prevCell, side, stepX, stepY, true);
-                                if (bId != -1) 
-                                { 
-                                    if (!_passableTexIDs.Contains(bId))
-                                    {
-                                        hit = 1; hitTexId = bId; hitBackFace = true; 
-                                    }
-                                    else 
-                                    {
-                                        if (illusionHitCount < 32)
-                                        {
-                                            float perpDist = (side == 0) ? (sideDistX - deltaDistX) : (sideDistY - deltaDistY);
-                                            if (settings.useCylinderEffect) perpDist *= (1.0f + cameraX * cameraX * settings.cylinderStrength);
-                                            if (perpDist <= 0.001f) perpDist = 0.001f;
-
-                                            float wX = (side == 0) ? py + perpDist * rayDirY : px + perpDist * rayDirX;
-                                            wX -= Mathf.Floor(wX);
-                                            int tX = (int)(wX * _texWidth);
-                                            if ((side == 0 && rayDirX > 0) ^ true) tX = _texWidth - tX - 1;
-                                            if ((side == 1 && rayDirY < 0) ^ true) tX = _texWidth - tX - 1;
-
-                                            _illusionHits[illusionHitCount++] = new IllusionHit { perpWallDist = perpDist, texX = tX, hitTexId = bId, side = side, mapX = prevX, mapY = prevY };
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        sideDistY += deltaDistY;
+                        mapY += stepY;
+                        side = 1;
+                        lastStepDist = sideDistY - deltaDistY;
                     }
-                }
 
-                if (hitBackFace) { if (side == 0) mapX -= stepX; else mapY -= stepY; }
+                    bool isPrevSolid = prevCell != null && prevCell.value != -1;
+                    bool isPrevCeilSolid = prevCell != null && prevCell.value != 1;
 
-                if (mapX >= 0 && mapX < _tileAnimStates.GetLength(0) && mapY >= 0 && mapY < _tileAnimStates.GetLength(1))
-                {
-                    var st = _tileAnimStates[mapX, mapY];
-                    if (st != null && st.isAnimating && st.config.frameTexIDs != null && st.config.frameTexIDs.Length > 0)
+                    if ((uint)mapX >= (uint)mapWidth || (uint)mapY >= (uint)mapHeight)
                     {
-                        if (hitTexId == st.config.frameTexIDs[0])
+                        hit = true;
+                        hitBackFace = true;
+                        hitTexId = prevCell != null ? GetTextureIdOnSide(prevCell, side, stepX, stepY, true) : 0;
+
+                        if (!isPrevSolid && voidEdgeDist < 0f) { voidEdgeDist = lastStepDist; voidEdgeSide = side; }
+                        if (!isPrevCeilSolid && ceilEdgeDist < 0f) { ceilEdgeDist = lastStepDist; ceilEdgeSide = side; }
+                        continue;
+                    }
+
+                    CellData currCell = cells != null ? cells[mapY * mapWidth + mapX] : null;
+                    bool isCurrSolid = currCell != null && currCell.value != -1;
+                    bool isCurrCeilSolid = currCell != null && currCell.value != 1;
+
+                    if (isPrevSolid && !isCurrSolid && voidEdgeDist < 0f)
+                    {
+                        float nearDist = lastStepDist * cylinderScale;
+                        if (nearDist <= 0.001f) nearDist = 0.001f;
+                        int nearLineHeight = (int)((screenHeight / nearDist) * hScale);
+                        int candidate = horizon - nearLineHeight / 2;
+                        if (candidate > clipY) clipY = candidate;
+                    }
+                    else if (!isPrevSolid && isCurrSolid && voidEdgeDist < 0f)
+                    {
+                        voidEdgeDist = lastStepDist;
+                        voidEdgeSide = side;
+                    }
+
+                    if (isPrevCeilSolid && !isCurrCeilSolid && ceilEdgeDist < 0f)
+                    {
+                        float nearDist = lastStepDist * cylinderScale;
+                        if (nearDist <= 0.001f) nearDist = 0.001f;
+                        int nearLineHeight = (int)((screenHeight / nearDist) * hScale);
+                        int candidate = horizon + nearLineHeight / 2;
+                        if (candidate < ceilClipY) ceilClipY = candidate;
+                    }
+                    else if (!isPrevCeilSolid && isCurrCeilSolid && ceilEdgeDist < 0f)
+                    {
+                        ceilEdgeDist = lastStepDist;
+                        ceilEdgeSide = side;
+                    }
+
+                    if (currCell != null && currCell.HasWall())
+                    {
+                        int fId = GetTextureIdOnSide(currCell, side, stepX, stepY, false);
+                        if (fId != -1)
                         {
-                            hitTexId = st.config.frameTexIDs[st.currentFrame];
+                            if (!IsPassableTexture(fId))
+                            {
+                                hit = true;
+                                hitTexId = fId;
+                                hitBackFace = false;
+                            }
+                            else if (illusionHitCount < illusionCapacity)
+                            {
+                                float perpDist = lastStepDist * cylinderScale;
+                                if (perpDist <= 0.001f) perpDist = 0.001f;
+
+                                float wX = side == 0 ? py + perpDist * rayDirY : px + perpDist * rayDirX;
+                                wX -= Mathf.Floor(wX);
+                                int tX = (int)(wX * texWidth);
+                                if (side == 0 && rayDirX > 0f) tX = texWidth - tX - 1;
+                                if (side == 1 && rayDirY < 0f) tX = texWidth - tX - 1;
+
+                                _illusionHits[illusionHitCount++] = new IllusionHit
+                                {
+                                    perpWallDist = perpDist, texX = tX, hitTexId = fId,
+                                    side = side, mapX = mapX, mapY = mapY
+                                };
+                            }
                         }
                     }
+
+                    if (!hit && prevCell != null && prevCell.HasWall())
+                    {
+                        int bId = GetTextureIdOnSide(prevCell, side, stepX, stepY, true);
+                        if (bId != -1)
+                        {
+                            if (!IsPassableTexture(bId))
+                            {
+                                hit = true;
+                                hitTexId = bId;
+                                hitBackFace = true;
+                            }
+                            else if (illusionHitCount < illusionCapacity)
+                            {
+                                float perpDist = lastStepDist * cylinderScale;
+                                if (perpDist <= 0.001f) perpDist = 0.001f;
+
+                                float wX = side == 0 ? py + perpDist * rayDirY : px + perpDist * rayDirX;
+                                wX -= Mathf.Floor(wX);
+                                int tX = (int)(wX * texWidth);
+                                if (!(side == 0 && rayDirX > 0f)) tX = texWidth - tX - 1;
+                                if (!(side == 1 && rayDirY < 0f)) tX = texWidth - tX - 1;
+
+                                _illusionHits[illusionHitCount++] = new IllusionHit
+                                {
+                                    perpWallDist = perpDist, texX = tX, hitTexId = bId,
+                                    side = side, mapX = prevX, mapY = prevY
+                                };
+                            }
+                        }
+                    }
+
+                    if (!hit) prevCell = currCell;
                 }
 
-                if (side == 0) perpWallDist = (sideDistX - deltaDistX);
-                else perpWallDist = (sideDistY - deltaDistY);
-
-                if (settings.useCylinderEffect)
+                if (hitBackFace)
                 {
-                    float distFactor = cameraX * cameraX;
-                    perpWallDist *= (1.0f + distFactor * settings.cylinderStrength);
+                    if (side == 0) mapX -= stepX;
+                    else mapY -= stepY;
                 }
+
+                if ((uint)mapX < (uint)tileAnimWidth && (uint)mapY < (uint)tileAnimHeight)
+                {
+                    TileAnimState st = _tileAnimStates[mapX, mapY];
+                    if (st != null && st.isAnimating && st.config.frameTexIDs != null && st.config.frameTexIDs.Length > 0 &&
+                        hitTexId == st.config.frameTexIDs[0])
+                        hitTexId = st.config.frameTexIDs[st.currentFrame];
+                }
+
+                float perpWallDist = lastStepDist * cylinderScale;
                 if (perpWallDist <= 0.001f) perpWallDist = 0.001f;
-                
-                // 1D 뎁스 버퍼 기록 (전체 세로줄에 대한 진짜 솔리드 벽 깊이 등록)
-                for (int s = 0; s < step; s++)
-                {
-                    if (x + s < _screenWidth) _zBuffer1D[x + s] = perpWallDist;
-                }
 
-                float wallX;
-                if (side == 0) wallX = py + perpWallDist * rayDirY;
-                else wallX = px + perpWallDist * rayDirX;
+                for (int s = 0; s < columnWidth; s++) _zBuffer1D[x + s] = perpWallDist;
+
+                float wallX = side == 0 ? py + perpWallDist * rayDirY : px + perpWallDist * rayDirX;
                 wallX -= Mathf.Floor(wallX);
 
-                if (settings.useOrganicEffect)
+                if (useOrganic)
                 {
-                    float t = settings.animTime * settings.organicSpeed;
-                    float spatialSeed = wallX * settings.organicFreqX;
-                    float noise = Mathf.PerlinNoise(spatialSeed, t) * 2f - 1f;                                  
-                    float breathNoise = Mathf.PerlinNoise(spatialSeed * 0.3f, t * 0.4f);
-                    float liveAmplitude = settings.organicAmplitude * Mathf.Lerp(1f - settings.organicBreath, 1f, breathNoise);
+                    float spatialSeed = wallX * organicFreqX;
+                    float noise = Mathf.PerlinNoise(spatialSeed, organicTime) * 2f - 1f;
+                    float breathNoise = Mathf.PerlinNoise(spatialSeed * 0.3f, organicTime * 0.4f);
+                    float liveAmplitude = organicAmplitude * Mathf.Lerp(1f - organicBreath, 1f, breathNoise);
                     perpWallDist += noise * liveAmplitude;
                     if (perpWallDist <= 0.001f) perpWallDist = 0.001f;
                 }
-                
-                float hScale = 0.66f; 
-                horizon = (int)(_screenHeight / 2 - player.JumpOffset + player.Pitch);
-                int lineHeight = (int)((_screenHeight / perpWallDist) * hScale);
-                int drawStart = Mathf.Max(0, -lineHeight / 2 + horizon);
-                int drawEnd = Mathf.Min(_screenHeight - 1, lineHeight / 2 + horizon);
 
-                if (settings.useMeltEffect)
+                int lineHeight = (int)((screenHeight / perpWallDist) * hScale);
+                int drawStart = Math.Max(0, -lineHeight / 2 + horizon);
+                int drawEnd = Math.Min(screenHeight - 1, lineHeight / 2 + horizon);
+
+                if (useMelt)
                 {
-                    float bumpSeed = wallX * 8.0f + x * 0.005f;
-                    float t = settings.animTime * settings.meltEdgeSpeed;
-                    int bump = (int)((Mathf.PerlinNoise(bumpSeed, t) * 2f - 1f) * settings.meltEdgeBump);
-                    drawStart = Mathf.Max(0, drawStart + bump);
-                    drawEnd   = Mathf.Min(_screenHeight - 1, drawEnd + bump);
+                    float bumpSeed = wallX * 8f + x * 0.005f;
+                    int bump = (int)((Mathf.PerlinNoise(bumpSeed, meltTime) * 2f - 1f) * meltEdgeBump);
+                    drawStart = Math.Max(0, drawStart + bump);
+                    drawEnd = Math.Min(screenHeight - 1, drawEnd + bump);
                 }
 
-                int texX = (int)(wallX * _texWidth);
-                if ((side == 0 && rayDirX > 0) ^ hitBackFace) texX = _texWidth - texX - 1;
-                if ((side == 1 && rayDirY < 0) ^ hitBackFace) texX = _texWidth - texX - 1;
+                int texX = (int)(wallX * texWidth);
+                if ((side == 0 && rayDirX > 0f) ^ hitBackFace) texX = texWidth - texX - 1;
+                if ((side == 1 && rayDirY < 0f) ^ hitBackFace) texX = texWidth - texX - 1;
 
                 int lightScale;
-                if (settings.useGridLighting)
+                if (useGridLighting)
                 {
-                    float dist = Mathf.Max(Mathf.Abs(mapX - player.LogicX), Mathf.Abs(mapY - player.LogicY));
-                    lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / (dist + 1.0f), 0f, 1f) * 255);
+                    float dist = Math.Max(Math.Abs(mapX - logicX), Math.Abs(mapY - logicY));
+                    lightScale = ComputeLightScale(lightingIntensity, dist + 1f);
                 }
                 else
                 {
-                    lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / perpWallDist, 0f, 1f) * 255);
+                    lightScale = ComputeLightScale(lightingIntensity, perpWallDist);
                 }
                 if (side == 1) lightScale = (lightScale * 230) >> 8;
 
-                bool isWire = _isScanning && (perpWallDist < _currentScanRadius);
-                bool isPulse = false;
-                bool isVEdge = false;
-                if (isWire)
-                {
-                    isPulse = Mathf.Abs(perpWallDist - _currentScanRadius) < pulseWidth;
-                    isVEdge = (texX == 0 || texX == _texWidth - 1);
-                }
+                bool isWire = scanning && perpWallDist < scanRadius;
+                bool isPulse = isWire && Mathf.Abs(perpWallDist - scanRadius) < pulseWidth;
+                bool isVEdge = isWire && (texX == 0 || texX == texWidth - 1);
 
                 if (lightScale <= 0 && !isWire)
                 {
                     for (int y = drawStart; y < drawEnd; y++)
                     {
-                        int bIdx = y * _screenWidth + x;
-                        for (int s = 0; s < step; s++)
+                        int bIdx = y * screenWidth + x;
+                        for (int s = 0; s < columnWidth; s++)
                         {
-                            if (x + s < _screenWidth)
-                            {
-                                _buffer[bIdx + s] = settings.fogColor;
-                                _depthBuffer[bIdx + s] = perpWallDist; 
-                            }
+                            _buffer[bIdx + s] = fogColor;
+                            _depthBuffer[bIdx + s] = perpWallDist;
+                        }
+                    }
+                }
+                else if (isWire)
+                {
+                    for (int y = drawStart; y < drawEnd; y++)
+                    {
+                        bool isHEdge = y == drawStart || y == drawEnd - 1;
+                        Color32 col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : black);
+                        int bIdx = y * screenWidth + x;
+                        for (int s = 0; s < columnWidth; s++)
+                        {
+                            _buffer[bIdx + s] = col;
+                            _depthBuffer[bIdx + s] = perpWallDist;
                         }
                     }
                 }
                 else
                 {
+                    int dBase = -screenHeight * 128 + lineHeight * 128 - pitch256 + jump256;
+                    float noiseX = texX * 0.1f;
+
                     for (int y = drawStart; y < drawEnd; y++)
                     {
-                        Color32 col;
-                        if (isWire)
-                        {
-                            bool isHEdge = (y == drawStart || y == drawEnd - 1);
-                            col = isPulse ? pulseColor : ((isVEdge || isHEdge) ? wireframeColor : Color.black);
-                        }
-                        else
-                        {
-                            int sTexX = texX;
-                            int d = y * 256 - _screenHeight * 128 + lineHeight * 128 - (int)player.Pitch * 256 + (int)player.JumpOffset * 256;
-                            int texY = ((d * _texHeight) / lineHeight) / 256;
+                        int d = y * 256 + dBase;
+                        int texY = ((d * texHeight) / lineHeight) / 256;
+                        int sampleX = texX;
 
-                            if (settings.useWallDistortion) {
-                                sTexX = (int)(texX + Mathf.Sin((y + x) * settings.distortionFreq) * settings.distortionAmp) & (_texWidth - 1);
-                                float noiseY = Mathf.PerlinNoise(texX * 0.1f, y * settings.distortionFreq);
-                                texY = Mathf.Clamp((int)(texY + (noiseY * 2f - 1f) * settings.distortionAmp), 0, _texHeight - 1);
-                            }
-                            
-                            col = GetWallPixelFast(hitTexId, sTexX, texY);
-                            if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
+                        if (useDistortion)
+                        {
+                            sampleX = (int)(texX + Mathf.Sin((y + x) * distortionFreq) * distortionAmp) & (texWidth - 1);
+                            float noiseY = Mathf.PerlinNoise(noiseX, y * distortionFreq);
+                            texY = Mathf.Clamp((int)(texY + (noiseY * 2f - 1f) * distortionAmp), 0, texHeight - 1);
                         }
 
-                        int bIdx = y * _screenWidth + x;
-                        for (int s = 0; s < step; s++)
+                        Color32 col = GetWallPixelFast(hitTexId, sampleX, texY);
+                        if (lightScale < 255) ApplyLight(ref col, lightScale, fogColor);
+
+                        int bIdx = y * screenWidth + x;
+                        for (int s = 0; s < columnWidth; s++)
                         {
-                            if (x + s < _screenWidth)
-                            {
-                                _buffer[bIdx + s] = col;
-                                _depthBuffer[bIdx + s] = perpWallDist;
-                            }
+                            _buffer[bIdx + s] = col;
+                            _depthBuffer[bIdx + s] = perpWallDist;
                         }
                     }
                 }
 
                 if (voidEdgeDist > 0f)
                 {
-                    if (settings.useCylinderEffect)
-                    {
-                        float distFactor = cameraX * cameraX;
-                        voidEdgeDist *= (1.0f + distFactor * settings.cylinderStrength);
-                    }
-
-                    DrawVoidWall(x, voidEdgeSide, stepX, stepY,
-                                px, py, rayDirX, rayDirY,
-                                voidEdgeDist, clipY,
-                                player, settings, step,
-                                pulseColor, wireframeColor, pulseWidth);
+                    voidEdgeDist *= cylinderScale;
+                    DrawVoidWall(x, voidEdgeSide, stepX, stepY, px, py, rayDirX, rayDirY,
+                        voidEdgeDist, clipY, player, settings, step, pulseColor, wireframeColor, pulseWidth);
                 }
 
                 if (ceilEdgeDist > 0f)
                 {
-                    if (settings.useCylinderEffect)
-                    {
-                        float distFactor = cameraX * cameraX;
-                        ceilEdgeDist *= (1.0f + distFactor * settings.cylinderStrength);
-                    }
-
-                    DrawCeilVoidWall(x, ceilEdgeSide, stepX, stepY,
-                                    px, py, rayDirX, rayDirY,
-                                    ceilEdgeDist, ceilClipY, 
-                                    player, settings, step,
-                                    pulseColor, wireframeColor, pulseWidth);
+                    ceilEdgeDist *= cylinderScale;
+                    DrawCeilVoidWall(x, ceilEdgeSide, stepX, stepY, px, py, rayDirX, rayDirY,
+                        ceilEdgeDist, ceilClipY, player, settings, step, pulseColor, wireframeColor, pulseWidth);
                 }
 
                 for (int i = illusionHitCount - 1; i >= 0; i--)
                 {
                     IllusionHit illusion = _illusionHits[i];
-                    
-                    int aLineHeight = (int)((_screenHeight / illusion.perpWallDist) * hScale);
-                    int aDrawStart = Mathf.Max(0, -aLineHeight / 2 + horizon);
-                    int aDrawEnd = Mathf.Min(_screenHeight - 1, aLineHeight / 2 + horizon);
-                    
+
+                    int aLineHeight = (int)((screenHeight / illusion.perpWallDist) * hScale);
+                    int aDrawStart = Math.Max(0, -aLineHeight / 2 + horizon);
+                    int aDrawEnd = Math.Min(screenHeight - 1, aLineHeight / 2 + horizon);
+
                     int aLightScale;
-                    if (settings.useGridLighting)
+                    if (useGridLighting)
                     {
-                        float dist = Mathf.Max(Mathf.Abs(illusion.mapX - player.LogicX), Mathf.Abs(illusion.mapY - player.LogicY));
-                        aLightScale = (int)(Mathf.Clamp(settings.lightingIntensity / (dist + 1.0f), 0f, 1f) * 255);
+                        float dist = Math.Max(Math.Abs(illusion.mapX - logicX), Math.Abs(illusion.mapY - logicY));
+                        aLightScale = ComputeLightScale(lightingIntensity, dist + 1f);
                     }
                     else
                     {
-                        aLightScale = (int)(Mathf.Clamp(settings.lightingIntensity / illusion.perpWallDist, 0f, 1f) * 255);
+                        aLightScale = ComputeLightScale(lightingIntensity, illusion.perpWallDist);
                     }
                     if (illusion.side == 1) aLightScale = (aLightScale * 230) >> 8;
 
+                    int aDBase = -screenHeight * 128 + aLineHeight * 128 - pitch256 + jump256;
                     for (int y = aDrawStart; y < aDrawEnd; y++)
                     {
-                        int d = y * 256 - _screenHeight * 128 + aLineHeight * 128 - (int)player.Pitch * 256 + (int)player.JumpOffset * 256;
-                        int texY = ((d * _texHeight) / aLineHeight) / 256;
-
+                        int d = y * 256 + aDBase;
+                        int texY = ((d * texHeight) / aLineHeight) / 256;
                         Color32 col = GetWallPixelFast(illusion.hitTexId, illusion.texX, texY);
-                        
-                        if (col.a > 0)
-                        {
-                            if (aLightScale <= 0) col = settings.fogColor; 
-                            else if (aLightScale < 255) ApplyLight(ref col, aLightScale, settings.fogColor);
+                        if (col.a == 0) continue;
 
-                            int bIdx = y * _screenWidth + x;
-                            for (int s = 0; s < step; s++)
+                        if (aLightScale <= 0) col = fogColor;
+                        else if (aLightScale < 255) ApplyLight(ref col, aLightScale, fogColor);
+
+                        int bIdx = y * screenWidth + x;
+                        for (int s = 0; s < columnWidth; s++)
+                        {
+                            int pixelIdx = bIdx + s;
+                            if (illusion.perpWallDist < _depthBuffer[pixelIdx])
                             {
-                                if (x + s < _screenWidth)
-                                {
-                                    if (illusion.perpWallDist < _depthBuffer[bIdx + s])
-                                    {
-                                        _buffer[bIdx + s] = col;
-                                        _depthBuffer[bIdx + s] = illusion.perpWallDist; 
-                                    }
-                                }
+                                _buffer[pixelIdx] = col;
+                                _depthBuffer[pixelIdx] = illusion.perpWallDist;
                             }
                         }
                     }
@@ -899,99 +938,100 @@ namespace RPGProject.Feature.Exploration
 
         private void CastFloorCeiling(DungeonPlayer player, DungeonRenderSettings settings, int step, float px, float py)
         {
-            float horizon = _screenHeight / 2 - player.JumpOffset + player.Pitch;
-            float hScale = 0.66f; 
+            int screenWidth = _screenWidth;
+            int screenHeight = _screenHeight;
+            float horizon = screenHeight / 2f - player.JumpOffset + player.Pitch;
+            const float hScale = 0.66f;
 
             Color32 pulseColor = settings.pulseColor;
             Color32 floorWireColor = settings.floorWireframeColor;
+            Color32 fogColor = settings.fogColor;
+            Color32 black = new Color32(0, 0, 0, 255);
             float pulseWidth = settings.pulseWidth;
 
-            for (int y = 0; y < _screenHeight; y++)
+            float leftRayX = player.DirX - player.PlaneX;
+            float leftRayY = player.DirY - player.PlaneY;
+            float rowStepXFactor = (2f * player.PlaneX / screenWidth) * step;
+            float rowStepYFactor = (2f * player.PlaneY / screenWidth) * step;
+
+            int mapWidth = _mapData.width;
+            int mapHeight = _mapData.height;
+            bool hasCeil = _mapData.hasCeil;
+            CellData[] cells = _mapData.cells;
+
+            for (int y = 0; y < screenHeight; y++)
             {
                 bool isFloor = y < horizon;
-                // 맵 데이터에 천장이 없으면 천장(isFloor == false) 부분은 픽셀 렌더링을 생략
-                if (!isFloor && !_mapData.hasCeil) continue;
-
-                // _ceilTexIdx == -1 이더라도 개별 셀에 천장이 있을 수 있으므로 가로줄 전체 스킵 최적화 코드를 비활성화
-                // if (!isFloor && _ceilTexIdx == -1 && !_isScanning) continue;
+                if (!isFloor && !hasCeil) continue;
 
                 float p = isFloor ? (horizon - y) : (y - horizon);
                 if (p <= 0.1f) p = 0.1f;
-                float rowDist = (0.5f * _screenHeight * hScale) / p;
+                float rowDist = (0.5f * screenHeight * hScale) / p;
 
-                float rDX0 = player.DirX - player.PlaneX;
-                float rDY0 = player.DirY - player.PlaneY;
-                float rDX1 = player.DirX + player.PlaneX;
-                float rDY1 = player.DirY + player.PlaneY;
+                float stepX = rowDist * rowStepXFactor;
+                float stepY = rowDist * rowStepYFactor;
+                float floorX = px + rowDist * leftRayX;
+                float floorY = py + rowDist * leftRayY;
 
-                float stepX = rowDist * (rDX1 - rDX0) / _screenWidth * step;
-                float stepY = rowDist * (rDY1 - rDY0) / _screenWidth * step;
-                float floorX = px + rowDist * rDX0;
-                float floorY = py + rowDist * rDY0;
-
-                int texIdx = isFloor ? _floorTexIdx : _ceilTexIdx;
-                
-                bool isRowScanned = _isScanning && (rowDist < _currentScanRadius);
-                bool isPulseRow = false;
-                if (isRowScanned)
-                {
-                    isPulseRow = Mathf.Abs(rowDist - _currentScanRadius) < pulseWidth;
-                }
+                bool isRowScanned = _isScanning && rowDist < _currentScanRadius;
+                bool isPulseRow = isRowScanned && Mathf.Abs(rowDist - _currentScanRadius) < pulseWidth;
 
                 int lightScale = 255;
-                if (!isRowScanned) 
+                if (!isRowScanned)
                     lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / rowDist, 0f, 1f) * 255);
 
+                int baseIdx = y * screenWidth;
                 if (lightScale <= 0 && !isRowScanned)
                 {
-                    int baseIdx = y * _screenWidth;
-                    for (int x = 0; x < _screenWidth; x += step)
+                    for (int x = 0; x < screenWidth; x += step)
                     {
-                        for (int s = 0; s < step; s++)
-                        {
-                            if (x + s < _screenWidth) _buffer[baseIdx + x + s] = settings.fogColor;
-                        }
+                        int endX = Math.Min(x + step, screenWidth);
+                        for (int drawX = x; drawX < endX; drawX++)
+                            _buffer[baseIdx + drawX] = fogColor;
                     }
                     continue;
                 }
 
-                for (int x = 0; x < _screenWidth; x += step)
+                int defaultTexIdx = isFloor ? _floorTexIdx : _ceilTexIdx;
+
+                for (int x = 0; x < screenWidth; x += step)
                 {
                     int cellX = (int)floorX;
                     int cellY = (int)floorY;
 
-                    CellData cell = _mapData.GetCell(cellX, cellY);
-                    bool isVoid = isFloor && (cell != null && cell.value == -1);
+                    CellData cell = null;
+                    if (cells != null && (uint)cellX < (uint)mapWidth && (uint)cellY < (uint)mapHeight)
+                        cell = cells[cellY * mapWidth + cellX];
+
+                    bool isVoid = isFloor && cell != null && cell.value == -1;
                     Color32 col;
 
                     if (isVoid)
                     {
                         float darkness = Mathf.Clamp01(1f - rowDist / settings.voidDepthScale);
-                        byte bright = (byte)(darkness * 60f); 
+                        byte bright = (byte)(darkness * 60f);
                         col = new Color32(bright, bright, bright, 255);
-                        
-                        if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
+
+                        if (lightScale < 255) ApplyLight(ref col, lightScale, fogColor);
                     }
                     else if (isRowScanned)
                     {
                         int tx = (int)(_texWidth * (floorX - cellX)) & (_texWidth - 1);
                         int ty = (int)(_texHeight * (floorY - cellY)) & (_texHeight - 1);
-                        
-                        bool edge = (tx == 0 || tx == _texWidth - 1 || ty == 0 || ty == _texHeight - 1);
-                        col = isPulseRow ? pulseColor : (edge ? floorWireColor : Color.black);
+
+                        bool edge = tx == 0 || tx == _texWidth - 1 || ty == 0 || ty == _texHeight - 1;
+                        col = isPulseRow ? pulseColor : (edge ? floorWireColor : black);
                     }
                     else
                     {
-                        // 현재 셀의 바닥/천장 텍스처를 우선하고 -1이면 fallback 텍스처 사용
-                        int activeTexIdx = isFloor ? _floorTexIdx : _ceilTexIdx;
-                        
+                        int activeTexIdx = defaultTexIdx;
+
                         if (cell != null)
                         {
                             if (isFloor && cell.floorTexIdx != -1) activeTexIdx = cell.floorTexIdx;
                             if (!isFloor && cell.ceilTexIdx != -1) activeTexIdx = cell.ceilTexIdx;
                         }
 
-                        // Fallback까지 거쳤는데도 최종 인덱스가 -1이라면, 픽셀 렌더링을 스킵
                         if (activeTexIdx == -1)
                         {
                             floorX += stepX;
@@ -1002,15 +1042,13 @@ namespace RPGProject.Feature.Exploration
                         int cx = (int)(_texWidth * (floorX - cellX)) & (_texWidth - 1);
                         int cy = (int)(_texHeight * (floorY - cellY)) & (_texHeight - 1);
                         col = GetWallPixelFast(activeTexIdx, cx, cy);
-                            
-                        if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
+
+                        if (lightScale < 255) ApplyLight(ref col, lightScale, fogColor);
                     }
 
-                    int baseIdx = y * _screenWidth;
-                    for (int s = 0; s < step; s++)
-                    {
-                        if (x + s < _screenWidth) _buffer[baseIdx + x + s] = col;
-                    }
+                    int endX = Math.Min(x + step, screenWidth);
+                    for (int drawX = x; drawX < endX; drawX++)
+                        _buffer[baseIdx + drawX] = col;
 
                     floorX += stepX;
                     floorY += stepY;
@@ -1120,41 +1158,42 @@ namespace RPGProject.Feature.Exploration
         {
             if (_sprtData == null || _sprtData.Length == 0) return;
 
-            for (int i = 0; i < _sprtData.Length; i++)
+            int spriteCount = _sprtData.Length;
+            for (int i = 0; i < spriteCount; i++)
             {
+                float dx = px - _sprtData[i].x;
+                float dy = py - _sprtData[i].y;
                 _spriteSortList[i].index = i;
-                _spriteSortList[i].distance = ((px - _sprtData[i].x) * (px - _sprtData[i].x) + 
-                                               (py - _sprtData[i].y) * (py - _sprtData[i].y));
+                _spriteSortList[i].distance = dx * dx + dy * dy;
             }
 
-            for (int i = _sprtData.Length; i < _spriteSortList.Length; i++)
-            {
-                _spriteSortList[i].index = 0;      
-                _spriteSortList[i].distance = -1f; 
-            }
+            Array.Sort(_spriteSortList, 0, spriteCount, SpriteSortComparer.Instance);
 
-            Array.Sort(_spriteSortList, (a, b) => b.distance.CompareTo(a.distance));
-
+            int screenWidth = _screenWidth;
+            int screenHeight = _screenHeight;
             float invDet = 1.0f / (player.PlaneX * player.DirY - player.DirX * player.PlaneY);
+            int vOffset = (int)(-player.JumpOffset + player.Pitch);
+            float fallenBlend = 0f;
+            float fallenInvBlend = 1f;
+            bool hasFallenSprite = false;
 
-            for (int i = 0; i < _sprtData.Length; i++)
+            for (int i = 0; i < spriteCount; i++)
             {
                 int idx = _spriteSortList[i].index;
-                float spriteX = _sprtData[idx].x - px;
-                float spriteY = _sprtData[idx].y - py;
+                SpriteInfo spriteInfo = _sprtData[idx];
+                float spriteX = spriteInfo.x - px;
+                float spriteY = spriteInfo.y - py;
 
                 float transformX = invDet * (player.DirY * spriteX - player.DirX * spriteY);
-                float transformY = invDet * (-player.PlaneY * spriteX + player.PlaneX * spriteY); 
+                float transformY = invDet * (-player.PlaneY * spriteX + player.PlaneX * spriteY);
 
-                if (transformY <= 0) continue; 
+                if (transformY <= 0f) continue;
+                if (_isScanning && transformY < _currentScanRadius) continue;
 
-                bool isScanned = _isScanning && (transformY < _currentScanRadius);
-                if (isScanned) continue; 
-
-                int lightScale = 255;
+                int lightScale;
                 if (settings.useGridLighting)
                 {
-                    float dist = Mathf.Max(Mathf.Abs(_sprtData[idx].x - player.LogicX), Mathf.Abs(_sprtData[idx].y - player.LogicY));
+                    float dist = Mathf.Max(Mathf.Abs(spriteInfo.x - player.LogicX), Mathf.Abs(spriteInfo.y - player.LogicY));
                     lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / (dist + 1.0f), 0f, 1f) * 255);
                 }
                 else
@@ -1162,111 +1201,100 @@ namespace RPGProject.Feature.Exploration
                     lightScale = (int)(Mathf.Clamp(settings.lightingIntensity / transformY, 0f, 1f) * 255);
                 }
 
-                int spriteScreenX = (int)((_screenWidth / 2.0f) * (1 + transformX / transformY));
-                int spriteHeight = (int)(Mathf.Abs(_screenHeight / transformY)); 
-                
-                int vOffset = (int)(-player.JumpOffset + player.Pitch);
-                int drawStartY = -spriteHeight / 2 + _screenHeight / 2 + vOffset;
-                if (drawStartY < 0) drawStartY = 0;
-                int drawEndY = spriteHeight / 2 + _screenHeight / 2 + vOffset;
-                if (drawEndY >= _screenHeight) drawEndY = _screenHeight - 1;
+                int spriteScreenX = (int)((screenWidth / 2.0f) * (1f + transformX / transformY));
+                int spriteHeight = (int)Mathf.Abs(screenHeight / transformY);
 
-                int spriteWidth = Mathf.Abs((int)(_screenHeight / transformY)); 
-                int drawStartX = -spriteWidth / 2 + spriteScreenX;
+                int drawStartY = -spriteHeight / 2 + screenHeight / 2 + vOffset;
+                if (drawStartY < 0) drawStartY = 0;
+                int drawEndY = spriteHeight / 2 + screenHeight / 2 + vOffset;
+                if (drawEndY >= screenHeight) drawEndY = screenHeight - 1;
+
+                int spriteWidth = Mathf.Abs((int)(screenHeight / transformY));
+                if (spriteWidth <= 0 || spriteHeight <= 0) continue;
+
+                int unclippedStartX = -spriteWidth / 2 + spriteScreenX;
+                int drawStartX = unclippedStartX;
                 if (drawStartX < 0) drawStartX = 0;
                 int drawEndX = spriteWidth / 2 + spriteScreenX;
-                if (drawEndX >= _screenWidth) drawEndX = _screenWidth;
+                if (drawEndX >= screenWidth) drawEndX = screenWidth;
+                if (drawStartX >= drawEndX || drawStartY >= drawEndY) continue;
 
-                int idOrIdx = _sprtData[idx].texIdx;
-                bool isEnemy = _sprtData[idx].isEnemy;
-
-                // 현재 그릴 스프라이트가 넘어진 몬스터인지 확인
-                bool isFallen = _sprtData[idx].isFallen; 
-
-                // 픽셀 루프를 돌기 전에, 깜빡임 비율을 미리 계산하여 CPU 부하를 없앰
-                float blend = 0f;
-                float invBlend = 1f;
-                byte blinkR = 255; byte blinkG = 255; byte blinkB = 255; // 깜빡일 색상
-
-                if (isFallen)
+                int idOrIdx = spriteInfo.texIdx;
+                PixelCache cache;
+                if (spriteInfo.isEnemy)
                 {
-                    // 시간(animTime)에 따라 0.0 ~ 1.0 사이를 오가는 사인파 생성 (16f는 깜빡임 속도)
-                    float blinkFactor = (Mathf.Sin(settings.animTime * 16f) + 1f) * 0.5f;
-                    blend = blinkFactor * 0.8f; // 최대 80% 까지만 색 혼합
-                    invBlend = 1f - blend;
-                }
-                
-                int texW = _texWidth; 
-                int texH = _texHeight;
-
-                if (isEnemy)
-                {
-                    if (_enemySprite != null && idOrIdx >= 0 && idOrIdx < _enemySprite.Length)
-                    {
-                        Sprite spr = _enemySprite[idOrIdx];
-                        if (spr != null)
-                        {
-                            texW = (int)spr.rect.width; 
-                            texH = (int)spr.rect.height;
-                        }
-                    }
+                    if ((uint)idOrIdx >= (uint)_enemyPixelCache.Length) continue;
+                    cache = _enemyPixelCache[idOrIdx];
                 }
                 else
                 {
-                    if (_objectDimensions != null && _objectDimensions.TryGetValue(idOrIdx, out Vector2Int dim))
-                    {
-                        texW = dim.x;
-                        texH = dim.y;
-                    }
+                    if (!_objectPixelCache.TryGetValue(idOrIdx, out cache)) continue;
+                }
+
+                if (!cache.IsValid) continue;
+
+                int texW = cache.width;
+                int texH = cache.height;
+                Color32[] pixels = cache.pixels;
+
+                if (spriteInfo.isFallen && !hasFallenSprite)
+                {
+                    float blinkFactor = (Mathf.Sin(settings.animTime * 16f) + 1f) * 0.5f;
+                    fallenBlend = blinkFactor * 0.8f;
+                    fallenInvBlend = 1f - fallenBlend;
+                    hasFallenSprite = true;
                 }
 
                 for (int stripe = drawStartX; stripe < drawEndX; stripe += step)
                 {
-                    int texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texW / spriteWidth) / 256;
-                    
-                    if (stripe >= 0 && stripe < _screenWidth)
+                    int texX = (int)(256 * (stripe - unclippedStartX) * texW / spriteWidth) / 256;
+                    if (texX < 0) texX = 0;
+                    else if (texX >= texW) texX = texW - 1;
+
+                    for (int y = drawStartY; y < drawEndY; y++)
                     {
-                        for (int y = drawStartY; y < drawEndY; y++)
+                        int d = (y - vOffset) * 256 - screenHeight * 128 + spriteHeight * 128;
+                        int texY = ((d * texH) / spriteHeight) / 256;
+                        if (texY < 0) texY = 0;
+                        else if (texY >= texH) texY = texH - 1;
+
+                        Color32 col = pixels[texY * texW + texX];
+                        if (col.a != 255) continue;
+
+                        if (spriteInfo.isFallen)
                         {
-                            int d = (y - vOffset) * 256 - _screenHeight * 128 + spriteHeight * 128;
-                            int texY = ((d * texH) / spriteHeight) / 256;
+                            col.r = (byte)((col.r * fallenInvBlend) + (255 * fallenBlend));
+                            col.g = (byte)((col.g * fallenInvBlend) + (255 * fallenBlend));
+                            col.b = (byte)((col.b * fallenInvBlend) + (255 * fallenBlend));
+                        }
 
-                            Color32 col;
-                            
-                            if (isEnemy) col = GetEnemySpritePixelFast(idOrIdx, texX, texY);
-                            else         col = GetObjectSpritePixelFast(idOrIdx, texX, texY);
-                            
-                            if (col.a == 255) 
+                        if (lightScale <= 0) col = settings.fogColor;
+                        else if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
+
+                        int bIdx = y * screenWidth + stripe;
+                        int endX = Math.Min(stripe + step, screenWidth);
+                        for (int drawX = stripe; drawX < endX; drawX++)
+                        {
+                            int pixelIdx = bIdx + (drawX - stripe);
+                            float zLine = _zBuffer1D[drawX];
+                            float zPixel = _depthBuffer[pixelIdx];
+                            float pixelDepth = zLine < zPixel ? zLine : zPixel;
+
+                            if (transformY < pixelDepth)
                             {
-                                // 넘어진 상태라면 미리 계산한 비율(blend)대로 색상을 고속 블렌딩
-                                if (isFallen)
-                                {
-                                    col.r = (byte)((col.r * invBlend) + (blinkR * blend));
-                                    col.g = (byte)((col.g * invBlend) + (blinkG * blend));
-                                    col.b = (byte)((col.b * invBlend) + (blinkB * blend));
-                                }
-
-                                if (lightScale <= 0) col = settings.fogColor; 
-                                else if (lightScale < 255) ApplyLight(ref col, lightScale, settings.fogColor);
-                                
-                                int bIdx = y * _screenWidth + stripe;
-                                
-                                for (int s = 0; s < step; s++)
-                                {
-                                    // 몬스터도 하이브리드 버퍼(Mathf.Min)를 통과한 경우에만 렌더링하고 깊이를 기록
-                                    float pixelDepth = Mathf.Min(_zBuffer1D[stripe + s], _depthBuffer[bIdx + s]);
-                                    
-                                    if (stripe + s < _screenWidth && transformY < pixelDepth)
-                                    {
-                                        _buffer[bIdx + s] = col;
-                                        _depthBuffer[bIdx + s] = transformY;
-                                    }
-                                }
+                                _buffer[pixelIdx] = col;
+                                _depthBuffer[pixelIdx] = transformY;
                             }
                         }
                     }
                 }
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int ComputeLightScale(float intensity, float distance)
+        {
+            return (int)(Mathf.Clamp(intensity / distance, 0f, 1f) * 255f);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1279,6 +1307,7 @@ namespace RPGProject.Feature.Exploration
             c.b = (byte)(((c.b * scale) + (fog.b * invScale)) >> 8);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetTextureIdOnSide(CellData cell, int side, int stepX, int stepY, bool back)
         {
             if (!back)
